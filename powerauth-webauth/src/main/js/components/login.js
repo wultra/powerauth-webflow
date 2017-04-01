@@ -17,9 +17,8 @@
 
 const React = require('react');
 const stompClient = require('../websocket-listener');
-const ReactRedux = require('react-redux');
 const utils = require('../utils');
-const connect = ReactRedux.connect;
+import { connect } from 'react-redux';
 
 class Login extends React.Component {
 
@@ -30,7 +29,7 @@ class Login extends React.Component {
 
     handleLogin() {
         // TODO - poslat data
-        var msg = {sessionId: this.props.sessionId, action: "LOGIN"};
+        const msg = {sessionId: this.props.sessionId, action: "LOGIN"};
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
     }
 
@@ -70,10 +69,10 @@ class Login extends React.Component {
 
 const mapStateToProps = (state) => {
     return {sessionId: state.sessionId, action: state.action}
-}
+};
 
 const CLogin = connect(
     mapStateToProps
-)(Login)
+)(Login);
 
 module.exports = CLogin;

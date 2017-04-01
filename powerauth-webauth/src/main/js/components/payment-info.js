@@ -17,15 +17,14 @@
 
 const React = require('react');
 const stompClient = require('../websocket-listener');
-const ReactRedux = require('react-redux');
 const utils = require('../utils');
-const connect = ReactRedux.connect;
+import { connect } from 'react-redux';
 
 class PaymentInfo extends React.Component {
 
     handleConfirmation() {
         // TODO - poslat data
-        var msg = {sessionId: this.props.sessionId, action: "PAYMENT_CONFIRM"};
+        const msg = {sessionId: this.props.sessionId, action: "PAYMENT_CONFIRM"};
         stompClient.send("/app/authorization", {}, JSON.stringify(msg));
     }
 
@@ -50,10 +49,10 @@ class PaymentInfo extends React.Component {
 
 const mapStateToProps = (state) => {
     return {sessionId: state.sessionId, action: state.action, amount: state.amount, currency: state.currency}
-}
+};
 
 const CPaymentInfo = connect(
     mapStateToProps
-)(PaymentInfo)
+)(PaymentInfo);
 
 module.exports = CPaymentInfo;

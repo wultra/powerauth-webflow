@@ -16,9 +16,8 @@
 'use strict';
 
 const React = require('react');
-const ReactRedux = require('react-redux');
 const utils = require('../utils');
-const connect = ReactRedux.connect;
+import { connect } from 'react-redux';
 
 class Message extends React.Component {
 
@@ -43,11 +42,11 @@ class Message extends React.Component {
 
 const mapStateToProps = (state) => {
     return {sessionId: state.sessionId, action: state.action, messageType: state.messageType, text: state.text}
-}
+};
 
 const CMessage = connect(
     mapStateToProps
-)(Message)
+)(Message);
 
 
 module.exports = CMessage;

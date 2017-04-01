@@ -27,12 +27,12 @@ class Home extends React.Component {
     }
 
     handleStartSession() {
-        var msg = {"action": "REGISTER", "performUITest": false};
+        const msg = {"action": "REGISTER", "performUITest": false};
         stompClient.send("/app/registration", {}, JSON.stringify(msg));
     }
 
     handleStartSessionTest() {
-        var msg = {"action": "REGISTER", "performUITest": true};
+        const msg = {"action": "REGISTER", "performUITest": true};
         stompClient.send("/app/registration", {}, JSON.stringify(msg));
     }
 

@@ -6,7 +6,6 @@ module.exports = {
     entry: './src/main/js/app.js',
     devtool: 'sourcemaps',
     cache: true,
-    debug: true,
     resolve: {
         alias: {
             'stompjs': node_dir + '/stompjs/lib/stomp.js',

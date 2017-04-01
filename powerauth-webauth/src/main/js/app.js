@@ -18,18 +18,11 @@
 // require
 const React = require('react');
 const ReactDOM = require('react-dom');
-const ReactRouter = require('react-router');
-const ReactRedux = require('react-redux');
-const Redux = require('redux');
 
-// aliasy
-const Router = ReactRouter.Router;
-const Route = ReactRouter.Route;
-const IndexRoute = ReactRouter.IndexRoute;
-const Link = ReactRouter.Link;
-const Provider = ReactRedux.Provider;
-const hashHistory = ReactRouter.hashHistory;
-const createStore = Redux.createStore;
+// importy
+import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
+import { Provider } from 'react-redux';
+import { createStore } from 'redux';
 
 // lokální require
 const stompClient = require('./websocket-listener');
@@ -53,41 +46,41 @@ class App extends React.Component {
     }
 
     onRegister(message) {
-        var msg = JSON.parse(message.body);
-        if (msg.action == "REGISTRATION_CONFIRM") {
+        const msg = JSON.parse(message.body);
+        if (msg.action === "REGISTRATION_CONFIRM") {
             store.dispatch(utils.saveAction(msg));
-        } else if (msg.action == "TERMINATE") {
+        } else if (msg.action === "TERMINATE") {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/terminate");
-        } else if (msg.action == "TERMINATE_REDIRECT") {
+        } else if (msg.action === "TERMINATE_REDIRECT") {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/terminate");
         }
     }
 
     onAuthenticate(message) {
-        var msg = JSON.parse(message.body);
-        if (msg.action == "DISPLAY_LOGIN_FORM" && store.getState().sessionId == msg.sessionId) {
+        const msg = JSON.parse(message.body);
+        if (msg.action === "DISPLAY_LOGIN_FORM" && store.getState().sessionId === msg.sessionId) {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/login");
         }
     }
 
     onAuthorize(message) {
-        var msg = JSON.parse(message.body);
-        if (msg.action == "DISPLAY_PAYMENT_INFO" && store.getState().sessionId == msg.sessionId) {
+        const msg = JSON.parse(message.body);
+        if (msg.action === "DISPLAY_PAYMENT_INFO" && store.getState().sessionId === msg.sessionId) {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/paymentInfo");
         }
-        if (msg.action == "DISPLAY_PAYMENT_AUTHORIZATION_FROM" && store.getState().sessionId == msg.sessionId) {
+        if (msg.action === "DISPLAY_PAYMENT_AUTHORIZATION_FROM" && store.getState().sessionId === msg.sessionId) {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/authorize");
         }
     }
 
     onMessage(message) {
-        var msg = JSON.parse(message.body);
-        if (msg.action == "DISPLAY_MESSAGE" && store.getState().sessionId == msg.sessionId) {
+        const msg = JSON.parse(message.body);
+        if (msg.action === "DISPLAY_MESSAGE" && store.getState().sessionId === msg.sessionId) {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/message");
         }
@@ -120,7 +113,7 @@ class App extends React.Component {
     }
 }
 
-var store = createStore(reducers.reducer);
+const store = createStore(reducers.reducer);
 
 ReactDOM.render(
     <Provider store={store}>
@@ -136,5 +129,5 @@ ReactDOM.render(
         </Router>
     </Provider>,
     document.getElementById('react')
-)
+);
 
