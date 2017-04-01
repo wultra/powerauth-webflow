@@ -14,7 +14,7 @@
 	<groupId>io.getlime.security</groupId>
 	<artifactId>powerauth-webauth</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>PowerAuth 2.0 WebAuth</name>
 	<description>Federated Authentication and Authorization Server for Web</description>
