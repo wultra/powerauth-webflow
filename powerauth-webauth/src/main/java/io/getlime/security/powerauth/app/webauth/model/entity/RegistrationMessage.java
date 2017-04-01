@@ -13,14 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.lime.webauth.repository;
-
-import io.lime.webauth.repository.model.Session;
-import org.springframework.data.repository.CrudRepository;
+package io.getlime.security.powerauth.app.webauth.model.entity;
 
 /**
  * @author Roman Strobl
  */
-public interface SessionRepository extends CrudRepository<Session, Long> {
+public class RegistrationMessage {
 
+    private String action;
+    private boolean performUITest;
+
+    public RegistrationMessage() {
+    }
+
+    public RegistrationMessage(String action, boolean performUITest) {
+        this.action = action;
+        this.performUITest = performUITest;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public boolean getPerformUITest() {
+        return performUITest;
+    }
+
+    public String toString() {
+        return "action: " + action + ", performUITest: " + performUITest;
+    }
 }

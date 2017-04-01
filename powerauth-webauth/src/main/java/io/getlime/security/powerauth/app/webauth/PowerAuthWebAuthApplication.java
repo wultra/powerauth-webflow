@@ -13,20 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.lime.webauth.controller;
+package io.getlime.security.powerauth.app.webauth;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Roman Strobl
  */
-@Controller
-public class HomeController {
+@SpringBootApplication
+public class PowerAuthWebAuthApplication {
 
-    @RequestMapping(value = "/")
-    public String index() {
-        return "index";
+    public static void main(String[] args) {
+        SpringApplication.run(PowerAuthWebAuthApplication.class, args);
     }
-
 }
