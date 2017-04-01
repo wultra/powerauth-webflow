@@ -13,24 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.getlime.security.powerauth.app.webauth.repository.model;
 
-var SockJS = require('sockjs-client');
-var stompClient;
-require('stompjs');
+import lombok.Data;
 
-function register(registrations) {
-    var socket = SockJS('./webauth');
-    stompClient = Stomp.over(socket);
-    stompClient.connect({}, function (frame) {
-        registrations.forEach(function (registration) {
-            stompClient.subscribe(registration.route, registration.callback);
-        });
-    });
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+/**
+ * @author Roman Strobl
+ */
+@Data
+@Entity
+public class Session {
+
+    private @Id
+    @GeneratedValue
+    Long id;
+
+    public Session() {
+    }
+
+    public String toString() {
+        return id.toString();
+    }
+
 }
-
-function send(destination, params, message) {
-    stompClient.send(destination, params, message);
-}
-
-module.exports.register = register;
-module.exports.send = send;

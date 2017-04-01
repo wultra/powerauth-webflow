@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.lime.webauth;
+package io.getlime.security.powerauth.app.webauth.repository;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import io.getlime.security.powerauth.app.webauth.repository.model.Session;
+import org.springframework.data.repository.CrudRepository;
 
 /**
  * @author Roman Strobl
  */
-@SpringBootApplication
-public class ReactAndSpringDataRestApplication {
+public interface SessionRepository extends CrudRepository<Session, Long> {
 
-    public static void main(String[] args) {
-        SpringApplication.run(ReactAndSpringDataRestApplication.class, args);
-    }
 }

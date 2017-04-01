@@ -13,30 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.lime.webauth.repository.model;
+package io.getlime.security.powerauth.app.webauth.controller;
 
-import lombok.Data;
-
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * @author Roman Strobl
  */
-@Data
-@Entity
-public class Session {
+@Controller
+public class HomeController {
 
-    private @Id
-    @GeneratedValue
-    Long id;
-
-    public Session() {
-    }
-
-    public String toString() {
-        return id.toString();
+    @RequestMapping(value = "/")
+    public String index() {
+        return "index";
     }
 
 }

@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.lime.webauth.controller;
+package io.getlime.security.powerauth.app.webauth.controller;
 
-import io.lime.webauth.model.entity.RegistrationMessage;
-import io.lime.webauth.repository.SessionRepository;
-import io.lime.webauth.repository.model.Session;
+import io.getlime.security.powerauth.app.webauth.configuration.WebSocketConfiguration;
+import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
+import io.getlime.security.powerauth.app.webauth.repository.model.Session;
+import io.getlime.security.powerauth.app.webauth.model.entity.RegistrationMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
-
-import static io.lime.webauth.configuration.WebSocketConfiguration.MESSAGE_PREFIX;
 
 /**
  * @author Roman Strobl
@@ -48,7 +47,7 @@ public class MessageController {
             Session session = new Session();
             sessionRepository.save(session);
             this.websocket.convertAndSend(
-                    MESSAGE_PREFIX + "/registration", "{\n" +
+                    WebSocketConfiguration.MESSAGE_PREFIX + "/registration", "{\n" +
                             "    \"action\": \"REGISTRATION_CONFIRM\",\n" +
                             "    \"sessionId\": \"" + session.toString() + "\"\n" +
                             "}");
@@ -57,7 +56,7 @@ public class MessageController {
                 // simulace redirectu po odpovědi od CBDS
                 Thread.sleep(1000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/authentication", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", "{\n" +
                                 "    \"action\": \"DISPLAY_LOGIN_FORM\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\"\n" +
                                 "}");
@@ -65,7 +64,7 @@ public class MessageController {
                 // simulace zobrazení payment info
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/authorization", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
                                 "    \"action\": \"DISPLAY_PAYMENT_INFO\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\",\n" +
                                 "    \"operationId\": \"40269145-d91f-4579-badd-c57fa1133239\",\n" +
@@ -76,7 +75,7 @@ public class MessageController {
                 // simulace zobrazení autorizace
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/authorization", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
                                 "    \"action\": \"DISPLAY_PAYMENT_AUTHORIZATION_FROM\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\",\n" +
                                 "    \"operationId\": \"40269145-d91f-4579-badd-c57fa1133239\"\n" +
@@ -85,7 +84,7 @@ public class MessageController {
                 // simulace informační zprávy
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/messages", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
                                 "    \"action\": \"DISPLAY_MESSAGE\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\",\n" +
                                 "    \"messageType\": \"information\",\n" +
@@ -95,7 +94,7 @@ public class MessageController {
                 // simulace chybové zprávy
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/messages", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
                                 "    \"action\": \"DISPLAY_MESSAGE\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\",\n" +
                                 "    \"messageType\": \"error\",\n" +
@@ -113,10 +112,10 @@ public class MessageController {
                 // simulace ukončení session
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/registration", "{\n" +
+                        WebSocketConfiguration.MESSAGE_PREFIX + "/registration", "{\n" +
                                 "    \"action\": \"TERMINATE_REDIRECT\",\n" +
                                 "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"redirectUrl\": \"http://localhost:8080\",\n" +
+                                "    \"redirectUrl\": \"./\",\n" +
                                 "    \"delay\": \"5\"\n" +
                                 "}");
                 sessionRepository.delete(session);
