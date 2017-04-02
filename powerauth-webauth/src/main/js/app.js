@@ -95,10 +95,10 @@ class App extends React.Component {
 
     componentDidMount() {
         stompClient.register([
-            {route: '/topic/registration', callback: this.onRegister},
-            {route: '/topic/authentication', callback: this.onAuthenticate},
-            {route: '/topic/authorization', callback: this.onAuthorize},
-            {route: '/topic/messages', callback: this.onMessage},
+            {route: '/user/topic/registration', callback: this.onRegister},
+            {route: '/user/topic/authentication', callback: this.onAuthenticate},
+            {route: '/user/topic/authorization', callback: this.onAuthorize},
+            {route: '/user/topic/messages', callback: this.onMessage},
         ]);
     }
 
