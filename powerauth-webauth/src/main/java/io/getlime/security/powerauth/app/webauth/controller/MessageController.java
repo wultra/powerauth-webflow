@@ -53,7 +53,7 @@ public class MessageController {
                             "}");
 
             if (message.getPerformUITest()) {
-                // simulace redirectu po odpovědi od CBDS
+                // simulates redirect after the reply from the Next Server
                 Thread.sleep(1000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", "{\n" +
@@ -61,7 +61,7 @@ public class MessageController {
                                 "    \"sessionId\": \"" + session.toString() + "\"\n" +
                                 "}");
 
-                // simulace zobrazení payment info
+                // simulates displaying the payment info
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
@@ -72,7 +72,7 @@ public class MessageController {
                                 "    \"currency\": \"CZK\"\n" +
                                 "}");
 
-                // simulace zobrazení autorizace
+                // simulates displaying the authorization form
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
@@ -81,7 +81,7 @@ public class MessageController {
                                 "    \"operationId\": \"40269145-d91f-4579-badd-c57fa1133239\"\n" +
                                 "}");
 
-                // simulace informační zprávy
+                // simulates displaying an information message
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
@@ -91,7 +91,7 @@ public class MessageController {
                                 "    \"text\": \"Test OK message\"\n" +
                                 "}");
 
-                // simulace chybové zprávy
+                // simulates displaying an error message
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
@@ -101,7 +101,7 @@ public class MessageController {
                                 "    \"text\": \"Test error message\"\n" +
                                 "}");
 
-                // simulace ukončení session bez redirectu
+                // simulates session termination without redirect
                 /*Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         MESSAGE_PREFIX + "/registration", "{\n" +
@@ -109,7 +109,7 @@ public class MessageController {
                                 "    \"sessionId\": \"" + session.toString() + "\"\n" +
                                 "}");*/
 
-                // simulace ukončení session
+                // simulates session termination with redirect
                 Thread.sleep(2000);
                 this.websocket.convertAndSend(
                         WebSocketConfiguration.MESSAGE_PREFIX + "/registration", "{\n" +

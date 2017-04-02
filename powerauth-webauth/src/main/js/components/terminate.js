@@ -28,7 +28,7 @@ class Terminate extends React.Component {
         if (!utils.checkAccess(this.props, "terminate")) {
             this.props.router.push("/");
         }
-        // TODO - vyřešit jinak, dispatch resetuje stav kompomenty
+        // TODO - needs to be handled differently, dispatch resets the state of the component
         // this.props.dispatch(utils.terminateSession(this.props.sessionId));
         if (this.props.delay !== undefined) {
             sleep(this.props.delay*1000).then(() => {
