@@ -33,16 +33,26 @@ WebpackDeployPlugin.prototype.apply = function (compiler) {
     compiler.plugin("done", compilation => {
         const date = new Date();
         compilationEnd = date.getTime();
-        console.log("Compilation finished in " + (compilationEnd - compilationStart) + " ms, deploying bundle.js and bundle.js.map.");
+        console.log("Compilation finished in " + (compilationEnd - compilationStart) + " ms.");
         try {
-            const rs1 = fs.createReadStream('src/main/resources/static/built/bundle.js');
-            const rs2 = fs.createReadStream('src/main/resources/static/built/bundle.js.map');
-            const ws1 = fs.createWriteStream('target/classes/static/built/bundle.js');
-            const ws2 = fs.createWriteStream('target/classes/static/built/bundle.js.map');
+            const src1 = "src/main/resources/static/built/bundle.js";
+            const src2 = "src/main/resources/static/built/bundle.js.map";
+            const target1 = "target/classes/static/built/bundle.js";
+            const target2 = "target/classes/static/built/bundle.js.map";
+            // redeploy only when source and target files exist
+            fs.accessSync(src1);
+            fs.accessSync(src2);
+            fs.accessSync(target1);
+            fs.accessSync(target2);
+            console.log("Deploying bundle.js and bundle.js.map");
+            const rs1 = fs.createReadStream(src1);
+            const rs2 = fs.createReadStream(src2);
+            const ws1 = fs.createWriteStream(target1);
+            const ws2 = fs.createWriteStream(target2);
             rs1.pipe(ws1);
-            ws1.on('finish', function() {
+            ws1.on('finish', function () {
                 rs2.pipe(ws2);
-                ws2.on('finish', function() {
+                ws2.on('finish', function () {
                     console.log('Deployment was successful.');
                 });
             });
