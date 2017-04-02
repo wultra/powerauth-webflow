@@ -2,6 +2,8 @@ var path = require('path');
 
 var node_dir = __dirname + '/node_modules';
 
+var WebpackDeployPlugin = require('./src/main/js/webpack-deploy.js');
+
 module.exports = {
     entry: './src/main/js/app.js',
     devtool: 'sourcemaps',
@@ -28,5 +30,8 @@ module.exports = {
                 }
             }
         ]
-    }
+    },
+    plugins: [
+        new WebpackDeployPlugin()
+    ]
 };
