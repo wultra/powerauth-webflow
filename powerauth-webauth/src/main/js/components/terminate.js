@@ -16,9 +16,8 @@
 'use strict';
 
 const React = require('react');
-const ReactRedux = require('react-redux');
 const utils = require('../utils');
-const connect = ReactRedux.connect;
+import { connect } from 'react-redux';
 
 class Terminate extends React.Component {
 
@@ -31,7 +30,7 @@ class Terminate extends React.Component {
         }
         // TODO - vyřešit jinak, dispatch resetuje stav kompomenty
         // this.props.dispatch(utils.terminateSession(this.props.sessionId));
-        if (this.props.delay != undefined) {
+        if (this.props.delay !== undefined) {
             sleep(this.props.delay*1000).then(() => {
                 window.location = this.props.redirectUrl;
             })
@@ -39,7 +38,7 @@ class Terminate extends React.Component {
     }
 
     render() {
-        if (this.props.redirectUrl != undefined && this.props.delay != undefined) {
+        if (this.props.redirectUrl !== undefined && this.props.delay !== undefined) {
             return (
                 <div>
                     Session terminated, redirect URL: <a href={this.props.redirectUrl}>{this.props.redirectUrl}</a>,
@@ -59,10 +58,10 @@ class Terminate extends React.Component {
 
 const mapStateToProps = (state) => {
     return {sessionId: state.sessionId, action: state.action, redirectUrl: state.redirectUrl, delay: state.delay}
-}
+};
 
 const CTerminate = connect(
     mapStateToProps
-)(Terminate)
+)(Terminate);
 
 module.exports = CTerminate;

@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+'use strict';
 
-var SockJS = require('sockjs-client');
-var stompClient;
+const SockJS = require('sockjs-client');
+let stompClient;
 require('stompjs');
 
 function register(registrations) {
-    var socket = SockJS('./webauth');
+    const socket = SockJS('./webauth');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
         registrations.forEach(function (registration) {

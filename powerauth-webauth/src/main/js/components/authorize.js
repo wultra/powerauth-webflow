@@ -17,14 +17,13 @@
 
 const React = require('react');
 const stompClient = require('../websocket-listener');
-const ReactRedux = require('react-redux');
 const utils = require('../utils');
-const connect = ReactRedux.connect;
+import { connect } from 'react-redux';
 
 class Authorize extends React.Component {
 
     handleAuthorization() {
-        var msg = {sessionId: this.props.sessionId, action: "PAYMENT_AUTHORIZATION_CONFIRM"};
+        const msg = {sessionId: this.props.sessionId, action: "PAYMENT_AUTHORIZATION_CONFIRM"};
         stompClient.send("/app/authorization", {}, JSON.stringify(msg));
     }
 
@@ -49,10 +48,10 @@ class Authorize extends React.Component {
 
 const mapStateToProps = (state) => {
     return {sessionId: state.sessionId, action: state.action}
-}
+};
 
 const CAuthorize = connect(
     mapStateToProps
-)(Authorize)
+)(Authorize);
 
 module.exports = CAuthorize;
