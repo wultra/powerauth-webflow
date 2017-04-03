@@ -23,7 +23,7 @@ import { connect } from 'react-redux';
 class PaymentInfo extends React.Component {
 
     handleConfirmation() {
-        // TODO - poslat data
+        // TODO - send data
         const msg = {sessionId: this.props.sessionId, action: "PAYMENT_CONFIRM"};
         stompClient.send("/app/authorization", {}, JSON.stringify(msg));
     }

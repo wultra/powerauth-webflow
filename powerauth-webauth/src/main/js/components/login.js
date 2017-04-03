@@ -28,7 +28,7 @@ class Login extends React.Component {
     }
 
     handleLogin() {
-        // TODO - poslat data
+        // TODO - send data
         const msg = {sessionId: this.props.sessionId, action: "LOGIN"};
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
     }
