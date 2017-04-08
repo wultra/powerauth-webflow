@@ -41,7 +41,11 @@ class Message extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    return {sessionId: state.sessionId, action: state.action, messageType: state.messageType, text: state.text}
+    let messageType = state.messageType;
+    if (messageType !== undefined) {
+        messageType = messageType.toLowerCase();
+    }
+    return {sessionId: state.sessionId, action: state.action, messageType: messageType, text: state.text}
 };
 
 const CMessage = connect(

@@ -16,9 +16,17 @@
 package io.getlime.security.powerauth.app.webauth.controller;
 
 import io.getlime.security.powerauth.app.webauth.configuration.WebSocketConfiguration;
+import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
+import io.getlime.security.powerauth.app.webauth.model.entity.authentication.ResponseDisplayLoginForm;
+import io.getlime.security.powerauth.app.webauth.model.entity.authorization.ResponseDisplayAuthorizationForm;
+import io.getlime.security.powerauth.app.webauth.model.entity.authorization.ResponseDisplayPaymentInfo;
+import io.getlime.security.powerauth.app.webauth.model.entity.messages.ResponseDisplayMessage;
+import io.getlime.security.powerauth.app.webauth.model.entity.messages.WebAuthMessageType;
+import io.getlime.security.powerauth.app.webauth.model.entity.registration.ResponseConfirmRegistration;
+import io.getlime.security.powerauth.app.webauth.model.entity.registration.ResponseTerminateAndRedirect;
 import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
 import io.getlime.security.powerauth.app.webauth.repository.model.Session;
-import io.getlime.security.powerauth.app.webauth.model.entity.RegistrationMessage;
+import io.getlime.security.powerauth.app.webauth.model.entity.registration.RequestRegistration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -26,6 +34,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import java.math.BigDecimal;
 
 /**
  * @author Roman Strobl
@@ -50,86 +59,69 @@ public class MessageController {
     }
 
     @MessageMapping("/registration")
-    public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationMessage message) throws Exception {
+    public void register(SimpMessageHeaderAccessor headerAccessor, RequestRegistration message) throws Exception {
         System.out.println("Received registration message: " + message);
-        if ("REGISTER".equals(message.getAction())) {
+        if (message.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
             Session session = new Session();
             sessionRepository.save(session);
 
             String sessionId = headerAccessor.getSessionId();
 
+            ResponseConfirmRegistration registrationResponse = new ResponseConfirmRegistration(session.toString());
+
             this.websocket.convertAndSendToUser(
-                    sessionId,WebSocketConfiguration.MESSAGE_PREFIX + "/registration", "{\n" +
-                            "    \"action\": \"REGISTRATION_CONFIRM\",\n" +
-                            "    \"sessionId\": \"" + session.toString() + "\"\n" +
-                            "}", createHeaders(sessionId));
+                    sessionId,WebSocketConfiguration.MESSAGE_PREFIX + "/registration", registrationResponse, createHeaders(sessionId));
 
             if (message.getPerformUITest()) {
                 // simulates redirect after the reply from the Next Server
                 Thread.sleep(1000);
+                String operationId = "40269145-d91f-4579-badd-c57fa1133239";
+
+                ResponseDisplayLoginForm displayLogin = new ResponseDisplayLoginForm(session.toString(), operationId, false);
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", "{\n" +
-                                "    \"action\": \"DISPLAY_LOGIN_FORM\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", displayLogin, createHeaders(sessionId));
 
                 // simulates displaying the payment info
                 Thread.sleep(2000);
+                ResponseDisplayPaymentInfo displayPayment = new ResponseDisplayPaymentInfo(session.toString(),
+                        operationId, new BigDecimal("103"), "CZK");
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
-                                "    \"action\": \"DISPLAY_PAYMENT_INFO\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"operationId\": \"40269145-d91f-4579-badd-c57fa1133239\",\n" +
-                                "    \"amount\": \"103\",\n" +
-                                "    \"currency\": \"CZK\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayPayment, createHeaders(sessionId));
 
                 // simulates displaying the authorization form
                 Thread.sleep(2000);
+                ResponseDisplayAuthorizationForm displayAuthorization = new ResponseDisplayAuthorizationForm(session.toString(),
+                        operationId);
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", "{\n" +
-                                "    \"action\": \"DISPLAY_PAYMENT_AUTHORIZATION_FROM\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"operationId\": \"40269145-d91f-4579-badd-c57fa1133239\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayAuthorization, createHeaders(sessionId));
 
                 // simulates displaying an information message
                 Thread.sleep(2000);
+                ResponseDisplayMessage displayOKMessage = new ResponseDisplayMessage(session.toString(),
+                        WebAuthMessageType.INFORMATION, "Test OK message");
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
-                                "    \"action\": \"DISPLAY_MESSAGE\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"messageType\": \"information\",\n" +
-                                "    \"text\": \"Test OK message\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayOKMessage, createHeaders(sessionId));
 
                 // simulates displaying an error message
                 Thread.sleep(2000);
+                ResponseDisplayMessage displayErrorMessage = new ResponseDisplayMessage(session.toString(),
+                        WebAuthMessageType.ERROR, "Test error message");
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", "{\n" +
-                                "    \"action\": \"DISPLAY_MESSAGE\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"messageType\": \"error\",\n" +
-                                "    \"text\": \"Test error message\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessage, createHeaders(sessionId));
 
                 // simulates session termination without redirect
                 /*Thread.sleep(2000);
-                this.websocket.convertAndSend(
-                        MESSAGE_PREFIX + "/registration", "{\n" +
-                                "    \"action\": \"TERMINATE\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\"\n" +
-                                "}");*/
+                ResponseTerminate terminate = new ResponseTerminate(,
+                        session.toString();
+                this.websocket.convertAndSendToUser(
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", terminate, createHeaders(sessionId));
+                */
 
                 // simulates session termination with redirect
                 Thread.sleep(2000);
+                ResponseTerminateAndRedirect terminateAndRedirect = new ResponseTerminateAndRedirect(session.toString(), "./", 5);
                 this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", "{\n" +
-                                "    \"action\": \"TERMINATE_REDIRECT\",\n" +
-                                "    \"sessionId\": \"" + session.toString() + "\",\n" +
-                                "    \"redirectUrl\": \"./\",\n" +
-                                "    \"delay\": \"5\"\n" +
-                                "}", createHeaders(sessionId));
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", terminateAndRedirect, createHeaders(sessionId));
                 sessionRepository.delete(session);
             }
         }

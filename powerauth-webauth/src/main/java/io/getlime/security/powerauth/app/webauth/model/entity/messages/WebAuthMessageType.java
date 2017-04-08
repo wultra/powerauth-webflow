@@ -13,33 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.webauth.model.entity;
+package io.getlime.security.powerauth.app.webauth.model.entity.messages;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
  * @author Roman Strobl
  */
-public class RegistrationMessage {
+public enum WebAuthMessageType {
+    INFORMATION,
+    ERROR
 
-    private String action;
-    private boolean performUITest;
-
-    public RegistrationMessage() {
-    }
-
-    public RegistrationMessage(String action, boolean performUITest) {
-        this.action = action;
-        this.performUITest = performUITest;
-    }
-
-    public String getAction() {
-        return action;
-    }
-
-    public boolean getPerformUITest() {
-        return performUITest;
-    }
-
-    public String toString() {
-        return "action: " + action + ", performUITest: " + performUITest;
-    }
 }
