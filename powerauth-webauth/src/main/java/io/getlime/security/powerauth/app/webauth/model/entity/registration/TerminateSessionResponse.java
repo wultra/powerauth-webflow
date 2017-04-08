@@ -20,13 +20,13 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 /**
  * @author Roman Strobl
  */
-public class ResponseConfirmRegistration extends WebSocketJsonMessage {
+public class TerminateSessionResponse extends WebSocketJsonMessage {
 
-    public ResponseConfirmRegistration() {
+    public TerminateSessionResponse() {
     }
 
-    public ResponseConfirmRegistration(String sessionId) {
-        this.action = WebAuthAction.REGISTRATION_CONFIRM;
+    public TerminateSessionResponse(String sessionId) {
+        this.action = WebAuthAction.TERMINATE;
         this.sessionId = sessionId;
     }
 

@@ -21,17 +21,17 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 /**
  * @author Roman Strobl
  */
-public class ResponseDisplayMessage extends WebSocketJsonMessage {
+public class DisplayMessageResponse extends WebSocketJsonMessage {
 
     @JsonProperty
     private WebAuthMessageType messageType;
     @JsonProperty
     private String text;
 
-    public ResponseDisplayMessage() {
+    public DisplayMessageResponse() {
     }
 
-    public ResponseDisplayMessage(String sessionId, WebAuthMessageType messageType, String text) {
+    public DisplayMessageResponse(String sessionId, WebAuthMessageType messageType, String text) {
         this.action = WebAuthAction.DISPLAY_MESSAGE;
         this.sessionId = sessionId;
         this.messageType = messageType;

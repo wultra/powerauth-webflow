@@ -15,19 +15,27 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
  * @author Roman Strobl
  */
-public class ResponseTerminate extends WebSocketJsonMessage {
+public class RegistrationRequest extends WebSocketJsonMessage {
 
-    public ResponseTerminate() {
+    @JsonProperty
+    private boolean performUITest;
+
+    public RegistrationRequest() {
     }
 
-    public ResponseTerminate(String sessionId) {
-        this.action = WebAuthAction.TERMINATE;
-        this.sessionId = sessionId;
+    public RegistrationRequest(boolean performUITest) {
+        this.action = WebAuthAction.REGISTER;
+        this.performUITest = performUITest;
+    }
+
+    public boolean getPerformUITest() {
+        return performUITest;
     }
 
 }

@@ -18,29 +18,31 @@ package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
-import java.math.BigDecimal;
-
 /**
  * @author Roman Strobl
  */
-public class ResponseDisplayPaymentInfo extends WebSocketJsonMessage {
+public class AuthorizationRequest extends WebSocketJsonMessage {
 
     @JsonProperty
     private String operationId;
     @JsonProperty
-    private BigDecimal amount;
-    @JsonProperty
-    private String currency;
+    private String authorizationCode;
 
-    public ResponseDisplayPaymentInfo() {
+    public AuthorizationRequest() {
     }
 
-    public ResponseDisplayPaymentInfo(String sessionId, String operationId, BigDecimal amount, String currency) {
-        this.action = WebAuthAction.DISPLAY_PAYMENT_INFO;
-        this.sessionId = sessionId;
+    public AuthorizationRequest(String operationId, String authorizationCode) {
+        this.action = WebAuthAction.PAYMENT_AUTHORIZATION_CONFIRM;
         this.operationId = operationId;
-        this.amount = amount;
-        this.currency = currency;
+        this.authorizationCode = authorizationCode;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public String getAuthorizationCode() {
+        return authorizationCode;
     }
 
 }

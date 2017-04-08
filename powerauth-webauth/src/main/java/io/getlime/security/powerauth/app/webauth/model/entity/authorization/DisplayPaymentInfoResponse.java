@@ -13,29 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.webauth.model.entity.registration;
+package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
+import java.math.BigDecimal;
+
 /**
  * @author Roman Strobl
  */
-public class ResponseTerminateAndRedirect extends WebSocketJsonMessage {
+public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {
 
     @JsonProperty
-    private String redirectUrl;
+    private String operationId;
     @JsonProperty
-    private int delay;
+    private BigDecimal amount;
+    @JsonProperty
+    private String currency;
 
-    public ResponseTerminateAndRedirect() {
+    public DisplayPaymentInfoResponse() {
     }
 
-    public ResponseTerminateAndRedirect(String sessionId, String redirectUrl, int delay) {
-        this.action = WebAuthAction.TERMINATE_REDIRECT;
+    public DisplayPaymentInfoResponse(String sessionId, String operationId, BigDecimal amount, String currency) {
+        this.action = WebAuthAction.DISPLAY_PAYMENT_INFO;
         this.sessionId = sessionId;
-        this.redirectUrl = redirectUrl;
-        this.delay = delay;
+        this.operationId = operationId;
+        this.amount = amount;
+        this.currency = currency;
     }
 
 }

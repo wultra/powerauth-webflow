@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
+package io.getlime.security.powerauth.app.webauth.model.entity.authentication;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
@@ -21,18 +21,21 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 /**
  * @author Roman Strobl
  */
-public class ResponseDisplayAuthorizationForm extends WebSocketJsonMessage {
+public class DisplayLoginFormResponse extends WebSocketJsonMessage {
 
     @JsonProperty
     private String operationId;
+    @JsonProperty
+    private boolean showCaptcha;
 
-    public ResponseDisplayAuthorizationForm() {
+    public DisplayLoginFormResponse() {
     }
 
-    public ResponseDisplayAuthorizationForm(String sessionId, String operationId) {
-        this.action = WebAuthAction.DISPLAY_PAYMENT_AUTHORIZATION_FORM;
+    public DisplayLoginFormResponse(String sessionId, String operationId, boolean showCaptcha) {
+        this.action = WebAuthAction.DISPLAY_LOGIN_FORM;
         this.sessionId = sessionId;
         this.operationId = operationId;
+        this.showCaptcha = showCaptcha;
     }
 
 }

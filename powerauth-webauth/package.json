@@ -26,7 +26,8 @@
     "redux": "^3.6.0",
     "sockjs-client": "^1.1.2",
     "stompjs": "^2.3.3",
-    "webpack": "^2.3.2"
+    "webpack": "^2.3.2",
+    "base-64": "^0.1.0"
   },
   "scripts": {
     "watch": "webpack --watch -d"

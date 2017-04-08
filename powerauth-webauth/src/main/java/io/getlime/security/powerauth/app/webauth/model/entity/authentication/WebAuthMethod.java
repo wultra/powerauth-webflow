@@ -12,14 +12,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */
-package io.getlime.security.powerauth.app.webauth.model.entity.messages;
+ */package io.getlime.security.powerauth.app.webauth.model.entity.authentication;
 
 /**
  * @author Roman Strobl
  */
-public enum WebAuthMessageType {
-    INFORMATION,
-    ERROR
-
+public enum WebAuthMethod {
+    BASIC_BASE64
 }

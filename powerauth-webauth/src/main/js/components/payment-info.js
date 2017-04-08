@@ -22,9 +22,27 @@ import { connect } from 'react-redux';
 
 class PaymentInfo extends React.Component {
 
+    constructor() {
+        super();
+        this.handleConfirmation = this.handleConfirmation.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+    }
+
     handleConfirmation() {
-        // TODO - send data
-        const msg = {sessionId: this.props.sessionId, action: "PAYMENT_CONFIRM"};
+        const msg = {
+            sessionId: this.props.sessionId,
+            action: "PAYMENT_CONFIRM",
+            operationId: this.props.operationId
+        };
+        stompClient.send("/app/authorization", {}, JSON.stringify(msg));
+    }
+
+    handleCancel() {
+        const msg = {
+            sessionId: this.props.sessionId,
+            action: "PAYMENT_CANCEL",
+            operationId: this.props.operationId
+        };
         stompClient.send("/app/authorization", {}, JSON.stringify(msg));
     }
 
@@ -39,6 +57,9 @@ class PaymentInfo extends React.Component {
             return (
                 <div>
                     Payment: {this.props.amount} {this.props.currency}&nbsp;&nbsp;<input type="submit" value="Confirm" onClick={this.handleConfirmation}/>
+                    &nbsp;&nbsp;
+                    <input type="submit" value="Cancel" onClick={this.handleCancel}/>
+
                 </div>
             )
         } else {
@@ -48,7 +69,7 @@ class PaymentInfo extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    return {sessionId: state.sessionId, action: state.action, amount: state.amount, currency: state.currency}
+    return {sessionId: state.sessionId, operationId: state.operationId, action: state.action, amount: state.amount, currency: state.currency}
 };
 
 const CPaymentInfo = connect(

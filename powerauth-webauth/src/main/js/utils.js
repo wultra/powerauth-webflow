@@ -16,38 +16,38 @@
 'use strict';
 
 function checkAccess(props, component) {
-    if (props.sessionId == undefined) {
+    if (props.sessionId === undefined) {
         return false;
     }
-    if (props.action == undefined) {
+    if (props.action === undefined) {
         return false;
     }
     switch (component) {
         case "login":
-            if (props.action == "DISPLAY_LOGIN_FORM") {
+            if (props.action === "DISPLAY_LOGIN_FORM") {
                 return true;
             }
             break;
         case "payment-info":
-            if (props.action == "DISPLAY_PAYMENT_INFO") {
+            if (props.action === "DISPLAY_PAYMENT_INFO") {
                 return true;
             }
             break;
         case "authorize":
-            if (props.action == "DISPLAY_PAYMENT_AUTHORIZATION_FROM") {
+            if (props.action === "DISPLAY_PAYMENT_AUTHORIZATION_FORM") {
                 return true;
             }
             break;
         case "message":
-            if (props.action == "DISPLAY_MESSAGE") {
+            if (props.action === "DISPLAY_MESSAGE") {
                 return true;
             }
             break;
         case "terminate":
-            if (props.action == "TERMINATE") {
+            if (props.action === "TERMINATE") {
                 return true;
             }
-            if (props.action == "TERMINATE_REDIRECT") {
+            if (props.action === "TERMINATE_REDIRECT") {
                 return true;
             }
             break;

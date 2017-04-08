@@ -72,7 +72,7 @@ class App extends React.Component {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/paymentInfo");
         }
-        if (msg.action === "DISPLAY_PAYMENT_AUTHORIZATION_FROM" && store.getState().sessionId === msg.sessionId) {
+        if (msg.action === "DISPLAY_PAYMENT_AUTHORIZATION_FORM" && store.getState().sessionId === msg.sessionId) {
             store.dispatch(utils.saveAction(msg));
             this.props.router.push("/authorize");
         }
