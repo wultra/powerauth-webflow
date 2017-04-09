@@ -18,6 +18,6 @@ package io.getlime.security.powerauth.app.credentialServer.model;
 /**
  * @author Roman Strobl
  */
-public enum AuthenticationMethod {
+public enum AuthenticationType {
     BASIC
 }

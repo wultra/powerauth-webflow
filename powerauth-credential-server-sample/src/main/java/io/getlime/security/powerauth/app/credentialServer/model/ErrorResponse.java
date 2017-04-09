@@ -27,7 +27,6 @@ public class ErrorResponse {
         USERNAME_FORMAT_INVALID,
         PASSWORD_FORMAT_INVALID,
         AUTH_METHOD_UNSUPPORTED,
-        REQUEST_TYPE_INVALID,
         INTERNAL_SERVER_ERROR
     }
 

@@ -28,9 +28,7 @@ public class AuthenticationRequest {
     @JsonProperty
     private String password;
     @JsonProperty
-    private AuthenticationMethod authMethod;
-    @JsonProperty
-    private RequestType requestType;
+    private AuthenticationType authType;
 
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -38,11 +36,10 @@ public class AuthenticationRequest {
     public AuthenticationRequest() {
     }
 
-    public AuthenticationRequest(String username, String password, AuthenticationMethod authMethod, RequestType requestType) {
+    public AuthenticationRequest(String username, String password, AuthenticationType authType) {
         this.username = username;
         this.password = password;
-        this.authMethod = authMethod;
-        this.requestType = requestType;
+        this.authType = authType;
     }
 
     public String getUsername() {
@@ -53,12 +50,8 @@ public class AuthenticationRequest {
         return password;
     }
 
-    public AuthenticationMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    public RequestType getRequestType() {
-        return requestType;
+    public AuthenticationType getAuthType() {
+        return authType;
     }
 
     private String toJson() {

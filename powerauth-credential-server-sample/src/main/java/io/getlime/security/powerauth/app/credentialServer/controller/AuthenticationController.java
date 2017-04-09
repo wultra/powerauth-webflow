@@ -45,15 +45,8 @@ public class AuthenticationController {
         }
 
         // other authentication methods are reserved for future use
-        if (authRequest.getAuthMethod()!=AuthenticationMethod.BASIC) {
+        if (authRequest.getAuthType()!= AuthenticationType.BASIC) {
             ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid request: method is not supported");
-            AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
-            return new ResponseEntity<>(response, response.getHttpStatus());
-        }
-
-        // place to branch between test and production request types
-        if (authRequest.getRequestType()!=RequestType.TEST) {
-            ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.REQUEST_TYPE_INVALID, "Invalid request: requestType is not supported");
             AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
             return new ResponseEntity<>(response, response.getHttpStatus());
         }
