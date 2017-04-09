@@ -13,18 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer;
+package io.getlime.security.powerauth.lib.credentialServer.model;
 
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.http.HttpStatus;
 
 /**
  * @author Roman Strobl
  */
-@SpringBootApplication
-public class CredentialServerSampleApplication {
+public class AuthenticationResponseError extends AuthenticationResponse {
 
-    public static void main(String[] args) {
-        SpringApplication.run(CredentialServerSampleApplication.class, args);
+    @JsonProperty
+    private ErrorResponse errorResponse;
+
+    public AuthenticationResponseError() {
     }
+
+    public AuthenticationResponseError(HttpStatus status, ErrorResponse errorResponse) {
+        this.httpStatus = status;
+        this.status = AuthenticationStatus.ERROR;
+        this.errorResponse = errorResponse;
+    }
+
+    public ErrorResponse getErrorResponse() {
+        return errorResponse;
+    }
+
 }

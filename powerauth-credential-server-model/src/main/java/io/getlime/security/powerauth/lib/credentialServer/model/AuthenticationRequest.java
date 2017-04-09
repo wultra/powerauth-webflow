@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,7 +28,7 @@ public class AuthenticationRequest {
     @JsonProperty
     private String password;
     @JsonProperty
-    private AuthenticationType authType;
+    private AuthenticationType type;
 
 
     private ObjectMapper mapper = new ObjectMapper();
@@ -36,10 +36,10 @@ public class AuthenticationRequest {
     public AuthenticationRequest() {
     }
 
-    public AuthenticationRequest(String username, String password, AuthenticationType authType) {
+    public AuthenticationRequest(String username, String password, AuthenticationType type) {
         this.username = username;
         this.password = password;
-        this.authType = authType;
+        this.type = type;
     }
 
     public String getUsername() {
@@ -50,8 +50,8 @@ public class AuthenticationRequest {
         return password;
     }
 
-    public AuthenticationType getAuthType() {
-        return authType;
+    public AuthenticationType getType() {
+        return type;
     }
 
     private String toJson() {

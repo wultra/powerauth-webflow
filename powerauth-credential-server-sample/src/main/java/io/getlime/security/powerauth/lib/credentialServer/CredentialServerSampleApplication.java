@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * @author Roman Strobl
  */
-public class HelloMessage {
+@SpringBootApplication
+public class CredentialServerSampleApplication {
 
-    @JsonProperty
-    private final String message;
-
-    public HelloMessage(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
+    public static void main(String[] args) {
+        SpringApplication.run(CredentialServerSampleApplication.class, args);
     }
 }

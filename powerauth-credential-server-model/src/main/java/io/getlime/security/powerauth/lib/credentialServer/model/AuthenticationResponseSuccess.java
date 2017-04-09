@@ -13,40 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 
 /**
  * @author Roman Strobl
  */
-public class AuthenticationResponse {
+public class AuthenticationResponseSuccess extends AuthenticationResponse {
 
-    private ObjectMapper mapper = new ObjectMapper();
-
-    @JsonIgnore
-    HttpStatus httpStatus;
     @JsonProperty
-    AuthenticationStatus status;
+    private String userId;
 
-    public HttpStatus getHttpStatus() {
-        return httpStatus;
+    public AuthenticationResponseSuccess() {
     }
 
-    private String toJson() {
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception ex) {
-            return null;
-        }
+    public AuthenticationResponseSuccess(String userId) {
+        this.httpStatus = HttpStatus.OK;
+        this.status = AuthenticationStatus.SUCCESS;
+        this.userId = userId;
     }
 
-    @Override
-    public String toString() {
-        return toJson();
+    public String getUserId() {
+        return userId;
     }
 
 }

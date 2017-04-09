@@ -29,6 +29,9 @@ import io.getlime.security.powerauth.app.webauth.model.entity.registration.Confi
 import io.getlime.security.powerauth.app.webauth.model.entity.registration.TerminateSessionAndRedirectResponse;
 import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
 import io.getlime.security.powerauth.app.webauth.repository.model.Session;
+import io.getlime.security.powerauth.app.webauth.service.AuthenticationService;
+import io.getlime.security.powerauth.lib.credentialServer.model.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.credentialServer.model.AuthenticationStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -48,11 +51,13 @@ public class MessageController {
 
     private final SimpMessagingTemplate websocket;
     private final SessionRepository sessionRepository;
+    private final AuthenticationService authService;
 
     @Autowired
-    public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository) {
+    public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository, AuthenticationService authService) {
         this.websocket = websocket;
         this.sessionRepository = sessionRepository;
+        this.authService = authService;
     }
 
     private MessageHeaders createHeaders(String sessionId) {
@@ -149,11 +154,10 @@ public class MessageController {
             case LOGIN_CONFIRM:
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
-                // fake authentication - if it succeeds, user is moved to the authorization screen
-                if (username != null
-                        && password != null
-                        && authenticationRequest.getUsername().equals("test")
-                        && Arrays.equals(authenticationRequest.getPassword(), "test".toCharArray())) {
+                // authenticate with the Credentials Server
+                AuthenticationResponse response = authService.authenticate(username, password);
+
+                if (response.getStatus() == AuthenticationStatus.SUCCESS) {
                     DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(authenticationRequest.getSessionId(),
                             authenticationRequest.getOperationId(), new BigDecimal("1000"), "EUR");
                     this.websocket.convertAndSendToUser(

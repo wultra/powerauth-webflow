@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer.model;
 
 /**
  * @author Roman Strobl
  */
-public enum AuthenticationType {
-    BASIC
+public enum AuthenticationStatus {
+    SUCCESS,
+    ERROR
+
 }

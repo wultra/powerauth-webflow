@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.controller;
+package io.getlime.security.powerauth.lib.credentialServer.controller;
 
-import io.getlime.security.powerauth.app.credentialServer.model.*;
+import io.getlime.security.powerauth.lib.credentialServer.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -45,7 +45,7 @@ public class AuthenticationController {
         }
 
         // other authentication methods are reserved for future use
-        if (authRequest.getAuthType()!= AuthenticationType.BASIC) {
+        if (authRequest.getType()!= AuthenticationType.BASIC) {
             ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid request: method is not supported");
             AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
             return new ResponseEntity<>(response, response.getHttpStatus());

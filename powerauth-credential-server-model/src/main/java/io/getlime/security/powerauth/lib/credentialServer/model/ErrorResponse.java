@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -34,6 +34,9 @@ public class ErrorResponse {
     private ResponseCode code;
     @JsonProperty
     private String message;
+
+    public ErrorResponse() {
+    }
 
     public ErrorResponse(ResponseCode code, String message) {
         this.code = code;

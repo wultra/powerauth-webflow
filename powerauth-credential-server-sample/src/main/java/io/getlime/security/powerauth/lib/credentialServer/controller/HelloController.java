@@ -13,13 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentialServer.controller;
+
+import io.getlime.security.powerauth.lib.credentialServer.model.HelloMessage;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Roman Strobl
  */
-public enum AuthenticationStatus {
-    SUCCESS,
-    ERROR
+@RestController
+public class HelloController {
 
+    @RequestMapping("/hello")
+    public HelloMessage hello() {
+        return new HelloMessage("Hello, world!");
+    }
 }
