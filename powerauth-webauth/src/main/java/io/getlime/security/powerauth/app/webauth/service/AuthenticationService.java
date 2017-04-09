@@ -40,7 +40,7 @@ public class AuthenticationService {
         try {
             ResponseEntity<AuthenticationResponseSuccess> response = template.exchange(credentialsServiceUrl + "/authenticate",
                     HttpMethod.POST, entity, AuthenticationResponseSuccess.class);
-            System.out.println("Response from Credential Serverx: "+response.getBody());
+            System.out.println("Response from Credential Server: "+response.getBody());
             return response.getBody();
         } catch (HttpStatusCodeException ex) {
             String responseString = ex.getResponseBodyAsString();
