@@ -63,7 +63,7 @@ class Authorize extends React.Component {
         if (utils.checkAccess(this.props, "authorize")) {
             return (
                 <div>
-                    Code: <input type="text" name="authorizationCode" onChange={this.handleAuthorizationCodeChange}/>
+                    Code: <input autoFocus type="text" name="authorizationCode" onChange={this.handleAuthorizationCodeChange}/>
                     &nbsp;&nbsp;<input type="submit" value="Authorize" onClick={this.handleAuthorization}/>
                     &nbsp;&nbsp;
                     <input type="submit" value="Cancel" onClick={this.handleCancel}/>

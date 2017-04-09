@@ -75,7 +75,7 @@ class Login extends React.Component {
                         <tbody>
                         <tr>
                             <td>Username:</td>
-                            <td><input type="text" value={this.state.username} onChange={this.handleUsernameChange}/></td>
+                            <td><input autoFocus type="text" value={this.state.username} onChange={this.handleUsernameChange}/></td>
                         </tr>
                         <tr>
                             <td>Password:</td>
