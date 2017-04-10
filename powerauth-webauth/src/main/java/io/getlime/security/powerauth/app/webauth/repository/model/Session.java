@@ -34,6 +34,9 @@ public class Session {
 
     private String sessionId;
 
+    public Session() {
+    }
+
     public Session(String sessionId) {
         this.sessionId = sessionId;
     }
