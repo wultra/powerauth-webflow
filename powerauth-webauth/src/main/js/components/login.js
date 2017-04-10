@@ -71,24 +71,27 @@ class Login extends React.Component {
         if (utils.checkAccess(this.props, "login")) {
             return (
                 <div>
-                    <table>
-                        <tbody>
-                        <tr>
-                            <td>Username:</td>
-                            <td><input autoFocus type="text" value={this.state.username} onChange={this.handleUsernameChange}/></td>
-                        </tr>
-                        <tr>
-                            <td>Password:</td>
-                            <td><input type="password" value={this.state.password} onChange={this.handlePasswordChange}/></td>
-                        </tr>
-                        <tr>
-                            <td colSpan="2" style={{textAlign: 'center'}}><input type="submit" value="Sign In" onClick={this.handleLogin}/>
-                                &nbsp;&nbsp;
-                                <input type="submit" value="Cancel" onClick={this.handleCancel}/>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
+                    {this.props.message}
+                    <div>
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td>Username:</td>
+                                <td><input autoFocus type="text" value={this.state.username} onChange={this.handleUsernameChange}/></td>
+                            </tr>
+                            <tr>
+                                <td>Password:</td>
+                                <td><input type="password" value={this.state.password} onChange={this.handlePasswordChange}/></td>
+                            </tr>
+                            <tr>
+                                <td colSpan="2" style={{textAlign: 'center'}}><input type="submit" value="Sign In" onClick={this.handleLogin}/>
+                                    &nbsp;&nbsp;
+                                    <input type="submit" value="Cancel" onClick={this.handleCancel}/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )
         } else {
@@ -98,7 +101,7 @@ class Login extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-    return {sessionId: state.sessionId, action: state.action, operationId: state.operationId}
+    return {sessionId: state.sessionId, action: state.action, message: state.message, operationId: state.operationId}
 };
 
 const CLogin = connect(

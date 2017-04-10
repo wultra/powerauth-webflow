@@ -27,15 +27,22 @@ public class DisplayLoginFormResponse extends WebSocketJsonMessage {
     private String operationId;
     @JsonProperty
     private boolean showCaptcha;
+    @JsonProperty
+    private String message;
 
     public DisplayLoginFormResponse() {
     }
 
-    public DisplayLoginFormResponse(String sessionId, String operationId, boolean showCaptcha) {
+    public DisplayLoginFormResponse(String sessionId, String operationId, String message, boolean showCaptcha) {
         this.action = WebAuthAction.DISPLAY_LOGIN_FORM;
         this.sessionId = sessionId;
         this.operationId = operationId;
+        this.message = message;
         this.showCaptcha = showCaptcha;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }

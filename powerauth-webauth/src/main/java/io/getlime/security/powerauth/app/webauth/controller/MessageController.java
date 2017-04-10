@@ -30,8 +30,15 @@ import io.getlime.security.powerauth.app.webauth.model.entity.registration.Termi
 import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
 import io.getlime.security.powerauth.app.webauth.repository.model.Session;
 import io.getlime.security.powerauth.app.webauth.service.AuthenticationService;
+import io.getlime.security.powerauth.app.webauth.service.NextMessageResolutionService;
+import io.getlime.security.powerauth.app.webauth.service.NextStepService;
 import io.getlime.security.powerauth.lib.credentialServer.model.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentialServer.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -41,7 +48,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Roman Strobl
@@ -52,12 +60,17 @@ public class MessageController {
     private final SimpMessagingTemplate websocket;
     private final SessionRepository sessionRepository;
     private final AuthenticationService authService;
+    private final NextStepService nextStepService;
+    private final NextMessageResolutionService resolutionService;
 
     @Autowired
-    public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository, AuthenticationService authService) {
+    public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository, AuthenticationService authService,
+                             NextStepService nextStepService, NextMessageResolutionService resolutionService) {
         this.websocket = websocket;
         this.sessionRepository = sessionRepository;
         this.authService = authService;
+        this.nextStepService = nextStepService;
+        this.resolutionService = resolutionService;
     }
 
     private MessageHeaders createHeaders(String sessionId) {
@@ -71,15 +84,12 @@ public class MessageController {
     public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest message) throws Exception {
         System.out.println("Received registration message: " + message);
         if (message.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
-            Session session = new Session();
+            String sessionId = headerAccessor.getSessionId();
+            Session session = new Session(sessionId);
             sessionRepository.save(session);
 
-            String sessionId = headerAccessor.getSessionId();
-
-            ConfirmRegistrationResponse registrationResponse = new ConfirmRegistrationResponse(session.toString());
-
-            this.websocket.convertAndSendToUser(
-                    sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", registrationResponse, createHeaders(sessionId));
+            ConfirmRegistrationResponse registrationResponse = new ConfirmRegistrationResponse(sessionId);
+            sendMessage(registrationResponse, sessionId);
 
             // UI test - walks through all UI screens with small delays, for development only
             if (message.getPerformUITest()) {
@@ -87,61 +97,63 @@ public class MessageController {
                 Thread.sleep(1000);
                 String operationId = "40269145-d91f-4579-badd-c57fa1133239";
 
-                DisplayLoginFormResponse displayLogin = new DisplayLoginFormResponse(session.toString(), operationId, false);
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", displayLogin, createHeaders(sessionId));
+                DisplayLoginFormResponse displayLogin = new DisplayLoginFormResponse(sessionId, operationId, "Please sign in", false);
+                sendMessage(displayLogin, sessionId);
 
                 // simulates displaying the payment info
                 Thread.sleep(2000);
-                DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(session.toString(),
-                        operationId, new BigDecimal("103"), "CZK");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayPayment, createHeaders(sessionId));
+                DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(sessionId, operationId, new BigDecimal("103"), "CZK");
+                sendMessage(displayPayment, sessionId);
 
                 // simulates displaying the authorization form
                 Thread.sleep(2000);
-                DisplayAuthorizationFormResponse displayAuthorization = new DisplayAuthorizationFormResponse(session.toString(),
-                        operationId);
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayAuthorization, createHeaders(sessionId));
+                DisplayAuthorizationFormResponse displayAuthorization = new DisplayAuthorizationFormResponse(sessionId, operationId);
+                sendMessage(displayAuthorization, sessionId);
 
                 // simulates displaying an information message
                 Thread.sleep(2000);
-                DisplayMessageResponse displayOKMessage = new DisplayMessageResponse(session.toString(),
-                        WebAuthMessageType.INFORMATION, "Test OK message");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayOKMessage, createHeaders(sessionId));
+                DisplayMessageResponse displayOKMessage = new DisplayMessageResponse(sessionId, WebAuthMessageType.INFORMATION, "Test OK message");
+                sendMessage(displayOKMessage, sessionId);
 
                 // simulates displaying an error message
                 Thread.sleep(2000);
-                DisplayMessageResponse displayErrorMessage = new DisplayMessageResponse(session.toString(),
-                        WebAuthMessageType.ERROR, "Test error message");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessage, createHeaders(sessionId));
+                DisplayMessageResponse displayErrorMessage = new DisplayMessageResponse(sessionId, WebAuthMessageType.ERROR, "Test error message");
+                sendMessage(displayErrorMessage, sessionId);
 
                 // simulates session termination without redirect
                 /*Thread.sleep(2000);
                 TerminateSessionResponse terminate = new TerminateSessionResponse(,
-                        session.toString();
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", terminate, createHeaders(sessionId));
+                        sessionId;
+                sendMessage(terminates, sessionId);
                 */
 
                 // simulates session termination with redirect
                 Thread.sleep(2000);
-                TerminateSessionAndRedirectResponse terminateAndRedirect = new TerminateSessionAndRedirectResponse(session.toString(), "./", 5);
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", terminateAndRedirect, createHeaders(sessionId));
+                TerminateSessionAndRedirectResponse terminateAndRedirect = new TerminateSessionAndRedirectResponse(sessionId, "./", 5);
+                sendMessage(terminateAndRedirect, sessionId);
                 sessionRepository.delete(session);
             } else {
                 // responses are based on communication with user, also for development only
                 // real communication will be initiated by OAuth authentication
 
+                // for testing without Next Step server
+                /*
                 String operationId = "40269145-d91f-4579-badd-c57fa1133239";
 
-                DisplayLoginFormResponse displayLogin = new DisplayLoginFormResponse(session.toString(), operationId, false);
+                DisplayLoginFormResponse displayLogin = new DisplayLoginFormResponse(sessionId, operationId, false);
                 this.websocket.convertAndSendToUser(
                         sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", displayLogin, createHeaders(sessionId));
+                */
+
+                // Testing of Next Step server
+                String operationName = "payment";
+                String operationData = "{\"amount\":100,\"currency\":\\\"CZK\",\"to\":\"CZ12000012345678901234\"}";
+                List<KeyValueParameter> params = new ArrayList<>();
+                KeyValueParameter param = new KeyValueParameter("risk", "0.639");
+                params.add(param);
+                CreateOperationResponse response = nextStepService.createOperation(operationName, operationData, params);
+                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(response, sessionId);
+                sendMessage(nextMessage, sessionId);
             }
         }
     }
@@ -155,26 +167,53 @@ public class MessageController {
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
                 // authenticate with the Credentials Server
-                AuthenticationResponse response = authService.authenticate(username, password);
+                AuthenticationResponse responseCS = authService.authenticate(username, password);
 
-                if (response.getStatus() == AuthenticationStatus.SUCCESS) {
+                if (responseCS.getStatus() == AuthenticationStatus.SUCCESS) {
+                    // for testing without Next Step server
+                    /*
                     DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(authenticationRequest.getSessionId(),
                             authenticationRequest.getOperationId(), new BigDecimal("1000"), "EUR");
-                    this.websocket.convertAndSendToUser(
-                            sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayPayment, createHeaders(sessionId));
+                    sendMessage(displayPayment, sessionId);
+                    */
+                    List<KeyValueParameter> params = new ArrayList<>();
+                    KeyValueParameter param = new KeyValueParameter("risk", "0.523");
+                    params.add(param);
+                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                            AuthStepResult.CONFIRMED, params);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    sendMessage(nextMessage, sessionId);
                 } else {
+                    // for testing without Next Step server
+                    /*
                     DisplayMessageResponse displayErrorMessage = new DisplayMessageResponse(authenticationRequest.getSessionId(),
                             WebAuthMessageType.ERROR, "Login failed.");
-                    this.websocket.convertAndSendToUser(
-                            sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessage, createHeaders(sessionId));
+                    sendMessage(displayErrorMessage, sessionId);
+                    */
+                    List<KeyValueParameter> params = new ArrayList<>();
+                    KeyValueParameter param = new KeyValueParameter("risk", "0.523");
+                    params.add(param);
+                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                            AuthStepResult.FAILED, params);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    sendMessage(nextMessage, sessionId);
                 }
                 break;
             case LOGIN_CANCEL:
                 // login canceled
+                // for testing without Next Step server
+                /*
                 DisplayMessageResponse displayErrorMessage = new DisplayMessageResponse(authenticationRequest.getSessionId(),
                         WebAuthMessageType.ERROR, "Authentication has been canceled.");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessage, createHeaders(sessionId));
+                sendMessage(displayErrorMessage, sessionId);
+                */
+                List<KeyValueParameter> params = new ArrayList<>();
+                KeyValueParameter param = new KeyValueParameter("risk", "0.523");
+                params.add(param);
+                UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
+                        AuthStepResult.CANCELED, params);
+                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, null, sessionId);
+                sendMessage(nextMessage, sessionId);
                 break;
         }
     }
@@ -187,34 +226,29 @@ public class MessageController {
             case PAYMENT_CONFIRM:
                 // authorization for the payment
                 DisplayAuthorizationFormResponse displayAuth = new DisplayAuthorizationFormResponse(authorizationRequest.getSessionId(), authorizationRequest.getOperationId());
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", displayAuth, createHeaders(sessionId));
+                sendMessage(displayAuth, sessionId);
                 break;
             case PAYMENT_CANCEL:
                 // payment canceled
                 DisplayMessageResponse displayErrorMessage = new DisplayMessageResponse(authorizationRequest.getSessionId(),
                         WebAuthMessageType.ERROR, "Payment has been canceled.");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessage, createHeaders(sessionId));
+                sendMessage(displayErrorMessage, sessionId);
                 break;
             case PAYMENT_AUTHORIZATION_CONFIRM:
                 // fake authorization
                 if (authorizationRequest.getAuthorizationCode() != null && authorizationRequest.getAuthorizationCode().equals("12345")) {
                     DisplayMessageResponse displayMessage = new DisplayMessageResponse(authorizationRequest.getSessionId(), WebAuthMessageType.INFORMATION,
                             "Payment has been authorized, you will be redirected to your bank...");
-                    this.websocket.convertAndSendToUser(
-                            sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayMessage, createHeaders(sessionId));
+                    sendMessage(displayMessage, sessionId);
                     Thread.sleep(5000);
                     TerminateSessionAndRedirectResponse terminateAndRedirect = new TerminateSessionAndRedirectResponse(authorizationRequest.getSessionId(), "./", 0);
-                    this.websocket.convertAndSendToUser(
-                            sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", terminateAndRedirect, createHeaders(sessionId));
+                    sendMessage(terminateAndRedirect, sessionId);
                     sessionRepository.delete(new Long(authorizationRequest.getSessionId()));
                 } else {
                     // payment not authorized
                     DisplayMessageResponse displayUnauthorizedMessage = new DisplayMessageResponse(authorizationRequest.getSessionId(),
                             WebAuthMessageType.ERROR, "Payment authorization failed.");
-                    this.websocket.convertAndSendToUser(
-                            sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayUnauthorizedMessage, createHeaders(sessionId));
+                    sendMessage(displayUnauthorizedMessage, sessionId);
                     break;
                 }
                 break;
@@ -222,10 +256,36 @@ public class MessageController {
                 // payment authorization canceled
                 DisplayMessageResponse displayErrorMessageAuth = new DisplayMessageResponse(authorizationRequest.getSessionId(),
                         WebAuthMessageType.ERROR, "Payment authorization has been canceled.");
-                this.websocket.convertAndSendToUser(
-                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", displayErrorMessageAuth, createHeaders(sessionId));
+                sendMessage(displayErrorMessageAuth, sessionId);
                 break;
         }
+    }
+    
+    private void sendMessage(WebSocketJsonMessage message, String sessionId) {
+        switch (message.getAction()) {
+            case REGISTRATION_CONFIRM:
+            case TERMINATE:
+            case TERMINATE_REDIRECT:
+                websocket.convertAndSendToUser(
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/registration", message, createHeaders(sessionId));
+                break;
+            case DISPLAY_LOGIN_FORM:
+                websocket.convertAndSendToUser(
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authentication", message, createHeaders(sessionId));
+                break;
+            case DISPLAY_PAYMENT_AUTHORIZATION_FORM:
+            case DISPLAY_PAYMENT_INFO:
+                websocket.convertAndSendToUser(
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/authorization", message, createHeaders(sessionId));
+                break;
+            case DISPLAY_MESSAGE:
+                websocket.convertAndSendToUser(
+                        sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", message, createHeaders(sessionId));
+                break;
+            default:
+                throw new IllegalStateException("Invalid action: "+message.getAction());
+        }
+        
     }
 
 }

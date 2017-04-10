@@ -32,11 +32,14 @@ public class Session {
     @GeneratedValue
     Long id;
 
-    public Session() {
+    private String sessionId;
+
+    public Session(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String toString() {
-        return id.toString();
+        return sessionId;
     }
 
 }
