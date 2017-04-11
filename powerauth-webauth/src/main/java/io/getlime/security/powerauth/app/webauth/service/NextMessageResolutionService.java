@@ -60,11 +60,11 @@ public class NextMessageResolutionService {
                         WebAuthMessageType.INFORMATION, "Operation has been authorized.");
             case FAILED:
                 return new DisplayMessageResponse(sessionId,
-                        WebAuthMessageType.INFORMATION, "Authorization has failed.");
+                        WebAuthMessageType.ERROR, "Authorization has failed.");
         }
 
         return new DisplayMessageResponse(sessionId,
-                WebAuthMessageType.INFORMATION, "Operation has failed.");
+                WebAuthMessageType.ERROR, "Operation has failed.");
     }
 
 
