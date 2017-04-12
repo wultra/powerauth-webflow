@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentialServer.controller;
+package io.getlime.security.powerauth.lib.credentials.controller;
 
-import io.getlime.security.powerauth.lib.credentialServer.model.*;
+import io.getlime.security.powerauth.lib.credentials.model.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
