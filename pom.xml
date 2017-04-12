@@ -63,6 +63,7 @@
 
 	<modules>
 		<module>powerauth-credential-server-model</module>
+        <module>powerauth-credential-server-sample</module>
 		<module>powerauth-webauth</module>
     </modules>
 
