@@ -4,7 +4,7 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 import io.getlime.security.powerauth.app.webauth.model.entity.authentication.DisplayLoginFormResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.DisplayMessageResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.WebAuthMessageType;
-import io.getlime.security.powerauth.lib.credentialServer.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;

@@ -13,34 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentialServer.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package io.getlime.security.powerauth.lib.credentials.model;
 
 /**
  * @author Roman Strobl
  */
-public class ErrorResponse {
-
-    public enum ResponseCode {
-        AUTH_FAIL,
-        USERNAME_FORMAT_INVALID,
-        PASSWORD_FORMAT_INVALID,
-        AUTH_METHOD_UNSUPPORTED,
-        INTERNAL_SERVER_ERROR
-    }
-
-    @JsonProperty
-    private ResponseCode code;
-    @JsonProperty
-    private String message;
-
-    public ErrorResponse() {
-    }
-
-    public ErrorResponse(ResponseCode code, String message) {
-        this.code = code;
-        this.message = message;
-    }
-
+public enum AuthenticationType {
+    BASIC
 }

@@ -3,6 +3,7 @@ package io.getlime.security.powerauth.app.webauth.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
 import io.getlime.security.powerauth.lib.credentialServer.model.*;
+import io.getlime.security.powerauth.lib.credentials.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;

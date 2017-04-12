@@ -13,23 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentialServer.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package io.getlime.security.powerauth.lib.credentials.model;
 
 /**
  * @author Roman Strobl
  */
-public class HelloMessage {
+public enum AuthenticationStatus {
+    SUCCESS,
+    ERROR
 
-    @JsonProperty
-    private final String message;
-
-    public HelloMessage(String message) {
-        this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
 }

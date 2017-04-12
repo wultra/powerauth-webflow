@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentialServer.model;
+package io.getlime.security.powerauth.lib.credentials.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.springframework.http.HttpStatus;
@@ -21,22 +21,22 @@ import org.springframework.http.HttpStatus;
 /**
  * @author Roman Strobl
  */
-public class AuthenticationResponseError extends AuthenticationResponse {
+public class AuthenticationResponseSuccess extends AuthenticationResponse {
 
     @JsonProperty
-    private ErrorResponse errorResponse;
+    private String userId;
 
-    public AuthenticationResponseError() {
+    public AuthenticationResponseSuccess() {
     }
 
-    public AuthenticationResponseError(HttpStatus status, ErrorResponse errorResponse) {
-        this.httpStatus = status;
-        this.status = AuthenticationStatus.ERROR;
-        this.errorResponse = errorResponse;
+    public AuthenticationResponseSuccess(String userId) {
+        this.httpStatus = HttpStatus.OK;
+        this.status = AuthenticationStatus.SUCCESS;
+        this.userId = userId;
     }
 
-    public ErrorResponse getErrorResponse() {
-        return errorResponse;
+    public String getUserId() {
+        return userId;
     }
 
 }
