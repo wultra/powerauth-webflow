@@ -19,12 +19,13 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 
-// importy
+// imports
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
+import { Row, Col } from 'react-bootstrap';
 
-// lokální require
+// local require
 const stompClient = require('./websocket-listener');
 const reducers = require('./reducers');
 const utils = require('./utils');
@@ -98,14 +99,19 @@ class App extends React.Component {
     render() {
         return (
             <div>
-                <Link to="/">Home</Link>
-                &nbsp;|&nbsp;<Link to="/login">Login</Link>
-                &nbsp;|&nbsp;<Link to="/paymentInfo">Payment Info</Link>
-                &nbsp;|&nbsp;<Link to="/authorize">Authorize</Link>
-                &nbsp;|&nbsp;<Link to="/message">Message</Link>
-                &nbsp;|&nbsp;<Link to="/terminate">Terminate</Link>
+                <div style={{position: "fixed", right: 0, bottom: 0}}>
+                    <Link to="/">Home</Link>
+                    &nbsp;|&nbsp;<Link to="/login">Login</Link>
+                    &nbsp;|&nbsp;<Link to="/paymentInfo">Payment Info</Link>
+                    &nbsp;|&nbsp;<Link to="/authorize">Authorize</Link>
+                    &nbsp;|&nbsp;<Link to="/message">Message</Link>
+                    &nbsp;|&nbsp;<Link to="/terminate">Terminate</Link>
+                </div>
 
-                <div id="home">
+                <div id="home" className="text-center">
+                    <div id="logo">
+                        <img src="./images/logo.png" alt="logo"/>
+                    </div>
                     {this.props.children}
                 </div>
             </div>

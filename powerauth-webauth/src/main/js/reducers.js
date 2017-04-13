@@ -21,7 +21,7 @@ function reducer(state = {sessionId:undefined}, action) {
             state = action.actionState;
             break;
         case "TERMINATE_SESSION":
-            state = {sessionId:undefined}
+            state = {sessionId:undefined};
             break;
         default:
     }

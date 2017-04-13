@@ -21,6 +21,8 @@ const utils = require('../utils');
 const base64 = require('base-64');
 import { connect } from 'react-redux';
 
+import { Button, FormGroup, FormControl } from 'react-bootstrap';
+
 class Login extends React.Component {
 
     constructor() {
@@ -45,7 +47,7 @@ class Login extends React.Component {
             action: "LOGIN_CONFIRM",
             operationId: this.props.operationId,
             method: "BASIC_BASE64",
-            credentials: base64.encode(this.state.username+":"+this.state.password)
+            credentials: base64.encode(this.state.username + ":" + this.state.password)
         };
         console.log(msg);
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
@@ -70,29 +72,20 @@ class Login extends React.Component {
     render() {
         if (utils.checkAccess(this.props, "login")) {
             return (
-                <div>
-                    {this.props.message}
-                    <div>
-                        <table>
-                            <tbody>
-                            <tr>
-                                <td>Username:</td>
-                                <td><input autoFocus type="text" value={this.state.username} onChange={this.handleUsernameChange}/></td>
-                            </tr>
-                            <tr>
-                                <td>Password:</td>
-                                <td><input type="password" value={this.state.password} onChange={this.handlePasswordChange}/></td>
-                            </tr>
-                            <tr>
-                                <td colSpan="2" style={{textAlign: 'center'}}><input type="submit" value="Sign In" onClick={this.handleLogin}/>
-                                    &nbsp;&nbsp;
-                                    <input type="submit" value="Cancel" onClick={this.handleCancel}/>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                <form onSubmit={this.handleLogin}>
+                    <FormGroup>
+                        {this.props.message}
+                    </FormGroup>
+                    <FormGroup>
+                        <FormControl autoFocus autocomplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <FormControl autocomplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
+                    </FormGroup>
+                </form>
             )
         } else {
             return null;

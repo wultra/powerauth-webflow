@@ -20,6 +20,7 @@
   "homepage": "https://github.com/lime-company/lime-security-powerauth-webauth",
   "dependencies": {
     "react": "^15.4.2",
+    "react-bootstrap": "^0.30.8",
     "react-dom": "^15.4.2",
     "react-router": "^3.0.3",
     "react-redux": "^5.0.3",

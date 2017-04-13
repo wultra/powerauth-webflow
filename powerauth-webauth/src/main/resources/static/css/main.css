@@ -1,0 +1,50 @@
+body {
+    font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", sans-serif;
+    color: #777777;
+    font-size: 14pt;
+}
+
+a {
+    color: #7FC000;
+    text-decoration: none;
+}
+
+.message-information {
+    color: #777777;
+}
+
+.message-error {
+    color: #C0007F;
+}
+
+#logo {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#logo img {
+    height: 60px;
+}
+
+#page-wrap {
+    margin: 120px auto 40px auto;
+    width: 320px;
+}
+
+.btn-success {
+    background-color: #7FC000;
+    border: none;
+}
+
+.btn-success:hover,.btn-success:active,.btn-success:focus {
+    background-color: #4c7400 !important;
+    border: none;
+}
+
+.image-result {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    width: 80px;
+    height: 80px;
+}
+

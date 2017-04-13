@@ -30,8 +30,14 @@ class Message extends React.Component {
     render() {
         if (utils.checkAccess(this.props, "message")) {
             return (
-                <div id={this.props.messageType}>
-                    {this.props.text}
+                <div className="text-center">
+                    <div className={'message-' + this.props.messageType}>
+                        {this.props.text}
+                    </div>
+                    <img className="image-result" alt="" src={"./images/image-" + this.props.messageType + ".png"}/>
+                    <div className={'message-' + this.props.messageType}>
+                        You will be redirected back to the original application.
+                    </div>
                 </div>
             )
         } else {
