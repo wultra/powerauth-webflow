@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -70,6 +71,8 @@ public class NextStepService {
             System.out.println("Response from Next Step Server: " + respObj.getResult() + ", " + respObj.getResultDescription());
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
+            return generateErrorResponse(ex);
+        } catch (ResourceAccessException ex) {
             return generateErrorResponse(ex);
         }
     }
@@ -122,7 +125,7 @@ public class NextStepService {
         try {
             // handles regular errors
             ErrorModel error = objectMapper.readValue(responseString, ErrorModel.class);
-            System.out.println("Response from Next Step Server was invalid, exception: " + ex.toString());
+            System.err.println("Response from Next Step Server was invalid, exception: " + ex.toString());
             if (error.getCode() == null) {
                 error.setCode("ERR_GENERIC");
                 error.setMessage("Next step service error: " + ex.toString());
@@ -130,12 +133,25 @@ public class NextStepService {
             return new Response<>(Response.Status.ERROR, error);
         } catch (IOException ex2) {
             // should never be reached - fatal error
-            System.out.println("Response from Next Step Server was invalid, exception: " + ex2.toString());
+            System.err.println("Response from Next Step Server was invalid, exception: " + ex2.toString());
             ErrorModel error = new ErrorModel();
             error.setCode("ERR_GENERIC");
             error.setMessage("Next step service error: " + ex2.toString());
             return new Response<>(Response.Status.ERROR, error);
         }
+    }
+
+    /**
+     * Handling of ResourceAccessException
+     * @param ex ResourceAccessException - service is not available
+     * @return ErrorModel with description of the error
+     */
+    private Response<ErrorModel> generateErrorResponse(ResourceAccessException ex) {
+        System.err.println("Next Step Server is not available, exception: " + ex.toString());
+        ErrorModel error = new ErrorModel();
+        error.setCode("ERR_GENERIC");
+        error.setMessage("Next step service is not available.");
+        return new Response<>(Response.Status.ERROR, error);
     }
 
 }
