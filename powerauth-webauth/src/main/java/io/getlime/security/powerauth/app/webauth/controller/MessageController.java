@@ -24,8 +24,8 @@ import io.getlime.security.powerauth.app.webauth.model.entity.authorization.Disp
 import io.getlime.security.powerauth.app.webauth.model.entity.authorization.DisplayPaymentInfoResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.DisplayMessageResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.WebAuthMessageType;
-import io.getlime.security.powerauth.app.webauth.model.entity.registration.RegistrationRequest;
 import io.getlime.security.powerauth.app.webauth.model.entity.registration.ConfirmRegistrationResponse;
+import io.getlime.security.powerauth.app.webauth.model.entity.registration.RegistrationRequest;
 import io.getlime.security.powerauth.app.webauth.model.entity.registration.TerminateSessionAndRedirectResponse;
 import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
 import io.getlime.security.powerauth.app.webauth.repository.model.Session;
@@ -34,11 +34,10 @@ import io.getlime.security.powerauth.app.webauth.service.NextMessageResolutionSe
 import io.getlime.security.powerauth.app.webauth.service.NextStepService;
 import io.getlime.security.powerauth.lib.credentials.model.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -151,8 +150,8 @@ public class MessageController {
                 List<KeyValueParameter> params = new ArrayList<>();
                 KeyValueParameter param = new KeyValueParameter("risk", "0.639");
                 params.add(param);
-                CreateOperationResponse response = nextStepService.createOperation(operationName, operationData, params);
-                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(response, sessionId);
+                Response<?> response = nextStepService.createOperation(operationName, operationData, params);
+                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(response, null, sessionId);
                 sendMessage(nextMessage, sessionId);
             }
         }
@@ -166,6 +165,12 @@ public class MessageController {
             case LOGIN_CONFIRM:
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
+                if (username==null) {
+                    username = "";
+                }
+                if (password==null) {
+                    password = "".toCharArray();
+                }
                 // authenticate with the Credentials Server
                 AuthenticationResponse responseCS = authService.authenticate(username, password);
 
@@ -179,7 +184,7 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.CONFIRMED, params);
                     WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
                     sendMessage(nextMessage, sessionId);
@@ -193,7 +198,7 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.FAILED, params);
                     WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
                     sendMessage(nextMessage, sessionId);
@@ -210,7 +215,7 @@ public class MessageController {
                 List<KeyValueParameter> params = new ArrayList<>();
                 KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                 params.add(param);
-                UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
+                Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
                         AuthStepResult.CANCELED, params);
                 WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, null, sessionId);
                 sendMessage(nextMessage, sessionId);
@@ -260,7 +265,7 @@ public class MessageController {
                 break;
         }
     }
-    
+
     private void sendMessage(WebSocketJsonMessage message, String sessionId) {
         switch (message.getAction()) {
             case REGISTRATION_CONFIRM:
@@ -283,9 +288,9 @@ public class MessageController {
                         sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", message, createHeaders(sessionId));
                 break;
             default:
-                throw new IllegalStateException("Invalid action: "+message.getAction());
+                throw new IllegalStateException("Invalid action: " + message.getAction());
         }
-        
+
     }
 
 }
