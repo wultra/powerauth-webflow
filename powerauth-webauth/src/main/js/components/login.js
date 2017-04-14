@@ -48,7 +48,9 @@ class Login extends React.Component {
         this.setState({password: event.target.value});
     }
 
-    handleLogin() {
+    handleLogin(event) {
+        // prevent regular form submission, this leads to side effects
+        event.preventDefault();
         this.firstLogin = false;
         // prepare and send login message
         const msg = {
@@ -73,7 +75,7 @@ class Login extends React.Component {
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
     }
 
-    componentWillReceiveProps(props) {
+    componentWillReceiveProps() {
         if (this.firstLogin===false) {
             // shake form in case first login failed
             const e = document.getElementById('login');
