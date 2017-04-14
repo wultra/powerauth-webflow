@@ -23,10 +23,14 @@ import { connect } from 'react-redux';
 
 import { Button, FormGroup, FormControl } from 'react-bootstrap';
 
+/**
+ * Login component handles the user authentication using username and password.
+ */
 class Login extends React.Component {
 
     constructor() {
         super();
+        // bind this for later
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
@@ -35,13 +39,16 @@ class Login extends React.Component {
     }
 
     handleUsernameChange(event) {
+        // update state on keypress
         this.setState({username: event.target.value});
     }
     handlePasswordChange(event) {
+        // update state on keypress
         this.setState({password: event.target.value});
     }
 
     handleLogin() {
+        // prepare and send login message
         const msg = {
             sessionId: this.props.sessionId,
             action: "LOGIN_CONFIRM",
@@ -54,6 +61,7 @@ class Login extends React.Component {
     }
 
     handleCancel() {
+        // prepare and send login canceled message
         const msg = {
             sessionId: this.props.sessionId,
             action: "LOGIN_CANCEL",
@@ -64,6 +72,7 @@ class Login extends React.Component {
     }
 
     componentWillMount() {
+        // display only if current action matches component
         if (!utils.checkAccess(this.props, "login")) {
             this.props.router.push("/");
         }

@@ -19,6 +19,10 @@ const SockJS = require('sockjs-client');
 let stompClient;
 require('stompjs');
 
+/**
+ * Registration for WebSocket routes with callback functions called on incoming messages.
+ * @param registrations routes and callback functions
+ */
 function register(registrations) {
     const socket = SockJS('./webauth');
     stompClient = Stomp.over(socket);
@@ -29,6 +33,12 @@ function register(registrations) {
     });
 }
 
+/**
+ * Sends a WebSocket message
+ * @param destination message destination
+ * @param params parameters, use {} for empty
+ * @param message text of the message, use JSON syntax
+ */
 function send(destination, params, message) {
     stompClient.send(destination, params, message);
 }

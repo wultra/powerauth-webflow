@@ -20,15 +20,22 @@ const stompClient = require('../websocket-listener');
 const utils = require('../utils');
 import { connect } from 'react-redux';
 
+/**
+ * PaymentInfo component displays payment information to the user.
+ *
+ * Later on it should be generalized to OperationInfo.
+ */
 class PaymentInfo extends React.Component {
 
     constructor() {
         super();
+        // bind this for later
         this.handleConfirmation = this.handleConfirmation.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
     }
 
     handleConfirmation() {
+        // send payment confirmation message
         const msg = {
             sessionId: this.props.sessionId,
             action: "PAYMENT_CONFIRM",
@@ -38,6 +45,7 @@ class PaymentInfo extends React.Component {
     }
 
     handleCancel() {
+        // send payment canceled message
         const msg = {
             sessionId: this.props.sessionId,
             action: "PAYMENT_CANCEL",
@@ -47,6 +55,7 @@ class PaymentInfo extends React.Component {
     }
 
     componentWillMount() {
+        // display only if current action matches component
         if (!utils.checkAccess(this.props, "payment-info")) {
             this.props.router.push("/");
         }

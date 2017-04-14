@@ -20,10 +20,16 @@ const stompClient = require('../websocket-listener');
 const utils = require('../utils');
 import { connect } from 'react-redux';
 
+/**
+ * Authorization component which handles authorization requests.
+ *
+ * Later it should be extended to support any operations, not just payments as well as support mobile authorizations.
+ */
 class Authorize extends React.Component {
 
     constructor() {
         super();
+        // bind this for later
         this.handleAuthorizationCodeChange = this.handleAuthorizationCodeChange.bind(this);
         this.handleAuthorization = this.handleAuthorization.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
@@ -31,10 +37,12 @@ class Authorize extends React.Component {
     }
 
     handleAuthorizationCodeChange(event) {
+        // update state on keypress
         this.setState({authorizationCode: event.target.value});
     }
 
     handleAuthorization() {
+        // prepare and send authorization message
         const msg = {
             sessionId: this.props.sessionId,
             action: "PAYMENT_AUTHORIZATION_CONFIRM",
@@ -45,6 +53,7 @@ class Authorize extends React.Component {
     }
 
     handleCancel() {
+        // prepare and send authorization canceled message
         const msg = {
             sessionId: this.props.sessionId,
             action: "PAYMENT_AUTHORIZATION_CANCEL",
@@ -54,6 +63,7 @@ class Authorize extends React.Component {
     }
 
     componentWillMount() {
+        // display only if current action matches component
         if (!utils.checkAccess(this.props, "authorize")) {
             this.props.router.push("/");
         }

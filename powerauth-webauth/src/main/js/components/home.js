@@ -18,20 +18,28 @@
 const React = require('react');
 const stompClient = require('../websocket-listener');
 
+/**
+ * Home component registers the frontend for WebSocket communication.
+ *
+ * Buttons will become obsolete in production and will be replaced by OAuth 2.0 integration.
+ */
 class Home extends React.Component {
 
     constructor() {
         super();
+        // bind this for later
         this.handleStartSession = this.handleStartSession.bind(this);
         this.handleStartSessionTest = this.handleStartSessionTest.bind(this);
     }
 
     handleStartSession() {
+        // register client
         const msg = {"action": "REGISTER", "performUITest": false};
         stompClient.send("/app/registration", {}, JSON.stringify(msg));
     }
 
     handleStartSessionTest() {
+        // register client and perform UI test
         const msg = {"action": "REGISTER", "performUITest": true};
         stompClient.send("/app/registration", {}, JSON.stringify(msg));
     }

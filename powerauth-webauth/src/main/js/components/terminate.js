@@ -19,6 +19,11 @@ const React = require('react');
 const utils = require('../utils');
 import { connect } from 'react-redux';
 
+/**
+ * Terminate component handles session termination and redirects.
+ *
+ * Some of the component's functionality will need to be implemented by the Message component, too.
+ */
 class Terminate extends React.Component {
 
     componentWillMount() {
@@ -26,11 +31,13 @@ class Terminate extends React.Component {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
         if (!utils.checkAccess(this.props, "terminate")) {
+            // display only if current action matches component
             this.props.router.push("/");
         }
         // TODO - needs to be handled differently, dispatch resets the state of the component
         // this.props.dispatch(utils.terminateSession(this.props.sessionId));
         if (this.props.delay !== undefined) {
+            // redirect with a delay
             sleep(this.props.delay*1000).then(() => {
                 window.location = this.props.redirectUrl;
             })

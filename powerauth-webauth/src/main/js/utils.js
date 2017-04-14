@@ -15,6 +15,13 @@
  */
 'use strict';
 
+/**
+ * This function checks whether component has access to the action, based on component's props.
+ * Current sessionId and action are checked for each components.
+ * @param props component properties
+ * @param component component name
+ * @returns true if access is granted
+ */
 function checkAccess(props, component) {
     if (props.sessionId === undefined) {
         return false;
@@ -55,6 +62,11 @@ function checkAccess(props, component) {
     return false;
 }
 
+/**
+ * Function used with the reducer to modify application state using Redux.
+ * @param actionState new state
+ * @returns structured object for the reducer
+ */
 function saveAction(actionState) {
     console.log(actionState);
     return {
@@ -63,6 +75,11 @@ function saveAction(actionState) {
     }
 }
 
+/**
+ * Function used with the reducer to reset application state using Redux.
+ * @param sessionId current sessionId
+ * @returns structured object for the reducer
+ */
 function terminateSession(sessionId) {
     return {
         type: "TERMINATE_SESSION",
