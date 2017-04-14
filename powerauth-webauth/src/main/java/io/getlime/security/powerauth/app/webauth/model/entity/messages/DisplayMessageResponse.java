@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.messages;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,9 +22,7 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class DisplayMessageResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private WebAuthMessageType messageType;
-    @JsonProperty
     private String text;
 
     public DisplayMessageResponse() {
@@ -36,6 +33,14 @@ public class DisplayMessageResponse extends WebSocketJsonMessage {
         this.sessionId = sessionId;
         this.messageType = messageType;
         this.text = text;
+    }
+
+    public WebAuthMessageType getMessageType() {
+        return messageType;
+    }
+
+    public String getText() {
+        return text;
     }
 
 }

@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,9 +22,7 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class AuthorizationRequest extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
-    @JsonProperty
     private String authorizationCode;
 
     public AuthorizationRequest() {

@@ -15,8 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Roman Strobl
  */
@@ -42,8 +40,6 @@ public class WebSocketJsonMessage {
     protected WebAuthAction action;
     protected String sessionId;
 
-    private ObjectMapper mapper = new ObjectMapper();
-
     public WebAuthAction getAction() {
         return action;
     }
@@ -52,16 +48,4 @@ public class WebSocketJsonMessage {
         return sessionId;
     }
 
-    public String toJson() {
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return toJson();
-    }
 }

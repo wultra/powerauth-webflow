@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 import java.math.BigDecimal;
@@ -25,11 +24,8 @@ import java.math.BigDecimal;
  */
 public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
-    @JsonProperty
     private BigDecimal amount;
-    @JsonProperty
     private String currency;
 
     public DisplayPaymentInfoResponse() {
@@ -43,4 +39,15 @@ public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {
         this.currency = currency;
     }
 
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
 }

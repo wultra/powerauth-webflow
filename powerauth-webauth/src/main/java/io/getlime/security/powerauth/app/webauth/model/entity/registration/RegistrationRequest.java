@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,7 +22,6 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class RegistrationRequest extends WebSocketJsonMessage {
 
-    @JsonProperty
     private boolean performUITest;
 
     public RegistrationRequest() {
@@ -36,6 +34,10 @@ public class RegistrationRequest extends WebSocketJsonMessage {
 
     public boolean getPerformUITest() {
         return performUITest;
+    }
+
+    public String toString() {
+        return "RegistrationRequest (performUITest=" + performUITest + ")";
     }
 
 }

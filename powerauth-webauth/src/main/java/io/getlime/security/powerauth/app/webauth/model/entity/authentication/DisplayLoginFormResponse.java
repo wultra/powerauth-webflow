@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.authentication;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,11 +22,8 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class DisplayLoginFormResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
-    @JsonProperty
     private boolean showCaptcha;
-    @JsonProperty
     private String message;
 
     public DisplayLoginFormResponse() {
@@ -43,6 +39,18 @@ public class DisplayLoginFormResponse extends WebSocketJsonMessage {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public boolean getShowCaptcha() {
+        return showCaptcha;
+    }
+
+    public String getMessage() {
+        return message;
     }
 
 }

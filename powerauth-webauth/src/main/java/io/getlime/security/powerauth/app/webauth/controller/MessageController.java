@@ -32,8 +32,7 @@ import io.getlime.security.powerauth.app.webauth.repository.model.Session;
 import io.getlime.security.powerauth.app.webauth.service.AuthenticationService;
 import io.getlime.security.powerauth.app.webauth.service.NextMessageResolutionService;
 import io.getlime.security.powerauth.app.webauth.service.NextStepService;
-import io.getlime.security.powerauth.lib.credentials.model.AuthenticationResponse;
-import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -165,16 +164,16 @@ public class MessageController {
             case LOGIN_CONFIRM:
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
-                if (username==null) {
+                if (username == null) {
                     username = "";
                 }
-                if (password==null) {
+                if (password == null) {
                     password = "".toCharArray();
                 }
                 // authenticate with the Credentials Server
-                AuthenticationResponse responseCS = authService.authenticate(username, password);
+                Response<?> responseCS = authService.authenticate(username, password);
 
-                if (responseCS.getStatus() == AuthenticationStatus.SUCCESS) {
+                if (responseCS.getStatus().equals(Response.Status.OK)) {
                     // for testing without Next Step server
                     /*
                     DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(authenticationRequest.getSessionId(),
@@ -184,9 +183,10 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    String userId = ((AuthenticationResponse) responseCS.getResponseObject()).getUserId();
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), userId, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.CONFIRMED, params);
-                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, Boolean.TRUE, sessionId);
                     sendMessage(nextMessage, sessionId);
                 } else {
                     // for testing without Next Step server
@@ -198,9 +198,9 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.FAILED, params);
-                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, Boolean.FALSE, sessionId);
                     sendMessage(nextMessage, sessionId);
                 }
                 break;

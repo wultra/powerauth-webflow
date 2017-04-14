@@ -15,7 +15,12 @@
  */
 package io.getlime.security.powerauth.lib.credentials.controller;
 
-import io.getlime.security.powerauth.lib.credentials.model.*;
+import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
+import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
+import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
+import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,53 +29,54 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Controller class which handles user authentication.
  * @author Roman Strobl
  */
 @RestController
 public class AuthenticationController {
 
+    /**
+     * Authenticate user with given username and password.
+     * @param authRequest Authenticate user request.
+     * @return Response with success or error code and error details in case authentication failed.
+     */
     @RequestMapping(name = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<AuthenticationResponse> authenticate(@RequestBody AuthenticationRequest authRequest) {
+    public ResponseEntity<Response<?>> authenticate(@RequestBody Request<AuthenticationRequest> authRequest) {
         // input handling
-        if (authRequest.getUsername()==null || authRequest.getUsername().isEmpty() || authRequest.getUsername().length()>30) {
-            ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.USERNAME_FORMAT_INVALID, "Invalid request: username format is invalid");
-            AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
-            return new ResponseEntity<>(response, response.getHttpStatus());
+        AuthenticationRequest request = authRequest.getRequestObject();
+        if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 30) {
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.USERNAME_FORMAT_INVALID, "Invalid request: username format is invalid");
+            Response response = new Response<>(Response.Status.ERROR, error);
+            return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }
 
-        if (authRequest.getPassword()==null || authRequest.getPassword().isEmpty() || authRequest.getPassword().length()>30) {
-            ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.PASSWORD_FORMAT_INVALID, "Invalid request: password format is invalid");
-            AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
-            return new ResponseEntity<>(response, response.getHttpStatus());
+        if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() > 30) {
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.PASSWORD_FORMAT_INVALID, "Invalid request: password format is invalid");
+            Response response = new Response<>(Response.Status.ERROR, error);
+            return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }
 
         // other authentication methods are reserved for future use
-        if (authRequest.getType()!= AuthenticationType.BASIC) {
-            ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid request: method is not supported");
-            AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.BAD_REQUEST, errorResponse);
-            return new ResponseEntity<>(response, response.getHttpStatus());
+        if (request.getType() != AuthenticationType.BASIC) {
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid request: method is not supported");
+            Response response = new Response<>(Response.Status.ERROR, error);
+            return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }
 
-        try {
-            // here will be the real authentication
-            if ("test".equals(authRequest.getUsername())
-                    && "test".equals(authRequest.getPassword())) {
-                // supply user id in constructor
-                AuthenticationResponse responseSuccess = new AuthenticationResponseSuccess("12345678");
-                return new ResponseEntity<>(responseSuccess, responseSuccess.getHttpStatus());
-            } else {
-                // regular authentication failed error
-                ErrorResponse errorResponse = new ErrorResponse(ErrorResponse.ResponseCode.AUTH_FAIL, "User authentication failed");
-                AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.UNAUTHORIZED, errorResponse);
-                return new ResponseEntity<>(response, response.getHttpStatus());
-                // handle other possible authentication errors here
-                // ...
-            }
-        } catch (Throwable t) {
-            // unexpected authentication error
-            ErrorResponse fatalErrorResponse = new ErrorResponse(ErrorResponse.ResponseCode.INTERNAL_SERVER_ERROR, t.toString());
-            AuthenticationResponse response = new AuthenticationResponseError(HttpStatus.INTERNAL_SERVER_ERROR, fatalErrorResponse);
-            return new ResponseEntity<>(response, response.getHttpStatus());
+        // here will be the real authentication
+        if ("test".equals(request.getUsername())
+                && "test".equals(request.getPassword())) {
+            // supply user id in constructor
+            AuthenticationResponse responseOK = new AuthenticationResponse("12345678");
+            Response response = new Response<>(Response.Status.ERROR, responseOK);
+            return new ResponseEntity<Response<?>>(response, HttpStatus.OK);
+        } else {
+            // regular authentication failed error
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.AUTH_FAIL, "User authentication failed");
+            Response response = new Response<>(Response.Status.ERROR, error);
+            return new ResponseEntity<Response<?>>(response, HttpStatus.UNAUTHORIZED);
+            // handle other possible authentication errors here
+            // ...
         }
     }
 }

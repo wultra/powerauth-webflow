@@ -4,7 +4,6 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 import io.getlime.security.powerauth.app.webauth.model.entity.authentication.DisplayLoginFormResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.DisplayMessageResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.WebAuthMessageType;
-import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
@@ -33,11 +32,11 @@ public class NextMessageResolutionService {
      * Server can be used to provide a more meaningful error message.
      *
      * @param response   response from the Next Step server
-     * @param authStatus last authentication status, use null if authentication was not performed
+     * @param authenticationSucceeded last authentication result, use null if authentication was not performed
      * @param sessionId  WebSocket sessionId
      * @return next message to show to the user
      */
-    public WebSocketJsonMessage resolveNextMessage(Response<?> response, AuthenticationStatus authStatus, String sessionId) {
+    public WebSocketJsonMessage resolveNextMessage(Response<?> response, Boolean authenticationSucceeded, String sessionId) {
         // TODO - handle better with OOP
         if (response.getResponseObject() instanceof ErrorModel) {
             return handleError((ErrorModel) response.getResponseObject(), sessionId);
@@ -50,7 +49,7 @@ public class NextMessageResolutionService {
         if (response.getResponseObject() instanceof UpdateOperationResponse) {
             UpdateOperationResponse responseObject = (UpdateOperationResponse) response.getResponseObject();
             // authStatus contains last authentication status for error messages
-            return resolveAuthResult(responseObject.getResult(), responseObject.getSteps(), responseObject.getOperationId(), authStatus, sessionId);
+            return resolveAuthResult(responseObject.getResult(), responseObject.getSteps(), responseObject.getOperationId(), authenticationSucceeded, sessionId);
         }
         return new DisplayMessageResponse(sessionId, WebAuthMessageType.ERROR, "Operation has failed.");
     }
@@ -72,11 +71,12 @@ public class NextMessageResolutionService {
      * @param authResult  main response type from Next Step server
      * @param steps       prioritized steps for the next action
      * @param operationId id of current operation
-     * @param authStatus  last authentication status
+     * @param authenticationSucceeded  last authentication result, use null if authentication was not performed
      * @param sessionId   WebSocket sessionId
      * @return next message to show to the user
      */
-    private static WebSocketJsonMessage resolveAuthResult(AuthResult authResult, List<AuthStep> steps, String operationId, AuthenticationStatus authStatus, String sessionId) {
+    private static WebSocketJsonMessage resolveAuthResult(AuthResult authResult, List<AuthStep> steps, String operationId,
+                                                          Boolean authenticationSucceeded, String sessionId) {
         switch (authResult) {
             case CONTINUE:
                 for (AuthStep step : steps) {
@@ -92,7 +92,7 @@ public class NextMessageResolutionService {
                             break;
                         case USERNAME_PASSWORD_AUTH:
                             System.out.println("Using supported auth method: " + step.getAuthMethod());
-                            if (authStatus == AuthenticationStatus.ERROR) {
+                            if (Boolean.FALSE.equals(authenticationSucceeded)) {
                                 return new DisplayLoginFormResponse(sessionId, operationId, "Authentication failed, please try again.", false);
                             } else {
                                 return new DisplayLoginFormResponse(sessionId, operationId, "Please sign in.", false);

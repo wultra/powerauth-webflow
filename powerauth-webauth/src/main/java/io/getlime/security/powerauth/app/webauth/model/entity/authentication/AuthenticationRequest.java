@@ -16,7 +16,6 @@
 package io.getlime.security.powerauth.app.webauth.model.entity.authentication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 import java.util.Base64;
@@ -26,11 +25,8 @@ import java.util.Base64;
  */
 public class AuthenticationRequest extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
-    @JsonProperty
     private WebAuthMethod method;
-    @JsonProperty
     private String credentials;
 
     public AuthenticationRequest() {
@@ -91,6 +87,19 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
 
     public String getOperationId() {
         return operationId;
+    }
+
+    public WebAuthMethod getMethod() {
+        return method;
+    }
+
+    public String getCredentials() {
+        return credentials;
+    }
+
+    @Override
+    public String toString() {
+        return "AuthenticationRequest (operationId=" + operationId + ")";
     }
 
 }

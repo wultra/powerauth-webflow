@@ -2,11 +2,16 @@ package io.getlime.security.powerauth.app.webauth.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
-import io.getlime.security.powerauth.lib.credentials.model.*;
+import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
+import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
+import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
+import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
@@ -31,36 +36,45 @@ public class AuthenticationService {
         this.objectMapper = objectMapper;
     }
 
-    public AuthenticationResponse authenticate(String username, char[] password) {
+    public Response<?> authenticate(String username, char[] password) {
         String credentialsServiceUrl = webAuthConfig.getCredentialServerServiceUrl();
         RestTemplate template = new RestTemplate();
         // java.net request factory throws exceptions -> response body is lost for errors, we use httpclient instead
         template.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         AuthenticationRequest request = new AuthenticationRequest(username, String.valueOf(password), AuthenticationType.BASIC);
-        HttpEntity<AuthenticationRequest> entity = new HttpEntity<>(request);
+        HttpEntity<Request<AuthenticationRequest>> entity = new HttpEntity<>(new Request<>(request));
         try {
-            ResponseEntity<AuthenticationResponseSuccess> response = template.exchange(credentialsServiceUrl + "/authenticate",
-                    HttpMethod.POST, entity, AuthenticationResponseSuccess.class);
-            System.out.println("Response from Credential Server: "+response.getBody());
-            return response.getBody();
+            ResponseEntity<Response<AuthenticationResponse>> response = template.exchange(credentialsServiceUrl + "/authenticate",
+                    HttpMethod.POST, entity, new ParameterizedTypeReference<Response<AuthenticationResponse>>() {
+                    });
+            System.out.println("Response from Credential Server - successfully authenticated user: " + response.getBody().getResponseObject().getUserId());
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             String responseString = ex.getResponseBodyAsString();
             try {
                 // handles regular authentication errors
-                AuthenticationResponse error = objectMapper.readValue(responseString, AuthenticationResponseError.class);
-                System.err.println("Response from Credential Server: "+error);
-                return error;
+                ErrorModel error = objectMapper.readValue(responseString, ErrorModel.class);
+                System.err.println("Response from Credential Server was invalid, exception: " + ex.toString());
+                if (error.getCode() == null) {
+                    error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+                    error.setMessage("Credential service error: " + ex.toString());
+                }
+                return new Response<>(Response.Status.ERROR, error);
             } catch (IOException ex2) {
                 // should never be reached - fatal error
-                System.err.println("Response from Credential Server was invalid, exception: "+ex2.toString());
-                ErrorResponse fatalErrorResponse = new ErrorResponse(ErrorResponse.ResponseCode.INTERNAL_SERVER_ERROR, ex2.toString());
-                return new AuthenticationResponseError(HttpStatus.INTERNAL_SERVER_ERROR, fatalErrorResponse);
+                System.err.println("Response from Credential Server was invalid, exception: " + ex2.toString());
+                ErrorModel error = new ErrorModel();
+                error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+                error.setMessage("Credential service error: " + ex2.toString());
+                return new Response<>(Response.Status.ERROR, error);
             }
         } catch (ResourceAccessException ex) {
             // Credential service is down
             System.err.println("Credential Server is not available, exception: " + ex.toString());
-            ErrorResponse fatalErrorResponse = new ErrorResponse(ErrorResponse.ResponseCode.INTERNAL_SERVER_ERROR, ex.toString());
-            return new AuthenticationResponseError(HttpStatus.INTERNAL_SERVER_ERROR, fatalErrorResponse);
+            ErrorModel error = new ErrorModel();
+            error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+            error.setMessage("Next step service is not available.");
+            return new Response<>(Response.Status.ERROR, error);
         }
     }
 

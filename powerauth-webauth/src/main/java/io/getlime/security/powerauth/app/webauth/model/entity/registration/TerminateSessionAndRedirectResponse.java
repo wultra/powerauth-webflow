@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,9 +22,7 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class TerminateSessionAndRedirectResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String redirectUrl;
-    @JsonProperty
     private int delay;
 
     public TerminateSessionAndRedirectResponse() {
@@ -36,6 +33,14 @@ public class TerminateSessionAndRedirectResponse extends WebSocketJsonMessage {
         this.sessionId = sessionId;
         this.redirectUrl = redirectUrl;
         this.delay = delay;
+    }
+
+    public String getRedirectUrl() {
+        return redirectUrl;
+    }
+
+    public int getDelay() {
+        return delay;
     }
 
 }

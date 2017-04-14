@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
@@ -23,7 +22,6 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
  */
 public class DisplayAuthorizationFormResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
 
     public DisplayAuthorizationFormResponse() {
@@ -33,6 +31,10 @@ public class DisplayAuthorizationFormResponse extends WebSocketJsonMessage {
         this.action = WebAuthAction.DISPLAY_PAYMENT_AUTHORIZATION_FORM;
         this.sessionId = sessionId;
         this.operationId = operationId;
+    }
+
+    public String getOperationId() {
+        return operationId;
     }
 
 }

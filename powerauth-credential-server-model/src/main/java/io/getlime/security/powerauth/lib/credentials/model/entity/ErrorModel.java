@@ -13,23 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentials.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+package io.getlime.security.powerauth.lib.credentials.model.entity;
 
 /**
  * @author Roman Strobl
  */
-public class HelloMessage {
+public class ErrorModel {
 
-    @JsonProperty
-    private final String message;
+    public enum ResponseCode {
+        AUTH_FAIL,
+        USERNAME_FORMAT_INVALID,
+        PASSWORD_FORMAT_INVALID,
+        AUTH_METHOD_UNSUPPORTED,
+        ERR_GENERIC
+    }
 
-    public HelloMessage(String message) {
+    private ResponseCode code;
+    private String message;
+
+    public ErrorModel() {
+    }
+
+    public ErrorModel(ResponseCode code, String message) {
+        this.code = code;
         this.message = message;
+    }
+
+    public ResponseCode getCode() {
+        return code;
+    }
+
+    public void setCode(ResponseCode code) {
+        this.code = code;
     }
 
     public String getMessage() {
         return message;
     }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
 }

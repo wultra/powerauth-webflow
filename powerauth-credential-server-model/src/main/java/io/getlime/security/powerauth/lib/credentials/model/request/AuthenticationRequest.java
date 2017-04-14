@@ -13,25 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentials.model;
+package io.getlime.security.powerauth.lib.credentials.model.request;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 
 /**
  * @author Roman Strobl
  */
 public class AuthenticationRequest {
 
-    @JsonProperty
     private String username;
-    @JsonProperty
     private String password;
-    @JsonProperty
     private AuthenticationType type;
-
-
-    private ObjectMapper mapper = new ObjectMapper();
 
     public AuthenticationRequest() {
     }
@@ -42,28 +35,28 @@ public class AuthenticationRequest {
         this.type = type;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getUsername() {
         return username;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setType(AuthenticationType type) {
+        this.type = type;
+    }
+
     public AuthenticationType getType() {
         return type;
     }
 
-    private String toJson() {
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return toJson();
-    }
 }
