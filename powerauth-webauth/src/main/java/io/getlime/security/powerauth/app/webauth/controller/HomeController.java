@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.webauth.controller;
 
+import io.getlime.security.powerauth.app.webauth.security.UserAuthentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -26,6 +28,7 @@ public class HomeController {
 
     @RequestMapping(value = "/")
     public String index() {
+        SecurityContextHolder.getContext().setAuthentication(new UserAuthentication());
         return "index";
     }
 

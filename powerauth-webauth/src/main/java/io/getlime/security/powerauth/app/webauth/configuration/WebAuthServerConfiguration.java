@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class WebAuthServerConfiguration {
+
     @Value("${powerauth.credentialServer.service.url}")
     private String credentialServerServiceUrl;
 
