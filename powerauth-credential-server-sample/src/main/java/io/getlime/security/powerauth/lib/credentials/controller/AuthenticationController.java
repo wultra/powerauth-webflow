@@ -68,7 +68,7 @@ public class AuthenticationController {
                 && "test".equals(request.getPassword())) {
             // supply user id in constructor
             AuthenticationResponse responseOK = new AuthenticationResponse("12345678");
-            Response response = new Response<>(Response.Status.ERROR, responseOK);
+            Response response = new Response<>(Response.Status.OK, responseOK);
             return new ResponseEntity<Response<?>>(response, HttpStatus.OK);
         } else {
             // regular authentication failed error
