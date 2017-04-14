@@ -77,10 +77,10 @@ class Login extends React.Component {
                         {this.props.message}
                     </FormGroup>
                     <FormGroup>
-                        <FormControl autoFocus autocomplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
+                        <FormControl autoFocus autoComplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
                     </FormGroup>
                     <FormGroup>
-                        <FormControl autocomplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+                        <FormControl autoComplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
                     </FormGroup>
                     <FormGroup>
                         <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
