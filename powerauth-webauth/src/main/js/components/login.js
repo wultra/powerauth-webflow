@@ -36,6 +36,7 @@ class Login extends React.Component {
         this.handleLogin = this.handleLogin.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.state = {username: "", password: ""};
+        this.firstLogin = true;
     }
 
     handleUsernameChange(event) {
@@ -48,6 +49,7 @@ class Login extends React.Component {
     }
 
     handleLogin() {
+        this.firstLogin = false;
         // prepare and send login message
         const msg = {
             sessionId: this.props.sessionId,
@@ -71,6 +73,27 @@ class Login extends React.Component {
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
     }
 
+    componentWillReceiveProps(props) {
+        if (this.firstLogin===false) {
+            // shake form in case first login failed
+            const e = document.getElementById('login');
+            e.style.marginLeft = '3px';
+            e.style.marginRight = '-3px';
+            setTimeout(function () {
+                e.style.marginLeft = '-2px';
+                e.style.marginRight = '2px';
+            }, 50);
+            setTimeout(function () {
+                e.style.marginLeft = '1px';
+                e.style.marginRight = '-1px';
+            }, 100);
+            setTimeout(function () {
+                e.style.marginLeft = '0px';
+                e.style.marginRight = '0px';
+            }, 150);
+        }
+    }
+
     componentWillMount() {
         // display only if current action matches component
         if (!utils.checkAccess(this.props, "login")) {
@@ -81,20 +104,22 @@ class Login extends React.Component {
     render() {
         if (utils.checkAccess(this.props, "login")) {
             return (
-                <form onSubmit={this.handleLogin}>
-                    <FormGroup>
-                        {this.props.message}
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoFocus autoComplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoComplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
-                    </FormGroup>
-                </form>
+                <div id="login">
+                    <form onSubmit={this.handleLogin}>
+                        <FormGroup>
+                            {this.props.message}
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoFocus autoComplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoComplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
+                        </FormGroup>
+                    </form>
+                </div>
             )
         } else {
             return null;
