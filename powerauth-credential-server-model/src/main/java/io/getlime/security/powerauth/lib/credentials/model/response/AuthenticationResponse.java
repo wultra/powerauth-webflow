@@ -16,22 +16,43 @@
 package io.getlime.security.powerauth.lib.credentials.model.response;
 
 /**
+ * Authentication response, to be embedded as Response<AuthenticationResponse>.
+ *
  * @author Roman Strobl
  */
 public class AuthenticationResponse {
 
+    /**
+     * Unique userId which identifies the user.
+     */
     private String userId;
 
+    /**
+     * Empty constructor.
+     */
     public AuthenticationResponse() {
     }
 
+    /**
+     * Constructor with userId parameter for convenience.
+     * @param userId Identification of the user.
+     */
     public AuthenticationResponse(String userId) {
         this.userId = userId;
     }
 
+    /**
+     * Sets the userId.
+     * @param userId userId to set
+     */
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    /**
+     * Gets the userId.
+     * @return userID
+     */
     public String getUserId() {
         return userId;
     }
