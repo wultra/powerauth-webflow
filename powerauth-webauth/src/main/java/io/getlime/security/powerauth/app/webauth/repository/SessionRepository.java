@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.webauth.repository.model.Session;
 import org.springframework.data.repository.CrudRepository;
 
 /**
+ * Basic CRUD repository for sessions. For now we use an in-memory repository, can be easily converted to a database
+ * repository in case we will need to persist sessions.
  * @author Roman Strobl
  */
 public interface SessionRepository extends CrudRepository<Session, Long> {

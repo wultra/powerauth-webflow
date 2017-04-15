@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models an authorization request from client. Authorization code is optional.
+ *
  * @author Roman Strobl
  */
 public class AuthorizationRequest extends WebSocketJsonMessage {

@@ -22,6 +22,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
+ * Models a session for communication via Web Sockets.
+ *
  * @author Roman Strobl
  */
 @Data

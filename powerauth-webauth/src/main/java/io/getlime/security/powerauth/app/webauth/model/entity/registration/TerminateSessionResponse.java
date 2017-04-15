@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models the session termination response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class TerminateSessionResponse extends WebSocketJsonMessage {

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Map;
 
 /**
- * Simple controller, redirects to the main HTML page with JavaScript content
+ * Simple controller, redirects to the main HTML page with JavaScript content.
  *
  * @author Roman Strobl
  */
@@ -38,7 +38,7 @@ public class HomeController {
     }
 
     /**
-     * Redirects to the index.html template file
+     * Redirects to the index.html template file.
      * @param model Model is used to store a link to the stylesheet which can be externalized
      * @return index page
      * @throws Exception thrown when page is not found

@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a confirm registration response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class ConfirmRegistrationResponse extends WebSocketJsonMessage {

@@ -22,12 +22,22 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 
 /**
+ * Authentication services provides services for communication with the Credential server.
+ * It uses the RestTemplate class to handle REST API calls. HTTP client is used instead of default client
+ * so that error responses contain full response bodies.
+ *
  * @author Roman Strobl
  */
 @Service
 public class AuthenticationService {
 
+    /**
+     * Provides access to Web Auth configuration.
+     */
     private WebAuthServerConfiguration webAuthConfig;
+    /**
+     * Used for converting error responses to objects.
+     */
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -36,6 +46,13 @@ public class AuthenticationService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Perform authentication with provided username and password.
+     *
+     * @param username username for user who is being authenticated
+     * @param password password as chararray to avoid having Strings with passwords in Java memory
+     * @return a Response with either AuthenticationResponse or ErrorModel given the result of the operation
+     */
     public Response<?> authenticate(String username, char[] password) {
         String credentialsServiceUrl = webAuthConfig.getCredentialServerServiceUrl();
         RestTemplate template = new RestTemplate();

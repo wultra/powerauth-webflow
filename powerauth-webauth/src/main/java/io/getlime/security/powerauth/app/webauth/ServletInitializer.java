@@ -19,7 +19,9 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
 
 /**
- * @author Petr Dvorak, petr@lime-company.eu
+ * Servlet initializer which handles application startup in a web container.
+ *
+ * @author Roman Strobl
  */
 public class ServletInitializer extends SpringBootServletInitializer {
 

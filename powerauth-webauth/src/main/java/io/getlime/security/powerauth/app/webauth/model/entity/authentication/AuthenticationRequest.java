@@ -21,6 +21,8 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 import java.util.Base64;
 
 /**
+ * Model for an authentication request from client.
+ *
  * @author Roman Strobl
  */
 public class AuthenticationRequest extends WebSocketJsonMessage {

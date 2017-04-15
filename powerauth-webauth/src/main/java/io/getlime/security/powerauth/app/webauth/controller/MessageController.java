@@ -50,17 +50,44 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * MessageController class handles responses to messages sent from the UI clients on different destinations.
+ *
+ * TODO - move all business logic out of this class once OAuth 2.0 integration is ready
+ *
  * @author Roman Strobl
  */
 @Controller
 public class MessageController {
 
+    /**
+     * Provides access to Web Sockets for sending replies.
+     */
     private final SimpMessagingTemplate websocket;
+    /**
+     * CRUD repository for sessions.
+     */
     private final SessionRepository sessionRepository;
+    /**
+     * Authentication service provides access to the Credential server.
+     */
     private final AuthenticationService authService;
+    /**
+     * Next step service provides access to the Next Step server.
+     */
     private final NextStepService nextStepService;
+    /**
+     * Resolves the next message to show to the user.
+     */
     private final NextMessageResolutionService resolutionService;
 
+    /**
+     * Autowired dependencies.
+     * @param websocket Web Socket reference
+     * @param sessionRepository session CRUD repository
+     * @param authService authentication service
+     * @param nextStepService next step service
+     * @param resolutionService message resolution service
+     */
     @Autowired
     public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository, AuthenticationService authService,
                              NextStepService nextStepService, NextMessageResolutionService resolutionService) {
@@ -71,6 +98,11 @@ public class MessageController {
         this.resolutionService = resolutionService;
     }
 
+    /**
+     * Creates headers for the message with provided sessionId.
+     * @param sessionId sessionId of the web socket session
+     * @return headers for the message
+     */
     private MessageHeaders createHeaders(String sessionId) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         headerAccessor.setSessionId(sessionId);
@@ -78,10 +110,16 @@ public class MessageController {
         return headerAccessor.getMessageHeaders();
     }
 
+    /**
+     * Handles registration messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param registrationRequest registration request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/registration")
-    public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest message) throws Exception {
-        System.out.println("Received registration message: " + message);
-        if (message.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
+    public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest registrationRequest) throws Exception {
+        System.out.println("Received registration message: " + registrationRequest);
+        if (registrationRequest.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
             String sessionId = headerAccessor.getSessionId();
             Session session = new Session(sessionId);
             sessionRepository.save(session);
@@ -90,7 +128,7 @@ public class MessageController {
             sendMessage(registrationResponse, sessionId);
 
             // UI test - walks through all UI screens with small delays, for development only
-            if (message.getPerformUITest()) {
+            if (registrationRequest.getPerformUITest()) {
                 // simulates redirect after the reply from the Next Server
                 Thread.sleep(1000);
                 String operationId = "40269145-d91f-4579-badd-c57fa1133239";
@@ -156,6 +194,12 @@ public class MessageController {
         }
     }
 
+    /**
+     * Handles authentication messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param authenticationRequest authentication request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/authentication")
     public void authenticate(SimpMessageHeaderAccessor headerAccessor, AuthenticationRequest authenticationRequest) throws Exception {
         System.out.println("Received authentication message: " + authenticationRequest);
@@ -223,6 +267,12 @@ public class MessageController {
         }
     }
 
+    /**
+     * Handles authorization messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param authorizationRequest authentication request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/authorization")
     public void authorize(SimpMessageHeaderAccessor headerAccessor, AuthorizationRequest authorizationRequest) throws Exception {
         System.out.println("Received authorization message: " + authorizationRequest);
@@ -266,6 +316,11 @@ public class MessageController {
         }
     }
 
+    /**
+     * Sends a message to a client identified by the websocket sessionId.
+     * @param message message to send
+     * @param sessionId sessionId for existing session
+     */
     private void sendMessage(WebSocketJsonMessage message, String sessionId) {
         switch (message.getAction()) {
             case REGISTRATION_CONFIRM:

@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a display authorization form response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class DisplayAuthorizationFormResponse extends WebSocketJsonMessage {

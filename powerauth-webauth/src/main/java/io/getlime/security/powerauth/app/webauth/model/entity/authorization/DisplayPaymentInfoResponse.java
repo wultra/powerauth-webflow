@@ -20,6 +20,10 @@ import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessa
 import java.math.BigDecimal;
 
 /**
+ * Models a display payment info response sent to the client.
+ *
+ * TODO - needs to be generalized to operations instead of payments.
+ *
  * @author Roman Strobl
  */
 public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {

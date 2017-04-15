@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.messages;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a display message response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class DisplayMessageResponse extends WebSocketJsonMessage {

@@ -16,10 +16,17 @@
 package io.getlime.security.powerauth.app.webauth.model.entity;
 
 /**
+ * Parent class for all Web Socket messages.
+ *
  * @author Roman Strobl
  */
 public class WebSocketJsonMessage {
 
+    /**
+     * Supported actions for different use cases.
+     *
+     * TODO - split actions to requests and responses.
+     */
     public enum WebAuthAction {
         REGISTER,
         REGISTRATION_CONFIRM,

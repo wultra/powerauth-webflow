@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a session termination response with redirect sent to the client.
+ *
  * @author Roman Strobl
  */
 public class TerminateSessionAndRedirectResponse extends WebSocketJsonMessage {
