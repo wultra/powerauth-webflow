@@ -32,9 +32,19 @@ public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {
     private BigDecimal amount;
     private String currency;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayPaymentInfoResponse() {
     }
 
+    /**
+     * Constructor with all parameters for convenience.
+     * @param sessionId websocket session id
+     * @param operationId operation id
+     * @param amount amount in this payment
+     * @param currency currency of this payment
+     */
     public DisplayPaymentInfoResponse(String sessionId, String operationId, BigDecimal amount, String currency) {
         this.action = WebAuthAction.DISPLAY_PAYMENT_INFO;
         this.sessionId = sessionId;
@@ -43,14 +53,26 @@ public class DisplayPaymentInfoResponse extends WebSocketJsonMessage {
         this.currency = currency;
     }
 
+    /**
+     * Gets the operation id.
+     * @return operation id
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Gets the amount for the payment.
+     * @return payment amount
+     */
     public BigDecimal getAmount() {
         return amount;
     }
 
+    /**
+     * Gets the currency of this payment.
+     * @return currency of the payment
+     */
     public String getCurrency() {
         return currency;
     }

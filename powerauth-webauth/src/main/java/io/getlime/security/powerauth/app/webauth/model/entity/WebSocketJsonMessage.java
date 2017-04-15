@@ -44,13 +44,27 @@ public class WebSocketJsonMessage {
         TERMINATE_REDIRECT
     }
 
+    /**
+     * Action to perform.
+     */
     protected WebAuthAction action;
+    /**
+     * Websocket sessionId.
+     */
     protected String sessionId;
 
+    /**
+     * Gets the action to perform.
+     * @return action to perform
+     */
     public WebAuthAction getAction() {
         return action;
     }
 
+    /**
+     * Gets the websocket sessionId.
+     * @return websocket sessionId.
+     */
     public String getSessionId() {
         return sessionId;
     }

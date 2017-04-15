@@ -28,9 +28,19 @@ public class DisplayLoginFormResponse extends WebSocketJsonMessage {
     private boolean showCaptcha;
     private String message;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayLoginFormResponse() {
     }
 
+    /**
+     * Constructor with all parameters for convenience.
+     * @param sessionId websocket sessionId
+     * @param operationId operation id
+     * @param message message to display to the user
+     * @param showCaptcha should the UI show captcha
+     */
     public DisplayLoginFormResponse(String sessionId, String operationId, String message, boolean showCaptcha) {
         this.action = WebAuthAction.DISPLAY_LOGIN_FORM;
         this.sessionId = sessionId;
@@ -39,18 +49,34 @@ public class DisplayLoginFormResponse extends WebSocketJsonMessage {
         this.showCaptcha = showCaptcha;
     }
 
+    /**
+     * Sets the message displayed to the user.
+     * @param message message to set.
+     */
     public void setMessage(String message) {
         this.message = message;
     }
 
+    /**
+     * Gets the operation id.
+     * @return operation id
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Gets whether to show the captcha.
+     * @return whether to show captcha
+     */
     public boolean getShowCaptcha() {
         return showCaptcha;
     }
 
+    /**
+     * Gets the message to be displayed to the user.
+     * @return message to show
+     */
     public String getMessage() {
         return message;
     }

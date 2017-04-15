@@ -26,15 +26,27 @@ public class DisplayAuthorizationFormResponse extends WebSocketJsonMessage {
 
     private String operationId;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayAuthorizationFormResponse() {
     }
 
+    /**
+     * Constructor with both parameters for convenience.
+     * @param sessionId websocket session id
+     * @param operationId operation id
+     */
     public DisplayAuthorizationFormResponse(String sessionId, String operationId) {
         this.action = WebAuthAction.DISPLAY_PAYMENT_AUTHORIZATION_FORM;
         this.sessionId = sessionId;
         this.operationId = operationId;
     }
 
+    /**
+     * Gets the operation id.
+     * @return operation id
+     */
     public String getOperationId() {
         return operationId;
     }

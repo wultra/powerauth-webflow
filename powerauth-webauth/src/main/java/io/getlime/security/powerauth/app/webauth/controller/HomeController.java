@@ -32,6 +32,10 @@ public class HomeController {
 
     private WebAuthServerConfiguration webAuthConfig;
 
+    /**
+     * Initialization of the HomeController with application configuration.
+     * @param webAuthConfig configuration of the application
+     */
     @Autowired
     public HomeController(WebAuthServerConfiguration webAuthConfig) {
         this.webAuthConfig = webAuthConfig;

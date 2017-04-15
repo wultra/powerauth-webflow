@@ -27,9 +27,18 @@ public class TerminateSessionAndRedirectResponse extends WebSocketJsonMessage {
     private String redirectUrl;
     private int delay;
 
+    /**
+     * Empty constructor.
+     */
     public TerminateSessionAndRedirectResponse() {
     }
 
+    /**
+     * Constructor with parameters for convenience.
+     * @param sessionId websocket sessionId
+     * @param redirectUrl URL where to redirect the user after session is terminated
+     * @param delay delay of the redirect in seconds, use 0 for an immediate redirect
+     */
     public TerminateSessionAndRedirectResponse(String sessionId, String redirectUrl, int delay) {
         this.action = WebAuthAction.TERMINATE_REDIRECT;
         this.sessionId = sessionId;
@@ -37,10 +46,19 @@ public class TerminateSessionAndRedirectResponse extends WebSocketJsonMessage {
         this.delay = delay;
     }
 
+    /**
+     * Gets the redirect URL.
+     *
+     * @return redirect URL
+     */
     public String getRedirectUrl() {
         return redirectUrl;
     }
 
+    /**
+     * Gets the redirect delay.
+     * @return delay of the redirect in seconds
+     */
     public int getDelay() {
         return delay;
     }

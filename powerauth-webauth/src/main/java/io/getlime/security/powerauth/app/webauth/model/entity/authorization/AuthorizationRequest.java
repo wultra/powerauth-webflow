@@ -27,19 +27,35 @@ public class AuthorizationRequest extends WebSocketJsonMessage {
     private String operationId;
     private String authorizationCode;
 
+    /**
+     * Empty constructor.
+     */
     public AuthorizationRequest() {
     }
 
+    /**
+     * Constructor with both parameters for convenience.
+     * @param operationId operation id
+     * @param authorizationCode authorization code for this operation
+     */
     public AuthorizationRequest(String operationId, String authorizationCode) {
         this.action = WebAuthAction.PAYMENT_AUTHORIZATION_CONFIRM;
         this.operationId = operationId;
         this.authorizationCode = authorizationCode;
     }
 
+    /**
+     * Gets the operation id.
+     * @return operation id
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Gets the authorization code.
+     * @return authorization code
+     */
     public String getAuthorizationCode() {
         return authorizationCode;
     }

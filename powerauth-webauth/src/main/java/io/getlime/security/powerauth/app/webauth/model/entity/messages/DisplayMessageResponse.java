@@ -27,9 +27,18 @@ public class DisplayMessageResponse extends WebSocketJsonMessage {
     private WebAuthMessageType messageType;
     private String text;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayMessageResponse() {
     }
 
+    /**
+     * Constructor with all parameters for convenience.
+     * @param sessionId websocket sessionId
+     * @param messageType type of the message, influences the visual representation on the frontend
+     * @param text text to display
+     */
     public DisplayMessageResponse(String sessionId, WebAuthMessageType messageType, String text) {
         this.action = WebAuthAction.DISPLAY_MESSAGE;
         this.sessionId = sessionId;

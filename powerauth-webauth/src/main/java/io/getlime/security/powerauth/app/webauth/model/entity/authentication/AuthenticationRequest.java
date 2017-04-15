@@ -31,15 +31,28 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
     private WebAuthMethod method;
     private String credentials;
 
+    /**
+     * Empty constructor.
+     */
     public AuthenticationRequest() {
     }
 
+    /**
+     * Constructor with all parameters for convenience.
+     * @param operationId id of the related operation
+     * @param method authentication method
+     * @param credentials credentials encoded using BASE64 with colon separating username and password
+     */
     public AuthenticationRequest(String operationId, WebAuthMethod method, String credentials) {
         this.action = WebAuthAction.LOGIN_CONFIRM;
         this.method = method;
         this.credentials = credentials;
     }
 
+    /**
+     * Get the username in plain text.
+     * @return
+     */
     @JsonIgnore
     public String getUsername() {
         if (credentials == null || method==null || operationId==null) {
@@ -63,6 +76,10 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
         return null;
     }
 
+    /**
+     * Get the password in plain text.
+     * @return
+     */
     @JsonIgnore
     public char[] getPassword() {
         if (credentials == null) {
@@ -87,18 +104,34 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
         return null;
     }
 
+    /**
+     * Get the operation id.
+     * @return operation id
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Get the authentication method.
+     * @return authentication method
+     */
     public WebAuthMethod getMethod() {
         return method;
     }
 
+    /**
+     * Get the BASE64-encoded credentials.
+     * @return BASE64-encoded credentials
+     */
     public String getCredentials() {
         return credentials;
     }
 
+    /**
+     * Returns a safe String representation of this object for logging.
+     * @return String representation
+     */
     @Override
     public String toString() {
         return "AuthenticationRequest (operationId=" + operationId + ")";

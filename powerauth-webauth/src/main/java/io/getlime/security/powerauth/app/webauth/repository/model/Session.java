@@ -36,13 +36,25 @@ public class Session {
 
     private String sessionId;
 
+    /**
+     * Empty constructor.
+     */
     public Session() {
     }
 
+    /**
+     * Parametrized constructor with sessionId.
+     *
+     * @param sessionId websocket sessionId
+     */
     public Session(String sessionId) {
         this.sessionId = sessionId;
     }
 
+    /**
+     * String representation of the session for logging.
+     * @return String representation
+     */
     public String toString() {
         return sessionId;
     }
