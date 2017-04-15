@@ -48,6 +48,6 @@ a {
     height: 80px;
 }
 
-#shake{
-    transition: margin 50ms;
+#login{
+    transition: margin 50ms ease-in-out 25ms;
 }

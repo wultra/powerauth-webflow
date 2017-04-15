@@ -84,15 +84,15 @@ class Login extends React.Component {
             setTimeout(function () {
                 e.style.marginLeft = '-2px';
                 e.style.marginRight = '2px';
-            }, 50);
+            }, 75);
             setTimeout(function () {
                 e.style.marginLeft = '1px';
                 e.style.marginRight = '-1px';
-            }, 100);
+            }, 150);
             setTimeout(function () {
                 e.style.marginLeft = '0px';
                 e.style.marginRight = '0px';
-            }, 150);
+            }, 225);
         }
     }
 
