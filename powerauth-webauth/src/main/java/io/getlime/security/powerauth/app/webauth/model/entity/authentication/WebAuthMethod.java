@@ -15,6 +15,8 @@
  */package io.getlime.security.powerauth.app.webauth.model.entity.authentication;
 
 /**
+ * Supported authentication methods.
+ *
  * @author Roman Strobl
  */
 public enum WebAuthMethod {

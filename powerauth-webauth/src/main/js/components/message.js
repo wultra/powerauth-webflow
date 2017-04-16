@@ -19,9 +19,15 @@ const React = require('react');
 const utils = require('../utils');
 import { connect } from 'react-redux';
 
+/**
+ * Message component shows informational and error messages.
+ *
+ * We should add redirect and session termination functionality later on (see terminate.js).
+ */
 class Message extends React.Component {
 
     componentWillMount() {
+        // display only if current action matches component
         if (!utils.checkAccess(this.props, "message")) {
             this.props.router.push("/");
         }

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import java.util.Map;
 
 /**
- * Simple controller, redirects to the main HTML page with JavaScript content
+ * Simple controller, redirects to the main HTML page with JavaScript content.
  *
  * @author Roman Strobl
  */
@@ -32,6 +32,10 @@ public class HomeController {
 
     private WebAuthServerConfiguration webAuthConfig;
 
+    /**
+     * Initialization of the HomeController with application configuration.
+     * @param webAuthConfig configuration of the application
+     */
     @Autowired
     public HomeController(WebAuthServerConfiguration webAuthConfig) {
         this.webAuthConfig = webAuthConfig;

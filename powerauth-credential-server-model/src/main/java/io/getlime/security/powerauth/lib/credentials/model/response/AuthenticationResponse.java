@@ -13,28 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.credentials.model;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import org.springframework.http.HttpStatus;
+package io.getlime.security.powerauth.lib.credentials.model.response;
 
 /**
+ * Authentication response, to be embedded as Response<AuthenticationResponse>.
+ *
  * @author Roman Strobl
  */
-public class AuthenticationResponseSuccess extends AuthenticationResponse {
+public class AuthenticationResponse {
 
-    @JsonProperty
+    /**
+     * Unique userId which identifies the user.
+     */
     private String userId;
 
-    public AuthenticationResponseSuccess() {
+    /**
+     * Empty constructor.
+     */
+    public AuthenticationResponse() {
     }
 
-    public AuthenticationResponseSuccess(String userId) {
-        this.httpStatus = HttpStatus.OK;
-        this.status = AuthenticationStatus.SUCCESS;
+    /**
+     * Constructor with userId parameter for convenience.
+     * @param userId Identification of the user.
+     */
+    public AuthenticationResponse(String userId) {
         this.userId = userId;
     }
 
+    /**
+     * Sets the userId.
+     * @param userId userId to set
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Gets the userId.
+     * @return userID
+     */
     public String getUserId() {
         return userId;
     }

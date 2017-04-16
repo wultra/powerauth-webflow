@@ -15,27 +15,47 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.registration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a registration request received from the client.
+ *
  * @author Roman Strobl
  */
 public class RegistrationRequest extends WebSocketJsonMessage {
 
-    @JsonProperty
     private boolean performUITest;
 
+    /**
+     * Empty constructor.
+     */
     public RegistrationRequest() {
     }
 
+    /**
+     * Constructor with parameters for convenience.
+     * @param performUITest whether to perform UI test
+     */
     public RegistrationRequest(boolean performUITest) {
         this.action = WebAuthAction.REGISTER;
         this.performUITest = performUITest;
     }
 
+    /**
+     * Whether to perform the UI test.
+     *
+     * @return whether UI test should be performed
+     */
     public boolean getPerformUITest() {
         return performUITest;
+    }
+
+    /**
+     * String representation of the object for logging.
+     * @return String representation
+     */
+    public String toString() {
+        return "RegistrationRequest (performUITest=" + performUITest + ")";
     }
 
 }

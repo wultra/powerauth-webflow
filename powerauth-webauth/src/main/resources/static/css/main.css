@@ -48,3 +48,6 @@ a {
     height: 80px;
 }
 
+#login{
+    transition: margin 50ms ease-in-out 25ms;
+}

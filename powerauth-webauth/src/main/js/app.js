@@ -23,7 +23,6 @@ const ReactDOM = require('react-dom');
 import { Router, Route, IndexRoute, Link, hashHistory } from 'react-router';
 import { Provider } from 'react-redux';
 import { createStore } from 'redux';
-import { Row, Col } from 'react-bootstrap';
 
 // local require
 const stompClient = require('./websocket-listener');
@@ -36,16 +35,23 @@ const CAuthorize = require('./components/authorize');
 const CMessage = require('./components/message');
 const CTerminate = require('./components/terminate');
 
+/**
+ * The App class is the main React component of this application. It handles incoming WebSocket messages
+ * from the backend and renders the main page. Other components render individual subpages and get redirected
+ * from here based on incoming messages.
+ */
 class App extends React.Component {
 
-    constructor(props) {
-        super(props);
+    constructor() {
+        super();
+        // bind this for later
         this.onRegister = this.onRegister.bind(this);
         this.onAuthenticate = this.onAuthenticate.bind(this);
         this.onAuthorize = this.onAuthorize.bind(this);
         this.onMessage = this.onMessage.bind(this);
     }
 
+    // registration and session termination
     onRegister(message) {
         const msg = JSON.parse(message.body);
         if (msg.action === "REGISTRATION_CONFIRM") {
@@ -59,6 +65,7 @@ class App extends React.Component {
         }
     }
 
+    // authentication using username and password
     onAuthenticate(message) {
         const msg = JSON.parse(message.body);
         if (msg.action === "DISPLAY_LOGIN_FORM" && store.getState().sessionId === msg.sessionId) {
@@ -67,6 +74,7 @@ class App extends React.Component {
         }
     }
 
+    // authorization of operations
     onAuthorize(message) {
         const msg = JSON.parse(message.body);
         if (msg.action === "DISPLAY_PAYMENT_INFO" && store.getState().sessionId === msg.sessionId) {
@@ -79,6 +87,7 @@ class App extends React.Component {
         }
     }
 
+    // displaying of messages
     onMessage(message) {
         const msg = JSON.parse(message.body);
         if (msg.action === "DISPLAY_MESSAGE" && store.getState().sessionId === msg.sessionId) {
@@ -87,6 +96,8 @@ class App extends React.Component {
         }
     }
 
+    // registration for individual topics with callbacks
+    // the /user prefix is used to avoid broadcasting messages to other users
     componentDidMount() {
         stompClient.register([
             {route: '/user/topic/registration', callback: this.onRegister},
@@ -96,6 +107,7 @@ class App extends React.Component {
         ]);
     }
 
+    // render the main page
     render() {
         return (
             <div>
@@ -119,8 +131,10 @@ class App extends React.Component {
     }
 }
 
+// Redux store, available for child components through store Provider
 const store = createStore(reducers.reducer);
 
+// routes in React-Router 3.x syntax
 ReactDOM.render(
     <Provider store={store}>
         <Router history={hashHistory}>

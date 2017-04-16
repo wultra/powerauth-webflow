@@ -20,6 +20,10 @@ const fs = require('fs');
 let compilationStart = -1;
 let compilationEnd = -1;
 
+/**
+ * This plug-in handles redeployment of the JavaScript code during development.
+ * @constructor empty
+ */
 function WebpackDeployPlugin() {
 }
 

@@ -32,6 +32,11 @@
             <artifactId>powerauth-credential-server-model</artifactId>
             <version>0.15.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-nextstep-model</artifactId>
+            <version>0.15.0</version>
+        </dependency>
     </dependencies>
 
     <build>

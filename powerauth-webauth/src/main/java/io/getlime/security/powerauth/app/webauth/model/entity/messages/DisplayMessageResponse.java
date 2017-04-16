@@ -15,27 +15,43 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.messages;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a display message response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class DisplayMessageResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private WebAuthMessageType messageType;
-    @JsonProperty
     private String text;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayMessageResponse() {
     }
 
+    /**
+     * Constructor with all parameters for convenience.
+     * @param sessionId websocket sessionId
+     * @param messageType type of the message, influences the visual representation on the frontend
+     * @param text text to display
+     */
     public DisplayMessageResponse(String sessionId, WebAuthMessageType messageType, String text) {
         this.action = WebAuthAction.DISPLAY_MESSAGE;
         this.sessionId = sessionId;
         this.messageType = messageType;
         this.text = text;
+    }
+
+    public WebAuthMessageType getMessageType() {
+        return messageType;
+    }
+
+    public String getText() {
+        return text;
     }
 
 }

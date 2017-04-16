@@ -31,8 +31,7 @@ import io.getlime.security.powerauth.app.webauth.security.UserAuthentication;
 import io.getlime.security.powerauth.app.webauth.service.AuthenticationService;
 import io.getlime.security.powerauth.app.webauth.service.NextMessageResolutionService;
 import io.getlime.security.powerauth.app.webauth.service.NextStepService;
-import io.getlime.security.powerauth.lib.credentials.model.AuthenticationResponse;
-import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -53,16 +52,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * MessageController class handles responses to messages sent from the UI clients on different destinations.
+ *
+ * TODO - move all business logic out of this class once OAuth 2.0 integration is ready
+ *
  * @author Roman Strobl
  */
 @Controller
 public class MessageController {
 
+    /**
+     * Provides access to Web Sockets for sending replies.
+     */
     private final SimpMessagingTemplate websocket;
     private final AuthenticationService authService;
+    /**
+     * Next step service provides access to the Next Step server.
+     */
     private final NextStepService nextStepService;
+    /**
+     * Resolves the next message to show to the user.
+     */
     private final NextMessageResolutionService resolutionService;
 
+    /**
+     * Autowired dependencies.
+     * @param websocket Web Socket reference
+     * @param authService authentication service
+     * @param nextStepService next step service
+     * @param resolutionService message resolution service
+     */
     @Autowired
     public MessageController(SimpMessagingTemplate websocket, AuthenticationService authService, NextStepService nextStepService, NextMessageResolutionService resolutionService) {
         this.websocket = websocket;
@@ -71,6 +90,11 @@ public class MessageController {
         this.resolutionService = resolutionService;
     }
 
+    /**
+     * Creates headers for the message with provided sessionId.
+     * @param sessionId sessionId of the web socket session
+     * @return headers for the message
+     */
     private MessageHeaders createHeaders(String sessionId) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         headerAccessor.setSessionId(sessionId);
@@ -78,9 +102,15 @@ public class MessageController {
         return headerAccessor.getMessageHeaders();
     }
 
+    /**
+     * Handles registration messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param registrationRequest registration request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/registration")
-    public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest message) throws Exception {
-        System.out.println("Received registration message: " + message);
+    public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest registrationRequest) throws Exception {
+        System.out.println("Received registration message: " + registrationRequest);
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
@@ -91,14 +121,14 @@ public class MessageController {
         auth.setUserId("admin");
         SecurityContextHolder.getContext().setAuthentication(auth);
 
-        if (message.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
+        if (registrationRequest.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
             String sessionId = headerAccessor.getSessionId();
 
             ConfirmRegistrationResponse registrationResponse = new ConfirmRegistrationResponse(sessionId);
             sendMessage(registrationResponse, sessionId);
 
             // UI test - walks through all UI screens with small delays, for development only
-            if (message.getPerformUITest()) {
+            if (registrationRequest.getPerformUITest()) {
                 // simulates redirect after the reply from the Next Server
                 Thread.sleep(1000);
                 String operationId = "40269145-d91f-4579-badd-c57fa1133239";
@@ -163,6 +193,12 @@ public class MessageController {
         }
     }
 
+    /**
+     * Handles authentication messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param authenticationRequest authentication request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/authentication")
     public void authenticate(SimpMessageHeaderAccessor headerAccessor, AuthenticationRequest authenticationRequest) throws Exception {
         System.out.println("Received authentication message: " + authenticationRequest);
@@ -171,16 +207,16 @@ public class MessageController {
             case LOGIN_CONFIRM:
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
-                if (username==null) {
+                if (username == null) {
                     username = "";
                 }
-                if (password==null) {
+                if (password == null) {
                     password = "".toCharArray();
                 }
                 // authenticate with the Credentials Server
-                AuthenticationResponse responseCS = authService.authenticate(username, password);
+                Response<?> responseCS = authService.authenticate(username, password);
 
-                if (responseCS.getStatus() == AuthenticationStatus.SUCCESS) {
+                if (responseCS.getStatus().equals(Response.Status.OK)) {
                     // for testing without Next Step server
                     /*
                     DisplayPaymentInfoResponse displayPayment = new DisplayPaymentInfoResponse(authenticationRequest.getSessionId(),
@@ -190,9 +226,10 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    String userId = ((AuthenticationResponse) responseCS.getResponseObject()).getUserId();
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), userId, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.CONFIRMED, params);
-                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, Boolean.TRUE, sessionId);
                     sendMessage(nextMessage, sessionId);
                 } else {
                     // for testing without Next Step server
@@ -204,9 +241,9 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.FAILED, params);
-                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
+                    WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, Boolean.FALSE, sessionId);
                     sendMessage(nextMessage, sessionId);
                 }
                 break;
@@ -229,6 +266,12 @@ public class MessageController {
         }
     }
 
+    /**
+     * Handles authorization messages arriving from the clients.
+     * @param headerAccessor message headers
+     * @param authorizationRequest authentication request message
+     * @throws Exception thrown in case of invalid messages
+     */
     @MessageMapping("/authorization")
     public void authorize(SimpMessageHeaderAccessor headerAccessor, AuthorizationRequest authorizationRequest) throws Exception {
         System.out.println("Received authorization message: " + authorizationRequest);
@@ -271,6 +314,11 @@ public class MessageController {
         }
     }
 
+    /**
+     * Sends a message to a client identified by the websocket sessionId.
+     * @param message message to send
+     * @param sessionId sessionId for existing session
+     */
     private void sendMessage(WebSocketJsonMessage message, String sessionId) {
         switch (message.getAction()) {
             case REGISTRATION_CONFIRM:

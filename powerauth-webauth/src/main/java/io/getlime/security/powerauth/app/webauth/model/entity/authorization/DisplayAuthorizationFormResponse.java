@@ -15,24 +15,40 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity.authorization;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.getlime.security.powerauth.app.webauth.model.entity.WebSocketJsonMessage;
 
 /**
+ * Models a display authorization form response sent to the client.
+ *
  * @author Roman Strobl
  */
 public class DisplayAuthorizationFormResponse extends WebSocketJsonMessage {
 
-    @JsonProperty
     private String operationId;
 
+    /**
+     * Empty constructor.
+     */
     public DisplayAuthorizationFormResponse() {
     }
 
+    /**
+     * Constructor with both parameters for convenience.
+     * @param sessionId websocket session id
+     * @param operationId operation id
+     */
     public DisplayAuthorizationFormResponse(String sessionId, String operationId) {
         this.action = WebAuthAction.DISPLAY_PAYMENT_AUTHORIZATION_FORM;
         this.sessionId = sessionId;
         this.operationId = operationId;
+    }
+
+    /**
+     * Gets the operation id.
+     * @return operation id
+     */
+    public String getOperationId() {
+        return operationId;
     }
 
 }

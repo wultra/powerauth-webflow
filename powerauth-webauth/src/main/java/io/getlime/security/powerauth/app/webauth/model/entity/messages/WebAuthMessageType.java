@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.webauth.model.entity.messages;
 
 /**
+ * Message types to show to the client for different types of messages.
+ *
  * @author Roman Strobl
  */
 public enum WebAuthMessageType {

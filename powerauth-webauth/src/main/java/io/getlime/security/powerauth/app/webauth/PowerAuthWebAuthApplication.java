@@ -19,6 +19,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ * Main Spring boot class for Web Auth server.
+ *
  * @author Roman Strobl
  */
 @SpringBootApplication

@@ -15,13 +15,18 @@
  */
 package io.getlime.security.powerauth.app.webauth.model.entity;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
+ * Parent class for all Web Socket messages.
+ *
  * @author Roman Strobl
  */
 public class WebSocketJsonMessage {
 
+    /**
+     * Supported actions for different use cases.
+     *
+     * TODO - split actions to requests and responses.
+     */
     public enum WebAuthAction {
         REGISTER,
         REGISTRATION_CONFIRM,
@@ -39,29 +44,29 @@ public class WebSocketJsonMessage {
         TERMINATE_REDIRECT
     }
 
+    /**
+     * Action to perform.
+     */
     protected WebAuthAction action;
+    /**
+     * Websocket sessionId.
+     */
     protected String sessionId;
 
-    private ObjectMapper mapper = new ObjectMapper();
-
+    /**
+     * Gets the action to perform.
+     * @return action to perform
+     */
     public WebAuthAction getAction() {
         return action;
     }
 
+    /**
+     * Gets the websocket sessionId.
+     * @return websocket sessionId.
+     */
     public String getSessionId() {
         return sessionId;
     }
 
-    public String toJson() {
-        try {
-            return mapper.writeValueAsString(this);
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return toJson();
-    }
 }

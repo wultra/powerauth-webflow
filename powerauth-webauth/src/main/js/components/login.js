@@ -23,25 +23,36 @@ import { connect } from 'react-redux';
 
 import { Button, FormGroup, FormControl } from 'react-bootstrap';
 
+/**
+ * Login component handles the user authentication using username and password.
+ */
 class Login extends React.Component {
 
     constructor() {
         super();
+        // bind this for later
         this.handleUsernameChange = this.handleUsernameChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleLogin = this.handleLogin.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.state = {username: "", password: ""};
+        this.firstLogin = true;
     }
 
     handleUsernameChange(event) {
+        // update state on keypress
         this.setState({username: event.target.value});
     }
     handlePasswordChange(event) {
+        // update state on keypress
         this.setState({password: event.target.value});
     }
 
-    handleLogin() {
+    handleLogin(event) {
+        // prevent regular form submission, this leads to side effects
+        event.preventDefault();
+        this.firstLogin = false;
+        // prepare and send login message
         const msg = {
             sessionId: this.props.sessionId,
             action: "LOGIN_CONFIRM",
@@ -54,6 +65,7 @@ class Login extends React.Component {
     }
 
     handleCancel() {
+        // prepare and send login canceled message
         const msg = {
             sessionId: this.props.sessionId,
             action: "LOGIN_CANCEL",
@@ -63,7 +75,29 @@ class Login extends React.Component {
         stompClient.send("/app/authentication", {}, JSON.stringify(msg));
     }
 
+    componentWillReceiveProps() {
+        if (this.firstLogin===false) {
+            // shake form in case first login failed
+            const e = document.getElementById('login');
+            e.style.marginLeft = '3px';
+            e.style.marginRight = '-3px';
+            setTimeout(function () {
+                e.style.marginLeft = '-2px';
+                e.style.marginRight = '2px';
+            }, 75);
+            setTimeout(function () {
+                e.style.marginLeft = '1px';
+                e.style.marginRight = '-1px';
+            }, 150);
+            setTimeout(function () {
+                e.style.marginLeft = '0px';
+                e.style.marginRight = '0px';
+            }, 225);
+        }
+    }
+
     componentWillMount() {
+        // display only if current action matches component
         if (!utils.checkAccess(this.props, "login")) {
             this.props.router.push("/");
         }
@@ -72,20 +106,22 @@ class Login extends React.Component {
     render() {
         if (utils.checkAccess(this.props, "login")) {
             return (
-                <form onSubmit={this.handleLogin}>
-                    <FormGroup>
-                        {this.props.message}
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoFocus autocomplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autocomplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
-                    </FormGroup>
-                </form>
+                <div id="login">
+                    <form onSubmit={this.handleLogin}>
+                        <FormGroup>
+                            {this.props.message}
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoFocus autoComplete="new-password" type="text" placeholder="Login number" value={this.state.username} onChange={this.handleUsernameChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoComplete="new-password" type="password" placeholder="Password" value={this.state.password} onChange={this.handlePasswordChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
+                        </FormGroup>
+                    </form>
+                </div>
             )
         } else {
             return null;

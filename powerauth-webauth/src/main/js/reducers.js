@@ -15,17 +15,28 @@
  */
 'use strict';
 
+/**
+ * Reducer which modifies application state based on incoming actions from backend. Old state is thrown away with
+ * each incoming message.
+ * @param state state to set
+ * @param action current action as received from the backend
+ * @returns new state
+ */
 function reducer(state = {sessionId:undefined}, action) {
     switch (action.type) {
         case "SAVE_ACTION":
+            // simply overwrites current state
             state = action.actionState;
             break;
         case "TERMINATE_SESSION":
+            // back to default state - sessionId is undefined, there is no action
             state = {sessionId:undefined};
             break;
         default:
     }
+    // remove for production use
     console.log(state);
+    // return new state
     return state;
 }
 
