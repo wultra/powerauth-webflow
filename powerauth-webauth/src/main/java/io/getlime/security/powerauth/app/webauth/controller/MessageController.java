@@ -24,27 +24,28 @@ import io.getlime.security.powerauth.app.webauth.model.entity.authorization.Disp
 import io.getlime.security.powerauth.app.webauth.model.entity.authorization.DisplayPaymentInfoResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.DisplayMessageResponse;
 import io.getlime.security.powerauth.app.webauth.model.entity.messages.WebAuthMessageType;
-import io.getlime.security.powerauth.app.webauth.model.entity.registration.RegistrationRequest;
 import io.getlime.security.powerauth.app.webauth.model.entity.registration.ConfirmRegistrationResponse;
+import io.getlime.security.powerauth.app.webauth.model.entity.registration.RegistrationRequest;
 import io.getlime.security.powerauth.app.webauth.model.entity.registration.TerminateSessionAndRedirectResponse;
-import io.getlime.security.powerauth.app.webauth.repository.SessionRepository;
-import io.getlime.security.powerauth.app.webauth.repository.model.Session;
+import io.getlime.security.powerauth.app.webauth.security.UserAuthentication;
 import io.getlime.security.powerauth.app.webauth.service.AuthenticationService;
 import io.getlime.security.powerauth.app.webauth.service.NextMessageResolutionService;
 import io.getlime.security.powerauth.app.webauth.service.NextStepService;
 import io.getlime.security.powerauth.lib.credentials.model.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentials.model.AuthenticationStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import java.math.BigDecimal;
@@ -58,16 +59,13 @@ import java.util.List;
 public class MessageController {
 
     private final SimpMessagingTemplate websocket;
-    private final SessionRepository sessionRepository;
     private final AuthenticationService authService;
     private final NextStepService nextStepService;
     private final NextMessageResolutionService resolutionService;
 
     @Autowired
-    public MessageController(SimpMessagingTemplate websocket, SessionRepository sessionRepository, AuthenticationService authService,
-                             NextStepService nextStepService, NextMessageResolutionService resolutionService) {
+    public MessageController(SimpMessagingTemplate websocket, AuthenticationService authService, NextStepService nextStepService, NextMessageResolutionService resolutionService) {
         this.websocket = websocket;
-        this.sessionRepository = sessionRepository;
         this.authService = authService;
         this.nextStepService = nextStepService;
         this.resolutionService = resolutionService;
@@ -83,10 +81,18 @@ public class MessageController {
     @MessageMapping("/registration")
     public void register(SimpMessageHeaderAccessor headerAccessor, RegistrationRequest message) throws Exception {
         System.out.println("Received registration message: " + message);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication instanceof AnonymousAuthenticationToken) {
+            authentication = new UserAuthentication();
+        }
+        UserAuthentication auth = (UserAuthentication) authentication;
+        auth.setAuthenticated(false);
+        auth.setUserId("admin");
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
         if (message.getAction() == WebSocketJsonMessage.WebAuthAction.REGISTER) {
             String sessionId = headerAccessor.getSessionId();
-            Session session = new Session(sessionId);
-            sessionRepository.save(session);
 
             ConfirmRegistrationResponse registrationResponse = new ConfirmRegistrationResponse(sessionId);
             sendMessage(registrationResponse, sessionId);
@@ -131,7 +137,6 @@ public class MessageController {
                 Thread.sleep(2000);
                 TerminateSessionAndRedirectResponse terminateAndRedirect = new TerminateSessionAndRedirectResponse(sessionId, "./", 5);
                 sendMessage(terminateAndRedirect, sessionId);
-                sessionRepository.delete(session);
             } else {
                 // responses are based on communication with user, also for development only
                 // real communication will be initiated by OAuth authentication
@@ -151,8 +156,8 @@ public class MessageController {
                 List<KeyValueParameter> params = new ArrayList<>();
                 KeyValueParameter param = new KeyValueParameter("risk", "0.639");
                 params.add(param);
-                CreateOperationResponse response = nextStepService.createOperation(operationName, operationData, params);
-                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(response, sessionId);
+                Response<?> response = nextStepService.createOperation(operationName, operationData, params);
+                WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(response, null, sessionId);
                 sendMessage(nextMessage, sessionId);
             }
         }
@@ -166,6 +171,12 @@ public class MessageController {
             case LOGIN_CONFIRM:
                 String username = authenticationRequest.getUsername();
                 char[] password = authenticationRequest.getPassword();
+                if (username==null) {
+                    username = "";
+                }
+                if (password==null) {
+                    password = "".toCharArray();
+                }
                 // authenticate with the Credentials Server
                 AuthenticationResponse responseCS = authService.authenticate(username, password);
 
@@ -179,7 +190,7 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.CONFIRMED, params);
                     WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
                     sendMessage(nextMessage, sessionId);
@@ -193,7 +204,7 @@ public class MessageController {
                     List<KeyValueParameter> params = new ArrayList<>();
                     KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                     params.add(param);
-                    UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
+                    Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), username, AuthMethod.USERNAME_PASSWORD_AUTH,
                             AuthStepResult.FAILED, params);
                     WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, responseCS.getStatus(), sessionId);
                     sendMessage(nextMessage, sessionId);
@@ -210,7 +221,7 @@ public class MessageController {
                 List<KeyValueParameter> params = new ArrayList<>();
                 KeyValueParameter param = new KeyValueParameter("risk", "0.523");
                 params.add(param);
-                UpdateOperationResponse responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
+                Response<?> responseNS = nextStepService.updateOperation(authenticationRequest.getOperationId(), null, AuthMethod.USERNAME_PASSWORD_AUTH,
                         AuthStepResult.CANCELED, params);
                 WebSocketJsonMessage nextMessage = resolutionService.resolveNextMessage(responseNS, null, sessionId);
                 sendMessage(nextMessage, sessionId);
@@ -243,7 +254,6 @@ public class MessageController {
                     Thread.sleep(5000);
                     TerminateSessionAndRedirectResponse terminateAndRedirect = new TerminateSessionAndRedirectResponse(authorizationRequest.getSessionId(), "./", 0);
                     sendMessage(terminateAndRedirect, sessionId);
-                    sessionRepository.delete(new Long(authorizationRequest.getSessionId()));
                 } else {
                     // payment not authorized
                     DisplayMessageResponse displayUnauthorizedMessage = new DisplayMessageResponse(authorizationRequest.getSessionId(),
@@ -260,7 +270,7 @@ public class MessageController {
                 break;
         }
     }
-    
+
     private void sendMessage(WebSocketJsonMessage message, String sessionId) {
         switch (message.getAction()) {
             case REGISTRATION_CONFIRM:
@@ -283,9 +293,9 @@ public class MessageController {
                         sessionId, WebSocketConfiguration.MESSAGE_PREFIX + "/messages", message, createHeaders(sessionId));
                 break;
             default:
-                throw new IllegalStateException("Invalid action: "+message.getAction());
+                throw new IllegalStateException("Invalid action: " + message.getAction());
         }
-        
+
     }
 
 }

@@ -15,20 +15,42 @@
  */
 package io.getlime.security.powerauth.app.webauth.controller;
 
-import io.getlime.security.powerauth.app.webauth.security.UserAuthentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Map;
+
 /**
+ * Simple controller, redirects to the main HTML page with JavaScript content
+ *
  * @author Roman Strobl
  */
 @Controller
 public class HomeController {
 
-    @RequestMapping(value = "/")
+    private WebAuthServerConfiguration webAuthConfig;
+
+    @Autowired
+    public HomeController(WebAuthServerConfiguration webAuthConfig) {
+        this.webAuthConfig = webAuthConfig;
+    }
+
+    @RequestMapping("/")
     public String index() {
-        SecurityContextHolder.getContext().setAuthentication(new UserAuthentication());
+        return "redirect:/authenticate";
+    }
+
+    /**
+     * Redirects to the index.jsp template file
+     * @param model Model is used to store a link to the stylesheet which can be externalized
+     * @return index page
+     * @throws Exception thrown when page is not found
+     */
+    @RequestMapping("/authenticate")
+    public String authenticate(Map<String, Object> model) throws Exception {
+        model.put("stylesheet", webAuthConfig.getStylesheetUrl());
         return "index";
     }
 

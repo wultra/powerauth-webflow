@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
@@ -38,8 +39,7 @@ public class AuthenticationService {
         AuthenticationRequest request = new AuthenticationRequest(username, String.valueOf(password), AuthenticationType.BASIC);
         HttpEntity<AuthenticationRequest> entity = new HttpEntity<>(request);
         try {
-            ResponseEntity<AuthenticationResponseSuccess> response = template.exchange(credentialsServiceUrl + "/authenticate",
-                    HttpMethod.POST, entity, AuthenticationResponseSuccess.class);
+            ResponseEntity<AuthenticationResponseSuccess> response = template.exchange(credentialsServiceUrl + "/authenticate", HttpMethod.POST, entity, AuthenticationResponseSuccess.class);
             System.out.println("Response from Credential Server: "+response.getBody());
             return response.getBody();
         } catch (HttpStatusCodeException ex) {
@@ -47,14 +47,19 @@ public class AuthenticationService {
             try {
                 // handles regular authentication errors
                 AuthenticationResponse error = objectMapper.readValue(responseString, AuthenticationResponseError.class);
-                System.out.println("Response from Credential Server: "+error);
+                System.err.println("Response from Credential Server: "+error);
                 return error;
             } catch (IOException ex2) {
                 // should never be reached - fatal error
-                System.out.println("Response from Credential Server was invalid, exception: "+ex2.toString());
+                System.err.println("Response from Credential Server was invalid, exception: "+ex2.toString());
                 ErrorResponse fatalErrorResponse = new ErrorResponse(ErrorResponse.ResponseCode.INTERNAL_SERVER_ERROR, ex2.toString());
                 return new AuthenticationResponseError(HttpStatus.INTERNAL_SERVER_ERROR, fatalErrorResponse);
             }
+        } catch (ResourceAccessException ex) {
+            // Credential service is down
+            System.err.println("Credential Server is not available, exception: " + ex.toString());
+            ErrorResponse fatalErrorResponse = new ErrorResponse(ErrorResponse.ResponseCode.INTERNAL_SERVER_ERROR, ex.toString());
+            return new AuthenticationResponseError(HttpStatus.INTERNAL_SERVER_ERROR, fatalErrorResponse);
         }
     }
 

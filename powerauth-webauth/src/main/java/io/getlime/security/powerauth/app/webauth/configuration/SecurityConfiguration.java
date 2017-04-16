@@ -17,10 +17,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .antMatcher("/**")
                     .authorizeRequests()
-                .antMatchers("/", "/webauth/**", "/built/**", "/css/**", "/images/**").permitAll()
+                .antMatchers("/", "/authenticate", "/webauth/**", "/built/**", "/css/**", "/images/**").permitAll()
                     .anyRequest().authenticated()
                     .and()
                     .exceptionHandling()
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/"));
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
     }
 }

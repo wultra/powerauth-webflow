@@ -18,8 +18,8 @@
 ## Directory-based project format:
 .idea/
 .mvn
+*.orig
 
 **/dist/
 **/node_modules/
 **/src/main/resources/static/built/
-

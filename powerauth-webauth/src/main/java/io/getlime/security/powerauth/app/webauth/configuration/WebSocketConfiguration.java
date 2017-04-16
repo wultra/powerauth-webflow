@@ -15,10 +15,8 @@
  */
 package io.getlime.security.powerauth.app.webauth.configuration;
 
-import io.getlime.security.powerauth.app.webauth.controller.MessageController;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.AbstractWebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -26,8 +24,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 /**
  * @author Roman Strobl
  */
-@Component
-@ComponentScan(basePackageClasses = {MessageController.class})
+@Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfigurer {
 
