@@ -79,15 +79,15 @@ class Login extends React.Component {
         if (this.firstLogin===false) {
             // shake form in case first login failed
             const e = document.getElementById('login');
-            e.style.marginLeft = '3px';
-            e.style.marginRight = '-3px';
+            e.style.marginLeft = '8px';
+            e.style.marginRight = '-8px';
             setTimeout(function () {
-                e.style.marginLeft = '-2px';
-                e.style.marginRight = '2px';
+                e.style.marginLeft = '-4px';
+                e.style.marginRight = '4px';
             }, 75);
             setTimeout(function () {
-                e.style.marginLeft = '1px';
-                e.style.marginRight = '-1px';
+                e.style.marginLeft = '2px';
+                e.style.marginRight = '-2px';
             }, 150);
             setTimeout(function () {
                 e.style.marginLeft = '0px';
