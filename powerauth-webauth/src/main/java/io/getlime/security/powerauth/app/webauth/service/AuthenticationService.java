@@ -73,7 +73,7 @@ public class AuthenticationService {
                 ErrorModel error = objectMapper.readValue(responseString, ErrorModel.class);
                 System.err.println("Response from Credential Server was invalid, exception: " + ex.toString());
                 if (error.getCode() == null) {
-                    error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+                    error.setCode(ErrorModel.ResponseCode.ERROR_GENERIC);
                     error.setMessage("Credential service error: " + ex.toString());
                 }
                 return new Response<>(Response.Status.ERROR, error);
@@ -81,7 +81,7 @@ public class AuthenticationService {
                 // should never be reached - fatal error
                 System.err.println("Response from Credential Server was invalid, exception: " + ex2.toString());
                 ErrorModel error = new ErrorModel();
-                error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+                error.setCode(ErrorModel.ResponseCode.ERROR_GENERIC);
                 error.setMessage("Credential service error: " + ex2.toString());
                 return new Response<>(Response.Status.ERROR, error);
             }
@@ -89,7 +89,7 @@ public class AuthenticationService {
             // Credential service is down
             System.err.println("Credential Server is not available, exception: " + ex.toString());
             ErrorModel error = new ErrorModel();
-            error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+            error.setCode(ErrorModel.ResponseCode.ERROR_GENERIC);
             error.setMessage("Next step service is not available.");
             return new Response<>(Response.Status.ERROR, error);
         }

@@ -51,7 +51,7 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
 
     /**
      * Get the username in plain text.
-     * @return
+     * @return username in plain text
      */
     @JsonIgnore
     public String getUsername() {
@@ -62,8 +62,13 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
             switch (method) {
                 case BASIC_BASE64:
                     String decoded = new String(Base64.getDecoder().decode(credentials));
+                    if (decoded.equals(":")) {
+                        // empty username and password
+                        return "";
+                    }
                     String[] parts = decoded.split(":");
-                    if (parts.length != 2) {
+                    if (parts.length > 2) {
+                        // more than one colon - invalid input
                         return null;
                     }
                     return parts[0];
@@ -78,11 +83,11 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
 
     /**
      * Get the password in plain text.
-     * @return
+     * @return password in plain text
      */
     @JsonIgnore
     public char[] getPassword() {
-        if (credentials == null) {
+        if (credentials == null || method==null || operationId==null) {
             return null;
         }
         try {
@@ -90,8 +95,17 @@ public class AuthenticationRequest extends WebSocketJsonMessage {
                 case BASIC_BASE64:
                     // TODO - convert without String for security reasons
                     String decoded = new String(Base64.getDecoder().decode(credentials));
+                    if (decoded.equals(":")) {
+                        // empty username and password
+                        return "".toCharArray();
+                    }
                     String[] parts = decoded.split(":");
-                    if (parts.length != 2) {
+                    if (decoded.endsWith(":") && parts.length==1) {
+                        // non-empty username but empty password
+                        return "".toCharArray();
+                    }
+                    if (parts.length > 2) {
+                        // more than one colon - invalid input
                         return null;
                     }
                     return parts[1].toCharArray();

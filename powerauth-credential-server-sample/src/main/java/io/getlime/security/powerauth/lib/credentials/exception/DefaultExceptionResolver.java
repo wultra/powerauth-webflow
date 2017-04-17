@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.lib.credentials.exception;
 import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,10 +41,60 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody
-    Response<ErrorModel> handleDefaultException() {
+    Response<ErrorModel> handleDefaultException(Throwable t) {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+        error.setCode(ErrorModel.ResponseCode.ERROR_GENERIC);
         error.setMessage("Unknown Error");
+        return new Response<>(Response.Status.ERROR, error);
+    }
+
+    /**
+     * Handling of validation errors.
+     * @return Response with ErrorModel.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody
+    Response<ErrorModel> handleDefaultException(MethodArgumentNotValidException ex) {
+        ErrorModel error = new ErrorModel();
+        error.setCode(ErrorModel.ResponseCode.INPUT_INVALID);
+        StringBuilder errorBuilder = new StringBuilder();
+        for (ObjectError objError: ex.getBindingResult().getAllErrors()) {
+            for (String code: objError.getCodes()) {
+                int lastErrorBuilderLength = errorBuilder.length();
+                switch (code) {
+                    case "username.empty":
+                        errorBuilder.append("username is empty");
+                        break;
+                    case "password.empty":
+                        errorBuilder.append("password is empty");
+                        break;
+                    case "username.long":
+                        errorBuilder.append("username length exceeded maximum number of characters");
+                        break;
+                    case "password.long":
+                        errorBuilder.append("password length exceeded maximum number of characters");
+                        break;
+                    case "type.unsupported":
+                        errorBuilder.append("authentication type is not supported");
+                        break;
+                    default:
+                        continue;
+                }
+                // add comma but only if some error message was added
+                if (lastErrorBuilderLength!=errorBuilder.length()) {
+                    errorBuilder.append(", ");
+                }
+            }
+        }
+        String errors;
+        if (errorBuilder.length()>=2) {
+            // strip trailing comma
+            errors = errorBuilder.substring(0, errorBuilder.length()-2);
+        } else {
+            errors = errorBuilder.toString();
+        }
+        error.setMessage("Input validation failed: "+errors);
         return new Response<>(Response.Status.ERROR, error);
     }
 
