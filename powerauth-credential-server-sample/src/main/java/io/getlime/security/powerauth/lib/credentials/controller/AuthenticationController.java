@@ -45,20 +45,20 @@ public class AuthenticationController {
         // input handling
         AuthenticationRequest request = authRequest.getRequestObject();
         if (request.getUsername() == null || request.getUsername().isEmpty() || request.getUsername().length() > 30) {
-            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.USERNAME_FORMAT_INVALID, "Invalid request: username format is invalid");
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.USERNAME_FORMAT_INVALID, "Incorrect username format");
             Response response = new Response<>(Response.Status.ERROR, error);
             return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }
 
         if (request.getPassword() == null || request.getPassword().isEmpty() || request.getPassword().length() > 30) {
-            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.PASSWORD_FORMAT_INVALID, "Invalid request: password format is invalid");
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.PASSWORD_FORMAT_INVALID, "Incorrect password format");
             Response response = new Response<>(Response.Status.ERROR, error);
             return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }
 
         // other authentication methods are reserved for future use
         if (request.getType() != AuthenticationType.BASIC) {
-            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid request: method is not supported");
+            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.AUTH_METHOD_UNSUPPORTED, "Invalid authentication method");
             Response response = new Response<>(Response.Status.ERROR, error);
             return new ResponseEntity<Response<?>>(response, HttpStatus.BAD_REQUEST);
         }

@@ -23,3 +23,5 @@
 **/dist/
 **/node_modules/
 **/src/main/resources/static/built/
+
+**/deploy-local.sh

@@ -1,6 +1,8 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
+import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -29,17 +31,14 @@ public class WebAuthServerConfiguration {
     @Value("${powerauth.webauth.stylesheet.url}")
     private String stylesheetUrl;
 
-    /**
-     * Get the Credential server service URL.
-     * @return
-     */
-    public String getCredentialServerServiceUrl() {
-        return credentialServerServiceUrl;
+    @Bean
+    public CredentialStoreClient defaultCredentialStoreClient() {
+        return new CredentialStoreClient(credentialServerServiceUrl);
     }
 
     /**
      * Get the Next step server service URL.
-     * @return
+     * @return Next step server service URL.
      */
     public String getNextstepServiceUrl() {
         return nextstepServiceUrl;
@@ -47,7 +46,7 @@ public class WebAuthServerConfiguration {
 
     /**
      * Get the dynamic URL for CSS stylesheet to allow external styling of Web Auth UI.
-     * @return
+     * @return Dynamic URL for CSS stylesheet.
      */
     public String getStylesheetUrl() {
         return stylesheetUrl;

@@ -5,7 +5,7 @@ var node_dir = __dirname + '/node_modules';
 var WebpackDeployPlugin = require('./src/main/js/webpack-deploy.js');
 
 module.exports = {
-    entry: './src/main/js/app.js',
+    entry: './src/main/js/client.js',
     devtool: 'sourcemaps',
     cache: true,
     resolve: {
@@ -15,7 +15,7 @@ module.exports = {
     },
     output: {
         path: __dirname,
-        filename: './src/main/resources/static/built/bundle.js'
+        filename: './src/main/resources/static/resources/js/built/bundle.js'
     },
     module: {
         loaders: [
@@ -25,7 +25,8 @@ module.exports = {
                 loader: 'babel-loader',
                 query: {
                     cacheDirectory: true,
-                    presets: ['es2015', 'react']
+                    presets: ['es2015', 'react'],
+                    plugins: ['transform-object-rest-spread', 'transform-decorators-legacy', 'transform-class-properties']
                 }
             }
         ]

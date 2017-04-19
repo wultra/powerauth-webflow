@@ -39,10 +39,10 @@ WebpackDeployPlugin.prototype.apply = function (compiler) {
         compilationEnd = date.getTime();
         console.log("Compilation finished in " + (compilationEnd - compilationStart) + " ms.");
         try {
-            const src1 = "src/main/resources/static/built/bundle.js";
-            const src2 = "src/main/resources/static/built/bundle.js.map";
-            const target1 = "target/classes/static/built/bundle.js";
-            const target2 = "target/classes/static/built/bundle.js.map";
+            const src1 = "src/main/resources/static/resources/js/built/bundle.js";
+            const src2 = "src/main/resources/static/resources/js/built/bundle.js.map";
+            const target1 = "target/classes/static/resources/js/built/bundle.js";
+            const target2 = "target/classes/static/resources/js/built/bundle.js.map";
             // redeploy only when source and target files exist
             fs.accessSync(src1);
             fs.accessSync(src2);

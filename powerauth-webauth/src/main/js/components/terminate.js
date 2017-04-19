@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-'use strict';
-
-const React = require('react');
-const utils = require('../utils');
+import React from 'react';
 import { connect } from 'react-redux';
 
 /**
@@ -26,49 +23,11 @@ import { connect } from 'react-redux';
  */
 class Terminate extends React.Component {
 
-    componentWillMount() {
-        function sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
-        if (!utils.checkAccess(this.props, "terminate")) {
-            // display only if current action matches component
-            this.props.router.push("/");
-        }
-        // TODO - needs to be handled differently, dispatch resets the state of the component
-        // this.props.dispatch(utils.terminateSession(this.props.sessionId));
-        if (this.props.delay !== undefined) {
-            // redirect with a delay
-            sleep(this.props.delay*1000).then(() => {
-                window.location = this.props.redirectUrl;
-            })
-        }
-    }
 
     render() {
-        if (this.props.redirectUrl !== undefined && this.props.delay !== undefined) {
-            return (
-                <div>
-                    Session terminated, redirect URL: <a href={this.props.redirectUrl}>{this.props.redirectUrl}</a>,
-                    delay: {this.props.delay}.
-                </div>
-            )
-        } else {
-            return (
-                <div>
-                    Session terminated.
-                </div>
-            )
-
-        }
+        return (
+            <div>Session terminated</div>
+        )
     }
+
 }
-
-const mapStateToProps = (state) => {
-    return {sessionId: state.sessionId, action: state.action, redirectUrl: state.redirectUrl, delay: state.delay}
-};
-
-const CTerminate = connect(
-    mapStateToProps
-)(Terminate);
-
-module.exports = CTerminate;

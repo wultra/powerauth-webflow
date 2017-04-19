@@ -16,10 +16,16 @@
 package io.getlime.security.powerauth.app.webauth.controller;
 
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
+import io.getlime.security.powerauth.app.webauth.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
 /**
@@ -31,14 +37,16 @@ import java.util.Map;
 public class HomeController {
 
     private WebAuthServerConfiguration webAuthConfig;
+    private AuthenticationManagementService authenticationManagementService;
 
     /**
      * Initialization of the HomeController with application configuration.
      * @param webAuthConfig configuration of the application
      */
     @Autowired
-    public HomeController(WebAuthServerConfiguration webAuthConfig) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebAuthServerConfiguration webAuthConfig) {
         this.webAuthConfig = webAuthConfig;
+        this.authenticationManagementService = authenticationManagementService;
     }
 
     @RequestMapping("/")
@@ -54,8 +62,28 @@ public class HomeController {
      */
     @RequestMapping("/authenticate")
     public String authenticate(Map<String, Object> model) throws Exception {
+        authenticationManagementService.clearContext();
         model.put("stylesheet", webAuthConfig.getStylesheetUrl());
         return "index";
+    }
+
+    @RequestMapping("/continue")
+    public void f(HttpServletRequest request, HttpServletResponse response) {
+        HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        SavedRequest savedRequest = cache.getRequest(request, response);
+        String redirectUrl;
+        if (savedRequest == null) {
+            StringBuffer url = request.getRequestURL();
+            String uri = request.getRequestURI();
+            String ctx = request.getContextPath();
+            String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
+            redirectUrl = base + "oauth/error";
+        } else {
+            authenticationManagementService.pendingAuthenticationToAuthentication();
+            redirectUrl = savedRequest.getRedirectUrl();
+        }
+        response.setHeader("Location", redirectUrl);
+        response.setStatus(HttpServletResponse.SC_FOUND);
     }
 
 }

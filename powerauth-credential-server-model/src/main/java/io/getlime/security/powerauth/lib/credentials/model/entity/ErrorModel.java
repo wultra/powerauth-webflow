@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.credentials.model.entity;
 
 /**
- * ErorModel is used in all error responses from the Credential server to specify error details.
+ * ErrorModel is used in all error responses from the Credential server to specify error details.
  * @author Roman Strobl
  */
 public class ErrorModel {
