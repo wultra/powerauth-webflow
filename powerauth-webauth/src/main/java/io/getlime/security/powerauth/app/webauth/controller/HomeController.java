@@ -15,10 +15,9 @@
  */
 package io.getlime.security.powerauth.app.webauth.controller;
 
+import io.getlime.security.powerauth.app.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
-import io.getlime.security.powerauth.app.webauth.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
@@ -40,8 +39,8 @@ public class HomeController {
     private AuthenticationManagementService authenticationManagementService;
 
     /**
-     * Initialization of the HomeController with application configuration.
-     * @param webAuthConfig configuration of the application
+     * Initialization of the HomeController with application WebAuthServicesConfiguration.
+     * @param webAuthConfig WebAuthServicesConfiguration of the application
      */
     @Autowired
     public HomeController(AuthenticationManagementService authenticationManagementService, WebAuthServerConfiguration webAuthConfig) {
@@ -55,7 +54,7 @@ public class HomeController {
     }
 
     /**
-     * Redirects to the index.jsp template file
+     * Renders the index.jsp template file
      * @param model Model is used to store a link to the stylesheet which can be externalized
      * @return index page
      * @throws Exception thrown when page is not found
@@ -63,10 +62,16 @@ public class HomeController {
     @RequestMapping("/authenticate")
     public String authenticate(Map<String, Object> model) throws Exception {
         authenticationManagementService.clearContext();
+        model.put("title", webAuthConfig.getPageTitle());
         model.put("stylesheet", webAuthConfig.getStylesheetUrl());
         return "index";
     }
 
+    /**
+     * Redirects user to previous URL after authentication, or to error URL in case of broken OAuth dance.
+     * @param request Reference to current HttpServletRequest.
+     * @param response Reference to current HttpServletResponse.
+     */
     @RequestMapping("/continue")
     public void f(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();

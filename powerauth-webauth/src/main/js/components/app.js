@@ -35,9 +35,7 @@ export default class App extends React.Component {
         return (
             <div>
                 <div id="home" className="text-center">
-                    <div id="logo">
-                        <img src="./resources/images/logo.png" alt="logo"/>
-                    </div>
+                    <div id="logo"></div>
                     <Component/>
                 </div>
             </div>

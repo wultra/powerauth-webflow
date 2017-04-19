@@ -48,33 +48,15 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-websocket</artifactId>
-        </dependency>
 
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>2.8.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.2</version>
-        </dependency>
-        <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-credential-server-client</artifactId>
+            <artifactId>powerauth-webauth-authentication-form</artifactId>
             <version>0.15.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-nextstep-model</artifactId>
+            <artifactId>powerauth-webauth-authentication-init</artifactId>
             <version>0.15.0</version>
         </dependency>
 

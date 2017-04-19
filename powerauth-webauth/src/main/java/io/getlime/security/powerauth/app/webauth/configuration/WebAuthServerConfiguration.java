@@ -1,6 +1,7 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,35 +15,16 @@ import org.springframework.context.annotation.Configuration;
 public class WebAuthServerConfiguration {
 
     /**
-     * Credential server service URL.
-     */
-    @Value("${powerauth.credentials.service.url}")
-    private String credentialServerServiceUrl;
-
-    /**
-     * Next step server service URL.
-     */
-    @Value("${powerauth.nextstep.service.url}")
-    private String nextstepServiceUrl;
-
-    /**
      * Dynamic URL for CSS stylesheet to allow external styling of Web Auth UI.
      */
-    @Value("${powerauth.webauth.stylesheet.url}")
+    @Value("${powerauth.webauth.page.stylesheet.url}")
     private String stylesheetUrl;
 
-    @Bean
-    public CredentialStoreClient defaultCredentialStoreClient() {
-        return new CredentialStoreClient(credentialServerServiceUrl);
-    }
-
     /**
-     * Get the Next step server service URL.
-     * @return Next step server service URL.
+     * Dynamic page title
      */
-    public String getNextstepServiceUrl() {
-        return nextstepServiceUrl;
-    }
+    @Value("${powerauth.webauth.page.title}")
+    private String pageTitle;
 
     /**
      * Get the dynamic URL for CSS stylesheet to allow external styling of Web Auth UI.
@@ -52,4 +34,11 @@ public class WebAuthServerConfiguration {
         return stylesheetUrl;
     }
 
+    /**
+     * Get dynamic page title.
+     * @return Page title.
+     */
+    public String getPageTitle() {
+        return pageTitle;
+    }
 }

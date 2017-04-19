@@ -22,6 +22,7 @@ public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     public void configureAuthorizationEndpoint(AuthorizationEndpoint authorizationEndpoint) {
+        // WORKAROUND: Cancel the session just before the redirect
         DefaultRedirectResolver redirectResolver = new DefaultRedirectResolver() {
             @Override public String resolveRedirect(String requestedRedirect, ClientDetails client) throws OAuth2Exception {
                 SecurityContextHolder.clearContext();

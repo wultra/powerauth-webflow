@@ -20,10 +20,11 @@ a {
 #logo {
     margin-top: 20px;
     margin-bottom: 20px;
-}
-
-#logo img {
     height: 60px;
+    background-image: url("../images/logo.png");
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
 #page-wrap {
