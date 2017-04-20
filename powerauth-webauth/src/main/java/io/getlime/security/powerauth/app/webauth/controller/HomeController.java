@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.app.webauth.controller;
 
-import io.getlime.security.powerauth.app.webauth.authentication.service.AuthenticationManagementService;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;

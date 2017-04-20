@@ -4,8 +4,9 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<name>powerauth-nextstep</name>
-	<description>PowerAuth 2.0 Next Step Server</description>
 	<artifactId>powerauth-nextstep</artifactId>
+	<groupId>io.getlime.security</groupId>
+	<description>PowerAuth 2.0 Next Step Server</description>
 	<version>0.15.0</version>
 	<packaging>war</packaging>
 

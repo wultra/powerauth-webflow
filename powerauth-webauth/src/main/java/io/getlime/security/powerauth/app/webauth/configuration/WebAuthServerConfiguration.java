@@ -4,6 +4,7 @@ import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClien
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Roman Strobl
  */
 @Configuration
+@ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class WebAuthServerConfiguration {
 
     /**

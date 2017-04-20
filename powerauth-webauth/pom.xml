@@ -12,11 +12,10 @@
     </parent>
 
     <artifactId>powerauth-webauth</artifactId>
+    <name>powerauth-webauth</name>
+    <description>Federated Authentication and Authorization Server for Web</description>
     <version>0.15.0</version>
     <packaging>war</packaging>
-
-    <name>PowerAuth 2.0 WebAuth</name>
-    <description>Federated Authentication and Authorization Server for Web</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,6 +56,11 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webauth-authentication-init</artifactId>
+            <version>0.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-webauth-resources</artifactId>
             <version>0.15.0</version>
         </dependency>
 
@@ -118,7 +122,6 @@
                             </execution>
                         </executions>
                     </plugin>
-
                 </plugins>
             </build>
         </profile>
@@ -172,6 +175,5 @@
             </build>
         </profile>
     </profiles>
-
 
 </project>

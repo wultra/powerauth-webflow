@@ -11,11 +11,10 @@
     </parent>
 
     <artifactId>powerauth-credential-server-sample</artifactId>
+    <name>powerauth-credential-server-sample</name>
+    <description>Sample implementation of Credential Server for Web Auth</description>
     <version>0.15.0</version>
     <packaging>war</packaging>
-
-    <name>PowerAuth 2.0 Credential Server Sample</name>
-    <description>Sample implementation of Credential Server for Web Auth</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

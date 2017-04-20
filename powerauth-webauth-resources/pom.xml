@@ -12,35 +12,40 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <artifactId>powerauth-nextstep-client</artifactId>
-    <name>powerauth-nextstep-server-client</name>
     <groupId>io.getlime.security</groupId>
+    <artifactId>powerauth-webauth-resources</artifactId>
+    <name>powerauth-webauth-resources</name>
     <version>0.15.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
-
-        <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-
-        <!-- Other Dependencies -->
         <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.3</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security.oauth</groupId>
+            <artifactId>spring-security-oauth2</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
         </dependency>
 
-        <!-- PowerAuth 2.0 Web Flow Dependencies -->
+        <!-- TEST -->
         <dependency>
-            <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-nextstep-model</artifactId>
-            <version>0.15.0</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
-
 
 </project>

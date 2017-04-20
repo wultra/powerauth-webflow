@@ -14,7 +14,7 @@
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webauth-authentication</artifactId>
-    <name>powerauth-webauth-parent</name>
+    <name>powerauth-webauth-authentication</name>
     <version>0.15.0</version>
     <packaging>jar</packaging>
 
