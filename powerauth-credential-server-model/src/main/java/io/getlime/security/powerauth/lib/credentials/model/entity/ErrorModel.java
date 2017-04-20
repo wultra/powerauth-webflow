@@ -25,11 +25,9 @@ public class ErrorModel {
      * Response codes for different authentication failures.
      */
     public enum ResponseCode {
-        AUTH_FAIL,
-        USERNAME_FORMAT_INVALID,
-        PASSWORD_FORMAT_INVALID,
-        AUTH_METHOD_UNSUPPORTED,
-        ERR_GENERIC
+        AUTHENTICATION_FAILED,
+        INPUT_INVALID,
+        ERROR_GENERIC
     }
 
     /**
