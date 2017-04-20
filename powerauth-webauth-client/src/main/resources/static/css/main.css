@@ -25,6 +25,10 @@ a {
     text-decoration: none;
 }
 
+.black {
+    color: #000;
+}
+
 .logo {
     height: 60px;
     margin-bottom: 20px;

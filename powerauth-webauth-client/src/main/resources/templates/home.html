@@ -36,7 +36,7 @@
 
             <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
                 <p>
-                Welcome, <strong><span th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></strong>!
+                Welcome, <span class="black"><span th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
                 </p>
                 <form id="disconnect" th:action="@{/connect/demo}" method="post">
                     <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
@@ -46,6 +46,9 @@
             </div>
 
             <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                <p>
+                    You're not logged in.
+                </p>
                 <form th:action="@{/connect/demo}" method="POST">
                     <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
                     <button type="submit" class="btn btn-lg btn-success">Log in</button>
