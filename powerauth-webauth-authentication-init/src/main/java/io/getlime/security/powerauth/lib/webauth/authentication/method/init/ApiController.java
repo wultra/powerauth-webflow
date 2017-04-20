@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Lime - HighTech Solutions s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MessageController class handles responses to messages sent from the UI clients on different destinations.
+ * Controller that handles the initialization of the authentication flow.
  *
- * @author Roman Strobl
+ * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
 public class ApiController extends AuthMethodController<InitOperationRequest, InitOperationResponse, AuthStepException> {
