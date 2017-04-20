@@ -89,7 +89,7 @@ public class DefaultExceptionResolver {
                 }
             }
         }
-        error.setMessage(String.join(",", errorMessages));
+        error.setMessage(String.join(" ", errorMessages));
         return new Response<>(Response.Status.ERROR, error);
     }
 
