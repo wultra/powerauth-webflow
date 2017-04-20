@@ -21,7 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
+import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.core.ParameterizedTypeReference;
@@ -98,28 +100,64 @@ public class CredentialStoreClient {
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
-                TypeReference<Response<ErrorModel>> typeReference = new TypeReference<Response<ErrorModel>>() {};
-                Response<ErrorModel> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-                ErrorModel error = errorResponse.getResponseObject();
-                if (error.getCode() == null) { // process malformed errors with undefined error code
-                    error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
-                    error.setMessage(ex.getMessage());
-                }
-                throw new CredentialStoreClientErrorException(ex, error);
-            } catch (IOException ex2) {
-                // JSON parsing failed
-                ErrorModel error = new ErrorModel();
-                error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
-                error.setMessage(ex2.getMessage());
-                throw new CredentialStoreClientErrorException(ex, error);
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
             }
-        } catch (ResourceAccessException ex) {
-            // Credential service is down
-            ErrorModel error = new ErrorModel();
+        } catch (ResourceAccessException ex) { // Credential service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Obtain user details based on user info.
+     *
+     * @param userId User ID for the user to be obtained.
+     * @return A response user with given ID.
+     */
+    public Response<UserDetailResponse> fetchUserDetail(String userId) throws CredentialStoreClientErrorException {
+        try {
+            // Exchange user details with credential server.
+            UserDetailRequest request = new UserDetailRequest(userId);
+            HttpEntity<Request<UserDetailRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/userInfo", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<UserDetailResponse>>() {});
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+
+            }
+        } catch (ResourceAccessException ex) { // Credential service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    private CredentialStoreClientErrorException resourceAccessException(ResourceAccessException ex) throws CredentialStoreClientErrorException {
+        ErrorModel error = new ErrorModel();
+        error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+        error.setMessage(ex.getMessage());
+        return new CredentialStoreClientErrorException(ex, error);
+    }
+
+    private CredentialStoreClientErrorException invalidErrorResponseBodyException(IOException ex) throws CredentialStoreClientErrorException {
+        // JSON parsing failed
+        ErrorModel error = new ErrorModel();
+        error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+        error.setMessage(ex.getMessage());
+        return new CredentialStoreClientErrorException(ex, error);
+    }
+
+    private CredentialStoreClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException, CredentialStoreClientErrorException {
+        TypeReference<Response<ErrorModel>> typeReference = new TypeReference<Response<ErrorModel>>() {};
+        Response<ErrorModel> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+        ErrorModel error = errorResponse.getResponseObject();
+        if (error.getCode() == null) { // process malformed errors with undefined error code
             error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
             error.setMessage(ex.getMessage());
-            throw new CredentialStoreClientErrorException(ex, error);
         }
+        return new CredentialStoreClientErrorException(ex, error);
     }
 
 }

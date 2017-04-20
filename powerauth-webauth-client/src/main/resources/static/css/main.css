@@ -27,7 +27,7 @@ a {
 
 .logo {
     height: 60px;
-    margin: 20px;
+    margin-bottom: 20px;
 }
 
 .wrapper {
@@ -36,6 +36,10 @@ a {
 
 .wrapper h1 {
     color: #333;
+}
+
+.btn {
+    width: 120px;
 }
 
 .btn-success {

@@ -16,10 +16,17 @@
 
 package io.getlime.security.powerauth.lib.webauth.resource.controller;
 
+import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
+import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
+import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.webauth.resource.model.User;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.security.Principal;
 
 /**
  * @author Petr Dvorak, petr@lime-company.eu
@@ -28,13 +35,27 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/api/secure/user")
 public class UserProfileController {
 
+    @Autowired
+    private CredentialStoreClient client;
+
     @RequestMapping("me")
-    public @ResponseBody User me() {
-        User user = new User();
-        user.setId("1234567890");
-        user.setGivenName("John");
-        user.setFamilyName("Doe");
-        return user;
+    public @ResponseBody User me(Principal principal) {
+        try {
+            final Response<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
+            UserDetailResponse userDetail = userDetailResponse.getResponseObject();
+            User user = new User();
+            user.setId(userDetail.getId());
+            user.setGivenName(userDetail.getGivenName());
+            user.setFamilyName(userDetail.getFamilyName());
+            return user;
+        } catch (CredentialStoreClientErrorException e) {
+            // Return dummy user
+            User user = new User();
+            user.setId("anonymousUser");
+            user.setGivenName(null);
+            user.setFamilyName(null);
+            return user;
+        }
     }
 
 }
