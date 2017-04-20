@@ -15,28 +15,26 @@
  */
 package io.getlime.security.powerauth.lib.credentials.controller;
 
-import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
+import io.getlime.security.powerauth.lib.credentials.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
+import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.credentials.validation.AuthenticationRequestValidator;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class which handles user authentication.
  * @author Roman Strobl
  */
-@RestController
+@Controller
 public class AuthenticationController {
 
     /**
@@ -44,8 +42,8 @@ public class AuthenticationController {
      * @param request Authenticate user request.
      * @return Response with success or error code and error details in case authentication failed.
      */
-    @RequestMapping(name = "/authenticate", method = RequestMethod.POST)
-    public ResponseEntity<Response<?>> authenticate(@RequestBody Request<AuthenticationRequest> request) throws MethodArgumentNotValidException, NoSuchMethodException {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public @ResponseBody Response<AuthenticationResponse> authenticate(@RequestBody Request<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
         AuthenticationRequest authenticationRequest = request.getRequestObject();
 
         // input validation is handled by AuthenticationRequestValidator
@@ -60,19 +58,27 @@ public class AuthenticationController {
         }
 
         // here will be the real authentication - call to the backend providing authentication
-        if ("test".equals(authenticationRequest.getUsername())
-                && "test".equals(authenticationRequest.getPassword())) {
-            // supply real user id in constructor
+        if ("test".equals(authenticationRequest.getUsername()) && "test".equals(authenticationRequest.getPassword())) {
             AuthenticationResponse responseOK = new AuthenticationResponse("12345678");
-            Response response = new Response<>(Response.Status.OK, responseOK);
-            return new ResponseEntity<Response<?>>(response, HttpStatus.OK);
+            return new Response<>(Response.Status.OK, responseOK);
         } else {
-            // regular authentication failed error
-            ErrorModel error = new ErrorModel(ErrorModel.Code.AUTHENTICATION_FAILED, "User authentication failed");
-            Response response = new Response<>(Response.Status.ERROR, error);
-            return new ResponseEntity<Response<?>>(response, HttpStatus.UNAUTHORIZED);
-            // handle other possible authentication errors here
-            // ...
+            throw new AuthenticationFailedException("User authentication failed");
         }
     }
+
+    @RequestMapping(value = "/userInfo", method = RequestMethod.POST)
+    public @ResponseBody Response<UserDetailResponse> fetchUserDetail(@RequestBody Request<UserDetailRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
+        UserDetailRequest userDetailRequest = request.getRequestObject();
+        String userId = userDetailRequest.getId();
+
+        // Fetch user details here ...
+
+        UserDetailResponse responseObject = new UserDetailResponse();
+        responseObject.setId(userId);
+        responseObject.setGivenName("Joe");
+        responseObject.setFamilyName("Doe");
+        return new Response<>(Response.Status.OK, responseObject);
+    }
+
+
 }

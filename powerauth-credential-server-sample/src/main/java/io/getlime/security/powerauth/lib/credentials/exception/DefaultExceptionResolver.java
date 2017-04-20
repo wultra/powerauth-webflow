@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.credentials.exception;
 import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -40,11 +41,16 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody
-    Response<ErrorModel> handleDefaultException(Throwable t) {
-        ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage("Unknown Error");
+    public @ResponseBody Response<ErrorModel> handleDefaultException(Throwable t) {
+        ErrorModel error = new ErrorModel(ErrorModel.Code.ERROR_GENERIC, "Unknown Error");
+        return new Response<>(Response.Status.ERROR, error);
+    }
+
+    @ExceptionHandler(AuthenticationFailedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody Response<ErrorModel> handleAuthenticationError(AuthenticationFailedException ex) {
+        // regular authentication failed error
+        ErrorModel error = new ErrorModel(ErrorModel.Code.AUTHENTICATION_FAILED, ex.getMessage());
         return new Response<>(Response.Status.ERROR, error);
     }
 
@@ -54,8 +60,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    Response<ErrorModel> handleDefaultException(MethodArgumentNotValidException ex) {
+    public @ResponseBody Response<ErrorModel> handleDefaultException(MethodArgumentNotValidException ex) {
         ErrorModel error = new ErrorModel();
         error.setCode(ErrorModel.Code.INPUT_INVALID);
         StringBuilder errorBuilder = new StringBuilder();
@@ -82,19 +87,19 @@ public class DefaultExceptionResolver {
                         continue;
                 }
                 // add comma but only if some error message was added
-                if (lastErrorBuilderLength!=errorBuilder.length()) {
+                if (lastErrorBuilderLength != errorBuilder.length()) {
                     errorBuilder.append(", ");
                 }
             }
         }
         String errors;
-        if (errorBuilder.length()>=2) {
+        if (errorBuilder.length() >= 2) {
             // strip trailing comma
-            errors = errorBuilder.substring(0, errorBuilder.length()-2);
+            errors = errorBuilder.substring(0, errorBuilder.length() - 2);
         } else {
             errors = errorBuilder.toString();
         }
-        error.setMessage("Input validation failed: "+errors);
+        error.setMessage("Input validation failed: " + errors);
         return new Response<>(Response.Status.ERROR, error);
     }
 
