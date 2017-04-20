@@ -73,6 +73,7 @@
         <module>powerauth-webauth-authentication-init</module>
         <module>powerauth-webauth-authentication-form</module>
         <module>powerauth-webauth-resources</module>
+        <module>powerauth-webauth-client</module>
     </modules>
 
 	<properties>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright 2017 Lime - HighTech Solutions s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>PowerAuth 2.0 Web Flow Demo</title>
+</head>
+<body>
+
+<div id="header">
+    <h1><a th:href="@{/}">PowerAuth 2.0 Web Flow Demo</a></h1>
+</div>
+
+<div id="content" layout:fragment="content">
+    <div class="wrapper text-center">
+        <p>
+            <img class="logo" src="./images/logo.png" alt="logo" />
+        </p>
+        <div class="accountConnection" th:each="providerId : ${providerIds}">
+            <p>
+                <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                    Welcome, <strong><span th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></strong>!
+                    <form id="disconnect" th:action="@{/connect/demo}" method="post">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <input type="hidden" name="_method" value="delete" />
+                        <button type="submit" class="btn btn-danger">Log out</button>
+                    </form>
+                </div>
+                <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                    <form th:action="@{/connect/demo}" method="POST">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                        <button type="submit" class="btn btn-success">Log in</button>
+                    </form>
+                </div>
+            </p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
