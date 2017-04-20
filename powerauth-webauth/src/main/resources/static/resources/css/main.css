@@ -9,6 +9,11 @@ a {
     text-decoration: none;
 }
 
+a:hover,a:active,a:focus {
+    color: #4c7400 !important;
+    text-decoration: none;
+}
+
 .message-information {
     color: #777777;
 }
