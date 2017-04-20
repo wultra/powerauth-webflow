@@ -43,7 +43,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody
     Response<ErrorModel> handleDefaultException(Throwable t) {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.ResponseCode.ERROR_GENERIC);
+        error.setCode(ErrorModel.Code.ERROR_GENERIC);
         error.setMessage("Unknown Error");
         return new Response<>(Response.Status.ERROR, error);
     }
@@ -57,7 +57,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody
     Response<ErrorModel> handleDefaultException(MethodArgumentNotValidException ex) {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.ResponseCode.INPUT_INVALID);
+        error.setCode(ErrorModel.Code.INPUT_INVALID);
         StringBuilder errorBuilder = new StringBuilder();
         for (ObjectError objError: ex.getBindingResult().getAllErrors()) {
             for (String code: objError.getCodes()) {

@@ -26,7 +26,7 @@ public class ErrorModel {
      * Response codes for different authentication failures.
      */
     public enum Code {
-        ERR_GENERIC
+        ERROR_GENERIC
     }
 
     private Code code;

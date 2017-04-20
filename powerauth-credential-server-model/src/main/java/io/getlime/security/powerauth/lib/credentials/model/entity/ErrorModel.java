@@ -24,7 +24,7 @@ public class ErrorModel {
     /**
      * Response codes for different authentication failures.
      */
-    public enum ResponseCode {
+    public enum Code {
         AUTHENTICATION_FAILED,
         INPUT_INVALID,
         ERROR_GENERIC
@@ -33,7 +33,7 @@ public class ErrorModel {
     /**
      * The response code identifies reason for the authentication failure.
      */
-    private ResponseCode code;
+    private Code code;
     /**
      * A message in English which describes the error.
      */
@@ -50,7 +50,7 @@ public class ErrorModel {
      * @param code response code
      * @param message message in English
      */
-    public ErrorModel(ResponseCode code, String message) {
+    public ErrorModel(Code code, String message) {
         this.code = code;
         this.message = message;
     }
@@ -59,7 +59,7 @@ public class ErrorModel {
      * Get the response code.
      * @return response code
      */
-    public ResponseCode getCode() {
+    public Code getCode() {
         return code;
     }
 
@@ -67,7 +67,7 @@ public class ErrorModel {
      * Set the response code.
      * @param code response code
      */
-    public void setCode(ResponseCode code) {
+    public void setCode(Code code) {
         this.code = code;
     }
 

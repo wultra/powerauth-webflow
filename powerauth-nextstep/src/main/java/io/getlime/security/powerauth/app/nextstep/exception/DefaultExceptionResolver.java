@@ -36,7 +36,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody Response<ErrorModel> handleDefaultException() {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERR_GENERIC);
+        error.setCode(ErrorModel.Code.ERROR_GENERIC);
         error.setMessage("Unknown Error");
         return new Response<>(Response.Status.ERROR, error);
     }

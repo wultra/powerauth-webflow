@@ -68,7 +68,7 @@ public class AuthenticationController {
             return new ResponseEntity<Response<?>>(response, HttpStatus.OK);
         } else {
             // regular authentication failed error
-            ErrorModel error = new ErrorModel(ErrorModel.ResponseCode.AUTHENTICATION_FAILED, "User authentication failed");
+            ErrorModel error = new ErrorModel(ErrorModel.Code.AUTHENTICATION_FAILED, "User authentication failed");
             Response response = new Response<>(Response.Status.ERROR, error);
             return new ResponseEntity<Response<?>>(response, HttpStatus.UNAUTHORIZED);
             // handle other possible authentication errors here

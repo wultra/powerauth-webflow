@@ -136,7 +136,7 @@ public class CredentialStoreClient {
 
     private CredentialStoreClientErrorException resourceAccessException(ResourceAccessException ex) throws CredentialStoreClientErrorException {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+        error.setCode(ErrorModel.Code.ERROR_GENERIC);
         error.setMessage(ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
     }
@@ -144,7 +144,7 @@ public class CredentialStoreClient {
     private CredentialStoreClientErrorException invalidErrorResponseBodyException(IOException ex) throws CredentialStoreClientErrorException {
         // JSON parsing failed
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+        error.setCode(ErrorModel.Code.ERROR_GENERIC);
         error.setMessage(ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
     }
@@ -154,7 +154,7 @@ public class CredentialStoreClient {
         Response<ErrorModel> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
         ErrorModel error = errorResponse.getResponseObject();
         if (error.getCode() == null) { // process malformed errors with undefined error code
-            error.setCode(ErrorModel.ResponseCode.ERR_GENERIC);
+            error.setCode(ErrorModel.Code.ERROR_GENERIC);
             error.setMessage(ex.getMessage());
         }
         return new CredentialStoreClientErrorException(ex, error);

@@ -152,7 +152,7 @@ public class NextStepClient {
      */
     private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) throws NextStepServiceException {
         ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERR_GENERIC);
+        error.setCode(ErrorModel.Code.ERROR_GENERIC);
         error.setMessage(ex.getMessage());
         return new NextStepServiceException(ex, error);
     }
@@ -172,7 +172,7 @@ public class NextStepClient {
         } catch (IOException ex2) {
             // JSON parsing failed
             ErrorModel error = new ErrorModel();
-            error.setCode(ErrorModel.Code.ERR_GENERIC);
+            error.setCode(ErrorModel.Code.ERROR_GENERIC);
             error.setMessage(ex2.getMessage());
             return new NextStepServiceException(ex, error);
         }
