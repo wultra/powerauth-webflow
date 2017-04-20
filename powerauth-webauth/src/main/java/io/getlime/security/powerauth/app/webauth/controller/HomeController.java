@@ -18,10 +18,13 @@ package io.getlime.security.powerauth.app.webauth.controller;
 import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -61,7 +64,6 @@ public class HomeController {
      */
     @RequestMapping("/authenticate")
     public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
-
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
@@ -79,7 +81,7 @@ public class HomeController {
      * @param request Reference to current HttpServletRequest.
      * @param response Reference to current HttpServletResponse.
      */
-    @RequestMapping("/continue")
+    @RequestMapping("/authenticate/continue")
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
@@ -97,6 +99,21 @@ public class HomeController {
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
         return null;
+    }
+
+    @RequestMapping("/authenticate/cancel")
+    public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        SavedRequest savedRequest = cache.getRequest(request, response);
+        if (savedRequest == null) {
+            return "redirect:/oauth/error";
+        }
+        String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
+        if (redirectUriParameter.length != 1) {
+            return "redirect:/oauth/error";
+        }
+        String redirectUri = redirectUriParameter[0];
+        return "redirect:" + redirectUri;
     }
 
 }

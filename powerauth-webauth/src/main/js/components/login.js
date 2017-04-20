@@ -64,6 +64,9 @@ export default class Login extends React.Component {
                     <FormGroup>
                         <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
                     </FormGroup>
+                    <FormGroup>
+                        <a href="./authenticate/cancel">Cancel</a>
+                    </FormGroup>
                 </form>
                 { this.props.context.loading ? <Spinner/> : undefined }
             </div>

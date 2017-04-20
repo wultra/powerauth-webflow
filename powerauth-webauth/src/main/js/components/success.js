@@ -30,7 +30,7 @@ export default class Success extends React.Component {
 
     componentWillMount() {
         setTimeout(() => {
-            window.location = './continue';
+            window.location = './authenticate/continue';
         }, 3000)
     }
 

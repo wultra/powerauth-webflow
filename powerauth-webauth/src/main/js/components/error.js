@@ -30,7 +30,7 @@ export default class Error extends React.Component {
 
     componentWillMount() {
         setTimeout(() => {
-            window.location = './continue';
+            window.location = './authenticate/cancel';
         }, 3000)
     }
 
