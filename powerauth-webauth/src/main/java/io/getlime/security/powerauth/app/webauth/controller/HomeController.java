@@ -60,7 +60,14 @@ public class HomeController {
      * @throws Exception thrown when page is not found
      */
     @RequestMapping("/authenticate")
-    public String authenticate(Map<String, Object> model) throws Exception {
+    public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        HttpSessionRequestCache cache = new HttpSessionRequestCache();
+        SavedRequest savedRequest = cache.getRequest(request, response);
+        if (savedRequest == null) {
+            return "redirect:/oauth/error";
+        }
+
         authenticationManagementService.clearContext();
         model.put("title", webAuthConfig.getPageTitle());
         model.put("stylesheet", webAuthConfig.getStylesheetUrl());
@@ -73,7 +80,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      */
     @RequestMapping("/continue")
-    public void f(HttpServletRequest request, HttpServletResponse response) {
+    public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         String redirectUrl;
@@ -82,13 +89,14 @@ public class HomeController {
             String uri = request.getRequestURI();
             String ctx = request.getContextPath();
             String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
-            redirectUrl = base + "oauth/error";
+            return "redirect:/oauth/error";
         } else {
             authenticationManagementService.pendingAuthenticationToAuthentication();
             redirectUrl = savedRequest.getRedirectUrl();
         }
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
+        return null;
     }
 
 }

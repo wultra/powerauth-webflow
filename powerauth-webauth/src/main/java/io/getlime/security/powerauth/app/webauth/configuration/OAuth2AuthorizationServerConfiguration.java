@@ -18,7 +18,7 @@ import org.springframework.security.oauth2.provider.endpoint.DefaultRedirectReso
  */
 @Configuration
 @EnableAuthorizationServer
-public class OAuth2Configuration extends AuthorizationServerConfigurerAdapter {
+public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
     @Autowired
     public void configureAuthorizationEndpoint(AuthorizationEndpoint authorizationEndpoint) {
