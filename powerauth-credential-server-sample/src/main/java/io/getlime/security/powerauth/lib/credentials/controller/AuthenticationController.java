@@ -75,7 +75,7 @@ public class AuthenticationController {
 
         UserDetailResponse responseObject = new UserDetailResponse();
         responseObject.setId(userId);
-        responseObject.setGivenName("Joe");
+        responseObject.setGivenName("John");
         responseObject.setFamilyName("Doe");
         return new Response<>(Response.Status.OK, responseObject);
     }
