@@ -40,7 +40,7 @@ export default class Error extends React.Component {
                 <div className={'message-error'}>
                     Authentication failed.
                 </div>
-                <img className="image-result" alt="" src={"./resources/images/image-error.png"}/>
+                <div className="image-result error"></div>
                 <div className={'message-error'}>
                     You will be redirected back to the original application.
                 </div>

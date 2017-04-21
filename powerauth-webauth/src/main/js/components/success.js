@@ -40,7 +40,7 @@ export default class Success extends React.Component {
                 <div className={'message-information'}>
                     {this.props.text}
                 </div>
-                <img className="image-result" alt="" src={"./resources/images/image-information.png"}/>
+                <div className="image-result success"></div>
                 <div className={'message-information'}>
                     You will be redirected back to the original application.
                 </div>

@@ -16,15 +16,12 @@
 
 package io.getlime.security.powerauth.app.webauth.configuration;
 
-import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Configuration for the Web Auth application, see default values in application.properties.
+ * Configuration for the Web Auth application.
  *
  * @author Roman Strobl
  */
@@ -33,23 +30,38 @@ import org.springframework.context.annotation.Configuration;
 public class WebAuthServerConfiguration {
 
     /**
-     * Dynamic URL for CSS stylesheet to allow external styling of Web Auth UI.
+     * Dynamic URL for external CSS stylesheet.
      */
-    @Value("${powerauth.webauth.page.stylesheet.url}")
-    private String stylesheetUrl;
+    @Value("${powerauth.webauth.page.custom-css.url}")
+    private String customStyleSheetUrl;
 
     /**
-     * Dynamic page title
+     * External location for the main CSS file.
+     * Note: Default value is "classpath:/resources/.
+     */
+    @Value("${powerauth.webauth.page.ext-css.location}")
+    private String stylesheetLocation;
+
+    /**
+     * Dynamic page title.
      */
     @Value("${powerauth.webauth.page.title}")
     private String pageTitle;
 
     /**
-     * Get the dynamic URL for CSS stylesheet to allow external styling of Web Auth UI.
-     * @return Dynamic URL for CSS stylesheet.
+     * Get custom external stylesheet URL.
+     * @return External stylesheet URL.
      */
-    public String getStylesheetUrl() {
-        return stylesheetUrl;
+    public String getCustomStyleSheetUrl() {
+        return customStyleSheetUrl;
+    }
+
+    /**
+     * Get the dynamic location for the main CSS stylesheet to allow external styling of Web Auth UI.
+     * @return Dynamic location for CSS stylesheet. By default, "classpath:/resources/".
+     */
+    public String getStylesheetLocation() {
+        return stylesheetLocation;
     }
 
     /**

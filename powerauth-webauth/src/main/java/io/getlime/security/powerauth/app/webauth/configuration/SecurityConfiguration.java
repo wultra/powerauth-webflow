@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .csrf().disable()
                 .antMatcher("/**").authorizeRequests()
-                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error",  "/api/**", "/resources/**").permitAll()
+                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error",  "/api/**", "/resources/**", "/ext-resources/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));

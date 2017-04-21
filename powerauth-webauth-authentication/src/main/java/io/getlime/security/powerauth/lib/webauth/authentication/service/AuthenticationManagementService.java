@@ -34,10 +34,6 @@ public class AuthenticationManagementService {
 
     private static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
 
-    public void clearContext() {
-        SecurityContextHolder.clearContext();
-    }
-
     private HttpServletRequest currentRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
@@ -54,6 +50,10 @@ public class AuthenticationManagementService {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         return (UserOperationAuthentication) session.getAttribute(PENDING_AUTH_OBJECT);
+    }
+
+    public void clearContext() {
+        SecurityContextHolder.clearContext();
     }
 
     public void createAuthenticationWithOperationId(String operationId) {

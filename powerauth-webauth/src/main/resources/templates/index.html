@@ -3,8 +3,9 @@
 <head lang="en">
     <meta charset="UTF-8"/>
     <title th:inline="text">[[${title}]]</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css"/>
-    <link rel="stylesheet" th:href="${stylesheet}"/>
+    <link rel="stylesheet" href="./resources/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="./ext-resources/css/main.css"/>
+    <link rel="stylesheet" th:if="${stylesheet != null}" th:href="${stylesheet}"/>
 </head>
 <body>
 

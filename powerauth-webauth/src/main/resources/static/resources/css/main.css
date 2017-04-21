@@ -48,12 +48,18 @@ a:hover,a:active,a:focus {
 }
 
 .image-result {
-    margin-top: 40px;
-    margin-bottom: 40px;
+    margin: 40px auto;
     width: 80px;
     height: 80px;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
 }
 
-#login{
-    transition: margin 50ms ease-in-out 25ms;
+.image-result.error {
+    background-image: url("../images/image-error.png");
+}
+
+.image-result.success {
+    background-image: url("../images/image-information.png");
 }

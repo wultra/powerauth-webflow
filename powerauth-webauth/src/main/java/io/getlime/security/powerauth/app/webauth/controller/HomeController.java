@@ -18,13 +18,10 @@ package io.getlime.security.powerauth.app.webauth.controller;
 import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.oauth2.provider.AuthorizationRequest;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.SessionAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,8 +54,8 @@ public class HomeController {
     }
 
     /**
-     * Renders the index.jsp template file
-     * @param model Model is used to store a link to the stylesheet which can be externalized
+     * Renders the main home page element.
+     * @param model Page model.
      * @return index page
      * @throws Exception thrown when page is not found
      */
@@ -72,7 +69,7 @@ public class HomeController {
 
         authenticationManagementService.clearContext();
         model.put("title", webAuthConfig.getPageTitle());
-        model.put("stylesheet", webAuthConfig.getStylesheetUrl());
+        model.put("stylesheet", webAuthConfig.getCustomStyleSheetUrl());
         return "index";
     }
 
@@ -80,6 +77,7 @@ public class HomeController {
      * Redirects user to previous URL after authentication, or to error URL in case of broken OAuth dance.
      * @param request Reference to current HttpServletRequest.
      * @param response Reference to current HttpServletResponse.
+     * @return Redirect to the /oauth/authorize page
      */
     @RequestMapping("/authenticate/continue")
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
@@ -101,6 +99,12 @@ public class HomeController {
         return null;
     }
 
+    /**
+     * Handles the cancelling of the authentication flow.
+     * @param request Reference to current HttpServletRequest.
+     * @param response Reference to current HttpServletResponse.
+     * @return Redirect to the originating page
+     */
     @RequestMapping("/authenticate/cancel")
     public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
@@ -113,7 +117,24 @@ public class HomeController {
             return "redirect:/oauth/error";
         }
         String redirectUri = redirectUriParameter[0];
+
+        // Clear security context and invalidate session
+        authenticationManagementService.clearContext();
+        request.getSession().invalidate();
+
         return "redirect:" + redirectUri;
+    }
+
+    /**
+     * Render the OAuth 2.0 protocol error page.
+     * @param model Model.
+     * @return Return oauth/error template.
+     */
+    @RequestMapping("/oauth/error")
+    public String oauthError(Map<String, Object> model) {
+        model.put("title", webAuthConfig.getPageTitle());
+        model.put("stylesheet", webAuthConfig.getCustomStyleSheetUrl());
+        return "oauth/error";
     }
 
 }
