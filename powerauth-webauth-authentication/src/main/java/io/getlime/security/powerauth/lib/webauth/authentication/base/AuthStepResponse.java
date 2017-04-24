@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Base class for any authentication step responses.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class AuthStepResponse {

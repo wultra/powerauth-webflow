@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.demo.oauth;import org.springfr
 import org.springframework.social.oauth2.OAuth2Template;
 
 /**
+ * Default service provider for demo service.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class DefaultApiServiceProvider extends AbstractOAuth2ServiceProvider<DefaultApiBinding> {

@@ -38,6 +38,8 @@ import org.springframework.social.security.AuthenticationNameUserIdSource;
 import javax.sql.DataSource;
 
 /**
+ * OAuth 2.0 Demo Client configuration.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration

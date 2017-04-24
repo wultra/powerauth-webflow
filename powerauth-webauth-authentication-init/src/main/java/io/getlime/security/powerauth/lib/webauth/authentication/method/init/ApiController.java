@@ -40,13 +40,15 @@ import java.util.List;
 public class ApiController extends AuthMethodController<InitOperationRequest, InitOperationResponse, AuthStepException> {
 
     /**
-     * Handles registration messages arriving from the clients.
-     * @param request registration request message.
-     * @return New registration response.
-     * @throws Exception thrown in case of invalid messages.
+     * Initialize a new authentication flow, by creating an operation. In case operation ID is already
+     * included in the request, it initializes context with the operation with this ID and starts authentication
+     * step sequence.
+     *
+     * @param request Authentication initialization request.
+     * @return Authentication initialization response.
      */
     @RequestMapping(value = "/api/init", method = RequestMethod.POST)
-    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws Exception {
+    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
         if (request.getOperationId() == null) {
             String operationName = "login";
             String operationData = null;

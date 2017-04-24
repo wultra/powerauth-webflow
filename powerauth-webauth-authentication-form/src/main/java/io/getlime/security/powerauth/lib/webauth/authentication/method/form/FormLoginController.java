@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 
 /**
+ * Controller for username / password authentication step.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
@@ -55,6 +57,11 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         }
     }
 
+    /**
+     * Handle the user authentication based on username and password.
+     * @param request Authentication request using username and password.
+     * @return Authentication response.
+     */
     @RequestMapping(value = "/api/authenticate", method = RequestMethod.POST)
     public @ResponseBody UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
         try {

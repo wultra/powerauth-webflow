@@ -22,6 +22,8 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 /**
+ * Default Spring Web MVC configuration.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration
@@ -30,6 +32,11 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Autowired
     private WebAuthServerConfiguration configuration;
 
+    /**
+     * Add resource handlers to registry. Used to publish custom folder as external resources.
+     * By default, resources in "classpath:/resources/" are used.
+     * @param registry Registry.
+     */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/ext-resources/**").addResourceLocations(configuration.getStylesheetLocation());

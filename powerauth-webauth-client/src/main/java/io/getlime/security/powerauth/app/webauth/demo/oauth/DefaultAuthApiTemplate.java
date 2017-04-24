@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.app.webauth.demo.oauth;import org.springframework.social.oauth2.OAuth2Template;
 
 /**
+ * Default template used to access resources needed for OAuth 2.0 dance.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class DefaultAuthApiTemplate extends OAuth2Template {

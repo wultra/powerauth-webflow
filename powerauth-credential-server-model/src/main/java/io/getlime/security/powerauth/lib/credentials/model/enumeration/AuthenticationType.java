@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.credentials.model.enumeration;
 /**
  * Supported authentication types.
  *
- * Currently only BASIC authentication is supported with plaintext username and password.
+ * <ul>
+ * <li>BASIC - Username and password sent via plaintext request.</li>
+ * </ul>
  *
  * @author Roman Strobl
  */

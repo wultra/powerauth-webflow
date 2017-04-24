@@ -17,10 +17,17 @@
 package io.getlime.security.powerauth.lib.webauth.authentication.exception;
 
 /**
+ * Exception during an authentication step.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class AuthStepException extends Throwable {
 
+    /**
+     * Constructor with message and cause.
+     * @param message Error message.
+     * @param cause Error cause (original exception, if any).
+     */
     public AuthStepException(String message, Throwable cause) {
         super(message, cause);
     }

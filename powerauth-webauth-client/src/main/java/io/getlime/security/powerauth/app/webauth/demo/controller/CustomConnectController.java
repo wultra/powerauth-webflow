@@ -23,6 +23,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.context.request.NativeWebRequest;
 
 /**
+ * Connect controller responsible for redirecting connection status page to home.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class CustomConnectController extends ConnectController {

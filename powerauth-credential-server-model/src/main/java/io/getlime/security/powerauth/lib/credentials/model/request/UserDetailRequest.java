@@ -17,23 +17,40 @@
 package io.getlime.security.powerauth.lib.credentials.model.request;
 
 /**
+ * Request object for obtaining user details by user ID.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class UserDetailRequest {
 
     private String id;
 
+    /**
+     * Default constructor
+     */
     public UserDetailRequest() {
     }
 
+    /**
+     * Constructor with user ID as a parameter.
+     * @param id User ID.
+     */
     public UserDetailRequest(String id) {
         this.id = id;
     }
 
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set user ID.
+     * @param id User ID.
+     */
     public void setId(String id) {
         this.id = id;
     }

@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * Controller class which handles user authentication.
+ *
  * @author Roman Strobl
  */
 @Controller
@@ -39,8 +40,11 @@ public class AuthenticationController {
 
     /**
      * Authenticate user with given username and password.
+     *
      * @param request Authenticate user request.
-     * @return Response with success or error code and error details in case authentication failed.
+     * @return Response with authenticated user ID.
+     * @throws AuthenticationFailedException In case that authentication fails.
+     * @throws MethodArgumentNotValidException In case form parameters are not valid.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody Response<AuthenticationResponse> authenticate(@RequestBody Request<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
@@ -66,8 +70,14 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Fetch user details based on user ID.
+     *
+     * @param request Request with user ID.
+     * @return Response with user details.
+     */
     @RequestMapping(value = "/userInfo", method = RequestMethod.POST)
-    public @ResponseBody Response<UserDetailResponse> fetchUserDetail(@RequestBody Request<UserDetailRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
+    public @ResponseBody Response<UserDetailResponse> fetchUserDetail(@RequestBody Request<UserDetailRequest> request) {
         UserDetailRequest userDetailRequest = request.getRequestObject();
         String userId = userDetailRequest.getId();
 

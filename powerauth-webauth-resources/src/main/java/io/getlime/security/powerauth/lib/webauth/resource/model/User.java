@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.webauth.resource.model;
 
 /**
+ * Class representing the user profile.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class User {

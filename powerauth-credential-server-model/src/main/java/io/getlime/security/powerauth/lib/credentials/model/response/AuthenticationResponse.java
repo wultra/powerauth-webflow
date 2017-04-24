@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.credentials.model.response;
 
 /**
- * Authentication response, to be embedded as Response<AuthenticationResponse>.
+ * Response of the authentication using username and password.
  *
  * @author Roman Strobl
  */

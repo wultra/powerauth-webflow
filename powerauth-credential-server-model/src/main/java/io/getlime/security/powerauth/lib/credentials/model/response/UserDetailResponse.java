@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.credentials.model.response;
 
 /**
+ * Response with user details.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class UserDetailResponse {
@@ -25,26 +27,50 @@ public class UserDetailResponse {
     private String givenName;
     private String familyName;
 
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set user ID.
+     * @param id User ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get user's given name.
+     * @return Given (first) name.
+     */
     public String getGivenName() {
         return givenName;
     }
 
+    /**
+     * Set user's given name.
+     * @param givenName Given (first) name.
+     */
     public void setGivenName(String givenName) {
         this.givenName = givenName;
     }
 
+    /**
+     * Get user's family name.
+     * @return User's family (last) name.
+     */
     public String getFamilyName() {
         return familyName;
     }
 
+    /**
+     * Set user's family name.
+     * @param familyName User's family (last) name.
+     */
     public void setFamilyName(String familyName) {
         this.familyName = familyName;
     }

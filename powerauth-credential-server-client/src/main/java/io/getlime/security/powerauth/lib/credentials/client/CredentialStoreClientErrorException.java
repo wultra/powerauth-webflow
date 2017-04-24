@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.lib.credentials.client;
 import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
 
 /**
+ * Exception thrown from the credential store in case of an error.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class CredentialStoreClientErrorException extends Throwable {

@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.webauth.authentication.base;
 
 /**
+ * Base class for any authentication step requests.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class AuthStepRequest {

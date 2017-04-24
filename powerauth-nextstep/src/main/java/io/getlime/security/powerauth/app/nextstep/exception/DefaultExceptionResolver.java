@@ -32,6 +32,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ControllerAdvice
 public class DefaultExceptionResolver {
 
+    /**
+     * Default exception handler, for unexpected errors.
+     * @return Response with error details.
+     */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody Response<ErrorModel> handleDefaultException() {

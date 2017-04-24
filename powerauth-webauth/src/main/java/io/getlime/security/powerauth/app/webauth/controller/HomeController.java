@@ -48,6 +48,10 @@ public class HomeController {
         this.authenticationManagementService = authenticationManagementService;
     }
 
+    /**
+     * Redirect from home page to /authenticate endpoint.
+     * @return Redirect to /authenticate endpoint.
+     */
     @RequestMapping("/")
     public String index() {
         return "redirect:/authenticate";

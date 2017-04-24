@@ -17,21 +17,39 @@
 package io.getlime.security.powerauth.lib.credentials.exception;
 
 /**
+ * Exception used for cases when authentication fails.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class AuthenticationFailedException extends Exception {
 
+    /**
+     * Default constructor.
+     */
     public AuthenticationFailedException() {
     }
 
+    /**
+     * Constructor with authentication failure message.
+     * @param message Authentication failure message.
+     */
     public AuthenticationFailedException(String message) {
         super(message);
     }
 
+    /**
+     * Constructor with authentication failure message and cause.
+     * @param message Authentication failure message.
+     * @param cause Cause, original exception.
+     */
     public AuthenticationFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Constructor with and cause.
+     * @param cause Cause, original exception.
+     */
     public AuthenticationFailedException(Throwable cause) {
         super(cause);
     }

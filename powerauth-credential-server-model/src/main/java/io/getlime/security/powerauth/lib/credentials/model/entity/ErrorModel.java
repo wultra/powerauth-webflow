@@ -16,7 +16,8 @@
 package io.getlime.security.powerauth.lib.credentials.model.entity;
 
 /**
- * ErrorModel is used in all error responses from the Credential server to specify error details.
+ * Error model, used to represent error responses.
+ *
  * @author Roman Strobl
  */
 public class ErrorModel {
@@ -34,6 +35,7 @@ public class ErrorModel {
      * The response code identifies reason for the authentication failure.
      */
     private Code code;
+
     /**
      * A message in English which describes the error.
      */

@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.credentials.model.request;
 import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 
 /**
- * Authentication request, to be embedded as Response<AuthenticationRequest>.
+ * Request for authenticating user with username and password.
  *
  * @author Roman Strobl
  */

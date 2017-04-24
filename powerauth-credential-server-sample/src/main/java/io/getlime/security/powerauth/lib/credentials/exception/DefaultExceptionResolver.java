@@ -39,7 +39,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of unexpected errors.
-     * @return Response with ErrorModel.
+     * @return Response with error information.
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -48,6 +48,11 @@ public class DefaultExceptionResolver {
         return new Response<>(Response.Status.ERROR, error);
     }
 
+    /**
+     * Hendling of authentication failures.
+     * @param ex Authentication faulure exception, with exception details.
+     * @return Response with error information.
+     */
     @ExceptionHandler(AuthenticationFailedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public @ResponseBody Response<ErrorModel> handleAuthenticationError(AuthenticationFailedException ex) {
@@ -58,7 +63,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of validation errors.
-     * @return Response with ErrorModel.
+     * @return Response with error information.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

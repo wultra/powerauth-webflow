@@ -22,6 +22,8 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 import org.springframework.security.oauth2.config.annotation.web.configuration.ResourceServerConfigurerAdapter;
 
 /**
+ * OAuth 2.0 Resource service configuration class.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration

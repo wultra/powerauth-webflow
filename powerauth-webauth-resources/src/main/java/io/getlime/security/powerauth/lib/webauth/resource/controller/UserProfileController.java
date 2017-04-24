@@ -29,6 +29,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.security.Principal;
 
 /**
+ * Controller for providing information about user profiles.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
@@ -38,6 +40,11 @@ public class UserProfileController {
     @Autowired
     private CredentialStoreClient client;
 
+    /**
+     * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
+     * @param principal Currently logged user.
+     * @return User profile.
+     */
     @RequestMapping("me")
     public @ResponseBody User me(Principal principal) {
         try {

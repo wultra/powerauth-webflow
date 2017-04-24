@@ -23,6 +23,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
+ * Basic configuration class, used to configure clients to Next Step service and Credential Store.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration
@@ -40,11 +42,19 @@ public class WebAuthServicesConfiguration {
     @Value("${powerauth.nextstep.service.url}")
     private String nextstepServiceUrl;
 
+    /**
+     * Default credential store client.
+     * @return Credential store client.
+     */
     @Bean
     public CredentialStoreClient defaultCredentialStoreClient() {
         return new CredentialStoreClient(credentialServerServiceUrl);
     }
 
+    /**
+     * Default Next Step service client.
+     * @return Next Step service client.
+     */
     @Bean
     public NextStepClient defaultNextStepClient() {
         return new NextStepClient(nextstepServiceUrl);

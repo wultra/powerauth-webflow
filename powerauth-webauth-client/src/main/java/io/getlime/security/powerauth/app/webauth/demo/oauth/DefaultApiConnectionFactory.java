@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.webauth.demo.oauth;import org.springfr
 import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
 
 /**
+ * Default connection factory for OAuth 2.0 protected service.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class DefaultApiConnectionFactory<T extends DefaultApiBinding> extends OAuth2ConnectionFactory<T> {

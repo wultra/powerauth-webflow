@@ -24,6 +24,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 /**
+ * Default Spring Security configuration.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration

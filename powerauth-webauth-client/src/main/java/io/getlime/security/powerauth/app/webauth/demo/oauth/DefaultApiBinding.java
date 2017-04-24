@@ -20,10 +20,16 @@ import io.getlime.security.powerauth.app.webauth.demo.model.User;
 import org.springframework.social.ApiBinding;
 
 /**
+ * Interface defining the API binding.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public interface DefaultApiBinding extends ApiBinding {
 
+    /**
+     * Get user profile.
+     * @return User profile.
+     */
     User getProfile();
 
 }

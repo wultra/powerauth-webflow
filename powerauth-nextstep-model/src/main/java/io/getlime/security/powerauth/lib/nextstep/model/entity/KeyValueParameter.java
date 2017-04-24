@@ -25,9 +25,17 @@ public class KeyValueParameter {
     private String key;
     private String value;
 
+    /**
+     * Default constructor.
+     */
     public KeyValueParameter() {
     }
 
+    /**
+     * Helper constructor with key and value in parameters.
+     * @param key Key.
+     * @param value Value associated with given key.
+     */
     public KeyValueParameter(String key, String value) {
         this.key = key;
         this.value = value;

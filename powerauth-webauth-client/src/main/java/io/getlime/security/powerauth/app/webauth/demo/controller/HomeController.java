@@ -26,6 +26,9 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * Default demo controller class.
+ */
 @Controller
 public class HomeController {
 

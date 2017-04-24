@@ -23,6 +23,8 @@ import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.UserProfileBuilder;
 
 /**
+ * Default API Adapter for provided OAuth 2.0 protected service.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapter<T> {

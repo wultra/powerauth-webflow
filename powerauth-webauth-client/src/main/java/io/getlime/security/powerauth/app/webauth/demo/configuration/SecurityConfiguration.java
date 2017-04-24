@@ -21,6 +21,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 /**
+ * Default Spring Security configuration.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration

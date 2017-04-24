@@ -52,6 +52,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
 
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        // TODO: Replace with client configuration from database.
         clients.inMemory()
                 .withClient("foo").secret("bar")
                 .authorizedGrantTypes("authorization_code")

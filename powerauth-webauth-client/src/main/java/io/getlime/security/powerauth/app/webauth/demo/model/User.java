@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.app.webauth.demo.model;
 
 /**
+ * Class representing a user displayed in the UI.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class User {

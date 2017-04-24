@@ -23,6 +23,8 @@ import org.springframework.social.support.URIBuilder;
 import java.net.URI;
 
 /**
+ * API template used for connecting to the actual OAuth 2.0 protected resources.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding implements DefaultApiBinding {
