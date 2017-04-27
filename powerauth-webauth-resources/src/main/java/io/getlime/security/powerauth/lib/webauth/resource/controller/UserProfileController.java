@@ -34,7 +34,7 @@ import java.security.Principal;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
-@RequestMapping("/api/secure/user")
+@RequestMapping("/api/secure/profile")
 public class UserProfileController {
 
     @Autowired
