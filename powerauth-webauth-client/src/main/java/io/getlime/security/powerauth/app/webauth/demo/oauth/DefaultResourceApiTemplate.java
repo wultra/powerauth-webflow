@@ -42,7 +42,7 @@ public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding impleme
 
     @Override
     public User getProfile() {
-        return getRestTemplate().getForObject(buildUri("/api/secure/user/me"), User.class);
+        return getRestTemplate().getForObject(buildUri("/api/secure/profile/me"), User.class);
     }
 
 }
