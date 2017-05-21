@@ -18,13 +18,32 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 
 // imports
-import { Provider, connect } from 'react-redux';
-import store from './store'
+import {Provider, connect} from 'react-redux';
+import {IntlProvider} from 'react-intl-redux';
 
-import App from './components/app'
+import store from './store';
+
+import App from './components/app';
+
+import {addLocaleData} from 'react-intl';
+
+import enLocaleData from 'react-intl/locale-data/en';
+import csLocaleData from 'react-intl/locale-data/cs';
+
+// currently only EN and CS languages are supported
+addLocaleData([
+    ...enLocaleData,
+    ...csLocaleData,
+]);
+
+// default locale is set according to JS variable lang, which is set by backend
+store.dispatch({
+    type: "CHANGE_LOCALE",
+    locale: lang
+});
 
 const app = document.getElementById('react');
 
-// Render the root component
-ReactDOM.render(<Provider store={store}><App/></Provider>, app);
+// Render the root component, IntlProvider provides access to i18n
+ReactDOM.render(<Provider store={store}><IntlProvider><App/></IntlProvider></Provider>, app);
 

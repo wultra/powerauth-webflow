@@ -16,6 +16,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+// i18n
+import {FormattedMessage} from 'react-intl';
+
 /**
  * Message component shows informational and error messages.
  *
@@ -38,11 +41,11 @@ export default class Error extends React.Component {
         return (
             <div className="text-center">
                 <div className={'message-error'}>
-                    Authentication failed.
+                    <FormattedMessage id="login.authenticationFailed"/>
                 </div>
                 <div className="image-result error"></div>
                 <div className={'message-error'}>
-                    You will be redirected back to the original application.
+                    <FormattedMessage id="message.redirect"/>
                 </div>
             </div>
         )

@@ -24,6 +24,9 @@ import { authenticate } from '../actions/usernamePasswordAuthActions'
 import { Button, FormGroup, FormControl } from 'react-bootstrap';
 import Spinner from 'react-spin';
 
+// i18n
+import {FormattedMessage} from 'react-intl';
+
 /**
  * Login component handles the user authentication using username and password.
  */
@@ -49,23 +52,24 @@ export default class Login extends React.Component {
     }
 
     render() {
+        const formatMessage = this.props.intl.formatMessage;
         return (
             <div id="login">
                 <form onSubmit={this.handleLogin}>
                     <FormGroup className={ (this.props.context.error ? "message-error" : "message-information" ) }>
-                        {this.props.context.message}
+                        <FormattedMessage id={this.props.context.message}/>
                     </FormGroup>
                     <FormGroup>
-                        <FormControl autoComplete="new-password" ref="username" type="text" placeholder="Login number" autoFocus />
+                        <FormControl autoComplete="new-password" ref="username" type="text" placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus />
                     </FormGroup>
                     <FormGroup>
-                        <FormControl autoComplete="new-password" ref="password" type="password" placeholder="Password" />
+                        <FormControl autoComplete="new-password" ref="password" type="password" placeholder={formatMessage({id: 'login.password'})} />
                     </FormGroup>
                     <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block>Sign In</Button>
+                        <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage id="login.signIn"/></Button>
                     </FormGroup>
                     <FormGroup>
-                        <a href="./authenticate/cancel">Cancel</a>
+                        <a href="./authenticate/cancel"><FormattedMessage id="login.cancel"/></a>
                     </FormGroup>
                 </form>
                 { this.props.context.loading ? <Spinner/> : undefined }

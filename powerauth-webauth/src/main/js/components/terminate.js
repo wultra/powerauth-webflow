@@ -16,6 +16,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+// i18n
+import {FormattedMessage} from 'react-intl';
+
 /**
  * Terminate component handles session termination and redirects.
  *
@@ -26,7 +29,7 @@ class Terminate extends React.Component {
 
     render() {
         return (
-            <div>Session terminated</div>
+            <div><FormattedMessage id="message.sessionTerminated"/></div>
         )
     }
 
