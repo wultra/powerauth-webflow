@@ -16,10 +16,18 @@
 
 package io.getlime.security.powerauth.app.webauth.configuration;
 
+import io.getlime.security.powerauth.app.webauth.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.LocaleResolver;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
+
+import java.util.Locale;
 
 /**
  * Default Spring Web MVC configuration.
@@ -39,7 +47,48 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
      */
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/ext-resources/**").addResourceLocations(configuration.getStylesheetLocation());
+        registry.addResourceHandler("/ext-resources/**").addResourceLocations(configuration.getResourcesLocation());
+    }
+
+    /**
+     * LocaleResolver resolves the locale based on cookie called 'lang'. Default locale is English.
+     * @return Locale resolver
+     */
+    @Bean
+    public LocaleResolver localeResolver() {
+        CookieLocaleResolver resolver = new CookieLocaleResolver();
+        resolver.setCookieName("lang");
+        resolver.setDefaultLocale(Locale.ENGLISH);
+        return resolver;
+    }
+
+    /**
+     * LocaleChangeInterceptor changes the locale based on value of parameter lang.
+     * @return Locale change interceptor
+     */
+    @Bean
+    public LocaleChangeInterceptor localeChangeInterceptor() {
+        LocaleChangeInterceptor lci = new LocaleChangeInterceptor();
+        lci.setParamName("lang");
+        return lci;
+    }
+
+    /**
+     * MessageSource provides access to internationalized messages. Custom implementation of MessageSource is used
+     * to allow reloading of messages and listing all message properties.
+     * @return Message source
+     */
+    @Bean
+    public ReloadableResourceBundleMessageSourceWithListing messageSource() {
+        ReloadableResourceBundleMessageSourceWithListing messageSource = new ReloadableResourceBundleMessageSourceWithListing();
+        messageSource.setBasename(configuration.getResourcesLocation()+"messages");
+        messageSource.setDefaultEncoding("UTF-8");
+        return messageSource;
+    }
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(localeChangeInterceptor());
     }
 
 }

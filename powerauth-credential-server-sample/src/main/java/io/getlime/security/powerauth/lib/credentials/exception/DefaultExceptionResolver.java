@@ -75,19 +75,19 @@ public class DefaultExceptionResolver {
             for (String code: objError.getCodes()) {
                 switch (code) {
                     case "username.empty":
-                        errorMessages.add("Username is empty.");
+                        errorMessages.add("login.username.empty");
                         break;
                     case "password.empty":
-                        errorMessages.add("Password is empty.");
+                        errorMessages.add("login.password.empty");
                         break;
                     case "username.long":
-                        errorMessages.add("Username too long.");
+                        errorMessages.add("login.username.long");
                         break;
                     case "password.long":
-                        errorMessages.add("Password too long.");
+                        errorMessages.add("login.password.long");
                         break;
                     case "type.unsupported":
-                        errorMessages.add("Unsupported authentication type.");
+                        errorMessages.add("login.type.unsupported");
                         break;
                     default:
                         break;

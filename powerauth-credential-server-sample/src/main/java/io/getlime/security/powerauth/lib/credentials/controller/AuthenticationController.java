@@ -66,7 +66,7 @@ public class AuthenticationController {
             AuthenticationResponse responseOK = new AuthenticationResponse("12345678");
             return new Response<>(Response.Status.OK, responseOK);
         } else {
-            throw new AuthenticationFailedException("User authentication failed");
+            throw new AuthenticationFailedException("login.authenticationFailed");
         }
     }
 

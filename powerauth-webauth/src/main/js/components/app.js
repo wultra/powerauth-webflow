@@ -1,9 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-import StartHandshake from './startHandshake'
-import Login from './login'
-import Success from './success'
+import StartHandshake from './startHandshake';
+import Login from './login';
+import Success from './success';
+
+// i18n
+import {injectIntl} from 'react-intl';
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -15,7 +18,30 @@ import Success from './success'
         screen: store.dispatching.currentScreen
     }
 })
-export default class App extends React.Component {
+export class App extends React.Component {
+
+    constructor() {
+        super();
+        this.changeLang = this.changeLang.bind(this);
+    }
+
+    /**
+     * Changes the current language for i18n.
+     * @param lang new language
+     */
+    changeLang(lang) {
+        // dispatches a reducer which updates locale strings based on lang variable
+        this.props.dispatch({
+            type: "CHANGE_LOCALE",
+            locale: lang
+        });
+        // cookie is set, so that the backend is aware of the locale change on next request
+        const d = new Date();
+        // cookie expiration is set to 30 days
+        d.setTime(d.getTime() + (30*24*60*60*1000));
+        document.cookie="lang="+lang+";expires="+d.toUTCString()+";path=/";
+    }
+
     render() {
         var Component;
         switch (this.props.screen) {
@@ -34,11 +60,21 @@ export default class App extends React.Component {
         }
         return (
             <div>
+                <div id="lang">
+                    {(this.props.intl.locale===undefined || this.props.intl.locale==='en') ? (
+                        <a href="#" onClick={() => {this.changeLang('cs')}}>Čeština</a>
+                    ) : (
+                        <a href="#" onClick={() => {this.changeLang('en')}}>English</a>
+                    )}
+                </div>
                 <div id="home" className="text-center">
                     <div id="logo"></div>
-                    <Component/>
+                    <Component intl={this.props.intl}/>
                 </div>
             </div>
         )
     }
 }
+
+// Locale is injected so that all components can access the intl property.
+export default injectIntl(App);
