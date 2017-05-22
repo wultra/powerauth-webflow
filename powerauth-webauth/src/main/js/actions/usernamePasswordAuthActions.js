@@ -7,7 +7,7 @@ export function authenticate(username, password) {
             payload: {
                 loading: true,
                 error: false,
-                message: "Please log in"
+                message: "login.pleaseLogIn"
             }
         });
         axios.post("./api/authenticate", {
@@ -40,7 +40,7 @@ export function authenticate(username, password) {
             if (error.response) {
                 errorMessage = error.response.data.message;
             } else if (error.request) {
-                errorMessage = "invalid_request"
+                errorMessage = "message.invalidRequest"
             } else {
                 errorMessage = error.message;
             }

@@ -36,11 +36,11 @@ public class WebAuthServerConfiguration {
     private String customStyleSheetUrl;
 
     /**
-     * External location for the main CSS file.
-     * Note: Default value is "classpath:/resources/.
+     * External location for the resources.
+     * Note: Default value is "classpath:/static/resources/.
      */
-    @Value("${powerauth.webauth.page.ext-css.location}")
-    private String stylesheetLocation;
+    @Value("${powerauth.webauth.page.ext-resources.location}")
+    private String resourcesLocation;
 
     /**
      * Dynamic page title.
@@ -57,11 +57,11 @@ public class WebAuthServerConfiguration {
     }
 
     /**
-     * Get the dynamic location for the main CSS stylesheet to allow external styling of Web Auth UI.
-     * @return Dynamic location for CSS stylesheet. By default, "classpath:/resources/".
+     * Get the dynamic location for the resources to allow external styling and localization of Web Auth UI.
+     * @return Dynamic location for the resources. By default, "classpath:/static/resources/".
      */
-    public String getStylesheetLocation() {
-        return stylesheetLocation;
+    public String getResourcesLocation() {
+        return resourcesLocation;
     }
 
     /**

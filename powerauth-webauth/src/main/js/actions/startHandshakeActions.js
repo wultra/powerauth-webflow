@@ -13,7 +13,7 @@ export function startHandshake() {
                         payload: {
                             loading: false,
                             error: false,
-                            message: "Please log in"
+                            message: "login.pleaseLogIn"
                         }
                     })
                 } else if (response.data.result === "FAILED") {
@@ -44,7 +44,7 @@ export function startHandshake() {
             if (error.response) {
                 errorMessage = error.response.data.message;
             } else if (error.request) {
-                errorMessage = "invalid_request"
+                errorMessage = "message.invalidRequest"
             } else {
                 errorMessage = error.message;
             }
