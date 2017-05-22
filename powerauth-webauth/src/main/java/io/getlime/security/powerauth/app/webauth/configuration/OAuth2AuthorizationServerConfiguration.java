@@ -59,7 +59,8 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
                 .scopes("profile").autoApprove(".*");
     }
 
-    @Override public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    @Override
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients();
     }
 }

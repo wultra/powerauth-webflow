@@ -124,7 +124,6 @@ public class HomeController {
 
         // Clear security context and invalidate session
         authenticationManagementService.clearContext();
-        request.getSession().invalidate();
 
         return "redirect:" + redirectUri;
     }
