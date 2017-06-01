@@ -17,7 +17,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // Actions
-import { startHandshake } from '../actions/startHandshakeActions'
+import { authenticate } from '../actions/startHandshakeActions'
 
 // Components
 import Spinner from 'react-spin';
@@ -33,7 +33,7 @@ import Spinner from 'react-spin';
 export default class StartHandshake extends React.Component {
 
     componentWillMount() {
-        this.props.dispatch(startHandshake());
+        this.props.dispatch(authenticate());
     }
 
     render() {

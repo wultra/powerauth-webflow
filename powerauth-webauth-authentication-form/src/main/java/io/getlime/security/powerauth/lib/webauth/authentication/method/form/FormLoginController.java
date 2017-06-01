@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.form;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
@@ -41,6 +42,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
+@RequestMapping(value = "/api/auth/form")
 public class FormLoginController extends AuthMethodController<UsernamePasswordAuthenticationRequest, UsernamePasswordAuthenticationResponse, AuthStepException> {
 
     @Autowired
@@ -57,12 +59,17 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         }
     }
 
+    @Override
+    protected AuthMethod getAuthMethodName() {
+        return AuthMethod.USERNAME_PASSWORD_AUTH;
+    }
+
     /**
      * Handle the user authentication based on username and password.
      * @param request Authentication request using username and password.
      * @return Authentication response.
      */
-    @RequestMapping(value = "/api/authenticate", method = RequestMethod.POST)
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {

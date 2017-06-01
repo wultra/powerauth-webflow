@@ -1,59 +1,14 @@
 import axios from 'axios';
+import { dispatchAction, dispatchError } from '../dispatcher/dispatcher'
 
-export function startHandshake() {
+export function authenticate() {
     return function (dispatch) {
-        axios.post("./api/init", {
+        axios.post("./api/auth/init/authenticate", {
             operationId: null
         }).then((response) => {
-            if (response.data.next.length > 0) {
-                var method = response.data.next[0];
-                if (response.data.result === "CONFIRMED") {
-                    dispatch({
-                        type: "SHOW_SCREEN_LOGIN",
-                        payload: {
-                            loading: false,
-                            error: false,
-                            message: "login.pleaseLogIn"
-                        }
-                    })
-                } else if (response.data.result === "FAILED") {
-                    dispatch({
-                        type: "SHOW_SCREEN_ERROR",
-                        payload: {
-                            message: response.data.message
-                        }
-                    })
-                }
-            } else {
-                if (response.data.result === "CONFIRMED") {
-                    dispatch({
-                        type: "SHOW_SCREEN_SUCCESS",
-                        payload: null
-                    })
-                } else if (response.data.result === "FAILED") {
-                    dispatch({
-                        type: "SHOW_SCREEN_ERROR",
-                        payload: {
-                            message: response.data.message
-                        }
-                    })
-                }
-            }
+            dispatchAction(dispatch, response);
         }).catch((error) => {
-            var errorMessage;
-            if (error.response) {
-                errorMessage = error.response.data.message;
-            } else if (error.request) {
-                errorMessage = "message.invalidRequest"
-            } else {
-                errorMessage = error.message;
-            }
-            dispatch({
-                type: "SHOW_SCREEN_ERROR",
-                payload: {
-                    message: errorMessage
-                }
-            })
+            dispatchError(dispatch, error);
         })
     }
 }

@@ -25,8 +25,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -104,6 +106,28 @@ public class NextStepClient {
             }
             HttpEntity<Request<CreateOperationRequest>> entity = new HttpEntity<>(new Request<>(request));
             ResponseEntity<Response<CreateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<CreateOperationResponse>>() {});
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            // Next Step service is down
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Calls the operation details endpoint via POST method to get operation details.
+     *
+     * @param id operation id
+     * @return a Response with {@link GetOperationDetailResponse} object for OK status or {@link ErrorModel} for ERROR status
+     */
+    public Response<GetOperationDetailResponse> getOperationDetail(String id) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetOperationDetailRequest request = new GetOperationDetailRequest();
+            request.setOperationId(id);
+            HttpEntity<Request<GetOperationDetailRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<GetOperationDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetOperationDetailResponse>>() {});
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);

@@ -55,13 +55,11 @@ public class OperationController {
         CreateOperationResponse response = new CreateOperationResponse();
         response.setOperationId("40269145-d91f-4579-badd-c57fa1133239");
         response.setResult(AuthResult.CONTINUE);
-        response.setResultDescription("Continue authentication by sending user to the login screen.");
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
 
         AuthStep authStep = new AuthStep();
         authStep.setAuthMethod(AuthMethod.USERNAME_PASSWORD_AUTH);
-        authStep.setDescription("Username and password login");
         response.getSteps().add(authStep);
 
         return new Response<>(Response.Status.OK, response);
@@ -84,18 +82,23 @@ public class OperationController {
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
 
         if (AuthStepResult.CONFIRMED.equals(requestObject.getAuthStepResult())) {
-            response.setResult(AuthResult.DONE);
-            response.setResultDescription("Authentication was successfully completed.");
+
+            if (AuthMethod.USERNAME_PASSWORD_AUTH.equals(requestObject.getAuthMethod())) {
+                response.setResult(AuthResult.CONTINUE);
+                AuthStep authStep = new AuthStep();
+                authStep.setAuthMethod(AuthMethod.SHOW_OPERATION_DETAIL);
+                response.getSteps().add(authStep);
+            } else {
+                response.setResult(AuthResult.DONE);
+            }
+
         } else if (AuthStepResult.CANCELED.equals(requestObject.getAuthStepResult())) {
             response.setResult(AuthResult.FAILED);
-            response.setResultDescription("User cancelled the authentication.");
         } else {
             response.setResult(AuthResult.CONTINUE);
-            response.setResultDescription("Continue authentication by sending user to the login screen.");
 
             AuthStep authStep = new AuthStep();
             authStep.setAuthMethod(AuthMethod.USERNAME_PASSWORD_AUTH);
-            authStep.setDescription("Username and password login");
             response.getSteps().add(authStep);
         }
         return new Response<>(Response.Status.OK, response);
@@ -116,7 +119,6 @@ public class OperationController {
         response.setUserId("26");
         response.setOperationData("{\"amount\":100,\"currency\":\"CZK\",\"to\":\"CZ12000012345678901234\"}");
         response.setResult(AuthResult.DONE);
-        response.setResultDescription("Authentication was successfully completed");
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
         return new Response<>(Response.Status.OK, response);

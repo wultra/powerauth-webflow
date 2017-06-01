@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.controller;
 
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
@@ -54,6 +55,21 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
     @Autowired
 
     private NextStepClient nextStepService;
+
+    protected GetOperationDetailResponse getOperation() {
+        try {
+            String operationId = authenticationManagementService.getPendingUserAuthentication().getOperationId();
+            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+            final GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
+            return responseObject;
+        } catch (NextStepServiceException e) {
+            return null;
+        }
+    }
+
+    protected AuthMethod getAuthMethodName() {
+        return AuthMethod.USERNAME_PASSWORD_AUTH;
+    }
 
     /**
      * Method to authenticate user with provided request object.
@@ -97,7 +113,7 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         try {
             String userId = authenticate(request);
             String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
-            Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, AuthMethod.USERNAME_PASSWORD_AUTH, AuthStepResult.CONFIRMED, null);
+            Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null);
             UpdateOperationResponse responseObject = response.getResponseObject();
             switch (responseObject.getResult()) {
                 case DONE: {

@@ -37,6 +37,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
+@RequestMapping(value = "/api/auth/init")
 public class ApiController extends AuthMethodController<InitOperationRequest, InitOperationResponse, AuthStepException> {
 
     /**
@@ -47,7 +48,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * @param request Authentication initialization request.
      * @return Authentication initialization response.
      */
-    @RequestMapping(value = "/api/init", method = RequestMethod.POST)
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
         if (request.getOperationId() == null) {
             String operationName = "login";

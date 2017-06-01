@@ -50,7 +50,11 @@ public class AuthenticationManagementService {
         session.setAttribute(PENDING_AUTH_OBJECT, auth);
     }
 
-    private UserOperationAuthentication getPendingUserAuthentication() {
+    /**
+     * Get the current pending authentication object.
+     * @return Pending authentication.
+     */
+    public UserOperationAuthentication getPendingUserAuthentication() {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         return (UserOperationAuthentication) session.getAttribute(PENDING_AUTH_OBJECT);

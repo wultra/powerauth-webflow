@@ -29,7 +29,6 @@ import java.util.List;
 public class AuthStep {
 
     private AuthMethod authMethod;
-    private String description;
     private List<KeyValueParameter> params;
 
     /**
@@ -53,22 +52,6 @@ public class AuthStep {
      */
     public void setAuthMethod(AuthMethod authMethod) {
         this.authMethod = authMethod;
-    }
-
-    /**
-     * Get authentication step description.
-     * @return Authentication step description.
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Set authentication step description.
-     * @param description Authentication step description.
-     */
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     /**

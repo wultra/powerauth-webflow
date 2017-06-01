@@ -13,36 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
+
+package io.getlime.security.powerauth.lib.webauth.authentication.method.operation.model.response;
 
 /**
- * Enum representing an authentication method.
- *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public enum AuthMethod {
-    /**
-     * Directly assign a user ID with given operation.
-     */
-    USER_ID_ASSIGN,
+public class OperationReviewDetailResponse {
 
-    /**
-     * Show operation details so that user can confirm them.
-     */
-    SHOW_OPERATION_DETAIL,
+    private String data;
 
-    /**
-     * Log user in using username and password form.
-     */
-    USERNAME_PASSWORD_AUTH,
+    public String getData() {
+        return data;
+    }
 
-    /**
-     * Authenticate user using PowerAuth 2.0 mobile token.
-     */
-    POWERAUTH_TOKEN,
-
-    /**
-     * Authenticate user using an SMS key.
-     */
-    SMS_KEY;
+    public void setData(String data) {
+        this.data = data;
+    }
 }

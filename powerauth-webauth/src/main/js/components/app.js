@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import StartHandshake from './startHandshake';
 import Login from './login';
 import Success from './success';
+import OperationDetail from './operation'
 
 // i18n
 import {injectIntl} from 'react-intl';
@@ -39,7 +40,7 @@ export class App extends React.Component {
         const d = new Date();
         // cookie expiration is set to 30 days
         d.setTime(d.getTime() + (30*24*60*60*1000));
-        document.cookie="lang="+lang+";expires="+d.toUTCString()+";path=/";
+        document.cookie="lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
     }
 
     render() {
@@ -53,6 +54,10 @@ export class App extends React.Component {
                 Component = Success;
                 break;
             }
+            case "SCREEN_OPERATION_DATA": {
+                Component = OperationDetail;
+                break;
+            }
             default: {
                 Component = StartHandshake;
                 break;
@@ -61,7 +66,7 @@ export class App extends React.Component {
         return (
             <div>
                 <div id="lang">
-                    {(this.props.intl.locale===undefined || this.props.intl.locale==='en') ? (
+                    {(this.props.intl.locale === undefined || this.props.intl.locale === 'en') ? (
                         <a href="#" onClick={() => {this.changeLang('cs')}}>Čeština</a>
                     ) : (
                         <a href="#" onClick={() => {this.changeLang('en')}}>English</a>

@@ -14,56 +14,49 @@
  * limitations under the License.
  */
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { connect } from 'react-redux';
 
 // Actions
-import { authenticate } from '../actions/usernamePasswordAuthActions'
+import { getOperationData, authenticate } from '../actions/showOperationDataActions'
 
 // Components
-import { Button, FormGroup, FormControl } from 'react-bootstrap';
+import { Button, FormGroup } from 'react-bootstrap';
 import Spinner from 'react-spin';
 
 // i18n
-import { FormattedMessage } from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 /**
- * Login component handles the user authentication using username and password.
+ * Operation component displays the operation data to the user.
  */
 @connect((store) => {
     return {
         context: store.dispatching.context
     }
 })
-export default class Login extends React.Component {
+export default class OperationDetail extends React.Component {
 
     constructor() {
         super();
         this.handleLogin = this.handleLogin.bind(this);
     }
 
+    componentWillMount() {
+        this.props.dispatch(getOperationData());
+    }
+
     handleLogin(event) {
         // prevent regular form submission
         event.preventDefault();
-        var username = ReactDOM.findDOMNode(this.refs.username);
-        var password = ReactDOM.findDOMNode(this.refs.password);
-        this.props.dispatch(authenticate(username.value, password.value));
-        password.value = "";
+        this.props.dispatch(authenticate());
     }
 
     render() {
-        const formatMessage = this.props.intl.formatMessage;
         return (
-            <div id="login">
+            <div id="operation">
                 <form onSubmit={this.handleLogin}>
-                    <FormGroup className={ (this.props.context.error ? "message-error" : "message-information" ) }>
-                        <FormattedMessage id={this.props.context.message}/>
-                    </FormGroup>
                     <FormGroup>
-                        <FormControl autoComplete="new-password" ref="username" type="text" placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus />
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoComplete="new-password" ref="password" type="password" placeholder={formatMessage({id: 'login.password'})} />
+                        {this.props.context.data}
                     </FormGroup>
                     <FormGroup>
                         <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage id="login.signIn"/></Button>
@@ -72,7 +65,6 @@ export default class Login extends React.Component {
                         <a href="./authenticate/cancel"><FormattedMessage id="login.cancel"/></a>
                     </FormGroup>
                 </form>
-                { this.props.context.loading ? <Spinner/> : undefined }
             </div>
         )
     }

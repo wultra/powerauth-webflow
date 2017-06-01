@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { dispatchAction, dispatchError } from '../dispatcher/dispatcher'
 
 export function authenticate(username, password) {
     return function (dispatch) {
@@ -7,15 +8,18 @@ export function authenticate(username, password) {
             payload: {
                 loading: true,
                 error: false,
-                message: "login.pleaseLogIn"
+                message: "login.pleaseLogIn" //TODO: Update message to "Loading..."
             }
         });
-        axios.post("./api/authenticate", {
+        axios.post("./api/auth/form/authenticate", {
             username: username,
             password: password
         }).then((response) => {
-
             switch (response.data.result) {
+                case 'CONFIRMED': {
+                    dispatchAction(dispatch, response);
+                    break;
+                }
                 case 'FAILED': {
                     dispatch({
                         type: "SHOW_SCREEN_LOGIN",
@@ -27,29 +31,9 @@ export function authenticate(username, password) {
                     });
                     break;
                 }
-                case 'CONFIRMED': { //TODO: check if there are more steps to do
-                    dispatch({
-                        type: "SHOW_SCREEN_SUCCESS",
-                        payload: response.data
-                    });
-                    break;
-                }
             }
         }).catch((error) => {
-            var errorMessage;
-            if (error.response) {
-                errorMessage = error.response.data.message;
-            } else if (error.request) {
-                errorMessage = "message.invalidRequest"
-            } else {
-                errorMessage = error.message;
-            }
-            dispatch({
-                type: "SHOW_SCREEN_ERROR",
-                payload: {
-                    message: errorMessage
-                }
-            })
+            dispatchError(dispatch, error);
         })
     }
 }
