@@ -22,6 +22,10 @@ a:hover,a:active,a:focus {
     color: #C0007F;
 }
 
+.font-small {
+    font-size: 12pt;
+}
+
 #logo {
     margin-top: 20px;
     margin-bottom: 20px;
@@ -45,6 +49,19 @@ a:hover,a:active,a:focus {
 .btn-success:hover,.btn-success:active,.btn-success:focus {
     background-color: #4c7400 !important;
     border: none;
+}
+
+.image {
+    margin: 40px auto;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.image.mtoken {
+    background-image: url("../images/token.png");
+    width: 185px;
+    height: 190px;
 }
 
 .image-result {

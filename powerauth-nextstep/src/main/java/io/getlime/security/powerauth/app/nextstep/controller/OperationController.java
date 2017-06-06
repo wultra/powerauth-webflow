@@ -88,6 +88,11 @@ public class OperationController {
                 AuthStep authStep = new AuthStep();
                 authStep.setAuthMethod(AuthMethod.SHOW_OPERATION_DETAIL);
                 response.getSteps().add(authStep);
+            } else if (AuthMethod.SHOW_OPERATION_DETAIL.equals(requestObject.getAuthMethod())) {
+                response.setResult(AuthResult.CONTINUE);
+                AuthStep authStep = new AuthStep();
+                authStep.setAuthMethod(AuthMethod.POWERAUTH_TOKEN);
+                response.getSteps().add(authStep);
             } else {
                 response.setResult(AuthResult.DONE);
             }

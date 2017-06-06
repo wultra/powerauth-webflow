@@ -15,8 +15,13 @@
  */
 package io.getlime.security.powerauth.app.webauth;
 
+import io.getlime.security.powerauth.crypto.lib.config.PowerAuthConfiguration;
+import io.getlime.security.powerauth.provider.CryptoProviderUtilFactory;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.support.SpringBootServletInitializer;
+
+import java.security.Security;
 
 /**
  * Servlet initializer which handles application startup in a web container.
@@ -27,6 +32,12 @@ public class ServletInitializer extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        // Register BC provider
+        Security.addProvider(new BouncyCastleProvider());
+
+        // Tell PowerAuth components to use BC provider
+        PowerAuthConfiguration.INSTANCE.setKeyConvertor(CryptoProviderUtilFactory.getCryptoProviderUtils());
+
         return application.sources(PowerAuthWebAuthApplication.class);
     }
 

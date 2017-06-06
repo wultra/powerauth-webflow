@@ -5,6 +5,7 @@ import StartHandshake from './startHandshake';
 import Login from './login';
 import Success from './success';
 import OperationDetail from './operation'
+import Token from './token'
 
 // i18n
 import {injectIntl} from 'react-intl';
@@ -56,6 +57,10 @@ export class App extends React.Component {
             }
             case "SCREEN_OPERATION_DATA": {
                 Component = OperationDetail;
+                break;
+            }
+            case "SCREEN_TOKEN": {
+                Component = Token;
                 break;
             }
             default: {

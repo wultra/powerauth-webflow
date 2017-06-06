@@ -39,6 +39,15 @@ export function dispatchAction(dispatch, response) {
                     });
                     break;
                 }
+                case "POWERAUTH_TOKEN": {
+                    dispatch({
+                        type: "SHOW_SCREEN_TOKEN",
+                        payload: {
+                            info: "firstLoad"
+                        }
+                    });
+                    break;
+                }
             }
         } else if (response.data.result === "FAILED") {
             dispatch({

@@ -72,10 +72,11 @@
         <module>powerauth-webauth-authentication</module>
         <module>powerauth-webauth-authentication-init</module>
         <module>powerauth-webauth-authentication-form</module>
-        <module>powerauth-webauth-resources</module>
-        <module>powerauth-webauth-client</module>
         <module>powerauth-webauth-authentication-operation-review</module>
-    </modules>
+        <module>powerauth-webauth-authentication-mtoken</module>
+		<module>powerauth-webauth-resources</module>
+		<module>powerauth-webauth-client</module>
+	</modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

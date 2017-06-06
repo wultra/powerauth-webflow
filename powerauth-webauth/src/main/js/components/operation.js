@@ -52,6 +52,10 @@ export default class OperationDetail extends React.Component {
     }
 
     render() {
+        // let data = JSON.parse(this.props.context.data);
+        // let amount = data.amount;
+        // let currency = data.currency;
+        // let toAccount = data.to;
         return (
             <div id="operation">
                 <form onSubmit={this.handleLogin}>

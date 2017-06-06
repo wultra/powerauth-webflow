@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.controller;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
@@ -33,6 +34,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,6 +72,19 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
 
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.USERNAME_PASSWORD_AUTH;
+    }
+
+    //TODO: Use correct NS service to implement this feature.
+    protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
+        GetOperationDetailResponse response = new GetOperationDetailResponse();
+        response.setOperationId(getOperation().getUserId());
+        response.setOperationData(getOperation().getOperationData());
+        response.setResult(AuthResult.CONTINUE);
+        response.setTimestampCreated(new Date());
+        response.setTimestampExpires(new Date());
+        List<GetOperationDetailResponse> list = new ArrayList<>();
+        list.add(response);
+        return list;
     }
 
     /**
@@ -112,7 +128,12 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
     protected R buildAuthorizationResponse(T request, AuthResponseProvider provider) throws AuthStepException {
         try {
             String userId = authenticate(request);
+            if (userId == null) { // user was not authenticated
+                authenticationManagementService.clearContext();
+                return provider.failedAuthentication();
+            }
             String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
+            // TODO: Allow passing custom parameters
             Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null);
             UpdateOperationResponse responseObject = response.getResponseObject();
             switch (responseObject.getResult()) {

@@ -17,9 +17,14 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
 import io.getlime.security.powerauth.app.webauth.i18n.ReloadableResourceBundleMessageSourceWithListing;
+import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
+import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthWebArgumentResolver;
+import io.getlime.security.powerauth.rest.api.spring.filter.PowerAuthRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -27,6 +32,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -40,14 +46,24 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Autowired
     private WebAuthServerConfiguration configuration;
 
-    /**
-     * Add resource handlers to registry. Used to publish custom folder as external resources.
-     * By default, resources in "classpath:/resources/" are used.
-     * @param registry Registry.
-     */
-    @Override
-    public void addResourceHandlers(ResourceHandlerRegistry registry) {
-        registry.addResourceHandler("/ext-resources/**").addResourceLocations(configuration.getResourcesLocation());
+    /* Register PowerAuth 2.0 Server Beans */
+
+    @Bean
+    public PowerAuthWebArgumentResolver powerAuthWebArgumentResolver() {
+        return new PowerAuthWebArgumentResolver();
+    }
+
+    @Bean
+    public PowerAuthAnnotationInterceptor powerAuthInterceptor() {
+        return new PowerAuthAnnotationInterceptor();
+    }
+
+    @Bean
+    public FilterRegistrationBean powerAuthFilterRegistration () {
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        registrationBean.setFilter(new PowerAuthRequestFilter());
+        registrationBean.setMatchAfter(true);
+        return registrationBean;
     }
 
     /**
@@ -87,8 +103,26 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     }
 
     @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
+        argumentResolvers.add(powerAuthWebArgumentResolver());
+        super.addArgumentResolvers(argumentResolvers);
+    }
+
+    /**
+     * Add resource handlers to registry. Used to publish custom folder as external resources.
+     * By default, resources in "classpath:/resources/" are used.
+     * @param registry Registry.
+     */
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/ext-resources/**").addResourceLocations(configuration.getResourcesLocation());
+    }
+
+    @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(powerAuthInterceptor());
         registry.addInterceptor(localeChangeInterceptor());
+        super.addInterceptors(registry);
     }
 
 }
