@@ -28,6 +28,9 @@ import java.util.List;
  */
 @Entity
 @Table(name = "ns_operation")
+@NamedQueries({
+        @NamedQuery(name = "OperationEntity.findPendingOperationsForUser", query = "SELECT o FROM OperationEntity o WHERE o.userId=?1 AND o.result='CONTINUE'")
+})
 public class OperationEntity implements Serializable {
 
     private static final long serialVersionUID = -8991119412441607003L;

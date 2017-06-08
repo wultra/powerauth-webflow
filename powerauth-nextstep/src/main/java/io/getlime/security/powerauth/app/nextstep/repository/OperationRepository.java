@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * CrudRepository for persistence of operations.
  *
@@ -26,4 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public interface OperationRepository extends CrudRepository<OperationEntity, String> {
+
+    List<OperationEntity> findPendingOperationsForUser(String userId);
+
 }
