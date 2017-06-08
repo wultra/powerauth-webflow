@@ -16,11 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
@@ -29,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,17 +146,38 @@ public class OperationPersistenceService {
         }
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            if (authMethod.equals(getCurrentAuthMethod(operation))) {
+            List<AuthMethod> responseAuthMethods = getResponseAuthMethods(operation);
+            if (responseAuthMethods.contains(authMethod)) {
                 filteredList.add(operation);
             }
         }
         return filteredList;
     }
 
-    private AuthMethod getCurrentAuthMethod(OperationEntity operation) {
+    /**
+     * Gets the list of @{link AuthMethod} for an operation. Authentication methods from the current step response
+     * are returned.
+     *
+     * @param operation operation entity
+     * @return list of @{link AuthMethod}
+     */
+    private List<AuthMethod> getResponseAuthMethods(OperationEntity operation) {
+        List<AuthMethod> authMethods = new ArrayList<>();
         if (operation == null) {
-            return null;
+            return authMethods;
         }
-        return operation.getOperationHistory().get(operation.getOperationHistory().size() - 1).getRequestAuthMethod();
+        // get steps from the current response
+        String responseSteps = operation.getOperationHistory().get(operation.getOperationHistory().size() - 1).getResponseSteps();
+        try {
+            List<AuthStep> steps = objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {
+            });
+            for (AuthStep step : steps) {
+                authMethods.add(step.getAuthMethod());
+            }
+        } catch (IOException e) {
+            // in case of an error empty list is returned
+            e.printStackTrace();
+        }
+        return authMethods;
     }
 }
