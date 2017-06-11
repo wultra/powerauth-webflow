@@ -135,6 +135,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
+            //TODO: Compare if provided data match expected operation data
+
             //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
             final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
 
