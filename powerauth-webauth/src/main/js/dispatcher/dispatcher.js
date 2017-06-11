@@ -17,27 +17,33 @@
 export function dispatchAction(dispatch, response) {
     if (response.data.next.length > 0) {
         if (response.data.result === "CONFIRMED") {
-            var method = response.data.next[0];
-            switch (method.authMethod) {
-                case "USERNAME_PASSWORD_AUTH": {
-                    dispatch({
-                        type: "SHOW_SCREEN_LOGIN",
-                        payload: {
-                            loading: false,
-                            error: false,
-                            message: "login.pleaseLogIn"
-                        }
-                    });
-                    break;
-                }
-                case "SHOW_OPERATION_DETAIL": {
-                    dispatch({
-                        type: "SHOW_SCREEN_OPERATION_DATA",
-                        payload: {
-                            data: ""
-                        }
-                    });
-                    break;
+            const next = response.data.next;
+            for (let key in next) {
+                switch (next[key].authMethod) {
+                    case "USER_ID_ASSIGN": {
+                        // TODO - implement USER_ID_ASSIGN, for now it is ignored
+                        break;
+                    }
+                    case "USERNAME_PASSWORD_AUTH": {
+                        dispatch({
+                            type: "SHOW_SCREEN_LOGIN",
+                            payload: {
+                                loading: false,
+                                error: false,
+                                message: "login.pleaseLogIn"
+                            }
+                        });
+                        break;
+                    }
+                    case "SHOW_OPERATION_DETAIL": {
+                        dispatch({
+                            type: "SHOW_SCREEN_OPERATION_DATA",
+                            payload: {
+                                data: ""
+                            }
+                        });
+                        break;
+                    }
                 }
             }
         } else if (response.data.result === "FAILED") {

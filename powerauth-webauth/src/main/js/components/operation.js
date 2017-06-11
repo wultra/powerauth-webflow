@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { connect } from 'react-redux';
-
+import React from "react";
+import {connect} from "react-redux";
 // Actions
-import { getOperationData, authenticate } from '../actions/showOperationDataActions'
-
+import {authenticate, getOperationData} from "../actions/showOperationDataActions";
 // Components
-import { Button, FormGroup } from 'react-bootstrap';
-import Spinner from 'react-spin';
-
+import {Button, FormGroup} from "react-bootstrap";
 // i18n
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage} from "react-intl";
 
 /**
  * Operation component displays the operation data to the user.
@@ -59,10 +55,11 @@ export default class OperationDetail extends React.Component {
                         {this.props.context.data}
                     </FormGroup>
                     <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage id="login.signIn"/></Button>
+                        <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage
+                            id="operation.confirm"/></Button>
                     </FormGroup>
                     <FormGroup>
-                        <a href="./authenticate/cancel"><FormattedMessage id="login.cancel"/></a>
+                        <a href="./authenticate/cancel"><FormattedMessage id="operation.cancel"/></a>
                     </FormGroup>
                 </form>
             </div>
