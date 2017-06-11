@@ -70,7 +70,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
-                public OperationReviewResponse doneAuthentication() {
+                public OperationReviewResponse doneAuthentication(String userId) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");
@@ -78,7 +78,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 }
 
                 @Override
-                public OperationReviewResponse failedAuthentication() {
+                public OperationReviewResponse failedAuthentication(String userId) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.FAILED);
                     response.setMessage("Authentication failed.");
@@ -86,7 +86,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 }
 
                 @Override
-                public OperationReviewResponse continueAuthentication(String operationId, List<AuthStep> steps) {
+                public OperationReviewResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");

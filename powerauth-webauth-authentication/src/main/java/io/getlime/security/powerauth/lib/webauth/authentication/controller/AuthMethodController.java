@@ -16,7 +16,6 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.controller;
 
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
@@ -34,8 +33,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -74,17 +71,13 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         return AuthMethod.USERNAME_PASSWORD_AUTH;
     }
 
-    //TODO: Use correct NS service to implement this feature.
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
-        GetOperationDetailResponse response = new GetOperationDetailResponse();
-        response.setOperationId(getOperation().getUserId());
-        response.setOperationData(getOperation().getOperationData());
-        response.setResult(AuthResult.CONTINUE);
-        response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new Date());
-        List<GetOperationDetailResponse> list = new ArrayList<>();
-        list.add(response);
-        return list;
+        try {
+            final Response<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId);
+            return operations.getResponseObject();
+        } catch (NextStepServiceException e) {
+            return null;
+        }
     }
 
     /**
@@ -95,6 +88,30 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
      */
     protected String authenticate(T request) throws E {
         return null;
+    }
+
+    /**
+     * Authorize operation with provided ID with user with given user ID.
+     * @param operationId Operation ID of operation to be authorized.
+     * @param userId User ID of user who should authorize operation.
+     * @return Response with information about operation update result.
+     * @throws NextStepServiceException In case communication fails.
+     */
+    protected UpdateOperationResponse authorize(String operationId, String userId) throws NextStepServiceException {
+        return authorize(operationId, userId, null);
+    }
+
+    /**
+     * Authorize operation with provided ID with user with given user ID.
+     * @param operationId Operation ID of operation to be authorized.
+     * @param userId User ID of user who should authorize operation.
+     * @param params Custom parameters.
+     * @return Response with information about operation update result.
+     * @throws NextStepServiceException In case communication fails.
+     */
+    protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
+        Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, params);
+        return response.getResponseObject();
     }
 
     /**
@@ -111,9 +128,9 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
-            return provider.continueAuthentication(operationId, responseObject.getSteps());
+            return provider.continueAuthentication(operationId, null, responseObject.getSteps());
         } catch (NextStepServiceException e) {
-            return provider.failedAuthentication();
+            return provider.failedAuthentication(null);
         }
     }
 
@@ -130,27 +147,26 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
             String userId = authenticate(request);
             if (userId == null) { // user was not authenticated
                 authenticationManagementService.clearContext();
-                return provider.failedAuthentication();
+                return provider.failedAuthentication(userId);
             }
-            String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
             // TODO: Allow passing custom parameters
-            Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null);
-            UpdateOperationResponse responseObject = response.getResponseObject();
+            String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
+            UpdateOperationResponse responseObject = authorize(operationId, userId, null);
             switch (responseObject.getResult()) {
                 case DONE: {
                     authenticationManagementService.authenticateCurrentSession();
-                    return provider.doneAuthentication();
+                    return provider.doneAuthentication(userId);
                 }
                 case FAILED: {
                     authenticationManagementService.clearContext();
-                    return provider.failedAuthentication();
+                    return provider.failedAuthentication(userId);
                 }
                 case CONTINUE: {
-                    return provider.continueAuthentication(operationId, responseObject.getSteps());
+                    return provider.continueAuthentication(responseObject.getOperationId(), userId, responseObject.getSteps());
                 }
                 default: {
                     authenticationManagementService.clearContext();
-                    return provider.failedAuthentication();
+                    return provider.failedAuthentication(userId);
                 }
             }
         } catch (NextStepServiceException e) {
@@ -165,23 +181,26 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
 
         /**
          * Called in case user successfully authenticated and no other authentication is needed.
+         * @param userId User ID.
          * @return Information about successful authentication, confirmation step.
          */
-        public abstract R doneAuthentication();
+        public abstract R doneAuthentication(String userId);
 
         /**
          * Called in case authentication fails and no other steps can be performed.
+         * @param userId User ID.
          * @return Information about authentication failure, error step.
          */
-        public abstract R failedAuthentication();
+        public abstract R failedAuthentication(String userId);
 
         /**
          * Called in case authentication should continue with next step(s).
          * @param operationId Operation ID of the current operation.
+         * @param userId User ID.
          * @param steps List of next steps to be performed.
          * @return Information about next steps for given operation.
          */
-        public abstract R continueAuthentication(String operationId, List<AuthStep> steps);
+        public abstract R continueAuthentication(String operationId, String userId, List<AuthStep> steps);
     }
 
 

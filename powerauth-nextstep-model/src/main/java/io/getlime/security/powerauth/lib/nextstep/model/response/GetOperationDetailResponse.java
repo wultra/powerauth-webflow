@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 import java.util.ArrayList;
@@ -36,12 +37,14 @@ public class GetOperationDetailResponse {
     private Date timestampExpires;
     private String operationData;
     private List<AuthStep> steps;
+    private List<OperationHistory> history;
 
     /**
      * Default constructor.
      */
     public GetOperationDetailResponse() {
         steps = new ArrayList<>();
+        history = new ArrayList<>();
     }
 
     /**
@@ -146,5 +149,13 @@ public class GetOperationDetailResponse {
      */
     public List<AuthStep> getSteps() {
         return steps;
+    }
+
+    /**
+     * Get the list with operation history records.
+     * @return List with operation history records.
+     */
+    public List<OperationHistory> getHistory() {
+        return history;
     }
 }

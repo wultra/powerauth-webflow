@@ -41,11 +41,18 @@ export default class Token extends React.Component {
     }
 
     componentWillMount() {
-        setTimeout(this.update, 5000);
+        this.update();
     }
 
     update() {
-        this.props.dispatch(authenticate());
+        let update = this.update;
+        this.props.dispatch(authenticate(function (b) {
+            if (b) {
+                setTimeout(function () {
+                    update();
+                }, 3000);
+            }
+        }));
     }
 
     render() {

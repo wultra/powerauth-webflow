@@ -75,7 +75,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
-                public UsernamePasswordAuthenticationResponse doneAuthentication() {
+                public UsernamePasswordAuthenticationResponse doneAuthentication(String userId) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");
@@ -83,7 +83,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 }
 
                 @Override
-                public UsernamePasswordAuthenticationResponse failedAuthentication() {
+                public UsernamePasswordAuthenticationResponse failedAuthentication(String userId) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
                     response.setMessage("Authentication failed.");
@@ -91,7 +91,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 }
 
                 @Override
-                public UsernamePasswordAuthenticationResponse continueAuthentication(String operationId, List<AuthStep> steps) {
+                public UsernamePasswordAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");

@@ -60,17 +60,17 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             return initiateOperationWithName(operationName, operationData, params, new AuthResponseProvider() {
 
                 @Override
-                public InitOperationResponse doneAuthentication() {
+                public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();
                 }
 
                 @Override
-                public InitOperationResponse failedAuthentication() {
+                public InitOperationResponse failedAuthentication(String userId) {
                     return failedOperationResponse(null);
                 }
 
                 @Override
-                public InitOperationResponse continueAuthentication(String operationId, List<AuthStep> steps) {
+                public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     return continueOperationResponse(operationId, steps);
                 }
             });
@@ -79,17 +79,17 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                     @Override
-                    public InitOperationResponse doneAuthentication() {
+                    public InitOperationResponse doneAuthentication(String userId) {
                         return completeOperationResponse();
                     }
 
                     @Override
-                    public InitOperationResponse failedAuthentication() {
+                    public InitOperationResponse failedAuthentication(String userId) {
                         return failedOperationResponse(null);
                     }
 
                     @Override
-                    public InitOperationResponse continueAuthentication(String operationId, List<AuthStep> steps) {
+                    public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                         return continueOperationResponse(operationId, steps);
                     }
                 });

@@ -17,10 +17,12 @@
 package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
@@ -118,6 +120,14 @@ public class OperationController {
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
         }
+
+        for (OperationHistoryEntity history: operation.getOperationHistory()) {
+            OperationHistory h = new OperationHistory();
+            h.setAuthMethod(history.getRequestAuthMethod());
+            h.setAuthResult(history.getResponseResult());
+            response.getHistory().add(h);
+        }
+
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
         return new Response<>(Response.Status.OK, response);

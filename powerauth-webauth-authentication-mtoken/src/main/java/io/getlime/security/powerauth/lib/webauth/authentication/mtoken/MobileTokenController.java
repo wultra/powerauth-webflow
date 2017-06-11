@@ -17,10 +17,14 @@
 package io.getlime.security.powerauth.lib.webauth.authentication.mtoken;
 
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
@@ -32,10 +36,7 @@ import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,13 +50,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        final List<AuthStep> steps = operation.getSteps();
-        for (AuthStep step: steps) {
-            if (AuthMethod.POWERAUTH_TOKEN.equals(step.getAuthMethod())) {
-                return null;
+        final List<OperationHistory> history = operation.getHistory();
+        for (OperationHistory h: history) {
+            if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
+                    && !AuthResult.FAILED.equals(h.getAuthResult())) {
+                return operation.getUserId();
             }
         }
-        return operation.getUserId();
+        return null;
     }
 
     @Override
@@ -66,10 +68,17 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
         try {
+            String userId = authenticate(request);
+            if (userId == null) {
+                final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                response.setResult(AuthStepResult.FAILED);
+                response.setMessage("Authentication failed.");
+                return response;
+            }
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
-                public MobileTokenAuthenticationResponse doneAuthentication() {
+                public MobileTokenAuthenticationResponse doneAuthentication(String userId) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");
@@ -77,7 +86,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 }
 
                 @Override
-                public MobileTokenAuthenticationResponse failedAuthentication() {
+                public MobileTokenAuthenticationResponse failedAuthentication(String userId) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
                     response.setMessage("Authentication failed.");
@@ -85,7 +94,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 }
 
                 @Override
-                public MobileTokenAuthenticationResponse continueAuthentication(String operationId, List<AuthStep> steps) {
+                public MobileTokenAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("User was successfully authenticated.");
@@ -103,15 +112,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
     @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody PowerAuthApiResponse<? extends Object> getOperationList(
+    public @ResponseBody PowerAuthApiResponse<List<GetOperationDetailResponse>> getOperationList(
             @RequestBody PowerAuthApiRequest<String> request,
             PowerAuthApiAuthentication apiAuthentication) {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
-            // TODO: Improve model handling - see #20
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            return new PowerAuthApiResponse<List<GetOperationDetailResponse>>(PowerAuthApiResponse.Status.OK, operationList);
+            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, operationList);
         } else {
             return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
         }
@@ -121,16 +129,16 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @PowerAuth(resourceId = "/operation/authorize")
     public @ResponseBody PowerAuthApiResponse<MobileTokenSignResponse> verifySignature(
             @RequestBody PowerAuthApiRequest<MobileTokenSignRequest> request,
-            PowerAuthApiAuthentication apiAuthentication) {
+            PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
-            //TODO: Mark operation as signed
+            //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
+            final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
 
-            MobileTokenSignResponse response = new MobileTokenSignResponse();
-            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, response);
+            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, null);
         } else {
             return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
         }
