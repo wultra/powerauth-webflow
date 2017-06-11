@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -35,7 +36,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controller class related to PowerAuth activation management.
@@ -118,6 +121,41 @@ public class OperationController {
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
         return new Response<>(Response.Status.OK, response);
+    }
+
+
+    /**
+     * Get the list of pending operations for user.
+     *
+     * @param request Get pending operations request.
+     * @return List with operation details.
+     */
+    @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
+    public @ResponseBody
+    Response<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody Request<GetPendingOperationsRequest> request) {
+
+        GetPendingOperationsRequest requestObject = request.getRequestObject();
+
+        List<GetOperationDetailResponse> responseList = new ArrayList<>();
+
+        List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.getAuthMethod());
+        if (operations == null) {
+            throw new IllegalArgumentException("Invalid query for pending operations, userId: " + requestObject.getUserId()
+                    + ", authMethod: " + requestObject.getAuthMethod());
+        }
+        for (OperationEntity operation : operations) {
+            GetOperationDetailResponse response = new GetOperationDetailResponse();
+            response.setOperationId(operation.getOperationId());
+            response.setUserId(operation.getUserId());
+            response.setOperationData(operation.getOperationData());
+            if (operation.getResult() != null) {
+                response.setResult(operation.getResult());
+            }
+            response.setTimestampCreated(new Date());
+            response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+            responseList.add(response);
+        }
+        return new Response<>(Response.Status.OK, responseList);
     }
 
 }

@@ -15,6 +15,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
@@ -35,16 +39,19 @@ public class OperationHistoryEntity implements Serializable {
     private OperationHistoryKey primaryKey;
 
     @Column(name = "request_auth_step_result")
-    private String requestAuthStepResult;
+    @Enumerated(EnumType.STRING)
+    private AuthStepResult requestAuthStepResult;
 
     @Column(name = "request_auth_method")
-    private String requestAuthMethod;
+    @Enumerated(EnumType.STRING)
+    private AuthMethod requestAuthMethod;
 
     @Column(name = "request_params")
     private String requestParams;
 
     @Column(name = "response_result")
-    private String responseResult;
+    @Enumerated(EnumType.STRING)
+    private AuthResult responseResult;
 
     @Column(name = "response_steps")
     private String responseSteps;
@@ -74,19 +81,19 @@ public class OperationHistoryEntity implements Serializable {
         this.primaryKey = primaryKey;
     }
 
-    public String getRequestAuthStepResult() {
+    public AuthStepResult getRequestAuthStepResult() {
         return requestAuthStepResult;
     }
 
-    public void setRequestAuthStepResult(String requestAuthStepResult) {
+    public void setRequestAuthStepResult(AuthStepResult requestAuthStepResult) {
         this.requestAuthStepResult = requestAuthStepResult;
     }
 
-    public String getRequestAuthMethod() {
+    public AuthMethod getRequestAuthMethod() {
         return requestAuthMethod;
     }
 
-    public void setRequestAuthMethod(String requestAuthMethod) {
+    public void setRequestAuthMethod(AuthMethod requestAuthMethod) {
         this.requestAuthMethod = requestAuthMethod;
     }
 
@@ -98,11 +105,11 @@ public class OperationHistoryEntity implements Serializable {
         this.requestParams = requestParams;
     }
 
-    public String getResponseResult() {
+    public AuthResult getResponseResult() {
         return responseResult;
     }
 
-    public void setResponseResult(String responseResult) {
+    public void setResponseResult(AuthResult responseResult) {
         this.responseResult = responseResult;
     }
 
