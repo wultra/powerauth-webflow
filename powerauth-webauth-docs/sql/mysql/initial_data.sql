@@ -50,9 +50,9 @@ VALUES (15, 'authorize_payment', 'UPDATE', 'USER_ID_ASSIGN', 'FAILED', 1, 'USER_
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (16, 'authorize_payment', 'UPDATE', 'USERNAME_PASSWORD_AUTH', 'FAILED', 2, 'USERNAME_PASSWORD_AUTH', 'CONTINUE');
 
-# authorize_payment - update operation (review operation) - CONFIRMED -> DONE (TBD token)
+# authorize_payment - update operation (review operation) - CONFIRMED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
-VALUES (17, 'authorize_payment', 'UPDATE', 'SHOW_OPERATION_DETAIL', 'CONFIRMED', 1, NULL, 'DONE');
+VALUES (17, 'authorize_payment', 'UPDATE', 'SHOW_OPERATION_DETAIL', 'CONFIRMED', 1, 'POWERAUTH_TOKEN', 'CONTINUE');
 
 # authorize_payment - update operation (review operation) - CANCELED -> FAILED
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
@@ -61,3 +61,15 @@ VALUES (18, 'authorize_payment', 'UPDATE', 'SHOW_OPERATION_DETAIL', 'CANCELED', 
 # authorize_payment - update operation (review operation) - FAILED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (19, 'authorize_payment', 'UPDATE', 'SHOW_OPERATION_DETAIL', 'FAILED', 1, 'SHOW_OPERATION_DETAIL', 'CONTINUE');
+
+# authorize_payment - update operation (authorize using mobile token) - CONFIRMED -> DONE
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (20, 'authorize_payment', 'UPDATE', 'POWERAUTH_TOKEN', 'CONFIRMED', 1, null, 'DONE');
+
+# authorize_payment - update operation (authorize using mobile token) - CANCELED -> FAILED
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (21, 'authorize_payment', 'UPDATE', 'POWERAUTH_TOKEN', 'CANCELED', 1, null, 'FAILED');
+
+# authorize_payment - update operation (authorize using mobile token) - FAILED -> CONTINUE
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (22, 'authorize_payment', 'UPDATE', 'POWERAUTH_TOKEN', 'FAILED', 1, 'POWERAUTH_TOKEN', 'CONTINUE');
