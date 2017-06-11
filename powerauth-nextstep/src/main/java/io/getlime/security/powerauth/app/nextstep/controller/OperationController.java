@@ -16,26 +16,29 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
+import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Controller class related to PowerAuth activation management.
@@ -45,88 +48,114 @@ import java.util.Date;
 @Controller
 public class OperationController {
 
+    private OperationPersistenceService operationPersistenceService;
+    private StepResolutionService stepResolutionService;
+
+    @Autowired
+    public OperationController(OperationPersistenceService operationPersistenceService,
+                               StepResolutionService stepResolutionService) {
+        this.operationPersistenceService = operationPersistenceService;
+        this.stepResolutionService = stepResolutionService;
+    }
+
     /**
      * Create a new operation with given name and data.
+     *
      * @param request Create operation request.
      * @return Create operation response.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.POST)
-    public @ResponseBody Response<CreateOperationResponse> createOperation(@RequestBody Request<CreateOperationRequest> request) {
-        CreateOperationResponse response = new CreateOperationResponse();
-        response.setOperationId("40269145-d91f-4579-badd-c57fa1133239");
-        response.setResult(AuthResult.CONTINUE);
-        response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+    public @ResponseBody
+    Response<CreateOperationResponse> createOperation(@RequestBody Request<CreateOperationRequest> request) {
+        // resolve response based on dynamic step definitions
+        CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
-        AuthStep authStep = new AuthStep();
-        authStep.setAuthMethod(AuthMethod.USERNAME_PASSWORD_AUTH);
-        response.getSteps().add(authStep);
+        // persist new operation
+        operationPersistenceService.createOperation(request.getRequestObject(), response);
 
         return new Response<>(Response.Status.OK, response);
     }
 
     /**
      * Update operation with given ID with a previous authentication step result.
+     *
      * @param request Update operation request.
      * @return Update operation response.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
-    public @ResponseBody Response<UpdateOperationResponse> updateOperation(@RequestBody Request<UpdateOperationRequest> request) {
+    public @ResponseBody
+    Response<UpdateOperationResponse> updateOperation(@RequestBody Request<UpdateOperationRequest> request) {
+        // resolve response based on dynamic step definitions
+        UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
-        UpdateOperationRequest requestObject = request.getRequestObject();
+        // persist operation update
+        operationPersistenceService.updateOperation(request.getRequestObject(), response);
 
-        UpdateOperationResponse response = new UpdateOperationResponse();
-        response.setOperationId(requestObject.getOperationId());
-        response.setUserId(requestObject.getUserId());
-        response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
-
-        if (AuthStepResult.CONFIRMED.equals(requestObject.getAuthStepResult())) {
-
-            if (AuthMethod.USERNAME_PASSWORD_AUTH.equals(requestObject.getAuthMethod())) {
-                response.setResult(AuthResult.CONTINUE);
-                AuthStep authStep = new AuthStep();
-                authStep.setAuthMethod(AuthMethod.SHOW_OPERATION_DETAIL);
-                response.getSteps().add(authStep);
-            } else if (AuthMethod.SHOW_OPERATION_DETAIL.equals(requestObject.getAuthMethod())) {
-                response.setResult(AuthResult.CONTINUE);
-                AuthStep authStep = new AuthStep();
-                authStep.setAuthMethod(AuthMethod.POWERAUTH_TOKEN);
-                response.getSteps().add(authStep);
-            } else {
-                response.setResult(AuthResult.DONE);
-            }
-
-        } else if (AuthStepResult.CANCELED.equals(requestObject.getAuthStepResult())) {
-            response.setResult(AuthResult.FAILED);
-        } else {
-            response.setResult(AuthResult.CONTINUE);
-
-            AuthStep authStep = new AuthStep();
-            authStep.setAuthMethod(AuthMethod.USERNAME_PASSWORD_AUTH);
-            response.getSteps().add(authStep);
-        }
         return new Response<>(Response.Status.OK, response);
     }
 
     /**
      * Get detail of an operation with given ID.
+     *
      * @param request Get operation detail request.
      * @return Get operation detail response.
      */
     @RequestMapping(value = "/operation/detail", method = RequestMethod.POST)
-    public @ResponseBody Response<GetOperationDetailResponse> operationDetail(@RequestBody Request<GetOperationDetailRequest> request) {
+    public @ResponseBody
+    Response<GetOperationDetailResponse> operationDetail(@RequestBody Request<GetOperationDetailRequest> request) {
 
         GetOperationDetailRequest requestObject = request.getRequestObject();
 
         GetOperationDetailResponse response = new GetOperationDetailResponse();
-        response.setOperationId(requestObject.getOperationId());
-        response.setUserId("26");
-        response.setOperationData("{\"amount\":100,\"currency\":\"CZK\",\"to\":\"CZ12000012345678901234\"}");
-        response.setResult(AuthResult.DONE);
+
+        OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId());
+        if (operation == null) {
+            throw new IllegalArgumentException("Invalid operationId: " + requestObject.getOperationId());
+        }
+        response.setOperationId(operation.getOperationId());
+        response.setUserId(operation.getUserId());
+        response.setOperationData(operation.getOperationData());
+        if (operation.getResult() != null) {
+            response.setResult(operation.getResult());
+        }
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
         return new Response<>(Response.Status.OK, response);
+    }
+
+
+    /**
+     * Get the list of pending operations for user.
+     *
+     * @param request Get pending operations request.
+     * @return List with operation details.
+     */
+    @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
+    public @ResponseBody
+    Response<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody Request<GetPendingOperationsRequest> request) {
+
+        GetPendingOperationsRequest requestObject = request.getRequestObject();
+
+        List<GetOperationDetailResponse> responseList = new ArrayList<>();
+
+        List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.getAuthMethod());
+        if (operations == null) {
+            throw new IllegalArgumentException("Invalid query for pending operations, userId: " + requestObject.getUserId()
+                    + ", authMethod: " + requestObject.getAuthMethod());
+        }
+        for (OperationEntity operation : operations) {
+            GetOperationDetailResponse response = new GetOperationDetailResponse();
+            response.setOperationId(operation.getOperationId());
+            response.setUserId(operation.getUserId());
+            response.setOperationData(operation.getOperationData());
+            if (operation.getResult() != null) {
+                response.setResult(operation.getResult());
+            }
+            response.setTimestampCreated(new Date());
+            response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+            responseList.add(response);
+        }
+        return new Response<>(Response.Status.OK, responseList);
     }
 
 }

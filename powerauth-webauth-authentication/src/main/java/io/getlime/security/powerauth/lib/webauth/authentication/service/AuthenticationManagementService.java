@@ -86,7 +86,7 @@ public class AuthenticationManagementService {
      */
     public String updateAuthenticationWithUserId(String userId) {
         UserOperationAuthentication auth = getPendingUserAuthentication();
-        if (auth.getUserId() != null && userId != auth.getUserId()) {
+        if (auth.getUserId() != null && !userId.equals(auth.getUserId())) {
             return null;
         }
         if (auth.getOperationId() == null) {

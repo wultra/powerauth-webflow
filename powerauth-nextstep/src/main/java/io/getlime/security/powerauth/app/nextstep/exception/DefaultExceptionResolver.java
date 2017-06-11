@@ -41,7 +41,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody Response<ErrorModel> handleDefaultException() {
         ErrorModel error = new ErrorModel();
         error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage("Unknown Error");
+        error.setMessage("error.unknown");
         return new Response<>(Response.Status.ERROR, error);
     }
 
