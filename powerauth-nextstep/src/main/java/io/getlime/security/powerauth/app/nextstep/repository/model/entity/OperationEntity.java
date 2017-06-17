@@ -118,6 +118,11 @@ public class OperationEntity implements Serializable {
         this.timestampExpires = timestampExpires;
     }
 
+    /**
+     * Is the operation expired?
+     *
+     * @return true if expired
+     */
     public boolean isExpired() {
         return new Date().after(timestampExpires);
     }

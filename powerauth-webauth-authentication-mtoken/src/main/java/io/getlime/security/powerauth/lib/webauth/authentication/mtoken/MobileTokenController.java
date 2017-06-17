@@ -73,6 +73,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         try {
             String userId = authenticate(request);
             if (userId == null) {
+                final GetOperationDetailResponse operation = getOperation();
+                if (operation.isExpired()) {
+                    // handle operation expiration
+                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                    response.setResult(AuthStepResult.FAILED);
+                    response.setMessage("authentication.timeout");
+                    return response;
+                }
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.FAILED);
                 response.setMessage("authentication.fail");

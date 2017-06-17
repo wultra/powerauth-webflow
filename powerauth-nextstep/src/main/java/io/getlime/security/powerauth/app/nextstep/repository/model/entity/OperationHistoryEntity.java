@@ -148,6 +148,15 @@ public class OperationHistoryEntity implements Serializable {
         this.responseTimestampExpires = responseTimestampExpires;
     }
 
+    /**
+     * Is the action expired?
+     *
+     * @return true if expired
+     */
+    public boolean isExpired() {
+        return new Date().after(responseTimestampExpires);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
