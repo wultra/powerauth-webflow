@@ -53,6 +53,9 @@ public class OperationHistoryEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthResult responseResult;
 
+    @Column(name = "response_result_description")
+    private String responseResultDescription;
+
     @Column(name = "response_steps")
     private String responseSteps;
 
@@ -111,6 +114,14 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setResponseResult(AuthResult responseResult) {
         this.responseResult = responseResult;
+    }
+
+    public String getResponseResultDescription() {
+        return responseResultDescription;
+    }
+
+    public void setResponseResultDescription(String responseResultDescription) {
+        this.responseResultDescription = responseResultDescription;
     }
 
     public String getResponseSteps() {

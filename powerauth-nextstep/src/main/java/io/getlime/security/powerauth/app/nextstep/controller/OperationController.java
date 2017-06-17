@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
@@ -52,12 +53,14 @@ public class OperationController {
 
     private OperationPersistenceService operationPersistenceService;
     private StepResolutionService stepResolutionService;
+    private NextStepServerConfiguration nextStepServerConfiguration;
 
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService,
-                               StepResolutionService stepResolutionService) {
+                               StepResolutionService stepResolutionService, NextStepServerConfiguration nextStepServerConfiguration) {
         this.operationPersistenceService = operationPersistenceService;
         this.stepResolutionService = stepResolutionService;
+        this.nextStepServerConfiguration = nextStepServerConfiguration;
     }
 
     /**
@@ -129,7 +132,7 @@ public class OperationController {
         }
 
         response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+        response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
         return new Response<>(Response.Status.OK, response);
     }
 
@@ -162,7 +165,7 @@ public class OperationController {
                 response.setResult(operation.getResult());
             }
             response.setTimestampCreated(new Date());
-            response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+            response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
             responseList.add(response);
         }
         return new Response<>(Response.Status.OK, responseList);

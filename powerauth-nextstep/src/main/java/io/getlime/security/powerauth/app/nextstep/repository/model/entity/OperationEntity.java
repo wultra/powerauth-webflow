@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -51,6 +52,12 @@ public class OperationEntity implements Serializable {
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
     private AuthResult result;
+
+    @Column(name = "timestamp_created")
+    private Date timestampCreated;
+
+    @Column(name = "timestamp_expires")
+    private Date timestampExpires;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "operation")
     private List<OperationHistoryEntity> operationHistory;
@@ -95,6 +102,26 @@ public class OperationEntity implements Serializable {
         this.result = result;
     }
 
+    public Date getTimestampCreated() {
+        return timestampCreated;
+    }
+
+    public void setTimestampCreated(Date timestampCreated) {
+        this.timestampCreated = timestampCreated;
+    }
+
+    public Date getTimestampExpires() {
+        return timestampExpires;
+    }
+
+    public void setTimestampExpires(Date timestampExpires) {
+        this.timestampExpires = timestampExpires;
+    }
+
+    public boolean isExpired() {
+        return new Date().after(timestampExpires);
+    }
+
     public List<OperationHistoryEntity> getOperationHistory() {
         return operationHistory;
     }
@@ -117,4 +144,5 @@ public class OperationEntity implements Serializable {
     public int hashCode() {
         return operationId != null ? operationId.hashCode() : 0;
     }
+
 }

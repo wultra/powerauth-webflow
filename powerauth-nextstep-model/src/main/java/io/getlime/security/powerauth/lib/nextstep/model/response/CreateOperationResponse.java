@@ -31,6 +31,7 @@ public class CreateOperationResponse {
 
     private String operationId;
     private AuthResult result;
+    private String resultDescription;
     private Date timestampCreated;
     private Date timestampExpires;
     private List<AuthStep> steps;
@@ -72,6 +73,24 @@ public class CreateOperationResponse {
      */
     public void setResult(AuthResult result) {
         this.result = result;
+    }
+
+    /**
+     * Get the authentication result description.
+     *
+     * @return Result description.
+     */
+    public String getResultDescription() {
+        return resultDescription;
+    }
+
+    /**
+     * Set the authentication result description.
+     *
+     * @param resultDescription Result description.
+     */
+    public void setResultDescription(String resultDescription) {
+        this.resultDescription = resultDescription;
     }
 
     /**
