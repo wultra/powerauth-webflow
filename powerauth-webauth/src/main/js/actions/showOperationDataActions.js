@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { dispatchAction, dispatchError } from '../dispatcher/dispatcher'
+import axios from "axios";
+import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
 export function getOperationData() {
     return function (dispatch) {
@@ -23,6 +23,11 @@ export function authenticate() {
                     break;
                 }
                 case 'FAILED': {
+                    // handle timeout - action can not succeed anymore, show error
+                    if (response.data.message === "authentication.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {
