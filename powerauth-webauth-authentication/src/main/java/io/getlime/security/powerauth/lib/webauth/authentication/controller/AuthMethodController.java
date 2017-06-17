@@ -189,9 +189,10 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         /**
          * Called in case authentication fails and no other steps can be performed.
          * @param userId User ID.
+         * @param failedReason Reason for the failure.
          * @return Information about authentication failure, error step.
          */
-        public abstract R failedAuthentication(String userId, String reason);
+        public abstract R failedAuthentication(String userId, String failedReason);
 
         /**
          * Called in case authentication should continue with next step(s).
