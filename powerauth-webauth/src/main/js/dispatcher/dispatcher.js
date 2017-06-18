@@ -67,7 +67,9 @@ export function dispatchAction(dispatch, response) {
         if (response.data.result === "CONFIRMED") {
             dispatch({
                 type: "SHOW_SCREEN_SUCCESS",
-                payload: null
+                payload: {
+                    message: response.data.message
+                }
             })
         } else if (response.data.result === "FAILED") {
             dispatch({
