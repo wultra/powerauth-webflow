@@ -13,28 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.repository;
+package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * CrudRepository for persistence of operations.
+ * Response object used for getting the list of supported authentication methods.
  *
  * @author Roman Strobl
  */
-@Component
-public interface OperationRepository extends CrudRepository<OperationEntity, String> {
+public class GetAuthMethodsResponse {
+
+    private List<AuthMethod> authMethods;
 
     /**
-     * Finds all pending operations for user.
-     *
-     * @param userId user ID
-     * @return List of pending operations.
+     * Default constructor.
      */
-    List<OperationEntity> findPendingOperationsForUser(String userId);
+    public GetAuthMethodsResponse() {
+        authMethods = new ArrayList<>();
+    }
 
+    public List<AuthMethod> getAuthMethods() {
+        return authMethods;
+    }
+
+    public void setAuthMethods(List<AuthMethod> authMethods) {
+        this.authMethods = authMethods;
+    }
 }

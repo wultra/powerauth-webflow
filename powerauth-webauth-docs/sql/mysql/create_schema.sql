@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS ns_step_definition;
 DROP TABLE IF EXISTS ns_operation_history;
 DROP TABLE IF EXISTS ns_operation;
+DROP TABLE IF EXISTS ns_user_prefs;
+DROP TABLE IF EXISTS ns_auth_method;
 DROP TABLE IF EXISTS oauth_code;
 DROP TABLE IF EXISTS oauth_refresh_token;
 DROP TABLE IF EXISTS oauth_access_token;
@@ -51,6 +53,23 @@ CREATE TABLE oauth_code (
   authentication LONG VARBINARY
 );
 
+CREATE TABLE ns_auth_method (
+  auth_method        VARCHAR(32) PRIMARY KEY,
+  order_number       INTEGER,
+  check_user_prefs   BOOLEAN,
+  user_prefs_column  INTEGER,
+  user_prefs_default BOOLEAN
+);
+
+CREATE TABLE ns_user_prefs (
+  user_id       VARCHAR(256) PRIMARY KEY,
+  auth_method_1 BOOLEAN,
+  auth_method_2 BOOLEAN,
+  auth_method_3 BOOLEAN,
+  auth_method_4 BOOLEAN,
+  auth_method_5 BOOLEAN
+);
+
 CREATE TABLE ns_operation (
   operation_id      VARCHAR(256) PRIMARY KEY,
   operation_name    VARCHAR(32),
@@ -73,7 +92,8 @@ CREATE TABLE ns_operation_history (
   response_timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   response_timestamp_expires  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (operation_id, result_id),
-  FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id)
+  FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id),
+  FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
 );
 
 CREATE TABLE ns_step_definition (
@@ -84,5 +104,8 @@ CREATE TABLE ns_step_definition (
   request_auth_step_result VARCHAR(32),
   response_priority        INTEGER,
   response_auth_method     VARCHAR(32),
-  response_result          VARCHAR(32)
+  response_result          VARCHAR(32),
+  FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
 );
+

@@ -38,7 +38,8 @@ import java.util.*;
  * This service performs dynamic resolution of the next steps. Step definitions are loaded during class initialization
  * and are used to generate responses for incoming requests. Step definitions are filtered by request parameters
  * and matching step definitions are returned as the list of next steps (including priorities in case more step
- * definitions match the request).
+ * definitions match the request). Step definitions are also filtered by authentication methods available for the user,
+ * authentication methods can be enabled or disabled dynamically in user preferences.
  *
  * @author Roman Strobl
  */
@@ -48,14 +49,17 @@ public class StepResolutionService {
     private IdGeneratorService idGeneratorService;
     private OperationPersistenceService operationPersistenceService;
     private NextStepServerConfiguration nextStepServerConfiguration;
+    private UserPrefsService userPrefsService;
     private Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
 
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
-                                 IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration) {
+                                 IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
+                                 UserPrefsService userPrefsService) {
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+        this.userPrefsService = userPrefsService;
         stepDefinitionsPerOperation = new HashMap<>();
         List<String> operationNames = stepDefinitionRepository.findDistinctOperationNames();
         for (String operationName : operationNames) {
@@ -73,7 +77,7 @@ public class StepResolutionService {
         CreateOperationResponse response = new CreateOperationResponse();
         response.setOperationId(idGeneratorService.generateOperationId());
         // AuthStepResult and AuthMethod are not available when creating the operation, null values are used to ignore them
-        List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null);
+        List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
@@ -109,20 +113,33 @@ public class StepResolutionService {
             return response;
         }
         response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
-        List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod());
+        List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
+        // TODO - verify priorities - issue #30
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
         }
         if (allResults.size() == 1) {
-            // Correct response - only one AuthResult found.
+            // Correct response - only one AuthResult found. Return all matching steps.
             response.setResult(allResults.iterator().next());
             return response;
+        } else if (allResults.size() > 1) {
+            // This state should not occur - there are multiple step definitions with different values of AuthResult.
+            // Fail the operation - this should not happen unless step definitions are misconfigured.
+            response.getSteps().clear();
+            response.setResult(AuthResult.FAILED);
+            response.setResultDescription("error.unknown");
+            return response;
+        } else {
+            // No step definition matches the current criteria. Suitable step definitions might have been filtered out
+            // via user preferences. Fail the operation.
+            // TODO - fallback mechanism - see issue #32
+            response.getSteps().clear();
+            response.setResult(AuthResult.FAILED);
+            response.setResultDescription("error.noAuthMethod");
+            return response;
         }
-        // This state should not occur - either there is no step definition which matches criteria or
-        // there are multiple step definitions with different values of AuthResult.
-        throw new IllegalStateException("Next step could not be resolved for update operation.");
     }
 
     /**
@@ -134,8 +151,12 @@ public class StepResolutionService {
      * @param authMethod     authentication method of previous authentication step
      * @return filtered list of steps
      */
-    private List<StepDefinitionEntity> filterSteps(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod) {
+    private List<StepDefinitionEntity> filterSteps(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
+        List<AuthMethod> authMethodsAvailableForUser = null;
+        if (userId != null) {
+            authMethodsAvailableForUser = userPrefsService.listAuthMethodsEnabledForUser(userId);
+        }
         List<StepDefinitionEntity> filteredStepDefinitions = new ArrayList<>();
         if (stepDefinitions == null) {
             throw new IllegalStateException("Step definitions are missing in Next Step server.");
@@ -150,7 +171,12 @@ public class StepResolutionService {
                 continue;
             }
             if (authMethod != null && !authMethod.equals(stepDef.getRequestAuthMethod())) {
-                // filter by AuthMethod
+                // filter by request AuthMethod
+                continue;
+            }
+            if (userId != null && stepDef.getResponseAuthMethod() != null && !authMethodsAvailableForUser.contains(stepDef.getResponseAuthMethod())) {
+                // filter by response AuthMethod based on methods available for the user - the list can change
+                // dynamically via user preferences
                 continue;
             }
             filteredStepDefinitions.add(stepDef);
