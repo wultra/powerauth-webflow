@@ -186,8 +186,8 @@ public class OperationController {
     Response<GetAuthMethodsResponse> getAuthMethods() {
         List<AuthMethodEntity> authMethods = authMethodRepository.findAllAuthMethods();
         List<AuthMethod> responseList = new ArrayList<>();
-        if (authMethods == null) {
-            throw new IllegalArgumentException("No authentication method is configured in Next Step server.");
+        if (authMethods == null || authMethods.isEmpty()) {
+            throw new IllegalStateException("No authentication method is configured in Next Step server.");
         }
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         for (AuthMethodEntity authMethod : authMethods) {
