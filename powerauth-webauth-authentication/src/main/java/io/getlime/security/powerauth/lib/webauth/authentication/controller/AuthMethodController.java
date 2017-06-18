@@ -57,9 +57,13 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
     private NextStepClient nextStepService;
 
     protected GetOperationDetailResponse getOperation() {
+        String operationId = authenticationManagementService.getPendingUserAuthentication().getOperationId();
+        return getOperation(operationId);
+    }
+
+    protected GetOperationDetailResponse getOperation(String id) {
         try {
-            String operationId = authenticationManagementService.getPendingUserAuthentication().getOperationId();
-            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(id);
             final GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
             return responseObject;
         } catch (NextStepServiceException e) {
@@ -73,7 +77,7 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
-            final Response<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId);
+            final Response<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId, getAuthMethodName());
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
             return null;

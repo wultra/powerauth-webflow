@@ -1,5 +1,6 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
+import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.rest.api.spring.provider.PowerAuthAuthenticationProvider;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.apache.ws.security.WSConstants;
@@ -22,6 +23,9 @@ public class PowerAuthWebServiceConfiguration {
 
     @Value("${powerauth.service.url}")
     private String powerAuthServiceUrl;
+
+    @Value("${powerauth.push.service.url}")
+    private String powerAuthPushServiceUrl;
 
     @Value("${powerauth.service.security.clientToken}")
     private String clientToken;
@@ -56,6 +60,13 @@ public class PowerAuthWebServiceConfiguration {
             ClientInterceptor interceptor = securityInterceptor();
             client.setInterceptors(new ClientInterceptor[] { interceptor });
         }
+        return client;
+    }
+
+    @Bean
+    public PushServerClient pushServerClient() {
+        PushServerClient client = new PushServerClient();
+        client.setServiceBaseUrl(powerAuthPushServiceUrl);
         return client;
     }
 

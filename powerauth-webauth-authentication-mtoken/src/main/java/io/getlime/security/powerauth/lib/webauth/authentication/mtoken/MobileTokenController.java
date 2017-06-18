@@ -16,6 +16,8 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.mtoken;
 
+import io.getlime.push.client.MobilePlatform;
+import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -28,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
+import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenSignRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenSignResponse;
@@ -35,6 +38,7 @@ import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAu
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,6 +50,9 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/api/auth/token")
 public class MobileTokenController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
+
+    @Autowired
+    private PushServerClient pushServerClient;
 
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
@@ -110,18 +117,40 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         }
     }
 
+    @RequestMapping(value="/push/register", method = RequestMethod.POST)
+    @PowerAuth(resourceId = "/push/register", signatureType = { PowerAuthSignatureTypes.POSSESSION })
+    public @ResponseBody String registerDevice(@RequestBody MobileTokenPushRegisterRequest request,
+                                               PowerAuthApiAuthentication apiAuthentication) {
+
+        // Get the values from the request
+        String platform = request.getPlatform();
+        String token = request.getToken();
+
+        // Check if the context is authenticated - if it is, add activation ID.
+        // This assures that the activation is assigned with a correct device.
+        String activationId = null;
+        if (apiAuthentication != null) {
+            activationId = apiAuthentication.getActivationId();
+        }
+
+        // Register the device and return response
+        boolean result = pushServerClient.registerDevice(1L, token, MobilePlatform.valueOf(platform), activationId);
+        if (result) {
+            return "OK";
+        } else {
+            return "NOT_OK";
+        }
+    }
+
     @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody PowerAuthApiResponse<List<GetOperationDetailResponse>> getOperationList(
-            @RequestBody PowerAuthApiRequest<String> request,
-            PowerAuthApiAuthentication apiAuthentication) {
-
+    public @ResponseBody PowerAuthApiResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) {
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, operationList);
+            return new PowerAuthApiResponse(PowerAuthApiResponse.Status.OK, PowerAuthApiResponse.Encryption.NONE, operationList);
         } else {
-            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
+            return new PowerAuthApiResponse(PowerAuthApiResponse.Status.OK, PowerAuthApiResponse.Encryption.NONE, null);
         }
     }
 
@@ -135,12 +164,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
-            //TODO: Compare if provided data match expected operation data
-
-            //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
-            final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
-
-            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, null);
+            final GetOperationDetailResponse operation = getOperation(operationId);
+            if (operation.getOperationData().equals(request.getRequestObject().getData())) {
+                //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
+                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
+                return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, null);
+            } else {
+                return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
+            }
         } else {
             return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
         }

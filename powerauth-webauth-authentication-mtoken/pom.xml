@@ -49,6 +49,11 @@
             <artifactId>powerauth-restful-security-spring</artifactId>
             <version>0.16.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-push-client</artifactId>
+            <version>0.16.0</version>
+        </dependency>
     </dependencies>
 
 </project>
