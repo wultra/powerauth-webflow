@@ -53,6 +53,9 @@ public class OperationHistoryEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthResult responseResult;
 
+    @Column(name = "response_result_description")
+    private String responseResultDescription;
+
     @Column(name = "response_steps")
     private String responseSteps;
 
@@ -113,6 +116,14 @@ public class OperationHistoryEntity implements Serializable {
         this.responseResult = responseResult;
     }
 
+    public String getResponseResultDescription() {
+        return responseResultDescription;
+    }
+
+    public void setResponseResultDescription(String responseResultDescription) {
+        this.responseResultDescription = responseResultDescription;
+    }
+
     public String getResponseSteps() {
         return responseSteps;
     }
@@ -135,6 +146,15 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setResponseTimestampExpires(Date responseTimestampExpires) {
         this.responseTimestampExpires = responseTimestampExpires;
+    }
+
+    /**
+     * Is the action expired?
+     *
+     * @return true if expired
+     */
+    public boolean isExpired() {
+        return new Date().after(responseTimestampExpires);
     }
 
     @Override

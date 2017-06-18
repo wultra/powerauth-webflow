@@ -1,14 +1,14 @@
-import React from 'react';
-import { connect } from 'react-redux';
+import React from "react";
+import {connect} from "react-redux";
 
-import StartHandshake from './startHandshake';
-import Login from './login';
-import Success from './success';
-import OperationDetail from './operation'
-import Token from './token'
-
+import StartHandshake from "./startHandshake";
+import Login from "./login";
+import Success from "./success";
+import Error from "./error";
+import OperationDetail from "./operation";
+import Token from "./token";
 // i18n
-import {injectIntl} from 'react-intl';
+import {injectIntl} from "react-intl";
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -45,7 +45,7 @@ export class App extends React.Component {
     }
 
     render() {
-        var Component;
+        let Component;
         switch (this.props.screen) {
             case "SCREEN_LOGIN": {
                 Component = Login;
@@ -53,6 +53,10 @@ export class App extends React.Component {
             }
             case "SCREEN_SUCCESS": {
                 Component = Success;
+                break;
+            }
+            case "SCREEN_ERROR": {
+                Component = Error;
                 break;
             }
             case "SCREEN_OPERATION_DATA": {

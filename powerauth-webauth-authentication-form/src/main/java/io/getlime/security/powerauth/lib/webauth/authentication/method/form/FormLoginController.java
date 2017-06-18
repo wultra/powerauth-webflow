@@ -16,17 +16,17 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.form;
 
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
-import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
-import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
+import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
+import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -78,15 +78,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 public UsernamePasswordAuthenticationResponse doneAuthentication(String userId) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     return response;
                 }
 
                 @Override
-                public UsernamePasswordAuthenticationResponse failedAuthentication(String userId) {
+                public UsernamePasswordAuthenticationResponse failedAuthentication(String userId, String failedReason) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
-                    response.setMessage("Authentication failed.");
+                    response.setMessage(failedReason);
                     return response;
                 }
 
@@ -94,7 +94,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 public UsernamePasswordAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
                     return response;
                 }

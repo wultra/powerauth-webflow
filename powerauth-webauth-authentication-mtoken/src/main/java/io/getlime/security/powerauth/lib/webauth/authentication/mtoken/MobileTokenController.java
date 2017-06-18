@@ -40,7 +40,10 @@ import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 
@@ -77,9 +80,17 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         try {
             String userId = authenticate(request);
             if (userId == null) {
+                final GetOperationDetailResponse operation = getOperation();
+                if (operation.isExpired()) {
+                    // handle operation expiration
+                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                    response.setResult(AuthStepResult.FAILED);
+                    response.setMessage("authentication.timeout");
+                    return response;
+                }
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.FAILED);
-                response.setMessage("Authentication failed.");
+                response.setMessage("authentication.fail");
                 return response;
             }
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
@@ -88,15 +99,15 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 public MobileTokenAuthenticationResponse doneAuthentication(String userId) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     return response;
                 }
 
                 @Override
-                public MobileTokenAuthenticationResponse failedAuthentication(String userId) {
+                public MobileTokenAuthenticationResponse failedAuthentication(String userId, String failedReason) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
-                    response.setMessage("Authentication failed.");
+                    response.setMessage(failedReason);
                     return response;
                 }
 
@@ -104,7 +115,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 public MobileTokenAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
                     return response;
                 }

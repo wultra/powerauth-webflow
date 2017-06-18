@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
@@ -46,13 +47,15 @@ public class StepResolutionService {
 
     private IdGeneratorService idGeneratorService;
     private OperationPersistenceService operationPersistenceService;
+    private NextStepServerConfiguration nextStepServerConfiguration;
     private Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
 
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
-                                 IdGeneratorService idGeneratorService) {
+                                 IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration) {
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
+        this.nextStepServerConfiguration = nextStepServerConfiguration;
         stepDefinitionsPerOperation = new HashMap<>();
         List<String> operationNames = stepDefinitionRepository.findDistinctOperationNames();
         for (String operationName : operationNames) {
@@ -73,7 +76,7 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null);
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+        response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
@@ -96,18 +99,29 @@ public class StepResolutionService {
         UpdateOperationResponse response = new UpdateOperationResponse();
         response.setOperationId(request.getOperationId());
         response.setUserId(request.getUserId());
+        response.setTimestampCreated(new Date());
+        if (operation.isExpired()) {
+            // Operation fails in case it is expired.
+            // Response expiration time matches operation expiration to avoid extending expiration time of the operation.
+            response.setTimestampExpires(operation.getTimestampExpires());
+            response.setResult(AuthResult.FAILED);
+            response.setResultDescription("authentication.timeout");
+            return response;
+        }
+        response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
         List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod());
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
-        response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
         }
         if (allResults.size() == 1) {
+            // Correct response - only one AuthResult found.
             response.setResult(allResults.iterator().next());
             return response;
         }
+        // This state should not occur - either there is no step definition which matches criteria or
+        // there are multiple step definitions with different values of AuthResult.
         throw new IllegalStateException("Next step could not be resolved for update operation.");
     }
 
@@ -123,6 +137,9 @@ public class StepResolutionService {
     private List<StepDefinitionEntity> filterSteps(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod) {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
         List<StepDefinitionEntity> filteredStepDefinitions = new ArrayList<>();
+        if (stepDefinitions == null) {
+            throw new IllegalStateException("Step definitions are missing in Next Step server.");
+        }
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             if (operationType != null && !operationType.equals(stepDef.getOperationType())) {
                 // filter by operation type

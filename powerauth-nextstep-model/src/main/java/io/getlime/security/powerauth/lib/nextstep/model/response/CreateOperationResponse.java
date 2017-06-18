@@ -31,6 +31,7 @@ public class CreateOperationResponse {
 
     private String operationId;
     private AuthResult result;
+    private String resultDescription;
     private Date timestampCreated;
     private Date timestampExpires;
     private List<AuthStep> steps;
@@ -75,6 +76,24 @@ public class CreateOperationResponse {
     }
 
     /**
+     * Get the authentication result description.
+     *
+     * @return Result description.
+     */
+    public String getResultDescription() {
+        return resultDescription;
+    }
+
+    /**
+     * Set the authentication result description.
+     *
+     * @param resultDescription Result description.
+     */
+    public void setResultDescription(String resultDescription) {
+        this.resultDescription = resultDescription;
+    }
+
+    /**
      * Get the timestamp of when the operation was created.
      * @return Timestamp when operation was created.
      */
@@ -104,6 +123,15 @@ public class CreateOperationResponse {
      */
     public void setTimestampExpires(Date timestampExpires) {
         this.timestampExpires = timestampExpires;
+    }
+
+    /**
+     * Is the operation expired?
+     *
+     * @return true if expired
+     */
+    public boolean isExpired() {
+        return new Date().after(timestampExpires);
     }
 
     /**

@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
@@ -30,7 +31,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationR
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,7 +39,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -52,12 +51,14 @@ public class OperationController {
 
     private OperationPersistenceService operationPersistenceService;
     private StepResolutionService stepResolutionService;
+    private NextStepServerConfiguration nextStepServerConfiguration;
 
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService,
-                               StepResolutionService stepResolutionService) {
+                               StepResolutionService stepResolutionService, NextStepServerConfiguration nextStepServerConfiguration) {
         this.operationPersistenceService = operationPersistenceService;
         this.stepResolutionService = stepResolutionService;
+        this.nextStepServerConfiguration = nextStepServerConfiguration;
     }
 
     /**
@@ -128,8 +129,8 @@ public class OperationController {
             response.getHistory().add(h);
         }
 
-        response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+        response.setTimestampCreated(operation.getTimestampCreated());
+        response.setTimestampExpires(operation.getTimestampExpires());
         return new Response<>(Response.Status.OK, response);
     }
 
@@ -161,8 +162,8 @@ public class OperationController {
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());
             }
-            response.setTimestampCreated(new Date());
-            response.setTimestampExpires(new DateTime().plusMinutes(5).toDate());
+            response.setTimestampCreated(operation.getTimestampCreated());
+            response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
         }
         return new Response<>(Response.Status.OK, responseList);

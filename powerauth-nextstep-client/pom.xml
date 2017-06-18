@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>powerauth-nextstep-client</artifactId>
-    <name>powerauth-nextstep-server-client</name>
+    <name>powerauth-nextstep-client</name>
     <groupId>io.getlime.security</groupId>
     <version>0.15.0</version>
     <packaging>jar</packaging>

@@ -72,11 +72,14 @@ public class OperationPersistenceService {
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setResult(response.getResult());
+        operation.setTimestampCreated(response.getTimestampCreated());
+        operation.setTimestampExpires(response.getTimestampExpires());
         operationRepository.save(operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setResponseResult(response.getResult());
+        operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
             // Params and steps are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
@@ -101,6 +104,8 @@ public class OperationPersistenceService {
         OperationEntity operation = operationRepository.findOne(response.getOperationId());
         operation.setUserId(request.getUserId());
         operation.setResult(response.getResult());
+        // operation expiration time matches current response expiration time
+        operation.setTimestampExpires(response.getTimestampExpires());
         operationRepository.save(operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
@@ -108,6 +113,7 @@ public class OperationPersistenceService {
         operationHistory.setRequestAuthMethod(request.getAuthMethod());
         operationHistory.setRequestAuthStepResult(request.getAuthStepResult());
         operationHistory.setResponseResult(response.getResult());
+        operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
             // Params and steps are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.

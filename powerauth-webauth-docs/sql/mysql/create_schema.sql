@@ -52,23 +52,26 @@ CREATE TABLE oauth_code (
 );
 
 CREATE TABLE ns_operation (
-  operation_id   VARCHAR(256) PRIMARY KEY,
-  operation_name VARCHAR(32),
-  operation_data VARCHAR(4096),
-  user_id        VARCHAR(256),
-  result         VARCHAR(32)
+  operation_id      VARCHAR(256) PRIMARY KEY,
+  operation_name    VARCHAR(32),
+  operation_data    VARCHAR(4096),
+  user_id           VARCHAR(256),
+  result            VARCHAR(32),
+  timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE ns_operation_history (
-  operation_id               VARCHAR(256),
-  result_id                  INTEGER,
-  request_auth_method        VARCHAR(32),
-  request_auth_step_result   VARCHAR(32),
-  request_params             VARCHAR(4096),
-  response_result            VARCHAR(32),
-  response_steps             VARCHAR(4096),
-  response_timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  response_timestamp_expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  operation_id                VARCHAR(256),
+  result_id                   INTEGER,
+  request_auth_method         VARCHAR(32),
+  request_auth_step_result    VARCHAR(32),
+  request_params              VARCHAR(4096),
+  response_result             VARCHAR(32),
+  response_result_description VARCHAR(256),
+  response_steps              VARCHAR(4096),
+  response_timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  response_timestamp_expires  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id)
 );
