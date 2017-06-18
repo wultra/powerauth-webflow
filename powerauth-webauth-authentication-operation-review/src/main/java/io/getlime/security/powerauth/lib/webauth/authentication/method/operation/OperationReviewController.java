@@ -16,7 +16,6 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.operation;
 
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -73,15 +72,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 public OperationReviewResponse doneAuthentication(String userId) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     return response;
                 }
 
                 @Override
-                public OperationReviewResponse failedAuthentication(String userId) {
+                public OperationReviewResponse failedAuthentication(String userId, String failedReason) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.FAILED);
-                    response.setMessage("Authentication failed.");
+                    response.setMessage(failedReason);
                     return response;
                 }
 
@@ -89,7 +88,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 public OperationReviewResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("User was successfully authenticated.");
+                    response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
                     return response;
                 }

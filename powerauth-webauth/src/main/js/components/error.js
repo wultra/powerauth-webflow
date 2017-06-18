@@ -13,20 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { connect } from 'react-redux';
-
+import React from "react";
+import {connect} from "react-redux";
 // i18n
-import {FormattedMessage} from 'react-intl';
+import {FormattedMessage} from "react-intl";
 
-/**
- * Message component shows informational and error messages.
- *
- * We should add redirect and session termination functionality later on (see terminate.js).
- */
 @connect((store) => {
     return {
-        message: store.error
+        context: store.dispatching.context
     }
 })
 export default class Error extends React.Component {
@@ -41,7 +35,7 @@ export default class Error extends React.Component {
         return (
             <div className="text-center">
                 <div className={'message-error'}>
-                    <FormattedMessage id="login.authenticationFailed"/>
+                    <FormattedMessage id={this.props.context.message}/>
                 </div>
                 <div className="image-result error"></div>
                 <div className={'message-error'}>

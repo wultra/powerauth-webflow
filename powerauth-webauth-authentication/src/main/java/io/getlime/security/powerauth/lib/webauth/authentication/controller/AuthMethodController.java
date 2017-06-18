@@ -16,11 +16,6 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.controller;
 
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
-import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
-import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
@@ -29,7 +24,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
+import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
+import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -130,7 +130,7 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
             return provider.continueAuthentication(operationId, null, responseObject.getSteps());
         } catch (NextStepServiceException e) {
-            return provider.failedAuthentication(null);
+            return provider.failedAuthentication(null, "error.unknown");
         }
     }
 
@@ -147,7 +147,7 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
             String userId = authenticate(request);
             if (userId == null) { // user was not authenticated
                 authenticationManagementService.clearContext();
-                return provider.failedAuthentication(userId);
+                return provider.failedAuthentication(userId, "authentication.fail");
             }
             // TODO: Allow passing custom parameters
             String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
@@ -159,14 +159,14 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
                 }
                 case FAILED: {
                     authenticationManagementService.clearContext();
-                    return provider.failedAuthentication(userId);
+                    return provider.failedAuthentication(userId, responseObject.getResultDescription());
                 }
                 case CONTINUE: {
                     return provider.continueAuthentication(responseObject.getOperationId(), userId, responseObject.getSteps());
                 }
                 default: {
                     authenticationManagementService.clearContext();
-                    return provider.failedAuthentication(userId);
+                    return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
         } catch (NextStepServiceException e) {
@@ -189,9 +189,10 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         /**
          * Called in case authentication fails and no other steps can be performed.
          * @param userId User ID.
+         * @param failedReason Reason for the failure.
          * @return Information about authentication failure, error step.
          */
-        public abstract R failedAuthentication(String userId);
+        public abstract R failedAuthentication(String userId, String failedReason);
 
         /**
          * Called in case authentication should continue with next step(s).

@@ -65,8 +65,8 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 }
 
                 @Override
-                public InitOperationResponse failedAuthentication(String userId) {
-                    return failedOperationResponse(null);
+                public InitOperationResponse failedAuthentication(String userId, String failedReason) {
+                    return failedOperationResponse(null, failedReason);
                 }
 
                 @Override
@@ -84,8 +84,8 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                     }
 
                     @Override
-                    public InitOperationResponse failedAuthentication(String userId) {
-                        return failedOperationResponse(null);
+                    public InitOperationResponse failedAuthentication(String userId, String failedReason) {
+                        return failedOperationResponse(null, failedReason);
                     }
 
                     @Override
@@ -94,16 +94,17 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                     }
                 });
             } catch (AuthStepException e) {
-                return failedOperationResponse(e.getMessage());
+                return failedOperationResponse(e.getMessage(), "error.unknown");
             }
         }
 
     }
 
-    private InitOperationResponse failedOperationResponse(String message) {
+    private InitOperationResponse failedOperationResponse(String message, String failedReason) {
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.FAILED);
         registrationResponse.setOperationId(message);
+        registrationResponse.setMessage(failedReason);
         return registrationResponse;
     }
 

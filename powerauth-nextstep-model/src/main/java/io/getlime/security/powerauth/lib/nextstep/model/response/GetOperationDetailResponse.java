@@ -144,6 +144,15 @@ public class GetOperationDetailResponse {
     }
 
     /**
+     * Is the operation expired?
+     *
+     * @return true if expired
+     */
+    public boolean isExpired() {
+        return new Date().after(timestampExpires);
+    }
+
+    /**
      * Get the list with optional extra parameters.
      * @return Extra parameters.
      */

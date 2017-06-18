@@ -1,5 +1,5 @@
-import axios from 'axios';
-import { dispatchAction, dispatchError } from '../dispatcher/dispatcher'
+import axios from "axios";
+import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
 export function authenticate(username, password) {
     return function (dispatch) {
@@ -21,6 +21,11 @@ export function authenticate(username, password) {
                     break;
                 }
                 case 'FAILED': {
+                    // handle timeout - login action can not succeed anymore, do not show login screen, show error instead
+                    if (response.data.message === "authentication.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     dispatch({
                         type: "SHOW_SCREEN_LOGIN",
                         payload: {
