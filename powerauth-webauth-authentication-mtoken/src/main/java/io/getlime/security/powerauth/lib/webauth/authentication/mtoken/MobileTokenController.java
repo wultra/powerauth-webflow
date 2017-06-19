@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.lib.webauth.authentication.mtoken;
 
 import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
+import io.getlime.push.model.StatusResponse;
+import io.getlime.push.model.entity.PushMessage;
+import io.getlime.push.model.entity.PushMessageBody;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -73,6 +76,24 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.POWERAUTH_TOKEN;
+    }
+
+    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    public @ResponseBody StatusResponse initPushMessage() {
+        final GetOperationDetailResponse operation = getOperation();
+        final String userId = operation.getUserId();
+
+        PushMessage message = new PushMessage();
+        message.setUserId(userId);
+
+        PushMessageBody body = new PushMessageBody();
+        body.setTitle("Potvrďte operaci");
+        body.setBody(operation.getOperationData());
+        body.setSound("default");
+
+        message.setMessage(body);
+
+        return pushServerClient.sendNotification(1L, message);
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -145,7 +166,11 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         }
 
         // Register the device and return response
-        boolean result = pushServerClient.registerDevice(1L, token, MobilePlatform.valueOf(platform), activationId);
+        MobilePlatform p = MobilePlatform.Android;
+        if ("ios".equalsIgnoreCase(platform)) {
+            p = MobilePlatform.iOS;
+        }
+        boolean result = pushServerClient.registerDevice(1L, token, p, activationId);
         if (result) {
             return "OK";
         } else {

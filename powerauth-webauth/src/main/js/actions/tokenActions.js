@@ -1,6 +1,14 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
+export function init() {
+    return function (dispatch) {
+        axios.post("./api/auth/token/init", {}).then((response) => {
+        }).catch((error) => {
+        })
+    }
+}
+
 export function authenticate(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/authenticate", {}).then((response) => {

@@ -17,7 +17,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // Actions
-import { authenticate } from '../actions/tokenActions'
+import { init, authenticate } from '../actions/tokenActions'
 
 // Components
 import Spinner from 'react-spin';
@@ -38,10 +38,16 @@ export default class Token extends React.Component {
     constructor() {
         super();
         this.update = this.update.bind(this);
+        this.init = this.init.bind(this);
     }
 
     componentWillMount() {
+        this.init();
         this.update();
+    }
+
+    init() {
+        this.props.dispatch(init());
     }
 
     update() {
