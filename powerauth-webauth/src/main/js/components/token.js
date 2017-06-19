@@ -65,13 +65,12 @@ export default class Token extends React.Component {
         return (
             <div id="token" className="text-center">
                 <div className={'message-information'}>
-                    Potvrďte operaci na vašem<br/>
-                    mobilním zařízení.
+                    <FormattedMessage id="message.token.confirm"/>
                 </div>
                 <div className="image mtoken"></div>
                 <div className="font-small message-information">
-                    Nemáte data na mobilním zařízení? Nevadí.<br/>
-                    Potvrďte operaci <a href="/">ověřením přes QR kód</a>.
+                    <FormattedMessage id="message.token.offline"/><br/>
+                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
                 </div>
             </div>
         )
