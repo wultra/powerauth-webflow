@@ -17,7 +17,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 
 // Actions
-import { authenticate } from '../actions/tokenActions'
+import { init, authenticate } from '../actions/tokenActions'
 
 // Components
 import Spinner from 'react-spin';
@@ -38,10 +38,16 @@ export default class Token extends React.Component {
     constructor() {
         super();
         this.update = this.update.bind(this);
+        this.init = this.init.bind(this);
     }
 
     componentWillMount() {
+        this.init();
         this.update();
+    }
+
+    init() {
+        this.props.dispatch(init());
     }
 
     update() {
@@ -59,13 +65,12 @@ export default class Token extends React.Component {
         return (
             <div id="token" className="text-center">
                 <div className={'message-information'}>
-                    Potvrďte operaci na vašem<br/>
-                    mobilním zařízení.
+                    <FormattedMessage id="message.token.confirm"/>
                 </div>
                 <div className="image mtoken"></div>
                 <div className="font-small message-information">
-                    Nemáte data na mobilním zařízení? Nevadí.<br/>
-                    Potvrďte operaci <a href="/">ověřením přes QR kód</a>.
+                    <FormattedMessage id="message.token.offline"/><br/>
+                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
                 </div>
             </div>
         )
