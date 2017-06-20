@@ -129,6 +129,9 @@ public class OperationController {
             response.getHistory().add(h);
         }
 
+        // add steps from current response
+        response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
+
         response.setTimestampCreated(operation.getTimestampCreated());
         response.setTimestampExpires(operation.getTimestampExpires());
         return new Response<>(Response.Status.OK, response);

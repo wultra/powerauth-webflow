@@ -24,7 +24,7 @@ import java.util.Date;
 import java.util.List;
 
 /**
- * Response object used for geting the operation detail.
+ * Response object used for getting the operation detail.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
