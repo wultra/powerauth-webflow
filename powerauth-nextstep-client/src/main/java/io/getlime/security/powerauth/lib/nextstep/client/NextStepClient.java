@@ -24,10 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -208,7 +205,9 @@ public class NextStepClient {
     public Response<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method", HttpMethod.GET, null, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
+            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
             });
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -228,7 +227,10 @@ public class NextStepClient {
     public Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/" + userId + "/auth-method", HttpMethod.GET, null, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
+            request.setUserId(userId);
+            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
             });
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -248,8 +250,12 @@ public class NextStepClient {
      */
     public Response<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
+            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
+            request.setUserId(userId);
+            request.setAuthMethod(authMethod);
+            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/" + userId + "/auth-method/" + authMethod, HttpMethod.POST, null, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
             });
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -269,8 +275,12 @@ public class NextStepClient {
      */
     public Response<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
+            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
+            request.setUserId(userId);
+            request.setAuthMethod(authMethod);
+            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/" + userId + "/auth-method/" + authMethod, HttpMethod.DELETE, null, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
             });
             return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
