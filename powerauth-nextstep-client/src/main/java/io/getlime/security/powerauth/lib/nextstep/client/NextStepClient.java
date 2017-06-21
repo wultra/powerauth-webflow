@@ -199,7 +199,7 @@ public class NextStepClient {
     /**
      * Get all authentication methods supported by Next Step server.
      *
-     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * @return List of authentication methods wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
      */
     public Response<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
@@ -221,7 +221,7 @@ public class NextStepClient {
      * Get all enabled authentication methods for given user.
      *
      * @param userId User ID
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
      */
     public Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
@@ -245,7 +245,7 @@ public class NextStepClient {
      *
      * @param userId     User ID
      * @param authMethod Authentication method
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
      */
     public Response<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
@@ -270,7 +270,7 @@ public class NextStepClient {
      *
      * @param userId     User ID
      * @param authMethod Authentication method
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
      */
     public Response<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
