@@ -136,6 +136,18 @@ public class OperationEntity implements Serializable {
         this.operationHistory = operationHistory;
     }
 
+    /**
+     * Returns current OperationHistoryEntity. Null value is return in case there is no history for this operation.
+     *
+     * @return Current OperationHistoryEntity
+     */
+    public OperationHistoryEntity getCurrentOperationHistoryEntity() {
+        if (operationHistory == null || operationHistory.isEmpty()) {
+            return null;
+        }
+        return operationHistory.get(operationHistory.size() - 1);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

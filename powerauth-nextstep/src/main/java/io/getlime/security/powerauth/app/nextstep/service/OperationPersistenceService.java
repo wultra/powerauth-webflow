@@ -161,28 +161,52 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Gets the list of @{link AuthMethod} for an operation. Authentication methods from the current step response
-     * are returned.
+     * Gets the list of @{link AuthStep} for an operation. Steps from the current response are returned.
+     * In case no history is available, empty list is returned.
+     *
+     * @param operation operation entity
+     * @return list of {@link AuthStep}
+     */
+    public List<AuthStep> getResponseAuthSteps(OperationEntity operation) {
+        List<AuthStep> steps = new ArrayList<>();
+        if (operation == null) {
+            return steps;
+        }
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            return steps;
+        }
+        // get steps from the current response
+        String responseSteps = operation.getCurrentOperationHistoryEntity().getResponseSteps();
+        if (responseSteps == null) {
+            return steps;
+        }
+        try {
+            steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {
+            }));
+            return steps;
+        } catch (IOException e) {
+            // in case of an error empty list is returned
+            e.printStackTrace();
+        }
+        return steps;
+    }
+
+    /**
+     * Gets the list of @{link AuthMethod} for an operation. Authentication methods from the current response
+     * are returned. In case no history is available, empty list is returned.
      *
      * @param operation operation entity
      * @return list of @{link AuthMethod}
      */
     private List<AuthMethod> getResponseAuthMethods(OperationEntity operation) {
         List<AuthMethod> authMethods = new ArrayList<>();
-        if (operation == null) {
+        List<AuthStep> responseSteps = getResponseAuthSteps(operation);
+        if (responseSteps.isEmpty()) {
             return authMethods;
         }
-        // get steps from the current response
-        String responseSteps = operation.getOperationHistory().get(operation.getOperationHistory().size() - 1).getResponseSteps();
-        try {
-            List<AuthStep> steps = objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {
-            });
-            for (AuthStep step : steps) {
-                authMethods.add(step.getAuthMethod());
-            }
-        } catch (IOException e) {
-            // in case of an error empty list is returned
-            e.printStackTrace();
+        for (AuthStep step : responseSteps) {
+            authMethods.add(step.getAuthMethod());
         }
         return authMethods;
     }
