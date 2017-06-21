@@ -24,11 +24,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.core.ParameterizedTypeReference;
@@ -197,6 +195,101 @@ public class NextStepClient {
             throw handleResourceAccessError(ex);
         }
     }
+
+    /**
+     * Get all authentication methods supported by Next Step server.
+     *
+     * @return List of authentication methods wrapped in GetAuthMethodsResponse.
+     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     */
+    public Response<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
+            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            });
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Get all enabled authentication methods for given user.
+     *
+     * @param userId User ID
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     */
+    public Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
+            request.setUserId(userId);
+            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            });
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Enable an authentication method for given user.
+     *
+     * @param userId     User ID
+     * @param authMethod Authentication method
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     */
+    public Response<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+        try {
+            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
+            request.setUserId(userId);
+            request.setAuthMethod(authMethod);
+            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
+            // Exchange next step request with NextStep server.
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            });
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Disable an authentication method for given user.
+     *
+     * @param userId     User ID
+     * @param authMethod Authentication method
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     */
+    public Response<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+        try {
+            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
+            request.setUserId(userId);
+            request.setAuthMethod(authMethod);
+            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
+            // Exchange next step request with NextStep server.
+            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            });
+            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
 
     /**
      * Handle resource access error (i.e. server not available).

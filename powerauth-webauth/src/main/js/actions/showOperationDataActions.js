@@ -31,7 +31,7 @@ export function authenticate() {
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {
-                            message: "message.invalidRequest"
+                            message: response.data.message
                         }
                     });
                     break;

@@ -24,6 +24,12 @@ export function authenticate(callback) {
                         dispatchAction(dispatch, response);
                         break;
                     }
+                    // if there is no supported auth method, show error, there is no point in continuing
+                    // TODO - handle fallback - see issue #32
+                    if (response.data.message === "error.noAuthMethod") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     callback(true);
                     dispatch({
                         type: "SHOW_SCREEN_TOKEN",

@@ -1,6 +1,18 @@
 INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, additional_information, autoapprove)
 VALUES ('democlient', 'changeme', 'profile', 'authorization_code', '{}', 'true');
 
+# authentication methods
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default)
+VALUES ('USER_ID_ASSIGN', 1, FALSE, NULL, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default)
+VALUES ('USERNAME_PASSWORD_AUTH', 2, TRUE, 1, TRUE);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default)
+VALUES ('SHOW_OPERATION_DETAIL', 3, FALSE, NULL, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default)
+VALUES ('POWERAUTH_TOKEN', 4, TRUE, 2, FALSE);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default)
+VALUES ('SMS_KEY', 5, FALSE, NULL, NULL);
+
 # login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (1, 'login', 'CREATE', NULL, NULL, 1, 'USER_ID_ASSIGN', 'CONTINUE');

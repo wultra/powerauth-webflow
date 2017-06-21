@@ -13,28 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.repository;
-
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
+package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * CrudRepository for persistence of operations.
+ * Request object used for querying authentication methods.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-@Component
-public interface OperationRepository extends CrudRepository<OperationEntity, String> {
+public class GetAuthMethodsRequest {
+
+    private String userId;
 
     /**
-     * Finds all pending operations for user.
+     * Get the user id.
      *
-     * @param userId user ID
-     * @return List of pending operations.
+     * @return user id
      */
-    List<OperationEntity> findPendingOperationsForUser(String userId);
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Set the user id.
+     *
+     * @param userId user id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
 }

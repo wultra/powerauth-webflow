@@ -15,26 +15,24 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-
 /**
- * CrudRepository for persistence of operations.
+ * CrudRepository for persistence of user preferences.
  *
  * @author Roman Strobl
  */
 @Component
-public interface OperationRepository extends CrudRepository<OperationEntity, String> {
+public interface UserPrefsRepository extends CrudRepository<UserPrefsEntity, String> {
 
     /**
-     * Finds all pending operations for user.
+     * Get user preferences for given user. Null is returned in case preferences are not available.
      *
-     * @param userId user ID
-     * @return List of pending operations.
+     * @param userId User ID
+     * @return User preferences.
      */
-    List<OperationEntity> findPendingOperationsForUser(String userId);
+    UserPrefsEntity findUserPrefs(String userId);
 
 }

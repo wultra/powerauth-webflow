@@ -17,18 +17,20 @@
 package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
+import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
+import io.getlime.security.powerauth.app.nextstep.service.UserPrefsService;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,13 +54,18 @@ public class OperationController {
     private OperationPersistenceService operationPersistenceService;
     private StepResolutionService stepResolutionService;
     private NextStepServerConfiguration nextStepServerConfiguration;
+    private AuthMethodRepository authMethodRepository;
+    private UserPrefsService userPrefsService;
 
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService,
-                               StepResolutionService stepResolutionService, NextStepServerConfiguration nextStepServerConfiguration) {
+                               StepResolutionService stepResolutionService, NextStepServerConfiguration nextStepServerConfiguration,
+                               AuthMethodRepository authMethodRepository, UserPrefsService userPrefsService) {
         this.operationPersistenceService = operationPersistenceService;
         this.stepResolutionService = stepResolutionService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+        this.authMethodRepository = authMethodRepository;
+        this.userPrefsService = userPrefsService;
     }
 
     /**
@@ -167,6 +174,103 @@ public class OperationController {
             responseList.add(response);
         }
         return new Response<>(Response.Status.OK, responseList);
+    }
+
+    /**
+     * Get all authentication methods supported by Next Step server.
+     *
+     * @param request Get auth methods request. Use null userId in request.
+     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     */
+    @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
+    public @ResponseBody
+    Response<GetAuthMethodsResponse> getAuthMethods(@RequestBody Request<GetAuthMethodsRequest> request) {
+        GetAuthMethodsRequest requestObject = request.getRequestObject();
+        String userId = requestObject.getUserId();
+        if (userId != null) {
+            throw new IllegalArgumentException("Parameter userId is not null in request object, however null value was expected.");
+        }
+        List<AuthMethodEntity> authMethods = authMethodRepository.findAllAuthMethods();
+        List<AuthMethod> responseList = new ArrayList<>();
+        if (authMethods == null || authMethods.isEmpty()) {
+            throw new IllegalStateException("No authentication method is configured in Next Step server.");
+        }
+        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        for (AuthMethodEntity authMethod : authMethods) {
+            responseList.add(authMethod.getAuthMethod());
+        }
+        response.setAuthMethods(responseList);
+        return new Response<>(Response.Status.OK, response);
+    }
+
+    /**
+     * Get all enabled authentication methods for given user.
+     *
+     * @param request Get auth methods request. Use non-null userId in request.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     */
+    @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
+    public @ResponseBody
+    Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody Request<GetAuthMethodsRequest> request) {
+        GetAuthMethodsRequest requestObject = request.getRequestObject();
+        String userId = requestObject.getUserId();
+        if (userId == null) {
+            throw new IllegalArgumentException("Parameter userId is null in request object.");
+        }
+        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
+        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.setAuthMethods(authMethods);
+        return new Response<>(Response.Status.OK, response);
+    }
+
+    /**
+     * Enable an authentication method for given user.
+     *
+     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     */
+    @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
+    public @ResponseBody
+    Response<GetAuthMethodsResponse> enableAuthMethodForUser(@RequestBody Request<UpdateAuthMethodRequest> request) {
+        UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        String userId = requestObject.getUserId();
+        if (userId == null) {
+            throw new IllegalArgumentException("Parameter userId is null in request object.");
+        }
+        AuthMethod authMethod = requestObject.getAuthMethod();
+        if (authMethod == null) {
+            throw new IllegalArgumentException("Parameter authMethod is null in request object.");
+        }
+        userPrefsService.updateAuthMethodForUser(userId, authMethod, true);
+        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
+        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.setAuthMethods(authMethods);
+        return new Response<>(Response.Status.OK, response);
+    }
+
+    /**
+     * Disable an authentication method for given user.
+     *
+     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     */
+    @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
+    public @ResponseBody
+    Response<GetAuthMethodsResponse> disableAuthMethodForUser(@RequestBody Request<UpdateAuthMethodRequest> request) {
+        UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        String userId = requestObject.getUserId();
+        if (userId == null) {
+            throw new IllegalArgumentException("Parameter userId is null in request object.");
+        }
+        AuthMethod authMethod = requestObject.getAuthMethod();
+        if (authMethod == null) {
+            throw new IllegalArgumentException("Parameter authMethod is null in request object.");
+        }
+        userPrefsService.updateAuthMethodForUser(userId, authMethod, false);
+        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
+        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.setAuthMethods(authMethods);
+        return new Response<>(Response.Status.OK, response);
     }
 
 }
