@@ -46,13 +46,45 @@
             </div>
 
             <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
-                <p>
-                    You're not logged in.
-                </p>
-                <form th:action="@{/connect/demo}" method="POST">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
-                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
-                </form>
+                <div>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#authorize" aria-controls="authorize" role="tab" data-toggle="tab">Authorization</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="login">
+                            <div class="padding">
+                                <p>
+                                    Authenticate as a user.
+                                </p>
+                                <form th:action="@{/connect/demo}" method="POST">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="authorize">
+                            <div class="padding">
+                                <p>
+                                    Authorize operation with given ID.
+                                </p>
+                                <form th:action="@{/connect/demo}" method="POST">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                    <div class="input-group input-group-lg">
+                                        <input type="text" class="form-control" name="operationId" placeholder="Operation ID"/>
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-success">Authorize</button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
         </div>

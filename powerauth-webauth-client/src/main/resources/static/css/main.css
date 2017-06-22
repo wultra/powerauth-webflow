@@ -36,10 +36,15 @@ a {
 
 .wrapper {
     margin: 120px auto 120px auto;
+    width: 400px;
 }
 
 .wrapper h1 {
     color: #333;
+}
+
+.padding {
+    margin: 40px;
 }
 
 .btn {
