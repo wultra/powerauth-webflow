@@ -77,6 +77,15 @@ public class HomeController {
         }
 
         authenticationManagementService.clearContext();
+
+        // fetch operation ID from the saved request, in case there is one present
+        final Map<String, String[]> parameterMap = savedRequest.getParameterMap();
+        final String[] operationIdList = parameterMap.get("operationId");
+        if (operationIdList != null && operationIdList.length == 1) {
+            final String operationId = operationIdList[0];
+            authenticationManagementService.createAuthenticationWithOperationId(operationId);
+        }
+
         model.put("title", webAuthConfig.getPageTitle());
         model.put("stylesheet", webAuthConfig.getCustomStyleSheetUrl());
         model.put("lang", LocaleContextHolder.getLocale().toString());

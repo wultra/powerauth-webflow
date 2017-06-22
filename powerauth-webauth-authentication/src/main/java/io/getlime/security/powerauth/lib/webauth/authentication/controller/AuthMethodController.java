@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -29,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webauth.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -57,8 +59,17 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
     private NextStepClient nextStepService;
 
     protected GetOperationDetailResponse getOperation() {
-        String operationId = authenticationManagementService.getPendingUserAuthentication().getOperationId();
-        return getOperation(operationId);
+        final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
+        if (pendingUserAuthentication != null) {
+            String operationId = pendingUserAuthentication.getOperationId();
+            if (operationId != null) {
+                return getOperation(operationId);
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
     }
 
     protected GetOperationDetailResponse getOperation(String id) {
@@ -133,6 +144,34 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
             String operationId = responseObject.getOperationId();
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
             return provider.continueAuthentication(operationId, null, responseObject.getSteps());
+        } catch (NextStepServiceException e) {
+            return provider.failedAuthentication(null, "error.unknown");
+        }
+    }
+
+    /**
+     * Initiate a new operation with given name, data and parameters.
+     * @param operationId ID of operation to be fetched.
+     * @param provider Provider that implements authentication callback.
+     * @return Response indicating next step, based on provider response.
+     */
+    protected R continueOperationWithId(String operationId, AuthResponseProvider provider) {
+        try {
+            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+            if (operationDetail != null) {
+                GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
+                if (responseObject != null) {
+                    if (AuthResult.DONE.equals(responseObject.getResult())) {
+                        return provider.doneAuthentication(responseObject.getUserId());
+                    } else {
+                        return provider.continueAuthentication(operationId, responseObject.getUserId(), responseObject.getSteps());
+                    }
+                } else {
+                    return provider.failedAuthentication(null, "error.unknown");
+                }
+            } else {
+                return provider.failedAuthentication(null, "error.unknown");
+            }
         } catch (NextStepServiceException e) {
             return provider.failedAuthentication(null, "error.unknown");
         }

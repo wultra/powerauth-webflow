@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webauth.authentication.method.init;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.method.init.model.request.InitOperationRequest;
@@ -50,12 +51,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
-        if (request.getOperationId() == null) {
 
-            // TODO - data needs to be received via OAuth2 authorization - this is just for testing
-            // String operationName = "login";
-            String operationName = "authorize_payment";
-            String operationData = "{\"amount\":100,\"currency\":\"CZK\",\"to\":\"CZ12000012345678901234\"}";
+        final GetOperationDetailResponse operation = getOperation();
+
+        if (operation == null) {
+            final String operationName = "login";
+            final String operationData = "{}";
             List<KeyValueParameter> params = new ArrayList<>();
             return initiateOperationWithName(operationName, operationData, params, new AuthResponseProvider() {
 
@@ -75,27 +76,22 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 }
             });
         } else {
-            try {
-                return buildAuthorizationResponse(request, new AuthResponseProvider() {
+            return continueOperationWithId(operation.getOperationId(), new AuthResponseProvider() {
+                @Override
+                public InitOperationResponse doneAuthentication(String userId) {
+                    return completeOperationResponse();
+                }
 
-                    @Override
-                    public InitOperationResponse doneAuthentication(String userId) {
-                        return completeOperationResponse();
-                    }
+                @Override
+                public InitOperationResponse failedAuthentication(String userId, String failedReason) {
+                    return failedOperationResponse(null, failedReason);
+                }
 
-                    @Override
-                    public InitOperationResponse failedAuthentication(String userId, String failedReason) {
-                        return failedOperationResponse(null, failedReason);
-                    }
-
-                    @Override
-                    public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
-                        return continueOperationResponse(operationId, steps);
-                    }
-                });
-            } catch (AuthStepException e) {
-                return failedOperationResponse(e.getMessage(), "error.unknown");
-            }
+                @Override
+                public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
+                    return continueOperationResponse(operationId, steps);
+                }
+            });
         }
 
     }

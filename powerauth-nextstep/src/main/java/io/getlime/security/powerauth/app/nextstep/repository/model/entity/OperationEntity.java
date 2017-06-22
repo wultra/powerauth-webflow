@@ -31,7 +31,7 @@ import java.util.List;
 @Table(name = "ns_operation")
 @NamedQueries({
         @NamedQuery(name = "OperationEntity.findPendingOperationsForUser", query = "SELECT o FROM OperationEntity o WHERE o.userId=?1 AND o.result='CONTINUE' " +
-                "AND o.timestampExpires > current_time ORDER BY o.timestampExpires")
+                "AND o.timestampExpires > CURRENT_TIMESTAMP ORDER BY o.timestampExpires")
 })
 public class OperationEntity implements Serializable {
 

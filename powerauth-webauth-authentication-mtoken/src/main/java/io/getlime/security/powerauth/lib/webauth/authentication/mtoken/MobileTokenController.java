@@ -32,6 +32,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.configuration.PushServiceConfiguration;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenSignRequest;
@@ -41,7 +42,9 @@ import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAu
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
+import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,6 +62,9 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
     @Autowired
     private PushServerClient pushServerClient;
+
+    @Autowired
+    private PushServiceConfiguration configuration;
 
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
@@ -93,7 +99,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         message.setMessage(body);
 
-        return pushServerClient.sendNotification(1L, message);
+        return pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -170,7 +176,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         if ("ios".equalsIgnoreCase(platform)) {
             p = MobilePlatform.iOS;
         }
-        boolean result = pushServerClient.registerDevice(1L, token, p, activationId);
+        boolean result = pushServerClient.registerDevice(configuration.getPushServerApplication(), token, p, activationId);
         if (result) {
             return "OK";
         } else {

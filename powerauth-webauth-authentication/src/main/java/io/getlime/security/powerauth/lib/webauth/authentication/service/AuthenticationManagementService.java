@@ -65,6 +65,9 @@ public class AuthenticationManagementService {
      */
     public void clearContext() {
         SecurityContextHolder.clearContext();
+        HttpServletRequest request = currentRequest();
+        HttpSession session = request.getSession();
+        session.removeAttribute(PENDING_AUTH_OBJECT);
     }
 
     /**
