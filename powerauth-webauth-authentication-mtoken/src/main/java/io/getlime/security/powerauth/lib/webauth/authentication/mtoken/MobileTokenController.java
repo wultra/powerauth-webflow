@@ -24,6 +24,7 @@ import io.getlime.push.model.entity.PushMessageBody;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -92,9 +93,17 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         PushMessage message = new PushMessage();
         message.setUserId(userId);
 
+        final OperationDisplayDetails displayDetails = operation.getDisplayDetails();
+
         PushMessageBody body = new PushMessageBody();
-        body.setTitle("Potvrďte operaci");
-        body.setBody(operation.getOperationData());
+        if (displayDetails != null) {
+            body.setTitle(displayDetails.getTitle());
+            body.setBody(displayDetails.getMessage());
+        } else {
+            //TODO: Localize the messages
+            body.setTitle("Confirm operation");
+            body.setBody("Data: " + operation.getOperationData());
+        }
         body.setSound("default");
 
         message.setMessage(body);

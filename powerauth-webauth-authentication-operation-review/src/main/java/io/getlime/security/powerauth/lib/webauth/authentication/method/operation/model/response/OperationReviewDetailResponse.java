@@ -16,12 +16,15 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.operation.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
+
 /**
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class OperationReviewDetailResponse {
 
     private String data;
+    private OperationDisplayDetails displayDetails; //TODO: Review used type.
 
     public String getData() {
         return data;
@@ -29,5 +32,13 @@ public class OperationReviewDetailResponse {
 
     public void setData(String data) {
         this.data = data;
+    }
+
+    public OperationDisplayDetails getDisplayDetails() {
+        return displayDetails;
+    }
+
+    public void setDisplayDetails(OperationDisplayDetails displayDetails) {
+        this.displayDetails = displayDetails;
     }
 }

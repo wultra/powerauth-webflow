@@ -18,7 +18,8 @@ import {connect} from "react-redux";
 // Actions
 import {authenticate, getOperationData} from "../actions/showOperationDataActions";
 // Components
-import {Button, FormGroup} from "react-bootstrap";
+import {Panel, Button, FormGroup} from "react-bootstrap";
+import Spinner from 'react-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
 
@@ -48,25 +49,90 @@ export default class OperationDetail extends React.Component {
     }
 
     render() {
-        // let data = JSON.parse(this.props.context.data);
-        // let amount = data.amount;
-        // let currency = data.currency;
-        // let toAccount = data.to;
-        return (
-            <div id="operation">
-                <form onSubmit={this.handleLogin}>
-                    <FormGroup>
-                        {this.props.context.data}
-                    </FormGroup>
-                    <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage
-                            id="operation.confirm"/></Button>
-                    </FormGroup>
-                    <FormGroup>
-                        <a href="./authenticate/cancel"><FormattedMessage id="operation.cancel"/></a>
-                    </FormGroup>
-                </form>
-            </div>
-        )
+        if (this.props.context.displayDetails) {
+            return (
+                <div id="operation">
+                    <form onSubmit={this.handleLogin}>
+                        <Panel>
+                            <div className="operation-approve content-wrap">
+                                <h3>{this.props.context.displayDetails.title}</h3>
+                                <p>{this.props.context.displayDetails.message}</p>
+                            </div>
+                            <div className="row">
+                                {this.props.context.displayDetails.parameters.map((item) => {
+                                    if (item.type == "AMOUNT") {
+                                        return (
+                                            <div className="attribute">
+                                                <div className="col-sm-6 key">
+                                                    {item.label}
+                                                </div>
+                                                <div className="col-sm-6 value">
+                                                    <span className="amount">{item.amount}</span> {item.currency}
+                                                </div>
+                                            </div>
+                                        )
+                                    } else if (item.type == "KEY_VALUE") {
+                                        return (
+                                            <div className="attribute">
+                                                <div className="col-sm-6 key">
+                                                    {item.label}
+                                                </div>
+                                                <div className="col-sm-6 value">
+                                                    {item.value}
+                                                </div>
+                                            </div>
+                                        )
+                                    } else if (item.type == "MESSAGE") {
+                                        return (
+                                            <div className="attribute">
+                                                <div className="col-sm-12">
+                                                    <div className="key">{item.label}</div>
+                                                    <div className="value">{item.message}</div>
+                                                </div>
+                                            </div>
+                                        )
+                                    }
+                                })}
+                            </div>
+                            <div className="row buttons">
+                                <div className="col-sm-6">
+                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default">
+                                        <FormattedMessage id="operation.cancel"/>
+                                    </a>
+                                </div>
+                                <div className="col-sm-6">
+                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                        <FormattedMessage id="operation.confirm"/>
+                                    </Button>
+                                </div>
+                            </div>
+                        </Panel>
+                    </form>
+                </div>
+            )
+        } else if (this.props.context.data) {
+            return (
+                <div id="operation">
+                    <form onSubmit={this.handleLogin}>
+                        <FormGroup>
+                            DATA: {this.props.context.data}
+                        </FormGroup>
+                        <FormGroup>
+                            <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage
+                                id="operation.confirm"/></Button>
+                        </FormGroup>
+                        <FormGroup>
+                            <a href="./authenticate/cancel"><FormattedMessage id="operation.cancel"/></a>
+                        </FormGroup>
+                    </form>
+                </div>
+            )
+        } else {
+            return (
+                <div id="operation">
+                    <Spinner/>
+                </div>
+            )
+        }
     }
 }

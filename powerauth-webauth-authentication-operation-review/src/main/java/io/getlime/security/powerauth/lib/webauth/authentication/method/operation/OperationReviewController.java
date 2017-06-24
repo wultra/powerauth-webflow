@@ -57,6 +57,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         if (operation != null) {
             OperationReviewDetailResponse response = new OperationReviewDetailResponse();
             response.setData(operation.getOperationData());
+            response.setDisplayDetails(operation.getDisplayDetails());
             return response;
         } else {
             return null;

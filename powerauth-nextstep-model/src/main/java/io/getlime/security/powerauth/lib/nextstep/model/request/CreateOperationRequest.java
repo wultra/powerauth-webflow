@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ public class CreateOperationRequest {
     private String operationName;
     private String operationData;
     private List<KeyValueParameter> params;
+    private OperationDisplayDetails displayDetails;
 
     /**
      * Default constructor.
@@ -78,4 +80,19 @@ public class CreateOperationRequest {
         return params;
     }
 
+    /**
+     * Get display details (title, message, other visual attributes, ...) of the operation.
+     * @return Display details.
+     */
+    public OperationDisplayDetails getDisplayDetails() {
+        return displayDetails;
+    }
+
+    /**
+     * Set display details object.
+     * @param displayDetails Set display details.
+     */
+    public void setDisplayDetails(OperationDisplayDetails displayDetails) {
+        this.displayDetails = displayDetails;
+    }
 }

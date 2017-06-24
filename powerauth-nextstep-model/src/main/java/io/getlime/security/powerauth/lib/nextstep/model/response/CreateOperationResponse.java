@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 import java.util.ArrayList;
@@ -35,6 +36,7 @@ public class CreateOperationResponse {
     private Date timestampCreated;
     private Date timestampExpires;
     private List<AuthStep> steps;
+    private OperationDisplayDetails displayDetails;
 
     /**
      * Default constructor.
@@ -140,6 +142,22 @@ public class CreateOperationResponse {
      */
     public List<AuthStep> getSteps() {
         return steps;
+    }
+
+    /**
+     * Get display details (title, message, other visual attributes, ...) of the operation.
+     * @return Display details.
+     */
+    public OperationDisplayDetails getDisplayDetails() {
+        return displayDetails;
+    }
+
+    /**
+     * Set display details object.
+     * @param displayDetails Set display details.
+     */
+    public void setDisplayDetails(OperationDisplayDetails displayDetails) {
+        this.displayDetails = displayDetails;
     }
 
 }

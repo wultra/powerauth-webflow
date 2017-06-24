@@ -81,6 +81,7 @@ public class StepResolutionService {
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         response.setTimestampCreated(new Date());
         response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
+        response.setDisplayDetails(request.getDisplayDetails());
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());

@@ -54,7 +54,7 @@ export default class Login extends React.Component {
     render() {
         const formatMessage = this.props.intl.formatMessage;
         return (
-            <div id="login">
+            <div id="login" className="content-wrap">
                 <form onSubmit={this.handleLogin}>
                     <FormGroup className={ (this.props.context.error ? "message-error" : "message-information" ) }>
                         <FormattedMessage id={this.props.context.message}/>

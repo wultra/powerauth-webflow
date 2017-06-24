@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
@@ -26,6 +27,7 @@ import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.app.nextstep.service.UserPrefsService;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -40,8 +42,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller class related to PowerAuth activation management.
@@ -121,6 +126,16 @@ public class OperationController {
         OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId());
         if (operation == null) {
             throw new IllegalArgumentException("Invalid operationId: " + requestObject.getOperationId());
+        }
+        if (operation.getOperationDisplayDetails() != null) {
+            //TODO: This needs to be written better, see issue #39.
+            OperationDisplayDetails details = null;
+            try {
+                details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
+            } catch (IOException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
+            }
+            response.setDisplayDetails(details);
         }
         response.setOperationId(operation.getOperationId());
         response.setUserId(operation.getUserId());

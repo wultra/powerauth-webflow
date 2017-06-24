@@ -38,6 +38,11 @@ a:hover,a:active,a:focus {
 
 #page-wrap {
     margin: 120px auto 40px auto;
+    width: 480px;
+}
+
+.content-wrap {
+    margin: 0 auto;
     width: 320px;
 }
 
@@ -85,4 +90,69 @@ a:hover,a:active,a:focus {
     position: absolute;
     top: 10px;
     right: 10px;
+}
+
+#operation .panel-body {
+    padding: 30px;
+}
+
+#operation .operation-approve {
+    text-align: center;
+}
+
+#operation .operation-approve h3 {
+    color: #7FC000;
+    font-size: 18pt;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+#operation .operation-approve p {
+    color: #777777;
+    font-size: 14pt;
+}
+
+#operation .key {
+    color: #777777;
+}
+
+#operation .value {
+    color: #333333;
+}
+
+#operation .col-sm-6.key {
+    text-align: left;
+}
+
+#operation .col-sm-6.value {
+    text-align: right;
+}
+
+#operation .col-sm-12 .key {
+    text-align: left;
+}
+
+#operation .col-sm-12 {
+    text-align: left;
+}
+
+#operation .col-sm-12 .value {
+    text-align: left;
+}
+
+#operation .amount {
+    font-size: 16pt;
+}
+
+#operation .attribute {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+#operation .buttons {
+    margin-top: 20px;
+}
+
+#operation .btn {
+    width: 100%;
 }

@@ -30,10 +30,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperation
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This service handles conversion of operation request/response objects into operation entities.
@@ -48,7 +51,6 @@ public class OperationPersistenceService {
     private IdGeneratorService idGeneratorService;
     private OperationRepository operationRepository;
     private OperationHistoryRepository operationHistoryRepository;
-
 
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
@@ -72,6 +74,12 @@ public class OperationPersistenceService {
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setResult(response.getResult());
+        try {
+            // Store display details as serialized JSON string.
+            operation.setOperationDisplayDetails(objectMapper.writeValueAsString(request.getDisplayDetails()));
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation display details", ex);
+        }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
         operationRepository.save(operation);
@@ -85,8 +93,8 @@ public class OperationPersistenceService {
             // We can add these entities later in case they are needed.
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation history", ex);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
