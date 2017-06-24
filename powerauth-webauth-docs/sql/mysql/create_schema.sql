@@ -71,13 +71,14 @@ CREATE TABLE ns_user_prefs (
 );
 
 CREATE TABLE ns_operation (
-  operation_id      VARCHAR(256) PRIMARY KEY,
-  operation_name    VARCHAR(32),
-  operation_data    VARCHAR(4096),
-  user_id           VARCHAR(256),
-  result            VARCHAR(32),
-  timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  timestamp_expires TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  operation_id                  VARCHAR(256) PRIMARY KEY,
+  operation_name                VARCHAR(32),
+  operation_data                VARCHAR(4096),
+  operation_display_details     TEXT,
+  user_id                       VARCHAR(256),
+  result                        VARCHAR(32),
+  timestamp_created             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_expires             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE ns_operation_history (
@@ -108,4 +109,3 @@ CREATE TABLE ns_step_definition (
   FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
 );
-
