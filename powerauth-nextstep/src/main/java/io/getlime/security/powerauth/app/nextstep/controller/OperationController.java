@@ -127,6 +127,12 @@ public class OperationController {
         if (operation == null) {
             throw new IllegalArgumentException("Invalid operationId: " + requestObject.getOperationId());
         }
+        response.setOperationId(operation.getOperationId());
+        response.setUserId(operation.getUserId());
+        response.setOperationData(operation.getOperationData());
+        if (operation.getResult() != null) {
+            response.setResult(operation.getResult());
+        }
         if (operation.getOperationDisplayDetails() != null) {
             //TODO: This needs to be written better, see issue #39.
             OperationDisplayDetails details = null;
@@ -136,12 +142,6 @@ public class OperationController {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
             }
             response.setDisplayDetails(details);
-        }
-        response.setOperationId(operation.getOperationId());
-        response.setUserId(operation.getUserId());
-        response.setOperationData(operation.getOperationData());
-        if (operation.getResult() != null) {
-            response.setResult(operation.getResult());
         }
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
@@ -186,6 +186,16 @@ public class OperationController {
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());
+            }
+            if (operation.getOperationDisplayDetails() != null) {
+                //TODO: This needs to be written better, see issue #39.
+                OperationDisplayDetails details = null;
+                try {
+                    details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
+                } catch (IOException ex) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
+                }
+                response.setDisplayDetails(details);
             }
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
