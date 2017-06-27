@@ -54,6 +54,11 @@
             <artifactId>powerauth-push-client</artifactId>
             <version>0.16.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>4.3.7.RELEASE</version>
+        </dependency>
     </dependencies>
 
 </project>
