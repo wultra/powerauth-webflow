@@ -34,18 +34,18 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.configuration.PushServiceConfiguration;
+import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.controller.MessageController;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenSignRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenSignResponse;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
-import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,6 +67,9 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Autowired
     private PushServiceConfiguration configuration;
 
+    @Autowired
+    private MessageController messageController;
+
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -86,7 +89,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody StatusResponse initPushMessage() {
+    public @ResponseBody
+    MobileTokenInitResponse initPushMessage() {
         final GetOperationDetailResponse operation = getOperation();
         final String userId = operation.getUserId();
 
@@ -108,22 +112,36 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         message.setMessage(body);
 
-        return pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
+        StatusResponse statusResponse = pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
+        final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
+        initResponse.setWebSocketId(messageController.generateWebSocketId(operation.getOperationId()));
+        if (statusResponse.getStatus().equals(StatusResponse.OK)) {
+            initResponse.setResult(AuthStepResult.CONFIRMED);
+            return initResponse;
+        }
+        initResponse.setResult(AuthStepResult.FAILED);
+        // TODO - better message for initialization error
+        initResponse.setMessage("authentication.fail");
+        return initResponse;
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
+    public @ResponseBody
+    MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
         try {
             String userId = authenticate(request);
+            final GetOperationDetailResponse operation = getOperation();
             if (userId == null) {
-                final GetOperationDetailResponse operation = getOperation();
                 if (operation.isExpired()) {
                     // handle operation expiration
+                    // remove WebSocket session, it is expired
+                    messageController.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
                     response.setMessage("authentication.timeout");
                     return response;
                 }
+                // WebSocket session can not be removed yet - authentication is in progress
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.FAILED);
                 response.setMessage("authentication.fail");
@@ -133,6 +151,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
                 @Override
                 public MobileTokenAuthenticationResponse doneAuthentication(String userId) {
+                    // remove WebSocket session, authorization is finished
+                    messageController.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -141,6 +161,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
                 @Override
                 public MobileTokenAuthenticationResponse failedAuthentication(String userId, String failedReason) {
+                    // WebSocket session can not be removed yet - authentication is in progress
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.FAILED);
                     response.setMessage(failedReason);
@@ -149,6 +170,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
                 @Override
                 public MobileTokenAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
+                    // remove WebSocket session, authorization is finished
+                    messageController.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -219,6 +242,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             if (operation.getOperationData().equals(request.getRequestObject().getData())) {
                 //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
                 final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
+                // notify Web UI using WebSocket message about authorization result
+                messageController.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, null);
             } else {
                 return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);

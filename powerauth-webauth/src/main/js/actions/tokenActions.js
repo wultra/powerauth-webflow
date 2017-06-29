@@ -4,7 +4,12 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 export function init() {
     return function (dispatch) {
         axios.post("./api/auth/token/init", {}).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_TOKEN",
+                payload: response.data
+            });
         }).catch((error) => {
+            console.log(error);
         })
     }
 }

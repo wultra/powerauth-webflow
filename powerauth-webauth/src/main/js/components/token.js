@@ -13,17 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { connect } from 'react-redux';
-
+import React from "react";
+import {connect} from "react-redux";
 // Actions
-import { init, authenticate } from '../actions/tokenActions'
-
+import {authenticate, init} from "../actions/tokenActions";
 // Components
-import Spinner from 'react-spin';
-
 // i18n
-import { FormattedMessage } from 'react-intl';
+import {FormattedMessage} from "react-intl";
+
+const stompClient = require('../websocket-client');
+
 
 /**
  * Operation component displays the operation data to the user.
@@ -39,6 +38,11 @@ export default class Token extends React.Component {
         super();
         this.update = this.update.bind(this);
         this.init = this.init.bind(this);
+        this.onRegister = this.onRegister.bind(this);
+        this.onAuthorize = this.onAuthorize.bind(this);
+        this.setAuthorizedByWebSocket = this.setAuthorizedByWebSocket.bind(this);
+        this.isAuthorizedByWebSocket = this.isAuthorizedByWebSocket.bind(this);
+        this.state = {authorizedByWebSocket: false};
     }
 
     componentWillMount() {
@@ -51,14 +55,49 @@ export default class Token extends React.Component {
     }
 
     update() {
-        let update = this.update;
+        const update = this.update;
+        const isAuthorizedByWebSocket = this.isAuthorizedByWebSocket;
         this.props.dispatch(authenticate(function (b) {
             if (b) {
                 setTimeout(function () {
-                    update();
+                    if (!isAuthorizedByWebSocket()) {
+                        update();
+                    }
                 }, 3000);
             }
         }));
+    }
+
+    setAuthorizedByWebSocket() {
+        this.setState({authorizedByWebSocket: true});
+    }
+
+    isAuthorizedByWebSocket() {
+        return this.state.authorizedByWebSocket;
+    }
+
+    onRegister() {
+        console.log('WebSocket has been registered.');
+    }
+
+    onAuthorize() {
+        const setAuthorizedByWebSocket = this.setAuthorizedByWebSocket;
+        console.log('Authorization received from WebSocket.');
+        this.props.dispatch(authenticate(function (b) {
+            if (!b) {
+                setAuthorizedByWebSocket();
+            }
+        }));
+    }
+
+    componentWillReceiveProps(props) {
+        const webSocketId = props.context.webSocketId;
+        if (webSocketId != null) {
+            stompClient.register([
+                {route: '/user/topic/registration', callback: this.onRegister},
+                {route: '/user/topic/authorization', callback: this.onAuthorize}
+            ], webSocketId);
+        }
     }
 
     render() {
