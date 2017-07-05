@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.nextstep.exception;
+package io.getlime.security.powerauth.app.webauth.exception;
 
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
@@ -37,6 +37,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Default exception handler, for unexpected errors.
+     *
      * @return Response with error details.
      */
     @ExceptionHandler(Throwable.class)
@@ -45,7 +46,7 @@ public class DefaultExceptionResolver {
     Response<ErrorModel> handleDefaultException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(
                 Level.SEVERE,
-                "Error occurred in Next Step server",
+                "Error occurred in Web Auth server",
                 t
         );
         ErrorModel error = new ErrorModel();
