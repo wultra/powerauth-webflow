@@ -30,7 +30,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperation
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
