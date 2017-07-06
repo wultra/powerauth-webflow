@@ -40,9 +40,11 @@ export default class Token extends React.Component {
         this.init = this.init.bind(this);
         this.onRegister = this.onRegister.bind(this);
         this.onAuthorize = this.onAuthorize.bind(this);
+        this.setAuthorizationByWebSocketInProgress = this.setAuthorizationByWebSocketInProgress.bind(this);
+        this.isAuthorizationByWebSocketInProgress = this.isAuthorizationByWebSocketInProgress.bind(this);
         this.setAuthorizedByWebSocket = this.setAuthorizedByWebSocket.bind(this);
         this.isAuthorizedByWebSocket = this.isAuthorizedByWebSocket.bind(this);
-        this.state = {authorizedByWebSocket: false};
+        this.state = {authorizationByWebSocketInProgress: false, authorizedByWebSocket: false};
     }
 
     componentWillMount() {
@@ -56,24 +58,45 @@ export default class Token extends React.Component {
 
     update() {
         const update = this.update;
+        const isAuthorizationByWebSocketInProgress = this.isAuthorizationByWebSocketInProgress;
         const isAuthorizedByWebSocket = this.isAuthorizedByWebSocket;
-        this.props.dispatch(authenticate(function (b) {
-            if (b) {
+        if (!isAuthorizedByWebSocket()) {
+            // Authorization by WebSockets wasn't completed, we need to keep calling update() every 3s.
+            if (isAuthorizationByWebSocketInProgress()) {
+                // If the WebSocket authorization is in progress, calling authenticate() method is temporarily paused,
+                // however update() method is called in 3s to check for possible change of state in case WebSocket
+                // authenticate() method fails (in this case the 3s polling will be resumed).
                 setTimeout(function () {
-                    if (!isAuthorizedByWebSocket()) {
-                        update();
-                    }
+                    update();
                 }, 3000);
+            } else {
+                // Otherwise keep trying to authenticate every 3s using polling. This is a fallback mechanism in case
+                // authorization by WebSockets fails completely (e.g. network issues).
+                this.props.dispatch(authenticate(function (b) {
+                    if (b) {
+                        setTimeout(function () {
+                            update();
+                        }, 3000);
+                    }
+                }));
             }
-        }));
+        }
     }
 
-    setAuthorizedByWebSocket() {
-        this.setState({authorizedByWebSocket: true});
+    setAuthorizedByWebSocket(authorized) {
+        this.setState({authorizedByWebSocket: authorized});
     }
 
     isAuthorizedByWebSocket() {
         return this.state.authorizedByWebSocket;
+    }
+
+    setAuthorizationByWebSocketInProgress(inProgress) {
+        this.setState({authorizationByWebSocketInProgress: inProgress});
+    }
+
+    isAuthorizationByWebSocketInProgress() {
+        return this.state.authorizationByWebSocketInProgress;
     }
 
     onRegister() {
@@ -82,11 +105,17 @@ export default class Token extends React.Component {
 
     onAuthorize() {
         const setAuthorizedByWebSocket = this.setAuthorizedByWebSocket;
+        const setAuthorizationByWebSocketInProgress = this.setAuthorizationByWebSocketInProgress;
+        // WebSocket authorization is marked as in progress so that regular 3s polling does not call the authenticate() method.
+        // This mechanism avoids calling authenticate() methods twice at the same time in the rather rare case of a race condition.
+        setAuthorizationByWebSocketInProgress(true);
         console.log('Authorization received from WebSocket.');
         this.props.dispatch(authenticate(function (b) {
             if (!b) {
-                setAuthorizedByWebSocket();
+                setAuthorizedByWebSocket(true);
             }
+            // End of attempt to authorize by WebSockets - 3s polling can be resumed in case authorization is not done yet.
+            setAuthorizationByWebSocketInProgress(false);
         }));
     }
 
