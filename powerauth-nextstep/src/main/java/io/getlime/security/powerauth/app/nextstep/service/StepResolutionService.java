@@ -123,10 +123,10 @@ public class StepResolutionService {
         AuthStepResult authStepResult = request.getAuthStepResult();
         if (isAuthMethodFailed(operation, request.getAuthMethod(), authStepResult)) {
             // check whether the authentication method has already failed completely, in case it has failed, update the authStepResult
-            authStepResult = AuthStepResult.AUTH_METHOD_FAILED;
+            request.setAuthStepResult(AuthStepResult.AUTH_METHOD_FAILED);
         }
 
-        List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, authStepResult, request.getAuthMethod(), request.getUserId());
+        List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
         // TODO - verify priorities - issue #30
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
