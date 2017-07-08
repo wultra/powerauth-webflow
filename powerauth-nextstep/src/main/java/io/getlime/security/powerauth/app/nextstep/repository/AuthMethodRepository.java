@@ -36,4 +36,12 @@ public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, A
      * @return List of supported authentication methods.
      */
     List<AuthMethodEntity> findAllAuthMethods();
+
+    /**
+     * Find an authentication method by its name.
+     *
+     * @param authMethod Name of authentication method.
+     * @return Authentication method.
+     */
+    AuthMethodEntity findByAuthMethod(AuthMethod authMethod);
 }

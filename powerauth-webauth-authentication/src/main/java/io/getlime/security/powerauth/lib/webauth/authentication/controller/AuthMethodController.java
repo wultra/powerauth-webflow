@@ -129,6 +129,11 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         return response.getResponseObject();
     }
 
+    protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
+        Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, params);
+        return response.getResponseObject();
+    }
+
     /**
      * Initiate a new operation with given name, data and parameters.
      * @param operationName Name of the operation to be created.
@@ -188,13 +193,17 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
     protected R buildAuthorizationResponse(T request, AuthResponseProvider provider) throws AuthStepException {
         try {
             String userId = authenticate(request);
-            if (userId == null) { // user was not authenticated
+            UpdateOperationResponse responseObject;
+            if (userId == null) {
+                // user was not authenticated - fail authorization
                 authenticationManagementService.clearContext();
-                return provider.failedAuthentication(userId, "authentication.fail");
+                responseObject = failAuthorization(getOperation().getOperationId(), null, null);
+            } else {
+                // user was authenticated - complete authorization
+                String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
+                responseObject = authorize(operationId, userId, null);
             }
             // TODO: Allow passing custom parameters
-            String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
-            UpdateOperationResponse responseObject = authorize(operationId, userId, null);
             switch (responseObject.getResult()) {
                 case DONE: {
                     authenticationManagementService.authenticateCurrentSession();

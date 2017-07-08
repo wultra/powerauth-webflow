@@ -35,5 +35,11 @@ public enum AuthStepResult {
     /**
      * Authentication failed, user cannot proceed to the next step.
      */
-    FAILED
+    AUTH_FAILED,
+
+    /**
+     * Authentication method failed completely, user cannot proceed to the next step and this authentication method
+     * should no longer be used.
+     */
+    AUTH_METHOD_FAILED
 }

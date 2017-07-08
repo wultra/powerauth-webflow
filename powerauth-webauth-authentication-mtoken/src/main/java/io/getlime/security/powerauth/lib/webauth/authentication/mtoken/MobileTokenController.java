@@ -119,7 +119,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
         }
-        initResponse.setResult(AuthStepResult.FAILED);
+        initResponse.setResult(AuthStepResult.AUTH_FAILED);
         // TODO - better message for initialization error
         initResponse.setMessage("authentication.fail");
         return initResponse;
@@ -137,13 +137,13 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                     // remove WebSocket session, it is expired
                     messageController.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.FAILED);
+                    response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage("authentication.timeout");
                     return response;
                 }
                 // WebSocket session can not be removed yet - authentication is in progress
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                response.setResult(AuthStepResult.FAILED);
+                response.setResult(AuthStepResult.AUTH_FAILED);
                 response.setMessage("authentication.fail");
                 return response;
             }
@@ -163,7 +163,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 public MobileTokenAuthenticationResponse failedAuthentication(String userId, String failedReason) {
                     // WebSocket session can not be removed yet - authentication is in progress
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.FAILED);
+                    response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
                     return response;
                 }
@@ -181,7 +181,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             });
         } catch (AuthStepException e) {
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-            response.setResult(AuthStepResult.FAILED);
+            response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
             return response;
         }
