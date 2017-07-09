@@ -129,7 +129,6 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
         sortSteps(stepDefinitions);
         verifyDuplicatePrioritiesAbsent(stepDefinitions);
-        response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
