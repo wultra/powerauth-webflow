@@ -30,7 +30,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperation
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import sun.rmi.runtime.Log;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -128,7 +127,11 @@ public class OperationPersistenceService {
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
-            e.printStackTrace();
+            Logger.getLogger(this.getClass().getName()).log(
+                    Level.SEVERE,
+                    "Error occurred while serializing operation history",
+                    e
+            );
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
@@ -195,7 +198,11 @@ public class OperationPersistenceService {
             return steps;
         } catch (IOException e) {
             // in case of an error empty list is returned
-            e.printStackTrace();
+            Logger.getLogger(this.getClass().getName()).log(
+                    Level.SEVERE,
+                    "Error occurred while deserializing response steps",
+                    e
+            );
         }
         return steps;
     }

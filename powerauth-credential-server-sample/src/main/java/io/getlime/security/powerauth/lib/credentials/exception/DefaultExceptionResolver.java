@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller advice responsible for default exception resolving.
@@ -43,7 +45,13 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody Response<ErrorModel> handleDefaultException() {
+    public @ResponseBody
+    Response<ErrorModel> handleDefaultException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(
+                Level.SEVERE,
+                "Error occurred in Credential server",
+                t
+        );
         ErrorModel error = new ErrorModel(ErrorModel.Code.ERROR_GENERIC, "Unknown Error");
         return new Response<>(Response.Status.ERROR, error);
     }

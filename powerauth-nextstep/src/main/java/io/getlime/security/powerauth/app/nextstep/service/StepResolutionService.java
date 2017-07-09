@@ -127,7 +127,9 @@ public class StepResolutionService {
         }
 
         List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
-        // TODO - verify priorities - issue #30
+        sortSteps(stepDefinitions);
+        verifyDuplicatePrioritiesAbsent(stepDefinitions);
+        response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
@@ -218,6 +220,29 @@ public class StepResolutionService {
             filteredStepDefinitions.add(stepDef);
         }
         return filteredStepDefinitions;
+    }
+
+    /**
+     * Sorts the step definitions based on their priorities.
+     *
+     * @param stepDefinitions step definitions
+     */
+    private void sortSteps(List<StepDefinitionEntity> stepDefinitions) {
+        Collections.sort(stepDefinitions, Comparator.comparing(StepDefinitionEntity::getResponsePriority));
+    }
+
+    /**
+     * Verifies that each priority is present only once in the list of step definitions.
+     *
+     * @param stepDefinitions step definitions
+     */
+    private void verifyDuplicatePrioritiesAbsent(List<StepDefinitionEntity> stepDefinitions) {
+        Map<Long, List<StepDefinitionEntity>> stepsByPriority = stepDefinitions
+                .stream()
+                .collect(Collectors.groupingBy(StepDefinitionEntity::getResponsePriority));
+        if (stepsByPriority.size() != stepDefinitions.size()) {
+            throw new IllegalStateException("Multiple steps with the same priority detected while resolving next step.");
+        }
     }
 
     /**

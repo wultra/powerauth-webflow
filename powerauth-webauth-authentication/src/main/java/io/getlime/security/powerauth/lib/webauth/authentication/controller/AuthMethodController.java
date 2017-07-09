@@ -204,6 +204,15 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
                 responseObject = authorize(operationId, userId, null);
             }
             // TODO: Allow passing custom parameters
+            String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
+            // fix of issue #44 - The last authMethod/authResult is shown twice in operation history
+            // first check whether response can be derived from operation detail - the auth method already called authorize()
+            final R authResponseFromOperationDetail = deriveAuthorizationResponseFromOperationDetail(operationId, userId, provider);
+            if (authResponseFromOperationDetail!=null) {
+                return authResponseFromOperationDetail;
+            }
+            // response could not be derived - call authorize() method to update current operation
+            UpdateOperationResponse responseObject = authorize(operationId, userId, null);
             switch (responseObject.getResult()) {
                 case DONE: {
                     authenticationManagementService.authenticateCurrentSession();
@@ -224,6 +233,44 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         } catch (NextStepServiceException e) {
             throw new AuthStepException(e.getError().getMessage(), e);
         }
+    }
+
+    /**
+     * Derive authorization response from operation detail for given operation. The response can be derived in case the
+     * authorization method called authorize() by itself and the result is either CONTINUE or DONE.
+     * Otherwise null is returned and authorize() method should be called to update the operation.
+     *
+     * @param operationId operation ID.
+     * @param userId user ID.
+     * @param provider Provider with authentication callback implementation.
+     * @return Response indicating next step derived from operation detail.
+     * @throws NextStepServiceException In case operation retrieval fails.
+     */
+    private R deriveAuthorizationResponseFromOperationDetail(String operationId, String userId, AuthResponseProvider provider) throws NextStepServiceException {
+        final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+        if (operationDetail != null) {
+            GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
+            // In case the last record in operation history has current authMethod and result is either DONE or CONTINUE,
+            // calling authorize() would lead to a duplicate NS update call. Return known response from operation detail instead.
+            if (responseObject!=null
+                    && !responseObject.getHistory().isEmpty()
+                    && responseObject.getHistory().get(responseObject.getHistory().size()-1).getAuthMethod()==getAuthMethodName()) {
+                switch (responseObject.getResult()) {
+                    case DONE: {
+                        authenticationManagementService.authenticateCurrentSession();
+                        return provider.doneAuthentication(userId);
+                    }
+                    case CONTINUE: {
+                        return provider.continueAuthentication(responseObject.getOperationId(), userId, responseObject.getSteps());
+                    }
+                    default:
+                        // authorization is pending
+                        return null;
+                }
+            }
+        }
+        // authorization is pending
+        return null;
     }
 
     /**
