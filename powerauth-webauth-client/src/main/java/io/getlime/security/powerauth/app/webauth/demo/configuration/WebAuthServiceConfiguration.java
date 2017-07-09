@@ -16,7 +16,9 @@
 
 package io.getlime.security.powerauth.app.webauth.demo.configuration;
 
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -42,6 +44,9 @@ public class WebAuthServiceConfiguration {
     @Value("${powerauth.webauth.service.oauth.clientSecret}")
     private String clientSecret;
 
+    @Value("${powerauth.nextstep.service.url}")
+    private String nextstepServiceUrl;
+
     public String getWebAuthServiceUrl() {
         return webAuthServiceUrl;
     }
@@ -61,4 +66,14 @@ public class WebAuthServiceConfiguration {
     public String getClientSecret() {
         return clientSecret;
     }
+
+    /**
+     * Default Next Step service client.
+     * @return Next Step service client.
+     */
+    @Bean
+    public NextStepClient defaultNextStepClient() {
+        return new NextStepClient(nextstepServiceUrl);
+    }
+
 }

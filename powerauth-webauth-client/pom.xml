@@ -80,7 +80,7 @@
         <!-- PowerAuth 2.0 Web Flow -->
         <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-nextstep-model</artifactId>
+            <artifactId>powerauth-nextstep-client</artifactId>
             <version>0.15.0</version>
         </dependency>
 

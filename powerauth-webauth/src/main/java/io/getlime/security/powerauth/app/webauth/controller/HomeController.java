@@ -80,7 +80,7 @@ public class HomeController {
 
         // fetch operation ID from the saved request, in case there is one present
         final Map<String, String[]> parameterMap = savedRequest.getParameterMap();
-        final String[] operationIdList = parameterMap.get("operationId");
+        final String[] operationIdList = parameterMap.get("operation_id");
         if (operationIdList != null && operationIdList.length == 1) {
             final String operationId = operationIdList[0];
             authenticationManagementService.createAuthenticationWithOperationId(operationId);

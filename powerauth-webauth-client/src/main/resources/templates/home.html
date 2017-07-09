@@ -36,7 +36,7 @@
 
             <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
                 <p>
-                Welcome, <span class="black"><span th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
+                Operation authorized by <span class="black"><span th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
                 </p>
                 <form id="disconnect" th:action="@{/connect/demo}" method="post">
                     <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
@@ -49,14 +49,17 @@
                 <div>
                     <ul class="nav nav-tabs" role="tablist">
                         <li role="presentation" class="active">
-                            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
+                            <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment (DEMO)</a>
                         </li>
                         <li role="presentation">
                             <a href="#authorize" aria-controls="authorize" role="tab" data-toggle="tab">Authorization</a>
                         </li>
+                        <li role="presentation">
+                            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
+                        </li>
                     </ul>
                     <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="login">
+                        <div role="tabpanel" class="tab-pane" id="login">
                             <div class="padding">
                                 <p>
                                     Authenticate as a user.
@@ -67,15 +70,38 @@
                                 </form>
                             </div>
                         </div>
+                        <div role="tabpanel" class="tab-pane active" id="payment">
+                            <div class="padding">
+                                <p>
+                                    Create Payment (DEMO)
+                                </p>
+                                <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{amount}"    placeholder="Amount"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{currency}"  placeholder="Currency"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{account}"   placeholder="Account Number"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{note}"      placeholder="Note"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
                         <div role="tabpanel" class="tab-pane" id="authorize">
                             <div class="padding">
                                 <p>
                                     Authorize operation with given ID.
                                 </p>
-                                <form th:action="@{/connect/demo}" method="POST">
-                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                                <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
                                     <div class="input-group input-group-lg">
-                                        <input type="text" class="form-control" name="operationId" placeholder="Operation ID"/>
+                                        <input type="text" class="form-control" name="operation_id" th:value="${operationId}" placeholder="Operation ID"/>
                                         <span class="input-group-btn">
                                             <button type="submit" class="btn btn-success">Authorize</button>
                                         </span>

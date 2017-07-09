@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -95,11 +96,25 @@ public class NextStepClient {
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
     public Response<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, operationData, null, params);
+    }
+
+    /**
+     * Calls the operation endpoint via POST method to create a new operation.
+     *
+     * @param operationName operation name
+     * @param operationData operation data
+     * @param displayDetails operation display details, such as title, message and displayable attributes
+     * @param params        list of generic parameters
+     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     */
+    public Response<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
             request.setOperationName(operationName);
             request.setOperationData(operationData);
+            request.setDisplayDetails(displayDetails);
             if (params != null) {
                 request.getParams().addAll(params);
             }
