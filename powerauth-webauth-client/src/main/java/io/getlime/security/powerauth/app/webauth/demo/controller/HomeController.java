@@ -92,7 +92,7 @@ public class HomeController {
                 + " to account " + paymentForm.getAccount() + ".");
 
         OperationAmountDisplayAttribute amountAttr = new OperationAmountDisplayAttribute();
-        amountAttr.setLabel("Amout");
+        amountAttr.setLabel("Amount");
         amountAttr.setAmount(paymentForm.getAmount());
         amountAttr.setCurrency(paymentForm.getCurrency());
         details.getParameters().add(amountAttr);
