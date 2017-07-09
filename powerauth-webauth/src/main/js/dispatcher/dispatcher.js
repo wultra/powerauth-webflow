@@ -55,7 +55,7 @@ export function dispatchAction(dispatch, response) {
                     }
                 }
             }
-        } else if (response.data.result === "FAILED") {
+        } else if (response.data.result === "AUTH_FAILED") {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
@@ -71,7 +71,7 @@ export function dispatchAction(dispatch, response) {
                     message: response.data.message
                 }
             })
-        } else if (response.data.result === "FAILED") {
+        } else if (response.data.result === "AUTH_FAILED") {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
