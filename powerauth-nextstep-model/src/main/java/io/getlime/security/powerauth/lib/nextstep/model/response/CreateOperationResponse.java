@@ -31,10 +31,12 @@ import java.util.List;
 public class CreateOperationResponse {
 
     private String operationId;
+    private String operationName;
     private AuthResult result;
     private String resultDescription;
     private Date timestampCreated;
     private Date timestampExpires;
+    private String operationData;
     private List<AuthStep> steps;
     private OperationDisplayDetails displayDetails;
 
@@ -59,6 +61,38 @@ public class CreateOperationResponse {
      */
     public void setOperationId(String operationId) {
         this.operationId = operationId;
+    }
+
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
+    public String getOperationName() {
+        return operationName;
+    }
+
+    /**
+     * Set operation name.
+     * @param operationName Operation name.
+     */
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
+    }
+
+    /**
+     * Get operation data.
+     * @return Operation data.
+     */
+    public String getOperationData() {
+        return operationData;
+    }
+
+    /**
+     * Set operation data.
+     * @param operationData Operation data.
+     */
+    public void setOperationData(String operationData) {
+        this.operationData = operationData;
     }
 
     /**

@@ -32,6 +32,7 @@ import java.util.List;
 public class GetOperationDetailResponse {
 
     private String operationId;
+    private String operationName;
     private String userId;
     private AuthResult result;
     private Date timestampCreated;
@@ -63,6 +64,22 @@ public class GetOperationDetailResponse {
      */
     public void setOperationId(String operationId) {
         this.operationId = operationId;
+    }
+
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
+    public String getOperationName() {
+        return operationName;
+    }
+
+    /**
+     * Set operation name.
+     * @param operationName Operation name.
+     */
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
     }
 
     /**

@@ -128,6 +128,7 @@ public class OperationController {
             throw new IllegalArgumentException("Invalid operationId: " + requestObject.getOperationId());
         }
         response.setOperationId(operation.getOperationId());
+        response.setOperationName(operation.getOperationName());
         response.setUserId(operation.getUserId());
         response.setOperationData(operation.getOperationData());
         if (operation.getResult() != null) {
@@ -182,6 +183,7 @@ public class OperationController {
         for (OperationEntity operation : operations) {
             GetOperationDetailResponse response = new GetOperationDetailResponse();
             response.setOperationId(operation.getOperationId());
+            response.setOperationName(operation.getOperationName());
             response.setUserId(operation.getUserId());
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {

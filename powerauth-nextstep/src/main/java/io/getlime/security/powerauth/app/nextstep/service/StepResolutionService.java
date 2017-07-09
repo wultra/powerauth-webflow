@@ -82,6 +82,7 @@ public class StepResolutionService {
     public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) {
         CreateOperationResponse response = new CreateOperationResponse();
         response.setOperationId(idGeneratorService.generateOperationId());
+        response.setOperationName(request.getOperationName());
         // AuthStepResult and AuthMethod are not available when creating the operation, null values are used to ignore them
         List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
@@ -109,6 +110,7 @@ public class StepResolutionService {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         UpdateOperationResponse response = new UpdateOperationResponse();
         response.setOperationId(request.getOperationId());
+        response.setOperationName(operation.getOperationName());
         response.setUserId(request.getUserId());
         response.setTimestampCreated(new Date());
         if (operation.isExpired()) {

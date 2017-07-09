@@ -109,6 +109,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             body.setBody("Data: " + operation.getOperationData());
         }
         body.setSound("default");
+        body.setCategory(operation.getOperationName());
 
         message.setMessage(body);
 
