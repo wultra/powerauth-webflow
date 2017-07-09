@@ -212,7 +212,6 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
                 return authResponseFromOperationDetail;
             }
             // response could not be derived - call authorize() method to update current operation
-            UpdateOperationResponse responseObject = authorize(operationId, userId, null);
             switch (responseObject.getResult()) {
                 case DONE: {
                     authenticationManagementService.authenticateCurrentSession();
