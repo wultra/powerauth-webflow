@@ -16,19 +16,19 @@
 // require
 const React = require('react');
 const ReactDOM = require('react-dom');
-
+const axiosDefaults = require('axios/lib/defaults');
 // imports
-import {Provider, connect} from 'react-redux';
-import {IntlProvider} from 'react-intl-redux';
+import {Provider} from "react-redux";
+import {IntlProvider} from "react-intl-redux";
 
-import store from './store';
+import store from "./store";
 
-import App from './components/app';
+import App from "./components/app";
 
-import {addLocaleData} from 'react-intl';
+import {addLocaleData} from "react-intl";
 
-import enLocaleData from 'react-intl/locale-data/en';
-import csLocaleData from 'react-intl/locale-data/cs';
+import enLocaleData from "react-intl/locale-data/en";
+import csLocaleData from "react-intl/locale-data/cs";
 
 // currently only EN and CS languages are supported
 addLocaleData([
@@ -41,6 +41,8 @@ store.dispatch({
     type: "CHANGE_LOCALE",
     locale: lang
 });
+
+axiosDefaults.headers.common[csrf.headerName] = csrf.token;
 
 const app = document.getElementById('react');
 

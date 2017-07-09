@@ -20,9 +20,14 @@ export function authenticate(username, password) {
                     dispatchAction(dispatch, response);
                     break;
                 }
-                case 'FAILED': {
+                case 'AUTH_FAILED': {
                     // handle timeout - login action can not succeed anymore, do not show login screen, show error instead
                     if (response.data.message === "authentication.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "authentication.maxAttemptsExceeded") {
                         dispatchAction(dispatch, response);
                         break;
                     }

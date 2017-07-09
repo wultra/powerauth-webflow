@@ -80,7 +80,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 @Override
                 public OperationReviewResponse failedAuthentication(String userId, String failedReason) {
                     final OperationReviewResponse response = new OperationReviewResponse();
-                    response.setResult(AuthStepResult.FAILED);
+                    response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
                     return response;
                 }
@@ -96,7 +96,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             });
         } catch (AuthStepException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
-            response.setResult(AuthStepResult.FAILED);
+            response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
             return response;
         }

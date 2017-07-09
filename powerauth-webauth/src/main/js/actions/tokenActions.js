@@ -23,7 +23,7 @@ export function authenticate(callback) {
                     dispatchAction(dispatch, response);
                     break;
                 }
-                case 'FAILED': {
+                case 'AUTH_FAILED': {
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "authentication.timeout") {
                         dispatchAction(dispatch, response);

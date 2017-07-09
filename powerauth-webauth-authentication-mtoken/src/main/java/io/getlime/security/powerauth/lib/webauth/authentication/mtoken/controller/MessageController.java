@@ -109,7 +109,7 @@ public class MessageController {
     public String generateWebSocketId(String operationId) {
         try {
             return DatatypeConverter.printHexBinary(
-                    MessageDigest.getInstance("MD5").digest(operationId.getBytes("UTF-8")));
+                    MessageDigest.getInstance("SHA-512").digest(operationId.getBytes("UTF-8")));
         } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
             return null;
         }

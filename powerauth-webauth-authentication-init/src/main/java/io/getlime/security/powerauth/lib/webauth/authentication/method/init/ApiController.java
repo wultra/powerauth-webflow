@@ -98,7 +98,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
     private InitOperationResponse failedOperationResponse(String message, String failedReason) {
         InitOperationResponse registrationResponse = new InitOperationResponse();
-        registrationResponse.setResult(AuthStepResult.FAILED);
+        registrationResponse.setResult(AuthStepResult.AUTH_FAILED);
         registrationResponse.setOperationId(message);
         registrationResponse.setMessage(failedReason);
         return registrationResponse;

@@ -58,7 +58,9 @@ CREATE TABLE ns_auth_method (
   order_number       INTEGER,
   check_user_prefs   BOOLEAN,
   user_prefs_column  INTEGER,
-  user_prefs_default BOOLEAN
+  user_prefs_default BOOLEAN,
+  check_auth_fails   BOOLEAN,
+  max_auth_fails     INTEGER
 );
 
 CREATE TABLE ns_user_prefs (

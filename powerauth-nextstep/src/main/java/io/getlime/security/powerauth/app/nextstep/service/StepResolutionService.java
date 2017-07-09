@@ -16,8 +16,11 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
+import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -33,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This service performs dynamic resolution of the next steps. Step definitions are loaded during class initialization
@@ -50,16 +54,18 @@ public class StepResolutionService {
     private OperationPersistenceService operationPersistenceService;
     private NextStepServerConfiguration nextStepServerConfiguration;
     private UserPrefsService userPrefsService;
+    private AuthMethodRepository authMethodRepository;
     private Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
 
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 UserPrefsService userPrefsService) {
+                                 UserPrefsService userPrefsService, AuthMethodRepository authMethodRepository) {
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
         this.userPrefsService = userPrefsService;
+        this.authMethodRepository = authMethodRepository;
         stepDefinitionsPerOperation = new HashMap<>();
         List<String> operationNames = stepDefinitionRepository.findDistinctOperationNames();
         for (String operationName : operationNames) {
@@ -114,20 +120,50 @@ public class StepResolutionService {
             return response;
         }
         response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
+        AuthStepResult authStepResult = request.getAuthStepResult();
+        if (isAuthMethodFailed(operation, request.getAuthMethod(), authStepResult)) {
+            // check whether the authentication method has already failed completely, in case it has failed, update the authStepResult
+            request.setAuthStepResult(AuthStepResult.AUTH_METHOD_FAILED);
+        }
+
         List<StepDefinitionEntity> stepDefinitions = filterSteps(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
-        // TODO - verify priorities - issue #30
-        response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
+        sortSteps(stepDefinitions);
+        verifyDuplicatePrioritiesAbsent(stepDefinitions);
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
         }
         if (allResults.size() == 1) {
-            // Correct response - only one AuthResult found. Return all matching steps.
+            // Straightforward response - only one AuthResult found. Return all matching steps.
+            response.getSteps().addAll(prepareAuthSteps(stepDefinitions));
             response.setResult(allResults.iterator().next());
             return response;
         } else if (allResults.size() > 1) {
-            // This state should not occur - there are multiple step definitions with different values of AuthResult.
-            // Fail the operation - this should not happen unless step definitions are misconfigured.
+            // We need to make sure a specific AuthResult is returned in case multiple authentication methods lead
+            // to different AuthResults.
+            // In case there is any DONE or CONTINUE next step, prefer it over FAILED. FAILED state can be caused by a failing
+            // authentication method or by method canceled by the user, in this case try to switch to other
+            // authentication method if it is available.
+            Map<AuthResult, List<StepDefinitionEntity>> stepsByAuthResult = stepDefinitions
+                    .stream()
+                    .collect(Collectors.groupingBy(StepDefinitionEntity::getResponseResult));
+            if (stepsByAuthResult.containsKey(AuthResult.DONE)) {
+                List<StepDefinitionEntity> doneSteps = stepsByAuthResult.get(AuthResult.DONE);
+                response.getSteps().addAll(prepareAuthSteps(doneSteps));
+                response.setResult(AuthResult.DONE);
+                return response;
+            } else if (stepsByAuthResult.containsKey(AuthResult.CONTINUE)) {
+                List<StepDefinitionEntity> continueSteps = stepsByAuthResult.get(AuthResult.CONTINUE);
+                response.getSteps().addAll(prepareAuthSteps(continueSteps));
+                response.setResult(AuthResult.CONTINUE);
+                return response;
+            } else if (stepsByAuthResult.containsKey(AuthResult.FAILED)) {
+                List<StepDefinitionEntity> failedSteps = stepsByAuthResult.get(AuthResult.FAILED);
+                response.getSteps().addAll(prepareAuthSteps(failedSteps));
+                response.setResult(AuthResult.FAILED);
+                return response;
+            }
+            // This code should not be reached - all cases should have been handled previously.
             response.getSteps().clear();
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.unknown");
@@ -135,7 +171,6 @@ public class StepResolutionService {
         } else {
             // No step definition matches the current criteria. Suitable step definitions might have been filtered out
             // via user preferences. Fail the operation.
-            // TODO - fallback mechanism - see issue #32
             response.getSteps().clear();
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.noAuthMethod");
@@ -146,10 +181,11 @@ public class StepResolutionService {
     /**
      * Filters step definitions by given parameters and returns a list of step definitions which match the query.
      *
-     * @param operationName  name of the operation
-     * @param operationType  type of the operation - CREATE/UPDATE
+     * @param operationName name of the operation
+     * @param operationType type of the operation - CREATE/UPDATE
      * @param authStepResult result of previous authentication step
-     * @param authMethod     authentication method of previous authentication step
+     * @param authMethod authentication method of previous authentication step
+     * @param userId user ID
      * @return filtered list of steps
      */
     private List<StepDefinitionEntity> filterSteps(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) {
@@ -186,6 +222,29 @@ public class StepResolutionService {
     }
 
     /**
+     * Sorts the step definitions based on their priorities.
+     *
+     * @param stepDefinitions step definitions
+     */
+    private void sortSteps(List<StepDefinitionEntity> stepDefinitions) {
+        Collections.sort(stepDefinitions, Comparator.comparing(StepDefinitionEntity::getResponsePriority));
+    }
+
+    /**
+     * Verifies that each priority is present only once in the list of step definitions.
+     *
+     * @param stepDefinitions step definitions
+     */
+    private void verifyDuplicatePrioritiesAbsent(List<StepDefinitionEntity> stepDefinitions) {
+        Map<Long, List<StepDefinitionEntity>> stepsByPriority = stepDefinitions
+                .stream()
+                .collect(Collectors.groupingBy(StepDefinitionEntity::getResponsePriority));
+        if (stepsByPriority.size() != stepDefinitions.size()) {
+            throw new IllegalStateException("Multiple steps with the same priority detected while resolving next step.");
+        }
+    }
+
+    /**
      * Converts List<StepDefinitionEntity> into a List<AuthStep>.
      *
      * @param stepDefinitions step definitions to convert
@@ -201,6 +260,48 @@ public class StepResolutionService {
             }
         }
         return authSteps;
+    }
+
+    /**
+     * Check whether given authentication method has previously failed or it has exceeded the maximum number of attempts.
+     *
+     * @param operation  operation whose history is being checked
+     * @param authMethod authentication method
+     * @return whether authentication method failed
+     */
+    private boolean isAuthMethodFailed(OperationEntity operation, AuthMethod authMethod, AuthStepResult currentAuthStepResult) {
+        if (currentAuthStepResult == AuthStepResult.AUTH_METHOD_FAILED) {
+            return true;
+        }
+        // in case authentication method previously failed, it is already failed
+        for (OperationHistoryEntity history : operation.getOperationHistory()) {
+            if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED) {
+                return true;
+            }
+        }
+        // check whether authMethod supports check of authorization failure count
+        AuthMethodEntity authMethodEntity = authMethodRepository.findByAuthMethod(authMethod);
+        if (authMethodEntity == null) {
+            throw new IllegalStateException("AuthMethod is missing in database: " + authMethod);
+        }
+        if (authMethodEntity.getCheckAuthorizationFailures()) {
+            // count failures
+            int failureCount = 0;
+            if (currentAuthStepResult == AuthStepResult.AUTH_FAILED) {
+                // add current failure
+                failureCount++;
+            }
+            for (OperationHistoryEntity history : operation.getOperationHistory()) {
+                // add all failures from history for this method
+                if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_FAILED) {
+                    failureCount++;
+                }
+            }
+            if (failureCount >= authMethodEntity.getMaxAuthorizationFailures()) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

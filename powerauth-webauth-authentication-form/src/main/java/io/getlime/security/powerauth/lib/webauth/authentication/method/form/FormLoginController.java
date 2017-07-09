@@ -19,10 +19,13 @@ package io.getlime.security.powerauth.lib.webauth.authentication.method.form;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
@@ -55,6 +58,17 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
         } catch (CredentialStoreClientErrorException e) {
+            try {
+                // User was not authenticated by credential store - fail authorization to count the number of failures and make it possible
+                // to switch to an alternate authentication method in case it is available.
+                UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), null, null);
+                if (response.getResult() == AuthResult.FAILED) {
+                    // FAILED result instead of CONTINUE means the authentication method is failed
+                    throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                }
+            } catch (NextStepServiceException e2) {
+                throw new AuthStepException(e2.getError().getMessage(), e2);
+            }
             throw new AuthStepException(e.getError().getMessage(), e);
         }
     }
@@ -85,7 +99,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 @Override
                 public UsernamePasswordAuthenticationResponse failedAuthentication(String userId, String failedReason) {
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
-                    response.setResult(AuthStepResult.FAILED);
+                    response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
                     return response;
                 }
@@ -101,7 +115,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             });
         } catch (AuthStepException e) {
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
-            response.setResult(AuthStepResult.FAILED);
+            response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
             return response;
         }

@@ -51,6 +51,12 @@ public class AuthMethodEntity implements Serializable {
     @Column(name = "user_prefs_default")
     private Boolean userPrefsDefault;
 
+    @Column(name = "check_auth_fails")
+    private Boolean checkAuthorizationFailures;
+
+    @Column(name = "max_auth_fails")
+    private Integer maxAuthorizationFailures;
+
     public AuthMethod getAuthMethod() {
         return authMethod;
     }
@@ -89,6 +95,22 @@ public class AuthMethodEntity implements Serializable {
 
     public void setUserPrefsDefault(Boolean userPrefsDefault) {
         this.userPrefsDefault = userPrefsDefault;
+    }
+
+    public Boolean getCheckAuthorizationFailures() {
+        return checkAuthorizationFailures;
+    }
+
+    public void setCheckAuthorizationFailures(Boolean checkAuthorizationFailures) {
+        this.checkAuthorizationFailures = checkAuthorizationFailures;
+    }
+
+    public Integer getMaxAuthorizationFailures() {
+        return maxAuthorizationFailures;
+    }
+
+    public void setMaxAuthorizationFailures(Integer maxAuthorizationFailures) {
+        this.maxAuthorizationFailures = maxAuthorizationFailures;
     }
 
     @Override
