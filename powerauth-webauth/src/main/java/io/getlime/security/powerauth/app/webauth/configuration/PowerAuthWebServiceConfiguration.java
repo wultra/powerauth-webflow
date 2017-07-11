@@ -1,7 +1,6 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
 import io.getlime.push.client.PushServerClient;
-import io.getlime.security.powerauth.rest.api.spring.provider.PowerAuthAuthenticationProvider;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.apache.ws.security.WSConstants;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
-import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
+import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
@@ -33,6 +32,7 @@ public class PowerAuthWebServiceConfiguration {
     @Value("${powerauth.service.security.clientSecret}")
     private String clientSecret;
 
+    // Must use DEPRECATED class here, wss4j2 is not yet production ready
     @Bean
     public Wss4jSecurityInterceptor securityInterceptor() {
         Wss4jSecurityInterceptor wss4jSecurityInterceptor = new Wss4jSecurityInterceptor();
