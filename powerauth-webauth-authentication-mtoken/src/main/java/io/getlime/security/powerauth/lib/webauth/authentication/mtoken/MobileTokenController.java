@@ -96,6 +96,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         PushMessage message = new PushMessage();
         message.setUserId(userId);
+        message.setPersonal(true);
+        message.setEncrypted(true);
 
         final OperationDisplayDetails displayDetails = operation.getDisplayDetails();
 
