@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.webauth.authentication.method.init;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
@@ -119,4 +120,8 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         return registrationResponse;
     }
 
+    @Override
+    protected AuthMethod getAuthMethodName() {
+        return AuthMethod.INIT;
+    }
 }

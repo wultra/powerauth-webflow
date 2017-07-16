@@ -21,6 +21,12 @@ package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public enum AuthMethod {
+
+    /**
+     * Initialize authentication dance, anonymous auth.
+     */
+    INIT,
+
     /**
      * Directly assign a user ID with given operation.
      */

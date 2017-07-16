@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webauth.authentication.mtoken;
+package io.getlime.security.powerauth.lib.webauth.authentication.mtoken.controller;
 
 import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
@@ -41,6 +41,7 @@ import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.req
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenSignResponse;
+import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
 import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
@@ -58,7 +59,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
-@RequestMapping(value = "/api/auth/token")
+@RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
     @Autowired
@@ -68,7 +69,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     private PushServiceConfiguration configuration;
 
     @Autowired
-    private MessageController messageController;
+    private WebSocketMessageService webSocketMessageService;
 
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
@@ -117,7 +118,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         StatusResponse statusResponse = pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
-        initResponse.setWebSocketId(messageController.generateWebSocketId(operation.getOperationId()));
+        initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
         if (statusResponse.getStatus().equals(StatusResponse.OK)) {
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
@@ -138,7 +139,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 if (operation.isExpired()) {
                     // handle operation expiration
                     // remove WebSocket session, it is expired
-                    messageController.removeWebSocketSession(operation.getOperationId());
+                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage("authentication.timeout");
@@ -155,7 +156,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 @Override
                 public MobileTokenAuthenticationResponse doneAuthentication(String userId) {
                     // remove WebSocket session, authorization is finished
-                    messageController.removeWebSocketSession(operation.getOperationId());
+                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -174,7 +175,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 @Override
                 public MobileTokenAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     // remove WebSocket session, authorization is finished
-                    messageController.removeWebSocketSession(operation.getOperationId());
+                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                     final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -187,72 +188,6 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
             return response;
-        }
-    }
-
-    @RequestMapping(value="/push/register", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/push/register", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody String registerDevice(@RequestBody MobileTokenPushRegisterRequest request,
-                                               PowerAuthApiAuthentication apiAuthentication) {
-
-        // Get the values from the request
-        String platform = request.getPlatform();
-        String token = request.getToken();
-
-        // Check if the context is authenticated - if it is, add activation ID.
-        // This assures that the activation is assigned with a correct device.
-        String activationId = null;
-        if (apiAuthentication != null) {
-            activationId = apiAuthentication.getActivationId();
-        }
-
-        // Register the device and return response
-        MobilePlatform p = MobilePlatform.Android;
-        if ("ios".equalsIgnoreCase(platform)) {
-            p = MobilePlatform.iOS;
-        }
-        boolean result = pushServerClient.registerDevice(configuration.getPushServerApplication(), token, p, activationId);
-        if (result) {
-            return "OK";
-        } else {
-            return "NOT_OK";
-        }
-    }
-
-    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/list", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody PowerAuthApiResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) {
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
-            String userId = apiAuthentication.getUserId();
-            final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            return new PowerAuthApiResponse(PowerAuthApiResponse.Status.OK, PowerAuthApiResponse.Encryption.NONE, operationList);
-        } else {
-            return new PowerAuthApiResponse(PowerAuthApiResponse.Status.OK, PowerAuthApiResponse.Encryption.NONE, null);
-        }
-    }
-
-    @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/authorize")
-    public @ResponseBody PowerAuthApiResponse<MobileTokenSignResponse> verifySignature(
-            @RequestBody PowerAuthApiRequest<MobileTokenSignRequest> request,
-            PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException {
-
-        if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
-            String userId = apiAuthentication.getUserId();
-            String operationId = request.getRequestObject().getId();
-
-            final GetOperationDetailResponse operation = getOperation(operationId);
-            if (operation.getOperationData().equals(request.getRequestObject().getData())) {
-                //TODO: Evaluate if userId comparison is needed (one in operation + one in auth object)
-                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
-                // notify Web UI using WebSocket message about authorization result
-                messageController.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
-                return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.OK, null);
-            } else {
-                return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
-            }
-        } else {
-            return new PowerAuthApiResponse<>(PowerAuthApiResponse.Status.ERROR, null);
         }
     }
 

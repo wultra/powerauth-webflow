@@ -49,7 +49,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Component
-public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepResponse, E extends AuthStepException> {
+public abstract class AuthMethodController<T extends AuthStepRequest, R extends AuthStepResponse, E extends AuthStepException> {
 
     @Autowired
     private AuthenticationManagementService authenticationManagementService;
@@ -82,9 +82,7 @@ public class AuthMethodController<T extends AuthStepRequest, R extends AuthStepR
         }
     }
 
-    protected AuthMethod getAuthMethodName() {
-        return AuthMethod.USERNAME_PASSWORD_AUTH;
-    }
+    abstract protected AuthMethod getAuthMethodName();
 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
