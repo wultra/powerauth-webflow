@@ -11,6 +11,13 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
  *
@@ -31,6 +38,9 @@ public class PowerAuthWebServiceConfiguration {
 
     @Value("${powerauth.service.security.clientSecret}")
     private String clientSecret;
+
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean acceptInvalidSslCertificate;
 
     // Must use DEPRECATED class here, wss4j2 is not yet production ready
     @Bean
@@ -60,6 +70,10 @@ public class PowerAuthWebServiceConfiguration {
             ClientInterceptor interceptor = securityInterceptor();
             client.setInterceptors(new ClientInterceptor[] { interceptor });
         }
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            trustAllCertificates();
+        }
         return client;
     }
 
@@ -67,7 +81,44 @@ public class PowerAuthWebServiceConfiguration {
     public PushServerClient pushServerClient() {
         PushServerClient client = new PushServerClient();
         client.setServiceBaseUrl(powerAuthPushServiceUrl);
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            trustAllCertificates();
+        }
         return client;
+    }
+
+    /**
+     * Activate trust in all SSL certificates including invalid ones for non-production use.
+     */
+    private void trustAllCertificates() {
+        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
+
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+
+            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
+            }
+
+        }};
+
+        try {
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        } catch (Exception e) {
+            Logger.getLogger(this.getClass().getName()).log(
+                    Level.SEVERE,
+                    "Error occurred while setting SSL socket factory",
+                    e
+            );
+        }
     }
 
 }
