@@ -109,6 +109,7 @@ public class StepResolutionService {
      */
     public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
+        checkLegitimityOfUpdate(operation, request);
         UpdateOperationResponse response = new UpdateOperationResponse();
         response.setOperationId(request.getOperationId());
         response.setOperationName(operation.getOperationName());
@@ -307,6 +308,46 @@ public class StepResolutionService {
             }
         }
         return false;
+    }
+
+    /**
+     * Check whether the update of operation is legitimate and meaningful.
+     *
+     * @param operationEntity Operation entity.
+     * @param request         Update request.
+     */
+    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) {
+        if (request == null || request.getOperationId() == null) {
+            throw new IllegalArgumentException("Operation update failed, because request is invalid.");
+        }
+        if (operationEntity == null) {
+            throw new IllegalArgumentException("Operation update failed, because operation does not exist (operationId: " + request.getOperationId() + ").");
+        }
+        if (request.getAuthMethod() == null) {
+            throw new IllegalArgumentException("Operation update failed, because authentication method is missing (operationId: " + request.getOperationId() + ").");
+        }
+        if (request.getAuthMethod() == AuthMethod.INIT) {
+            throw new IllegalArgumentException("Operation update failed, because INIT method cannot be updated (operationId: " + request.getOperationId() + ").");
+        }
+        if (request.getAuthStepResult() == null) {
+            throw new IllegalArgumentException("Operation update failed, because result of authentication step is missing (operationId: " + request.getOperationId() + ").");
+        }
+        List<OperationHistoryEntity> operationHistory = operationEntity.getOperationHistory();
+        if (operationHistory.isEmpty()) {
+            throw new IllegalStateException("Operation update failed, because operation is missing its history (operationId: " + request.getOperationId() + ").");
+        }
+        OperationHistoryEntity initOperationItem = operationHistory.get(0);
+        if (initOperationItem.getRequestAuthMethod() != null || initOperationItem.getRequestAuthStepResult() != null) {
+            throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
+        }
+        for (OperationHistoryEntity historyItem : operationHistory) {
+            if (historyItem.getResponseResult() == AuthResult.DONE) {
+                throw new IllegalStateException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
+            }
+            if (historyItem.getResponseResult() == AuthResult.FAILED) {
+                throw new IllegalStateException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
+            }
+        }
     }
 
 }
