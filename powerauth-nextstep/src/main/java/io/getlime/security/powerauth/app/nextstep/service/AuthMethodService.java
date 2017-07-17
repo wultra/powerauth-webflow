@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,15 +33,29 @@ import java.util.List;
  * @author Roman Strobl
  */
 @Service
-public class UserPrefsService {
+public class AuthMethodService {
 
     private AuthMethodRepository authMethodRepository;
     private UserPrefsRepository userPrefsRepository;
 
     @Autowired
-    public UserPrefsService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository) {
+    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository) {
         this.authMethodRepository = authMethodRepository;
         this.userPrefsRepository = userPrefsRepository;
+    }
+
+    /**
+     * Lists all authentication methods supported by the Next Step server.
+     *
+     * @return List of all authentication methods.s
+     */
+    public List<AuthMethodDetail> listAuthMethods() {
+        List<AuthMethodDetail> allMethods = new ArrayList<>();
+        List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
+        for (AuthMethodEntity authMethodEntity : authMethodList) {
+            allMethods.add(getAuthMethodDetail(authMethodEntity));
+        }
+        return allMethods;
     }
 
     /**
@@ -50,8 +65,8 @@ public class UserPrefsService {
      * @param userId User ID
      * @return List of authentication methods enabled for given user.
      */
-    public List<AuthMethod> listAuthMethodsEnabledForUser(String userId) {
-        List<AuthMethod> enabledMethods = new ArrayList<>();
+    public List<AuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
+        List<AuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);
         for (AuthMethodEntity authMethodEntity : authMethodList) {
@@ -61,18 +76,18 @@ public class UserPrefsService {
                     // get status of methods with user prefs
                     if (userPrefs.getAuthMethodEnabled(authMethodEntity.getUserPrefsColumn())) {
                         // add method in case it is enabled in user prefs
-                        enabledMethods.add(authMethodEntity.getAuthMethod());
+                        enabledMethods.add(getAuthMethodDetail(authMethodEntity));
                     }
                 } else {
                     // user prefs are not set - resolve methods with user prefs by their default value
                     if (authMethodEntity.getUserPrefsDefault()) {
                         // add method in case it is enabled by default
-                        enabledMethods.add(authMethodEntity.getAuthMethod());
+                        enabledMethods.add(getAuthMethodDetail(authMethodEntity));
                     }
                 }
             } else {
                 // add all methods without user prefs
-                enabledMethods.add(authMethodEntity.getAuthMethod());
+                enabledMethods.add(getAuthMethodDetail(authMethodEntity));
             }
         }
         return enabledMethods;
@@ -131,5 +146,22 @@ public class UserPrefsService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
+    }
+
+    /**
+     * Converts AuthMethodEntity into AuthMethodDetail which contains less fields available for the UI.
+     *
+     * @param authMethodEntity entity representing the authentication method.
+     * @return Authentication method detail.
+     */
+    private AuthMethodDetail getAuthMethodDetail(AuthMethodEntity authMethodEntity) {
+        if (authMethodEntity == null) {
+            return null;
+        }
+        AuthMethodDetail authMethodDetail = new AuthMethodDetail();
+        authMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
+        authMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
+        authMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
+        return authMethodDetail;
     }
 }

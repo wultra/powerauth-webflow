@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class GetAuthMethodsResponse {
 
-    private List<AuthMethod> authMethods;
+    private List<AuthMethodDetail> authMethods;
 
     /**
      * Default constructor.
@@ -36,11 +36,11 @@ public class GetAuthMethodsResponse {
         authMethods = new ArrayList<>();
     }
 
-    public List<AuthMethod> getAuthMethods() {
+    public List<AuthMethodDetail> getAuthMethods() {
         return authMethods;
     }
 
-    public void setAuthMethods(List<AuthMethod> authMethods) {
+    public void setAuthMethods(List<AuthMethodDetail> authMethods) {
         this.authMethods = authMethods;
     }
 }

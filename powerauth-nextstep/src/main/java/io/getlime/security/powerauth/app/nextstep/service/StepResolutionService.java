@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMe
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -53,18 +54,18 @@ public class StepResolutionService {
     private IdGeneratorService idGeneratorService;
     private OperationPersistenceService operationPersistenceService;
     private NextStepServerConfiguration nextStepServerConfiguration;
-    private UserPrefsService userPrefsService;
+    private AuthMethodService authMethodService;
     private AuthMethodRepository authMethodRepository;
     private Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
 
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 UserPrefsService userPrefsService, AuthMethodRepository authMethodRepository) {
+                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository) {
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
-        this.userPrefsService = userPrefsService;
+        this.authMethodService = authMethodService;
         this.authMethodRepository = authMethodRepository;
         stepDefinitionsPerOperation = new HashMap<>();
         List<String> operationNames = stepDefinitionRepository.findDistinctOperationNames();
@@ -192,9 +193,11 @@ public class StepResolutionService {
      */
     private List<StepDefinitionEntity> filterSteps(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
-        List<AuthMethod> authMethodsAvailableForUser = null;
+        List<AuthMethod> authMethodsAvailableForUser = new ArrayList<>();
         if (userId != null) {
-            authMethodsAvailableForUser = userPrefsService.listAuthMethodsEnabledForUser(userId);
+            for (AuthMethodDetail authMethodDetail : authMethodService.listAuthMethodsEnabledForUser(userId)) {
+                authMethodsAvailableForUser.add(authMethodDetail.getAuthMethod());
+            }
         }
         List<StepDefinitionEntity> filteredStepDefinitions = new ArrayList<>();
         if (stepDefinitions == null) {
