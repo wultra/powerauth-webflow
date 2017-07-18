@@ -24,7 +24,7 @@ import javax.annotation.Resource;
 import java.util.Locale;
 
 /**
- * Service which converts resource bundle messages for given locale to JSON and provides access to the ResourceBundle.
+ * Service which converts resource bundle messages for given locale to JSON and provides access to the MessageSource.
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
@@ -35,10 +35,19 @@ public class I18NService {
     @Resource
     private ReloadableResourceBundleMessageSourceWithListing messageSource;
 
+    /**
+     * Default constructor.
+     */
     public I18NService() {
         this.objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Generates JSON representation of all messages for given locale.
+     *
+     * @param locale Requested locale.
+     * @return JSON representation of messages.
+     */
     public String generateMessages(Locale locale) {
         try {
             return objectMapper.writeValueAsString(messageSource.getAllProperties(locale));
@@ -47,7 +56,12 @@ public class I18NService {
         }
     }
 
-    public AbstractMessageSource getResourceBundle() {
+    /**
+     * Get the message source for all locales.
+     *
+     * @return Message source.
+     */
+    public AbstractMessageSource getMessageSource() {
         return messageSource;
     }
 
