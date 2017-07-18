@@ -15,9 +15,9 @@
  */
 package io.getlime.security.powerauth.app.webauth.controller;
 
-import io.getlime.security.powerauth.app.webauth.i18n.I18nService;
-import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
+import io.getlime.security.powerauth.app.webauth.i18n.I18NService;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -40,14 +40,14 @@ public class HomeController {
 
     private WebAuthServerConfiguration webAuthConfig;
     private AuthenticationManagementService authenticationManagementService;
-    private I18nService i18nService;
+    private I18NService i18nService;
 
     /**
      * Initialization of the HomeController with application WebAuthServicesConfiguration.
      * @param webAuthConfig WebAuthServicesConfiguration of the application
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebAuthServerConfiguration webAuthConfig, I18nService i18nService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebAuthServerConfiguration webAuthConfig, I18NService i18nService) {
         this.webAuthConfig = webAuthConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
