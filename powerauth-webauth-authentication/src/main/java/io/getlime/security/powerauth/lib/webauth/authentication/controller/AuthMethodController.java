@@ -142,7 +142,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected R initiateOperationWithName(String operationName, String operationData, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
-            Response<CreateOperationResponse> response = nextStepService.createOperation(operationName, operationData, params);
+            Response<CreateOperationResponse> response = nextStepService.createOperation(operationName, null, operationData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
