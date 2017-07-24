@@ -61,10 +61,13 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             try {
                 // User was not authenticated by credential store - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
-                UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), null, null);
-                if (response.getResult() == AuthResult.FAILED) {
-                    // FAILED result instead of CONTINUE means the authentication method is failed
-                    throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
+                if ("login.authenticationFailed".equals(e.getError().getMessage())) {
+                    UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), null, null);
+                    if (response.getResult() == AuthResult.FAILED) {
+                        // FAILED result instead of CONTINUE means the authentication method is failed
+                        throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                    }
                 }
             } catch (NextStepServiceException e2) {
                 throw new AuthStepException(e2.getError().getMessage(), e2);

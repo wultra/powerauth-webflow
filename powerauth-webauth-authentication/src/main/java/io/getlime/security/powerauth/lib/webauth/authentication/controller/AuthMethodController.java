@@ -199,17 +199,17 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             } else {
                 // user was authenticated - complete authorization
                 String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
+                // fix of issue #44 - The last authMethod/authResult is shown twice in operation history
+                // first check whether response can be derived from operation detail - the auth method already called authorize()
+                final R authResponseFromOperationDetail = deriveAuthorizationResponseFromOperationDetail(operationId, userId, provider);
+                if (authResponseFromOperationDetail != null) {
+                    // authorization was successfully derived, return response immediately to avoid a duplicate update call
+                    return authResponseFromOperationDetail;
+                }
+                // response could not be derived - call authorize() method to update current operation
                 responseObject = authorize(operationId, userId, null);
             }
             // TODO: Allow passing custom parameters
-            String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
-            // fix of issue #44 - The last authMethod/authResult is shown twice in operation history
-            // first check whether response can be derived from operation detail - the auth method already called authorize()
-            final R authResponseFromOperationDetail = deriveAuthorizationResponseFromOperationDetail(operationId, userId, provider);
-            if (authResponseFromOperationDetail!=null) {
-                return authResponseFromOperationDetail;
-            }
-            // response could not be derived - call authorize() method to update current operation
             switch (responseObject.getResult()) {
                 case DONE: {
                     authenticationManagementService.authenticateCurrentSession();

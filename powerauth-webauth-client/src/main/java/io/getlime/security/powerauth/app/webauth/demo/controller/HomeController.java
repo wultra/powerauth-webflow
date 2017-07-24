@@ -15,13 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webauth.demo.controller;
 
-import java.math.BigDecimal;
-import java.security.Principal;
-
-import javax.inject.Inject;
-import javax.inject.Provider;
-import javax.servlet.http.HttpSession;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -40,6 +33,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.servlet.http.HttpSession;
+import java.math.BigDecimal;
+import java.security.Principal;
 
 /**
  * Default demo controller class.

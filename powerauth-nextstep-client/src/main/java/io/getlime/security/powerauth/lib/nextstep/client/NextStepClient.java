@@ -92,12 +92,13 @@ public class NextStepClient {
      * Calls the operation endpoint via POST method to create a new operation.
      *
      * @param operationName operation name
+     * @param operationId   operation ID (optional - if null, unique ID is automatically generated)
      * @param operationData operation data
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, operationData, null, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, operationId, operationData, null, params);
     }
 
     /**
@@ -105,15 +106,30 @@ public class NextStepClient {
      *
      * @param operationName operation name
      * @param operationData operation data
+     * @param params        list of generic parameters
+     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     */
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, null, params);
+    }
+
+
+    /**
+     * Calls the operation endpoint via POST method to create a new operation.
+     *
+     * @param operationName operation name
+     * @param operationId   operation ID (optional - if null, unique ID is automatically generated)
+     * @param operationData operation data
      * @param displayDetails operation display details, such as title, message and displayable attributes
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
             request.setOperationName(operationName);
+            request.setOperationId(operationId);
             request.setOperationData(operationData);
             request.setDisplayDetails(displayDetails);
             if (params != null) {
@@ -128,6 +144,19 @@ public class NextStepClient {
             // Next Step service is down
             throw handleResourceAccessError(ex);
         }
+    }
+
+    /**
+     * Calls the operation endpoint via POST method to create a new operation.
+     *
+     * @param operationName operation name
+     * @param operationData operation data
+     * @param displayDetails operation display details, such as title, message and displayable attributes
+     * @param params        list of generic parameters
+     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     */
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, displayDetails, params);
     }
 
     /**

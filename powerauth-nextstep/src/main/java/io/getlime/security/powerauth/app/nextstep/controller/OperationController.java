@@ -19,21 +19,17 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
-import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.app.nextstep.service.UserPrefsService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +46,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Controller class related to PowerAuth activation management.
+ * Controller class related to Next Step operations.
  *
  * @author Petr Dvorak
  */
@@ -59,19 +55,12 @@ public class OperationController {
 
     private OperationPersistenceService operationPersistenceService;
     private StepResolutionService stepResolutionService;
-    private NextStepServerConfiguration nextStepServerConfiguration;
-    private AuthMethodRepository authMethodRepository;
-    private UserPrefsService userPrefsService;
 
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService,
-                               StepResolutionService stepResolutionService, NextStepServerConfiguration nextStepServerConfiguration,
-                               AuthMethodRepository authMethodRepository, UserPrefsService userPrefsService) {
+                               StepResolutionService stepResolutionService) {
         this.operationPersistenceService = operationPersistenceService;
         this.stepResolutionService = stepResolutionService;
-        this.nextStepServerConfiguration = nextStepServerConfiguration;
-        this.authMethodRepository = authMethodRepository;
-        this.userPrefsService = userPrefsService;
     }
 
     /**
@@ -88,7 +77,7 @@ public class OperationController {
         // persist new operation
         operationPersistenceService.createOperation(request.getRequestObject(), response);
 
-        return new ObjectResponse<>(Response.Status.OK, response);
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -105,7 +94,7 @@ public class OperationController {
         // persist operation update
         operationPersistenceService.updateOperation(request.getRequestObject(), response);
 
-        return new ObjectResponse<>(Response.Status.OK, response);
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -132,16 +121,7 @@ public class OperationController {
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
         }
-        if (operation.getOperationDisplayDetails() != null) {
-            //TODO: This needs to be written better, see issue #39.
-            OperationDisplayDetails details = null;
-            try {
-                details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
-            } catch (IOException ex) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
-            }
-            response.setDisplayDetails(details);
-        }
+        assignDisplayDetails(response, operation);
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
@@ -155,7 +135,7 @@ public class OperationController {
 
         response.setTimestampCreated(operation.getTimestampCreated());
         response.setTimestampExpires(operation.getTimestampExpires());
-        return new ObjectResponse<>(Response.Status.OK, response);
+        return new ObjectResponse<>(response);
     }
 
 
@@ -186,114 +166,31 @@ public class OperationController {
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());
             }
-            if (operation.getOperationDisplayDetails() != null) {
-                //TODO: This needs to be written better, see issue #39.
-                OperationDisplayDetails details = null;
-                try {
-                    details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
-                } catch (IOException ex) {
-                    Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
-                }
-                response.setDisplayDetails(details);
-            }
+            assignDisplayDetails(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
         }
-        return new ObjectResponse<>(Response.Status.OK, responseList);
+        return new ObjectResponse<>(responseList);
     }
 
     /**
-     * Get all authentication methods supported by Next Step server.
-     *
-     * @param request Get auth methods request. Use null userId in request.
-     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * In case operation entity has serialized display details, attempt to deserialize the
+     * object and assign it to the response with operation detail.
+     * @param response Reponse to be enriched by operation detail.
+     * @param operation Database entity representing operation.
      */
-    @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
-        GetAuthMethodsRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
-        if (userId != null) {
-            throw new IllegalArgumentException("Parameter userId is not null in request object, however null value was expected.");
+    private void assignDisplayDetails(GetOperationDetailResponse response, OperationEntity operation) {
+        if (operation.getOperationDisplayDetails() != null) {
+            //TODO: This needs to be written better, see issue #39.
+            OperationDisplayDetails details = null;
+            try {
+                details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
+            } catch (IOException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
+            }
+            response.setDisplayDetails(details);
         }
-        List<AuthMethodEntity> authMethods = authMethodRepository.findAllAuthMethods();
-        List<AuthMethod> responseList = new ArrayList<>();
-        if (authMethods == null || authMethods.isEmpty()) {
-            throw new IllegalStateException("No authentication method is configured in Next Step server.");
-        }
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        for (AuthMethodEntity authMethod : authMethods) {
-            responseList.add(authMethod.getAuthMethod());
-        }
-        response.setAuthMethods(responseList);
-        return new ObjectResponse<>(Response.Status.OK, response);
-    }
-
-    /**
-     * Get all enabled authentication methods for given user.
-     *
-     * @param request Get auth methods request. Use non-null userId in request.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
-     */
-    @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
-        GetAuthMethodsRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
-        if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object.");
-        }
-        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        response.setAuthMethods(authMethods);
-        return new ObjectResponse<>(Response.Status.OK, response);
-    }
-
-    /**
-     * Enable an authentication method for given user.
-     *
-     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
-     */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
-        if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object.");
-        }
-        AuthMethod authMethod = requestObject.getAuthMethod();
-        if (authMethod == null) {
-            throw new IllegalArgumentException("Parameter authMethod is null in request object.");
-        }
-        userPrefsService.updateAuthMethodForUser(userId, authMethod, true);
-        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        response.setAuthMethods(authMethods);
-        return new ObjectResponse<>(Response.Status.OK, response);
-    }
-
-    /**
-     * Disable an authentication method for given user.
-     *
-     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
-     */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
-        if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object.");
-        }
-        AuthMethod authMethod = requestObject.getAuthMethod();
-        if (authMethod == null) {
-            throw new IllegalArgumentException("Parameter authMethod is null in request object.");
-        }
-        userPrefsService.updateAuthMethodForUser(userId, authMethod, false);
-        List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        response.setAuthMethods(authMethods);
-        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
 }

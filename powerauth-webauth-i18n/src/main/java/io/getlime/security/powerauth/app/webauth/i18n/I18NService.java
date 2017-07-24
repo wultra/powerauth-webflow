@@ -17,27 +17,37 @@ package io.getlime.security.powerauth.app.webauth.i18n;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Locale;
 
 /**
- * Service which converts resource bundle messages for given locale to JSON.
- * @author Roman Strobl
+ * Service which converts resource bundle messages for given locale to JSON and provides access to the MessageSource.
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
-public class I18nService {
+public class I18NService {
 
     private ObjectMapper objectMapper;
 
     @Resource
     private ReloadableResourceBundleMessageSourceWithListing messageSource;
 
-    public I18nService() {
+    /**
+     * Default constructor.
+     */
+    public I18NService() {
         this.objectMapper = new ObjectMapper();
     }
 
+    /**
+     * Generates JSON representation of all messages for given locale.
+     *
+     * @param locale Requested locale.
+     * @return JSON representation of messages.
+     */
     public String generateMessages(Locale locale) {
         try {
             return objectMapper.writeValueAsString(messageSource.getAllProperties(locale));
@@ -45,4 +55,14 @@ public class I18nService {
             return null;
         }
     }
+
+    /**
+     * Get the message source for all locales.
+     *
+     * @return Message source.
+     */
+    public AbstractMessageSource getMessageSource() {
+        return messageSource;
+    }
+
 }

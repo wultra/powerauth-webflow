@@ -2,16 +2,18 @@ INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_gr
 VALUES ('democlient', 'changeme', 'profile', 'authorization_code', '{}', 'true');
 
 # authentication methods
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails)
-VALUES ('USER_ID_ASSIGN', 1, FALSE, NULL, NULL, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails)
-VALUES ('USERNAME_PASSWORD_AUTH', 2, TRUE, 1, TRUE, TRUE, 5);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails)
-VALUES ('SHOW_OPERATION_DETAIL', 3, FALSE, NULL, NULL, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails)
-VALUES ('POWERAUTH_TOKEN', 4, TRUE, 2, FALSE, TRUE, 1);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails)
-VALUES ('SMS_KEY', 5, FALSE, NULL, NULL, TRUE, 5);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('INIT', 1, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('USER_ID_ASSIGN', 2, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('USERNAME_PASSWORD_AUTH', 3, TRUE, 1, TRUE, TRUE, 5, TRUE, 'method.username_password');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('SHOW_OPERATION_DETAIL', 4, FALSE, NULL, NULL, FALSE, NULL, TRUE, 'method.show_operation_detail');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('POWERAUTH_TOKEN', 4, TRUE, 5, FALSE, TRUE, 1, TRUE, 'method.powerauth_token');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
+VALUES ('SMS_KEY', 6, FALSE, NULL, NULL, TRUE, 5, TRUE, 'method.sms_key');
 
 # login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
