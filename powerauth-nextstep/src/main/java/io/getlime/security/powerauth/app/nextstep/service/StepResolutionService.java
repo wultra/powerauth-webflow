@@ -82,7 +82,16 @@ public class StepResolutionService {
      */
     public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) {
         CreateOperationResponse response = new CreateOperationResponse();
-        response.setOperationId(idGeneratorService.generateOperationId());
+        if (request.getOperationId() != null && !request.getOperationId().isEmpty()) {
+            // operation ID received from the client, verify that it is available
+            if (operationPersistenceService.getOperation(request.getOperationId()) != null) {
+                throw new IllegalArgumentException("Operation could not be created, operation ID is already used: " + request.getOperationId());
+            }
+            response.setOperationId(request.getOperationId());
+        } else {
+            // set auto-generated operation ID
+            response.setOperationId(idGeneratorService.generateOperationId());
+        }
         response.setOperationName(request.getOperationName());
         // AuthStepResult and AuthMethod are not available when creating the operation, null values are used to ignore them
         List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null, null);

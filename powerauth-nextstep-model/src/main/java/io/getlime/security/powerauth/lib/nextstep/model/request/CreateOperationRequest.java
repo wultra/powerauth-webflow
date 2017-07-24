@@ -29,6 +29,7 @@ import java.util.List;
 public class CreateOperationRequest {
 
     private String operationName;
+    private String operationId;
     private String operationData;
     private List<KeyValueParameter> params;
     private OperationDisplayDetails displayDetails;
@@ -54,6 +55,24 @@ public class CreateOperationRequest {
      */
     public void setOperationName(String operationName) {
         this.operationName = operationName;
+    }
+
+    /**
+     * Get the operation ID.
+     *
+     * @return Operation ID.
+     */
+    public String getOperationId() {
+        return operationId;
+    }
+
+    /**
+     * Set the operation ID.
+     *
+     * @param operationId operation ID, use null value in case operation ID should be generated.
+     */
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     /**
