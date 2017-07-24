@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.lib.nextstep.client;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
+import io.getlime.core.rest.model.base.entity.Error;
 
 /**
  * Exception for failures in Next Step service processing.
@@ -25,7 +25,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
  */
 public class NextStepServiceException extends Throwable {
 
-    private ErrorModel error;
+    private Error error;
 
     /**
      * Constructor with cause.
@@ -40,7 +40,7 @@ public class NextStepServiceException extends Throwable {
      * @param cause Original exception.
      * @param error Object with error information.
      */
-    public NextStepServiceException(Throwable cause, ErrorModel error) {
+    public NextStepServiceException(Throwable cause, Error error) {
         super(cause);
         this.error = error;
     }
@@ -49,7 +49,7 @@ public class NextStepServiceException extends Throwable {
      * Get error detail information.
      * @return Error detail information.
      */
-    public ErrorModel getError() {
+    public Error getError() {
         return error;
     }
 }

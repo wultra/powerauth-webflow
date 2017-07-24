@@ -16,8 +16,9 @@
 
 package io.getlime.security.powerauth.app.nextstep.exception;
 
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
+import io.getlime.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -41,17 +42,10 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody
-    Response<ErrorModel> handleDefaultException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(
-                Level.SEVERE,
-                "Error occurred in Next Step server",
-                t
-        );
-        ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage("error.unknown");
-        return new Response<>(Response.Status.ERROR, error);
+    public @ResponseBody ObjectResponse<Error> handleDefaultException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", t);
+        Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
+        return new ObjectResponse<>(Response.Status.ERROR, error);
     }
 
 }

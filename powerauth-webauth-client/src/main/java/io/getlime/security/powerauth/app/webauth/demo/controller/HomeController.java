@@ -24,10 +24,10 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webauth.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountDisplayAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationKeyValueDisplayAttribute;
@@ -112,10 +112,8 @@ public class HomeController {
         messageAttr.setMessage(paymentForm.getNote());
         details.getParameters().add(messageAttr);
 
-        final Response<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, details, null);
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, details, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
-
-
 
         return "redirect:/";
     }

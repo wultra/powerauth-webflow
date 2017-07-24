@@ -16,11 +16,11 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.form;
 
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -54,7 +54,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         try {
-            final Response<AuthenticationResponse> authenticateResponse = credentialStoreClient.authenticate(request.getUsername(), request.getPassword());
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = credentialStoreClient.authenticate(request.getUsername(), request.getPassword());
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
         } catch (CredentialStoreClientErrorException e) {

@@ -16,10 +16,10 @@
 
 package io.getlime.security.powerauth.lib.webauth.resource.controller;
 
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
 import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.webauth.resource.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,7 +48,7 @@ public class UserProfileController {
     @RequestMapping("me")
     public @ResponseBody User me(Principal principal) {
         try {
-            final Response<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
+            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
             User user = new User();
             user.setId(userDetail.getId());

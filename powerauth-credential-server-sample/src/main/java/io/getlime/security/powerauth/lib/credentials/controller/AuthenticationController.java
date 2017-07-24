@@ -15,14 +15,15 @@
  */
 package io.getlime.security.powerauth.lib.credentials.controller;
 
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.credentials.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.credentials.validation.AuthenticationRequestValidator;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -47,7 +48,7 @@ public class AuthenticationController {
      * @throws MethodArgumentNotValidException In case form parameters are not valid.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody Response<AuthenticationResponse> authenticate(@RequestBody Request<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
+    public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@RequestBody ObjectRequest<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
         AuthenticationRequest authenticationRequest = request.getRequestObject();
 
         // input validation is handled by AuthenticationRequestValidator
@@ -64,7 +65,7 @@ public class AuthenticationController {
         // here will be the real authentication - call to the backend providing authentication
         if ("test".equals(authenticationRequest.getPassword())) {
             AuthenticationResponse responseOK = new AuthenticationResponse(authenticationRequest.getUsername());
-            return new Response<>(Response.Status.OK, responseOK);
+            return new ObjectResponse<>(Response.Status.OK, responseOK);
         } else {
             throw new AuthenticationFailedException("login.authenticationFailed");
         }
@@ -77,7 +78,7 @@ public class AuthenticationController {
      * @return Response with user details.
      */
     @RequestMapping(value = "/userInfo", method = RequestMethod.POST)
-    public @ResponseBody Response<UserDetailResponse> fetchUserDetail(@RequestBody Request<UserDetailRequest> request) {
+    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) {
         UserDetailRequest userDetailRequest = request.getRequestObject();
         String userId = userDetailRequest.getId();
 
@@ -87,7 +88,7 @@ public class AuthenticationController {
         responseObject.setId(userId);
         responseObject.setGivenName("John");
         responseObject.setFamilyName("Doe");
-        return new Response<>(Response.Status.OK, responseObject);
+        return new ObjectResponse<>(Response.Status.OK, responseObject);
     }
 
 

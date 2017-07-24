@@ -16,9 +16,9 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.controller;
 
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -74,7 +74,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     protected GetOperationDetailResponse getOperation(String id) {
         try {
-            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(id);
+            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(id);
             final GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
             return responseObject;
         } catch (NextStepServiceException e) {
@@ -86,7 +86,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
-            final Response<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId, getAuthMethodName());
+            final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId, getAuthMethodName());
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
             return null;
@@ -123,12 +123,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
-        Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, params);
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, params);
         return response.getResponseObject();
     }
 
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
-        Response<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, params);
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, params);
         return response.getResponseObject();
     }
 
@@ -142,7 +142,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected R initiateOperationWithName(String operationName, String operationData, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
-            Response<CreateOperationResponse> response = nextStepService.createOperation(operationName, operationData, params);
+            ObjectResponse<CreateOperationResponse> response = nextStepService.createOperation(operationName, operationData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
@@ -160,7 +160,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected R continueOperationWithId(String operationId, AuthResponseProvider provider) {
         try {
-            final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
             if (operationDetail != null) {
                 GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
                 if (responseObject != null) {
@@ -244,7 +244,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case operation retrieval fails.
      */
     private R deriveAuthorizationResponseFromOperationDetail(String operationId, String userId, AuthResponseProvider provider) throws NextStepServiceException {
-        final Response<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+        final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
         if (operationDetail != null) {
             GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
             // In case the last record in operation history has current authMethod and result is either DONE or CONTINUE,

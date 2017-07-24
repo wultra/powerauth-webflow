@@ -18,14 +18,15 @@ package io.getlime.security.powerauth.lib.credentials.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
+import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
 import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -89,15 +90,15 @@ public class CredentialStoreClient {
      *
      * @param username username for user who is being authenticated
      * @param password password as a string
-     * @return a Response with either AuthenticationResponse or ErrorModel given the result of the operation
+     * @return a Response with either AuthenticationResponse or CredentialStoreError given the result of the operation
      */
-    public Response<AuthenticationResponse> authenticate(String username, String password) throws CredentialStoreClientErrorException {
+    public ObjectResponse<AuthenticationResponse> authenticate(String username, String password) throws CredentialStoreClientErrorException {
         try {
             // Exchange authentication request with credential server.
             AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC);
-            HttpEntity<Request<AuthenticationRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<AuthenticationResponse>>() {});
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {});
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
                 throw httpStatusException(ex);
@@ -115,13 +116,13 @@ public class CredentialStoreClient {
      * @param userId User ID for the user to be obtained.
      * @return A response user with given ID.
      */
-    public Response<UserDetailResponse> fetchUserDetail(String userId) throws CredentialStoreClientErrorException {
+    public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId) throws CredentialStoreClientErrorException {
         try {
             // Exchange user details with credential server.
             UserDetailRequest request = new UserDetailRequest(userId);
-            HttpEntity<Request<UserDetailRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/userInfo", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<UserDetailResponse>>() {});
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/userInfo", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {});
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
                 throw httpStatusException(ex);
@@ -135,26 +136,22 @@ public class CredentialStoreClient {
     }
 
     private CredentialStoreClientErrorException resourceAccessException(ResourceAccessException ex) throws CredentialStoreClientErrorException {
-        ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage(ex.getMessage());
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
     }
 
     private CredentialStoreClientErrorException invalidErrorResponseBodyException(IOException ex) throws CredentialStoreClientErrorException {
         // JSON parsing failed
-        ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage(ex.getMessage());
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
     }
 
     private CredentialStoreClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException, CredentialStoreClientErrorException {
-        TypeReference<Response<ErrorModel>> typeReference = new TypeReference<Response<ErrorModel>>() {};
-        Response<ErrorModel> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-        ErrorModel error = errorResponse.getResponseObject();
+        TypeReference<ObjectResponse<CredentialStoreError>> typeReference = new TypeReference<ObjectResponse<CredentialStoreError>>() {};
+        ObjectResponse<CredentialStoreError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+        CredentialStoreError error = errorResponse.getResponseObject();
         if (error.getCode() == null) { // process malformed errors with undefined error code
-            error.setCode(ErrorModel.Code.ERROR_GENERIC);
+            error.setCode(CredentialStoreError.Code.ERROR_GENERIC);
             error.setMessage(ex.getMessage());
         }
         return new CredentialStoreClientErrorException(ex, error);

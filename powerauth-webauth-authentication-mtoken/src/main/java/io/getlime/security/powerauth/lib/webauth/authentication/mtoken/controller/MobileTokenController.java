@@ -16,13 +16,13 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.mtoken.controller;
 
-import io.getlime.push.client.MobilePlatform;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.push.client.PushServerClient;
-import io.getlime.push.model.StatusResponse;
+import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
 import io.getlime.push.model.entity.PushMessageBody;
-import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
+import io.getlime.push.model.entity.PushSendResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
@@ -30,22 +30,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.configuration.PushServiceConfiguration;
-import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.controller.MessageController;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
-import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
-import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.request.MobileTokenSignRequest;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenInitResponse;
-import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.model.response.MobileTokenSignResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.service.WebSocketMessageService;
-import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
-import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiRequest;
-import io.getlime.security.powerauth.rest.api.model.base.PowerAuthApiResponse;
-import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,8 +81,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody
-    MobileTokenInitResponse initPushMessage() {
+    public @ResponseBody MobileTokenInitResponse initPushMessage() {
         final GetOperationDetailResponse operation = getOperation();
         final String userId = operation.getUserId();
 
@@ -116,16 +106,21 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         message.setMessage(body);
 
-        StatusResponse statusResponse = pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
-        if (statusResponse.getStatus().equals(StatusResponse.OK)) {
-            initResponse.setResult(AuthStepResult.CONFIRMED);
-            return initResponse;
+
+        try {
+            final ObjectResponse<PushSendResult> response = pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
+            if (response.getStatus().equals(Response.Status.OK)) {
+                initResponse.setResult(AuthStepResult.CONFIRMED);
+            } else {
+                initResponse.setResult(AuthStepResult.AUTH_FAILED);
+                initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
+            }
+        } catch (PushServerClientException ex) {
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
         }
-        initResponse.setResult(AuthStepResult.AUTH_FAILED);
-        // TODO - better message for initialization error
-        initResponse.setMessage("authentication.fail");
         return initResponse;
     }
 

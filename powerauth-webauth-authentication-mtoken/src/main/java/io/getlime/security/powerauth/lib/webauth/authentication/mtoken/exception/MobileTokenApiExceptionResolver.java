@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.getlime.security.powerauth.app.webauth.exception;
+package io.getlime.security.powerauth.lib.webauth.authentication.mtoken.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
-import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.exception.PushRegistrationFailedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,24 +27,36 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Controller advice responsible for default exception resolving.
+ * Handler for mobile token related exceptions.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
+
 @ControllerAdvice
-public class DefaultExceptionResolver {
+public class MobileTokenApiExceptionResolver {
 
     /**
-     * Default exception handler, for unexpected errors.
+     * Exception handler for push registration related exception..
      *
      * @return Response with error details.
      */
-    @ExceptionHandler(Throwable.class)
+    @ExceptionHandler(PushRegistrationFailedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Auth server", t);
-        final Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
-        return new ErrorResponse(error);
+    public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(Error.genericError());
+    }
+
+    /**
+     * Exception handler for push registration related exception..
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(InvalidRequestObjectException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(Error.genericError());
     }
 
 }

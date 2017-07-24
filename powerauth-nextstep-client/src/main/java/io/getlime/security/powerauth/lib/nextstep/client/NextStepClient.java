@@ -18,9 +18,10 @@ package io.getlime.security.powerauth.lib.nextstep.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ErrorModel;
+import io.getlime.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -95,7 +96,7 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public Response<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
         return createOperation(operationName, operationData, null, params);
     }
 
@@ -108,7 +109,7 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public Response<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
@@ -118,9 +119,9 @@ public class NextStepClient {
             if (params != null) {
                 request.getParams().addAll(params);
             }
-            HttpEntity<Request<CreateOperationRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<CreateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<CreateOperationResponse>>() {});
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            HttpEntity<ObjectRequest<CreateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<CreateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateOperationResponse>>() {});
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -139,7 +140,7 @@ public class NextStepClient {
      * @param params         list of generic parameters
      * @return a Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public Response<UpdateOperationResponse> updateOperation(String operationId, String userId, AuthMethod authMethod, AuthStepResult authStepResult, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, AuthMethod authMethod, AuthStepResult authStepResult, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             UpdateOperationRequest request = new UpdateOperationRequest();
@@ -150,10 +151,10 @@ public class NextStepClient {
             if (params != null) {
                 request.getParams().addAll(params);
             }
-            HttpEntity<Request<UpdateOperationRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<UpdateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<Response<UpdateOperationResponse>>() {
+            HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -165,16 +166,17 @@ public class NextStepClient {
      * Calls the operation details endpoint via POST method to get operation details.
      *
      * @param id operation id
-     * @return a Response with {@link GetOperationDetailResponse} object for OK status or {@link ErrorModel} for ERROR status
+     * @return a Response with {@link GetOperationDetailResponse} object for OK status or
+     * {@link io.getlime.core.rest.model.base.entity.Error} for ERROR status
      */
-    public Response<GetOperationDetailResponse> getOperationDetail(String id) throws NextStepServiceException {
+    public ObjectResponse<GetOperationDetailResponse> getOperationDetail(String id) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             GetOperationDetailRequest request = new GetOperationDetailRequest();
             request.setOperationId(id);
-            HttpEntity<Request<GetOperationDetailRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<GetOperationDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetOperationDetailResponse>>() {});
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            HttpEntity<ObjectRequest<GetOperationDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationDetailResponse>>() {});
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -183,7 +185,7 @@ public class NextStepClient {
         }
     }
 
-    public Response<List<GetOperationDetailResponse>> getPendingOperations(String userId) throws NextStepServiceException {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId) throws NextStepServiceException {
         return getPendingOperations(userId, null);
     }
 
@@ -192,18 +194,18 @@ public class NextStepClient {
      * @param userId user id
      * @param authMethod authentication method
      * @return a Response with list of {@link GetOperationDetailResponse} for OK status
-     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public Response<List<GetOperationDetailResponse>> getPendingOperations(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             GetPendingOperationsRequest request = new GetPendingOperationsRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
-            HttpEntity<Request<GetPendingOperationsRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<List<GetOperationDetailResponse>>> response = defaultTemplate().exchange(serviceUrl + "/user/operation/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<List<GetOperationDetailResponse>>>() {
+            HttpEntity<ObjectRequest<GetPendingOperationsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<List<GetOperationDetailResponse>>> response = defaultTemplate().exchange(serviceUrl + "/user/operation/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -215,16 +217,16 @@ public class NextStepClient {
      * Get all authentication methods supported by Next Step server.
      *
      * @return List of authentication methods wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public Response<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             GetAuthMethodsRequest request = new GetAuthMethodsRequest();
-            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            HttpEntity<ObjectRequest<GetAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -237,17 +239,17 @@ public class NextStepClient {
      *
      * @param userId User ID
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             GetAuthMethodsRequest request = new GetAuthMethodsRequest();
             request.setUserId(userId);
-            HttpEntity<Request<GetAuthMethodsRequest>> entity = new HttpEntity<>(new Request<>(request));
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            HttpEntity<ObjectRequest<GetAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -261,18 +263,18 @@ public class NextStepClient {
      * @param userId     User ID
      * @param authMethod Authentication method
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public Response<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
-            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
+            HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -286,18 +288,18 @@ public class NextStepClient {
      * @param userId     User ID
      * @param authMethod Authentication method
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link ErrorModel} for ERROR status
+     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public Response<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
-            HttpEntity<Request<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new Request<>(request));
+            HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<Response<GetAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
-            return new Response<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {
@@ -313,9 +315,7 @@ public class NextStepClient {
      * @throws NextStepServiceException exception with ErrorModel
      */
     private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) throws NextStepServiceException {
-        ErrorModel error = new ErrorModel();
-        error.setCode(ErrorModel.Code.ERROR_GENERIC);
-        error.setMessage(ex.getMessage());
+        Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
         return new NextStepServiceException(ex, error);
     }
 
@@ -327,15 +327,13 @@ public class NextStepClient {
      */
     private NextStepServiceException handleHttpError(HttpStatusCodeException ex) throws NextStepServiceException {
         try {
-            TypeReference<Response<ErrorModel>> typeReference = new TypeReference<Response<ErrorModel>>() {};
-            Response<ErrorModel> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-            ErrorModel error = errorResponse.getResponseObject();
+            TypeReference<ObjectResponse<Error>> typeReference = new TypeReference<ObjectResponse<Error>>() {};
+            ObjectResponse<Error> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+            Error error = errorResponse.getResponseObject();
             return new NextStepServiceException(ex, error);
         } catch (IOException ex2) {
             // JSON parsing failed
-            ErrorModel error = new ErrorModel();
-            error.setCode(ErrorModel.Code.ERROR_GENERIC);
-            error.setMessage(ex2.getMessage());
+            Error error = new Error(Error.Code.ERROR_GENERIC, ex2.getMessage());
             return new NextStepServiceException(ex, error);
         }
     }

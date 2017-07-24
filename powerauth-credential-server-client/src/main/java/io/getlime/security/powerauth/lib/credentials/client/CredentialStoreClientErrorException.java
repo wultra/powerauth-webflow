@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.lib.credentials.client;
 
-import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
+import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
 
 /**
  * Exception thrown from the credential store in case of an error.
@@ -25,7 +25,7 @@ import io.getlime.security.powerauth.lib.credentials.model.entity.ErrorModel;
  */
 public class CredentialStoreClientErrorException extends Throwable {
 
-    private ErrorModel error;
+    private CredentialStoreError error;
 
     public CredentialStoreClientErrorException() {
     }
@@ -34,12 +34,12 @@ public class CredentialStoreClientErrorException extends Throwable {
         super(cause);
     }
 
-    public CredentialStoreClientErrorException(Throwable cause, ErrorModel error) {
+    public CredentialStoreClientErrorException(Throwable cause, CredentialStoreError error) {
         super(cause);
         this.error = error;
     }
 
-    public ErrorModel getError() {
+    public CredentialStoreError getError() {
         return error;
     }
 }

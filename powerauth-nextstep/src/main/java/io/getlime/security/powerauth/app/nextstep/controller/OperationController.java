@@ -17,6 +17,9 @@
 package io.getlime.security.powerauth.app.nextstep.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
@@ -25,8 +28,6 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.app.nextstep.service.UserPrefsService;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Request;
-import io.getlime.security.powerauth.lib.nextstep.model.base.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -80,15 +81,14 @@ public class OperationController {
      * @return Create operation response.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<CreateOperationResponse> createOperation(@RequestBody Request<CreateOperationRequest> request) {
+    public @ResponseBody ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) {
         // resolve response based on dynamic step definitions
         CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist new operation
         operationPersistenceService.createOperation(request.getRequestObject(), response);
 
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
     /**
@@ -98,15 +98,14 @@ public class OperationController {
      * @return Update operation response.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
-    public @ResponseBody
-    Response<UpdateOperationResponse> updateOperation(@RequestBody Request<UpdateOperationRequest> request) {
+    public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) {
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist operation update
         operationPersistenceService.updateOperation(request.getRequestObject(), response);
 
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
     /**
@@ -116,8 +115,7 @@ public class OperationController {
      * @return Get operation detail response.
      */
     @RequestMapping(value = "/operation/detail", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<GetOperationDetailResponse> operationDetail(@RequestBody Request<GetOperationDetailRequest> request) {
+    public @ResponseBody ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestBody ObjectRequest<GetOperationDetailRequest> request) {
 
         GetOperationDetailRequest requestObject = request.getRequestObject();
 
@@ -157,7 +155,7 @@ public class OperationController {
 
         response.setTimestampCreated(operation.getTimestampCreated());
         response.setTimestampExpires(operation.getTimestampExpires());
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
 
@@ -168,8 +166,7 @@ public class OperationController {
      * @return List with operation details.
      */
     @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody Request<GetPendingOperationsRequest> request) {
+    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
 
         GetPendingOperationsRequest requestObject = request.getRequestObject();
 
@@ -203,7 +200,7 @@ public class OperationController {
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
         }
-        return new Response<>(Response.Status.OK, responseList);
+        return new ObjectResponse<>(Response.Status.OK, responseList);
     }
 
     /**
@@ -213,8 +210,7 @@ public class OperationController {
      * @return List of authentication methods wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<GetAuthMethodsResponse> getAuthMethods(@RequestBody Request<GetAuthMethodsRequest> request) {
+    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
         GetAuthMethodsRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId != null) {
@@ -230,7 +226,7 @@ public class OperationController {
             responseList.add(authMethod.getAuthMethod());
         }
         response.setAuthMethods(responseList);
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
     /**
@@ -240,8 +236,7 @@ public class OperationController {
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody Request<GetAuthMethodsRequest> request) {
+    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
         GetAuthMethodsRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
@@ -250,7 +245,7 @@ public class OperationController {
         List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.setAuthMethods(authMethods);
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
     /**
@@ -260,8 +255,7 @@ public class OperationController {
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
-    public @ResponseBody
-    Response<GetAuthMethodsResponse> enableAuthMethodForUser(@RequestBody Request<UpdateAuthMethodRequest> request) {
+    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
@@ -275,7 +269,7 @@ public class OperationController {
         List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.setAuthMethods(authMethods);
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
     /**
@@ -285,8 +279,7 @@ public class OperationController {
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
-    public @ResponseBody
-    Response<GetAuthMethodsResponse> disableAuthMethodForUser(@RequestBody Request<UpdateAuthMethodRequest> request) {
+    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
@@ -300,7 +293,7 @@ public class OperationController {
         List<AuthMethod> authMethods = userPrefsService.listAuthMethodsEnabledForUser(userId);
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.setAuthMethods(authMethods);
-        return new Response<>(Response.Status.OK, response);
+        return new ObjectResponse<>(Response.Status.OK, response);
     }
 
 }
