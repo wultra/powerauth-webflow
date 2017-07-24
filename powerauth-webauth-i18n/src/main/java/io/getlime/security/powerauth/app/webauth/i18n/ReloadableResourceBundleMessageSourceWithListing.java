@@ -24,11 +24,11 @@ import java.util.Properties;
  * Custom ResourceBundleMessageSource which is both reloadable and supports listing. Cache is disabled to allow
  * immediate reload of messages.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class ReloadableResourceBundleMessageSourceWithListing extends ReloadableResourceBundleMessageSource {
 
-    public Properties getAllProperties(Locale locale) {
+    Properties getAllProperties(Locale locale) {
         clearCacheIncludingAncestors();
         PropertiesHolder propertiesHolder = getMergedProperties(locale);
         return propertiesHolder.getProperties();
