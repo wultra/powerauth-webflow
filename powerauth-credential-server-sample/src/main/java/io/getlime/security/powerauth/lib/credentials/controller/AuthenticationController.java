@@ -65,7 +65,7 @@ public class AuthenticationController {
         // here will be the real authentication - call to the backend providing authentication
         if ("test".equals(authenticationRequest.getPassword())) {
             AuthenticationResponse responseOK = new AuthenticationResponse(authenticationRequest.getUsername());
-            return new ObjectResponse<>(Response.Status.OK, responseOK);
+            return new ObjectResponse<>(responseOK);
         } else {
             throw new AuthenticationFailedException("login.authenticationFailed");
         }
@@ -88,7 +88,7 @@ public class AuthenticationController {
         responseObject.setId(userId);
         responseObject.setGivenName("John");
         responseObject.setFamilyName("Doe");
-        return new ObjectResponse<>(Response.Status.OK, responseObject);
+        return new ObjectResponse<>(responseObject);
     }
 
 

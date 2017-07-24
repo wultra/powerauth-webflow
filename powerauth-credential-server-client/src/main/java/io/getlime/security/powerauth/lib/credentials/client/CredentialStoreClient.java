@@ -98,7 +98,7 @@ public class CredentialStoreClient {
             AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC);
             HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {});
-            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
                 throw httpStatusException(ex);
@@ -122,7 +122,7 @@ public class CredentialStoreClient {
             UserDetailRequest request = new UserDetailRequest(userId);
             HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/userInfo", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {});
-            return new ObjectResponse<>(Response.Status.OK, response.getBody().getResponseObject());
+            return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
                 throw httpStatusException(ex);

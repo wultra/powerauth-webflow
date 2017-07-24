@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.credentials.exception;
 
+import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
@@ -46,10 +47,10 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ObjectResponse<CredentialStoreError> handleDefaultException(Throwable t) {
+    public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Credential server", t);
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, "Unknown Error");
-        return new ObjectResponse<>(Response.Status.ERROR, error);
+        return new ErrorResponse(error);
     }
 
     /**
@@ -59,10 +60,10 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(AuthenticationFailedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody ObjectResponse<CredentialStoreError> handleAuthenticationError(AuthenticationFailedException ex) {
+    public @ResponseBody ErrorResponse handleAuthenticationError(AuthenticationFailedException ex) {
         // regular authentication failed error
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.AUTHENTICATION_FAILED, ex.getMessage());
-        return new ObjectResponse<>(Response.Status.ERROR, error);
+        return new ErrorResponse(error);
     }
 
     /**
@@ -71,7 +72,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<CredentialStoreError> handleDefaultException(MethodArgumentNotValidException ex) {
+    public @ResponseBody ErrorResponse handleDefaultException(MethodArgumentNotValidException ex) {
         List<String> errorMessages = new ArrayList<>();
         for (ObjectError objError: ex.getBindingResult().getAllErrors()) {
             for (String code: objError.getCodes()) {
@@ -98,7 +99,7 @@ public class DefaultExceptionResolver {
         }
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.INPUT_INVALID, "validation.error");
         error.setValidationErrors(errorMessages);
-        return new ObjectResponse<>(Response.Status.ERROR, error);
+        return new ErrorResponse(error);
     }
 
 }
