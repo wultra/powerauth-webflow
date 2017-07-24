@@ -57,6 +57,12 @@ public class AuthMethodEntity implements Serializable {
     @Column(name = "max_auth_fails")
     private Integer maxAuthorizationFailures;
 
+    @Column(name = "has_user_interface")
+    private Boolean hasUserInterface;
+
+    @Column(name = "display_name_key")
+    private String displayNameKey;
+
     public AuthMethod getAuthMethod() {
         return authMethod;
     }
@@ -111,6 +117,22 @@ public class AuthMethodEntity implements Serializable {
 
     public void setMaxAuthorizationFailures(Integer maxAuthorizationFailures) {
         this.maxAuthorizationFailures = maxAuthorizationFailures;
+    }
+
+    public Boolean getHasUserInterface() {
+        return hasUserInterface;
+    }
+
+    public void setHasUserInterface(Boolean hasUserInterface) {
+        this.hasUserInterface = hasUserInterface;
+    }
+
+    public String getDisplayNameKey() {
+        return displayNameKey;
+    }
+
+    public void setDisplayNameKey(String displayNameKey) {
+        this.displayNameKey = displayNameKey;
     }
 
     @Override

@@ -60,7 +60,9 @@ CREATE TABLE ns_auth_method (
   user_prefs_column  INTEGER,
   user_prefs_default BOOLEAN,
   check_auth_fails   BOOLEAN,
-  max_auth_fails     INTEGER
+  max_auth_fails     INTEGER,
+  has_user_interface BOOLEAN,
+  display_name_key   VARCHAR(32)
 );
 
 CREATE TABLE ns_user_prefs (
