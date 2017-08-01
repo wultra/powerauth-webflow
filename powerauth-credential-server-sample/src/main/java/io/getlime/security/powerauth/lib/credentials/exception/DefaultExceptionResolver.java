@@ -17,8 +17,6 @@
 package io.getlime.security.powerauth.lib.credentials.exception;
 
 import io.getlime.core.rest.model.base.response.ErrorResponse;
-import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.ObjectError;
@@ -74,7 +72,8 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleDefaultException(MethodArgumentNotValidException ex) {
         List<String> errorMessages = new ArrayList<>();
-        for (ObjectError objError: ex.getBindingResult().getAllErrors()) {
+        final List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
+        for (ObjectError objError: allErrors) {
             for (String code: objError.getCodes()) {
                 switch (code) {
                     case "username.empty":
@@ -97,7 +96,47 @@ public class DefaultExceptionResolver {
                 }
             }
         }
-        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.INPUT_INVALID, "validation.error");
+
+        String message;
+        if (errorMessages != null) {
+            if (errorMessages.contains("login.username.empty")) {
+                if (errorMessages.contains("login.password.empty")) {
+                    message = "login.username.empty login.password.empty";
+                } else {
+                    if (errorMessages.contains("login.password.long")) {
+                        message = "login.username.empty login.password.long";
+                    } else {
+                        message = "login.username.empty";
+                    }
+                }
+            } else {
+                if (errorMessages.contains("login.password.empty")) {
+                    if (errorMessages.contains("login.username.long")) {
+                        message = "login.password.empty login.username.long";
+                    } else {
+                        message = "login.password.empty";
+                    }
+                } else {
+                    if (errorMessages.contains("login.username.long")) {
+                        if (errorMessages.contains("login.password.long")) {
+                            message = "login.username.long login.password.long";
+                        } else {
+                            message = "login.username.long";
+                        }
+                    } else {
+                        if (errorMessages.contains("login.password.long")) {
+                            message = "login.password.long";
+                        } else {
+                            message = "login.authenticationFailed";
+                        }
+                    }
+                }
+            }
+        } else {
+            message = "login.authenticationFailed";
+        }
+
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.INPUT_INVALID, message);
         error.setValidationErrors(errorMessages);
         return new ErrorResponse(error);
     }

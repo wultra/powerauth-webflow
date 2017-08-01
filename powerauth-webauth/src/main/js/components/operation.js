@@ -96,7 +96,7 @@ export default class OperationDetail extends React.Component {
                             </div>
                             <div className="row buttons">
                                 <div className="col-sm-6">
-                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default">
+                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default" block>
                                         <FormattedMessage id="operation.cancel"/>
                                     </a>
                                 </div>

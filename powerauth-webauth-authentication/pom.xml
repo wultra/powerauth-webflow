@@ -42,6 +42,11 @@
             <artifactId>powerauth-nextstep-client</artifactId>
             <version>0.15.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-webauth-i18n</artifactId>
+            <version>0.15.0</version>
+        </dependency>
 
         <!-- TEST -->
         <dependency>

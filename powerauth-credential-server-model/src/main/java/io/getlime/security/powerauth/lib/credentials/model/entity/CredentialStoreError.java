@@ -37,6 +37,13 @@ public class CredentialStoreError extends Error {
     }
 
     /**
+     * Default constructor.
+     */
+    public CredentialStoreError() {
+        super();
+    }
+
+    /**
      * Constructor accepting code and message.
      *
      * @param code    Error code.

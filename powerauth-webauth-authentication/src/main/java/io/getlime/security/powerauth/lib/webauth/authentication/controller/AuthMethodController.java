@@ -199,37 +199,36 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             } else {
                 // user was authenticated - complete authorization
                 String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
-                // fix of issue #44 - The last authMethod/authResult is shown twice in operation history
-                // first check whether response can be derived from operation detail - the auth method already called authorize()
-                final R authResponseFromOperationDetail = deriveAuthorizationResponseFromOperationDetail(operationId, userId, provider);
-                if (authResponseFromOperationDetail != null) {
-                    // authorization was successfully derived, return response immediately to avoid a duplicate update call
-                    return authResponseFromOperationDetail;
-                }
+
                 // response could not be derived - call authorize() method to update current operation
                 responseObject = authorize(operationId, userId, null);
             }
             // TODO: Allow passing custom parameters
             switch (responseObject.getResult()) {
                 case DONE: {
-                    authenticationManagementService.authenticateCurrentSession();
                     return provider.doneAuthentication(userId);
                 }
                 case FAILED: {
-                    authenticationManagementService.clearContext();
                     return provider.failedAuthentication(userId, responseObject.getResultDescription());
                 }
                 case CONTINUE: {
                     return provider.continueAuthentication(responseObject.getOperationId(), userId, responseObject.getSteps());
                 }
                 default: {
-                    authenticationManagementService.clearContext();
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
         } catch (NextStepServiceException e) {
             throw new AuthStepException(e.getError().getMessage(), e);
         }
+    }
+
+    protected void clearCurrentBrowserSession() {
+        authenticationManagementService.clearContext();
+    }
+
+    protected void authenticateCurrentBrowserSession() {
+        authenticationManagementService.authenticateCurrentSession();
     }
 
     /**
@@ -249,12 +248,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
             // In case the last record in operation history has current authMethod and result is either DONE or CONTINUE,
             // calling authorize() would lead to a duplicate NS update call. Return known response from operation detail instead.
-            if (responseObject!=null
+            if (responseObject != null
                     && !responseObject.getHistory().isEmpty()
-                    && responseObject.getHistory().get(responseObject.getHistory().size()-1).getAuthMethod()==getAuthMethodName()) {
+                    && responseObject.getHistory().get(responseObject.getHistory().size() - 1).getAuthMethod() == getAuthMethodName()) {
                 switch (responseObject.getResult()) {
                     case DONE: {
-                        authenticationManagementService.authenticateCurrentSession();
                         return provider.doneAuthentication(userId);
                     }
                     case CONTINUE: {

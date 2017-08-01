@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
 import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;

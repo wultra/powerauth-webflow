@@ -21,7 +21,7 @@ import { connect } from 'react-redux';
 import { authenticate } from '../actions/usernamePasswordAuthActions'
 
 // Components
-import { Button, FormGroup, FormControl } from 'react-bootstrap';
+import { Panel, Button, FormGroup, FormControl } from 'react-bootstrap';
 import Spinner from 'react-spin';
 
 // i18n
@@ -54,23 +54,33 @@ export default class Login extends React.Component {
     render() {
         const formatMessage = this.props.intl.formatMessage;
         return (
-            <div id="login" className="content-wrap">
+            <div id="login">
                 <form onSubmit={this.handleLogin}>
-                    <FormGroup className={ (this.props.context.error ? "message-error" : "message-information" ) }>
-                        <FormattedMessage id={this.props.context.message}/>
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoComplete="new-password" ref="username" type="text" placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus />
-                    </FormGroup>
-                    <FormGroup>
-                        <FormControl autoComplete="new-password" ref="password" type="password" placeholder={formatMessage({id: 'login.password'})} />
-                    </FormGroup>
-                    <FormGroup>
-                        <Button bsSize="lg" type="submit" bsStyle="success" block><FormattedMessage id="login.signIn"/></Button>
-                    </FormGroup>
-                    <FormGroup>
-                        <a href="./authenticate/cancel"><FormattedMessage id="login.cancel"/></a>
-                    </FormGroup>
+                    <Panel>
+                        <FormGroup className={ (this.props.context.error ? "message-error" : "message-information" ) }>
+                            <FormattedMessage id={this.props.context.message}/>
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoComplete="new-password" ref="username" type="text" placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus />
+                        </FormGroup>
+                        <FormGroup>
+                            <FormControl autoComplete="new-password" ref="password" type="password" placeholder={formatMessage({id: 'login.password'})} />
+                        </FormGroup>
+                        <FormGroup>
+                            <div className="row buttons">
+                                <div className="col-sm-6">
+                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default">
+                                        <FormattedMessage id="login.cancel"/>
+                                    </a>
+                                </div>
+                                <div className="col-sm-6">
+                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                        <FormattedMessage id="login.signIn"/>
+                                    </Button>
+                                </div>
+                            </div>
+                        </FormGroup>
+                    </Panel>
                 </form>
                 { this.props.context.loading ? <Spinner/> : undefined }
             </div>

@@ -71,6 +71,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
                 @Override
                 public OperationReviewResponse doneAuthentication(String userId) {
+                    authenticateCurrentBrowserSession();
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -79,6 +80,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
                 @Override
                 public OperationReviewResponse failedAuthentication(String userId, String failedReason) {
+                    clearCurrentBrowserSession();
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);

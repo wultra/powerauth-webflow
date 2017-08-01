@@ -93,6 +93,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
                 @Override
                 public UsernamePasswordAuthenticationResponse doneAuthentication(String userId) {
+                    authenticateCurrentBrowserSession();
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -101,6 +102,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
                 @Override
                 public UsernamePasswordAuthenticationResponse failedAuthentication(String userId, String failedReason) {
+                    clearCurrentBrowserSession();
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);

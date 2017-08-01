@@ -44,7 +44,7 @@ public class MobileTokenApiExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(Error.genericError());
+        return new ErrorResponse(new Error());
     }
 
     /**
@@ -56,7 +56,7 @@ public class MobileTokenApiExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(Error.genericError());
+        return new ErrorResponse(new Error());
     }
 
 }

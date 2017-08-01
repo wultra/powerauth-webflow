@@ -125,65 +125,50 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody
-    MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
-        try {
-            String userId = authenticate(request);
-            final GetOperationDetailResponse operation = getOperation();
-            if (userId == null) {
-                if (operation.isExpired()) {
-                    // handle operation expiration
-                    // remove WebSocket session, it is expired
-                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
-                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.AUTH_FAILED);
-                    response.setMessage("authentication.timeout");
-                    return response;
-                }
-                // WebSocket session can not be removed yet - authentication is in progress
-                final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                response.setResult(AuthStepResult.AUTH_FAILED);
-                response.setMessage("authentication.fail");
-                return response;
-            }
-            return buildAuthorizationResponse(request, new AuthResponseProvider() {
+    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
 
-                @Override
-                public MobileTokenAuthenticationResponse doneAuthentication(String userId) {
-                    // remove WebSocket session, authorization is finished
-                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
-                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("authentication.success");
-                    return response;
-                }
+        final GetOperationDetailResponse operation = getOperation();
 
-                @Override
-                public MobileTokenAuthenticationResponse failedAuthentication(String userId, String failedReason) {
-                    // WebSocket session can not be removed yet - authentication is in progress
-                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.AUTH_FAILED);
-                    response.setMessage(failedReason);
-                    return response;
-                }
-
-                @Override
-                public MobileTokenAuthenticationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
-                    // remove WebSocket session, authorization is finished
-                    webSocketMessageService.removeWebSocketSession(operation.getOperationId());
-                    final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-                    response.setResult(AuthStepResult.CONFIRMED);
-                    response.setMessage("authentication.success");
-                    response.getNext().addAll(steps);
-                    return response;
-                }
-            });
-        } catch (AuthStepException e) {
+        if (operation.isExpired()) {
+            // handle operation expiration
+            // remove WebSocket session, it is expired
+            clearCurrentBrowserSession();
+            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            response.setMessage("authentication.timeout");
             return response;
         }
+
+        if (AuthResult.DONE.equals(operation.getResult())) {
+            authenticateCurrentBrowserSession();
+            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.CONFIRMED);
+            response.getNext().addAll(operation.getSteps());
+            response.setMessage("authentication.success");
+            return response;
+        }
+
+        final List<OperationHistory> history = operation.getHistory();
+        for (OperationHistory h: history) {
+            if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod()) && !AuthResult.FAILED.equals(h.getAuthResult())) {
+                // remove WebSocket session, authorization is finished
+                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
+                final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                response.setResult(AuthStepResult.CONFIRMED);
+                response.getNext().addAll(operation.getSteps());
+                response.setMessage("authentication.success");
+                return response;
+            }
+        }
+
+        // WebSocket session can not be removed yet - authentication is in progress
+        final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+        response.setResult(AuthStepResult.AUTH_FAILED);
+        response.setMessage("authentication.fail");
+        return response;
+
     }
 
 }
