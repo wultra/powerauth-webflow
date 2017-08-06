@@ -142,6 +142,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
+            //TODO: Use cancel authorization method, see #51
             final UpdateOperationResponse updateOperationResponse = failAuthorization(operationId, userId, null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             return new Response();
