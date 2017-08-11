@@ -18,16 +18,11 @@ package io.getlime.security.powerauth.lib.webauth.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.SSLConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Basic configuration class, used to configure clients to Next Step service and Credential Store.
@@ -37,17 +32,13 @@ import java.util.logging.Logger;
 @Configuration
 public class WebAuthServicesConfiguration {
 
+    private SSLConfigurationService sslConfigurationService;
+
     /**
      * Credential server service URL.
      */
     @Value("${powerauth.credentials.service.url}")
     private String credentialServerServiceUrl;
-
-    /**
-     * Whether to accept invalid SSL certificates in Credential Store.
-     */
-    @Value("${powerauth.credentials.service.ssl.acceptInvalidSslCertificate}")
-    private boolean acceptInvalidSslCertificateInCredentialStore;
 
     /**
      * Next step server service URL.
@@ -56,10 +47,15 @@ public class WebAuthServicesConfiguration {
     private String nextstepServiceUrl;
 
     /**
-     * Whether to accept invalid SSL certificates in Next Step.
+     * Whether invalid SSL certificates should be accepted.
      */
-    @Value("${powerauth.nextstep.service.ssl.acceptInvalidSslCertificate}")
-    private boolean acceptInvalidSslCertificateInNextStep;
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean acceptInvalidSslCertificate;
+
+    @Autowired
+    public WebAuthServicesConfiguration(SSLConfigurationService sslConfigurationService) {
+        this.sslConfigurationService = sslConfigurationService;
+    }
 
     /**
      * Default credential store client.
@@ -69,8 +65,8 @@ public class WebAuthServicesConfiguration {
     public CredentialStoreClient defaultCredentialStoreClient() {
         CredentialStoreClient client = new CredentialStoreClient(credentialServerServiceUrl);
         // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificateInCredentialStore) {
-            trustAllCertificates();
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
         }
         return client;
     }
@@ -83,42 +79,10 @@ public class WebAuthServicesConfiguration {
     public NextStepClient defaultNextStepClient() {
         NextStepClient client = new NextStepClient(nextstepServiceUrl);
         // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificateInNextStep) {
-            trustAllCertificates();
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
         }
         return client;
     }
 
-    /**
-     * Activate trust in all SSL certificates including invalid ones for non-production use.
-     */
-    private void trustAllCertificates() {
-        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-
-        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-            }
-
-            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-            }
-
-        }};
-
-        try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
-                    "Error occurred while setting SSL socket factory",
-                    e
-            );
-        }
-    }
 }

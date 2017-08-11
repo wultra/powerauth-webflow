@@ -55,10 +55,10 @@ public class WebAuthServiceConfiguration {
     private String nextstepServiceUrl;
 
     /**
-     * Whether to accept invalid SSL certificates in Next Step.
+     * Whether invalid SSL certificates should be accepted.
      */
-    @Value("${powerauth.nextstep.service.ssl.acceptInvalidSslCertificate}")
-    private boolean acceptInvalidSslCertificateInNextStep;
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean acceptInvalidSslCertificate;
 
     public String getWebAuthServiceUrl() {
         return webAuthServiceUrl;
@@ -88,7 +88,7 @@ public class WebAuthServiceConfiguration {
     public NextStepClient defaultNextStepClient() {
         NextStepClient client = new NextStepClient(nextstepServiceUrl);
         // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificateInNextStep) {
+        if (acceptInvalidSslCertificate) {
             trustAllCertificates();
         }
         return client;
