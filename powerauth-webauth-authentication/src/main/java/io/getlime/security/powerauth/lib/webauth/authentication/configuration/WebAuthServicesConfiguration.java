@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.webauth.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.SSLConfigurationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +31,8 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class WebAuthServicesConfiguration {
+
+    private SSLConfigurationService sslConfigurationService;
 
     /**
      * Credential server service URL.
@@ -43,12 +47,28 @@ public class WebAuthServicesConfiguration {
     private String nextstepServiceUrl;
 
     /**
+     * Whether invalid SSL certificates should be accepted.
+     */
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean acceptInvalidSslCertificate;
+
+    @Autowired
+    public WebAuthServicesConfiguration(SSLConfigurationService sslConfigurationService) {
+        this.sslConfigurationService = sslConfigurationService;
+    }
+
+    /**
      * Default credential store client.
      * @return Credential store client.
      */
     @Bean
     public CredentialStoreClient defaultCredentialStoreClient() {
-        return new CredentialStoreClient(credentialServerServiceUrl);
+        CredentialStoreClient client = new CredentialStoreClient(credentialServerServiceUrl);
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
+        }
+        return client;
     }
 
     /**
@@ -57,7 +77,12 @@ public class WebAuthServicesConfiguration {
      */
     @Bean
     public NextStepClient defaultNextStepClient() {
-        return new NextStepClient(nextstepServiceUrl);
+        NextStepClient client = new NextStepClient(nextstepServiceUrl);
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
+        }
+        return client;
     }
 
 }

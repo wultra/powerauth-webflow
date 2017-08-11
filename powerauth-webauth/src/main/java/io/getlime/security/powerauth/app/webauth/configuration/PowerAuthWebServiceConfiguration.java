@@ -1,8 +1,10 @@
 package io.getlime.security.powerauth.app.webauth.configuration;
 
 import io.getlime.push.client.PushServerClient;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.SSLConfigurationService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.apache.ws.security.WSConstants;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -20,6 +22,8 @@ import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class PowerAuthWebServiceConfiguration {
 
+    private SSLConfigurationService sslConfigurationService;
+
     @Value("${powerauth.service.url}")
     private String powerAuthServiceUrl;
 
@@ -31,6 +35,14 @@ public class PowerAuthWebServiceConfiguration {
 
     @Value("${powerauth.service.security.clientSecret}")
     private String clientSecret;
+
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean acceptInvalidSslCertificate;
+
+    @Autowired
+    public PowerAuthWebServiceConfiguration(SSLConfigurationService sslConfigurationService) {
+        this.sslConfigurationService = sslConfigurationService;
+    }
 
     // Must use DEPRECATED class here, wss4j2 is not yet production ready
     @Bean
@@ -60,6 +72,10 @@ public class PowerAuthWebServiceConfiguration {
             ClientInterceptor interceptor = securityInterceptor();
             client.setInterceptors(new ClientInterceptor[] { interceptor });
         }
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
+        }
         return client;
     }
 
@@ -67,6 +83,10 @@ public class PowerAuthWebServiceConfiguration {
     public PushServerClient pushServerClient() {
         PushServerClient client = new PushServerClient();
         client.setServiceBaseUrl(powerAuthPushServiceUrl);
+        // whether invalid SSL certificates should be accepted
+        if (acceptInvalidSslCertificate) {
+            sslConfigurationService.trustAllCertificates();
+        }
         return client;
     }
 
