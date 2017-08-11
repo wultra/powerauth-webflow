@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, init} from "../actions/tokenActions";
+import {authenticate, cancel, init} from "../actions/tokenActions";
 // Components
 // i18n
 import {FormattedMessage} from "react-intl";
@@ -44,6 +44,7 @@ export default class Token extends React.Component {
         this.isAuthorizationInProgress = this.isAuthorizationInProgress.bind(this);
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
         this.state = {authorizationInProgress: false, authorized: false};
     }
 
@@ -140,6 +141,10 @@ export default class Token extends React.Component {
         }));
     }
 
+    handleCancel(event) {
+        this.props.dispatch(cancel());
+    }
+
     componentWillReceiveProps(props) {
         const webSocketId = props.context.webSocketId;
         if (webSocketId !== undefined) {
@@ -160,6 +165,10 @@ export default class Token extends React.Component {
                 <div className="font-small message-information">
                     <FormattedMessage id="message.token.offline"/><br/>
                     <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
+                    <br/><br/>
+                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                        <FormattedMessage id="operation.cancel"/>
+                    </a>
                 </div>
             </div>
         )

@@ -23,6 +23,15 @@ export function authenticate(callback) {
                     dispatchAction(dispatch, response);
                     break;
                 }
+                case 'CANCELED': {
+                    dispatch({
+                        type: "SHOW_SCREEN_ERROR",
+                        payload: {
+                            message: response.data.message
+                        }
+                    });
+                    break;
+                }
                 case 'AUTH_FAILED': {
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "authentication.timeout") {
@@ -47,6 +56,21 @@ export function authenticate(callback) {
             }
         }).catch((error) => {
             callback(false);
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+export function cancel() {
+    return function (dispatch) {
+        axios.post("./api/auth/token/web/cancel", {}).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_ERROR",
+                payload: {
+                    message: response.data.message
+                }
+            });
+        }).catch((error) => {
             dispatchError(dispatch, error);
         })
     }

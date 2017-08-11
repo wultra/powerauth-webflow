@@ -87,7 +87,8 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Authentication response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
+    public @ResponseBody
+    UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
@@ -127,4 +128,20 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
     }
 
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public @ResponseBody
+    UsernamePasswordAuthenticationResponse cancelAuthentication() {
+        try {
+            cancelAuthorization(getOperation().getOperationId(), null, "UNKNOWN", null);
+            final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
+            response.setResult(AuthStepResult.CANCELED);
+            response.setMessage("operation.canceled");
+            return response;
+        } catch (NextStepServiceException e) {
+            final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage(e.getMessage());
+            return response;
+        }
+    }
 }

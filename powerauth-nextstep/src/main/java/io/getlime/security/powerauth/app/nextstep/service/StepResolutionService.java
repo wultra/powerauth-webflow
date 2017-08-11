@@ -124,12 +124,20 @@ public class StepResolutionService {
         response.setOperationName(operation.getOperationName());
         response.setUserId(request.getUserId());
         response.setTimestampCreated(new Date());
+        if (request.getAuthStepResult() == AuthStepResult.CANCELED) {
+            // User canceled the operation. There is nothing else to do but fail the operation.
+            response.setTimestampExpires(operation.getTimestampExpires());
+            response.setResult(AuthResult.FAILED);
+            // Save authStepResultDescription which contains reason for cancelation.
+            response.setResultDescription(request.getAuthStepResultDescription());
+            return response;
+        }
         if (operation.isExpired()) {
             // Operation fails in case it is expired.
             // Response expiration time matches operation expiration to avoid extending expiration time of the operation.
             response.setTimestampExpires(operation.getTimestampExpires());
             response.setResult(AuthResult.FAILED);
-            response.setResultDescription("authentication.timeout");
+            response.setResultDescription("operation.timeout");
             return response;
         }
         response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());

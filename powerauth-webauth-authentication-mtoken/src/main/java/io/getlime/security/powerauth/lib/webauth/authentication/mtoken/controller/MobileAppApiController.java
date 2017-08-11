@@ -134,16 +134,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
     }
 
-    @RequestMapping(value = "/operation/reject", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/reject", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody Object rejectOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, NextStepServiceException {
+    @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
+    @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    public @ResponseBody
+    Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, NextStepServiceException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
-            //TODO: Use cancel authorization method, see #51
-            final UpdateOperationResponse updateOperationResponse = failAuthorization(operationId, userId, null);
+            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, request.getRequestObject().getReason(), null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             return new Response();
 

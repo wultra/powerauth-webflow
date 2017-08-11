@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webauth.authentication.method.operation;
 
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -97,6 +98,23 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 }
             });
         } catch (AuthStepException e) {
+            final OperationReviewResponse response = new OperationReviewResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage(e.getMessage());
+            return response;
+        }
+    }
+
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public @ResponseBody
+    OperationReviewResponse cancelAuthentication() {
+        try {
+            cancelAuthorization(getOperation().getOperationId(), null, "UNKNOWN", null);
+            final OperationReviewResponse response = new OperationReviewResponse();
+            response.setResult(AuthStepResult.CANCELED);
+            response.setMessage("operation.canceled");
+            return response;
+        } catch (NextStepServiceException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());

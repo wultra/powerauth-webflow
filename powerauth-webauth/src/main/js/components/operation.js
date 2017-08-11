@@ -16,9 +16,9 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, getOperationData} from "../actions/showOperationDataActions";
+import {authenticate, cancel, getOperationData} from "../actions/showOperationDataActions";
 // Components
-import {Panel, Button, FormGroup} from "react-bootstrap";
+import {Button, FormGroup, Panel} from "react-bootstrap";
 import Spinner from 'react-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
@@ -36,6 +36,7 @@ export default class OperationDetail extends React.Component {
     constructor() {
         super();
         this.handleLogin = this.handleLogin.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     componentWillMount() {
@@ -46,6 +47,10 @@ export default class OperationDetail extends React.Component {
         // prevent regular form submission
         event.preventDefault();
         this.props.dispatch(authenticate());
+    }
+
+    handleCancel(event) {
+        this.props.dispatch(cancel());
     }
 
     render() {
@@ -96,7 +101,7 @@ export default class OperationDetail extends React.Component {
                             </div>
                             <div className="row buttons">
                                 <div className="col-sm-6">
-                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default" block>
+                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default" block>
                                         <FormattedMessage id="operation.cancel"/>
                                     </a>
                                 </div>
@@ -122,7 +127,7 @@ export default class OperationDetail extends React.Component {
                                 id="operation.confirm"/></Button>
                         </FormGroup>
                         <FormGroup>
-                            <a href="./authenticate/cancel"><FormattedMessage id="operation.cancel"/></a>
+                            <a href="#" onClick={this.handleCancel}><FormattedMessage id="operation.cancel"/></a>
                         </FormGroup>
                     </form>
                 </div>

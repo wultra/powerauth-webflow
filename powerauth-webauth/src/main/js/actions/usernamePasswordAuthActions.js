@@ -53,3 +53,18 @@ export function authenticate(username, password) {
         })
     }
 }
+
+export function cancel() {
+    return function (dispatch) {
+        axios.post("./api/auth/form/cancel", {}).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_ERROR",
+                payload: {
+                    message: response.data.message
+                }
+            });
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}

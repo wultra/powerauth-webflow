@@ -123,12 +123,33 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
-        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, params);
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params);
         return response.getResponseObject();
     }
 
+    /**
+     * Fail the operation with provided operation ID with user with given user ID.
+     *
+     * @param operationId Operation ID of operation to fail.
+     * @param userId      User ID of user who owns the operation.
+     * @param params      Custom parameters.
+     * @return Response with information about operation update result.
+     * @throws NextStepServiceException In case communication fails.
+     */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
-        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, params);
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params);
+        return response.getResponseObject();
+    }
+
+    /**
+     * @param operationId Operation ID of operation to cancel.
+     * @param userId      User ID of user who owns the operation.
+     * @param params      Custom parameters.
+     * @return Response with information about operation update result.
+     * @throws NextStepServiceException In case communication fails.
+     */
+    protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, String cancelationReason, List<KeyValueParameter> params) throws NextStepServiceException {
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelationReason, params);
         return response.getResponseObject();
     }
 
