@@ -125,12 +125,9 @@ public class StepResolutionService {
         response.setUserId(request.getUserId());
         response.setTimestampCreated(new Date());
         if (request.getAuthStepResult() == AuthStepResult.CANCELED) {
-            // User canceled the operation. There is nothing else to do but fail the operation.
-            response.setTimestampExpires(operation.getTimestampExpires());
-            response.setResult(AuthResult.FAILED);
-            // Save authStepResultDescription which contains reason for cancelation.
-            response.setResultDescription(request.getAuthStepResultDescription());
-            return response;
+            // User canceled the operation. Save authStepResultDescription which contains the reason for cancellation.
+            // The next step is still resolved according to the dynamic rules.
+            response.setResultDescription("canceled." + request.getAuthStepResultDescription().toLowerCase());
         }
         if (operation.isExpired()) {
             // Operation fails in case it is expired.
