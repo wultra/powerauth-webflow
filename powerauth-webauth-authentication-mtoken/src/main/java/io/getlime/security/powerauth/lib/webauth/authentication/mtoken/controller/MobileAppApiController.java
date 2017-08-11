@@ -9,6 +9,7 @@ import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
@@ -143,7 +144,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
-            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, request.getRequestObject().getReason(), null);
+            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.valueOf(request.getRequestObject().getReason()), null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             return new Response();
 

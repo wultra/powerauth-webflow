@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
@@ -132,7 +133,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     public @ResponseBody
     UsernamePasswordAuthenticationResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, "UNKNOWN", null);
+            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
@@ -182,7 +183,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     public @ResponseBody
     MobileTokenAuthenticationResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, "UNKNOWN", null);
+            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

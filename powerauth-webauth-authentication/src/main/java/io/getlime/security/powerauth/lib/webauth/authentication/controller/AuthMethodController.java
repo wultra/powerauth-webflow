@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
@@ -142,14 +143,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * @param operationId Operation ID of operation to cancel.
-     * @param userId      User ID of user who owns the operation.
-     * @param params      Custom parameters.
+     * @param operationId  Operation ID of operation to cancel.
+     * @param userId       User ID of user who owns the operation.
+     * @param params       Custom parameters.
+     * @param cancelReason Reason for cancellation of the operation.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
      */
-    protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, String cancelationReason, List<KeyValueParameter> params) throws NextStepServiceException {
-        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelationReason, params);
+    protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException {
+        ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params);
         return response.getResponseObject();
     }
 

@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceExceptio
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
@@ -109,7 +110,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     public @ResponseBody
     OperationReviewResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, "UNKNOWN", null);
+            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
