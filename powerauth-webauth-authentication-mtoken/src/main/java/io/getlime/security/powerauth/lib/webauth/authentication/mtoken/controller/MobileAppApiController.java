@@ -9,6 +9,7 @@ import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
@@ -134,16 +135,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
     }
 
-    @RequestMapping(value = "/operation/reject", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/reject", signatureType = { PowerAuthSignatureTypes.POSSESSION })
-    public @ResponseBody Object rejectOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, NextStepServiceException {
+    @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
+    @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    public @ResponseBody
+    Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, NextStepServiceException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
             String operationId = request.getRequestObject().getId();
 
-            //TODO: Use cancel authorization method, see #51
-            final UpdateOperationResponse updateOperationResponse = failAuthorization(operationId, userId, null);
+            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.valueOf(request.getRequestObject().getReason()), null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             return new Response();
 

@@ -2,6 +2,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 
 /**
  * @author Petr Dvorak, petr@lime-company.eu
@@ -10,6 +11,7 @@ public class OperationHistory {
 
     private AuthMethod authMethod;
     private AuthResult authResult;
+    private AuthStepResult requestAuthStepResult;
 
     public AuthMethod getAuthMethod() {
         return authMethod;
@@ -25,5 +27,13 @@ public class OperationHistory {
 
     public void setAuthResult(AuthResult authResult) {
         this.authResult = authResult;
+    }
+
+    public AuthStepResult getRequestAuthStepResult() {
+        return requestAuthStepResult;
+    }
+
+    public void setRequestAuthStepResult(AuthStepResult requestAuthStepResult) {
+        this.requestAuthStepResult = requestAuthStepResult;
     }
 }

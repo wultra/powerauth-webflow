@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -169,7 +168,7 @@ public class NextStepClient {
      * @param params         list of generic parameters
      * @return a Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, AuthMethod authMethod, AuthStepResult authStepResult, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             UpdateOperationRequest request = new UpdateOperationRequest();
@@ -177,6 +176,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
             request.setAuthStepResult(authStepResult);
+            request.setAuthStepResultDescription(authStepResultDescription);
             if (params != null) {
                 request.getParams().addAll(params);
             }

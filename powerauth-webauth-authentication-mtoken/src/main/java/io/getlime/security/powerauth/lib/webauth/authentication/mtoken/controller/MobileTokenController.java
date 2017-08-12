@@ -23,12 +23,13 @@ import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
 import io.getlime.push.model.entity.PushMessageBody;
 import io.getlime.push.model.entity.PushSendResult;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
@@ -136,7 +137,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
             webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage("authentication.timeout");
+            response.setMessage("operation.timeout");
             return response;
         }
 
@@ -152,13 +153,21 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h: history) {
-            if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod()) && !AuthResult.FAILED.equals(h.getAuthResult())) {
+            if (AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() && !AuthResult.FAILED.equals(h.getAuthResult())) {
                 // remove WebSocket session, authorization is finished
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.getNext().addAll(operation.getSteps());
                 response.setMessage("authentication.success");
+                return response;
+            }
+            if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod()) && AuthResult.FAILED.equals(h.getAuthResult()) && AuthStepResult.CANCELED.equals(h.getRequestAuthStepResult())) {
+                // remove WebSocket session, operation is canceled
+                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
+                final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                response.setResult(AuthStepResult.CANCELED);
+                response.setMessage("operation.canceled");
                 return response;
             }
         }
@@ -168,7 +177,23 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         response.setResult(AuthStepResult.AUTH_FAILED);
         response.setMessage("authentication.fail");
         return response;
+    }
 
+    @RequestMapping(value = "/cancel", method = RequestMethod.POST)
+    public @ResponseBody
+    MobileTokenAuthenticationResponse cancelAuthentication() {
+        try {
+            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.CANCELED);
+            response.setMessage("operation.canceled");
+            return response;
+        } catch (NextStepServiceException e) {
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage(e.getMessage());
+            return response;
+        }
     }
 
 }

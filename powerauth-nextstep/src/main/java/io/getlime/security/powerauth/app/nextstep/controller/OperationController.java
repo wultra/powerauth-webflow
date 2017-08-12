@@ -126,6 +126,7 @@ public class OperationController {
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
             h.setAuthMethod(history.getRequestAuthMethod());
+            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
             h.setAuthResult(history.getResponseResult());
             response.getHistory().add(h);
         }

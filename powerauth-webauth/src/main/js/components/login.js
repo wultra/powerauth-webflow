@@ -15,17 +15,14 @@
  */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { connect } from 'react-redux';
-
+import {connect} from 'react-redux';
 // Actions
-import { authenticate } from '../actions/usernamePasswordAuthActions'
-
+import {authenticate, cancel} from '../actions/usernamePasswordAuthActions'
 // Components
-import { Panel, Button, FormGroup, FormControl } from 'react-bootstrap';
+import {Button, FormControl, FormGroup, Panel} from 'react-bootstrap';
 import Spinner from 'react-spin';
-
 // i18n
-import { FormattedMessage } from 'react-intl';
+import {FormattedMessage} from 'react-intl';
 
 /**
  * Login component handles the user authentication using username and password.
@@ -40,6 +37,7 @@ export default class Login extends React.Component {
     constructor() {
         super();
         this.handleLogin = this.handleLogin.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
     }
 
     handleLogin(event) {
@@ -48,6 +46,14 @@ export default class Login extends React.Component {
         var username = ReactDOM.findDOMNode(this.refs.username);
         var password = ReactDOM.findDOMNode(this.refs.password);
         this.props.dispatch(authenticate(username.value, password.value));
+        password.value = "";
+    }
+
+    handleCancel(event) {
+        var username = ReactDOM.findDOMNode(this.refs.username);
+        var password = ReactDOM.findDOMNode(this.refs.password);
+        this.props.dispatch(cancel());
+        username.value = "";
         password.value = "";
     }
 
@@ -69,7 +75,7 @@ export default class Login extends React.Component {
                         <FormGroup>
                             <div className="row buttons">
                                 <div className="col-sm-6">
-                                    <a href="./authenticate/cancel" className="btn btn-lg btn-default">
+                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                         <FormattedMessage id="login.cancel"/>
                                     </a>
                                 </div>

@@ -33,6 +33,7 @@ public class UpdateOperationRequest {
     private String userId;
     private AuthMethod authMethod;
     private AuthStepResult authStepResult;
+    private String authStepResultDescription;
     private List<KeyValueParameter> params;
 
     /**
@@ -106,6 +107,23 @@ public class UpdateOperationRequest {
         this.authStepResult = authStepResult;
     }
 
+    /**
+     * Get the description of the previous authentication step result.
+     *
+     * @return Description of authentication step result.
+     */
+    public String getAuthStepResultDescription() {
+        return authStepResultDescription;
+    }
+
+    /**
+     * Set the description of the previous authentication step result.
+     *
+     * @param authStepResultDescription Description of authentication step result.
+     */
+    public void setAuthStepResultDescription(String authStepResultDescription) {
+        this.authStepResultDescription = authStepResultDescription;
+    }
     /**
      * Get the list with optional extra parameters.
      * @return Extra parameters.
