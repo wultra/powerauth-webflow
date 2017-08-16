@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS ba_sms_authorization;
 DROP TABLE IF EXISTS ns_step_definition;
 DROP TABLE IF EXISTS ns_operation_history;
 DROP TABLE IF EXISTS ns_operation;
@@ -75,14 +76,14 @@ CREATE TABLE ns_user_prefs (
 );
 
 CREATE TABLE ns_operation (
-  operation_id                  VARCHAR(256) PRIMARY KEY,
-  operation_name                VARCHAR(32),
-  operation_data                VARCHAR(4096),
-  operation_display_details     TEXT,
-  user_id                       VARCHAR(256),
-  result                        VARCHAR(32),
-  timestamp_created             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  timestamp_expires             TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  operation_id              VARCHAR(256) PRIMARY KEY,
+  operation_name            VARCHAR(32),
+  operation_data            VARCHAR(4096),
+  operation_display_details TEXT,
+  user_id                   VARCHAR(256),
+  result                    VARCHAR(32),
+  timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE ns_operation_history (
@@ -112,4 +113,18 @@ CREATE TABLE ns_step_definition (
   response_result          VARCHAR(32),
   FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
+);
+
+CREATE TABLE ba_sms_authorization (
+  message_id           VARCHAR(256) PRIMARY KEY,
+  user_id              VARCHAR(256),
+  operation_name       VARCHAR(32),
+  operation_data       VARCHAR(4096),
+  authorization_code   VARCHAR(32),
+  message_text         VARCHAR(256),
+  verify_request_count INTEGER,
+  verified             BOOLEAN,
+  timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
