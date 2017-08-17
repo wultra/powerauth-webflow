@@ -142,7 +142,7 @@ public class SMSAuthorizationController {
         if (smsEntity.isExpired()) {
             throw new SMSAuthorizationFailedException("sms_authorization.expired");
         }
-        if (smsEntity.getTimestampVerified().after(smsEntity.getTimestampCreated())) {
+        if (smsEntity.isVerified()) {
             throw new SMSAuthorizationFailedException("sms_authorization.already_verified");
         }
         if (smsEntity.getVerifyRequestCount() > credentialStoreConfiguration.getSmsOtpMaxVerifyTriesPerMessage()) {
