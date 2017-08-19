@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.credentials.model.request;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -37,9 +38,21 @@ public class CreateSMSAuthorizationRequest {
     /**
      * Operation data in JSON format.
      */
-    private ObjectNode operationData;
+    private JsonNode operationData;
+
+    /**
+     * Language used in the SMS OTP messages.
+     */
+    private String lang;
 
     public CreateSMSAuthorizationRequest() {
+    }
+
+    public CreateSMSAuthorizationRequest(String userId, String operationName, JsonNode operationData, String lang) {
+        this.userId = userId;
+        this.operationName = operationName;
+        this.operationData = operationData;
+        this.lang = lang;
     }
 
     public String getUserId() {
@@ -58,11 +71,19 @@ public class CreateSMSAuthorizationRequest {
         this.operationName = operationName;
     }
 
-    public ObjectNode getOperationData() {
+    public JsonNode getOperationData() {
         return operationData;
     }
 
     public void setOperationData(ObjectNode operationData) {
         this.operationData = operationData;
+    }
+
+    public String getLang() {
+        return lang;
+    }
+
+    public void setLang(String lang) {
+        this.lang = lang;
     }
 }

@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.credentials.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
+import io.getlime.security.powerauth.crypto.lib.util.HMACHashUtilities;
 import io.getlime.security.powerauth.lib.credentials.configuration.CredentialStoreConfiguration;
 import io.getlime.security.powerauth.lib.credentials.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.credentials.exception.SMSAuthorizationMessageInvalidException;
@@ -27,6 +29,9 @@ import io.getlime.security.powerauth.lib.credentials.repository.SMSAuthorization
 import io.getlime.security.powerauth.lib.credentials.repository.model.entity.SMSAuthorizationEntity;
 import io.getlime.security.powerauth.lib.credentials.validation.CreateSMSAuthorizationRequestValidator;
 import org.joda.time.DateTime;
+import org.springframework.context.MessageSource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BeanPropertyBindingResult;
@@ -37,9 +42,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.security.SecureRandom;
+import java.math.BigInteger;
 import java.util.Date;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -48,7 +55,11 @@ import java.util.UUID;
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Controller
+@RequestMapping("/api/auth/sms")
 public class SMSAuthorizationController {
+
+    // the authorization code length - number of digits
+    private static final int AUTHORIZATION_CODE_LENGTH = 8;
 
     private SMSAuthorizationRepository smsAuthorizationRepository;
     private CredentialStoreConfiguration credentialStoreConfiguration;
@@ -64,7 +75,7 @@ public class SMSAuthorizationController {
      * @param request Request data.
      * @return Response with message ID.
      */
-    @RequestMapping(value = "/sms/create", method = RequestMethod.POST)
+    @RequestMapping(value = "create", method = RequestMethod.POST)
     public @ResponseBody
     ObjectResponse<CreateSMSAuthorizationResponse> create(@RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request) throws MethodArgumentNotValidException {
         CreateSMSAuthorizationRequest createSMSAuthorizationRequest = request.getRequestObject();
@@ -84,16 +95,15 @@ public class SMSAuthorizationController {
         // messageId is generated as random UUID, it can be overriden to provide a real message identification
         String messageId = UUID.randomUUID().toString();
 
-        // authorization code generation - to be updated based on application requirements
-        String authorizationCode = String.valueOf((new SecureRandom()).nextInt(90000000) + 10000000);
-
         // update names of operationData JSON fields if necessary
         BigDecimal amount = createSMSAuthorizationRequest.getOperationData().get("amount").decimalValue();
         String currency = createSMSAuthorizationRequest.getOperationData().get("currency").textValue();
         String account = createSMSAuthorizationRequest.getOperationData().get("account").textValue();
 
-        // TODO - i18n and usage of text template
-        String messageText = "Authorization code for payment of " + amount + " " + currency + " to account " + account + " is " + authorizationCode + ".";
+        // update localized SMS message text in resources
+        String authorizationCode = generateAuthorizationCode(amount, currency, account);
+        String[] messageArgs = {amount.toPlainString(), currency, account, authorizationCode};
+        String messageText = messageSource().getMessage("sms-otp.text", messageArgs, new Locale(createSMSAuthorizationRequest.getLang()));
 
         SMSAuthorizationEntity smsEntity = new SMSAuthorizationEntity();
         smsEntity.setMessageId(messageId);
@@ -123,7 +133,7 @@ public class SMSAuthorizationController {
      * @param request Request data.
      * @return Authorization response.
      */
-    @RequestMapping(value = "/sms/verify", method = RequestMethod.POST)
+    @RequestMapping(value = "verify", method = RequestMethod.POST)
     public @ResponseBody
     ObjectResponse verify(@RequestBody ObjectRequest<VerifySMSAuthorizationRequest> request) throws SMSAuthorizationMessageInvalidException, SMSAuthorizationFailedException {
         VerifySMSAuthorizationRequest verifyRequest = request.getRequestObject();
@@ -163,5 +173,42 @@ public class SMSAuthorizationController {
         return new ObjectResponse();
     }
 
+    /**
+     * Authorization code generation - to be updated based on application requirements.
+     *
+     * @return Generated authorization code.
+     */
+    private String generateAuthorizationCode(BigDecimal amount, String currency, String account) {
+        try {
+            // use random key for hash
+            byte[] randomKey = new KeyGenerator().generateRandomBytes(16);
+            // include amount, currency and account in the operation data
+            String operationData = amount + "&" + currency + "&" + account;
+            HMACHashUtilities hmac = new HMACHashUtilities();
+            // generate hash of operation data to achieve the dynamic linking property:
+            // "any change to the amount or payee shall result in a change of the authentication code"
+            byte[] otpHash = hmac.hash(randomKey, operationData.getBytes("UTF-8"));
+            // use modulo on generated hash to get the right length of authorization code
+            BigInteger otp = new BigInteger(otpHash).mod(BigInteger.TEN.pow(AUTHORIZATION_CODE_LENGTH));
+            // prepare digit format - add leading zeros in case otp starts with zeros
+            String digitFormat = "%" + String.format("%02d", AUTHORIZATION_CODE_LENGTH) + "d";
+            // apply the digit format
+            return String.format(digitFormat, otp);
+        } catch (UnsupportedEncodingException ex) {
+            // UTF-8 is always available, null is never thrown
+            return null;
+        }
+    }
 
+    /**
+     * Get MessageSource with i18n data for authorizations SMS messages.
+     *
+     * @return MessageSource.
+     */
+    @Bean
+    private MessageSource messageSource() {
+        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
+        messageSource.setBasename("classpath:/static/resources/messages");
+        return messageSource;
+    }
 }
