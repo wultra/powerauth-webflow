@@ -183,7 +183,7 @@ public class SMSAuthorizationController {
             // use random key for hash
             byte[] randomKey = new KeyGenerator().generateRandomBytes(16);
             // include amount, currency and account in the operation data
-            String operationData = amount + "&" + currency + "&" + account;
+            String operationData = amount.toPlainString() + "&" + currency + "&" + account;
             HMACHashUtilities hmac = new HMACHashUtilities();
             // generate hash of operation data to achieve the dynamic linking property:
             // "any change to the amount or payee shall result in a change of the authentication code"
