@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -65,6 +66,21 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Handling of SMS OTP authorization failures.
+     *
+     * @param ex Authorization failure exception, with exception details.
+     * @return Response with error information.
+     */
+    @ExceptionHandler(SMSAuthorizationFailedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody
+    ErrorResponse handleAuthenticationError(SMSAuthorizationFailedException ex) {
+        // regular sms authorization failed error
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.SMS_AUTHORIZATION_FAILED, ex.getMessage());
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Handling of validation errors.
      * @return Response with error information.
      */
@@ -74,66 +90,43 @@ public class DefaultExceptionResolver {
         List<String> errorMessages = new ArrayList<>();
         final List<ObjectError> allErrors = ex.getBindingResult().getAllErrors();
         for (ObjectError objError: allErrors) {
-            for (String code: objError.getCodes()) {
-                switch (code) {
-                    case "username.empty":
-                        errorMessages.add("login.username.empty");
-                        break;
-                    case "password.empty":
-                        errorMessages.add("login.password.empty");
-                        break;
-                    case "username.long":
-                        errorMessages.add("login.username.long");
-                        break;
-                    case "password.long":
-                        errorMessages.add("login.password.long");
-                        break;
-                    case "type.unsupported":
-                        errorMessages.add("login.type.unsupported");
-                        break;
-                    default:
-                        break;
-                }
-            }
+            errorMessages.addAll(Arrays.asList(objError.getCodes()));
         }
 
+        // preparation of user friendly error messages for the UI
         String message;
-        if (errorMessages != null) {
-            if (errorMessages.contains("login.username.empty")) {
-                if (errorMessages.contains("login.password.empty")) {
-                    message = "login.username.empty login.password.empty";
-                } else {
-                    if (errorMessages.contains("login.password.long")) {
-                        message = "login.username.empty login.password.long";
-                    } else {
-                        message = "login.username.empty";
-                    }
-                }
+        if (errorMessages.contains("login.username.empty")) {
+            if (errorMessages.contains("login.password.empty")) {
+                message = "login.username.empty login.password.empty";
             } else {
-                if (errorMessages.contains("login.password.empty")) {
-                    if (errorMessages.contains("login.username.long")) {
-                        message = "login.password.empty login.username.long";
-                    } else {
-                        message = "login.password.empty";
-                    }
+                if (errorMessages.contains("login.password.long")) {
+                    message = "login.username.empty login.password.long";
                 } else {
-                    if (errorMessages.contains("login.username.long")) {
-                        if (errorMessages.contains("login.password.long")) {
-                            message = "login.username.long login.password.long";
-                        } else {
-                            message = "login.username.long";
-                        }
-                    } else {
-                        if (errorMessages.contains("login.password.long")) {
-                            message = "login.password.long";
-                        } else {
-                            message = "login.authenticationFailed";
-                        }
-                    }
+                    message = "login.username.empty";
                 }
             }
         } else {
-            message = "login.authenticationFailed";
+            if (errorMessages.contains("login.password.empty")) {
+                if (errorMessages.contains("login.username.long")) {
+                    message = "login.password.empty login.username.long";
+                } else {
+                    message = "login.password.empty";
+                }
+            } else {
+                if (errorMessages.contains("login.username.long")) {
+                    if (errorMessages.contains("login.password.long")) {
+                        message = "login.username.long login.password.long";
+                    } else {
+                        message = "login.username.long";
+                    }
+                } else {
+                    if (errorMessages.contains("login.password.long")) {
+                        message = "login.password.long";
+                    } else {
+                        message = "login.authenticationFailed";
+                    }
+                }
+            }
         }
 
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.INPUT_INVALID, message);
@@ -141,4 +134,16 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Handling of invalid request errors for other reason than validation errors.
+     *
+     * @return Response with error information.
+     */
+    @ExceptionHandler(SMSAuthorizationMessageInvalidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody
+    ErrorResponse handleDefaultException(SMSAuthorizationMessageInvalidException ex) {
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.INPUT_INVALID, ex.getMessage());
+        return new ErrorResponse(error);
+    }
 }

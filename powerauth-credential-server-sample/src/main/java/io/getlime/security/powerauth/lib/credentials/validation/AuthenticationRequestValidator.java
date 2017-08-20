@@ -40,18 +40,18 @@ public class AuthenticationRequestValidator implements Validator {
         AuthenticationRequest authRequest = (AuthenticationRequest) o;
         String username = authRequest.getUsername();
         String password = authRequest.getPassword();
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "username.empty");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "password.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "login.username.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "login.password.empty");
         // update validation logic based on the real Credential server requirements
         if (username.length() > 30) {
-            errors.rejectValue("username","username.long");
+            errors.rejectValue("username", "login.username.long");
         }
         if (password.length() > 30) {
-            errors.rejectValue("password","password.long");
+            errors.rejectValue("password", "login.password.long");
         }
         AuthenticationType authType = authRequest.getType();
         if (authType != AuthenticationType.BASIC) {
-            errors.rejectValue("type","type.unsupported");
+            errors.rejectValue("type", "login.type.unsupported");
         }
     }
 }

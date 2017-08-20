@@ -17,14 +17,18 @@
 package io.getlime.security.powerauth.lib.credentials.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.credentials.model.entity.CredentialStoreError;
 import io.getlime.security.powerauth.lib.credentials.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
+import io.getlime.security.powerauth.lib.credentials.model.request.CreateSMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
+import io.getlime.security.powerauth.lib.credentials.model.request.VerifySMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.credentials.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.credentials.model.response.UserDetailResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -96,7 +100,8 @@ public class CredentialStoreClient {
             // Exchange authentication request with credential server.
             AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC);
             HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {});
+            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
+            });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
@@ -120,7 +125,8 @@ public class CredentialStoreClient {
             // Exchange user details with credential server.
             UserDetailRequest request = new UserDetailRequest(userId);
             HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/userInfo", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {});
+            ResponseEntity<ObjectResponse<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/user/info", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
+            });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             try {
@@ -134,6 +140,65 @@ public class CredentialStoreClient {
         }
     }
 
+    /**
+     * Create authorization SMS OTP message.
+     *
+     * @param userId        User ID.
+     * @param operationName Operation name.
+     * @param operationData Operation data in JSON format.
+     * @param lang          language for i18n.
+     * @return Response with generated messageId.
+     * @throws CredentialStoreClientErrorException Exception thrown when action fails.
+     */
+    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, String operationName, String operationData, String lang) throws CredentialStoreClientErrorException {
+        try {
+            JsonNode operationDataJson = objectMapper.readTree(operationData);
+            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, operationName, operationDataJson, lang);
+            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = defaultTemplate().exchange(
+                    serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<CreateSMSAuthorizationResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+            }
+        } catch (ResourceAccessException ex) { // Credential service is down
+            throw resourceAccessException(ex);
+        } catch (IOException ex) {
+            throw ioException(ex);
+        }
+    }
+
+    /**
+     * Verify authorization code for previously generated SMS OTP message.
+     *
+     * @param messageId         Message ID.
+     * @param authorizationCode User entered authorization code.
+     * @return Empty response returned when action succeeds.
+     * @throws CredentialStoreClientErrorException Exception is thrown when action fails with error details.
+     */
+    public ObjectResponse verifyAuthorizationSMS(String messageId, String authorizationCode) throws CredentialStoreClientErrorException {
+        try {
+            VerifySMSAuthorizationRequest request = new VerifySMSAuthorizationRequest(messageId, authorizationCode);
+            HttpEntity<ObjectRequest<VerifySMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            defaultTemplate().exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse();
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+            }
+        } catch (ResourceAccessException ex) { // Credential service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
     private CredentialStoreClientErrorException resourceAccessException(ResourceAccessException ex) throws CredentialStoreClientErrorException {
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
@@ -141,6 +206,11 @@ public class CredentialStoreClient {
 
     private CredentialStoreClientErrorException invalidErrorResponseBodyException(IOException ex) throws CredentialStoreClientErrorException {
         // JSON parsing failed
+        CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, ex.getMessage());
+        return new CredentialStoreClientErrorException(ex, error);
+    }
+
+    private CredentialStoreClientErrorException ioException(IOException ex) throws CredentialStoreClientErrorException {
         CredentialStoreError error = new CredentialStoreError(CredentialStoreError.Code.ERROR_GENERIC, ex.getMessage());
         return new CredentialStoreClientErrorException(ex, error);
     }

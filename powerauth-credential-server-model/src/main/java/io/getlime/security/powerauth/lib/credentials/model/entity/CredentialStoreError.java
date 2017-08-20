@@ -33,6 +33,7 @@ public class CredentialStoreError extends Error {
      */
     public class Code extends Error.Code {
         public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+        public static final String SMS_AUTHORIZATION_FAILED = "SMS_AUTHORIZATION_FAILED";
         public static final String INPUT_INVALID = "INPUT_INVALID";
     }
 

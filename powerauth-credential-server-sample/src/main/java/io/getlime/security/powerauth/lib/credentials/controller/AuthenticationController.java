@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.lib.credentials.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.credentials.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.credentials.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.credentials.model.request.UserDetailRequest;
@@ -29,7 +28,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * Controller class which handles user authentication.
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.*;
  * @author Roman Strobl
  */
 @Controller
+@RequestMapping("/api/auth/user")
 public class AuthenticationController {
 
     /**
@@ -77,7 +80,7 @@ public class AuthenticationController {
      * @param request Request with user ID.
      * @return Response with user details.
      */
-    @RequestMapping(value = "/userInfo", method = RequestMethod.POST)
+    @RequestMapping(value = "/info", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) {
         UserDetailRequest userDetailRequest = request.getRequestObject();
         String userId = userDetailRequest.getId();
