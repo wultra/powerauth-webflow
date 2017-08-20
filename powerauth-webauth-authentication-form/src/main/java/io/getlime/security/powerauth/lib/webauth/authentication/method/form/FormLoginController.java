@@ -88,8 +88,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @return Authentication response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody
-    UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
+    public @ResponseBody UsernamePasswordAuthenticationResponse authenticateHandler(@RequestBody UsernamePasswordAuthenticationRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 

@@ -187,10 +187,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             if (operationDetail != null) {
                 GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
                 if (responseObject != null) {
+                    final String userId = responseObject.getUserId();
+                    if (userId != null) {
+                        authenticationManagementService.updateAuthenticationWithUserId(userId);
+                    }
                     if (AuthResult.DONE.equals(responseObject.getResult())) {
-                        return provider.doneAuthentication(responseObject.getUserId());
+                        return provider.doneAuthentication(userId);
                     } else {
-                        return provider.continueAuthentication(operationId, responseObject.getUserId(), responseObject.getSteps());
+                        return provider.continueAuthentication(operationId, userId, responseObject.getSteps());
                     }
                 } else {
                     return provider.failedAuthentication(null, "error.unknown");
@@ -252,6 +256,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     protected void authenticateCurrentBrowserSession() {
         authenticationManagementService.authenticateCurrentSession();
+        final GetOperationDetailResponse operation = getOperation();
+        if (AuthResult.DONE.equals(operation.getResult())) {
+            authenticationManagementService.pendingAuthenticationToAuthentication();
+        }
     }
 
     /**

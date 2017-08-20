@@ -18,8 +18,13 @@ package io.getlime.security.powerauth.app.webauth.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.app.webauth.configuration.WebAuthServerConfiguration;
+import io.getlime.security.powerauth.app.webauth.i18n.I18NService;
 import io.getlime.security.powerauth.lib.webauth.authentication.mtoken.exception.PushRegistrationFailedException;
+import io.getlime.security.powerauth.lib.webauth.authentication.service.AuthenticationManagementService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -36,6 +41,17 @@ import java.util.logging.Logger;
 @ControllerAdvice
 public class DefaultExceptionResolver {
 
+    private AuthenticationManagementService authenticationManagementService;
+
+    /**
+     * Initialization of the class with default configuration.
+     * @param authenticationManagementService Service managing authentication context.
+     */
+    @Autowired
+    public DefaultExceptionResolver(AuthenticationManagementService authenticationManagementService) {
+        this.authenticationManagementService = authenticationManagementService;
+    }
+
     /**
      * Default exception handler, for unexpected errors.
      *
@@ -48,5 +64,20 @@ public class DefaultExceptionResolver {
         final Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
         return new ErrorResponse(error);
     }
+
+    /**
+     * Default exception handler, for unexpected errors.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(InsufficientAuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public String handleUnauthorizedException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Auth server", t);
+        authenticationManagementService.clearContext();
+        return "redirect:/oauth/error";
+    }
+
+
 
 }
