@@ -5,8 +5,9 @@ import StartHandshake from "./startHandshake";
 import Login from "./login";
 import Success from "./success";
 import Error from "./error";
-import OperationDetail from "./operation";
-import Token from "./token";
+import OperationReview from "./operationReview";
+import Token from "./tokenAuth";
+import SMSAuthorization from "./smsAuth";
 // i18n
 import {injectIntl} from "react-intl";
 
@@ -59,12 +60,16 @@ export class App extends React.Component {
                 Component = Error;
                 break;
             }
-            case "SCREEN_OPERATION_DATA": {
-                Component = OperationDetail;
+            case "SCREEN_OPERATION_REVIEW": {
+                Component = OperationReview;
                 break;
             }
             case "SCREEN_TOKEN": {
                 Component = Token;
+                break;
+            }
+            case "SCREEN_SMS": {
+                Component = SMSAuthorization;
                 break;
             }
             default: {

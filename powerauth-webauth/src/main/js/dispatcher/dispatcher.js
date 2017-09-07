@@ -18,6 +18,7 @@ export function dispatchAction(dispatch, response) {
     if (response.data.next.length > 0) {
         if (response.data.result === "CONFIRMED") {
             const next = response.data.next;
+            let authMethods = [];
             for (let key in next) {
                 switch (next[key].authMethod) {
                     case "USER_ID_ASSIGN": {
@@ -35,25 +36,25 @@ export function dispatchAction(dispatch, response) {
                         });
                         break;
                     }
-                    case "SHOW_OPERATION_DETAIL": {
-                        dispatch({
-                            type: "SHOW_SCREEN_OPERATION_DATA",
-                            payload: {
-                                data: ""
-                            }
-                        });
+                    case "POWERAUTH_TOKEN": {
+                        // add powerauth token authentication method for operation review step
+                        authMethods.push("POWERAUTH_TOKEN");
                         break;
                     }
-                    case "POWERAUTH_TOKEN": {
-                        dispatch({
-                            type: "SHOW_SCREEN_TOKEN",
-                            payload: {
-                                info: "firstLoad"
-                            }
-                        });
+                    case "SMS_KEY": {
+                        // add powerauth token authentication method for operation review step
+                        authMethods.push("SMS_KEY");
                         break;
                     }
                 }
+            }
+            if (authMethods.length > 0) {
+                dispatch({
+                    type: "SHOW_SCREEN_OPERATION_REVIEW",
+                    payload: {
+                        authMethods: authMethods
+                    }
+                });
             }
         } else if (response.data.result === "AUTH_FAILED") {
             dispatch({
@@ -83,7 +84,7 @@ export function dispatchAction(dispatch, response) {
 }
 
 export function dispatchError(dispatch, error) {
-    var errorMessage;
+    let errorMessage;
     if (error.response) {
         errorMessage = error.response.data.message;
     } else if (error.request) {
