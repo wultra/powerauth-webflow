@@ -16,8 +16,10 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, init} from "../actions/tokenActions";
+import {authenticate, cancel, getOperationData, init} from "../actions/tokenAuthActions";
 // Components
+import OperationDetail from "./operationDetail";
+import {Panel} from "react-bootstrap";
 // i18n
 import {FormattedMessage} from "react-intl";
 
@@ -51,6 +53,7 @@ export default class Token extends React.Component {
     componentWillMount() {
         this.init();
         this.update();
+        this.props.dispatch(getOperationData());
     }
 
     init() {
@@ -157,19 +160,21 @@ export default class Token extends React.Component {
 
     render() {
         return (
-            <div id="token" className="text-center">
-                <div className={'message-information'}>
-                    <FormattedMessage id="message.token.confirm"/>
-                </div>
-                <div className="image mtoken"></div>
-                <div className="font-small message-information">
-                    <FormattedMessage id="message.token.offline"/><br/>
-                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
-                    <br/><br/>
-                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                        <FormattedMessage id="operation.cancel"/>
-                    </a>
-                </div>
+            <div id="operation">
+                <form>
+                    <Panel>
+                        <OperationDetail/>
+                        <div className="image mtoken"></div>
+                        <div className="font-small message-information">
+                            <FormattedMessage id="message.token.offline"/><br/>
+                            <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
+                            <br/><br/>
+                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                <FormattedMessage id="operation.cancel"/>
+                            </a>
+                        </div>
+                    </Panel>
+                </form>
             </div>
         )
     }
