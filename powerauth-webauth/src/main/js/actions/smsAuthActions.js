@@ -85,7 +85,7 @@ export function authenticate(userAuthCode) {
                         break;
                     }
                     // if the maximum number of SMS OTP messages has been exceeded, show an error, the method cannot continue
-                    if (response.data.message === "sms_authorization.max_tries_exceeded") {
+                    if (response.data.message === "smsAuthorization.maxAttemptsExceeded") {
                         dispatchAction(dispatch, response);
                         break;
                     }

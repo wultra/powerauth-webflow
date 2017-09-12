@@ -77,7 +77,7 @@ export default class SMSAuthorization extends React.Component {
                                 <FormattedMessage id={this.props.context.message}/>
                             </FormGroup>
                         ) : (undefined)}
-                        <FormattedMessage id="sms_authorization.auth_code_text"/>
+                        <FormattedMessage id="smsAuthorization.authCodeText"/>
                         <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
                         <br/><br/>
                         <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
