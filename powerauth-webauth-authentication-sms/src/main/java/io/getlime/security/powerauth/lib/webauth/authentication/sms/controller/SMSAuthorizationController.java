@@ -7,9 +7,11 @@ import io.getlime.security.powerauth.lib.credentials.model.response.CreateSMSAut
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webauth.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webauth.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webauth.authentication.sms.model.request.SMSAuthorizationRequest;
@@ -62,6 +64,16 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             operationIdToMessageIdMap.remove(operation.getOperationId());
             return operation.getUserId();
         } catch (CredentialStoreClientErrorException e) {
+            // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
+            try {
+                UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), operation.getUserId(), null);
+                if (response.getResult() == AuthResult.FAILED) {
+                    // FAILED result instead of CONTINUE means the authentication method is failed
+                    throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                }
+            } catch (NextStepServiceException e2) {
+                throw new AuthStepException(e2.getError().getMessage(), e2);
+            }
             throw new AuthStepException(e.getError().getMessage(), e);
         }
     }

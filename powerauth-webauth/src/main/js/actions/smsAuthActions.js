@@ -79,6 +79,16 @@ export function authenticate(userAuthCode) {
                         dispatchAction(dispatch, response);
                         break;
                     }
+                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "authentication.maxAttemptsExceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the maximum number of SMS OTP messages has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "sms_authorization.max_tries_exceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // if there is no supported auth method, show error, there is no point in continuing
                     if (response.data.message === "error.noAuthMethod") {
                         dispatchAction(dispatch, response);
