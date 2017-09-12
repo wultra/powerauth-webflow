@@ -16,10 +16,11 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {cancel, getOperationData, init} from "../actions/smsAuthActions";
+import {authenticate, cancel, getOperationData, init} from "../actions/smsAuthActions";
 // Components
 import OperationDetail from "./operationDetail";
-import {Panel} from "react-bootstrap";
+import {FormGroup, Panel} from "react-bootstrap";
+import Spinner from 'react-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
 
@@ -36,7 +37,10 @@ export default class SMSAuthorization extends React.Component {
     constructor() {
         super();
         this.init = this.init.bind(this);
+        this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.state = {authCode: ''};
     }
 
     componentWillMount() {
@@ -46,6 +50,14 @@ export default class SMSAuthorization extends React.Component {
 
     init() {
         this.props.dispatch(init());
+    }
+
+    handleAuthCodeChange(event) {
+        this.setState({authCode: event.target.value});
+    }
+
+    handleSubmit(event) {
+        this.props.dispatch(authenticate(this.state.authCode));
     }
 
     handleCancel(event) {
@@ -59,13 +71,24 @@ export default class SMSAuthorization extends React.Component {
                     <Panel>
                         <OperationDetail/>
                         <br/>
-                        <b>SMS authorization - under construction</b>
+                        {(this.props.context.message) ? (
+                            <FormGroup
+                                className={(this.props.context.error ? "message-error" : "message-information" )}>
+                                <FormattedMessage id={this.props.context.message}/>
+                            </FormGroup>
+                        ) : (undefined)}
+                        <FormattedMessage id="sms_authorization.auth_code_text"/>
+                        <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
                         <br/><br/>
                         <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                             <FormattedMessage id="operation.cancel"/>
                         </a>
+                        <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
+                            <FormattedMessage id="operation.confirm"/>
+                        </a>
                     </Panel>
                 </form>
+                {this.props.context.loading ? <Spinner/> : undefined}
             </div>
         )
     }
