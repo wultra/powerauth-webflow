@@ -89,8 +89,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * @return Authorization response.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody
-    SMSAuthorizationResponse initSMSAuthorization() {
+    public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() {
         final GetOperationDetailResponse operation = getOperation();
         final String userId = operation.getUserId();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
@@ -114,8 +113,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * @return Authorization response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody
-    SMSAuthorizationResponse authenticateHandler(@RequestBody SMSAuthorizationRequest request) {
+    public @ResponseBody SMSAuthorizationResponse authenticateHandler(@RequestBody SMSAuthorizationRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
@@ -161,8 +159,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * @return Authorization response.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody
-    SMSAuthorizationResponse cancelAuthentication() {
+    public @ResponseBody SMSAuthorizationResponse cancelAuthentication() {
         try {
             operationIdToMessageIdMap.remove(getOperation().getOperationId());
             cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
