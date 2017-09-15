@@ -40,30 +40,30 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
         CreateSMSAuthorizationRequest authRequest = (CreateSMSAuthorizationRequest) o;
         String userId = authRequest.getUserId();
         String operationName = authRequest.getOperationName();
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userId", "sms_authorization.user_id.empty");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "operationName", "sms_authorization.operation_name.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userId", "smsAuthorization.userId.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "operationName", "smsAuthorization.operationName.empty");
 
         // update validation logic based on the real requirements
         if (userId.length() > 30) {
-            errors.rejectValue("userId", "sms_authorization.user_id.long");
+            errors.rejectValue("userId", "smsAuthorization.userId.long");
         }
         if (operationName.length() > 32) {
-            errors.rejectValue("operationName", "sms_authorization.operation_name.long");
+            errors.rejectValue("operationName", "smsAuthorization.operationName.long");
         }
 
         JsonNode amount = authRequest.getOperationData().get("amount");
         JsonNode currency = authRequest.getOperationData().get("currency");
         JsonNode account = authRequest.getOperationData().get("account");
         if (amount == null) {
-            errors.rejectValue("operationData", "sms_authorization.amount.empty");
+            errors.rejectValue("operationData", "smsAuthorization.amount.empty");
         } else if (!amount.isNumber()) {
-            errors.rejectValue("operationData", "sms_authorization.amount.invalid");
+            errors.rejectValue("operationData", "smsAuthorization.amount.invalid");
         }
         if (currency == null || currency.textValue().isEmpty()) {
-            errors.rejectValue("operationData", "sms_authorization.currency.empty");
+            errors.rejectValue("operationData", "smsAuthorization.currency.empty");
         }
         if (account == null || account.textValue().isEmpty()) {
-            errors.rejectValue("operationData", "sms_authorization.account.empty");
+            errors.rejectValue("operationData", "smsAuthorization.account.empty");
         }
 
     }

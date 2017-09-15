@@ -73,7 +73,8 @@
         <module>powerauth-webauth-authentication-init</module>
         <module>powerauth-webauth-authentication-form</module>
         <module>powerauth-webauth-authentication-operation-review</module>
-        <module>powerauth-webauth-authentication-mtoken</module>
+		<module>powerauth-webauth-authentication-mtoken</module>
+		<module>powerauth-webauth-authentication-sms</module>
 		<module>powerauth-webauth-i18n</module>
 		<module>powerauth-webauth-resources</module>
 		<module>powerauth-webauth-client</module>

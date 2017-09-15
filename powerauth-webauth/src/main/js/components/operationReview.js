@@ -83,9 +83,9 @@ export default class OperationReview extends React.Component {
                             {(this.props.context.authMethods.length > 0) ? (
                                 <div>
                                     {(this.props.context.authMethods.length > 1) ? (
-                                        <FormattedMessage id="operation.confirmation_text_choice"/>
+                                        <FormattedMessage id="operation.confirmationTextChoice"/>
                                     ) : (
-                                        <FormattedMessage id="operation.confirmation_text"/>
+                                        <FormattedMessage id="operation.confirmationText"/>
                                     )}
                                     <div className="row buttons">
                                         {this.props.context.authMethods.map((authMethod) => {
@@ -95,7 +95,7 @@ export default class OperationReview extends React.Component {
                                                         <div className="col-sm-6">
                                                             <a href="#" onClick={this.handleToken}
                                                                className="btn btn-lg btn-default" block>
-                                                                <FormattedMessage id="method.powerauth_token"/>
+                                                                <FormattedMessage id="method.powerauthToken"/>
                                                             </a>
                                                         </div>
                                                     );
@@ -105,7 +105,7 @@ export default class OperationReview extends React.Component {
                                                         <div className="col-sm-6">
                                                             <a href="#" onClick={this.handleSMS}
                                                                className="btn btn-lg btn-default" block>
-                                                                <FormattedMessage id="method.sms_key"/>
+                                                                <FormattedMessage id="method.smsKey"/>
                                                             </a>
                                                         </div>
                                                     );
@@ -122,7 +122,7 @@ export default class OperationReview extends React.Component {
                                 </div>
                             ) : (
                                 <div className={'message-error'}>
-                                    <FormattedMessage id="operation.no_method"/>
+                                    <FormattedMessage id="operation.noMethod"/>
                                 </div>
                             )}
                         </Panel>
