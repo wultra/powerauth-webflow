@@ -34,7 +34,11 @@ export function init() {
         axios.post("./api/auth/sms/init", {}).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_SMS",
-                payload: response.data
+                payload: {
+                    loading: false,
+                    error: false,
+                    message: response.data.message
+                }
             });
         }).catch((error) => {
             console.log(error);
@@ -42,12 +46,21 @@ export function init() {
     }
 }
 
-export function authenticate(callback) {
+export function authenticate(userAuthCode) {
     return function (dispatch) {
-        axios.post("./api/auth/sms/authenticate", {}).then((response) => {
+        dispatch({
+            type: "SHOW_SCREEN_SMS",
+            payload: {
+                loading: true,
+                error: false,
+                message: ""
+            }
+        });
+        axios.post("./api/auth/sms/authenticate", {
+            authCode: userAuthCode
+        }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
-                    callback(false);
                     dispatchAction(dispatch, response);
                     break;
                 }
@@ -66,23 +79,33 @@ export function authenticate(callback) {
                         dispatchAction(dispatch, response);
                         break;
                     }
+                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "authentication.maxAttemptsExceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the maximum number of SMS OTP messages has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "smsAuthorization.maxAttemptsExceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // if there is no supported auth method, show error, there is no point in continuing
                     if (response.data.message === "error.noAuthMethod") {
                         dispatchAction(dispatch, response);
                         break;
                     }
-                    callback(true);
                     dispatch({
                         type: "SHOW_SCREEN_SMS",
                         payload: {
-                            info: "reload"
+                            loading: false,
+                            error: true,
+                            message: response.data.message
                         }
                     });
                     break;
                 }
             }
         }).catch((error) => {
-            callback(false);
             dispatchError(dispatch, error);
         })
     }

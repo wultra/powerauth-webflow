@@ -140,28 +140,28 @@ public class SMSAuthorizationController {
         String messageId = verifyRequest.getMessageId();
         SMSAuthorizationEntity smsEntity = smsAuthorizationRepository.findOne(messageId);
         if (smsEntity == null) {
-            throw new SMSAuthorizationMessageInvalidException("sms_authorization.invalid_message");
+            throw new SMSAuthorizationMessageInvalidException("smsAuthorization.invalidMessage");
         }
         // increase number of verification tries and save entity
         smsEntity.setVerifyRequestCount(smsEntity.getVerifyRequestCount() + 1);
         smsAuthorizationRepository.save(smsEntity);
 
         if (smsEntity.getAuthorizationCode() == null || smsEntity.getAuthorizationCode().isEmpty()) {
-            throw new SMSAuthorizationMessageInvalidException("sms_authorization.invalid_code");
+            throw new SMSAuthorizationMessageInvalidException("smsAuthorization.invalidCode");
         }
         if (smsEntity.isExpired()) {
-            throw new SMSAuthorizationFailedException("sms_authorization.expired");
+            throw new SMSAuthorizationFailedException("smsAuthorization.expired");
         }
         if (smsEntity.isVerified()) {
-            throw new SMSAuthorizationFailedException("sms_authorization.already_verified");
+            throw new SMSAuthorizationFailedException("smsAuthorization.alreadyVerified");
         }
         if (smsEntity.getVerifyRequestCount() > credentialStoreConfiguration.getSmsOtpMaxVerifyTriesPerMessage()) {
-            throw new SMSAuthorizationFailedException("sms_authorization.max_tries_exceeded");
+            throw new SMSAuthorizationFailedException("smsAuthorization.maxAttemptsExceeded");
         }
         String authorizationCodeExpected = smsEntity.getAuthorizationCode();
         String authorizationCodeActual = verifyRequest.getAuthorizationCode();
         if (!authorizationCodeActual.equals(authorizationCodeExpected)) {
-            throw new SMSAuthorizationFailedException("sms_authorization.failed");
+            throw new SMSAuthorizationFailedException("smsAuthorization.failed");
         }
 
         // SMS OTP authorization succeeded when this line is reached, update entity verification status
