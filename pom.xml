@@ -62,9 +62,9 @@
 	</issueManagement>
 
 	<modules>
-		<module>powerauth-credential-server-client</module>
-		<module>powerauth-credential-server-model</module>
-        <module>powerauth-credential-server-sample</module>
+		<module>powerauth-bank-adapter-client</module>
+		<module>powerauth-bank-adapter-model</module>
+		<module>powerauth-bank-adapter</module>
         <module>powerauth-nextstep</module>
 		<module>powerauth-nextstep-client</module>
 		<module>powerauth-nextstep-model</module>
