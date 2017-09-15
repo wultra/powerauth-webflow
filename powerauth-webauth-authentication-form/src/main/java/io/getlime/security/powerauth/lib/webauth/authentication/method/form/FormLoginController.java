@@ -17,9 +17,9 @@
 package io.getlime.security.powerauth.lib.webauth.authentication.method.form;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
-import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
-import io.getlime.security.powerauth.lib.credentials.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
+import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.bankadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -50,17 +50,17 @@ import java.util.List;
 public class FormLoginController extends AuthMethodController<UsernamePasswordAuthenticationRequest, UsernamePasswordAuthenticationResponse, AuthStepException> {
 
     @Autowired
-    private CredentialStoreClient credentialStoreClient;
+    private BankAdapterClient bankAdapterClient;
 
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         try {
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = credentialStoreClient.authenticate(request.getUsername(), request.getPassword());
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = bankAdapterClient.authenticate(request.getUsername(), request.getPassword());
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
-        } catch (CredentialStoreClientErrorException e) {
+        } catch (BankAdapterClientErrorException e) {
             try {
-                // User was not authenticated by credential store - fail authorization to count the number of failures and make it possible
+                // User was not authenticated by Bank Adapter - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
                 // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
                 if ("login.authenticationFailed".equals(e.getError().getMessage())) {
