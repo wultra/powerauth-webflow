@@ -1,9 +1,9 @@
 package io.getlime.security.powerauth.lib.webauth.authentication.sms.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClient;
-import io.getlime.security.powerauth.lib.credentials.client.CredentialStoreClientErrorException;
-import io.getlime.security.powerauth.lib.credentials.model.response.CreateSMSAuthorizationResponse;
+import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
+import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.bankadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -24,9 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
+import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This controller provides endpoints for SMS authorization.
@@ -38,11 +37,10 @@ import java.util.Map;
 public class SMSAuthorizationController extends AuthMethodController<SMSAuthorizationRequest, SMSAuthorizationResponse, AuthStepException> {
 
     @Autowired
-    private CredentialStoreClient credentialStoreClient;
+    private BankAdapterClient bankAdapterClient;
 
-    // Storage for mapping of operationId->messageId.
-    // TODO - switch operationId->messageId mapping to database to avoid memory leaks
-    private Map<String, String> operationIdToMessageIdMap = new HashMap<>();
+    @Autowired
+    private HttpSession httpSession;
 
     /**
      * Verifies the authorization code entered by user against code generated during initialization.
@@ -54,16 +52,16 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        final String messageId = operationIdToMessageIdMap.get(operation.getOperationId());
+        final Object messageId = httpSession.getAttribute("messageId");
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
             throw new AuthStepException("error.invalidRequest", new NullPointerException());
         }
         try {
-            credentialStoreClient.verifyAuthorizationSMS(messageId, request.getAuthCode());
-            operationIdToMessageIdMap.remove(operation.getOperationId());
+            bankAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
+            httpSession.removeAttribute("messageId");
             return operation.getUserId();
-        } catch (CredentialStoreClientErrorException e) {
+        } catch (BankAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             try {
                 UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), operation.getUserId(), null);
@@ -94,12 +92,12 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final String userId = operation.getUserId();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
         try {
-            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = credentialStoreClient.createAuthorizationSMS(userId, operation.getOperationName(), operation.getOperationData(), LocaleContextHolder.getLocale().getLanguage());
+            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = bankAdapterClient.createAuthorizationSMS(userId, operation.getOperationName(), operation.getOperationData(), LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
-            operationIdToMessageIdMap.put(operation.getOperationId(), messageId);
+            httpSession.setAttribute("messageId", messageId);
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
-        } catch (CredentialStoreClientErrorException e) {
+        } catch (BankAdapterClientErrorException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage(e.getMessage());
             return initResponse;
@@ -161,7 +159,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() {
         try {
-            operationIdToMessageIdMap.remove(getOperation().getOperationId());
+            httpSession.removeAttribute("messageId");
             cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
