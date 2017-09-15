@@ -42,6 +42,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Autowired
     private HttpSession httpSession;
 
+    private static final String MESSAGE_ID = "messageId";
+
     /**
      * Verifies the authorization code entered by user against code generated during initialization.
      *
@@ -52,14 +54,14 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        final Object messageId = httpSession.getAttribute("messageId");
+        final Object messageId = httpSession.getAttribute(MESSAGE_ID);
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
             throw new AuthStepException("error.invalidRequest", new NullPointerException());
         }
         try {
             bankAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
-            httpSession.removeAttribute("messageId");
+            httpSession.removeAttribute(MESSAGE_ID);
             return operation.getUserId();
         } catch (BankAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
@@ -94,7 +96,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         try {
             ObjectResponse<CreateSMSAuthorizationResponse> baResponse = bankAdapterClient.createAuthorizationSMS(userId, operation.getOperationName(), operation.getOperationData(), LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
-            httpSession.setAttribute("messageId", messageId);
+            httpSession.setAttribute(MESSAGE_ID, messageId);
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
         } catch (BankAdapterClientErrorException e) {
@@ -159,7 +161,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() {
         try {
-            httpSession.removeAttribute("messageId");
+            httpSession.removeAttribute(MESSAGE_ID);
             cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
