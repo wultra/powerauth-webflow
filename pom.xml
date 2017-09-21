@@ -3,11 +3,11 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>powerauth-webauth-parent</name>
+	<name>powerauth-webflow-parent</name>
 	<description>Federated Authentication and Authorization Server for Web</description>
 
 	<groupId>io.getlime.security</groupId>
-	<artifactId>powerauth-webauth-parent</artifactId>
+	<artifactId>powerauth-webflow-parent</artifactId>
 	<version>0.15.0</version>
 	<packaging>pom</packaging>
 
@@ -51,14 +51,15 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:https://github.com/lime-company/lime-security-powerauth-webauth.git</connection>
-		<developerConnection>scm:git:https://github.com/lime-company/lime-security-powerauth-webauth.git</developerConnection>
-		<url>https://github.com/lime-company/lime-security-powerauth-webauth</url>
+		<connection>scm:git:https://github.com/lime-company/lime-security-powerauth-webflow.git</connection>
+		<developerConnection>scm:git:https://github.com/lime-company/lime-security-powerauth-webflow.git
+		</developerConnection>
+		<url>https://github.com/lime-company/lime-security-powerauth-webflow</url>
 	</scm>
 
 	<issueManagement>
 		<system>Github</system>
-		<url>https://github.com/lime-company/lime-security-powerauth-webauth/issues</url>
+		<url>https://github.com/lime-company/lime-security-powerauth-webflow/issues</url>
 	</issueManagement>
 
 	<modules>
@@ -68,16 +69,16 @@
         <module>powerauth-nextstep</module>
 		<module>powerauth-nextstep-client</module>
 		<module>powerauth-nextstep-model</module>
-		<module>powerauth-webauth</module>
-        <module>powerauth-webauth-authentication</module>
-        <module>powerauth-webauth-authentication-init</module>
-        <module>powerauth-webauth-authentication-form</module>
-        <module>powerauth-webauth-authentication-operation-review</module>
-		<module>powerauth-webauth-authentication-mtoken</module>
-		<module>powerauth-webauth-authentication-sms</module>
-		<module>powerauth-webauth-i18n</module>
-		<module>powerauth-webauth-resources</module>
-		<module>powerauth-webauth-client</module>
+		<module>powerauth-webflow</module>
+		<module>powerauth-webflow-authentication</module>
+		<module>powerauth-webflow-authentication-init</module>
+		<module>powerauth-webflow-authentication-form</module>
+		<module>powerauth-webflow-authentication-operation-review</module>
+		<module>powerauth-webflow-authentication-mtoken</module>
+		<module>powerauth-webflow-authentication-sms</module>
+		<module>powerauth-webflow-i18n</module>
+		<module>powerauth-webflow-resources</module>
+		<module>powerauth-webflow-client</module>
 	</modules>
 
 	<properties>

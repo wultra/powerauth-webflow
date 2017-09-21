@@ -12,7 +12,7 @@
     <packaging>jar</packaging>
 
     <parent>
-        <artifactId>powerauth-webauth-parent</artifactId>
+        <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
         <version>0.15.0</version>
         <relativePath>../pom.xml</relativePath>
