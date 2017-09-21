@@ -76,8 +76,7 @@ public class SMSAuthorizationController {
      * @return Response with message ID.
      */
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public @ResponseBody
-    ObjectResponse<CreateSMSAuthorizationResponse> create(@RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request) throws MethodArgumentNotValidException {
+    public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request) throws MethodArgumentNotValidException {
         CreateSMSAuthorizationRequest createSMSAuthorizationRequest = request.getRequestObject();
 
         // input validation is handled by CreateSMSAuthorizationRequestValidator
@@ -134,8 +133,7 @@ public class SMSAuthorizationController {
      * @return Authorization response.
      */
     @RequestMapping(value = "verify", method = RequestMethod.POST)
-    public @ResponseBody
-    ObjectResponse verify(@RequestBody ObjectRequest<VerifySMSAuthorizationRequest> request) throws SMSAuthorizationMessageInvalidException, SMSAuthorizationFailedException {
+    public @ResponseBody ObjectResponse verify(@RequestBody ObjectRequest<VerifySMSAuthorizationRequest> request) throws SMSAuthorizationMessageInvalidException, SMSAuthorizationFailedException {
         VerifySMSAuthorizationRequest verifyRequest = request.getRequestObject();
         String messageId = verifyRequest.getMessageId();
         SMSAuthorizationEntity smsEntity = smsAuthorizationRepository.findOne(messageId);

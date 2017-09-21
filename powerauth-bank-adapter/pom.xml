@@ -5,14 +5,14 @@
 
     <parent>
         <groupId>io.getlime.security</groupId>
-        <artifactId>powerauth-webauth-parent</artifactId>
+        <artifactId>powerauth-webflow-parent</artifactId>
         <version>0.15.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-bank-adapter</artifactId>
     <name>powerauth-bank-adapter</name>
-    <description>Sample implementation of Bank Adapter for Web Auth</description>
+    <description>Sample implementation of Bank Adapter for Web Flow</description>
     <version>0.15.0</version>
     <packaging>war</packaging>
 

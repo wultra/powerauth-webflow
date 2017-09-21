@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<!--
+  ~ Copyright 2017 Lime - HighTech Solutions s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout">
+<head>
+    <title>PowerAuth 2.0 Web Flow Demo</title>
+</head>
+<body>
+
+<div id="header">
+    <h1><a th:href="@{/}">PowerAuth 2.0 Web Flow Demo</a></h1>
+</div>
+
+<div id="content" layout:fragment="content">
+    <div class="wrapper text-center">
+        <p>
+            <img class="logo" src="./images/logo.png" alt="logo"/>
+        </p>
+        <div th:each="providerId : ${providerIds}">
+
+            <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                <p>
+                    Operation authorized by <span class="black"><span
+                        th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
+                </p>
+                <form id="disconnect" th:action="@{/connect/demo}" method="post">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                    <input type="hidden" name="_method" value="delete"/>
+                    <button type="submit" class="btn btn-lg btn-danger">Log out</button>
+                </form>
+            </div>
+
+            <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                <div>
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment (DEMO)</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#authorize" aria-controls="authorize" role="tab"
+                               data-toggle="tab">Authorization</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane" id="login">
+                            <div class="padding">
+                                <p>
+                                    Authenticate as a user.
+                                </p>
+                                <form th:action="@{/connect/demo}" method="POST">
+                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane active" id="payment">
+                            <div class="padding">
+                                <p>
+                                    Create Payment (DEMO)
+                                </p>
+                                <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{amount}"
+                                               placeholder="Amount"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{currency}"
+                                               placeholder="Currency"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{account}"
+                                               placeholder="Account Number"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="authorize">
+                            <div class="padding">
+                                <p>
+                                    Authorize operation with given ID.
+                                </p>
+                                <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
+                                    <div class="input-group input-group-lg">
+                                        <input type="text" class="form-control" name="operation_id"
+                                               th:value="${operationId}" placeholder="Operation ID"/>
+                                        <span class="input-group-btn">
+                                            <button type="submit" class="btn btn-success">Authorize</button>
+                                        </span>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

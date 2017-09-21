@@ -73,8 +73,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(SMSAuthorizationFailedException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody
-    ErrorResponse handleAuthenticationError(SMSAuthorizationFailedException ex) {
+    public @ResponseBody ErrorResponse handleAuthenticationError(SMSAuthorizationFailedException ex) {
         // regular sms authorization failed error
         BankAdapterError error = new BankAdapterError(BankAdapterError.Code.SMS_AUTHORIZATION_FAILED, ex.getMessage());
         return new ErrorResponse(error);
@@ -141,8 +140,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(SMSAuthorizationMessageInvalidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody
-    ErrorResponse handleDefaultException(SMSAuthorizationMessageInvalidException ex) {
+    public @ResponseBody ErrorResponse handleDefaultException(SMSAuthorizationMessageInvalidException ex) {
         BankAdapterError error = new BankAdapterError(BankAdapterError.Code.INPUT_INVALID, ex.getMessage());
         return new ErrorResponse(error);
     }
