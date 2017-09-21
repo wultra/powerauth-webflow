@@ -41,7 +41,7 @@
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-credential-server-client</artifactId>
+            <artifactId>powerauth-bank-adapter-client</artifactId>
             <version>0.15.0</version>
         </dependency>
     </dependencies>
