@@ -22,7 +22,7 @@ require('stompjs');
 /**
  * Registration for WebSocket routes with callback functions called on incoming messages.
  * @param registrations routes and callback functions
- * @param Web Socket ID
+ * @param webSocketId Web Socket ID
  */
 function register(registrations, webSocketId) {
     let headers = {};
@@ -49,9 +49,6 @@ function send(destination, params, message) {
     stompClient.send(destination, params, message);
 }
 
-/**
- * Disconnects the WebSocket.
- */
 function disconnect() {
     stompClient.disconnect();
 }

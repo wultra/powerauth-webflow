@@ -20,7 +20,7 @@ export function getOperationData() {
     return function (dispatch) {
         axios.get("./api/auth/operation/detail").then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_TOKEN",
+                type: "SHOW_SCREEN_QR_CODE",
                 payload: response.data
             });
         }).catch((error) => {
@@ -31,23 +31,45 @@ export function getOperationData() {
 
 export function init() {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/init", {}).then((response) => {
+        dispatch({
+            type: "SHOW_SCREEN_QR_CODE",
+            payload: {
+                loading: true,
+                error: false,
+                message: ""
+            }
+        });
+        axios.post("./api/auth/qr/init", {}).then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_TOKEN",
-                payload: response.data
+                type: "SHOW_SCREEN_QR_CODE",
+                payload: {
+                    loading: false,
+                    error: false,
+                    message: "",
+                    qrCode: response.data.qrcode
+                }
             });
         }).catch((error) => {
-            dispatchError(dispatch, error);
+            console.log(error);
         })
     }
 }
 
-export function authenticate(callback) {
+export function authenticate(userAuthCode) {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/authenticate", {}).then((response) => {
+        axios.post("./api/auth/qr/authenticate", {
+            authCode: userAuthCode
+        }).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_QR_CODE",
+                payload: {
+                    loading: true,
+                    error: false,
+                    message: ""
+                }
+            });
             switch (response.data.result) {
                 case 'CONFIRMED': {
-                    callback(false);
                     dispatchAction(dispatch, response);
                     break;
                 }
@@ -66,24 +88,29 @@ export function authenticate(callback) {
                         dispatchAction(dispatch, response);
                         break;
                     }
+                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "authentication.maxAttemptsExceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // if there is no supported auth method, show error, there is no point in continuing
                     // TODO - handle fallback - see issue #32
                     if (response.data.message === "error.noAuthMethod") {
                         dispatchAction(dispatch, response);
                         break;
                     }
-                    callback(true);
                     dispatch({
-                        type: "SHOW_SCREEN_TOKEN",
+                        type: "SHOW_SCREEN_QR_CODE",
                         payload: {
-                            info: "reload"
+                            loading: false,
+                            error: true,
+                            message: response.data.message
                         }
                     });
                     break;
                 }
             }
         }).catch((error) => {
-            callback(false);
             dispatchError(dispatch, error);
         })
     }
@@ -91,7 +118,7 @@ export function authenticate(callback) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/cancel", {}).then((response) => {
+        axios.post("./api/auth/qr/cancel", {}).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
@@ -101,14 +128,5 @@ export function cancel() {
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
-    }
-}
-
-export function switchToQRCode() {
-    return function (dispatch) {
-        dispatch({
-            type: "SHOW_SCREEN_QR_CODE",
-            payload: {}
-        });
     }
 }

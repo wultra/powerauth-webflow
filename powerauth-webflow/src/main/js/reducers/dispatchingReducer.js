@@ -17,6 +17,13 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
+        case "SHOW_SCREEN_QR_CODE": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_QR_CODE",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
         case "SHOW_SCREEN_SMS": {
             return {
                 ...state,
@@ -86,7 +93,6 @@ function mergeContext(actionType, oldContext, newContext) {
 }
 
 function mergeData(oldContext, newContext) {
-    // formData need to remain in context
     if (oldContext.formData !== undefined && newContext.formData === undefined) {
         newContext.formData = oldContext.formData;
     }

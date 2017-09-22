@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, getOperationData, init} from "../actions/tokenAuthActions";
+import {authenticate, cancel, getOperationData, init, switchToQRCode} from "../actions/tokenAuthActions";
 // Components
 import OperationDetail from "./operationDetail";
 import {Panel} from "react-bootstrap";
@@ -47,6 +47,7 @@ export default class Token extends React.Component {
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.handleSwitchToQRCode = this.handleSwitchToQRCode.bind(this);
         this.cancelAuthorization = this.cancelAuthorization.bind(this);
         this.setUpdateTimeout = this.setUpdateTimeout.bind(this);
         this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
@@ -194,6 +195,19 @@ export default class Token extends React.Component {
         this.props.dispatch(cancel());
     }
 
+    handleSwitchToQRCode(event) {
+        // cancel authorization, update() method could be already called
+        this.cancelAuthorization();
+        // cancel update() call using timeout if it is scheduled for future
+        const updateTimeout = this.getUpdateTimeout();
+        if (updateTimeout !== null) {
+            clearTimeout(updateTimeout);
+        }
+        // disconnect Web Socket connection
+        stompClient.disconnect();
+        this.props.dispatch(switchToQRCode());
+    }
+
     componentWillReceiveProps(props) {
         if (!this.state.webSocketInitialized) {
             const webSocketId = props.context.webSocketId;
@@ -221,7 +235,8 @@ export default class Token extends React.Component {
                             <div className="attributes">
                                 <div className="font-small message-information">
                                     <FormattedMessage id="message.token.offline"/><br/>
-                                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
+                                    <a href="#" onClick={this.handleSwitchToQRCode}><FormattedMessage
+                                        id="message.token.offline.link"/></a>
                                 </div>
                             </div>
                             <div className="attribute row">
