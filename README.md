@@ -6,7 +6,7 @@ Typical use-case for the software stack is securing the RESTful API interfaces, 
 
 ## Documentation
 
-Visit our wiki for [technical details about PowerAuth 2.0 Web Flow](https://github.com/lime-company/lime-security-powerauth-webflow/wiki).
+Visit our wiki for [technical details about PowerAuth 2.0 Web Flow](https://github.com/lime-company/powerauth-webflow/wiki).
 
 ## License
 
