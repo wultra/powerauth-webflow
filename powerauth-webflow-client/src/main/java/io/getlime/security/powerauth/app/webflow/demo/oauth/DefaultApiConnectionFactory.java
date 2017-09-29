@@ -26,7 +26,7 @@ import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
  */
 public class DefaultApiConnectionFactory<T extends DefaultApiBinding> extends OAuth2ConnectionFactory<T> {
 
-    public DefaultApiConnectionFactory(String providerId, AbstractOAuth2ServiceProvider provider) {
+    public DefaultApiConnectionFactory(String providerId, AbstractOAuth2ServiceProvider<T> provider) {
         super(providerId, provider, new DefaultApiAdapter<T>());
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.ws.soap.security.wss4j.Wss4jSecurityInterceptor;
  */
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
+@SuppressWarnings("deprecation")
 public class PowerAuthWebServiceConfiguration {
 
     private SSLConfigurationService sslConfigurationService;

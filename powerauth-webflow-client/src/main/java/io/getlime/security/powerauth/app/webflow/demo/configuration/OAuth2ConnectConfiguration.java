@@ -61,7 +61,7 @@ public class OAuth2ConnectConfiguration extends SocialConfigurerAdapter {
                 webFlowConfig.getWebFlowOAuthTokenUrl(),
                 webFlowConfig.getWebFlowServiceUrl()
         );
-        DefaultApiConnectionFactory factory = new DefaultApiConnectionFactory("demo", provider);
+        DefaultApiConnectionFactory factory = new DefaultApiConnectionFactory<>("demo", provider);
         config.addConnectionFactory(factory);
     }
 

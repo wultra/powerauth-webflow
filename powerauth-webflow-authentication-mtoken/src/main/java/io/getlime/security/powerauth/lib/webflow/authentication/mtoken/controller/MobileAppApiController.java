@@ -102,7 +102,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String userId = apiAuthentication.getUserId();
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            return new ObjectResponse(operationList);
+            return new ObjectResponse<>(operationList);
         } else {
             throw new PowerAuthAuthenticationException("Authentication failed: Unable to download pending operations");
         }
