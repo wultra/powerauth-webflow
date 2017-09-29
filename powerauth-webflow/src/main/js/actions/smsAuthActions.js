@@ -41,7 +41,7 @@ export function init() {
                 }
             });
         }).catch((error) => {
-            console.log(error);
+            dispatchError(dispatch, error);
         })
     }
 }

@@ -45,11 +45,11 @@ export default class SMSAuthorization extends React.Component {
 
     componentWillMount() {
         this.init();
-        this.props.dispatch(getOperationData());
     }
 
     init() {
         this.props.dispatch(init());
+        this.props.dispatch(getOperationData());
     }
 
     handleAuthCodeChange(event) {
@@ -57,6 +57,8 @@ export default class SMSAuthorization extends React.Component {
     }
 
     handleSubmit(event) {
+        // prevent regular form submission
+        event.preventDefault();
         this.props.dispatch(authenticate(this.state.authCode));
     }
 
@@ -67,7 +69,7 @@ export default class SMSAuthorization extends React.Component {
     render() {
         return (
             <div id="operation">
-                <form>
+                <form onSubmit={this.handleSubmit}>
                     <Panel>
                         <OperationDetail/>
                         <br/>
