@@ -19,6 +19,24 @@ import {dispatchError} from "../dispatcher/dispatcher";
 export function getOperationData() {
     return function (dispatch) {
         axios.get("./api/auth/operation/detail").then((response) => {
+            if (response.data.formData && response.data.formData.userInput.chosenAuthMethod) {
+                // if authMethod is already chosen, skip choice and go directly to the authMethod
+                switch (response.data.formData.userInput.chosenAuthMethod) {
+                    case "POWERAUTH_TOKEN":
+                        dispatch({
+                            type: "SHOW_SCREEN_TOKEN",
+                            payload: response.data
+                        });
+                        return;
+                    case "SMS_KEY":
+                        dispatch({
+                            type: "SHOW_SCREEN_SMS",
+                            payload: response.data
+                        });
+                        return;
+                    // otherwise show regular operation review with authMethod choice
+                }
+            }
             dispatch({
                 type: "SHOW_SCREEN_OPERATION_REVIEW",
                 payload: response.data
@@ -38,6 +56,29 @@ export function cancel() {
                     message: response.data.message
                 }
             });
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+export function chooseAuthMethod(authMethod) {
+    return function (dispatch) {
+        dispatch({
+            type: "CHOOSE_AUTH_METHOD",
+            payload: {
+                chosenAuthMethod: authMethod
+            }
+        });
+    }
+}
+
+export function updateFormData(formData, callback) {
+    return function (dispatch) {
+        axios.put("./api/auth/operation/formData", {
+            formData: formData
+        }).then((response) => {
+            callback();
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

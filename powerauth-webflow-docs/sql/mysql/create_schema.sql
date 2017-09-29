@@ -22,7 +22,7 @@ CREATE TABLE oauth_client_details (
   refresh_token_validity  INTEGER,
   additional_information  VARCHAR(4096),
   autoapprove             VARCHAR(256)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE oauth_client_token (
   token_id          VARCHAR(256),
@@ -30,7 +30,7 @@ CREATE TABLE oauth_client_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 CREATE TABLE oauth_access_token (
@@ -41,18 +41,18 @@ CREATE TABLE oauth_access_token (
   client_id         VARCHAR(256),
   authentication    LONG VARBINARY,
   refresh_token     VARCHAR(256)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE oauth_refresh_token (
   token_id       VARCHAR(256),
   token          LONG VARBINARY,
   authentication LONG VARBINARY
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE oauth_code (
   code           VARCHAR(255),
   authentication LONG VARBINARY
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY,
@@ -64,7 +64,7 @@ CREATE TABLE ns_auth_method (
   max_auth_fails     INTEGER,
   has_user_interface BOOLEAN,
   display_name_key   VARCHAR(32)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY,
@@ -73,18 +73,18 @@ CREATE TABLE ns_user_prefs (
   auth_method_3 BOOLEAN,
   auth_method_4 BOOLEAN,
   auth_method_5 BOOLEAN
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ns_operation (
   operation_id              VARCHAR(256) PRIMARY KEY,
   operation_name            VARCHAR(32),
   operation_data            VARCHAR(4096),
-  operation_display_details TEXT,
+  operation_form_data       TEXT,
   user_id                   VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256),
@@ -100,7 +100,7 @@ CREATE TABLE ns_operation_history (
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id),
   FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ns_step_definition (
   step_definition_id       INTEGER PRIMARY KEY,
@@ -113,7 +113,7 @@ CREATE TABLE ns_step_definition (
   response_result          VARCHAR(32),
   FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE ba_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY,
@@ -127,4 +127,4 @@ CREATE TABLE ba_sms_authorization (
   timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

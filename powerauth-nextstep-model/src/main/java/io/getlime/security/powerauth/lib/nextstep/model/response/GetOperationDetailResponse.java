@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
@@ -40,7 +40,7 @@ public class GetOperationDetailResponse {
     private String operationData;
     private List<AuthStep> steps;
     private List<OperationHistory> history;
-    private OperationDisplayDetails displayDetails;
+    private OperationFormData formData;
 
     /**
      * Default constructor.
@@ -188,19 +188,19 @@ public class GetOperationDetailResponse {
     }
 
     /**
-     * Get display details (title, message, other visual attributes, ...) of the operation.
-     * @return Display details.
+     * Get form data (title, message, other visual attributes, ...) of the operation.
+     * @return Form data.
      */
-    public OperationDisplayDetails getDisplayDetails() {
-        return displayDetails;
+    public OperationFormData getFormData() {
+        return formData;
     }
 
     /**
-     * Set display details object.
-     * @param displayDetails Set display details.
+     * Set form data object.
+     * @param formData Set form data.
      */
-    public void setDisplayDetails(OperationDisplayDetails displayDetails) {
-        this.displayDetails = displayDetails;
+    public void setFormData(OperationFormData formData) {
+        this.formData = formData;
     }
 
 }

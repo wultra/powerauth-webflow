@@ -5,12 +5,12 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationMessageDisplayAttribute extends OperationDisplayAttribute {
+public class OperationMessageAttribute extends OperationFormAttribute {
 
     private String label;
     private String message;
 
-    public OperationMessageDisplayAttribute() {
+    public OperationMessageAttribute() {
         this.type = Type.MESSAGE;
     }
 

@@ -8,13 +8,13 @@ import java.math.BigDecimal;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationAmountDisplayAttribute extends OperationDisplayAttribute {
+public class OperationAmountAttribute extends OperationFormAttribute {
 
     private String label;
     private BigDecimal amount;
     private String currency;
 
-    public OperationAmountDisplayAttribute() {
+    public OperationAmountAttribute() {
         this.type = Type.AMOUNT;
     }
 

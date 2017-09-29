@@ -14,30 +14,45 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
- * @author Petr Dvorak, petr@lime-company.eu
+ * Request to update operation form data.
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationReviewDetailResponse {
+public class UpdateOperationFormDataRequest extends AuthStepRequest {
 
-    private String data;
     private OperationFormData formData;
 
-    public String getData() {
-        return data;
+    /**
+     * Default constructor.
+     */
+    public UpdateOperationFormDataRequest() {
     }
 
-    public void setData(String data) {
-        this.data = data;
+    /**
+     * Constructor with form data.
+     * @param formData Form data.
+     */
+    public UpdateOperationFormDataRequest(OperationFormData formData) {
+        this.formData = formData;
     }
 
+    /**
+     * Get the form data.
+     * @return Form data.
+     */
     public OperationFormData getFormData() {
         return formData;
     }
 
+    /**
+     * Set the form data.
+     * @param formData form data.
+     */
     public void setFormData(OperationFormData formData) {
         this.formData = formData;
     }

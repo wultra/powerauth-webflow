@@ -21,10 +21,10 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountDisplayAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationKeyValueDisplayAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationMessageDisplayAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationKeyValueAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationMessageAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
@@ -84,34 +84,34 @@ public class HomeController {
     @RequestMapping("/payment/create")
     public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
         String data = new ObjectMapper().writeValueAsString(paymentForm);
-        OperationDisplayDetails details = new OperationDisplayDetails();
-        details.setTitle("Confirm Payment");
-        details.setMessage("Hello, please confirm payment "
+        OperationFormData formData = new OperationFormData();
+        formData.setTitle("Confirm Payment");
+        formData.setMessage("Hello, please confirm payment "
                 + paymentForm.getAmount() + " " + paymentForm.getCurrency()
                 + " to account " + paymentForm.getAccount() + ".");
 
-        OperationAmountDisplayAttribute amountAttr = new OperationAmountDisplayAttribute();
+        OperationAmountAttribute amountAttr = new OperationAmountAttribute();
         amountAttr.setLabel("Amount");
         amountAttr.setAmount(paymentForm.getAmount());
         amountAttr.setCurrency(paymentForm.getCurrency());
-        details.getParameters().add(amountAttr);
+        formData.getParameters().add(amountAttr);
 
-        OperationKeyValueDisplayAttribute accountAttr = new OperationKeyValueDisplayAttribute();
+        OperationKeyValueAttribute accountAttr = new OperationKeyValueAttribute();
         accountAttr.setLabel("To Account");
         accountAttr.setValue(paymentForm.getAccount());
-        details.getParameters().add(accountAttr);
+        formData.getParameters().add(accountAttr);
 
-        OperationKeyValueDisplayAttribute dateAttr = new OperationKeyValueDisplayAttribute();
+        OperationKeyValueAttribute dateAttr = new OperationKeyValueAttribute();
         dateAttr.setLabel("Due Date");
         dateAttr.setValue("06/29/2017");
-        details.getParameters().add(dateAttr);
+        formData.getParameters().add(dateAttr);
 
-        OperationMessageDisplayAttribute messageAttr = new OperationMessageDisplayAttribute();
+        OperationMessageAttribute messageAttr = new OperationMessageAttribute();
         messageAttr.setLabel("Note");
         messageAttr.setMessage(paymentForm.getNote());
-        details.getParameters().add(messageAttr);
+        formData.getParameters().add(messageAttr);
 
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, details, null);
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 
         return "redirect:/";

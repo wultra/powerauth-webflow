@@ -16,29 +16,12 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 
 /**
- * @author Petr Dvorak, petr@lime-company.eu
+ * Response to update of form data.
+ *
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationReviewDetailResponse {
-
-    private String data;
-    private OperationFormData formData;
-
-    public String getData() {
-        return data;
-    }
-
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    public OperationFormData getFormData() {
-        return formData;
-    }
-
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
-    }
+public class UpdateOperationFormDataResponse extends AuthStepResponse {
 }

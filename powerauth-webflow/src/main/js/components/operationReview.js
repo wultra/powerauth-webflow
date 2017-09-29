@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {cancel, getOperationData} from "../actions/operationReviewActions";
+import {cancel, chooseAuthMethod, getOperationData, updateFormData} from "../actions/operationReviewActions";
 // Components
 import {Panel} from "react-bootstrap";
 import Spinner from 'react-spin';
@@ -40,6 +40,8 @@ export default class OperationReview extends React.Component {
         this.handleToken = this.handleToken.bind(this);
         this.handleSMS = this.handleSMS.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.switchToTokenScreen = this.switchToTokenScreen.bind(this);
+        this.switchToSMSScreen = this.switchToSMSScreen.bind(this);
     }
 
     componentWillMount() {
@@ -47,8 +49,18 @@ export default class OperationReview extends React.Component {
     }
 
     handleToken(event) {
-        // prevent regular form submission
-        event.preventDefault();
+        const switchToTokenScreen = this.switchToTokenScreen;
+        // choose authMethod and send updated formData, then move to the token screen
+        if (this.props.context.formData) {
+            this.props.dispatch(chooseAuthMethod("POWERAUTH_TOKEN"));
+            this.props.dispatch(updateFormData(this.props.context.formData, function () {
+                // change screen after form data are stored
+                switchToTokenScreen();
+            }));
+        }
+    }
+
+    switchToTokenScreen() {
         this.props.dispatch({
             type: "SHOW_SCREEN_TOKEN",
             payload: {
@@ -57,9 +69,20 @@ export default class OperationReview extends React.Component {
         });
     }
 
+
     handleSMS(event) {
-        // prevent regular form submission
-        event.preventDefault();
+        const switchToSMSScreen = this.switchToSMSScreen;
+        // choose authMethod and send updated formData, then move to the sms screen
+        if (this.props.context.formData) {
+            this.props.dispatch(chooseAuthMethod("SMS_KEY"));
+            this.props.dispatch(updateFormData(this.props.context.formData, function () {
+                // change screen after display details are stored
+                switchToSMSScreen();
+            }));
+        }
+    }
+
+    switchToSMSScreen() {
         this.props.dispatch({
             type: "SHOW_SCREEN_SMS",
             payload: {
@@ -73,7 +96,7 @@ export default class OperationReview extends React.Component {
     }
 
     render() {
-        if (this.props.context.displayDetails || this.props.context.data) {
+        if (this.props.context.formData || this.props.context.data) {
             return (
                 <div id="operation">
                     <form>
@@ -92,9 +115,9 @@ export default class OperationReview extends React.Component {
                                             switch (authMethod) {
                                                 case "POWERAUTH_TOKEN":
                                                     return (
-                                                        <div className="col-sm-6">
+                                                        <div className="col-sm-6" key={authMethod}>
                                                             <a href="#" onClick={this.handleToken}
-                                                               className="btn btn-lg btn-default" block>
+                                                               className="btn btn-lg btn-default">
                                                                 <FormattedMessage id="method.powerauthToken"/>
                                                             </a>
                                                         </div>
@@ -102,9 +125,9 @@ export default class OperationReview extends React.Component {
                                                     break;
                                                 case "SMS_KEY":
                                                     return (
-                                                        <div className="col-sm-6">
+                                                        <div className="col-sm-6" key={authMethod}>
                                                             <a href="#" onClick={this.handleSMS}
-                                                               className="btn btn-lg btn-default" block>
+                                                               className="btn btn-lg btn-default">
                                                                 <FormattedMessage id="method.smsKey"/>
                                                             </a>
                                                         </div>
@@ -113,8 +136,7 @@ export default class OperationReview extends React.Component {
                                             }
                                         })}
                                         <div className="col-sm-6">
-                                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default"
-                                               block>
+                                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                                 <FormattedMessage id="operation.cancel"/>
                                             </a>
                                         </div>
