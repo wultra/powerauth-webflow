@@ -49,7 +49,7 @@ export default class OperationDetail extends React.Component {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (!this.props.context.chosenBankAccountNumber) {
+                    if (!this.props.context.formData.userInput.chosenBankAccountNumber) {
                         // the context doesn't contain chosenBankAccountNumber yet, save it in the context
                         if (item.chosenBankAccountNumber) {
                             // bank account was already chosen (e.g. in previous step) - keep the choice
@@ -127,12 +127,16 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     )
                                 } else {
-                                    let chosenBankAccount = item.bankAccounts[0];
-                                    this.bankAccounts.map((bankAccount) => {
-                                        if (bankAccount.number === this.props.context.formData.userInput.chosenBankAccountNumber) {
-                                            chosenBankAccount = bankAccount;
-                                        }
-                                    });
+                                    let chosenBankAccount;
+                                    if (!this.props.context.formData.userInput.chosenBankAccountNumber) {
+                                        chosenBankAccount = item.bankAccounts[0];
+                                    } else {
+                                        this.bankAccounts.map((bankAccount) => {
+                                            if (bankAccount.number === this.props.context.formData.userInput.chosenBankAccountNumber) {
+                                                chosenBankAccount = bankAccount;
+                                            }
+                                        });
+                                    }
                                     return (
                                         <div key={item.label} className="attribute">
                                             <div className="col-sm-12">

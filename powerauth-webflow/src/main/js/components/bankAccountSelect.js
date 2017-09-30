@@ -30,21 +30,39 @@ export default class BankAccountSelect extends React.Component {
     }
 
     render () {
-        return (
-            <div className="section">
-                <Select
-                    optionComponent={BankAccountOption}
-                    options={this.props.bankAccounts}
-                    value={this.props.chosenBankAccount}
-                    valueComponent={BankAccountValue}
-                    disabled={this.props.choiceDisabled}
-                    clearable={false}
-                    searchable={false}
-                    autoFocus={true}
-                    onChange={this.onChange}
-                />
-            </div>
-        )
+        if (this.props.chosenBankAccount) {
+            return (
+                <div className="section">
+                    <Select
+                        optionComponent={BankAccountOption}
+                        options={this.props.bankAccounts}
+                        value={this.props.chosenBankAccount}
+                        valueComponent={BankAccountValue}
+                        disabled={this.props.choiceDisabled}
+                        clearable={false}
+                        searchable={false}
+                        autoFocus={true}
+                        onChange={this.onChange}
+                    />
+                </div>
+            )
+        } else {
+            // component initialization - do not show data yet
+            return (
+                <div className="section">
+                    <Select
+                        optionComponent={BankAccountOption}
+                        options={null}
+                        value={null}
+                        valueComponent={BankAccountValue}
+                        disabled={this.props.choiceDisabled}
+                        clearable={false}
+                        searchable={false}
+                        autoFocus={true}
+                    />
+                </div>
+            )
+        }
     }
 }
 
