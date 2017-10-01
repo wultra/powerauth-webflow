@@ -41,7 +41,6 @@ export default class Login extends React.Component {
     }
 
     handleLogin(event) {
-        // prevent regular form submission
         event.preventDefault();
         var username = ReactDOM.findDOMNode(this.refs.username);
         var password = ReactDOM.findDOMNode(this.refs.password);
@@ -50,6 +49,7 @@ export default class Login extends React.Component {
     }
 
     handleCancel(event) {
+        event.preventDefault();
         var username = ReactDOM.findDOMNode(this.refs.username);
         var password = ReactDOM.findDOMNode(this.refs.password);
         this.props.dispatch(cancel());

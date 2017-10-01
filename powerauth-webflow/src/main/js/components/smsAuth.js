@@ -57,12 +57,12 @@ export default class SMSAuthorization extends React.Component {
     }
 
     handleSubmit(event) {
-        // prevent regular form submission
         event.preventDefault();
         this.props.dispatch(authenticate(this.state.authCode));
     }
 
     handleCancel(event) {
+        event.preventDefault();
         this.props.dispatch(cancel());
     }
 
