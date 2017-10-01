@@ -64,20 +64,20 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
             errors.rejectValue("operationName", "smsAuthorization.operationName.long");
         }
 
-        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getFormData());
+        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
         BigDecimal amount = amountAttribute.getAmount();
         String currency = amountAttribute.getCurrency();
-        String account = operationFormDataService.getAccount(authRequest.getFormData());
+        String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
         if (amount == null) {
-            errors.rejectValue("operationData", "smsAuthorization.amount.empty");
+            errors.rejectValue("operationFormData", "smsAuthorization.amount.empty");
         } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("operationData", "smsAuthorization.amount.invalid");
+            errors.rejectValue("operationFormData", "smsAuthorization.amount.invalid");
         }
         if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("operationData", "smsAuthorization.currency.empty");
+            errors.rejectValue("operationFormData", "smsAuthorization.currency.empty");
         }
         if (account == null || account.isEmpty()) {
-            errors.rejectValue("operationData", "smsAuthorization.account.empty");
+            errors.rejectValue("operationFormData", "smsAuthorization.account.empty");
         }
 
     }

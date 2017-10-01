@@ -42,7 +42,7 @@ public class CreateSMSAuthorizationRequest {
     /**
      * Operation formData.
      */
-    private OperationFormData formData;
+    private OperationFormData operationFormData;
 
     /**
      * Language used in the SMS OTP messages.
@@ -52,11 +52,12 @@ public class CreateSMSAuthorizationRequest {
     public CreateSMSAuthorizationRequest() {
     }
 
-    public CreateSMSAuthorizationRequest(String operationId, String userId, String operationName, OperationFormData formData, String lang) {
+    public CreateSMSAuthorizationRequest(String operationId, String userId, String operationName,
+                                         OperationFormData operationFormData, String lang) {
         this.operationId = operationId;
         this.userId = userId;
         this.operationName = operationName;
-        this.formData = formData;
+        this.operationFormData = operationFormData;
         this.lang = lang;
     }
 
@@ -84,12 +85,12 @@ public class CreateSMSAuthorizationRequest {
         this.operationName = operationName;
     }
 
-    public OperationFormData getFormData() {
-        return formData;
+    public OperationFormData getOperationFormData() {
+        return operationFormData;
     }
 
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
+    public void setOperationFormData(OperationFormData operationFormData) {
+        this.operationFormData = operationFormData;
     }
 
     public String getLang() {

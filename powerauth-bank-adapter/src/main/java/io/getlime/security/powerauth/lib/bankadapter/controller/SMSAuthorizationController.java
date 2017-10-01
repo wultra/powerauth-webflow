@@ -103,10 +103,10 @@ public class SMSAuthorizationController {
         String messageId = UUID.randomUUID().toString();
 
         // update names of operationData JSON fields if necessary
-        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(createSMSAuthorizationRequest.getFormData());
+        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(createSMSAuthorizationRequest.getOperationFormData());
         BigDecimal amount = amountAttribute.getAmount();
         String currency = amountAttribute.getCurrency();
-        String account = operationFormDataService.getAccount(createSMSAuthorizationRequest.getFormData());
+        String account = operationFormDataService.getAccount(createSMSAuthorizationRequest.getOperationFormData());
 
         // update localized SMS message text in resources
         String authorizationCode = generateAuthorizationCode(amount, currency, account);
