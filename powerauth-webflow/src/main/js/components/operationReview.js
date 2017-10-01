@@ -49,6 +49,7 @@ export default class OperationReview extends React.Component {
     }
 
     handleToken(event) {
+        event.preventDefault();
         const switchToTokenScreen = this.switchToTokenScreen;
         // choose authMethod and send updated formData, then move to the token screen
         if (this.props.context.formData) {
@@ -71,6 +72,7 @@ export default class OperationReview extends React.Component {
 
 
     handleSMS(event) {
+        event.preventDefault();
         const switchToSMSScreen = this.switchToSMSScreen;
         // choose authMethod and send updated formData, then move to the sms screen
         if (this.props.context.formData) {
@@ -92,6 +94,7 @@ export default class OperationReview extends React.Component {
     }
 
     handleCancel(event) {
+        event.preventDefault();
         this.props.dispatch(cancel());
     }
 
