@@ -17,7 +17,6 @@
 package io.getlime.security.powerauth.lib.bankadapter.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -29,6 +28,7 @@ import io.getlime.security.powerauth.lib.bankadapter.model.response.Authenticati
 import io.getlime.security.powerauth.lib.bankadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.bankadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.bankadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -142,17 +142,17 @@ public class BankAdapterClient {
     /**
      * Create authorization SMS OTP message.
      *
+     * @param operationId   Operation ID.
      * @param userId        User ID.
      * @param operationName Operation name.
-     * @param operationData Operation data in JSON format.
+     * @param formData      Operation form data.
      * @param lang          language for i18n.
      * @return Response with generated messageId.
      * @throws BankAdapterClientErrorException Exception thrown when action fails.
      */
-    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, String operationName, String operationData, String lang) throws BankAdapterClientErrorException {
+    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String operationId, String userId, String operationName, OperationFormData formData, String lang) throws BankAdapterClientErrorException {
         try {
-            JsonNode operationDataJson = objectMapper.readTree(operationData);
-            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, operationName, operationDataJson, lang);
+            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(operationId, userId, operationName, formData, lang);
             HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = defaultTemplate().exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
@@ -167,8 +167,6 @@ public class BankAdapterClient {
             }
         } catch (ResourceAccessException ex) { // Bank Adapter service is down
             throw resourceAccessException(ex);
-        } catch (IOException ex) {
-            throw ioException(ex);
         }
     }
 

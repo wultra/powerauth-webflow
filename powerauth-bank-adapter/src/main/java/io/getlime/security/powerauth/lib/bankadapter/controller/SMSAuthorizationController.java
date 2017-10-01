@@ -27,8 +27,11 @@ import io.getlime.security.powerauth.lib.bankadapter.model.request.VerifySMSAuth
 import io.getlime.security.powerauth.lib.bankadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.bankadapter.repository.SMSAuthorizationRepository;
 import io.getlime.security.powerauth.lib.bankadapter.repository.model.entity.SMSAuthorizationEntity;
+import io.getlime.security.powerauth.lib.bankadapter.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.bankadapter.validation.CreateSMSAuthorizationRequestValidator;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import org.joda.time.DateTime;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -63,10 +66,16 @@ public class SMSAuthorizationController {
 
     private SMSAuthorizationRepository smsAuthorizationRepository;
     private BankAdapterConfiguration bankAdapterConfiguration;
+    private OperationFormDataService operationFormDataService;
+    private CreateSMSAuthorizationRequestValidator requestValidator;
 
-    public SMSAuthorizationController(SMSAuthorizationRepository smsAuthorizationRepository, BankAdapterConfiguration bankAdapterConfiguration) {
+    @Autowired
+    public SMSAuthorizationController(SMSAuthorizationRepository smsAuthorizationRepository, BankAdapterConfiguration bankAdapterConfiguration,
+                                      OperationFormDataService operationFormDataService, CreateSMSAuthorizationRequestValidator requestValidator) {
         this.smsAuthorizationRepository = smsAuthorizationRepository;
         this.bankAdapterConfiguration = bankAdapterConfiguration;
+        this.operationFormDataService = operationFormDataService;
+        this.requestValidator = requestValidator;
     }
 
     /**
@@ -81,9 +90,8 @@ public class SMSAuthorizationController {
 
         // input validation is handled by CreateSMSAuthorizationRequestValidator
         // validation is invoked manually because of the generified Request object
-        CreateSMSAuthorizationRequestValidator validator = new CreateSMSAuthorizationRequestValidator();
         BeanPropertyBindingResult result = new BeanPropertyBindingResult(createSMSAuthorizationRequest, "createSMSAuthorizationRequest");
-        ValidationUtils.invokeValidator(validator, createSMSAuthorizationRequest, result);
+        ValidationUtils.invokeValidator(requestValidator, createSMSAuthorizationRequest, result);
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
             MethodParameter methodParam = new MethodParameter(new Object() {
@@ -95,9 +103,10 @@ public class SMSAuthorizationController {
         String messageId = UUID.randomUUID().toString();
 
         // update names of operationData JSON fields if necessary
-        BigDecimal amount = createSMSAuthorizationRequest.getOperationData().get("amount").decimalValue();
-        String currency = createSMSAuthorizationRequest.getOperationData().get("currency").textValue();
-        String account = createSMSAuthorizationRequest.getOperationData().get("account").textValue();
+        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(createSMSAuthorizationRequest.getFormData());
+        BigDecimal amount = amountAttribute.getAmount();
+        String currency = amountAttribute.getCurrency();
+        String account = operationFormDataService.getAccount(createSMSAuthorizationRequest.getFormData());
 
         // update localized SMS message text in resources
         String authorizationCode = generateAuthorizationCode(amount, currency, account);
@@ -106,9 +115,9 @@ public class SMSAuthorizationController {
 
         SMSAuthorizationEntity smsEntity = new SMSAuthorizationEntity();
         smsEntity.setMessageId(messageId);
+        smsEntity.setOperationId(createSMSAuthorizationRequest.getOperationId());
         smsEntity.setUserId(createSMSAuthorizationRequest.getUserId());
         smsEntity.setOperationName(createSMSAuthorizationRequest.getOperationName());
-        smsEntity.setOperationData(createSMSAuthorizationRequest.getOperationData().toString());
         smsEntity.setAuthorizationCode(authorizationCode);
         smsEntity.setMessageText(messageText);
         smsEntity.setVerifyRequestCount(0);
@@ -207,6 +216,7 @@ public class SMSAuthorizationController {
     private MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/static/resources/messages");
+        messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
 }

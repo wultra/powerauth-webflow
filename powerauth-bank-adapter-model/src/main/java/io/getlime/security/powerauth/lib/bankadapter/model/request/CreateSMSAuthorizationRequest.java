@@ -15,8 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.bankadapter.model.request;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 
 /**
  * Request for creating SMS OTP authorization message.
@@ -24,6 +23,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class CreateSMSAuthorizationRequest {
+
+    /**
+     * Operation ID related to this authorization request.
+     */
+    private String operationId;
 
     /**
      * User ID for this authorization request.
@@ -36,9 +40,9 @@ public class CreateSMSAuthorizationRequest {
     private String operationName;
 
     /**
-     * Operation data in JSON format.
+     * Operation formData.
      */
-    private JsonNode operationData;
+    private OperationFormData formData;
 
     /**
      * Language used in the SMS OTP messages.
@@ -48,11 +52,20 @@ public class CreateSMSAuthorizationRequest {
     public CreateSMSAuthorizationRequest() {
     }
 
-    public CreateSMSAuthorizationRequest(String userId, String operationName, JsonNode operationData, String lang) {
+    public CreateSMSAuthorizationRequest(String operationId, String userId, String operationName, OperationFormData formData, String lang) {
+        this.operationId = operationId;
         this.userId = userId;
         this.operationName = operationName;
-        this.operationData = operationData;
+        this.formData = formData;
         this.lang = lang;
+    }
+
+    public String getOperationId() {
+        return operationId;
+    }
+
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     public String getUserId() {
@@ -71,12 +84,12 @@ public class CreateSMSAuthorizationRequest {
         this.operationName = operationName;
     }
 
-    public JsonNode getOperationData() {
-        return operationData;
+    public OperationFormData getFormData() {
+        return formData;
     }
 
-    public void setOperationData(ObjectNode operationData) {
-        this.operationData = operationData;
+    public void setFormData(OperationFormData formData) {
+        this.formData = formData;
     }
 
     public String getLang() {

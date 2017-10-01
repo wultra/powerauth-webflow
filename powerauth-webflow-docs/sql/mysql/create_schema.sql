@@ -78,7 +78,7 @@ CREATE TABLE ns_user_prefs (
 CREATE TABLE ns_operation (
   operation_id              VARCHAR(256) PRIMARY KEY,
   operation_name            VARCHAR(32),
-  operation_data            VARCHAR(4096),
+  operation_data            TEXT,
   operation_form_data       TEXT,
   user_id                   VARCHAR(256),
   result                    VARCHAR(32),
@@ -117,11 +117,11 @@ CREATE TABLE ns_step_definition (
 
 CREATE TABLE ba_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY,
+  operation_id         VARCHAR(256),
   user_id              VARCHAR(256),
   operation_name       VARCHAR(32),
-  operation_data       VARCHAR(4096),
   authorization_code   VARCHAR(32),
-  message_text         VARCHAR(256),
+  message_text         TEXT,
   verify_request_count INTEGER,
   verified             BOOLEAN,
   timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
