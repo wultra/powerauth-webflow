@@ -99,16 +99,18 @@ class BankAccountValue extends React.Component {
 
 function formatBankAccount(bankAccount, multiLine) {
     return (
-        <div className="font-tiny">
+        <div>
             <table width="100%">
                 <tbody>
                 <tr>
-                    <td width="25%">{bankAccount.number}</td>
-                    <td width="35%">&nbsp;{bankAccount.name}&nbsp;</td>
-                    <td width="40%">
-                        <FormattedMessage id="operationReview.bankAccount.balance"/>
-                        &nbsp;{bankAccount.balance} {bankAccount.currency}
+                    <td width="50%">{bankAccount.name}</td>
+                    <td width="50%" className="tint text-right">
+                        {bankAccount.balance} {bankAccount.currency}
                     </td>
+                </tr>
+                <tr>
+                    <td width="50%" className="message-information">{bankAccount.number}</td>
+                    <td width="50%"></td>
                 </tr>
                 {(!bankAccount.usableForPayment && multiLine) ? (
                     <tr>

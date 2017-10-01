@@ -56,6 +56,7 @@ a:hover, a:active, a:focus {
 
 .btn-success:hover, .btn-success:active, .btn-success:focus {
     background-color: #4c7400 !important;
+    color: white !important;
     border: none;
 }
 
@@ -68,8 +69,9 @@ a:hover, a:active, a:focus {
 
 .image.mtoken {
     background-image: url("../images/token.png");
-    width: 185px;
-    height: 190px;
+    width: 120px;
+    height: 120px;
+    margin: 0px auto;
 }
 
 .image-result {
@@ -148,16 +150,40 @@ a:hover, a:active, a:focus {
 }
 
 #operation .attribute {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#operation .auth-actions {
     margin-top: 20px;
-    margin-bottom: 20px;
 }
 
 #operation .buttons {
-    margin-top: 40px;
+    margin-top: 20px;
 }
 
 #operation .btn {
     width: 100%;
+}
+
+/* Base styling */
+
+.tint {
+    color: #7FC000;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+/* React Select Fix */
+
+.Select-input {
+    height: 68px;
+}
+
+.Select-placeholder {
+    line-height: 68px
 }
 
 /* LOGIN */

@@ -102,43 +102,48 @@ export default class OperationReview extends React.Component {
                     <form>
                         <Panel>
                             <OperationDetail/>
-                            <br/>
                             {(this.props.context.authMethods.length > 0) ? (
-                                <div>
+                                <div className="auth-actions">
                                     {(this.props.context.authMethods.length > 1) ? (
                                         <FormattedMessage id="operation.confirmationTextChoice"/>
                                     ) : (
                                         <FormattedMessage id="operation.confirmationText"/>
                                     )}
-                                    <div className="row buttons">
+                                    <div className="buttons">
                                         {this.props.context.authMethods.map((authMethod) => {
                                             switch (authMethod) {
                                                 case "POWERAUTH_TOKEN":
                                                     return (
-                                                        <div className="col-sm-6" key={authMethod}>
-                                                            <a href="#" onClick={this.handleToken}
-                                                               className="btn btn-lg btn-default">
-                                                                <FormattedMessage id="method.powerauthToken"/>
-                                                            </a>
+                                                        <div className="attribute row">
+                                                            <div className="col-sm-12" key={authMethod}>
+                                                                <a href="#" onClick={this.handleToken}
+                                                                   className="btn btn-lg btn-success">
+                                                                    <FormattedMessage id="method.powerauthToken"/>
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     );
                                                     break;
                                                 case "SMS_KEY":
                                                     return (
-                                                        <div className="col-sm-6" key={authMethod}>
-                                                            <a href="#" onClick={this.handleSMS}
-                                                               className="btn btn-lg btn-default">
-                                                                <FormattedMessage id="method.smsKey"/>
-                                                            </a>
+                                                        <div className="attribute row">
+                                                            <div className="col-sm-12" key={authMethod}>
+                                                                <a href="#" onClick={this.handleSMS}
+                                                                   className="btn btn-lg btn-success">
+                                                                    <FormattedMessage id="method.smsKey"/>
+                                                                </a>
+                                                            </div>
                                                         </div>
                                                     );
                                                     break;
                                             }
                                         })}
-                                        <div className="col-sm-6">
-                                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                                <FormattedMessage id="operation.cancel"/>
-                                            </a>
+                                        <div className="attribute row">
+                                            <div className="col-sm-12">
+                                                <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                                    <FormattedMessage id="operation.cancel"/>
+                                                </a>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

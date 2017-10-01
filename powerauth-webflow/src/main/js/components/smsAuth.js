@@ -72,22 +72,36 @@ export default class SMSAuthorization extends React.Component {
                 <form onSubmit={this.handleSubmit}>
                     <Panel>
                         <OperationDetail/>
-                        <br/>
-                        {(this.props.context.message) ? (
-                            <FormGroup
-                                className={(this.props.context.error ? "message-error" : "message-information" )}>
-                                <FormattedMessage id={this.props.context.message}/>
-                            </FormGroup>
-                        ) : (undefined)}
-                        <FormattedMessage id="smsAuthorization.authCodeText"/>
-                        <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                        <br/><br/>
-                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                            <FormattedMessage id="operation.cancel"/>
-                        </a>
-                        <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
-                            <FormattedMessage id="operation.confirm"/>
-                        </a>
+                        <div className="auth-actions">
+                            {(this.props.context.message) ? (
+                                <FormGroup
+                                    className={(this.props.context.error ? "message-error" : "message-information" )}>
+                                    <FormattedMessage id={this.props.context.message}/>
+                                </FormGroup>
+                            ) : (undefined)}
+                            <div className="attribute row">
+                                <div className="col-sm-12">
+                                    <FormattedMessage id="smsAuthorization.authCodeText"/>
+                                </div>
+                            </div>
+                            <div className="attribute row">
+                                <div className="col-sm-12">
+                                    <input autoFocus className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
+                                </div>
+                            </div>
+                            <div className="attribute row">
+                                <div className="col-sm-6">
+                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                        <FormattedMessage id="operation.cancel"/>
+                                    </a>
+                                </div>
+                                <div className="col-sm-6">
+                                    <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                        <FormattedMessage id="operation.confirm"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     </Panel>
                 </form>
                 {this.props.context.loading ? <Spinner/> : undefined}

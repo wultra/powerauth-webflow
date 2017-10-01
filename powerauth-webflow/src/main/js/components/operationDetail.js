@@ -85,11 +85,11 @@ export default class OperationDetail extends React.Component {
                         <h3>{this.props.context.formData.title}</h3>
                         <p>{this.props.context.formData.message}</p>
                     </div>
-                    <div className="row">
+                    <div>
                         {this.props.context.formData.parameters.map((item) => {
                             if (item.type === "AMOUNT") {
                                 return (
-                                    <div className="attribute" key={item.label}>
+                                    <div className="row attribute" key={item.label}>
                                         <div className="col-sm-6 key">
                                             {item.label}
                                         </div>
@@ -100,7 +100,7 @@ export default class OperationDetail extends React.Component {
                                 )
                             } else if (item.type === "KEY_VALUE") {
                                 return (
-                                    <div className="attribute" key={item.label}>
+                                    <div className="row attribute" key={item.label}>
                                         <div className="col-sm-6 key">
                                             {item.label}
                                         </div>
@@ -111,7 +111,7 @@ export default class OperationDetail extends React.Component {
                                 )
                             } else if (item.type === "MESSAGE") {
                                 return (
-                                    <div className="attribute" key={item.label}>
+                                    <div className="row attribute" key={item.label}>
                                         <div className="col-sm-12">
                                             <div className="key">{item.label}</div>
                                             <div className="value">{item.message}</div>
@@ -138,7 +138,7 @@ export default class OperationDetail extends React.Component {
                                         });
                                     }
                                     return (
-                                        <div key={item.label} className="attribute">
+                                        <div key={item.label} className="row attribute">
                                             <div className="col-sm-12">
                                                 <div className="key">
                                                     <FormattedMessage id="operationReview.bankAccount.number"/>

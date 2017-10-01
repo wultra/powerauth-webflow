@@ -213,14 +213,21 @@ export default class Token extends React.Component {
                 <form>
                     <Panel>
                         <OperationDetail/>
-                        <div className="image mtoken"></div>
-                        <div className="font-small message-information">
-                            <FormattedMessage id="message.token.offline"/><br/>
-                            <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
-                            <br/><br/>
-                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                <FormattedMessage id="operation.cancel"/>
-                            </a>
+                        <div className="auth-actions">
+                            <div className="attributes">
+                                <div className="image mtoken"></div>
+                            </div>
+                            <div className="attributes">
+                                <div className="font-small message-information">
+                                    <FormattedMessage id="message.token.offline"/><br/>
+                                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
+                                </div>
+                            </div>
+                            <div className="attribute row">
+                                <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="operation.cancel"/>
+                                </a>
+                            </div>
                         </div>
                     </Panel>
                 </form>

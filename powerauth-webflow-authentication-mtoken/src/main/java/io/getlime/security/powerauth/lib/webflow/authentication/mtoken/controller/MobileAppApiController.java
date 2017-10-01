@@ -45,14 +45,18 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/token/app")
 public class MobileAppApiController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
-    @Autowired
-    private WebSocketMessageService webSocketMessageService;
+    private final WebSocketMessageService webSocketMessageService;
+
+    private final PushServiceConfiguration configuration;
+
+    private final PushServerClient pushServerClient;
 
     @Autowired
-    private PushServiceConfiguration configuration;
-
-    @Autowired
-    private PushServerClient pushServerClient;
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, PushServiceConfiguration configuration, PushServerClient pushServerClient) {
+        this.webSocketMessageService = webSocketMessageService;
+        this.configuration = configuration;
+        this.pushServerClient = pushServerClient;
+    }
 
     @Override
     protected AuthMethod getAuthMethodName() {
@@ -84,7 +88,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             p = MobilePlatform.iOS;
         }
         try {
-            boolean result = pushServerClient.registerDevice(configuration.getPushServerApplication(), token, p, activationId);
+            boolean result = pushServerClient.createDevice(configuration.getPushServerApplication(), token, p, activationId);
             if (result) {
                 return new Response();
             } else {

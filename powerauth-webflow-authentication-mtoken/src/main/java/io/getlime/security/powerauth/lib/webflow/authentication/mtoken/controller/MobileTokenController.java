@@ -22,7 +22,7 @@ import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
 import io.getlime.push.model.entity.PushMessageBody;
-import io.getlime.push.model.entity.PushSendResult;
+import io.getlime.push.model.entity.PushMessageSendResult;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
@@ -54,14 +54,16 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
-    @Autowired
-    private PushServerClient pushServerClient;
+    private final PushServerClient pushServerClient;
+    private final PushServiceConfiguration configuration;
+    private final WebSocketMessageService webSocketMessageService;
 
     @Autowired
-    private PushServiceConfiguration configuration;
-
-    @Autowired
-    private WebSocketMessageService webSocketMessageService;
+    public MobileTokenController(PushServerClient pushServerClient, PushServiceConfiguration configuration, WebSocketMessageService webSocketMessageService) {
+        this.pushServerClient = pushServerClient;
+        this.configuration = configuration;
+        this.webSocketMessageService = webSocketMessageService;
+    }
 
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
@@ -88,8 +90,8 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         PushMessage message = new PushMessage();
         message.setUserId(userId);
-        message.setPersonal(true);
-        message.setEncrypted(true);
+        message.getAttributes().setPersonal(true);
+        message.getAttributes().setEncrypted(true);
 
         final OperationFormData formData = operation.getFormData();
 
@@ -105,13 +107,13 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
         body.setSound("default");
         body.setCategory(operation.getOperationName());
 
-        message.setMessage(body);
+        message.setBody(body);
 
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
 
         try {
-            final ObjectResponse<PushSendResult> response = pushServerClient.sendNotification(configuration.getPushServerApplication(), message);
+            final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(configuration.getPushServerApplication(), message);
             if (response.getStatus().equals(Response.Status.OK)) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
             } else {
