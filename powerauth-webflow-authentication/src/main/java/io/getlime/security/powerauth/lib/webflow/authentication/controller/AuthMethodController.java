@@ -56,7 +56,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     private AuthenticationManagementService authenticationManagementService;
 
     @Autowired
-
     private NextStepClient nextStepService;
 
     protected GetOperationDetailResponse getOperation() {

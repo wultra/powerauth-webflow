@@ -78,7 +78,7 @@ class BankAccountOption extends React.Component {
                  onMouseMove={this.handleMouseMove}
                  onMouseDown={this.handleMouseDown}
                  onMouseEnter={this.handleMouseEnter}>
-                {formatBankAccount(bankAccount, true)}
+                {formatBankAccount(bankAccount)}
             </div>
         );
     }
@@ -90,14 +90,14 @@ class BankAccountValue extends React.Component {
         return (
             <div className="Select-value">
                 <span className="Select-value-label">
-                    {formatBankAccount(bankAccount, false)}
+                    {formatBankAccount(bankAccount)}
                 </span>
             </div>
         );
     }
 }
 
-function formatBankAccount(bankAccount, multiLine) {
+function formatBankAccount(bankAccount) {
     return (
         <div>
             <table width="100%">
@@ -110,20 +110,12 @@ function formatBankAccount(bankAccount, multiLine) {
                 </tr>
                 <tr>
                     <td width="50%" className="message-information">{bankAccount.number}</td>
-                    <td width="50%"></td>
+                    <td width="50%">
+                        <div className="message-error font-tiny">
+                            <FormattedMessage id={bankAccount.unusableForPaymentReason}/>
+                        </div>
+                    </td>
                 </tr>
-                {(!bankAccount.usableForPayment && multiLine) ? (
-                    <tr>
-                        <td colSpan="3">
-                            <div className="message-error font-tiny">
-                                <FormattedMessage
-                                    id={bankAccount.unusableForPaymentReason}/>
-                            </div>
-                        </td>
-                    </tr>
-                ) : (
-                    undefined
-                )}
                 </tbody>
             </table>
         </div>
