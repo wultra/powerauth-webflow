@@ -47,26 +47,40 @@ export default class Token extends React.Component {
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.state = {authorizationInProgress: false, authorized: false};
+        this.cancelAuthorization = this.cancelAuthorization.bind(this);
+        this.setUpdateTimeout = this.setUpdateTimeout.bind(this);
+        this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
+        this.state = {
+            webSocketInitialized: false,
+            authorizationInProgress: false,
+            authorized: false,
+            authorizationCanceled: false,
+            updateTimeout: null
+        };
     }
 
     componentWillMount() {
         this.init();
         this.update();
-        this.props.dispatch(getOperationData());
     }
 
     init() {
         this.props.dispatch(init());
+        this.props.dispatch(getOperationData());
     }
 
     update() {
         // Save references to the methods for the calls from anonymous functions.
         const setAuthorized = this.setAuthorized;
         const setAuthorizationInProgress = this.setAuthorizationInProgress;
+        const setUpdateTimeout = this.setUpdateTimeout;
         const update = this.update;
         if (this.isAuthorized()) {
             // Authorization was already done, there is nothing to do.
+            return;
+        }
+        if (this.isAuthorizationCanceled()) {
+            // Authorization was canceled, there is nothing to do.
             return;
         }
         // Authorization is in progress and wasn't completed yet (this state happens when authorization is initiated by WebSockets).
@@ -74,9 +88,10 @@ export default class Token extends React.Component {
             // If the WebSocket authorization is in progress, calling authenticate() method is temporarily paused,
             // however update() method is called in 3s to check for possible change of state in case WebSocket
             // authenticate() method fails. In this case the 3s polling with call of the authenticate() method will be resumed.
-            setTimeout(function () {
+            const timeout = setTimeout(function () {
                 update();
             }, 3000);
+            setUpdateTimeout(timeout);
         } else {
             // Mark authorization in progress to lock calling of the authenticate() method. This prevents duplicate calls
             // of the authenticate() method.
@@ -85,9 +100,10 @@ export default class Token extends React.Component {
             // authorization by WebSockets fails completely (e.g. network issues).
             this.props.dispatch(authenticate(function (b) {
                 if (b) {
-                    setTimeout(function () {
+                    const timeout = setTimeout(function () {
                         update();
                     }, 3000);
+                    setUpdateTimeout(timeout);
                 } else {
                     // Authorization was completed successfully.
                     setAuthorized(true);
@@ -114,6 +130,22 @@ export default class Token extends React.Component {
         return this.state.authorizationInProgress;
     }
 
+    cancelAuthorization() {
+        this.setState({authorizationCanceled: true});
+    }
+
+    isAuthorizationCanceled() {
+        return this.state.authorizationCanceled;
+    }
+
+    setUpdateTimeout(timeout) {
+        this.setState({updateTimeout: timeout});
+    }
+
+    getUpdateTimeout() {
+        return this.state.updateTimeout;
+    }
+
     onRegister() {
         console.log('WebSocket has been registered.');
     }
@@ -131,6 +163,10 @@ export default class Token extends React.Component {
             // Authorization is already in progress, do not dispatch authenticate(), it is already handled by polling.
             return;
         }
+        if (this.isAuthorizationCanceled()) {
+            // Authorization was canceled, there is nothing to do.
+            return;
+        }
         // Mark authorization in progress to lock calling of the authenticate() method. This prevents duplicate calls
         // of the authenticate() method.
         setAuthorizationInProgress(true);
@@ -145,16 +181,29 @@ export default class Token extends React.Component {
     }
 
     handleCancel(event) {
+        // cancel authorization, update() method could be already called
+        this.cancelAuthorization();
+        // cancel update() call using timeout if it is scheduled for future
+        const updateTimeout = this.getUpdateTimeout();
+        if (updateTimeout !== null) {
+            clearTimeout(updateTimeout);
+        }
+        // disconnect Web Socket connection
+        stompClient.disconnect();
         this.props.dispatch(cancel());
     }
 
     componentWillReceiveProps(props) {
-        const webSocketId = props.context.webSocketId;
-        if (webSocketId !== undefined) {
-            stompClient.register([
-                {route: '/user/topic/registration', callback: this.onRegister},
-                {route: '/user/topic/authorization', callback: this.onAuthorize}
-            ], webSocketId);
+        if (!this.state.webSocketInitialized) {
+            const webSocketId = props.context.webSocketId;
+            if (webSocketId !== undefined) {
+                stompClient.register([
+                    {route: '/user/topic/registration', callback: this.onRegister},
+                    {route: '/user/topic/authorization', callback: this.onAuthorize}
+                ], webSocketId);
+                // WebSocket needs to be initialized only once
+                this.setState({webSocketInitialized: true});
+            }
         }
     }
 

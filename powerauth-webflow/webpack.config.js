@@ -3,6 +3,7 @@ var path = require('path');
 var node_dir = __dirname + '/node_modules';
 
 var WebpackDeployPlugin = require('./src/main/js/webpack-deploy.js');
+var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
 
 module.exports = {
     entry: './src/main/js/client.js',
@@ -32,6 +33,7 @@ module.exports = {
         ]
     },
     plugins: [
-        new WebpackDeployPlugin()
+        new WebpackDeployPlugin(),
+        new HardSourceWebpackPlugin()
     ]
 };

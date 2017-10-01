@@ -37,7 +37,7 @@ export function init() {
                 payload: response.data
             });
         }).catch((error) => {
-            console.log(error);
+            dispatchError(dispatch, error);
         })
     }
 }

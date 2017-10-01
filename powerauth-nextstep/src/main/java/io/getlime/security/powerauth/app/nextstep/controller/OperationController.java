@@ -23,12 +23,9 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOperationDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetPendingOperationsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
@@ -121,7 +118,7 @@ public class OperationController {
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
         }
-        assignDisplayDetails(response, operation);
+        assignFormData(response, operation);
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
@@ -167,7 +164,7 @@ public class OperationController {
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());
             }
-            assignDisplayDetails(response, operation);
+            assignFormData(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
@@ -176,21 +173,34 @@ public class OperationController {
     }
 
     /**
-     * In case operation entity has serialized display details, attempt to deserialize the
+     * Update operation with given ID with a previous authentication step result.
+     *
+     * @param request Update operation request.
+     * @return Update operation response.
+     */
+    @RequestMapping(value = "/operation/formData", method = RequestMethod.PUT)
+    public @ResponseBody ObjectResponse updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) {
+        // persist operation form data update
+        operationPersistenceService.updateFormData(request.getRequestObject());
+        return new ObjectResponse();
+    }
+
+    /**
+     * In case operation entity has serialized form data, attempt to deserialize the
      * object and assign it to the response with operation detail.
      * @param response Reponse to be enriched by operation detail.
      * @param operation Database entity representing operation.
      */
-    private void assignDisplayDetails(GetOperationDetailResponse response, OperationEntity operation) {
-        if (operation.getOperationDisplayDetails() != null) {
+    private void assignFormData(GetOperationDetailResponse response, OperationEntity operation) {
+        if (operation.getOperationFormData() != null) {
             //TODO: This needs to be written better, see issue #39.
-            OperationDisplayDetails details = null;
+            OperationFormData formData = null;
             try {
-                details = new ObjectMapper().readValue(operation.getOperationDisplayDetails(), OperationDisplayDetails.class);
+                formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
             } catch (IOException ex) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display details", ex);
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing operation display formData", ex);
             }
-            response.setDisplayDetails(details);
+            response.setFormData(formData);
         }
     }
 

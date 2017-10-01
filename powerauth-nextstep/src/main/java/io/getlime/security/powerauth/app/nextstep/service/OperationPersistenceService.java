@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
@@ -74,10 +75,10 @@ public class OperationPersistenceService {
         operation.setOperationId(response.getOperationId());
         operation.setResult(response.getResult());
         try {
-            // Store display details as serialized JSON string.
-            operation.setOperationDisplayDetails(objectMapper.writeValueAsString(request.getDisplayDetails()));
+            // Store form data as serialized JSON string.
+            operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation display details", ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation form data", ex);
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
@@ -136,6 +137,24 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operationHistoryRepository.save(operationHistory);
+    }
+
+    /**
+     * Updates form data for given operation.
+     * @param request Request to update form data.
+     */
+    public void updateFormData(UpdateFormDataRequest request) {
+        OperationEntity operation = operationRepository.findOne(request.getOperationId());
+        try {
+            operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
+        } catch (JsonProcessingException e) {
+            Logger.getLogger(this.getClass().getName()).log(
+                    Level.SEVERE,
+                    "Error occurred while serializing operation form data",
+                    e
+            );
+        }
+        operationRepository.save(operation);
     }
 
     /**

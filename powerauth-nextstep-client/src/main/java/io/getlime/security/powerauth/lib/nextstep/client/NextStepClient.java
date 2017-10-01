@@ -22,7 +22,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationDisplayDetails;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -119,18 +119,18 @@ public class NextStepClient {
      * @param operationName operation name
      * @param operationId   operation ID (optional - if null, unique ID is automatically generated)
      * @param operationData operation data
-     * @param displayDetails operation display details, such as title, message and displayable attributes
+     * @param formData operation form data, such as title, message and displayable attributes
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
             request.setOperationName(operationName);
             request.setOperationId(operationId);
             request.setOperationData(operationData);
-            request.setDisplayDetails(displayDetails);
+            request.setFormData(formData);
             if (params != null) {
                 request.getParams().addAll(params);
             }
@@ -150,12 +150,12 @@ public class NextStepClient {
      *
      * @param operationName operation name
      * @param operationData operation data
-     * @param displayDetails operation display details, such as title, message and displayable attributes
+     * @param formData operation form data, such as title, message and displayable attributes
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationDisplayDetails displayDetails, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, displayDetails, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, formData, params);
     }
 
     /**
@@ -182,6 +182,23 @@ public class NextStepClient {
             }
             HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    public ObjectResponse updateOperationFormData(String operationId, OperationFormData formData) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateFormDataRequest request = new UpdateFormDataRequest();
+            request.setOperationId(operationId);
+            request.setFormData(formData);
+            HttpEntity<ObjectRequest<UpdateFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/operation/formData", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

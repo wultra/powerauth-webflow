@@ -22,12 +22,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.bankadapter.model.entity.BankAdapterError;
+import io.getlime.security.powerauth.lib.bankadapter.model.entity.FormDataChangeEntity;
 import io.getlime.security.powerauth.lib.bankadapter.model.enumeration.AuthenticationType;
-import io.getlime.security.powerauth.lib.bankadapter.model.request.AuthenticationRequest;
-import io.getlime.security.powerauth.lib.bankadapter.model.request.CreateSMSAuthorizationRequest;
-import io.getlime.security.powerauth.lib.bankadapter.model.request.UserDetailRequest;
-import io.getlime.security.powerauth.lib.bankadapter.model.request.VerifySMSAuthorizationRequest;
+import io.getlime.security.powerauth.lib.bankadapter.model.request.*;
 import io.getlime.security.powerauth.lib.bankadapter.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.bankadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.bankadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.bankadapter.model.response.UserDetailResponse;
 import org.springframework.core.ParameterizedTypeReference;
@@ -193,6 +192,61 @@ public class BankAdapterClient {
                 throw httpStatusException(ex);
             } catch (IOException ex2) { // JSON parsing failed
                 throw invalidErrorResponseBodyException(ex2);
+            }
+        } catch (ResourceAccessException ex) { // Bank Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Obtain bank account list for given user.
+     *
+     * @param userId User ID of the user for this request.
+     * @return A list of bank accounts for given user.
+     */
+    public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId) throws BankAdapterClientErrorException {
+        try {
+            // Exchange user details with bank adapter.
+            BankAccountListRequest request = new BankAccountListRequest(userId);
+            HttpEntity<ObjectRequest<BankAccountListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<BankAccountListResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/account/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<BankAccountListResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+
+            }
+        } catch (ResourceAccessException ex) { // Bank Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Send a notification about formData change.
+     *
+     * @param formDataChange Operation formData change.
+     * @return Object response.
+     */
+    public ObjectResponse sendFormDataChangedNotification(FormDataChangeEntity formDataChange, String userId, String operationId) throws BankAdapterClientErrorException {
+        try {
+            // Exchange user details with bank adapter.
+            FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
+            request.setUserId(userId);
+            request.setOperationId(operationId);
+            request.setFormDataChange(formDataChange);
+            HttpEntity<ObjectRequest<FormDataChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/api/operation/formData/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+
             }
         } catch (ResourceAccessException ex) { // Bank Adapter service is down
             throw resourceAccessException(ex);

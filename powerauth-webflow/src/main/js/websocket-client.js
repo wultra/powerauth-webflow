@@ -25,7 +25,7 @@ require('stompjs');
  * @param Web Socket ID
  */
 function register(registrations, webSocketId) {
-    var headers = {};
+    let headers = {};
     headers[csrf.headerName] = csrf.token;
     const socket = SockJS('./websocket');
     stompClient = Stomp.over(socket);
@@ -49,5 +49,13 @@ function send(destination, params, message) {
     stompClient.send(destination, params, message);
 }
 
+/**
+ * Disconnects the WebSocket.
+ */
+function disconnect() {
+    stompClient.disconnect();
+}
+
 module.exports.register = register;
+module.exports.disconnect = disconnect;
 module.exports.send = send;

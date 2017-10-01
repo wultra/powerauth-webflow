@@ -5,12 +5,12 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationKeyValueDisplayAttribute extends OperationDisplayAttribute {
+public class OperationKeyValueAttribute extends OperationFormAttribute {
 
     private String label;
     private String value;
 
-    public OperationKeyValueDisplayAttribute() {
+    public OperationKeyValueAttribute() {
         this.type = Type.KEY_VALUE;
     }
 

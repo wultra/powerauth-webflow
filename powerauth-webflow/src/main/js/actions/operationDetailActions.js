@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.webflow.demo.oauth;
-
-import org.springframework.social.connect.support.OAuth2ConnectionFactory;
-import org.springframework.social.oauth2.AbstractOAuth2ServiceProvider;
-
-/**
- * Default connection factory for OAuth 2.0 protected service.
- *
- * @author Petr Dvorak, petr@lime-company.eu
- */
-public class DefaultApiConnectionFactory<T extends DefaultApiBinding> extends OAuth2ConnectionFactory<T> {
-
-    public DefaultApiConnectionFactory(String providerId, AbstractOAuth2ServiceProvider<T> provider) {
-        super(providerId, provider, new DefaultApiAdapter<T>());
+export function changeBankAccount(bankAccountNumber) {
+    return function (dispatch) {
+        dispatch({
+            type: "CHANGE_BANK_ACCOUNT",
+            payload: {
+                chosenBankAccountNumber: bankAccountNumber
+            }
+        });
     }
 }

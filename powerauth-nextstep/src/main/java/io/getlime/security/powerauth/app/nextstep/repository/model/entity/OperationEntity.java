@@ -44,8 +44,8 @@ public class OperationEntity implements Serializable {
     @Column(name = "operation_name")
     private String operationName;
 
-    @Column(name = "operation_display_details")
-    private String operationDisplayDetails;
+    @Column(name = "operation_form_data")
+    private String operationFormData;
 
     @Column(name = "operation_data")
     private String operationData;
@@ -82,12 +82,12 @@ public class OperationEntity implements Serializable {
         this.operationName = operationName;
     }
 
-    public String getOperationDisplayDetails() {
-        return operationDisplayDetails;
+    public String getOperationFormData() {
+        return operationFormData;
     }
 
-    public void setOperationDisplayDetails(String operationDisplayDetails) {
-        this.operationDisplayDetails = operationDisplayDetails;
+    public void setOperationFormData(String operationFormData) {
+        this.operationFormData = operationFormData;
     }
 
     public String getOperationData() {
