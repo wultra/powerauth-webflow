@@ -196,6 +196,7 @@ export default class Token extends React.Component {
     }
 
     handleSwitchToQRCode(event) {
+        event.preventDefault();
         // cancel authorization, update() method could be already called
         this.cancelAuthorization();
         // cancel update() call using timeout if it is scheduled for future

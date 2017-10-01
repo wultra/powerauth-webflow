@@ -93,6 +93,7 @@ function mergeContext(actionType, oldContext, newContext) {
 }
 
 function mergeData(oldContext, newContext) {
+    // formData need to remain in context
     if (oldContext.formData !== undefined && newContext.formData === undefined) {
         newContext.formData = oldContext.formData;
     }
