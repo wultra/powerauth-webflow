@@ -111,9 +111,11 @@ function formatBankAccount(bankAccount) {
                 <tr>
                     <td width="50%" className="message-information">{bankAccount.number}</td>
                     <td width="50%">
-                        <div className="message-error font-tiny">
-                            <FormattedMessage id={bankAccount.unusableForPaymentReason}/>
-                        </div>
+                        {(!bankAccount.usableForPayment && multiLine) ? (
+                            <div className="message-error font-tiny">
+                                <FormattedMessage id={bankAccount.unusableForPaymentReason}/>
+                            </div>
+                        ) : (undefined)}
                     </td>
                 </tr>
                 </tbody>
