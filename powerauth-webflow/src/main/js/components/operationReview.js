@@ -117,8 +117,8 @@ export default class OperationReview extends React.Component {
                                             switch (authMethod) {
                                                 case "POWERAUTH_TOKEN":
                                                     return (
-                                                        <div className="attribute row">
-                                                            <div className="col-sm-12" key={authMethod}>
+                                                        <div className="attribute row" key={authMethod}>
+                                                            <div className="col-sm-12">
                                                                 <a href="#" onClick={this.handleToken}
                                                                    className="btn btn-lg btn-success">
                                                                     <FormattedMessage id="method.powerauthToken"/>
@@ -129,8 +129,8 @@ export default class OperationReview extends React.Component {
                                                     break;
                                                 case "SMS_KEY":
                                                     return (
-                                                        <div className="attribute row">
-                                                            <div className="col-sm-12" key={authMethod}>
+                                                        <div className="attribute row" key={authMethod}>
+                                                            <div className="col-sm-12">
                                                                 <a href="#" onClick={this.handleSMS}
                                                                    className="btn btn-lg btn-success">
                                                                     <FormattedMessage id="method.smsKey"/>
