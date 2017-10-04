@@ -94,7 +94,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final String userId = operation.getUserId();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
         try {
-            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = bankAdapterClient.createAuthorizationSMS(userId, operation.getOperationName(), operation.getOperationData(), LocaleContextHolder.getLocale().getLanguage());
+            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = bankAdapterClient.createAuthorizationSMS(
+                    operation.getOperationId(), userId, operation.getOperationName(), operation.getFormData(),
+                    LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
             httpSession.setAttribute(MESSAGE_ID, messageId);
             initResponse.setResult(AuthStepResult.CONFIRMED);

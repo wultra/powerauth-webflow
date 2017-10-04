@@ -15,11 +15,16 @@
  */
 package io.getlime.security.powerauth.lib.bankadapter.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import io.getlime.security.powerauth.lib.bankadapter.model.request.CreateSMSAuthorizationRequest;
+import io.getlime.security.powerauth.lib.bankadapter.service.OperationFormDataService;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
+
+import java.math.BigDecimal;
 
 /**
  * Validator for SMS OTP authorization requests.
@@ -28,7 +33,15 @@ import org.springframework.validation.Validator;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
+@Component
 public class CreateSMSAuthorizationRequestValidator implements Validator {
+
+    private OperationFormDataService operationFormDataService;
+
+    @Autowired
+    public CreateSMSAuthorizationRequestValidator(OperationFormDataService operationFormDataService) {
+        this.operationFormDataService = operationFormDataService;
+    }
 
     @Override
     public boolean supports(Class<?> clazz) {
@@ -51,19 +64,20 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
             errors.rejectValue("operationName", "smsAuthorization.operationName.long");
         }
 
-        JsonNode amount = authRequest.getOperationData().get("amount");
-        JsonNode currency = authRequest.getOperationData().get("currency");
-        JsonNode account = authRequest.getOperationData().get("account");
+        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
+        BigDecimal amount = amountAttribute.getAmount();
+        String currency = amountAttribute.getCurrency();
+        String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
         if (amount == null) {
-            errors.rejectValue("operationData", "smsAuthorization.amount.empty");
-        } else if (!amount.isNumber()) {
-            errors.rejectValue("operationData", "smsAuthorization.amount.invalid");
+            errors.rejectValue("operationFormData", "smsAuthorization.amount.empty");
+        } else if (amount.doubleValue()<=0) {
+            errors.rejectValue("operationFormData", "smsAuthorization.amount.invalid");
         }
-        if (currency == null || currency.textValue().isEmpty()) {
-            errors.rejectValue("operationData", "smsAuthorization.currency.empty");
+        if (currency == null || currency.isEmpty()) {
+            errors.rejectValue("operationFormData", "smsAuthorization.currency.empty");
         }
-        if (account == null || account.textValue().isEmpty()) {
-            errors.rejectValue("operationData", "smsAuthorization.account.empty");
+        if (account == null || account.isEmpty()) {
+            errors.rejectValue("operationFormData", "smsAuthorization.account.empty");
         }
 
     }
