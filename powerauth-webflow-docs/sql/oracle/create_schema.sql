@@ -8,87 +8,86 @@ CREATE TABLE oauth_client_details (
   authorities             VARCHAR(256),
   access_token_validity   INTEGER,
   refresh_token_validity  INTEGER,
-  additional_information  VARCHAR(4096),
+  additional_information  VARCHAR(4000),
   autoapprove             VARCHAR(256)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 CREATE TABLE oauth_client_token (
   token_id          VARCHAR(256),
-  token             LONG VARBINARY,
+  token             CLOB,
   authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
+);
 
 CREATE TABLE oauth_access_token (
   token_id          VARCHAR(256),
-  token             LONG VARBINARY,
+  token             CLOB,
   authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
-  authentication    LONG VARBINARY,
+  authentication    CLOB,
   refresh_token     VARCHAR(256)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 CREATE TABLE oauth_refresh_token (
   token_id       VARCHAR(256),
-  token          LONG VARBINARY,
-  authentication LONG VARBINARY
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  token          CLOB,
+  authentication CLOB
+);
 
 CREATE TABLE oauth_code (
   code           VARCHAR(255),
-  authentication LONG VARBINARY
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  authentication CLOB
+);
 
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY,
   order_number       INTEGER,
-  check_user_prefs   BOOLEAN,
+  check_user_prefs   NUMBER(1) DEFAULT 0,
   user_prefs_column  INTEGER,
-  user_prefs_default BOOLEAN,
-  check_auth_fails   BOOLEAN,
+  user_prefs_default NUMBER(1) DEFAULT 0,
+  check_auth_fails   NUMBER(1) DEFAULT 0,
   max_auth_fails     INTEGER,
-  has_user_interface BOOLEAN,
+  has_user_interface NUMBER(1) DEFAULT 0,
   display_name_key   VARCHAR(32)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+);
 
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY,
-  auth_method_1 BOOLEAN,
-  auth_method_2 BOOLEAN,
-  auth_method_3 BOOLEAN,
-  auth_method_4 BOOLEAN,
-  auth_method_5 BOOLEAN
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  auth_method_1 NUMBER(1) DEFAULT 0,
+  auth_method_2 NUMBER(1) DEFAULT 0,
+  auth_method_3 NUMBER(1) DEFAULT 0,
+  auth_method_4 NUMBER(1) DEFAULT 0,
+  auth_method_5 NUMBER(1) DEFAULT 0
+);
 
 CREATE TABLE ns_operation (
   operation_id              VARCHAR(256) PRIMARY KEY,
   operation_name            VARCHAR(32),
-  operation_data            TEXT,
-  operation_form_data       TEXT,
+  operation_data            CLOB,
+  operation_form_data       CLOB,
   user_id                   VARCHAR(256),
   result                    VARCHAR(32),
-  timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  timestamp_created         TIMESTAMP,
+  timestamp_expires         TIMESTAMP
+);
 
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256),
   result_id                   INTEGER,
   request_auth_method         VARCHAR(32),
   request_auth_step_result    VARCHAR(32),
-  request_params              VARCHAR(4096),
+  request_params              VARCHAR(4000),
   response_result             VARCHAR(32),
   response_result_description VARCHAR(256),
-  response_steps              VARCHAR(4096),
-  response_timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  response_timestamp_expires  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (operation_id, result_id),
-  FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id),
-  FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  response_steps              VARCHAR(4000),
+  response_timestamp_created  TIMESTAMP,
+  response_timestamp_expires  TIMESTAMP,
+  CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
+  CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
+  CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method)
+);
 
 CREATE TABLE ns_step_definition (
   step_definition_id       INTEGER PRIMARY KEY,
@@ -99,9 +98,9 @@ CREATE TABLE ns_step_definition (
   response_priority        INTEGER,
   response_auth_method     VARCHAR(32),
   response_result          VARCHAR(32),
-  FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
-  FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CONSTRAINT step_request_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  CONSTRAINT step_response_auth_method_fk FOREIGN KEY (response_auth_method) REFERENCES ns_auth_method (auth_method)
+);
 
 CREATE TABLE ba_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY,
@@ -109,15 +108,15 @@ CREATE TABLE ba_sms_authorization (
   user_id              VARCHAR(256),
   operation_name       VARCHAR(32),
   authorization_code   VARCHAR(32),
-  message_text         TEXT,
+  message_text         CLOB,
   verify_request_count INTEGER,
-  verified             BOOLEAN,
-  timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  verified             NUMBER(1) DEFAULT 0,
+  timestamp_created    TIMESTAMP,
+  timestamp_verified   TIMESTAMP,
+  timestamp_expires    TIMESTAMP
+);
 
-/*This table is required only for the demo client application
+/* This table is required only for the demo client application
 CREATE TABLE UserConnection (
   userId VARCHAR(255) NOT NULL,
   providerId VARCHAR(255) NOT NULL,
@@ -129,7 +128,7 @@ CREATE TABLE UserConnection (
   accessToken VARCHAR(512) not null,
   secret VARCHAR(512),
   refreshToken VARCHAR(512),
-  expireTime bigint,
+  expireTime TIMESTAMP,
 PRIMARY KEY (userId, providerId, providerUserId));
 CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
 */
