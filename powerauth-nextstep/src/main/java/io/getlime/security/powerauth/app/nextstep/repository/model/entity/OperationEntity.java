@@ -64,6 +64,7 @@ public class OperationEntity implements Serializable {
     private Date timestampExpires;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "operation")
+    @OrderBy("result_id")
     private List<OperationHistoryEntity> operationHistory;
 
     public String getOperationId() {

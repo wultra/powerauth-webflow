@@ -129,7 +129,7 @@ CREATE TABLE UserConnection (
   accessToken VARCHAR(512) not null,
   secret VARCHAR(512),
   refreshToken VARCHAR(512),
-  expireTime bigint,
+  expireTime BIGINT,
 PRIMARY KEY (userId, providerId, providerUserId));
 CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
 */

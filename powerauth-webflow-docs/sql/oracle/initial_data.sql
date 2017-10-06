@@ -1,5 +1,5 @@
 INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, additional_information, autoapprove)
-VALUES ('democlient', 'changeme', 'profile', 'authorization_code', '{}', '1');
+VALUES ('democlient', 'changeme', 'profile', 'authorization_code', '{}', 'true');
 
 -- authentication methods
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
