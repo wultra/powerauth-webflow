@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS ba_sms_authorization;
+DROP TABLE IF EXISTS da_sms_authorization;
 DROP TABLE IF EXISTS ns_step_definition;
 DROP TABLE IF EXISTS ns_operation_history;
 DROP TABLE IF EXISTS ns_operation;

@@ -63,9 +63,9 @@
 	</issueManagement>
 
 	<modules>
-		<module>powerauth-bank-adapter-client</module>
-		<module>powerauth-bank-adapter-model</module>
-		<module>powerauth-bank-adapter</module>
+		<module>powerauth-data-adapter-client</module>
+		<module>powerauth-data-adapter-model</module>
+		<module>powerauth-data-adapter</module>
         <module>powerauth-nextstep</module>
 		<module>powerauth-nextstep-client</module>
 		<module>powerauth-nextstep-model</module>
