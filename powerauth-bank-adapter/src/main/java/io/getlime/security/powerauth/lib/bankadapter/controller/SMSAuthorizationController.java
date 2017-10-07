@@ -104,7 +104,9 @@ public class SMSAuthorizationController {
         String account = operationFormDataService.getAccount(createSMSAuthorizationRequest.getOperationFormData());
 
         // update localized SMS message text in resources
-        String authorizationCode = generateAuthorizationCode(amount, currency, account);
+        final DataDigest.Result digestResult = generateAuthorizationCode(amount, currency, account);
+        final String authorizationCode = digestResult.getDigest();
+        final byte[] salt = digestResult.getSalt();
         String[] messageArgs = {amount.toPlainString(), currency, account, authorizationCode};
         String messageText = messageSource().getMessage("sms-otp.text", messageArgs, new Locale(createSMSAuthorizationRequest.getLang()));
 
@@ -114,6 +116,7 @@ public class SMSAuthorizationController {
         smsEntity.setUserId(createSMSAuthorizationRequest.getUserId());
         smsEntity.setOperationName(createSMSAuthorizationRequest.getOperationName());
         smsEntity.setAuthorizationCode(authorizationCode);
+        smsEntity.setSalt(salt);
         smsEntity.setMessageText(messageText);
         smsEntity.setVerifyRequestCount(0);
         smsEntity.setTimestampCreated(new Date());
@@ -180,12 +183,12 @@ public class SMSAuthorizationController {
      *
      * @return Generated authorization code.
      */
-    private String generateAuthorizationCode(BigDecimal amount, String currency, String account) {
+    private DataDigest.Result generateAuthorizationCode(BigDecimal amount, String currency, String account) {
         List<String> digestItems = new ArrayList<>();
         digestItems.add(amount.toPlainString());
         digestItems.add(currency);
         digestItems.add(account);
-        return new DataDigest().generateDigest(digestItems).getDigest();
+        return new DataDigest().generateDigest(digestItems);
     }
 
     /**
