@@ -17,8 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
-import io.getlime.security.powerauth.crypto.lib.util.HMACHashUtilities;
+import io.getlime.security.powerauth.crypto.server.util.DataDigest;
 import io.getlime.security.powerauth.lib.dataadapter.configuration.DataAdapterConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationMessageInvalidException;
