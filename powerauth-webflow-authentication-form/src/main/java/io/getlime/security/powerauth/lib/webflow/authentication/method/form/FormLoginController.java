@@ -17,9 +17,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.bankadapter.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -50,17 +50,17 @@ import java.util.List;
 public class FormLoginController extends AuthMethodController<UsernamePasswordAuthenticationRequest, UsernamePasswordAuthenticationResponse, AuthStepException> {
 
     @Autowired
-    private BankAdapterClient bankAdapterClient;
+    private DataAdapterClient dataAdapterClient;
 
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         try {
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = bankAdapterClient.authenticate(request.getUsername(), request.getPassword());
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticate(request.getUsername(), request.getPassword());
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
-        } catch (BankAdapterClientErrorException e) {
+        } catch (DataAdapterClientErrorException e) {
             try {
-                // User was not authenticated by Bank Adapter - fail authorization to count the number of failures and make it possible
+                // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
                 // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
                 if ("login.authenticationFailed".equals(e.getError().getMessage())) {

@@ -1,5 +1,5 @@
 BEGIN
-   EXECUTE IMMEDIATE 'DROP TABLE ba_sms_authorization';
+   EXECUTE IMMEDIATE 'DROP TABLE da_sms_authorization';
 EXCEPTION
    WHEN OTHERS THEN NULL;
 END;

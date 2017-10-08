@@ -43,7 +43,7 @@
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-bank-adapter-client</artifactId>
+            <artifactId>powerauth-data-adapter-client</artifactId>
             <version>0.15.0</version>
         </dependency>
 
