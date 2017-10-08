@@ -17,7 +17,6 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -27,10 +26,13 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
-import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
-import io.getlime.security.powerauth.crypto.lib.util.Hash;
+import io.getlime.powerauth.soap.CreateOfflineSignaturePayloadResponse;
+import io.getlime.powerauth.soap.GetActivationListForUserResponse;
+import io.getlime.powerauth.soap.SignatureType;
+import io.getlime.powerauth.soap.VerifyOfflineSignatureResponse;
+import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -42,6 +44,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeInitResponse;
+import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
@@ -74,6 +77,13 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private PowerAuthServiceClient powerAuthServiceClient;
+
+    // TODO - store in form
+    private static String nonce = null;
+    private static String dataHashed = null;
+
     /**
      * Verifies the authorization code.
      *
@@ -83,10 +93,30 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      */
     @Override
     protected String authenticate(QRCodeAuthenticationRequest request) throws AuthStepException {
-        // TODO - verify real authorization code
-        if ("12345678".equals(request.getAuthCode())) {
-            return getOperation().getUserId();
+        // TODO - activation choice, for now we use first activation found
+        // TODO - filter out inactive activations
+        List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
+        GetActivationListForUserResponse.Activations activation = activations.get(0);
+        System.out.println("verification request activationId: "+activation.getActivationId());
+        System.out.println("verification request nonce: "+nonce);
+        System.out.println("verification request dataHashed: "+dataHashed);
+        String data = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), BaseEncoding.base64().decode(dataHashed));
+        System.out.println("data from PowerAuthHttpBody: "+data);
+        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(activation.getActivationId(), data, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
+        System.out.println("verification response userId: "+signatureResponse.getUserId());
+        System.out.println("verification response isSignatureValid: "+signatureResponse.isSignatureValid());
+        System.out.println("verification response signatureType: "+signatureResponse.getSignatureType());
+        System.out.println("verification response activationStatus: "+signatureResponse.getActivationStatus());
+        System.out.println("verification response activationId: "+signatureResponse.getActivationId());
+        if (signatureResponse.isSignatureValid()) {
+            System.out.println("signature is valid");
+            String userId = getOperation().getUserId();
+            if (signatureResponse.getUserId().equals(userId)) {
+                System.out.println("user match");
+                return userId;
+            }
         }
+        System.out.println("signature is not valid");
         // otherwise fail authorization
         try {
             UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), getOperation().getUserId(), null);
@@ -196,52 +226,73 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @throws IOException Thrown when generating QR code fails.
      */
     private String generateQRCode() throws IOException {
+        System.out.println("generating QR code");
+        // TODO - activation choice, for now we use first activation found
+        List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
+        GetActivationListForUserResponse.Activations activation = activations.get(0);
+
         GetOperationDetailResponse operation = getOperation();
-        byte[] operationDataHash = generateHashForData(operation.getOperationData());
-        byte[] randomBytes = generateRandomBytes();
-        String messageText = generateMessageText(operation.getOperationData());
+        String operationData = operation.getOperationData();
+        String messageText = generateMessageText(operation.getFormData());
 
-        // TODO - use PowerAuth to sign with dt + & + rnd + & + msg
-        byte[] signature = "signature".getBytes();
+        System.out.println("signature payload request activationId: "+activation.getActivationId());
+        System.out.println("signature payload request operationData: "+operationData);
+        System.out.println("signature payload request messageText: "+messageText);
+        CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
+        System.out.println("signature payload response data: "+response.getData());
+        System.out.println("signature payload response dataHash: "+response.getDataHash());
+        System.out.println("signature payload response message: "+response.getMessage());
+        System.out.println("signature payload response nonce: "+response.getNonce());
+        System.out.println("signature payload response signature: "+response.getSignature());
 
-        String qrCodeData = generateJsonDataForQRCode(operationDataHash, randomBytes, messageText, signature);
+        // TODO - check operationData, it should match
+
+        // TODO - save into form as hidden field
+        nonce = response.getNonce();
+        dataHashed = response.getDataHash();
+
+        String qrCodeData = generateJsonDataForQRCode(response.getDataHash(), response.getNonce(), response.getMessage(), response.getSignature());
+        System.out.println("QR code data: "+qrCodeData);
         return encodeQRCode(qrCodeData, 400);
-    }
-
-    /**
-     * Generates a SHA-256 hash for operation data.
-     *
-     * @param operationData Operation data.
-     * @return Hash for operation data.
-     */
-    private byte[] generateHashForData(String operationData) {
-        return Hash.sha256(operationData);
-    }
-
-    /**
-     * Generates random bytes for the QR code.
-     *
-     * @return 16 random bytes.
-     */
-    private byte[] generateRandomBytes() {
-        return new KeyGenerator().generateRandomBytes(16);
     }
 
     /**
      * Generates the localized message for operation data.
      *
-     * @param operationDataAsString Operation data as JSON string.
+     * @param formData Operation form data.
      * @return Localized message.
      * @throws IOException Thrown when generating message fails.
      */
-    private String generateMessageText(String operationDataAsString) throws IOException {
-        JsonNode operationData = objectMapper.readTree(operationDataAsString);
-        BigDecimal amount = operationData.get("amount").decimalValue();
-        String currency = operationData.get("currency").textValue();
-        String account = operationData.get("account").textValue();
+    private String generateMessageText(OperationFormData formData) throws IOException {
+        BigDecimal amount = null;
+        String currency = null;
+        String account = null;
+        for (OperationFormAttribute attribute: formData.getParameters()) {
+            switch (attribute.getType()) {
+                case AMOUNT:
+                    OperationAmountAttribute amountAttribute = (OperationAmountAttribute) attribute;
+                    amount = amountAttribute.getAmount();
+                    currency = amountAttribute.getCurrency();
+                    break;
+                case KEY_VALUE:
+                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
+                    if ("To Account".equals(keyValueAttribute.getLabel())) {
+                        account = keyValueAttribute.getValue();
+                    }
+                    break;
+            }
+        }
+        if (amount==null || amount.doubleValue()<=0) {
+            throw new IllegalStateException("Invalid amount in formData: "+amount);
+        }
+        if (currency==null || currency.isEmpty()) {
+            throw new IllegalStateException("Missing currency in formData.");
+        }
+        if (account==null || account.isEmpty()) {
+            throw new IllegalStateException("Missing account in formData.");
+        }
         String[] messageArgs = {amount.toPlainString(), currency, account};
-        String messageText = messageSource().getMessage("qrCode.messageText", messageArgs, LocaleContextHolder.getLocale());
-        return messageText;
+        return messageSource().getMessage("qrCode.messageText", messageArgs, LocaleContextHolder.getLocale());
     }
 
     /**
@@ -253,12 +304,12 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @param signature         Signature of the QR code.
      * @return Data for the QR code.
      */
-    private String generateJsonDataForQRCode(byte[] operationDataHash, byte[] randomBytes, String messageText, byte[] signature) throws JsonProcessingException {
+    private String generateJsonDataForQRCode(String operationDataHash, String randomBytes, String messageText, String signature) throws JsonProcessingException {
         ObjectNode qrNode = JsonNodeFactory.instance.objectNode();
-        qrNode.put("dt", BaseEncoding.base64().encode(operationDataHash));
-        qrNode.put("rnd", BaseEncoding.base64().encode(randomBytes));
+        qrNode.put("dt", operationDataHash);
+        qrNode.put("rnd", randomBytes);
         qrNode.put("msg", messageText);
-        qrNode.put("sig", BaseEncoding.base64().encode(signature));
+        qrNode.put("sig", signature);
         return objectMapper.writeValueAsString(qrNode);
     }
 
