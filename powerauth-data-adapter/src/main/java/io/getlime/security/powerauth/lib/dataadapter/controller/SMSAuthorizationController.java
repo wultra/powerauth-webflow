@@ -45,12 +45,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.Date;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Controller class which handles SMS OTP authorization.
@@ -186,25 +182,11 @@ public class SMSAuthorizationController {
      * @return Generated authorization code.
      */
     private String generateAuthorizationCode(BigDecimal amount, String currency, String account) {
-        try {
-            // use random key for hash
-            byte[] randomKey = new KeyGenerator().generateRandomBytes(16);
-            // include amount, currency and account in the operation data
-            String operationData = amount.toPlainString() + "&" + currency + "&" + account;
-            HMACHashUtilities hmac = new HMACHashUtilities();
-            // generate hash of operation data to achieve the dynamic linking property:
-            // "any change to the amount or payee shall result in a change of the authentication code"
-            byte[] otpHash = hmac.hash(randomKey, operationData.getBytes("UTF-8"));
-            // use modulo on generated hash to get the right length of authorization code
-            BigInteger otp = new BigInteger(otpHash).mod(BigInteger.TEN.pow(AUTHORIZATION_CODE_LENGTH));
-            // prepare digit format - add leading zeros in case otp starts with zeros
-            String digitFormat = "%" + String.format("%02d", AUTHORIZATION_CODE_LENGTH) + "d";
-            // apply the digit format
-            return String.format(digitFormat, otp);
-        } catch (UnsupportedEncodingException ex) {
-            // UTF-8 is always available, null is never thrown
-            return null;
-        }
+        List<String> digestItems = new ArrayList<>();
+        digestItems.add(amount.toPlainString());
+        digestItems.add(currency);
+        digestItems.add(account);
+        return new DataDigest().generateDigest(digestItems).getDigest();
     }
 
     /**

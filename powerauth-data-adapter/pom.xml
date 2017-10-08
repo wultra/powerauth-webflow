@@ -44,7 +44,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>0.16.0</version>
+            <version>0.16.1</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
