@@ -49,6 +49,9 @@ public class SMSAuthorizationEntity implements Serializable {
     @Column(name = "authorization_code")
     private String authorizationCode;
 
+    @Column(name = "salt")
+    private byte[] salt;
+
     @Column(name = "message_text")
     private String messageText;
 
@@ -105,6 +108,14 @@ public class SMSAuthorizationEntity implements Serializable {
 
     public void setAuthorizationCode(String authorizationCode) {
         this.authorizationCode = authorizationCode;
+    }
+
+    public byte[] getSalt() {
+        return salt;
+    }
+
+    public void setSalt(byte[] salt) {
+        this.salt = salt;
     }
 
     public String getMessageText() {
