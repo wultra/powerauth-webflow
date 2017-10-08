@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Basic configuration class, used to configure clients to Next Step service and Bank Adapter.
+ * Basic configuration class, used to configure clients to Next Step service and Data Adapter.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
@@ -35,10 +35,10 @@ public class WebFlowServicesConfiguration {
     private SSLConfigurationService sslConfigurationService;
 
     /**
-     * Bank Adapter service URL.
+     * Data Adapter service URL.
      */
-    @Value("${powerauth.bankAdapter.service.url}")
-    private String bankAdapterServiceUrl;
+    @Value("${powerauth.dataAdapter.service.url}")
+    private String dataAdapterServiceUrl;
 
     /**
      * Next step server service URL.
@@ -58,13 +58,13 @@ public class WebFlowServicesConfiguration {
     }
 
     /**
-     * Default bank adapter client.
+     * Default data adapter client.
      *
-     * @return Bank adapter client.
+     * @return Data adapter client.
      */
     @Bean
-    public BankAdapterClient defaultBankAdapterClient() {
-        BankAdapterClient client = new BankAdapterClient(bankAdapterServiceUrl);
+    public DataAdapterClient defaultDataAdapterClient() {
+        DataAdapterClient client = new DataAdapterClient(dataAdapterServiceUrl);
         // whether invalid SSL certificates should be accepted
         if (acceptInvalidSslCertificate) {
             sslConfigurationService.trustAllCertificates();

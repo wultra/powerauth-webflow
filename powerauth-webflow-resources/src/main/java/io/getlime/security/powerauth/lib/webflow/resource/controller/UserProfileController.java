@@ -17,9 +17,9 @@
 package io.getlime.security.powerauth.lib.webflow.resource.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.bankadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.resource.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -38,7 +38,7 @@ import java.security.Principal;
 public class UserProfileController {
 
     @Autowired
-    private BankAdapterClient client;
+    private DataAdapterClient client;
 
     /**
      * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
@@ -56,7 +56,7 @@ public class UserProfileController {
             user.setGivenName(userDetail.getGivenName());
             user.setFamilyName(userDetail.getFamilyName());
             return user;
-        } catch (BankAdapterClientErrorException e) {
+        } catch (DataAdapterClientErrorException e) {
             // Return dummy user
             User user = new User();
             user.setId("anonymousUser");

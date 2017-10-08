@@ -123,8 +123,8 @@ CREATE TABLE ns_step_definition (
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Table ba_sms_authorization stores data for SMS OTP authorization.
-CREATE TABLE ba_sms_authorization (
+-- Table da_sms_authorization stores data for SMS OTP authorization.
+CREATE TABLE da_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY,
   operation_id         VARCHAR(256),
   user_id              VARCHAR(256),
