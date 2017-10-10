@@ -17,12 +17,12 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.bankadapter.model.entity.AuthMethodChoiceEntity;
-import io.getlime.security.powerauth.lib.bankadapter.model.entity.BankAccountChoiceEntity;
-import io.getlime.security.powerauth.lib.bankadapter.model.entity.BankAccountEntity;
-import io.getlime.security.powerauth.lib.bankadapter.model.response.BankAccountListResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthMethodChoiceEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoiceEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -62,7 +62,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
 
     @Autowired
-    private BankAdapterClient bankAdapterClient;
+    private DataAdapterClient dataAdapterClient;
 
     @Autowired
     private NextStepClient nextStepClient;
@@ -154,21 +154,21 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         try {
             // update formData in Next Step server
             nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
-            // Send notification to Bank Adapter if the bank account has changed.
+            // Send notification to Data Adapter if the bank account has changed.
             // In case there is no bank account choice, the notification is not performed.
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
                 BankAccountChoiceEntity bankAccountChoice = new BankAccountChoiceEntity();
                 bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
-                bankAdapterClient.sendFormDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
+                dataAdapterClient.sendFormDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
             }
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_AUTH_METHOD)) {
                 AuthMethodChoiceEntity authMethodChoice = new AuthMethodChoiceEntity();
                 String chosenAuthMethod = request.getFormData().getUserInput().get(FIELD_CHOSEN_AUTH_METHOD);
                 authMethodChoice.setChosenAuthMethod(AuthMethodChoiceEntity.ChosenAuthMethod.valueOf(chosenAuthMethod));
-                bankAdapterClient.sendFormDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
+                dataAdapterClient.sendFormDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
             }
             return new UpdateOperationFormDataResponse();
-        } catch (NextStepServiceException | BankAdapterClientErrorException e) {
+        } catch (NextStepServiceException | DataAdapterClientErrorException e) {
             final UpdateOperationFormDataResponse response = new UpdateOperationFormDataResponse();
             response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
             response.setMessage(e.getMessage());
@@ -186,14 +186,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                ObjectResponse<BankAccountListResponse> response = bankAdapterClient.fetchBankAccounts(operation.getUserId());
+                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId());
                 List<BankAccountEntity> bankAccountEntities = response.getResponseObject().getBankAccounts();
                 List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
                 if (!bankAccountDetails.isEmpty()) {
                     formData.addBankAccountChoice("bankAccountChoice", bankAccountDetails, null);
                 }
                 formData.setDynamicDataLoaded(true);
-            } catch (BankAdapterClientErrorException e) {
+            } catch (DataAdapterClientErrorException e) {
                 // Failed to load dynamic data, log the error. The UI will handle missing dynamic data error separately.
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
             }

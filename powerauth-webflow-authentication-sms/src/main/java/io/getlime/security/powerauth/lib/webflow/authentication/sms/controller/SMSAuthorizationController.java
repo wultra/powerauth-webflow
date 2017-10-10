@@ -1,9 +1,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClient;
-import io.getlime.security.powerauth.lib.bankadapter.client.BankAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.bankadapter.model.response.CreateSMSAuthorizationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -37,7 +37,7 @@ import java.util.List;
 public class SMSAuthorizationController extends AuthMethodController<SMSAuthorizationRequest, SMSAuthorizationResponse, AuthStepException> {
 
     @Autowired
-    private BankAdapterClient bankAdapterClient;
+    private DataAdapterClient dataAdapterClient;
 
     @Autowired
     private HttpSession httpSession;
@@ -60,10 +60,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             throw new AuthStepException("error.invalidRequest", new NullPointerException());
         }
         try {
-            bankAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
+            dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
             httpSession.removeAttribute(MESSAGE_ID);
             return operation.getUserId();
-        } catch (BankAdapterClientErrorException e) {
+        } catch (DataAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             try {
                 UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), operation.getUserId(), null);
@@ -84,7 +84,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     }
 
     /**
-     * Initializes the SMS authorization process by creating authorization SMS using Bank Adapter.
+     * Initializes the SMS authorization process by creating authorization SMS using Data Adapter.
      *
      * @return Authorization response.
      */
@@ -94,12 +94,14 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final String userId = operation.getUserId();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
         try {
-            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = bankAdapterClient.createAuthorizationSMS(userId, operation.getOperationName(), operation.getOperationData(), LocaleContextHolder.getLocale().getLanguage());
+            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(
+                    operation.getOperationId(), userId, operation.getOperationName(), operation.getFormData(),
+                    LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
             httpSession.setAttribute(MESSAGE_ID, messageId);
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
-        } catch (BankAdapterClientErrorException e) {
+        } catch (DataAdapterClientErrorException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage(e.getMessage());
             return initResponse;

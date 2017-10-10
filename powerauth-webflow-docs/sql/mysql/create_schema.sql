@@ -1,15 +1,6 @@
-DROP TABLE IF EXISTS ba_sms_authorization;
-DROP TABLE IF EXISTS ns_step_definition;
-DROP TABLE IF EXISTS ns_operation_history;
-DROP TABLE IF EXISTS ns_operation;
-DROP TABLE IF EXISTS ns_user_prefs;
-DROP TABLE IF EXISTS ns_auth_method;
-DROP TABLE IF EXISTS oauth_code;
-DROP TABLE IF EXISTS oauth_refresh_token;
-DROP TABLE IF EXISTS oauth_access_token;
-DROP TABLE IF EXISTS oauth_client_token;
-DROP TABLE IF EXISTS oauth_client_details;
-
+-- Table oauth_client_details stores details about OAuth2 client applications.
+-- Every Web Flow client application should have a record in this table.
+-- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java
 CREATE TABLE oauth_client_details (
   client_id               VARCHAR(256) PRIMARY KEY,
   resource_ids            VARCHAR(256),
@@ -24,6 +15,8 @@ CREATE TABLE oauth_client_details (
   autoapprove             VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.
+-- See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html
 CREATE TABLE oauth_client_token (
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
@@ -32,7 +25,8 @@ CREATE TABLE oauth_client_token (
   client_id         VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-
+-- Table oauth_access_token stores OAuth2 access tokens.
+-- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_access_token (
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
@@ -43,17 +37,23 @@ CREATE TABLE oauth_access_token (
   refresh_token     VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table oauth_access_token stores OAuth2 refresh tokens.
+-- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_refresh_token (
   token_id       VARCHAR(256),
   token          LONG VARBINARY,
   authentication LONG VARBINARY
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table oauth_code stores data for the OAuth2 authorization code grant.
+-- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java
 CREATE TABLE oauth_code (
   code           VARCHAR(255),
   authentication LONG VARBINARY
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_auth_method stores configuration of authentication methods.
+-- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY,
   order_number       INTEGER,
@@ -66,6 +66,8 @@ CREATE TABLE ns_auth_method (
   display_name_key   VARCHAR(32)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_user_prefs stores user preferences.
+-- Status of authentication methods is stored in this able per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY,
   auth_method_1 BOOLEAN,
@@ -75,10 +77,12 @@ CREATE TABLE ns_user_prefs (
   auth_method_5 BOOLEAN
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_operation stores details of Web Flow operations.
+-- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
   operation_id              VARCHAR(256) PRIMARY KEY,
   operation_name            VARCHAR(32),
-  operation_data            VARCHAR(4096),
+  operation_data            TEXT,
   operation_form_data       TEXT,
   user_id                   VARCHAR(256),
   result                    VARCHAR(32),
@@ -86,6 +90,8 @@ CREATE TABLE ns_operation (
   timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_operation_history stores all changes of operations.
+-- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256),
   result_id                   INTEGER,
@@ -102,6 +108,8 @@ CREATE TABLE ns_operation_history (
   FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_step_definition stores definitions of authentication/authorization steps.
+-- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_step_definition (
   step_definition_id       INTEGER PRIMARY KEY,
   operation_name           VARCHAR(32),
@@ -115,16 +123,37 @@ CREATE TABLE ns_step_definition (
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE ba_sms_authorization (
+-- Table da_sms_authorization stores data for SMS OTP authorization.
+CREATE TABLE da_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY,
+  operation_id         VARCHAR(256),
   user_id              VARCHAR(256),
   operation_name       VARCHAR(32),
-  operation_data       VARCHAR(4096),
   authorization_code   VARCHAR(32),
-  message_text         VARCHAR(256),
+  salt                 VARBINARY(16),
+  message_text         TEXT,
   verify_request_count INTEGER,
   verified             BOOLEAN,
   timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table UserConnection is required only for the demo client application which is based on Spring Social.
+-- See: https://github.com/spring-projects/spring-social
+/*
+CREATE TABLE UserConnection (
+  userId VARCHAR(255) NOT NULL,
+  providerId VARCHAR(255) NOT NULL,
+  providerUserId VARCHAR(255),
+  rank INTEGER NOT NULL,
+  displayName VARCHAR(255),
+  profileUrl VARCHAR(512),
+  imageUrl VARCHAR(512),
+  accessToken VARCHAR(512) not null,
+  secret VARCHAR(512),
+  refreshToken VARCHAR(512),
+  expireTime BIGINT,
+PRIMARY KEY (userId, providerId, providerUserId));
+CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
+*/
