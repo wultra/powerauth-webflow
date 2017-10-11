@@ -97,26 +97,14 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
         // TODO - filter out inactive activations
         List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
         GetActivationListForUserResponse.Activations activation = activations.get(0);
-        System.out.println("verification request activationId: "+activation.getActivationId());
-        System.out.println("verification request nonce: "+nonce);
-        System.out.println("verification request dataHashed: "+dataHashed);
         String data = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), BaseEncoding.base64().decode(dataHashed));
-        System.out.println("data from PowerAuthHttpBody: "+data);
         VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(activation.getActivationId(), data, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
-        System.out.println("verification response userId: "+signatureResponse.getUserId());
-        System.out.println("verification response isSignatureValid: "+signatureResponse.isSignatureValid());
-        System.out.println("verification response signatureType: "+signatureResponse.getSignatureType());
-        System.out.println("verification response activationStatus: "+signatureResponse.getActivationStatus());
-        System.out.println("verification response activationId: "+signatureResponse.getActivationId());
         if (signatureResponse.isSignatureValid()) {
-            System.out.println("signature is valid");
             String userId = getOperation().getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
-                System.out.println("user match");
                 return userId;
             }
         }
-        System.out.println("signature is not valid");
         // otherwise fail authorization
         try {
             UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), getOperation().getUserId(), null);
@@ -226,7 +214,6 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @throws IOException Thrown when generating QR code fails.
      */
     private String generateQRCode() throws IOException {
-        System.out.println("generating QR code");
         // TODO - activation choice, for now we use first activation found
         List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
         GetActivationListForUserResponse.Activations activation = activations.get(0);
@@ -235,15 +222,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
         String operationData = operation.getOperationData();
         String messageText = generateMessageText(operation.getFormData());
 
-        System.out.println("signature payload request activationId: "+activation.getActivationId());
-        System.out.println("signature payload request operationData: "+operationData);
-        System.out.println("signature payload request messageText: "+messageText);
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
-        System.out.println("signature payload response data: "+response.getData());
-        System.out.println("signature payload response dataHash: "+response.getDataHash());
-        System.out.println("signature payload response message: "+response.getMessage());
-        System.out.println("signature payload response nonce: "+response.getNonce());
-        System.out.println("signature payload response signature: "+response.getSignature());
 
         // TODO - check operationData, it should match
 
@@ -252,7 +231,6 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
         dataHashed = response.getDataHash();
 
         String qrCodeData = generateJsonDataForQRCode(response.getDataHash(), response.getNonce(), response.getMessage(), response.getSignature());
-        System.out.println("QR code data: "+qrCodeData);
         return encodeQRCode(qrCodeData, 400);
     }
 
