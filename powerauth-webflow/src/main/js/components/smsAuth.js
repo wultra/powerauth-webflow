@@ -78,7 +78,12 @@ export default class SMSAuthorization extends React.Component {
                                     className={(this.props.context.error ? "message-error" : "message-information" )}>
                                     <FormattedMessage id={this.props.context.message}/>
                                 </FormGroup>
-                            ) : (undefined)}
+                            ) : (
+                                <FormGroup
+                                    className={"message-information"}>
+                                    &nbsp;
+                                </FormGroup>
+                            )}
                             <div className="attribute row">
                                 <div className="col-sm-12">
                                     <FormattedMessage id="smsAuthorization.authCodeText"/>

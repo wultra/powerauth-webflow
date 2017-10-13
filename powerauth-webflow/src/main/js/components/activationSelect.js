@@ -15,10 +15,8 @@
  */
 import React from 'react';
 import Select from 'react-select';
-// i18n
-import {FormattedMessage} from "react-intl";
 
-export default class BankAccountSelect extends React.Component {
+export default class ActivationSelect extends React.Component {
 
     constructor() {
         super();
@@ -33,11 +31,10 @@ export default class BankAccountSelect extends React.Component {
         return (
             <div className="section">
                 <Select
-                    optionComponent={BankAccountOption}
-                    options={this.props.bankAccounts}
-                    value={this.props.chosenBankAccount}
-                    valueComponent={BankAccountValue}
-                    disabled={this.props.choiceDisabled}
+                    optionComponent={ActivationOption}
+                    options={this.props.activations}
+                    value={this.props.chosenActivation}
+                    valueComponent={ActivationValue}
                     clearable={false}
                     searchable={false}
                     autoFocus={true}
@@ -48,7 +45,7 @@ export default class BankAccountSelect extends React.Component {
     }
 }
 
-class BankAccountOption extends React.Component {
+class ActivationOption extends React.Component {
 
     constructor() {
         super();
@@ -71,52 +68,41 @@ class BankAccountOption extends React.Component {
         if (this.props.isFocused) return;
         this.props.onFocus(this.props.option, event);
     }
+
     render () {
-        const bankAccount = this.props.option;
+        const activation = this.props.option;
         return (
             <div className={this.props.className}
                  onMouseMove={this.handleMouseMove}
                  onMouseDown={this.handleMouseDown}
                  onMouseEnter={this.handleMouseEnter}>
-                {formatBankAccount(bankAccount)}
+                {formatActivation(activation)}
             </div>
         );
     }
 }
 
-class BankAccountValue extends React.Component {
+class ActivationValue extends React.Component {
     render () {
-        const bankAccount = this.props.value;
+        const activation = this.props.value;
         return (
             <div className="Select-value">
                 <span className="Select-value-label">
-                    {formatBankAccount(bankAccount)}
+                    {formatActivation(activation)}
                 </span>
             </div>
         );
     }
 }
 
-function formatBankAccount(bankAccount) {
+function formatActivation(activation) {
     return (
         <div>
             <table width="100%">
                 <tbody>
                 <tr>
-                    <td width="50%">{bankAccount.name}</td>
-                    <td width="50%" className="tint text-right">
-                        {bankAccount.balance} {bankAccount.currency}
-                    </td>
-                </tr>
-                <tr>
-                    <td width="50%" className="message-information">{bankAccount.number}</td>
-                    <td width="50%">
-                        {(!bankAccount.usableForPayment && bankAccount.unusableForPaymentReason) ? (
-                            <div className="message-error font-tiny text-right">
-                                <FormattedMessage id={bankAccount.unusableForPaymentReason}/>
-                            </div>
-                        ) : (undefined)}
-                    </td>
+                    <td width="50%" className="text-left">{activation.activationName}</td>
+                    <td width="50%" className="tint text-right">{activation.timestampLastUsed}</td>
                 </tr>
                 </tbody>
             </table>

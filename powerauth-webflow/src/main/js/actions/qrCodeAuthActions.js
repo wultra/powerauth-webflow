@@ -29,42 +29,75 @@ export function getOperationData() {
     }
 }
 
-export function init() {
+export function initQRCode(activationId) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_QR_CODE",
             payload: {
                 loading: true,
                 error: false,
+                init: false,
                 message: ""
             }
         });
-        axios.post("./api/auth/qr/init", {}).then((response) => {
+        axios.post("./api/auth/qr/init", {
+            activationId: activationId
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_QR_CODE",
                 payload: {
                     loading: false,
                     error: false,
+                    init: true,
                     message: "",
-                    qrCode: response.data.qrcode
+                    qrCode: response.data.qrcode,
+                    nonce: response.data.nonce,
+                    dataHash: response.data.dataHash,
+                    chosenActivation: response.data.chosenActivation,
+                    activations: response.data.activations
                 }
             });
         }).catch((error) => {
-            console.log(error);
+            dispatchError(dispatch, error);
         })
     }
 }
 
-export function authenticate(userAuthCode) {
+export function changeActivation(activation) {
     return function (dispatch) {
+        dispatch({
+            type: "CHANGE_ACTIVATION",
+            payload: {
+                chosenActivation: activation,
+                init: false
+            }
+        });
+    }
+}
+
+export function authenticate(activationId, authCode, nonce, dataHash) {
+    return function (dispatch) {
+        dispatch({
+            type: "SHOW_SCREEN_QR_CODE",
+            payload: {
+                loading: true,
+                error: false,
+                init: false,
+                message: ""
+            }
+        });
         axios.post("./api/auth/qr/authenticate", {
-            authCode: userAuthCode
+            activationId: activationId,
+            authCode: authCode,
+            nonce: nonce,
+            dataHash: dataHash
         }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_QR_CODE",
                 payload: {
                     loading: true,
                     error: false,
+                    init: false,
                     message: ""
                 }
             });
@@ -104,6 +137,7 @@ export function authenticate(userAuthCode) {
                         payload: {
                             loading: false,
                             error: true,
+                            init: false,
                             message: response.data.message
                         }
                     });

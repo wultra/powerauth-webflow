@@ -29,37 +29,27 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Handler for mobile token related exceptions.
+ * Handler for QR Code related exceptions.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 
 @ControllerAdvice
 @Order(Ordered.LOWEST_PRECEDENCE-1)
-public class MobileTokenApiExceptionResolver {
+public class QRCodeExceptionResolver {
 
     /**
-     * Exception handler for push registration related exception..
+     * Exception handler for illegal states (e.g. activation gone missing and invalid formData)
      *
      * @return Response with error details.
      */
-    @ExceptionHandler(PushRegistrationFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error());
-    }
-
-    /**
-     * Exception handler for push registration related exception..
-     *
-     * @return Response with error details.
-     */
-    @ExceptionHandler(InvalidRequestObjectException.class)
+    @ExceptionHandler(QRCodeInvalidDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error());
+    public @ResponseBody ErrorResponse handleInvalidRequestObjectException(QRCodeInvalidDataException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", ex);
+        Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
+        return new ErrorResponse(error);
     }
+
 
 }

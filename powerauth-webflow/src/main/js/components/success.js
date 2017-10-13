@@ -35,7 +35,11 @@ export default class Success extends React.Component {
         return (
             <div className="text-center">
                 <div className={'message-information'}>
-                    <FormattedMessage id={this.props.context.message}/>
+                    {(this.props.context.message) ? (
+                        <FormattedMessage id={this.props.context.message}/>
+                    ) : (
+                        <FormattedMessage id="error.unknown"/>
+                    )}
                 </div>
                 <div className="image-result success"></div>
                 <div className={'message-information'}>

@@ -104,11 +104,14 @@ export function cancel() {
     }
 }
 
-export function switchToQRCode() {
+export function updateFormData(formData, callback) {
     return function (dispatch) {
-        dispatch({
-            type: "SHOW_SCREEN_QR_CODE",
-            payload: {}
-        });
+        axios.put("./api/auth/operation/formData", {
+            formData: formData
+        }).then((response) => {
+            callback();
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
     }
 }

@@ -16,20 +16,8 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.BaseEncoding;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.MultiFormatWriter;
-import com.google.zxing.WriterException;
-import com.google.zxing.client.j2se.MatrixToImageWriter;
-import com.google.zxing.common.BitMatrix;
-import io.getlime.powerauth.soap.CreateOfflineSignaturePayloadResponse;
-import io.getlime.powerauth.soap.GetActivationListForUserResponse;
-import io.getlime.powerauth.soap.SignatureType;
-import io.getlime.powerauth.soap.VerifyOfflineSignatureResponse;
+import io.getlime.powerauth.soap.*;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
@@ -41,7 +29,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.QRCodeInvalidDataException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.QRCodeEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeAuthenticationRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeInitResponse;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
@@ -56,14 +48,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller for offline authorization based on a QR code.
@@ -74,15 +64,12 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/api/auth/qr")
 public class QRCodeController extends AuthMethodController<QRCodeAuthenticationRequest, QRCodeAuthenticationResponse, AuthStepException> {
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private PowerAuthServiceClient powerAuthServiceClient;
 
-    // TODO - store in form
-    private static String nonce = null;
-    private static String dataHashed = null;
+    @Autowired
+    public QRCodeController(PowerAuthServiceClient powerAuthServiceClient) {
+        this.powerAuthServiceClient = powerAuthServiceClient;
+    }
 
     /**
      * Verifies the authorization code.
@@ -92,13 +79,12 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @throws AuthStepException Thrown when authorization step fails.
      */
     @Override
-    protected String authenticate(QRCodeAuthenticationRequest request) throws AuthStepException {
-        // TODO - activation choice, for now we use first activation found
-        // TODO - filter out inactive activations
-        List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
-        GetActivationListForUserResponse.Activations activation = activations.get(0);
-        String data = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), BaseEncoding.base64().decode(dataHashed));
-        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(activation.getActivationId(), data, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
+    protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+        // nonce and dataHash are received from UI - they were stored together with the QR code
+        String nonce = request.getNonce();
+        String dataHash = request.getDataHash();
+        String data = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), BaseEncoding.base64().decode(dataHash));
+        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), data, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
         if (signatureResponse.isSignatureValid()) {
             String userId = getOperation().getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -131,10 +117,59 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @throws IOException Thrown when generating QR code fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody
-    QRCodeInitResponse initQRCode() throws IOException {
+    @ResponseBody
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
-        initResponse.setQRCode(generateQRCode());
+
+        // loading of activations
+        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
+
+        // sort activations by last timestamp used
+        allActivations.sort((a1, a2) -> {
+            Date timestamp1 = a1.getTimestampLastUsed().toGregorianCalendar().getTime();
+            Date timestamp2 = a2.getTimestampLastUsed().toGregorianCalendar().getTime();
+            return timestamp2.compareTo(timestamp1);
+        });
+
+        // transfer activations into ActivationEntity list and filter data
+        List<ActivationEntity> activationEntities = new ArrayList<>();
+        for (GetActivationListForUserResponse.Activations activation: allActivations) {
+            if (activation.getActivationStatus() == ActivationStatus.ACTIVE) {
+                ActivationEntity activationEntity = new ActivationEntity();
+                activationEntity.setActivationId(activation.getActivationId());
+                activationEntity.setActivationName(activation.getActivationName());
+                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+                Date timestampLastUsed = activation.getTimestampLastUsed().toGregorianCalendar().getTime();
+                activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
+                activationEntities.add(activationEntity);
+            }
+        }
+
+        if (activationEntities.isEmpty()) {
+            // unexpected state - last activation was removed or blocked
+            throw new QRCodeInvalidDataException("qrCode.noActivation");
+        }
+
+        ActivationEntity chosenActivation = null;
+        if (request.getActivationId() != null) {
+            // search for requested activation
+            for (ActivationEntity activationEntity: activationEntities) {
+                if (request.getActivationId().equals(activationEntity.getActivationId())) {
+                    chosenActivation = activationEntity;
+                }
+            }
+        }
+        if (chosenActivation == null) {
+            // first activation is chosen in case activation hasn't been chosen yet
+            chosenActivation = activationEntities.get(0);
+        }
+        // generating of QR code
+        QRCodeEntity qrCodeEntity = generateQRCode(chosenActivation);
+        initResponse.setQRCode(qrCodeEntity.generateImage());
+        initResponse.setNonce(qrCodeEntity.getNonce());
+        initResponse.setDataHash(qrCodeEntity.getDataHash());
+        initResponse.setChosenActivation(chosenActivation);
+        initResponse.setActivations(activationEntities);
         return initResponse;
     }
 
@@ -145,8 +180,8 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @return Authorization response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody
-    QRCodeAuthenticationResponse verifyAuthCode(@RequestBody QRCodeAuthenticationRequest request) {
+    @ResponseBody
+    public QRCodeAuthenticationResponse verifyAuthCode(@RequestBody QRCodeAuthenticationRequest request) {
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
@@ -191,8 +226,8 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @return Authorization response.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody
-    QRCodeAuthenticationResponse cancelAuthentication() {
+    @ResponseBody
+    public QRCodeAuthenticationResponse cancelAuthentication() {
         try {
             cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
@@ -213,25 +248,24 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @return QR code as String-based PNG image.
      * @throws IOException Thrown when generating QR code fails.
      */
-    private String generateQRCode() throws IOException {
-        // TODO - activation choice, for now we use first activation found
-        List<GetActivationListForUserResponse.Activations> activations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
-        GetActivationListForUserResponse.Activations activation = activations.get(0);
-
+    private QRCodeEntity generateQRCode(ActivationEntity activation) throws IOException, QRCodeInvalidDataException {
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
         String messageText = generateMessageText(operation.getFormData());
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 
-        // TODO - check operationData, it should match
+        if (!response.getData().equals(operationData)) {
+            throw new QRCodeInvalidDataException("qrCode.invalidData");
+        }
+        // do not check message, some sanitization could be done by PowerAuth server
 
-        // TODO - save into form as hidden field
-        nonce = response.getNonce();
-        dataHashed = response.getDataHash();
-
-        String qrCodeData = generateJsonDataForQRCode(response.getDataHash(), response.getNonce(), response.getMessage(), response.getSignature());
-        return encodeQRCode(qrCodeData, 400);
+        QRCodeEntity qrCode = new QRCodeEntity(250);
+        qrCode.setDataHash(response.getDataHash());
+        qrCode.setNonce(response.getNonce());
+        qrCode.setMessage(response.getMessage());
+        qrCode.setSignature(response.getSignature());
+        return qrCode;
     }
 
     /**
@@ -241,7 +275,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @return Localized message.
      * @throws IOException Thrown when generating message fails.
      */
-    private String generateMessageText(OperationFormData formData) throws IOException {
+    private String generateMessageText(OperationFormData formData) throws IOException, QRCodeInvalidDataException {
         BigDecimal amount = null;
         String currency = null;
         String account = null;
@@ -261,63 +295,16 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
             }
         }
         if (amount==null || amount.doubleValue()<=0) {
-            throw new IllegalStateException("Invalid amount in formData: "+amount);
+            throw new QRCodeInvalidDataException("qrCode.invalidAmount");
         }
         if (currency==null || currency.isEmpty()) {
-            throw new IllegalStateException("Missing currency in formData.");
+            throw new QRCodeInvalidDataException("qrCode.invalidCurrency");
         }
         if (account==null || account.isEmpty()) {
-            throw new IllegalStateException("Missing account in formData.");
+            throw new QRCodeInvalidDataException("qrCode.invalidAccount");
         }
         String[] messageArgs = {amount.toPlainString(), currency, account};
         return messageSource().getMessage("qrCode.messageText", messageArgs, LocaleContextHolder.getLocale());
-    }
-
-    /**
-     * Generates data for the QR code.
-     *
-     * @param operationDataHash Hash of operation data.
-     * @param randomBytes       Random bytes.
-     * @param messageText       Message based on the operation data.
-     * @param signature         Signature of the QR code.
-     * @return Data for the QR code.
-     */
-    private String generateJsonDataForQRCode(String operationDataHash, String randomBytes, String messageText, String signature) throws JsonProcessingException {
-        ObjectNode qrNode = JsonNodeFactory.instance.objectNode();
-        qrNode.put("dt", operationDataHash);
-        qrNode.put("rnd", randomBytes);
-        qrNode.put("msg", messageText);
-        qrNode.put("sig", signature);
-        return objectMapper.writeValueAsString(qrNode);
-    }
-
-    /**
-     * Encodes the QR code data into a String-based PNG image.
-     *
-     * @param qrCodeData QR code data.
-     * @param qrCodeSize Image width and height.
-     * @return Encoded QR code as image.
-     */
-    private String encodeQRCode(String qrCodeData, int qrCodeSize) {
-        try {
-            BitMatrix matrix = new MultiFormatWriter().encode(
-                    new String(qrCodeData.getBytes("UTF-8"), "ISO-8859-1"),
-                    BarcodeFormat.QR_CODE,
-                    qrCodeSize,
-                    qrCodeSize);
-            BufferedImage image = MatrixToImageWriter.toBufferedImage(matrix);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(image, "png", baos);
-            byte[] bytes = baos.toByteArray();
-            return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
-        } catch (WriterException | IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
-                    "Error occurred while generating QR code",
-                    e
-            );
-        }
-        return null;
     }
 
     /**

@@ -45,6 +45,14 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
+        case "CHANGE_ACTIVATION": {
+            return {
+                ...state,
+                // do not change the current screen
+                currentScreen: state.currentScreen,
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
         case "CHOOSE_AUTH_METHOD": {
             return {
                 ...state,
@@ -75,15 +83,22 @@ function mergeContext(actionType, oldContext, newContext) {
             mergeData(oldContext, newContext);
             break;
         case "SHOW_SCREEN_TOKEN":
+            mergeData(oldContext, newContext);
+            setOfflineMode(newContext, false);
+            break;
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
             break;
         case "SHOW_SCREEN_QR_CODE":
             mergeQRCode(oldContext, newContext);
             mergeData(oldContext, newContext);
+            setOfflineMode(newContext, true);
             break;
         case "CHANGE_BANK_ACCOUNT":
             changeBankAccount(oldContext, newContext);
+            break;
+        case "CHANGE_ACTIVATION":
+            changeActivation(oldContext, newContext);
             break;
         case "CHOOSE_AUTH_METHOD":
             chooseAuthMethod(oldContext, newContext);
@@ -117,6 +132,10 @@ function mergeQRCode(oldContext, newContext) {
     }
 }
 
+function setOfflineMode(newContext, offlineModeEnabled) {
+    newContext.formData.userInput.offlineModeEnabled = offlineModeEnabled;
+}
+
 function changeBankAccount(oldContext, newContext) {
     let chosenBankAccountNumber = newContext.chosenBankAccountNumber;
     // copy all oldContext properties except for chosenBankAccountNumber, which should be taken from newContext
@@ -126,6 +145,17 @@ function changeBankAccount(oldContext, newContext) {
         }
     }
     newContext.formData.userInput.chosenBankAccountNumber = chosenBankAccountNumber;
+}
+
+function changeActivation(oldContext, newContext) {
+    let chosenActivationId = newContext.chosenActivation.activationId;
+    // copy all oldContext properties except for chosenActivationId, which should be taken from newContext
+    for (const prop in oldContext) {
+        if (oldContext.hasOwnProperty(prop)) {
+            newContext[prop] = oldContext[prop];
+        }
+    }
+    newContext.formData.userInput.chosenActivationId = chosenActivationId;
 }
 
 function chooseAuthMethod(oldContext, newContext) {

@@ -16,6 +16,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
+
+import java.util.List;
 
 /**
  * Response to the init step of offline mobile token authentication with QR code.
@@ -25,6 +28,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 public class QRCodeInitResponse extends AuthStepResponse {
 
     private String qrCode;
+    private String nonce;
+    private String dataHash;
+    private ActivationEntity chosenActivation;
+    private List<ActivationEntity> activations;
 
     public String getQRCode() {
         return qrCode;
@@ -32,5 +39,45 @@ public class QRCodeInitResponse extends AuthStepResponse {
 
     public void setQRCode(String qrCode) {
         this.qrCode = qrCode;
+    }
+
+    public String getQrCode() {
+        return qrCode;
+    }
+
+    public void setQrCode(String qrCode) {
+        this.qrCode = qrCode;
+    }
+
+    public String getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(String nonce) {
+        this.nonce = nonce;
+    }
+
+    public String getDataHash() {
+        return dataHash;
+    }
+
+    public void setDataHash(String dataHash) {
+        this.dataHash = dataHash;
+    }
+
+    public ActivationEntity getChosenActivation() {
+        return chosenActivation;
+    }
+
+    public void setChosenActivation(ActivationEntity chosenActivation) {
+        this.chosenActivation = chosenActivation;
+    }
+
+    public List<ActivationEntity> getActivations() {
+        return activations;
+    }
+
+    public void setActivations(List<ActivationEntity> activations) {
+        this.activations = activations;
     }
 }
