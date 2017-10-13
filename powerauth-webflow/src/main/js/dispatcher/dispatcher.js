@@ -86,10 +86,20 @@ export function dispatchAction(dispatch, response) {
 export function dispatchError(dispatch, error) {
     let errorMessage;
     if (error.response) {
-        errorMessage = error.response.data.message;
+        if (error.response.data.responseObject.message) {
+            // structured error responses which include a responseObject with a message
+            errorMessage = error.response.data.responseObject.message;
+        } else {
+            // responses with message field in the data
+            errorMessage = error.response.data.message;
+        }
     } else if (error.request) {
+        // the request was made but no response was received
+        // see: https://www.npmjs.com/package/axios#handling-errors
         errorMessage = "message.invalidRequest"
     } else {
+        // something happened in setting up the request that triggered an Error
+        // see: https://www.npmjs.com/package/axios#handling-errors
         errorMessage = error.message;
     }
     dispatch({
