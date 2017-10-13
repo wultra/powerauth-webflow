@@ -316,6 +316,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     private MessageSource messageSource() {
         ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
         messageSource.setBasename("classpath:/static/resources/messages");
+        messageSource.setDefaultEncoding("UTF-8");
         return messageSource;
     }
 
