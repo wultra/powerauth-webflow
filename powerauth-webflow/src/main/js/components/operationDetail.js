@@ -38,26 +38,29 @@ export default class OperationDetail extends React.Component {
 
     constructor() {
         super();
+        this.init = this.init.bind(this);
+        this.resolveChosenBankAccount = this.resolveChosenBankAccount.bind(this);
         this.handleBankAccountChoice = this.handleBankAccountChoice.bind(this);
         this.storeBankAccounts = this.storeBankAccounts.bind(this);
-        this.bankAccounts = null;
+        this.state = {bankAccounts: null, chosenBankAccount: null};
     }
 
     componentWillMount() {
-        if (this.bankAccounts === null && this.props.context.formData) {
+        this.init();
+    }
+
+    init() {
+        if (this.props.context.formData) {
             this.props.context.formData.parameters.map((item) => {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (!this.props.context.formData.userInput.chosenBankAccountNumber) {
-                        // the context doesn't contain chosenBankAccountNumber yet, save it in the context
-                        if (item.chosenBankAccountNumber) {
-                            // bank account was already chosen (e.g. in previous step) - keep the choice
-                            this.handleBankAccountChoice(item);
-                        } else {
-                            // initial bank account is set to the first bank account found
-                            this.handleBankAccountChoice(item.bankAccounts[0]);
-                        }
+                    if (this.props.context.formData.userInput.chosenBankAccountNumber) {
+                        // bank account has already been chosen
+                        this.resolveChosenBankAccount(item.bankAccounts, this.props.context.formData.userInput.chosenBankAccountNumber);
+                    } else {
+                        // initial bank account is set to the first bank account found
+                        this.handleBankAccountChoice(item.bankAccounts[0]);
                     }
                 }
             });
@@ -66,14 +69,19 @@ export default class OperationDetail extends React.Component {
 
     storeBankAccounts(bankAccountsReceived) {
         // bankAccount are saved for easier work with bank accounts
-        this.bankAccounts = bankAccountsReceived;
+        this.setState({bankAccounts: bankAccountsReceived});
+    }
+
+    resolveChosenBankAccount(bankAccounts, chosenBankAccountNumber) {
+        bankAccounts.map((bankAccount) => {
+            if (bankAccount.number === chosenBankAccountNumber) {
+                this.setState({chosenBankAccount: bankAccount});
+            }
+        });
     }
 
     handleBankAccountChoice(bankAccount) {
-        if (this.bankAccounts === null) {
-            // bank accounts are not yet initialized - invalid state
-            return;
-        }
+        this.setState({chosenBankAccount: bankAccount});
         this.props.dispatch(changeBankAccount(bankAccount.number));
     }
 
@@ -127,16 +135,6 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     )
                                 } else {
-                                    let chosenBankAccount;
-                                    if (!this.props.context.formData.userInput.chosenBankAccountNumber) {
-                                        chosenBankAccount = item.bankAccounts[0];
-                                    } else {
-                                        this.bankAccounts.map((bankAccount) => {
-                                            if (bankAccount.number === this.props.context.formData.userInput.chosenBankAccountNumber) {
-                                                chosenBankAccount = bankAccount;
-                                            }
-                                        });
-                                    }
                                     return (
                                         <div key={item.label} className="row attribute">
                                             <div className="col-sm-12">
@@ -144,10 +142,10 @@ export default class OperationDetail extends React.Component {
                                                     <FormattedMessage id="operationReview.bankAccount.number"/>
                                                 </div>
                                                 <div className="value">
-                                                    {(this.bankAccounts) ? (
+                                                    {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
                                                         <BankAccountSelect
-                                                            bankAccounts={this.bankAccounts}
-                                                            chosenBankAccount={chosenBankAccount}
+                                                            bankAccounts={this.state.bankAccounts}
+                                                            chosenBankAccount={this.state.chosenBankAccount}
                                                             choiceDisabled={item.choiceDisabled}
                                                             callback={this.handleBankAccountChoice}
                                                         />

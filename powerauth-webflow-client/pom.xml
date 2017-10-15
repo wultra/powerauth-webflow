@@ -84,6 +84,13 @@
             <version>0.15.0</version>
         </dependency>
 
+        <!-- H2 DB -->
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
         <!-- Tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

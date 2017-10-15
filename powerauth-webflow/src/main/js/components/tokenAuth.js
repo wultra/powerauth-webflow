@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, getOperationData, init} from "../actions/tokenAuthActions";
+import {authenticate, cancel, getOperationData, init, updateFormData} from "../actions/tokenAuthActions";
 // Components
 import OperationDetail from "./operationDetail";
 import {Panel} from "react-bootstrap";
@@ -47,21 +47,29 @@ export default class Token extends React.Component {
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.handleSwitchToQRCode = this.handleSwitchToQRCode.bind(this);
+        this.switchToQRCode = this.switchToQRCode.bind(this);
         this.cancelAuthorization = this.cancelAuthorization.bind(this);
         this.setUpdateTimeout = this.setUpdateTimeout.bind(this);
         this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
+        this.disconnect = this.disconnect.bind(this);
         this.state = {
             webSocketInitialized: false,
             authorizationInProgress: false,
             authorized: false,
             authorizationCanceled: false,
-            updateTimeout: null
+            updateTimeout: null,
+            disconnected: false
         };
     }
 
     componentWillMount() {
         this.init();
         this.update();
+    }
+
+    componentWillUnmount() {
+        this.disconnect();
     }
 
     init() {
@@ -182,6 +190,25 @@ export default class Token extends React.Component {
 
     handleCancel(event) {
         event.preventDefault();
+        this.disconnect();
+        this.props.dispatch(cancel());
+    }
+
+    handleSwitchToQRCode(event) {
+        event.preventDefault();
+        this.disconnect();
+        const switchToQRCode = this.switchToQRCode;
+        // update form data - enable offline mode, when page is refreshed user selection is remembered
+        this.props.dispatch(updateFormData(this.props.context.formData, function () {
+            // change screen after formData are stored
+            switchToQRCode();
+        }));
+    }
+
+    disconnect() {
+        if (this.state.disconnected) {
+            return;
+        }
         // cancel authorization, update() method could be already called
         this.cancelAuthorization();
         // cancel update() call using timeout if it is scheduled for future
@@ -191,7 +218,14 @@ export default class Token extends React.Component {
         }
         // disconnect Web Socket connection
         stompClient.disconnect();
-        this.props.dispatch(cancel());
+        this.setState({disconnected: true});
+    }
+
+    switchToQRCode() {
+        this.props.dispatch({
+            type: "SHOW_SCREEN_QR_CODE",
+            payload: {}
+        });
     }
 
     componentWillReceiveProps(props) {
@@ -221,7 +255,8 @@ export default class Token extends React.Component {
                             <div className="attributes">
                                 <div className="font-small message-information">
                                     <FormattedMessage id="message.token.offline"/><br/>
-                                    <a href="/"><FormattedMessage id="message.token.offline.link"/></a>
+                                    <a href="#" onClick={this.handleSwitchToQRCode}><FormattedMessage
+                                        id="message.token.offline.link"/></a>
                                 </div>
                             </div>
                             <div className="attribute row">

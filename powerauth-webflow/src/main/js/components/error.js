@@ -35,7 +35,11 @@ export default class Error extends React.Component {
         return (
             <div className="text-center">
                 <div className={'message-error'}>
-                    <FormattedMessage id={this.props.context.message}/>
+                    {(this.props.context.message) ? (
+                        <FormattedMessage id={this.props.context.message}/>
+                    ) : (
+                        <FormattedMessage id="error.unknown"/>
+                    )}
                 </div>
                 <div className="image-result error"></div>
                 <div className={'message-error'}>

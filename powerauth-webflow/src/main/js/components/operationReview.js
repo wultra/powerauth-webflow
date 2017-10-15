@@ -78,7 +78,7 @@ export default class OperationReview extends React.Component {
         if (this.props.context.formData) {
             this.props.dispatch(chooseAuthMethod("SMS_KEY"));
             this.props.dispatch(updateFormData(this.props.context.formData, function () {
-                // change screen after display details are stored
+                // change screen after formData are stored
                 switchToSMSScreen();
             }));
         }

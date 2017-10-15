@@ -20,7 +20,7 @@ export function getOperationData() {
     return function (dispatch) {
         axios.get("./api/auth/operation/detail").then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_TOKEN",
+                type: "SHOW_SCREEN_QR_CODE",
                 payload: response.data
             });
         }).catch((error) => {
@@ -29,12 +29,33 @@ export function getOperationData() {
     }
 }
 
-export function init() {
+export function initQRCode(activationId) {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/init", {}).then((response) => {
+        dispatch({
+            type: "SHOW_SCREEN_QR_CODE",
+            payload: {
+                loading: true,
+                error: false,
+                init: false,
+                message: ""
+            }
+        });
+        axios.post("./api/auth/qr/init", {
+            activationId: activationId
+        }).then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_TOKEN",
-                payload: response.data
+                type: "SHOW_SCREEN_QR_CODE",
+                payload: {
+                    loading: false,
+                    error: false,
+                    init: true,
+                    message: "",
+                    qrCode: response.data.qrcode,
+                    nonce: response.data.nonce,
+                    dataHash: response.data.dataHash,
+                    chosenActivation: response.data.chosenActivation,
+                    activations: response.data.activations
+                }
             });
         }).catch((error) => {
             dispatchError(dispatch, error);
@@ -42,12 +63,46 @@ export function init() {
     }
 }
 
-export function authenticate(callback) {
+export function changeActivation(activation) {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/authenticate", {}).then((response) => {
+        dispatch({
+            type: "CHANGE_ACTIVATION",
+            payload: {
+                chosenActivation: activation,
+                init: false
+            }
+        });
+    }
+}
+
+export function authenticate(activationId, authCode, nonce, dataHash) {
+    return function (dispatch) {
+        dispatch({
+            type: "SHOW_SCREEN_QR_CODE",
+            payload: {
+                loading: true,
+                error: false,
+                init: false,
+                message: ""
+            }
+        });
+        axios.post("./api/auth/qr/authenticate", {
+            activationId: activationId,
+            authCode: authCode,
+            nonce: nonce,
+            dataHash: dataHash
+        }).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_QR_CODE",
+                payload: {
+                    loading: true,
+                    error: false,
+                    init: false,
+                    message: ""
+                }
+            });
             switch (response.data.result) {
                 case 'CONFIRMED': {
-                    callback(false);
                     dispatchAction(dispatch, response);
                     break;
                 }
@@ -66,24 +121,30 @@ export function authenticate(callback) {
                         dispatchAction(dispatch, response);
                         break;
                     }
+                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
+                    if (response.data.message === "authentication.maxAttemptsExceeded") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // if there is no supported auth method, show error, there is no point in continuing
                     // TODO - handle fallback - see issue #32
                     if (response.data.message === "error.noAuthMethod") {
                         dispatchAction(dispatch, response);
                         break;
                     }
-                    callback(true);
                     dispatch({
-                        type: "SHOW_SCREEN_TOKEN",
+                        type: "SHOW_SCREEN_QR_CODE",
                         payload: {
-                            info: "reload"
+                            loading: false,
+                            error: true,
+                            init: false,
+                            message: response.data.message
                         }
                     });
                     break;
                 }
             }
         }).catch((error) => {
-            callback(false);
             dispatchError(dispatch, error);
         })
     }
@@ -91,25 +152,13 @@ export function authenticate(callback) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/cancel", {}).then((response) => {
+        axios.post("./api/auth/qr/cancel", {}).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
                     message: response.data.message
                 }
             });
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
-}
-
-export function updateFormData(formData, callback) {
-    return function (dispatch) {
-        axios.put("./api/auth/operation/formData", {
-            formData: formData
-        }).then((response) => {
-            callback();
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
