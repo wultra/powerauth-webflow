@@ -31,7 +31,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.QRCodeInvalidDataException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.QRCodeEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.OfflineSignatureQrCode;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeAuthenticationResponse;
@@ -164,10 +164,10 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
             chosenActivation = activationEntities.get(0);
         }
         // generating of QR code
-        QRCodeEntity qrCodeEntity = generateQRCode(chosenActivation);
-        initResponse.setQRCode(qrCodeEntity.generateImage());
-        initResponse.setNonce(qrCodeEntity.getNonce());
-        initResponse.setDataHash(qrCodeEntity.getDataHash());
+        OfflineSignatureQrCode qrCode = generateQRCode(chosenActivation);
+        initResponse.setQRCode(qrCode.generateImage());
+        initResponse.setNonce(qrCode.getNonce());
+        initResponse.setDataHash(qrCode.getDataHash());
         initResponse.setChosenActivation(chosenActivation);
         initResponse.setActivations(activationEntities);
         return initResponse;
@@ -248,10 +248,10 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      * @return QR code as String-based PNG image.
      * @throws IOException Thrown when generating QR code fails.
      */
-    private QRCodeEntity generateQRCode(ActivationEntity activation) throws IOException, QRCodeInvalidDataException {
+    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws IOException, QRCodeInvalidDataException {
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
-        String messageText = generateMessageText(operation.getFormData());
+        String messageText = operation.getFormData().getMessage();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 
@@ -260,64 +260,12 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
         }
         // do not check message, some sanitization could be done by PowerAuth server
 
-        QRCodeEntity qrCode = new QRCodeEntity(250);
+        OfflineSignatureQrCode qrCode = new OfflineSignatureQrCode(250);
         qrCode.setDataHash(response.getDataHash());
         qrCode.setNonce(response.getNonce());
         qrCode.setMessage(response.getMessage());
         qrCode.setSignature(response.getSignature());
         return qrCode;
-    }
-
-    /**
-     * Generates the localized message for operation data.
-     *
-     * @param formData Operation form data.
-     * @return Localized message.
-     * @throws IOException Thrown when generating message fails.
-     */
-    private String generateMessageText(OperationFormData formData) throws IOException, QRCodeInvalidDataException {
-        BigDecimal amount = null;
-        String currency = null;
-        String account = null;
-        for (OperationFormAttribute attribute: formData.getParameters()) {
-            switch (attribute.getType()) {
-                case AMOUNT:
-                    OperationAmountAttribute amountAttribute = (OperationAmountAttribute) attribute;
-                    amount = amountAttribute.getAmount();
-                    currency = amountAttribute.getCurrency();
-                    break;
-                case KEY_VALUE:
-                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
-                    if ("To Account".equals(keyValueAttribute.getLabel())) {
-                        account = keyValueAttribute.getValue();
-                    }
-                    break;
-            }
-        }
-        if (amount==null || amount.doubleValue()<=0) {
-            throw new QRCodeInvalidDataException("qrCode.invalidAmount");
-        }
-        if (currency==null || currency.isEmpty()) {
-            throw new QRCodeInvalidDataException("qrCode.invalidCurrency");
-        }
-        if (account==null || account.isEmpty()) {
-            throw new QRCodeInvalidDataException("qrCode.invalidAccount");
-        }
-        String[] messageArgs = {amount.toPlainString(), currency, account};
-        return messageSource().getMessage("qrCode.messageText", messageArgs, LocaleContextHolder.getLocale());
-    }
-
-    /**
-     * Get MessageSource with i18n data for authorizations SMS messages.
-     *
-     * @return MessageSource.
-     */
-    @Bean
-    private MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:/static/resources/messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
     }
 
 }

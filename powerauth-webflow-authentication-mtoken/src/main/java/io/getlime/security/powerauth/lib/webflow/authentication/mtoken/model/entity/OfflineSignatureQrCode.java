@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 /**
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class QRCodeEntity {
+public class OfflineSignatureQrCode {
 
     private int size;
     private String dataHash;
@@ -47,7 +47,7 @@ public class QRCodeEntity {
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public QRCodeEntity(int size) {
+    public OfflineSignatureQrCode(int size) {
         this.size = size;
     }
 
