@@ -51,7 +51,7 @@ public class AuthMethodController {
     /**
      * Get all authentication methods supported by Next Step server.
      *
-     * @param request Get auth methods request. Use null userId in request.
+     * @param request Get auth methods request. Use null user ID in request.
      * @return List of authentication methods wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
@@ -73,7 +73,7 @@ public class AuthMethodController {
     /**
      * Get all enabled authentication methods for given user.
      *
-     * @param request Get auth methods request. Use non-null userId in request.
+     * @param request Get auth methods request. In case user ID is null, list of auth methods enabled by default is returned.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
@@ -90,7 +90,7 @@ public class AuthMethodController {
     /**
      * Enable an authentication method for given user.
      *
-     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
+     * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
@@ -114,7 +114,7 @@ public class AuthMethodController {
     /**
      * Disable an authentication method for given user.
      *
-     * @param request Update auth method request. Use non-null userId in request and specify authMethod.
+     * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)

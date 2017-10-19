@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
 /**
+ * Exception thrown when authentication method is not available.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthMethodNotAvailableException extends Exception {

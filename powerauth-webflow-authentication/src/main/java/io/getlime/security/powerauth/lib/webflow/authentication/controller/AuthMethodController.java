@@ -90,7 +90,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     abstract protected AuthMethod getAuthMethodName();
 
     protected boolean isAuthMethodAvailable(String userId, String operationId) {
-        return authMethodAvailabilityService.isAuthMethodEnabledForUser(getAuthMethodName(), userId, operationId);
+        return authMethodAvailabilityService.isAuthMethodEnabled(getAuthMethodName(), userId, operationId);
     }
 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
@@ -281,10 +281,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
-
+    /**
+     * Filters the list of steps based on current availability of authentication methods.
+     * @param authSteps List of authentication steps.
+     * @param userId User ID, use null for unknown user ID.
+     * @param operationId Operation ID.
+     */
     private void filterStepsBasedOnActiveAuthMethods(List<AuthStep> authSteps, String userId, String operationId) {
         for (AuthStep authStep: authSteps) {
-            if (!authMethodAvailabilityService.isAuthMethodEnabledForUser(authStep.getAuthMethod(), userId, operationId)) {
+            if (!authMethodAvailabilityService.isAuthMethodEnabled(authStep.getAuthMethod(), userId, operationId)) {
                 authSteps.remove(authStep);
             }
         }

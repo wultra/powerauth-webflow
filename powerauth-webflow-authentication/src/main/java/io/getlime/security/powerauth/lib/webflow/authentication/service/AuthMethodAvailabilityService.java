@@ -39,7 +39,7 @@ public class AuthMethodAvailabilityService {
      * @param operationId Operation ID.
      * @return Whether authentication method is available.
      */
-    public boolean isAuthMethodEnabledForUser(AuthMethod authMethod, String userId, String operationId) {
+    public boolean isAuthMethodEnabled(AuthMethod authMethod, String userId, String operationId) {
         try {
             ObjectResponse<GetAuthMethodsResponse> response = nextStepClient.getAuthMethodsEnabledForUser(userId);
             List<AuthMethodDetail> enabledAuthMethods = response.getResponseObject().getAuthMethods();
@@ -66,12 +66,13 @@ public class AuthMethodAvailabilityService {
      * @return Whether Mobile Token authentication method is available.
      */
     private boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) {
+        System.out.println("isMobileTokenAuthMethodAvailable: "+userId);
         // check whether user has an ACTIVE activation
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
         for (GetActivationListForUserResponse.Activations activation: allActivations) {
             if (activation.getActivationStatus() == ActivationStatus.ACTIVE) {
                 // user has an active activation - method can be used
-                // TODO - filter applications based on activationId, ACTIVE activation may come from another application, see #122
+                // TODO - filter activations based on applicationId, ACTIVE activation may come from another application, see #122
                 return true;
             }
         }
