@@ -66,7 +66,6 @@ public class AuthMethodAvailabilityService {
      * @return Whether Mobile Token authentication method is available.
      */
     private boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) {
-        System.out.println("isMobileTokenAuthMethodAvailable: "+userId);
         // check whether user has an ACTIVE activation
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
         for (GetActivationListForUserResponse.Activations activation: allActivations) {
