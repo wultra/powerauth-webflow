@@ -68,7 +68,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled authenticate() call should always fail
             return null;
         }
@@ -136,7 +136,7 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         final GetOperationDetailResponse operation = getOperation();
 
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, operation should fail
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);

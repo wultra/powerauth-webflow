@@ -37,7 +37,9 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.Authenti
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Base controller for any authentication method. Controller class is templated using three attributes.
@@ -89,8 +91,18 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     abstract protected AuthMethod getAuthMethodName();
 
-    protected boolean isAuthMethodAvailable(String userId, String operationId) {
-        return authMethodAvailabilityService.isAuthMethodEnabled(getAuthMethodName(), userId, operationId);
+    /**
+     * Returns whether authentication method is available in operation steps.
+     * @param operation Operation.
+     * @return Whether authentication method is available.
+     */
+    protected boolean isAuthMethodAvailable(GetOperationDetailResponse operation) {
+        for (AuthStep step: operation.getSteps()) {
+            if (step.getAuthMethod() == getAuthMethodName()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
@@ -288,11 +300,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param operationId Operation ID.
      */
     private void filterStepsBasedOnActiveAuthMethods(List<AuthStep> authSteps, String userId, String operationId) {
+        Set<AuthStep> authStepsToRemove = new HashSet<>();
         for (AuthStep authStep: authSteps) {
             if (!authMethodAvailabilityService.isAuthMethodEnabled(authStep.getAuthMethod(), userId, operationId)) {
-                authSteps.remove(authStep);
+                authStepsToRemove.add(authStep);
             }
         }
+        authSteps.removeAll(authStepsToRemove);
     }
 
     /**

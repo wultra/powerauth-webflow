@@ -77,7 +77,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled authenticate() call should always fail
             return null;
         }
@@ -122,7 +122,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException, AuthMethodNotAvailableException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // QR code cannot be generated when AuthMethod is disabled
             throw new AuthMethodNotAvailableException("method.disabled");
         }

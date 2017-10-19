@@ -57,7 +57,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, authenticate() call should always fail
             return null;
         }
@@ -99,7 +99,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() {
         final GetOperationDetailResponse operation = getOperation();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
-        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+        if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, initSMSAuthorization() call should always fail
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("method.disabled");

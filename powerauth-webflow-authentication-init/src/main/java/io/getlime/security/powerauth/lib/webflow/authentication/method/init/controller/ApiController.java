@@ -127,9 +127,4 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         return AuthMethod.INIT;
     }
 
-    @Override
-    protected boolean isAuthMethodAvailable(String userId, String operationId) {
-        // init AuthMethod is always enabled, at this point userId is not known, thus Next Step user preferences are not relevant
-        return true;
-    }
 }

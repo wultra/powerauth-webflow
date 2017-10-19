@@ -82,12 +82,6 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         return AuthMethod.USERNAME_PASSWORD_AUTH;
     }
 
-    @Override
-    protected boolean isAuthMethodAvailable(String userId, String operationId) {
-        // form-based authentication is always enabled, at this point userId is not known, thus Next Step user preferences are not relevant
-        return true;
-    }
-
     /**
      * Handle the user authentication based on username and password.
      *
