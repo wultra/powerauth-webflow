@@ -67,7 +67,7 @@ CREATE TABLE ns_auth_method (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_prefs stores user preferences.
--- Status of authentication methods is stored in this able per user (methods can be enabled or disabled).
+-- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY,
   auth_method_1 BOOLEAN,
@@ -91,7 +91,6 @@ CREATE TABLE ns_operation (
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_operation_history stores all changes of operations.
--- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256),
   result_id                   INTEGER,
