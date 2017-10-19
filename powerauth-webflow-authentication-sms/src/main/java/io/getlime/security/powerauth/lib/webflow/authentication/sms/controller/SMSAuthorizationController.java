@@ -36,11 +36,14 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/sms")
 public class SMSAuthorizationController extends AuthMethodController<SMSAuthorizationRequest, SMSAuthorizationResponse, AuthStepException> {
 
-    @Autowired
-    private DataAdapterClient dataAdapterClient;
+    private final DataAdapterClient dataAdapterClient;
+    private final HttpSession httpSession;
 
     @Autowired
-    private HttpSession httpSession;
+    public SMSAuthorizationController(DataAdapterClient dataAdapterClient, HttpSession httpSession) {
+        this.dataAdapterClient = dataAdapterClient;
+        this.httpSession = httpSession;
+    }
 
     private static final String MESSAGE_ID = "messageId";
 
@@ -54,6 +57,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+            // when AuthMethod is disabled, authenticate() call should always fail
+            return null;
+        }
         final Object messageId = httpSession.getAttribute(MESSAGE_ID);
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
@@ -91,8 +98,15 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() {
         final GetOperationDetailResponse operation = getOperation();
-        final String userId = operation.getUserId();
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
+        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+            // when AuthMethod is disabled, initSMSAuthorization() call should always fail
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("method.disabled");
+            return initResponse;
+        }
+
+        final String userId = operation.getUserId();
         try {
             ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(
                     operation.getOperationId(), userId, operation.getOperationName(), operation.getFormData(),

@@ -79,10 +79,8 @@ public class AuthMethodController {
     @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
         GetAuthMethodsRequest requestObject = request.getRequestObject();
+        // userId can be null - in this case default setting is returned when user is not known
         String userId = requestObject.getUserId();
-        if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object.");
-        }
         List<AuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.setAuthMethods(authMethods);

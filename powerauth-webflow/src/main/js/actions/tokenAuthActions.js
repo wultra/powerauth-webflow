@@ -61,6 +61,11 @@ export function authenticate(callback) {
                     break;
                 }
                 case 'AUTH_FAILED': {
+                    // handle case when authentication method is no longer available
+                    if (response.data.message === "method.disabled") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "authentication.timeout") {
                         dispatchAction(dispatch, response);

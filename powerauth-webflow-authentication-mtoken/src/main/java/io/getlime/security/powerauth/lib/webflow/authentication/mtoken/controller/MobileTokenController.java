@@ -68,6 +68,10 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+            // when AuthMethod is disabled authenticate() call should always fail
+            return null;
+        }
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
@@ -131,6 +135,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
 
         final GetOperationDetailResponse operation = getOperation();
+
+        if (!isAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+            // when AuthMethod is disabled, operation should fail
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
+        }
 
         if (operation.isExpired()) {
             // handle operation expiration

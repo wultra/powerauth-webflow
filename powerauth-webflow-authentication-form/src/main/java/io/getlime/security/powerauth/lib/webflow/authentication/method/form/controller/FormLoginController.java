@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.form.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
@@ -80,6 +80,12 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.USERNAME_PASSWORD_AUTH;
+    }
+
+    @Override
+    protected boolean isAuthMethodAvailable(String userId, String operationId) {
+        // form-based authentication is always enabled, at this point userId is not known, thus Next Step user preferences are not relevant
+        return true;
     }
 
     /**

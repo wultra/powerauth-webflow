@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.init;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
@@ -125,5 +125,11 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.INIT;
+    }
+
+    @Override
+    protected boolean isAuthMethodAvailable(String userId, String operationId) {
+        // init AuthMethod is always enabled, at this point userId is not known, thus Next Step user preferences are not relevant
+        return true;
     }
 }
