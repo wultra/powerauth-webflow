@@ -17,16 +17,14 @@ package io.getlime.security.powerauth.lib.dataadapter.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.dataadapter.validation.AuthenticationRequestValidator;
-import org.springframework.core.MethodParameter;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +40,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @RequestMapping("/api/auth/user")
 public class AuthenticationController {
 
+    private final DataAdapter dataAdapter;
+
+    @Autowired
+    public AuthenticationController(DataAdapter dataAdapter) {
+        this.dataAdapter = dataAdapter;
+    }
+
     /**
      * Authenticate user with given username and password.
      *
@@ -53,25 +58,8 @@ public class AuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@RequestBody ObjectRequest<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
         AuthenticationRequest authenticationRequest = request.getRequestObject();
-
-        // input validation is handled by AuthenticationRequestValidator
-        // validation is invoked manually because of the generified Request object
-        AuthenticationRequestValidator validator = new AuthenticationRequestValidator();
-        BeanPropertyBindingResult result = new BeanPropertyBindingResult(authenticationRequest, "authenticationRequest");
-        ValidationUtils.invokeValidator(validator, authenticationRequest, result);
-        if (result.hasErrors()) {
-            // getEnclosingMethod() on new object returns a reference to current method
-            MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);
-            throw new MethodArgumentNotValidException(methodParam, result);
-        }
-
-        // here will be the real authentication - call to the backend providing authentication
-        if ("test".equals(authenticationRequest.getPassword())) {
-            AuthenticationResponse responseOK = new AuthenticationResponse(authenticationRequest.getUsername());
-            return new ObjectResponse<>(responseOK);
-        } else {
-            throw new AuthenticationFailedException("login.authenticationFailed");
-        }
+        AuthenticationResponse response = dataAdapter.authenticateUser(authenticationRequest);
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -81,17 +69,10 @@ public class AuthenticationController {
      * @return Response with user details.
      */
     @RequestMapping(value = "/info", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) {
+    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws MethodArgumentNotValidException {
         UserDetailRequest userDetailRequest = request.getRequestObject();
-        String userId = userDetailRequest.getId();
-
-        // Fetch user details here ...
-
-        UserDetailResponse responseObject = new UserDetailResponse();
-        responseObject.setId(userId);
-        responseObject.setGivenName("John");
-        responseObject.setFamilyName("Doe");
-        return new ObjectResponse<>(responseObject);
+        UserDetailResponse response = dataAdapter.fetchUserDetail(userDetailRequest);
+        return new ObjectResponse<>(response);
     }
 
 

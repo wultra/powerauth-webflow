@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.dataadapter.validation;
+package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 
+import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
-import io.getlime.security.powerauth.lib.dataadapter.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

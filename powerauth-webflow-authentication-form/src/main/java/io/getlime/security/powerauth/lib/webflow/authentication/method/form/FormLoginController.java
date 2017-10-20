@@ -49,13 +49,17 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/form")
 public class FormLoginController extends AuthMethodController<UsernamePasswordAuthenticationRequest, UsernamePasswordAuthenticationResponse, AuthStepException> {
 
+    private final DataAdapterClient dataAdapterClient;
+
     @Autowired
-    private DataAdapterClient dataAdapterClient;
+    public FormLoginController(DataAdapterClient dataAdapterClient) {
+        this.dataAdapterClient = dataAdapterClient;
+    }
 
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         try {
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticate(request.getUsername(), request.getPassword());
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword());
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
