@@ -131,11 +131,11 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 initResponse.setResult(AuthStepResult.CONFIRMED);
             } else {
                 initResponse.setResult(AuthStepResult.AUTH_FAILED);
-                initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
+                initResponse.setMessage("pushMessage.fail");
             }
         } catch (PushServerClientException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
+            initResponse.setMessage("pushMessage.fail");
         }
         return initResponse;
     }

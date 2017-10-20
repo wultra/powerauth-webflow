@@ -44,6 +44,7 @@ export default class Token extends React.Component {
         this.onAuthorize = this.onAuthorize.bind(this);
         this.setAuthorizationInProgress = this.setAuthorizationInProgress.bind(this);
         this.isAuthorizationInProgress = this.isAuthorizationInProgress.bind(this);
+        this.setInitialized = this.setInitialized.bind(this);
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
@@ -54,6 +55,7 @@ export default class Token extends React.Component {
         this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
         this.disconnect = this.disconnect.bind(this);
         this.state = {
+            initialized: false,
             webSocketInitialized: false,
             authorizationInProgress: false,
             authorized: false,
@@ -65,7 +67,6 @@ export default class Token extends React.Component {
 
     componentWillMount() {
         this.init();
-        this.update();
     }
 
     componentWillUnmount() {
@@ -73,8 +74,17 @@ export default class Token extends React.Component {
     }
 
     init() {
-        this.props.dispatch(init());
-        this.props.dispatch(getOperationData());
+        const setInitialized = this.setInitialized;
+        const dispatch = this.props.dispatch;
+        const update = this.update;
+        dispatch(init(function(initSucceeded) {
+            if (initSucceeded) {
+                setInitialized(true);
+                // continue only when init() succeeds - when push message is delivered
+                dispatch(getOperationData());
+                update();
+            }
+        }));
     }
 
     update() {
@@ -120,6 +130,10 @@ export default class Token extends React.Component {
                 setAuthorizationInProgress(false);
             }));
         }
+    }
+
+    setInitialized(initialized) {
+        this.setState({initialized: initialized});
     }
 
     setAuthorized(authorized) {
@@ -206,7 +220,7 @@ export default class Token extends React.Component {
     }
 
     disconnect() {
-        if (this.state.disconnected) {
+        if (!this.state.initialized || this.state.disconnected) {
             return;
         }
         // cancel authorization, update() method could be already called

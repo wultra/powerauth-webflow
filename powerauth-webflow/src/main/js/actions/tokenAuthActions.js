@@ -29,7 +29,7 @@ export function getOperationData() {
     }
 }
 
-export function init() {
+export function init(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -40,6 +40,8 @@ export function init() {
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
             });
+            // initialization complete - mobile token authorization can start
+            callback(true);
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

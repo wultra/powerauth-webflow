@@ -28,7 +28,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCan
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthMethodNotAvailableException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.QRCodeInvalidDataException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
@@ -119,12 +118,15 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException, AuthMethodNotAvailableException {
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
         if (!isAuthMethodAvailable(operation)) {
             // QR code cannot be generated when AuthMethod is disabled
-            throw new AuthMethodNotAvailableException("method.disabled");
+            final QRCodeInitResponse response = new QRCodeInitResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
         }
 
         // loading of activations
