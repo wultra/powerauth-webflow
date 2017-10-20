@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class BankAccountEntity {
+public class BankAccount {
 
     private String number;
     private String name;

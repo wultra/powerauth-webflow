@@ -17,6 +17,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -37,6 +40,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Base controller for any authentication method. Controller class is templated using three attributes.
@@ -57,6 +62,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     @Autowired
     private NextStepClient nextStepService;
+
+    @Autowired
+    private DataAdapterClient dataAdapterClient;
 
     protected GetOperationDetailResponse getOperation() {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
@@ -127,6 +135,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
         ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params);
+        // notify Data Adapter in case operation is in DONE state now
+        if (response.getResponseObject().getResult()==AuthResult.DONE) {
+            try {
+                dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, operationId);
+            } catch (DataAdapterClientErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
+            }
+        }
         return response.getResponseObject();
     }
 
@@ -141,6 +157,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException {
         ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params);
+        // notify Data Adapter in case operation is in FAILED state now
+        if (response.getResponseObject().getResult()==AuthResult.FAILED) {
+            try {
+                dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operationId);
+            } catch (DataAdapterClientErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
+            }
+        }
         return response.getResponseObject();
     }
 
@@ -154,6 +178,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException {
         ObjectResponse<UpdateOperationResponse> response = nextStepService.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params);
+        // notify Data Adapter in case operation is in FAILED state now
+        if (response.getResponseObject().getResult()==AuthResult.FAILED) {
+            try {
+                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operationId);
+            } catch (DataAdapterClientErrorException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
+            }
+        }
         return response.getResponseObject();
     }
 

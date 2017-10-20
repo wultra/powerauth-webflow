@@ -7,10 +7,7 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFai
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.impl.validation.CreateSMSAuthorizationRequestValidator;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthMethodChoiceEntity;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoiceEntity;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountEntity;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChangeEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
@@ -101,9 +98,9 @@ public class DataAdapterService implements DataAdapter {
 
         // Replace mock bank account data with real data loaded from the bank backend.
         // In case the bank account selection is disabled, return an empty list.
-        List<BankAccountEntity> bankAccounts = new ArrayList<>();
+        List<BankAccount> bankAccounts = new ArrayList<>();
 
-        BankAccountEntity bankAccount1 = new BankAccountEntity();
+        BankAccount bankAccount1 = new BankAccount();
         bankAccount1.setName("Běžný účet v CZK");
         bankAccount1.setBalance(new BigDecimal("24394.52"));
         bankAccount1.setNumber("12345678/1234");
@@ -111,7 +108,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount1.setUsableForPayment(true);
         bankAccounts.add(bankAccount1);
 
-        BankAccountEntity bankAccount2 = new BankAccountEntity();
+        BankAccount bankAccount2 = new BankAccount();
         bankAccount2.setName("Spořící účet v CZK");
         bankAccount2.setBalance(new BigDecimal("158121.10"));
         bankAccount2.setNumber("87654321/4321");
@@ -119,7 +116,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount2.setUsableForPayment(true);
         bankAccounts.add(bankAccount2);
 
-        BankAccountEntity bankAccount3 = new BankAccountEntity();
+        BankAccount bankAccount3 = new BankAccount();
         bankAccount3.setName("Spořící účet v EUR");
         bankAccount3.setBalance(new BigDecimal("1.90"));
         bankAccount3.setNumber("44444444/1111");
@@ -134,27 +131,36 @@ public class DataAdapterService implements DataAdapter {
 
     @Override
     public void formDataChangedNotification(FormDataChangeNotificationRequest notificationRequest) {
-        FormDataChangeEntity change = notificationRequest.getFormDataChange();
+        FormDataChange change = notificationRequest.getFormDataChange();
         switch (change.getType()) {
             case BANK_ACCOUNT_CHOICE:
-                bankAccountChosen((BankAccountChoiceEntity) change, notificationRequest.getUserId(), notificationRequest.getOperationId());
+                bankAccountChosen((BankAccountChoice) change, notificationRequest.getUserId(), notificationRequest.getOperationId());
                 break;
             case AUTH_METHOD_CHOICE:
-                authMethodChosen((AuthMethodChoiceEntity) change, notificationRequest.getUserId(), notificationRequest.getOperationId());
+                authMethodChosen((AuthMethodChoice) change, notificationRequest.getUserId(), notificationRequest.getOperationId());
                 break;
             default:
                 throw new IllegalStateException("Invalid change entity type: " + change.getType());
         }
     }
 
-    private void bankAccountChosen(BankAccountChoiceEntity bankAccountChoice, String userId, String operationId) {
+    private void bankAccountChosen(BankAccountChoice bankAccountChoice, String userId, String operationId) {
         // Handle bank account choice here (e.g. send notification to bank backend).
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Bank account chosen: " + bankAccountChoice.getBankAccountNumber() + ", user: " + userId + ", operationId: " + operationId);
     }
 
-    private void authMethodChosen(AuthMethodChoiceEntity authMethodChoice, String userId, String operationId) {
+    private void authMethodChosen(AuthMethodChoice authMethodChoice, String userId, String operationId) {
         // Handle authorization method choice here (e.g. send notification to bank backend).
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Authorization method chosen: " + authMethodChoice.getChosenAuthMethod() + ", user: " + userId + ", operationId: " + operationId);
+    }
+
+    @Override
+    public void operationChangedNotification(OperationChangeNotificationRequest notificationRequest) {
+        String operationId = notificationRequest.getOperationId();
+        String userId = notificationRequest.getUserId();
+        OperationChange change = notificationRequest.getOperationChange();
+        // Handle operation change here (e.g. send notification to bank backend).
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation changed: " + change + ", user: " + userId + ", operationId: " + operationId);
     }
 
     @Override

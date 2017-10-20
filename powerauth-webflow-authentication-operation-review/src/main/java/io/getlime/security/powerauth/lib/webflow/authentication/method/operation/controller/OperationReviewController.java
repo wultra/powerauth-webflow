@@ -19,9 +19,9 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.operatio
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthMethodChoiceEntity;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoiceEntity;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthMethodChoice;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
@@ -160,14 +160,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // Send notification to Data Adapter if the bank account has changed.
             // In case there is no bank account choice, the notification is not performed.
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
-                BankAccountChoiceEntity bankAccountChoice = new BankAccountChoiceEntity();
+                BankAccountChoice bankAccountChoice = new BankAccountChoice();
                 bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
                 dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
             }
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_AUTH_METHOD)) {
-                AuthMethodChoiceEntity authMethodChoice = new AuthMethodChoiceEntity();
+                AuthMethodChoice authMethodChoice = new AuthMethodChoice();
                 String chosenAuthMethod = request.getFormData().getUserInput().get(FIELD_CHOSEN_AUTH_METHOD);
-                authMethodChoice.setChosenAuthMethod(AuthMethodChoiceEntity.ChosenAuthMethod.valueOf(chosenAuthMethod));
+                authMethodChoice.setChosenAuthMethod(AuthMethodChoice.ChosenAuthMethod.valueOf(chosenAuthMethod));
                 dataAdapterClient.formDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
             }
             return new UpdateOperationFormDataResponse();
@@ -190,7 +190,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // however it can be easily extended in the future.
             try {
                 ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId());
-                List<BankAccountEntity> bankAccountEntities = response.getResponseObject().getBankAccounts();
+                List<BankAccount> bankAccountEntities = response.getResponseObject().getBankAccounts();
                 List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
                 if (!bankAccountDetails.isEmpty()) {
                     formData.addBankAccountChoice("bankAccountChoice", bankAccountDetails, null);
@@ -204,13 +204,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return formData;
     }
 
-    private List<BankAccountDetail> convertBankAccountEntities(List<BankAccountEntity> bankAccountEntities) {
+    private List<BankAccountDetail> convertBankAccountEntities(List<BankAccount> bankAccountEntities) {
         // TODO - move to a converter class
         List<BankAccountDetail> bankAccountDetails = new ArrayList<>();
         if (bankAccountEntities==null || bankAccountEntities.isEmpty()) {
             return bankAccountDetails;
         }
-        for (BankAccountEntity bankAccountEntity: bankAccountEntities) {
+        for (BankAccount bankAccountEntity: bankAccountEntities) {
             BankAccountDetail bankAccount = new BankAccountDetail();
             bankAccount.setName(bankAccountEntity.getName());
             bankAccount.setNumber(bankAccountEntity.getNumber());

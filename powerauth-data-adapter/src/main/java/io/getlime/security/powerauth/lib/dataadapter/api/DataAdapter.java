@@ -64,6 +64,12 @@ public interface DataAdapter {
     void formDataChangedNotification(FormDataChangeNotificationRequest notificationRequest);
 
     /**
+     * Send notification about operation change.
+     * @param notificationRequest Notification request.
+     */
+    void operationChangedNotification(OperationChangeNotificationRequest notificationRequest);
+
+    /**
      * Create an authorization SMS with generated OTP.
      * @param createSMSRequest Create SMS request.
      * @return SMS OTP response.

@@ -21,7 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.DataAdapterError;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChangeEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
@@ -228,7 +229,7 @@ public class DataAdapterClient {
      * @param formDataChange Operation formData change.
      * @return Object response.
      */
-    public ObjectResponse formDataChangedNotification(FormDataChangeEntity formDataChange, String userId, String operationId) throws DataAdapterClientErrorException {
+    public ObjectResponse formDataChangedNotification(FormDataChange formDataChange, String userId, String operationId) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
             FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
@@ -237,6 +238,35 @@ public class DataAdapterClient {
             request.setFormDataChange(formDataChange);
             HttpEntity<ObjectRequest<FormDataChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/api/operation/formData/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            try {
+                throw httpStatusException(ex);
+            } catch (IOException ex2) { // JSON parsing failed
+                throw invalidErrorResponseBodyException(ex2);
+
+            }
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Send a notification about operation change.
+     *
+     * @param operationChange Operation change.
+     * @return Object response.
+     */
+    public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, String operationId) throws DataAdapterClientErrorException {
+        try {
+            // Exchange user details with data adapter.
+            OperationChangeNotificationRequest request = new OperationChangeNotificationRequest();
+            request.setUserId(userId);
+            request.setOperationId(operationId);
+            request.setOperationChange(operationChange);
+            HttpEntity<ObjectRequest<OperationChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/api/operation/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
