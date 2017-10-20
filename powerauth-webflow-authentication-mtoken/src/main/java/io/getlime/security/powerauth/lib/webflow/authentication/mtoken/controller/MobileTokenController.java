@@ -90,6 +90,15 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody MobileTokenInitResponse initPushMessage() {
         final GetOperationDetailResponse operation = getOperation();
+
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled, operation should fail
+            final MobileTokenInitResponse response = new MobileTokenInitResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
+        }
+
         final String userId = operation.getUserId();
 
         PushMessage message = new PushMessage();

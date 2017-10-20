@@ -32,6 +32,10 @@ export function getOperationData() {
 export function init() {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}).then((response) => {
+            if (response.data.result === 'AUTH_FAILED') {
+                dispatchAction(dispatch, response);
+                return;
+            }
             dispatch({
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
