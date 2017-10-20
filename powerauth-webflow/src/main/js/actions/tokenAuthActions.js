@@ -32,7 +32,8 @@ export function getOperationData() {
 export function init(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}).then((response) => {
-            if (response.data.result === 'AUTH_FAILED') {
+            // silently ignore push message failures, see #125
+            if (response.data.result === 'AUTH_FAILED' && response.data.message !== 'pushMessage.fail') {
                 dispatchAction(dispatch, response);
                 return;
             }
