@@ -64,17 +64,16 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Default exception handler, for unexpected errors.
+     * Handling of unauthorized Exception.
      *
      * @return Response with error details.
      */
     @ExceptionHandler(InsufficientAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public String handleUnauthorizedException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", t);
+    public String handleUnauthorizedException(InsufficientAuthenticationException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", ex);
         authenticationManagementService.clearContext();
         return "redirect:/oauth/error";
     }
-
 
 }

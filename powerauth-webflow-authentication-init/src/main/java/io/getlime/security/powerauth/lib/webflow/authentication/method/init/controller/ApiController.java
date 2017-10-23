@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.init;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
@@ -126,4 +126,5 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.INIT;
     }
+
 }

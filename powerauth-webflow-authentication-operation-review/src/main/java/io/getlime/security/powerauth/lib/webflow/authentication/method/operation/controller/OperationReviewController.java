@@ -72,6 +72,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
+        final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled authenticate() call should always fail
+            return null;
+        }
         //TODO: Check pre-authenticated user here
         return getOperation().getUserId();
     }

@@ -29,13 +29,20 @@ export function getOperationData() {
     }
 }
 
-export function init() {
+export function init(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}).then((response) => {
+            // silently ignore push message failures, see #125
+            if (response.data.result === 'AUTH_FAILED' && response.data.message !== 'pushMessage.fail') {
+                dispatchAction(dispatch, response);
+                return;
+            }
             dispatch({
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
             });
+            // initialization complete - mobile token authorization can start
+            callback(true);
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -61,6 +68,11 @@ export function authenticate(callback) {
                     break;
                 }
                 case 'AUTH_FAILED': {
+                    // handle case when authentication method is no longer available
+                    if (response.data.message === "method.disabled") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "authentication.timeout") {
                         dispatchAction(dispatch, response);

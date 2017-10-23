@@ -54,6 +54,11 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-java-client-spring</artifactId>
+            <version>0.17.0</version>
+        </dependency>
     </dependencies>
 
 

@@ -35,13 +35,16 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodAvailabilityService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.Set;
 
 /**
  * Base controller for any authentication method. Controller class is templated using three attributes.
@@ -61,7 +64,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     private AuthenticationManagementService authenticationManagementService;
 
     @Autowired
-    private NextStepClient nextStepService;
+    private NextStepClient nextStepClient;
+
+    @Autowired
+    private AuthMethodAvailabilityService authMethodAvailabilityService;
 
     @Autowired
     private DataAdapterClient dataAdapterClient;
@@ -80,9 +86,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
-    protected GetOperationDetailResponse getOperation(String id) {
+    protected GetOperationDetailResponse getOperation(String operationId) {
         try {
-            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(id);
+            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
+            filterStepsBasedOnActiveAuthMethods(operationDetail.getResponseObject().getSteps(), operationDetail.getResponseObject().getUserId(), operationId);
             final GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
             return responseObject;
         } catch (NextStepServiceException e) {
@@ -92,9 +99,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     abstract protected AuthMethod getAuthMethodName();
 
+    /**
+     * Returns whether authentication method is available in operation steps.
+     * @param operation Operation.
+     * @return Whether authentication method is available.
+     */
+    protected boolean isAuthMethodAvailable(GetOperationDetailResponse operation) {
+        for (AuthStep step: operation.getSteps()) {
+            if (step.getAuthMethod() == getAuthMethodName()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
-            final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepService.getPendingOperations(userId, getAuthMethodName());
+            final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, getAuthMethodName());
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
             return null;
@@ -143,6 +164,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
 
@@ -165,6 +187,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
 
@@ -186,6 +209,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
 
@@ -200,9 +224,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected R initiateOperationWithName(String operationName, String operationData, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
-            ObjectResponse<CreateOperationResponse> response = nextStepService.createOperation(operationName, operationData, params);
+            ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
+            filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), null, operationId);
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
             return provider.continueAuthentication(operationId, null, responseObject.getSteps());
         } catch (NextStepServiceException e) {
@@ -219,11 +244,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected R continueOperationWithId(String operationId, AuthResponseProvider provider) {
         try {
-            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
+            final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
             if (operationDetail != null) {
                 GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
                 if (responseObject != null) {
                     final String userId = responseObject.getUserId();
+                    filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), userId, operationId);
                     if (userId != null) {
                         authenticationManagementService.updateAuthenticationWithUserId(userId);
                     }
@@ -300,40 +326,19 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Derive authorization response from operation detail for given operation. The response can be derived in case the
-     * authorization method called authorize() by itself and the result is either CONTINUE or DONE.
-     * Otherwise null is returned and authorize() method should be called to update the operation.
-     *
-     * @param operationId operation ID.
-     * @param userId      user ID.
-     * @param provider    Provider with authentication callback implementation.
-     * @return Response indicating next step derived from operation detail.
-     * @throws NextStepServiceException In case operation retrieval fails.
+     * Filters the list of steps based on current availability of authentication methods.
+     * @param authSteps List of authentication steps.
+     * @param userId User ID, use null for unknown user ID.
+     * @param operationId Operation ID.
      */
-    private R deriveAuthorizationResponseFromOperationDetail(String operationId, String userId, AuthResponseProvider provider) throws NextStepServiceException {
-        final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepService.getOperationDetail(operationId);
-        if (operationDetail != null) {
-            GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
-            // In case the last record in operation history has current authMethod and result is either DONE or CONTINUE,
-            // calling authorize() would lead to a duplicate NS update call. Return known response from operation detail instead.
-            if (responseObject != null
-                    && !responseObject.getHistory().isEmpty()
-                    && responseObject.getHistory().get(responseObject.getHistory().size() - 1).getAuthMethod() == getAuthMethodName()) {
-                switch (responseObject.getResult()) {
-                    case DONE: {
-                        return provider.doneAuthentication(userId);
-                    }
-                    case CONTINUE: {
-                        return provider.continueAuthentication(responseObject.getOperationId(), userId, responseObject.getSteps());
-                    }
-                    default:
-                        // authorization is pending
-                        return null;
-                }
+    private void filterStepsBasedOnActiveAuthMethods(List<AuthStep> authSteps, String userId, String operationId) {
+        Set<AuthStep> authStepsToRemove = new HashSet<>();
+        for (AuthStep authStep: authSteps) {
+            if (!authMethodAvailabilityService.isAuthMethodEnabled(authStep.getAuthMethod(), userId, operationId)) {
+                authStepsToRemove.add(authStep);
             }
         }
-        // authorization is pending
-        return null;
+        authSteps.removeAll(authStepsToRemove);
     }
 
     /**

@@ -20,7 +20,7 @@ import com.google.common.io.BaseEncoding;
 import io.getlime.powerauth.soap.*;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -38,10 +38,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeInitResponse;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,6 +75,11 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      */
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+        final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled authenticate() call should always fail
+            return null;
+        }
         // nonce and dataHash are received from UI - they were stored together with the QR code
         String nonce = request.getNonce();
         String dataHash = request.getDataHash();
@@ -120,6 +120,14 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     @ResponseBody
     public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
+        final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation)) {
+            // QR code cannot be generated when AuthMethod is disabled
+            final QRCodeInitResponse response = new QRCodeInitResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
+        }
 
         // loading of activations
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
