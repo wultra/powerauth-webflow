@@ -68,6 +68,10 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled authenticate() call should always fail
+            return null;
+        }
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
@@ -86,6 +90,15 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody MobileTokenInitResponse initPushMessage() {
         final GetOperationDetailResponse operation = getOperation();
+
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled, operation should fail
+            final MobileTokenInitResponse response = new MobileTokenInitResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
+        }
+
         final String userId = operation.getUserId();
 
         PushMessage message = new PushMessage();
@@ -118,11 +131,11 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 initResponse.setResult(AuthStepResult.CONFIRMED);
             } else {
                 initResponse.setResult(AuthStepResult.AUTH_FAILED);
-                initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
+                initResponse.setMessage("pushMessage.fail");
             }
         } catch (PushServerClientException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            initResponse.setMessage("authentication.fail"); // TODO: better message for initialization error
+            initResponse.setMessage("pushMessage.fail");
         }
         return initResponse;
     }
@@ -131,6 +144,14 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
     public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
 
         final GetOperationDetailResponse operation = getOperation();
+
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled, operation should fail
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
+        }
 
         if (operation.isExpired()) {
             // handle operation expiration

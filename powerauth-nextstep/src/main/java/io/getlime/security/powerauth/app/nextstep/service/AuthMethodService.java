@@ -68,7 +68,11 @@ public class AuthMethodService {
     public List<AuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
         List<AuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
-        UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);
+        UserPrefsEntity userPrefs = null;
+        if (userId!=null) {
+            // read user prefs only when user ID is not null, for some authentication methods user ID is not known
+            userPrefs = userPrefsRepository.findUserPrefs(userId);
+        }
         for (AuthMethodEntity authMethodEntity : authMethodList) {
             if (authMethodEntity.getCheckUserPrefs()) {
                 // methods with user prefs require special handling
