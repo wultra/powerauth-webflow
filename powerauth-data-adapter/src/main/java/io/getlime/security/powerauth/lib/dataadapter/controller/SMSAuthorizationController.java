@@ -67,8 +67,8 @@ public class SMSAuthorizationController {
         CreateSMSAuthorizationRequest smsRequest = request.getRequestObject();
         // input validation is handled by CreateSMSAuthorizationRequestValidator
         // validation is invoked manually because of the generified Request object
-        BeanPropertyBindingResult result = new BeanPropertyBindingResult(request, "createSMSAuthorizationRequest");
-        ValidationUtils.invokeValidator(requestValidator, request, result);
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(smsRequest, "createSMSAuthorizationRequest");
+        ValidationUtils.invokeValidator(requestValidator, smsRequest, result);
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
             MethodParameter methodParam = new MethodParameter(new Object() {
