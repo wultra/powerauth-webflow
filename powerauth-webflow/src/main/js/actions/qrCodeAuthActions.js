@@ -43,6 +43,10 @@ export function initQRCode(activationId) {
         axios.post("./api/auth/qr/init", {
             activationId: activationId
         }).then((response) => {
+            if (response.data.result === 'AUTH_FAILED') {
+                dispatchAction(dispatch, response);
+                return;
+            }
             dispatch({
                 type: "SHOW_SCREEN_QR_CODE",
                 payload: {

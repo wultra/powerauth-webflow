@@ -61,14 +61,22 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
     private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
 
-    @Autowired
-    private DataAdapterClient dataAdapterClient;
+    private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
 
     @Autowired
-    private NextStepClient nextStepClient;
+    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
+        this.dataAdapterClient = dataAdapterClient;
+        this.nextStepClient = nextStepClient;
+    }
 
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
+        final GetOperationDetailResponse operation = getOperation();
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled authenticate() call should always fail
+            return null;
+        }
         //TODO: Check pre-authenticated user here
         return getOperation().getUserId();
     }
