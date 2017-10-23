@@ -140,7 +140,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(SMSAuthorizationMessageInvalidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleDefaultException(SMSAuthorizationMessageInvalidException ex) {
+    public @ResponseBody ErrorResponse handleMessageInvalidException(SMSAuthorizationMessageInvalidException ex) {
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.INPUT_INVALID, ex.getMessage());
         return new ErrorResponse(error);
     }

@@ -94,7 +94,7 @@ public class DataAdapterClient {
      * @param password password as a string
      * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation
      */
-    public ObjectResponse<AuthenticationResponse> authenticate(String username, String password) throws DataAdapterClientErrorException {
+    public ObjectResponse<AuthenticationResponse> authenticateUser(String username, String password) throws DataAdapterClientErrorException {
         try {
             // Exchange authentication request with data adapter.
             AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC);
@@ -228,7 +228,7 @@ public class DataAdapterClient {
      * @param formDataChange Operation formData change.
      * @return Object response.
      */
-    public ObjectResponse sendFormDataChangedNotification(FormDataChangeEntity formDataChange, String userId, String operationId) throws DataAdapterClientErrorException {
+    public ObjectResponse formDataChangedNotification(FormDataChangeEntity formDataChange, String userId, String operationId) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
             FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
@@ -258,11 +258,6 @@ public class DataAdapterClient {
 
     private DataAdapterClientErrorException invalidErrorResponseBodyException(IOException ex) throws DataAdapterClientErrorException {
         // JSON parsing failed
-        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
-        return new DataAdapterClientErrorException(ex, error);
-    }
-
-    private DataAdapterClientErrorException ioException(IOException ex) throws DataAdapterClientErrorException {
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
         return new DataAdapterClientErrorException(ex, error);
     }

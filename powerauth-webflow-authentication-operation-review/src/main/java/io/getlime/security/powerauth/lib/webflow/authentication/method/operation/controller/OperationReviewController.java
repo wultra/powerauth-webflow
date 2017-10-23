@@ -61,11 +61,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
     private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
 
-    @Autowired
-    private DataAdapterClient dataAdapterClient;
+    private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
 
     @Autowired
-    private NextStepClient nextStepClient;
+    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
+        this.dataAdapterClient = dataAdapterClient;
+        this.nextStepClient = nextStepClient;
+    }
 
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
@@ -159,13 +162,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
                 BankAccountChoiceEntity bankAccountChoice = new BankAccountChoiceEntity();
                 bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
-                dataAdapterClient.sendFormDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
+                dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
             }
             if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_AUTH_METHOD)) {
                 AuthMethodChoiceEntity authMethodChoice = new AuthMethodChoiceEntity();
                 String chosenAuthMethod = request.getFormData().getUserInput().get(FIELD_CHOSEN_AUTH_METHOD);
                 authMethodChoice.setChosenAuthMethod(AuthMethodChoiceEntity.ChosenAuthMethod.valueOf(chosenAuthMethod));
-                dataAdapterClient.sendFormDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
+                dataAdapterClient.formDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
             }
             return new UpdateOperationFormDataResponse();
         } catch (NextStepServiceException | DataAdapterClientErrorException e) {

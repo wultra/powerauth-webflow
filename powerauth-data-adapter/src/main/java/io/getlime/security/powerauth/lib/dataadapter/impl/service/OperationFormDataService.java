@@ -1,4 +1,4 @@
-package io.getlime.security.powerauth.lib.dataadapter.service;
+package io.getlime.security.powerauth.lib.dataadapter.impl.service;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormAttribute;
