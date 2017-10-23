@@ -39,6 +39,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.UpdateOperationFormDataResponse;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,6 +64,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
 
+    @Autowired
     public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
