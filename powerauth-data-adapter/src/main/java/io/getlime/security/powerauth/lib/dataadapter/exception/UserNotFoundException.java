@@ -13,38 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.getlime.security.powerauth.lib.dataadapter.exception;
 
 /**
- * Exception used for cases when SMS OTP message is invalid.
- *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class SMSAuthorizationMessageInvalidException extends Exception {
+public class UserNotFoundException extends Exception {
 
     /**
      * Default constructor.
      */
-    public SMSAuthorizationMessageInvalidException() {
+    public UserNotFoundException() {
     }
 
     /**
-     * Constructor with failure message.
+     * Constructor with message.
      *
-     * @param message Authentication failure message.
+     * @param message Message.
      */
-    public SMSAuthorizationMessageInvalidException(String message) {
+    public UserNotFoundException(String message) {
         super(message);
     }
 
     /**
-     * Constructor with failure message and cause.
+     * Constructor with message and cause.
      *
-     * @param message Authentication failure message.
+     * @param message Message.
      * @param cause   Cause, original exception.
      */
-    public SMSAuthorizationMessageInvalidException(String message, Throwable cause) {
+    public UserNotFoundException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -53,7 +50,7 @@ public class SMSAuthorizationMessageInvalidException extends Exception {
      *
      * @param cause Cause, original exception.
      */
-    public SMSAuthorizationMessageInvalidException(Throwable cause) {
+    public UserNotFoundException(Throwable cause) {
         super(cause);
     }
 }

@@ -51,7 +51,7 @@ public class FormDataChangeController {
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse formDataChangedNotification(@RequestBody ObjectRequest<FormDataChangeNotificationRequest> request) {
         FormDataChangeNotificationRequest notification = request.getRequestObject();
-        dataAdapter.formDataChangedNotification(notification);
+        dataAdapter.formDataChangedNotification(notification.getUserId(), notification.getOperationId(), notification.getFormDataChange());
         return new ObjectResponse();
     }
 

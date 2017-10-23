@@ -134,14 +134,15 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Handling of invalid request errors for other reason than validation errors.
+     * Handling of user not found exception.
      *
      * @return Response with error information.
      */
-    @ExceptionHandler(SMSAuthorizationMessageInvalidException.class)
+    @ExceptionHandler(UserNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleMessageInvalidException(SMSAuthorizationMessageInvalidException ex) {
+    public @ResponseBody ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.INPUT_INVALID, ex.getMessage());
         return new ErrorResponse(error);
     }
+
 }

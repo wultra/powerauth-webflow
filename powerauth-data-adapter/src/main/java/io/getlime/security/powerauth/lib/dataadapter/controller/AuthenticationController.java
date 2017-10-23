@@ -19,12 +19,17 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFailedException;
+import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,7 +63,18 @@ public class AuthenticationController {
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@RequestBody ObjectRequest<AuthenticationRequest> request) throws MethodArgumentNotValidException, AuthenticationFailedException {
         AuthenticationRequest authenticationRequest = request.getRequestObject();
-        AuthenticationResponse response = dataAdapter.authenticateUser(authenticationRequest);
+        // input validation is handled by AuthenticationRequestValidator
+        // validation is invoked manually because of the generified Request object
+        AuthenticationRequestValidator validator = new AuthenticationRequestValidator();
+        BeanPropertyBindingResult result = new BeanPropertyBindingResult(authenticationRequest, "authenticationRequest");
+        ValidationUtils.invokeValidator(validator, authenticationRequest, result);
+        if (result.hasErrors()) {
+            // getEnclosingMethod() on new object returns a reference to current method
+            MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);
+            throw new MethodArgumentNotValidException(methodParam, result);
+        }
+        dataAdapter.authenticateUser(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+        AuthenticationResponse response = new AuthenticationResponse(authenticationRequest.getUsername());
         return new ObjectResponse<>(response);
     }
 
@@ -69,9 +85,9 @@ public class AuthenticationController {
      * @return Response with user details.
      */
     @RequestMapping(value = "/info", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws MethodArgumentNotValidException {
+    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws MethodArgumentNotValidException, UserNotFoundException {
         UserDetailRequest userDetailRequest = request.getRequestObject();
-        UserDetailResponse response = dataAdapter.fetchUserDetail(userDetailRequest);
+        UserDetailResponse response = dataAdapter.fetchUserDetail(userDetailRequest.getId());
         return new ObjectResponse<>(response);
     }
 

@@ -51,7 +51,7 @@ public class OperationChangeController {
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse operationChangedNotification(@RequestBody ObjectRequest<OperationChangeNotificationRequest> request) {
         OperationChangeNotificationRequest notification = request.getRequestObject();
-        dataAdapter.operationChangedNotification(notification);
+        dataAdapter.operationChangedNotification(notification.getUserId(), notification.getOperationId(), notification.getOperationChange());
         return new ObjectResponse();
     }
 
