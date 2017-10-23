@@ -6,11 +6,11 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class BankAccountChoiceEntity extends FormDataChangeEntity {
+public class BankAccountChoice extends FormDataChange {
 
     private String bankAccountNumber;
 
-    public BankAccountChoiceEntity() {
+    public BankAccountChoice() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 

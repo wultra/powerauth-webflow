@@ -6,7 +6,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class AuthMethodChoiceEntity extends FormDataChangeEntity {
+public class AuthMethodChoice extends FormDataChange {
 
     public enum ChosenAuthMethod {
         POWERAUTH_TOKEN,
@@ -15,7 +15,7 @@ public class AuthMethodChoiceEntity extends FormDataChangeEntity {
 
     private ChosenAuthMethod chosenAuthMethod;
 
-    public AuthMethodChoiceEntity() {
+    public AuthMethodChoice() {
         this.type = Type.AUTH_METHOD_CHOICE;
     }
 

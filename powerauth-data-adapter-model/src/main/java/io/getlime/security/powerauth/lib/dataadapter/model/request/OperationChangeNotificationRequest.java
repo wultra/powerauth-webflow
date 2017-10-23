@@ -16,35 +16,34 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 
 /**
- * Request object for notifying data adapter about operation formData change.
+ * Request object for notifying data adapter about operation change.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class FormDataChangeNotificationRequest {
+public class OperationChangeNotificationRequest {
 
     private String userId;
     private String operationId;
-    private FormDataChange formDataChange;
+    private OperationChange operationChange;
 
     /**
      * Default constructor
      */
-    public FormDataChangeNotificationRequest() {
+    public OperationChangeNotificationRequest() {
     }
 
     /**
      * Constructor with user ID, operation ID and formData change.
      * @param userId User ID.
      * @param operationId Operation ID.
-     * @param formDataChange FormData change.
      */
-    public FormDataChangeNotificationRequest(String userId, String operationId, FormDataChange formDataChange) {
+    public OperationChangeNotificationRequest(String userId, String operationId, OperationChange operationChange) {
         this.userId = userId;
         this.operationId = operationId;
-        this.formDataChange = formDataChange;
+        this.operationChange = operationChange;
     }
 
     /**
@@ -79,19 +78,11 @@ public class FormDataChangeNotificationRequest {
         this.operationId = operationId;
     }
 
-    /**
-     * Get formData change.
-     * @return FormData change.
-     */
-    public FormDataChange getFormDataChange() {
-        return formDataChange;
+    public OperationChange getOperationChange() {
+        return operationChange;
     }
 
-    /**
-     * Set formData change.
-     * @param formDataChange Change of formData.
-     */
-    public void setFormDataChange(FormDataChange formDataChange) {
-        this.formDataChange = formDataChange;
+    public void setOperationChange(OperationChange operationChange) {
+        this.operationChange = operationChange;
     }
 }

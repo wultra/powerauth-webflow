@@ -12,10 +12,10 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = BankAccountChoiceEntity.class, name = "BANK_ACCOUNT_CHOICE"),
-        @JsonSubTypes.Type(value = AuthMethodChoiceEntity.class, name = "AUTH_METHOD_CHOICE")
+        @JsonSubTypes.Type(value = BankAccountChoice.class, name = "BANK_ACCOUNT_CHOICE"),
+        @JsonSubTypes.Type(value = AuthMethodChoice.class, name = "AUTH_METHOD_CHOICE")
 })
-public class FormDataChangeEntity {
+public class FormDataChange {
 
     public enum Type {
         BANK_ACCOUNT_CHOICE,
