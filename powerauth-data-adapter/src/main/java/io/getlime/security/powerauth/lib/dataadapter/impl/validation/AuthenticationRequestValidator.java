@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Authentic
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
@@ -47,25 +48,19 @@ public class AuthenticationRequestValidator implements Validator {
         String username = authRequest.getUsername();
         String password = authRequest.getPassword();
 
-        if (username==null || username.isEmpty()) {
-            errors.rejectValue("requestObject", "login.username.empty");
-        } else {
-            if (username.length() > 30) {
-                errors.rejectValue("requestObject", "login.username.long");
-            }
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.username", "login.username.empty");
+        if (username!=null && username.length() > 30) {
+            errors.rejectValue("requestObject.username", "login.username.long");
         }
 
-        if (password==null || password.isEmpty()) {
-            errors.rejectValue("requestObject", "login.password.empty");
-        } else {
-            if (password.length() > 30) {
-                errors.rejectValue("requestObject", "login.password.long");
-            }
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.password", "login.password.empty");
+        if (password!=null && password.length() > 30) {
+            errors.rejectValue("requestObject.password", "login.password.long");
         }
 
         AuthenticationType authType = authRequest.getType();
         if (authType != AuthenticationType.BASIC) {
-            errors.rejectValue("requestObject", "login.type.unsupported");
+            errors.rejectValue("requestObject.type", "login.type.unsupported");
         }
     }
 }

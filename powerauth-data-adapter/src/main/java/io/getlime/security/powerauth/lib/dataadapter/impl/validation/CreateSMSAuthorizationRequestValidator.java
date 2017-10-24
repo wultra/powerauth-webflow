@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAt
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import java.math.BigDecimal;
@@ -58,20 +59,14 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
         String userId = authRequest.getUserId();
         String operationName = authRequest.getOperationName();
 
-        if (userId == null || userId.isEmpty()) {
-            errors.rejectValue("requestObject", "smsAuthorization.userId.empty");
-        } else {
-            if (userId.length() > 30) {
-                errors.rejectValue("requestObject", "smsAuthorization.userId.long");
-            }
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.userId", "smsAuthorization.userId.empty");
+        if (userId != null && userId.length() > 30) {
+            errors.rejectValue("requestObject.userId", "smsAuthorization.userId.long");
         }
 
-        if (operationName == null || operationName.isEmpty()) {
-            errors.rejectValue("requestObject", "smsAuthorization.operationName.empty");
-        } else {
-            if (operationName.length() > 32) {
-                errors.rejectValue("requestObject", "smsAuthorization.operationName.long");
-            }
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.operationName", "smsAuthorization.operationName.empty");
+        if (operationName != null && operationName.length() > 32) {
+            errors.rejectValue("requestObject.operationName", "smsAuthorization.operationName.long");
         }
 
         OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
@@ -80,17 +75,17 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
         String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
 
         if (amount == null) {
-            errors.rejectValue("requestObject", "smsAuthorization.amount.empty");
+            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.empty");
         } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("requestObject", "smsAuthorization.amount.invalid");
+            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.invalid");
         }
 
         if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("requestObject", "smsAuthorization.currency.empty");
+            errors.rejectValue("requestObject.formData", "smsAuthorization.currency.empty");
         }
 
         if (account == null || account.isEmpty()) {
-            errors.rejectValue("requestObject", "smsAuthorization.account.empty");
+            errors.rejectValue("requestObject.formData", "smsAuthorization.account.empty");
         }
 
     }
