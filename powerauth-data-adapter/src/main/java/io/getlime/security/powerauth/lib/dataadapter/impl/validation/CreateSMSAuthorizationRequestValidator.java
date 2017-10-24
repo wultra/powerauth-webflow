@@ -15,20 +15,20 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 
+import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import java.math.BigDecimal;
 
 /**
  * Validator for SMS OTP authorization requests.
- * <p>
+ *
  * Additional validation logic can be added if applicable.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
@@ -45,39 +45,52 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return CreateSMSAuthorizationRequest.class.isAssignableFrom(clazz);
+        return ObjectRequest.class.isAssignableFrom(clazz);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void validate(Object o, Errors errors) {
-        CreateSMSAuthorizationRequest authRequest = (CreateSMSAuthorizationRequest) o;
+        ObjectRequest<CreateSMSAuthorizationRequest> requestObject = (ObjectRequest<CreateSMSAuthorizationRequest>) o;
+        CreateSMSAuthorizationRequest authRequest = requestObject.getRequestObject();
+
+        // update validation logic based on the real Data Adapter requirements
         String userId = authRequest.getUserId();
         String operationName = authRequest.getOperationName();
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "userId", "smsAuthorization.userId.empty");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "operationName", "smsAuthorization.operationName.empty");
 
-        // update validation logic based on the real requirements
-        if (userId.length() > 30) {
-            errors.rejectValue("userId", "smsAuthorization.userId.long");
+        if (userId == null || userId.isEmpty()) {
+            errors.rejectValue("requestObject", "smsAuthorization.userId.empty");
+        } else {
+            if (userId.length() > 30) {
+                errors.rejectValue("requestObject", "smsAuthorization.userId.long");
+            }
         }
-        if (operationName.length() > 32) {
-            errors.rejectValue("operationName", "smsAuthorization.operationName.long");
+
+        if (operationName == null || operationName.isEmpty()) {
+            errors.rejectValue("requestObject", "smsAuthorization.operationName.empty");
+        } else {
+            if (operationName.length() > 32) {
+                errors.rejectValue("requestObject", "smsAuthorization.operationName.long");
+            }
         }
 
         OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
         BigDecimal amount = amountAttribute.getAmount();
         String currency = amountAttribute.getCurrency();
         String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
+
         if (amount == null) {
-            errors.rejectValue("operationFormData", "smsAuthorization.amount.empty");
+            errors.rejectValue("requestObject", "smsAuthorization.amount.empty");
         } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("operationFormData", "smsAuthorization.amount.invalid");
+            errors.rejectValue("requestObject", "smsAuthorization.amount.invalid");
         }
+
         if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("operationFormData", "smsAuthorization.currency.empty");
+            errors.rejectValue("requestObject", "smsAuthorization.currency.empty");
         }
+
         if (account == null || account.isEmpty()) {
-            errors.rejectValue("operationFormData", "smsAuthorization.account.empty");
+            errors.rejectValue("requestObject", "smsAuthorization.account.empty");
         }
 
     }

@@ -26,11 +26,17 @@ public class DataAdapterService implements DataAdapter {
     }
 
     @Override
-    public void authenticateUser(String username, String password) throws AuthenticationFailedException {
-        // Here will be the real authentication - call to the backend providing authentication
+    public UserDetailResponse authenticateUser(String username, String password) throws AuthenticationFailedException {
+        // Here will be the real authentication - call to the backend providing authentication.
         // In case that authentication fails, throw an AuthenticationFailedException.
         if ("test".equals(password)) {
-            return;
+            UserDetailResponse userDetail = new UserDetailResponse();
+            // Set real user ID.
+            userDetail.setId("12345678");
+            // Provide real user details as long as they are available.
+            userDetail.setGivenName("John");
+            userDetail.setFamilyName("Doe");
+            return userDetail;
         }
         throw new AuthenticationFailedException("login.authenticationFailed");
     }

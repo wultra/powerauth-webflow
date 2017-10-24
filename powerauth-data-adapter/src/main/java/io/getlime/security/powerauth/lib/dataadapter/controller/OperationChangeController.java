@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.OperationChangeNotificationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -51,7 +52,10 @@ public class OperationChangeController {
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse operationChangedNotification(@RequestBody ObjectRequest<OperationChangeNotificationRequest> request) {
         OperationChangeNotificationRequest notification = request.getRequestObject();
-        dataAdapter.operationChangedNotification(notification.getUserId(), notification.getOperationId(), notification.getOperationChange());
+        String userId = notification.getUserId();
+        String operationId = notification.getOperationId();
+        OperationChange operationChange = notification.getOperationChange();
+        dataAdapter.operationChangedNotification(userId, operationId, operationChange);
         return new ObjectResponse();
     }
 

@@ -19,22 +19,22 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
-import io.getlime.security.powerauth.lib.dataadapter.impl.validation.CreateSMSAuthorizationRequestValidator;
+import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.VerifySMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.repository.model.entity.SMSAuthorizationEntity;
 import io.getlime.security.powerauth.lib.dataadapter.service.SMSPersistenceService;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BeanPropertyBindingResult;
-import org.springframework.validation.ValidationUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * Controller class which handles SMS OTP authorization.
@@ -46,40 +46,68 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class SMSAuthorizationController {
 
     private final SMSPersistenceService smsPersistenceService;
-    private final CreateSMSAuthorizationRequestValidator requestValidator;
-    private DataAdapter dataAdapter;
+    private final AuthenticationRequestValidator requestValidator;
+    private final DataAdapter dataAdapter;
 
     @Autowired
-    public SMSAuthorizationController(SMSPersistenceService smsPersistenceService, CreateSMSAuthorizationRequestValidator requestValidator, DataAdapter dataAdapter) {
+    public SMSAuthorizationController(SMSPersistenceService smsPersistenceService, AuthenticationRequestValidator requestValidator, DataAdapter dataAdapter) {
         this.smsPersistenceService = smsPersistenceService;
         this.requestValidator = requestValidator;
         this.dataAdapter = dataAdapter;
+    }
+
+
+    /**
+     * Initializes the request validator.
+     * @param binder Data binder.
+     */
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(requestValidator);
     }
 
     /**
      * Create a new SMS OTP authorization message.
      *
      * @param request Request data.
+     * @param result BindingResult for input validation.
      * @return Response with message ID.
      */
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request) throws MethodArgumentNotValidException, SMSAuthorizationFailedException {
-        CreateSMSAuthorizationRequest smsRequest = request.getRequestObject();
-        // input validation is handled by CreateSMSAuthorizationRequestValidator
-        // validation is invoked manually because of the generified Request object
-        BeanPropertyBindingResult result = new BeanPropertyBindingResult(smsRequest, "createSMSAuthorizationRequest");
-        ValidationUtils.invokeValidator(requestValidator, smsRequest, result);
+    public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@Valid @RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request, BindingResult result) throws MethodArgumentNotValidException, SMSAuthorizationFailedException {
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
-            MethodParameter methodParam = new MethodParameter(new Object() {
-            }.getClass().getEnclosingMethod(), 0);
+            MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);
             throw new MethodArgumentNotValidException(methodParam, result);
         }
-        SMSAuthorizationEntity smsEntity = smsPersistenceService.createAuthorizationSMS(smsRequest.getUserId(),
-                smsRequest.getOperationId(), smsRequest.getOperationName(), smsRequest.getOperationFormData(), smsRequest.getLang());
-        dataAdapter.sendAuthorizationSMS(smsEntity.getMessageText(), smsEntity.getUserId());
-        CreateSMSAuthorizationResponse response = new CreateSMSAuthorizationResponse(smsEntity.getMessageId());
+        CreateSMSAuthorizationRequest smsRequest = request.getRequestObject();
+
+        // Create authorization SMS and persist it.
+        SMSAuthorizationEntity smsEntity = createAuthorizationSMS(smsRequest);
+
+        // Send SMS with generated text to target user.
+        String userId = smsEntity.getUserId();
+        String messageId = smsEntity.getMessageId();
+        String messageText = smsEntity.getMessageText();
+        dataAdapter.sendAuthorizationSMS(userId, messageText);
+
+        // Create response.
+        CreateSMSAuthorizationResponse response = new CreateSMSAuthorizationResponse(messageId);
         return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Validates the request and sends SMS.
+     * @param smsRequest Create SMS request.
+     * @return SMS entity.
+     */
+    private SMSAuthorizationEntity createAuthorizationSMS(@Valid CreateSMSAuthorizationRequest smsRequest) {
+        String userId = smsRequest.getUserId();
+        String operationId = smsRequest.getOperationId();
+        String operationName = smsRequest.getOperationName();
+        OperationFormData formData = smsRequest.getOperationFormData();
+        String lang = smsRequest.getLang();
+        return smsPersistenceService.createAuthorizationSMS(userId, operationId, operationName, formData, lang);
     }
 
     /**
@@ -91,7 +119,10 @@ public class SMSAuthorizationController {
     @RequestMapping(value = "verify", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse verify(@RequestBody ObjectRequest<VerifySMSAuthorizationRequest> request) throws SMSAuthorizationFailedException {
         VerifySMSAuthorizationRequest verifyRequest = request.getRequestObject();
-        smsPersistenceService.verifyAuthorizationSMS(verifyRequest.getMessageId(), verifyRequest.getAuthorizationCode());
+        String messageId = verifyRequest.getMessageId();
+        String authorizationCode = verifyRequest.getAuthorizationCode();
+        // Verify authorization code.
+        smsPersistenceService.verifyAuthorizationSMS(messageId, authorizationCode);
         return new ObjectResponse();
     }
 

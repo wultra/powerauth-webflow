@@ -15,10 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 
+import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
+import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 /**
@@ -28,30 +29,43 @@ import org.springframework.validation.Validator;
  *
  * @author Roman Strobl
  */
+@Component
 public class AuthenticationRequestValidator implements Validator {
 
     @Override
     public boolean supports(Class<?> clazz) {
-        return AuthenticationRequest.class.isAssignableFrom(clazz);
+        return ObjectRequest.class.isAssignableFrom(clazz);
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void validate(Object o, Errors errors) {
-        AuthenticationRequest authRequest = (AuthenticationRequest) o;
+        ObjectRequest<AuthenticationRequest> requestObject = (ObjectRequest<AuthenticationRequest>) o;
+        AuthenticationRequest authRequest = requestObject.getRequestObject();
+
+        // update validation logic based on the real Data Adapter requirements
         String username = authRequest.getUsername();
         String password = authRequest.getPassword();
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "username", "login.username.empty");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "password", "login.password.empty");
-        // update validation logic based on the real Data Adapter requirements
-        if (username.length() > 30) {
-            errors.rejectValue("username", "login.username.long");
+
+        if (username==null || username.isEmpty()) {
+            errors.rejectValue("requestObject", "login.username.empty");
+        } else {
+            if (username.length() > 30) {
+                errors.rejectValue("requestObject", "login.username.long");
+            }
         }
-        if (password.length() > 30) {
-            errors.rejectValue("password", "login.password.long");
+
+        if (password==null || password.isEmpty()) {
+            errors.rejectValue("requestObject", "login.password.empty");
+        } else {
+            if (password.length() > 30) {
+                errors.rejectValue("requestObject", "login.password.long");
+            }
         }
+
         AuthenticationType authType = authRequest.getType();
         if (authType != AuthenticationType.BASIC) {
-            errors.rejectValue("type", "login.type.unsupported");
+            errors.rejectValue("requestObject", "login.type.unsupported");
         }
     }
 }

@@ -39,7 +39,7 @@ public interface DataAdapter {
      * @param password Password for user authentication.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
-    void authenticateUser(String username, String password) throws AuthenticationFailedException;
+    UserDetailResponse authenticateUser(String username, String password) throws AuthenticationFailedException;
 
     /**
      * Fetch user detail for given user.

@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.BankAccountListRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 /**
  * Controller class which handles retrieving bank account details.
@@ -54,7 +57,9 @@ public class BankAccountController {
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<BankAccountListResponse> fetchBankAccounts(@RequestBody ObjectRequest<BankAccountListRequest> request) throws MethodArgumentNotValidException, UserNotFoundException {
         BankAccountListRequest bankAccountListRequest = request.getRequestObject();
-        BankAccountListResponse response = new BankAccountListResponse(bankAccountListRequest.getUserId(), dataAdapter.fetchBankAccounts(bankAccountListRequest.getUserId()));
+        String userId = bankAccountListRequest.getUserId();
+        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId);
+        BankAccountListResponse response = new BankAccountListResponse(userId, bankAccounts);
         return new ObjectResponse<>(response);
     }
 
