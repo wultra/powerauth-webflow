@@ -17,15 +17,16 @@ package io.getlime.security.powerauth.lib.dataadapter.api;
 
 import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
-import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+
+import java.util.List;
 
 /**
- * DataAdapter interface defines methods which should be implemented for integration of Web Flow with 3rd parties.
+ * Interface defines methods which should be implemented for integration of Web Flow with 3rd parties.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -34,55 +35,50 @@ public interface DataAdapter {
     /**
      * Authenticate user using provided credentials.
      *
-     * @param authenticationRequest Authentication request.
-     * @return Authentication response.
-     * @throws MethodArgumentNotValidException Thrown when input validation fails.
+     * @param username Username for user authentication.
+     * @param password Password for user authentication.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
-    AuthenticationResponse authenticateUser(AuthenticationRequest authenticationRequest) throws MethodArgumentNotValidException, AuthenticationFailedException;
+    UserDetailResponse authenticateUser(String username, String password) throws AuthenticationFailedException;
 
     /**
      * Fetch user detail for given user.
-     * @param userDetailRequest Request with user ID.
+     * @param userId User ID.
      * @return Response with user details.
-     * @throws MethodArgumentNotValidException Thrown when input validation fails.
+     * @throws UserNotFoundException Thrown when user does not exist.
      */
-    UserDetailResponse fetchUserDetail(UserDetailRequest userDetailRequest) throws MethodArgumentNotValidException;
+    UserDetailResponse fetchUserDetail(String userId) throws UserNotFoundException;
 
     /**
      * Fetch bank account details for given user.
-     * @param bankAccountListRequest Request with user ID.
+     * @param userId User ID.
      * @return Response with bank account details.
-     * @throws MethodArgumentNotValidException Thrown when input validation fails.
+     * @throws UserNotFoundException Thrown when user does not exist.
      */
-    BankAccountListResponse fetchBankAccounts(BankAccountListRequest bankAccountListRequest) throws MethodArgumentNotValidException;
+    List<BankAccount> fetchBankAccounts(String userId) throws UserNotFoundException;
 
     /**
-     * Send notification about formData change.
-     * @param notificationRequest Notification request.
+     * Receive notification about formData change.
+     * @param userId User ID.
+     * @param operationId Operation ID.
+     * @param formDataChange FormData change.
      */
-    void formDataChangedNotification(FormDataChangeNotificationRequest notificationRequest);
+    void formDataChangedNotification(String userId, String operationId, FormDataChange formDataChange);
 
     /**
-     * Send notification about operation change.
-     * @param notificationRequest Notification request.
+     * Receive notification about operation change.
+     * @param userId User ID.
+     * @param operationId Operation ID.
+     * @param operationChange Operation change.
      */
-    void operationChangedNotification(OperationChangeNotificationRequest notificationRequest);
+    void operationChangedNotification(String userId, String operationId, OperationChange operationChange);
 
     /**
-     * Create an authorization SMS with generated OTP.
-     * @param createSMSRequest Create SMS request.
-     * @return SMS OTP response.
-     * @throws MethodArgumentNotValidException Thrown when input validation fails.
+     * Send an authorization SMS with generated OTP.
+     * @param userId User ID.
+     * @param messageText Text of SMS message.
      * @throws SMSAuthorizationFailedException Thrown when message could not be created.
      */
-    CreateSMSAuthorizationResponse createAuthorizationSMS(CreateSMSAuthorizationRequest createSMSRequest) throws MethodArgumentNotValidException, SMSAuthorizationFailedException;
-
-    /**
-     * Verify an authorization SMS with generated OTP.
-     * @param verifySMSRequest Verify SMS OTP request.
-     * @throws SMSAuthorizationFailedException Thrown when OTP validation fails.
-     */
-    void verifyAuthorizationSMS(VerifySMSAuthorizationRequest verifySMSRequest) throws SMSAuthorizationFailedException;
+    void sendAuthorizationSMS(String userId, String messageText) throws SMSAuthorizationFailedException;
 
 }
