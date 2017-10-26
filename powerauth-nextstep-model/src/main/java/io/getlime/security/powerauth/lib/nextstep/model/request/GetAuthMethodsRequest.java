@@ -22,24 +22,4 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
  */
 public class GetAuthMethodsRequest {
 
-    private String userId;
-
-    /**
-     * Get the user id.
-     *
-     * @return user id
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set the user id.
-     *
-     * @param userId user id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
 }

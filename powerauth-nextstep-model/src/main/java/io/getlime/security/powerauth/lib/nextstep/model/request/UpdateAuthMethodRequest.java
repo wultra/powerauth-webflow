@@ -26,20 +26,21 @@ public class UpdateAuthMethodRequest {
 
     private String userId;
     private AuthMethod authMethod;
+    private String config;
 
     /**
-     * Get the user id.
+     * Get the user ID.
      *
-     * @return user id
+     * @return User ID.
      */
     public String getUserId() {
         return userId;
     }
 
     /**
-     * Set the user id.
+     * Set the user ID.
      *
-     * @param userId user id
+     * @param userId User ID.
      */
     public void setUserId(String userId) {
         this.userId = userId;
@@ -48,7 +49,7 @@ public class UpdateAuthMethodRequest {
     /**
      * Get the authentication method.
      *
-     * @return authentication method
+     * @return Authentication method.
      */
     public AuthMethod getAuthMethod() {
         return authMethod;
@@ -57,10 +58,25 @@ public class UpdateAuthMethodRequest {
     /**
      * Set the authentication method.
      *
-     * @param authMethod authentication method
+     * @param authMethod Authentication method.
      */
     public void setAuthMethod(AuthMethod authMethod) {
         this.authMethod = authMethod;
     }
 
+    /**
+     * Get the authentication method configuration.
+     * @return Configuration.
+     */
+    public String getConfig() {
+        return config;
+    }
+
+    /**
+     * Set the authentication method configuration.
+     * @param config Configuration.
+     */
+    public void setConfig(String config) {
+        this.config = config;
+    }
 }

@@ -3,6 +3,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
+ * Class represents details of an authentication method.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthMethodDetail {

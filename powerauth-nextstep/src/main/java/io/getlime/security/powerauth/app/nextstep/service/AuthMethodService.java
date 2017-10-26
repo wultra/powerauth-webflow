@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -65,8 +66,8 @@ public class AuthMethodService {
      * @param userId User ID
      * @return List of authentication methods enabled for given user.
      */
-    public List<AuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
-        List<AuthMethodDetail> enabledMethods = new ArrayList<>();
+    public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
+        List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = null;
         if (userId!=null) {
@@ -79,19 +80,21 @@ public class AuthMethodService {
                 if (userPrefs != null) {
                     // get status of methods with user prefs
                     if (userPrefs.getAuthMethodEnabled(authMethodEntity.getUserPrefsColumn())) {
+                        // read configuration of method from user prefs
+                        String config = userPrefs.getAuthMethodConfig(authMethodEntity.getUserPrefsColumn());
                         // add method in case it is enabled in user prefs
-                        enabledMethods.add(getAuthMethodDetail(authMethodEntity));
+                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, config));
                     }
                 } else {
                     // user prefs are not set - resolve methods with user prefs by their default value
                     if (authMethodEntity.getUserPrefsDefault()) {
                         // add method in case it is enabled by default
-                        enabledMethods.add(getAuthMethodDetail(authMethodEntity));
+                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
                     }
                 }
             } else {
                 // add all methods without user prefs
-                enabledMethods.add(getAuthMethodDetail(authMethodEntity));
+                enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
             }
         }
         return enabledMethods;
@@ -104,7 +107,7 @@ public class AuthMethodService {
      * @param authMethod authentication method
      * @param enabled    true if enabled, false if disabled, null if unspecified
      */
-    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled) {
+    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, String config) {
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
         // check whether this method supports modifications at all
@@ -134,6 +137,8 @@ public class AuthMethodService {
                         // set default value for other methods than the method which is being updated
                         userPrefs.setAuthMethodEnabled(authMethodEntity.getUserPrefsColumn(), authMethodEntity.getUserPrefsDefault());
                     }
+                    // set authMethod configuration
+                    userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), config);
                 }
             }
         } else {
@@ -143,6 +148,8 @@ public class AuthMethodService {
                     if (authMethodEntity.getAuthMethod() == authMethod) {
                         // set requested value for method which is being updated
                         userPrefs.setAuthMethodEnabled(authMethodEntity.getUserPrefsColumn(), enabled);
+                        // set authMethod configuration
+                        userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), config);
                     }
                 }
             }
@@ -167,5 +174,18 @@ public class AuthMethodService {
         authMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         authMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
         return authMethodDetail;
+    }
+
+    private UserAuthMethodDetail getUserAuthMethodDetail(String userId, AuthMethodEntity authMethodEntity, String config) {
+        if (authMethodEntity == null) {
+            return null;
+        }
+        UserAuthMethodDetail userAuthMethodDetail = new UserAuthMethodDetail();
+        userAuthMethodDetail.setUserId(userId);
+        userAuthMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
+        userAuthMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
+        userAuthMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
+        userAuthMethodDetail.setConfig(config);
+        return userAuthMethodDetail;
     }
 }
