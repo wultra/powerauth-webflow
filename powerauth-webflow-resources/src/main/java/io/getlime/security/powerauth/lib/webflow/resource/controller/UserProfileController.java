@@ -20,7 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.resource.model.User;
+import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,21 +47,21 @@ public class UserProfileController {
      * @return User profile.
      */
     @RequestMapping("me")
-    public @ResponseBody User me(Principal principal) {
+    public @ResponseBody UserResponse me(Principal principal) {
         try {
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
-            User user = new User();
-            user.setId(userDetail.getId());
-            user.setGivenName(userDetail.getGivenName());
-            user.setFamilyName(userDetail.getFamilyName());
+            UserResponse user = new UserResponse();
+            user.getUser().setId(userDetail.getId());
+            user.getUser().setGivenName(userDetail.getGivenName());
+            user.getUser().setFamilyName(userDetail.getFamilyName());
             return user;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
-            User user = new User();
-            user.setId("anonymousUser");
-            user.setGivenName(null);
-            user.setFamilyName(null);
+            UserResponse user = new UserResponse();
+            user.getUser().setId("anonymousUser");
+            user.getUser().setGivenName(null);
+            user.getUser().setFamilyName(null);
             return user;
         }
     }
