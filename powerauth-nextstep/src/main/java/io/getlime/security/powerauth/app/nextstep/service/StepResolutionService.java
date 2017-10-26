@@ -359,7 +359,11 @@ public class StepResolutionService {
                 throw new IllegalStateException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
             }
             if (historyItem.getResponseResult() == AuthResult.FAILED) {
-                throw new IllegalStateException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
+                // #102 - allow double cancellation requests, cancel requests may come from multiple channels, so this is a supported scenario
+                if (operationEntity.getCurrentOperationHistoryEntity().getRequestAuthStepResult() != AuthStepResult.CANCELED
+                        || request.getAuthStepResult() != AuthStepResult.CANCELED) {
+                    throw new IllegalStateException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
+                }
             }
         }
     }
