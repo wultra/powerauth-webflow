@@ -52,14 +52,14 @@ import java.util.List;
  */
 @Controller
 @RequestMapping(value = "/api/auth/token/web")
-public class MobileTokenController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
+public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
     private final PushServerClient pushServerClient;
     private final PushServiceConfiguration configuration;
     private final WebSocketMessageService webSocketMessageService;
 
     @Autowired
-    public MobileTokenController(PushServerClient pushServerClient, PushServiceConfiguration configuration, WebSocketMessageService webSocketMessageService) {
+    public MobileTokenOnlineController(PushServerClient pushServerClient, PushServiceConfiguration configuration, WebSocketMessageService webSocketMessageService) {
         this.pushServerClient = pushServerClient;
         this.configuration = configuration;
         this.webSocketMessageService = webSocketMessageService;
@@ -145,14 +145,6 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         final GetOperationDetailResponse operation = getOperation();
 
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled, operation should fail
-            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-            response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage("method.disabled");
-            return response;
-        }
-
         if (operation.isExpired()) {
             // handle operation expiration
             // remove WebSocket session, it is expired
@@ -176,8 +168,9 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
 
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
-            if (AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() && !AuthResult.FAILED.equals(h.getAuthResult())) {
-                // remove WebSocket session, authorization is finished
+            // in case step was already confirmed, the authentication method has already succeeded
+            if (AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() && AuthStepResult.CONFIRMED.equals(h.getRequestAuthStepResult())) {
+                // remove WebSocket session, authorization is confirmed
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CONFIRMED);
@@ -185,14 +178,39 @@ public class MobileTokenController extends AuthMethodController<MobileTokenAuthe
                 response.setMessage("authentication.success");
                 return response;
             }
+            // in case previous authentication lead to an authentication method failure, the authentication method has already failed
+            if (AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() && AuthStepResult.AUTH_METHOD_FAILED.equals(h.getRequestAuthStepResult())) {
+                // remove WebSocket session, authentication method is failed
+                clearCurrentBrowserSession();
+                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
+                final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+                response.getNext().addAll(operation.getSteps());
+                response.setMessage("authentication.fail");
+                return response;
+            }
+            // in case the authentication has been canceled, the authentication method is canceled
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod()) && AuthResult.FAILED.equals(h.getAuthResult()) && AuthStepResult.CANCELED.equals(h.getRequestAuthStepResult())) {
                 // remove WebSocket session, operation is canceled
+                clearCurrentBrowserSession();
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CANCELED);
                 response.setMessage("operation.canceled");
                 return response;
             }
+        }
+        // otherwise authentication is still pending and waits for user action
+
+        // the check for disabled method needs to be done after operation history is verified - the operation can be already moved to the next step
+        if (!isAuthMethodAvailable(operation)) {
+            // when AuthMethod is disabled, operation should fail
+            clearCurrentBrowserSession();
+            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
+            final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("method.disabled");
+            return response;
         }
 
         // WebSocket session can not be removed yet - authentication is in progress

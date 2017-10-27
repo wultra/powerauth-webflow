@@ -10,7 +10,6 @@ import Token from "./tokenAuth";
 import SMSAuthorization from "./smsAuth";
 // i18n
 import {injectIntl} from "react-intl";
-import QRCode from "./qrCodeAuth";
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -69,10 +68,6 @@ export class App extends React.Component {
                 Component = Token;
                 break;
             }
-            case "SCREEN_QR_CODE": {
-                Component = QRCode;
-                break;
-            }
             case "SCREEN_SMS": {
                 Component = SMSAuthorization;
                 break;
@@ -96,7 +91,7 @@ export class App extends React.Component {
                     )}
                 </div>
                 <div id="home" className="text-center">
-                    <div id="logo"></div>
+                    <div id="logo"/>
                     <Component intl={this.props.intl}/>
                 </div>
             </div>

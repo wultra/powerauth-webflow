@@ -17,13 +17,6 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
-        case "SHOW_SCREEN_QR_CODE": {
-            return {
-                ...state,
-                currentScreen: "SCREEN_QR_CODE",
-                context: mergeContext(action.type, state.context, action.payload)
-            };
-        }
         case "SHOW_SCREEN_SMS": {
             return {
                 ...state,
@@ -84,15 +77,10 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
         case "SHOW_SCREEN_TOKEN":
             mergeData(oldContext, newContext);
-            setOfflineMode(newContext, false);
+            mergeQRCode(oldContext, newContext);
             break;
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
-            break;
-        case "SHOW_SCREEN_QR_CODE":
-            mergeQRCode(oldContext, newContext);
-            mergeData(oldContext, newContext);
-            setOfflineMode(newContext, true);
             break;
         case "CHANGE_BANK_ACCOUNT":
             changeBankAccount(oldContext, newContext);
@@ -130,10 +118,6 @@ function mergeQRCode(oldContext, newContext) {
     if (oldContext.qrCode !== undefined && newContext.qrCode === undefined) {
         newContext.qrCode = oldContext.qrCode;
     }
-}
-
-function setOfflineMode(newContext, offlineModeEnabled) {
-    newContext.formData.userInput.offlineModeEnabled = offlineModeEnabled;
 }
 
 function changeBankAccount(oldContext, newContext) {

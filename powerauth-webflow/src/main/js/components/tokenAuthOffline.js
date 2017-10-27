@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Lime - HighTech Solutions s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,10 +16,9 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, changeActivation, getOperationData, initQRCode} from "../actions/qrCodeAuthActions";
+import {authenticateOffline, changeActivation, initOffline} from "../actions/tokenAuthOfflineActions";
 // Components
-import OperationDetail from "./operationDetail";
-import {FormGroup, Panel} from "react-bootstrap";
+import {FormGroup} from "react-bootstrap";
 import Spinner from 'react-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
@@ -34,7 +33,7 @@ import ActivationSelect from "./activationSelect";
         context: store.dispatching.context
     }
 })
-export default class QRCode extends React.Component {
+export default class TokenOffline extends React.Component {
 
     constructor() {
         super();
@@ -46,7 +45,6 @@ export default class QRCode extends React.Component {
         this.resolveChosenActivation = this.resolveChosenActivation.bind(this);
         this.handleActivationChoice = this.handleActivationChoice.bind(this);
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
-        this.handleCancel = this.handleCancel.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {authCode: '', activations: null, chosenActivation: null, nonce: null, dataHash: null};
     }
@@ -56,8 +54,7 @@ export default class QRCode extends React.Component {
     }
 
     init() {
-        this.props.dispatch(initQRCode(null));
-        this.props.dispatch(getOperationData());
+        this.props.dispatch(initOffline(null));
     }
 
     componentWillReceiveProps(props) {
@@ -77,7 +74,7 @@ export default class QRCode extends React.Component {
         }
         if (activations !== undefined && activations.length>0) {
             this.storeActivations(activations);
-            if (this.props.context.formData.userInput.chosenActivationId) {
+            if (props.context.formData.userInput.chosenActivationId) {
                 this.resolveChosenActivation(activations)
             } else {
                 this.storeChosenActivation(chosenActivation);
@@ -112,56 +109,45 @@ export default class QRCode extends React.Component {
     handleActivationChoice(activation) {
         this.setState({chosenActivation: activation});
         this.props.dispatch(changeActivation(activation));
-        this.props.dispatch(initQRCode(activation.activationId));
+        this.props.dispatch(initOffline(activation.activationId));
     }
 
     handleAuthCodeChange(event) {
         this.setState({authCode: event.target.value});
     }
 
-
-    handleCancel(event) {
-        this.props.dispatch(cancel());
-    }
-
     handleSubmit(event) {
         // prevent regular form submission
         event.preventDefault();
-        this.props.dispatch(authenticate(this.state.chosenActivation.activationId, this.state.authCode, this.state.nonce, this.state.dataHash));
+        this.props.dispatch(authenticateOffline(this.state.chosenActivation.activationId, this.state.authCode, this.state.nonce, this.state.dataHash));
     }
 
     render() {
         return (
-            <div id="operation">
-                <form onSubmit={this.handleSubmit}>
-                    <Panel>
-                        <OperationDetail/>
+            <div>
 
-                        {(this.state.activations && this.state.chosenActivation) ? (
-                            <div>
-                                <div className="row attribute col-sm-6 key">
-                                    <FormattedMessage id="qrCode.device"/>
-                                </div>
-                                <ActivationSelect
-                                    activations={this.state.activations}
-                                    chosenActivation={this.state.chosenActivation}
-                                    choiceDisabled={this.state.activations.length<2}
-                                    callback={this.handleActivationChoice}
-                                />
-                            </div>
-                        ) : (
-                            <Spinner/>
-                        )}
+                {(this.state.activations && this.state.chosenActivation) ? (
+                    <div>
+                        <div className="row attribute col-sm-6 key">
+                            <FormattedMessage id="qrCode.device"/>
+                        </div>
+                        <ActivationSelect
+                            activations={this.state.activations}
+                            chosenActivation={this.state.chosenActivation}
+                            choiceDisabled={this.state.activations.length<2}
+                            callback={this.handleActivationChoice}
+                        />
+                    </div>
+                ) : (
+                    <Spinner/>
+                )}
 
-                        {(this.props.context.qrCode) ? (
-                            <img src={"data:image/png;" + this.props.context.qrCode}/>
-                        ) : (
-                            <Spinner/>
-                        )}
-
+                {(this.props.context.qrCode) ? (
+                    <div>
+                        <img src={"data:image/png;" + this.props.context.qrCode}/>
                         {(this.props.context.message) ? (
                             <FormGroup
-                                className={(this.props.context.error ? "message-error" : "message-information" )}>
+                                className={(this.props.context.error ? "message-error" : "message-information")}>
                                 <FormattedMessage id={this.props.context.message}/>
                             </FormGroup>
                         ) : (
@@ -175,15 +161,20 @@ export default class QRCode extends React.Component {
                         <br/>
                         <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
                         <br/><br/>
-                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                            <FormattedMessage id="operation.cancel"/>
-                        </a>
-                        <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
-                            <FormattedMessage id="operation.confirm"/>
-                        </a>
-                    </Panel>
-                </form>
-                {this.props.context.loading ? <Spinner/> : undefined}
+                        <div className="attribute row">
+                            <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                <FormattedMessage id="operation.cancel"/>
+                            </a>
+                        </div>
+                        <div className="attribute row">
+                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
+                                <FormattedMessage id="operation.confirm"/>
+                            </a>
+                        </div>
+                    </div>
+                ) : (
+                    <Spinner/>
+                )}
             </div>
         )
     }
