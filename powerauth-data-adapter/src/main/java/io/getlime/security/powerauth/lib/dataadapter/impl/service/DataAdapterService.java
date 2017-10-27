@@ -30,13 +30,11 @@ public class DataAdapterService implements DataAdapter {
         // Here will be the real authentication - call to the backend providing authentication.
         // In case that authentication fails, throw an AuthenticationFailedException.
         if ("test".equals(password)) {
-            UserDetailResponse userDetail = new UserDetailResponse();
-            // Set real user ID.
-            userDetail.setId("12345678");
-            // Provide real user details as long as they are available.
-            userDetail.setGivenName("John");
-            userDetail.setFamilyName("Doe");
-            return userDetail;
+            try {
+                return fetchUserDetail(username);
+            } catch (UserNotFoundException e) {
+                throw new AuthenticationFailedException("login.authenticationFailed");
+            }
         }
         throw new AuthenticationFailedException("login.authenticationFailed");
     }
