@@ -111,10 +111,11 @@ public class HomeController {
         SavedRequest savedRequest = cache.getRequest(request, response);
         String redirectUrl;
         if (savedRequest == null) {
-            StringBuffer url = request.getRequestURL();
-            String uri = request.getRequestURI();
-            String ctx = request.getContextPath();
-            String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
+            // Redirect to original page? Currently, use redirect to error...
+            // StringBuffer url = request.getRequestURL();
+            // String uri = request.getRequestURI();
+            // String ctx = request.getContextPath();
+            // String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
             return "redirect:/oauth/error";
         } else {
             authenticationManagementService.pendingAuthenticationToAuthentication();
