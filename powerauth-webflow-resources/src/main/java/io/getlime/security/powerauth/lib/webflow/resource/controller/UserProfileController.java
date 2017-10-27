@@ -55,6 +55,8 @@ public class UserProfileController {
             user.getUser().setId(userDetail.getId());
             user.getUser().setGivenName(userDetail.getGivenName());
             user.getUser().setFamilyName(userDetail.getFamilyName());
+            user.getConnection().setLanguage("CZ");
+            user.getConnection().setSca(true);
             return user;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
@@ -62,6 +64,8 @@ public class UserProfileController {
             user.getUser().setId("anonymousUser");
             user.getUser().setGivenName(null);
             user.getUser().setFamilyName(null);
+            user.getConnection().setLanguage("CZ");
+            user.getConnection().setSca(false);
             return user;
         }
     }
