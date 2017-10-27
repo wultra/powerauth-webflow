@@ -7,11 +7,11 @@ VALUES ('INIT', 1, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
 VALUES ('USER_ID_ASSIGN', 2, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('USERNAME_PASSWORD_AUTH', 3, FALSE, 1, TRUE, TRUE, 5, TRUE, 'method.usernamePassword');
+VALUES ('USERNAME_PASSWORD_AUTH', 3, FALSE, NULL, TRUE, TRUE, 5, TRUE, 'method.usernamePassword');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
 VALUES ('SHOW_OPERATION_DETAIL', 4, FALSE, NULL, NULL, FALSE, NULL, TRUE, 'method.showOperationDetail');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('POWERAUTH_TOKEN', 4, TRUE, 5, FALSE, TRUE, 5, TRUE, 'method.powerauthToken');
+VALUES ('POWERAUTH_TOKEN', 5, TRUE, 1, FALSE, TRUE, 5, TRUE, 'method.powerauthToken');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
 VALUES ('SMS_KEY', 6, FALSE, NULL, NULL, TRUE, 5, TRUE, 'method.smsKey');
 

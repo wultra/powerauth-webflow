@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 /**
- * Request object used for querying authentication methods.
+ * Configuration of authentication methods per user.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl
  */
-public class GetAuthMethodsRequest {
+public class AuthMethodConfiguration {
 
+    private String activationId;
+
+    public String getActivationId() {
+        return activationId;
+    }
+
+    public void setActivationId(String activationId) {
+        this.activationId = activationId;
+    }
 }

@@ -26,10 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -287,13 +284,13 @@ public class NextStepClient {
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Exception with {@link Error} for ERROR status
      */
-    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
+            GetUserAuthMethodsRequest request = new GetUserAuthMethodsRequest();
             request.setUserId(userId);
-            HttpEntity<ObjectRequest<GetAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
+            HttpEntity<ObjectRequest<GetUserAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetUserAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetUserAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

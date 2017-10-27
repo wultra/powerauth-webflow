@@ -22,8 +22,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMe
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -210,8 +210,8 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
         List<AuthMethod> authMethodsAvailableForUser = new ArrayList<>();
         if (userId != null) {
-            for (AuthMethodDetail authMethodDetail : authMethodService.listAuthMethodsEnabledForUser(userId)) {
-                authMethodsAvailableForUser.add(authMethodDetail.getAuthMethod());
+            for (UserAuthMethodDetail userAuthMethodDetail : authMethodService.listAuthMethodsEnabledForUser(userId)) {
+                authMethodsAvailableForUser.add(userAuthMethodDetail.getAuthMethod());
             }
         }
         List<StepDefinitionEntity> filteredStepDefinitions = new ArrayList<>();

@@ -36,6 +36,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.req
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QRCodeInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -59,11 +60,13 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/qr")
 public class QRCodeController extends AuthMethodController<QRCodeAuthenticationRequest, QRCodeAuthenticationResponse, AuthStepException> {
 
-    private PowerAuthServiceClient powerAuthServiceClient;
+    private final PowerAuthServiceClient powerAuthServiceClient;
+    private final AuthMethodQueryService authMethodQueryService;
 
     @Autowired
-    public QRCodeController(PowerAuthServiceClient powerAuthServiceClient) {
+    public QRCodeController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService) {
         this.powerAuthServiceClient = powerAuthServiceClient;
+        this.authMethodQueryService = authMethodQueryService;
     }
 
     /**
@@ -118,7 +121,7 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException {
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException, NextStepServiceException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
         if (!isAuthMethodAvailable(operation)) {
@@ -129,20 +132,29 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
             return response;
         }
 
+        String userId = getOperation().getUserId();
+
+        // try to get activation from authMethod configuration
+        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+
+        if (configuredActivationId == null) {
+            // unexpected state - activation is not set or configuration is invalid
+            throw new QRCodeInvalidDataException("qrCode.invalidActivation");
+        }
+
+        if (request.getActivationId() != null && !request.getActivationId().equals(configuredActivationId)) {
+            // unexpected state - UI requests different activationId than configured activationId
+            throw new QRCodeInvalidDataException("qrCode.invalidRequest");
+
+        }
+
         // loading of activations
-        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(getOperation().getUserId());
+        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
 
-        // sort activations by last timestamp used
-        allActivations.sort((a1, a2) -> {
-            Date timestamp1 = a1.getTimestampLastUsed().toGregorianCalendar().getTime();
-            Date timestamp2 = a2.getTimestampLastUsed().toGregorianCalendar().getTime();
-            return timestamp2.compareTo(timestamp1);
-        });
-
-        // transfer activations into ActivationEntity list and filter data
+        // transfer activations into ActivationEntity list and filter data to match activationId from authentication method configuration
         List<ActivationEntity> activationEntities = new ArrayList<>();
         for (GetActivationListForUserResponse.Activations activation: allActivations) {
-            if (activation.getActivationStatus() == ActivationStatus.ACTIVE) {
+            if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
                 ActivationEntity activationEntity = new ActivationEntity();
                 activationEntity.setActivationId(activation.getActivationId());
                 activationEntity.setActivationName(activation.getActivationName());
@@ -158,25 +170,16 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
             throw new QRCodeInvalidDataException("qrCode.noActivation");
         }
 
-        ActivationEntity chosenActivation = null;
-        if (request.getActivationId() != null) {
-            // search for requested activation
-            for (ActivationEntity activationEntity: activationEntities) {
-                if (request.getActivationId().equals(activationEntity.getActivationId())) {
-                    chosenActivation = activationEntity;
-                }
-            }
-        }
-        if (chosenActivation == null) {
-            // first activation is chosen in case activation hasn't been chosen yet
-            chosenActivation = activationEntities.get(0);
-        }
+        // currently only one activation is supported - the one which is configured
+        ActivationEntity activation = activationEntities.get(0);
+
         // generating of QR code
-        OfflineSignatureQrCode qrCode = generateQRCode(chosenActivation);
+        OfflineSignatureQrCode qrCode = generateQRCode(activation);
         initResponse.setQRCode(qrCode.generateImage());
         initResponse.setNonce(qrCode.getNonce());
         initResponse.setDataHash(qrCode.getDataHash());
-        initResponse.setChosenActivation(chosenActivation);
+        initResponse.setChosenActivation(activation);
+        // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);
         return initResponse;
     }

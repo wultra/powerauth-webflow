@@ -74,7 +74,12 @@ CREATE TABLE ns_user_prefs (
   auth_method_2 BOOLEAN,
   auth_method_3 BOOLEAN,
   auth_method_4 BOOLEAN,
-  auth_method_5 BOOLEAN
+  auth_method_5 BOOLEAN,
+  auth_method_1_config VARCHAR(256),
+  auth_method_2_config VARCHAR(256),
+  auth_method_3_config VARCHAR(256),
+  auth_method_4_config VARCHAR(256),
+  auth_method_5_config VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_operation stores details of Web Flow operations.
