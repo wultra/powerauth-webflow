@@ -16,10 +16,30 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used for querying authentication methods.
+ * Request object used for querying authentication methods per user.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class GetAuthMethodsRequest {
+public class GetUserAuthMethodsRequest {
+
+    private String userId;
+
+    /**
+     * Get the user id.
+     *
+     * @return user id
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Set the user id.
+     *
+     * @param userId user id
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
 }

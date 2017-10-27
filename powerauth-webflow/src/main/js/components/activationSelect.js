@@ -35,6 +35,7 @@ export default class ActivationSelect extends React.Component {
                     options={this.props.activations}
                     value={this.props.chosenActivation}
                     valueComponent={ActivationValue}
+                    disabled={this.props.choiceDisabled}
                     clearable={false}
                     searchable={false}
                     autoFocus={true}

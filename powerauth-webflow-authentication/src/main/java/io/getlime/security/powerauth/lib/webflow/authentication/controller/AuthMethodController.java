@@ -35,7 +35,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodAvailabilityService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -67,7 +67,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     private NextStepClient nextStepClient;
 
     @Autowired
-    private AuthMethodAvailabilityService authMethodAvailabilityService;
+    private AuthMethodQueryService authMethodQueryService;
 
     @Autowired
     private DataAdapterClient dataAdapterClient;
@@ -334,7 +334,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     private void filterStepsBasedOnActiveAuthMethods(List<AuthStep> authSteps, String userId, String operationId) {
         Set<AuthStep> authStepsToRemove = new HashSet<>();
         for (AuthStep authStep: authSteps) {
-            if (!authMethodAvailabilityService.isAuthMethodEnabled(authStep.getAuthMethod(), userId, operationId)) {
+            if (!authMethodQueryService.isAuthMethodEnabled(authStep.getAuthMethod(), userId, operationId)) {
                 authStepsToRemove.add(authStep);
             }
         }

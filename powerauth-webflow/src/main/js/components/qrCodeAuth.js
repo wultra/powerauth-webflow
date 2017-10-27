@@ -145,6 +145,7 @@ export default class QRCode extends React.Component {
                                 <ActivationSelect
                                     activations={this.state.activations}
                                     chosenActivation={this.state.chosenActivation}
+                                    choiceDisabled={this.state.activations.length<2}
                                     callback={this.handleActivationChoice}
                                 />
                             </div>

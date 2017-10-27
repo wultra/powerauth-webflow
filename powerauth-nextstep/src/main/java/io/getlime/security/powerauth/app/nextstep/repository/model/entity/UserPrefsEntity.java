@@ -51,6 +51,21 @@ public class UserPrefsEntity implements Serializable {
     @Column(name = "auth_method_5")
     private Boolean authMethod5Enabled;
 
+    @Column(name = "auth_method_1_config")
+    private String authMethod1Config;
+
+    @Column(name = "auth_method_2_config")
+    private String authMethod2Config;
+
+    @Column(name = "auth_method_3_config")
+    private String authMethod3Config;
+
+    @Column(name = "auth_method_4_config")
+    private String authMethod4Config;
+
+    @Column(name = "auth_method_5_config")
+    private String authMethod5Config;
+
     public String getUserId() {
         return userId;
     }
@@ -97,6 +112,46 @@ public class UserPrefsEntity implements Serializable {
 
     public void setAuthMethod5Enabled(Boolean authMethod5Enabled) {
         this.authMethod5Enabled = authMethod5Enabled;
+    }
+
+    public String getAuthMethod1Config() {
+        return authMethod1Config;
+    }
+
+    public void setAuthMethod1Config(String authMethod1Config) {
+        this.authMethod1Config = authMethod1Config;
+    }
+
+    public String getAuthMethod2Config() {
+        return authMethod2Config;
+    }
+
+    public void setAuthMethod2Config(String authMethod2Config) {
+        this.authMethod2Config = authMethod2Config;
+    }
+
+    public String getAuthMethod3Config() {
+        return authMethod3Config;
+    }
+
+    public void setAuthMethod3Config(String authMethod3Config) {
+        this.authMethod3Config = authMethod3Config;
+    }
+
+    public String getAuthMethod4Config() {
+        return authMethod4Config;
+    }
+
+    public void setAuthMethod4Config(String authMethod4Config) {
+        this.authMethod4Config = authMethod4Config;
+    }
+
+    public String getAuthMethod5Config() {
+        return authMethod5Config;
+    }
+
+    public void setAuthMethod5Config(String authMethod5Config) {
+        this.authMethod5Config = authMethod5Config;
     }
 
     /**
@@ -148,6 +203,46 @@ public class UserPrefsEntity implements Serializable {
             default:
                 throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
         }
+    }
+
+    public String getAuthMethodConfig(int columnNumber) {
+        switch (columnNumber) {
+            case 1:
+                return getAuthMethod1Config();
+            case 2:
+                return getAuthMethod2Config();
+            case 3:
+                return getAuthMethod3Config();
+            case 4:
+                return getAuthMethod4Config();
+            case 5:
+                return getAuthMethod5Config();
+            default:
+                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+        }
+    }
+
+    public void setAuthMethodConfig(int columnNumber, String config) {
+        switch (columnNumber) {
+            case 1:
+                setAuthMethod1Config(config);
+                break;
+            case 2:
+                setAuthMethod2Config(config);
+                break;
+            case 3:
+                setAuthMethod3Config(config);
+                break;
+            case 4:
+                setAuthMethod4Config(config);
+                break;
+            case 5:
+                setAuthMethod5Config(config);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+        }
+
     }
 
     @Override
