@@ -77,7 +77,6 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
         case "SHOW_SCREEN_TOKEN":
             mergeData(oldContext, newContext);
-            mergeQRCode(oldContext, newContext);
             break;
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
@@ -110,13 +109,6 @@ function mergeAuthMethods(oldContext, newContext) {
     // authMethods need to remain in context
     if (oldContext.authMethods !== undefined && newContext.authMethods === undefined) {
         newContext.authMethods = oldContext.authMethods;
-    }
-}
-
-function mergeQRCode(oldContext, newContext) {
-    // QR code needs to remain in context
-    if (oldContext.qrCode !== undefined && newContext.qrCode === undefined) {
-        newContext.qrCode = oldContext.qrCode;
     }
 }
 

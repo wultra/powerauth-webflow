@@ -38,15 +38,18 @@ export default class TokenOffline extends React.Component {
     constructor() {
         super();
         this.init = this.init.bind(this);
+        this.storeQRCode = this.storeQRCode.bind(this);
         this.storeNonce = this.storeNonce.bind(this);
         this.storeDataHash = this.storeDataHash.bind(this);
         this.storeActivations = this.storeActivations.bind(this);
         this.storeChosenActivation = this.storeChosenActivation.bind(this);
+        this.storeError = this.storeError.bind(this);
+        this.storeMessage = this.storeMessage.bind(this);
         this.resolveChosenActivation = this.resolveChosenActivation.bind(this);
         this.handleActivationChoice = this.handleActivationChoice.bind(this);
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.state = {authCode: '', activations: null, chosenActivation: null, nonce: null, dataHash: null};
+        this.state = {authCode: '', activations: null, chosenActivation: null, qrCode: null, nonce: null, dataHash: null, error: null, message: null};
     }
 
     componentWillMount() {
@@ -59,13 +62,25 @@ export default class TokenOffline extends React.Component {
 
     componentWillReceiveProps(props) {
         if (!props.context.init) {
+            // store message and error into component state because online mode reloads context frequently due to polling
+            if (props.context.error !== undefined) {
+                this.storeError(props.context.error);
+            }
+            if (props.context.message !== undefined) {
+                this.storeMessage(props.context.message);
+            }
             return;
         }
+        // offline mode initialization
         props.context.init = false;
+        const qrCode = props.context.qrCode;
         const nonce = props.context.nonce;
         const dataHash = props.context.dataHash;
         const chosenActivation = props.context.chosenActivation;
         const activations = props.context.activations;
+        if (qrCode !== undefined) {
+            this.storeQRCode(qrCode);
+        }
         if (nonce !== undefined) {
             this.storeNonce(nonce);
         }
@@ -82,6 +97,10 @@ export default class TokenOffline extends React.Component {
         }
     }
 
+    storeQRCode(qrCodeReceived) {
+        this.setState({qrCode: qrCodeReceived});
+    }
+
     storeNonce(nonceReceived) {
         this.setState({nonce: nonceReceived});
     }
@@ -96,6 +115,14 @@ export default class TokenOffline extends React.Component {
 
     storeChosenActivation(chosenActivation) {
         this.setState({chosenActivation: chosenActivation});
+    }
+
+    storeError(errorReceived) {
+        this.setState({error: errorReceived});
+    }
+
+    storeMessage(messageReceived) {
+        this.setState({message: messageReceived});
     }
 
     resolveChosenActivation(activations, chosenActivationId) {
@@ -142,13 +169,13 @@ export default class TokenOffline extends React.Component {
                     <Spinner/>
                 )}
 
-                {(this.props.context.qrCode) ? (
+                {(this.state.qrCode) ? (
                     <div>
-                        <img src={"data:image/png;" + this.props.context.qrCode}/>
-                        {(this.props.context.message) ? (
+                        <img src={"data:image/png;" + this.state.qrCode}/>
+                        {(this.state.message) ? (
                             <FormGroup
-                                className={(this.props.context.error ? "message-error" : "message-information")}>
-                                <FormattedMessage id={this.props.context.message}/>
+                                className={(this.state.error ? "message-error" : "message-information")}>
+                                <FormattedMessage id={this.state.message}/>
                             </FormGroup>
                         ) : (
                             <FormGroup
