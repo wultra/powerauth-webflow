@@ -248,7 +248,7 @@ export default class Token extends React.Component {
             if (props.context.formData.userInput.offlineModeEnabled) {
                 this.setOfflineMode(true);
             } else {
-                this.setOfflineMode(false)
+                this.setOfflineMode(false);
             }
         }
     }
