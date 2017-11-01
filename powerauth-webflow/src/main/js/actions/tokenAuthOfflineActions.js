@@ -16,23 +16,10 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
-export function getOperationData() {
-    return function (dispatch) {
-        axios.get("./api/auth/operation/detail").then((response) => {
-            dispatch({
-                type: "SHOW_SCREEN_QR_CODE",
-                payload: response.data
-            });
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
-}
-
-export function initQRCode(activationId) {
+export function initOffline(activationId) {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_QR_CODE",
+            type: "SHOW_SCREEN_TOKEN",
             payload: {
                 loading: true,
                 error: false,
@@ -40,7 +27,7 @@ export function initQRCode(activationId) {
                 message: ""
             }
         });
-        axios.post("./api/auth/qr/init", {
+        axios.post("./api/auth/token/offline/init", {
             activationId: activationId
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
@@ -48,7 +35,7 @@ export function initQRCode(activationId) {
                 return;
             }
             dispatch({
-                type: "SHOW_SCREEN_QR_CODE",
+                type: "SHOW_SCREEN_TOKEN",
                 payload: {
                     loading: false,
                     error: false,
@@ -79,10 +66,10 @@ export function changeActivation(activation) {
     }
 }
 
-export function authenticate(activationId, authCode, nonce, dataHash) {
+export function authenticateOffline(activationId, authCode, nonce, dataHash) {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_QR_CODE",
+            type: "SHOW_SCREEN_TOKEN",
             payload: {
                 loading: true,
                 error: false,
@@ -90,14 +77,14 @@ export function authenticate(activationId, authCode, nonce, dataHash) {
                 message: ""
             }
         });
-        axios.post("./api/auth/qr/authenticate", {
+        axios.post("./api/auth/token/offline/authenticate", {
             activationId: activationId,
             authCode: authCode,
             nonce: nonce,
             dataHash: dataHash
         }).then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_QR_CODE",
+                type: "SHOW_SCREEN_TOKEN",
                 payload: {
                     loading: true,
                     error: false,
@@ -137,7 +124,7 @@ export function authenticate(activationId, authCode, nonce, dataHash) {
                         break;
                     }
                     dispatch({
-                        type: "SHOW_SCREEN_QR_CODE",
+                        type: "SHOW_SCREEN_TOKEN",
                         payload: {
                             loading: false,
                             error: true,
@@ -154,17 +141,3 @@ export function authenticate(activationId, authCode, nonce, dataHash) {
     }
 }
 
-export function cancel() {
-    return function (dispatch) {
-        axios.post("./api/auth/qr/cancel", {}).then((response) => {
-            dispatch({
-                type: "SHOW_SCREEN_ERROR",
-                payload: {
-                    message: response.data.message
-                }
-            });
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
-}

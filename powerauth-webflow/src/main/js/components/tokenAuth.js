@@ -16,12 +16,13 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, getOperationData, init, updateFormData} from "../actions/tokenAuthActions";
+import {authenticateOnline, cancel, getOperationData, initOnline} from "../actions/tokenAuthOnlineActions";
 // Components
 import OperationDetail from "./operationDetail";
+import TokenOffline from "./tokenAuthOffline";
+import TokenOnline from "./tokenAuthOnline";
+import Spinner from 'react-spin';
 import {Panel} from "react-bootstrap";
-// i18n
-import {FormattedMessage} from "react-intl";
 
 const stompClient = require('../websocket-client');
 
@@ -48,12 +49,11 @@ export default class Token extends React.Component {
         this.setAuthorized = this.setAuthorized.bind(this);
         this.isAuthorized = this.isAuthorized.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.handleSwitchToQRCode = this.handleSwitchToQRCode.bind(this);
-        this.switchToQRCode = this.switchToQRCode.bind(this);
         this.cancelAuthorization = this.cancelAuthorization.bind(this);
         this.setUpdateTimeout = this.setUpdateTimeout.bind(this);
         this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
         this.disconnect = this.disconnect.bind(this);
+        this.setOfflineMode = this.setOfflineMode.bind(this);
         this.state = {
             initialized: false,
             webSocketInitialized: false,
@@ -61,7 +61,8 @@ export default class Token extends React.Component {
             authorized: false,
             authorizationCanceled: false,
             updateTimeout: null,
-            disconnected: false
+            disconnected: false,
+            offlineModeEnabled: null
         };
     }
 
@@ -77,7 +78,7 @@ export default class Token extends React.Component {
         const setInitialized = this.setInitialized;
         const dispatch = this.props.dispatch;
         const update = this.update;
-        dispatch(init(function(initSucceeded) {
+        dispatch(initOnline(function(initSucceeded) {
             if (initSucceeded) {
                 setInitialized(true);
                 // continue only when init() succeeds - when push message is delivered
@@ -116,7 +117,7 @@ export default class Token extends React.Component {
             setAuthorizationInProgress(true);
             // Keep trying to authenticate every 3s using polling. This is a fallback mechanism in case
             // authorization by WebSockets fails completely (e.g. network issues).
-            this.props.dispatch(authenticate(function (b) {
+            this.props.dispatch(authenticateOnline(function (b) {
                 if (b) {
                     const timeout = setTimeout(function () {
                         update();
@@ -192,7 +193,7 @@ export default class Token extends React.Component {
         // Mark authorization in progress to lock calling of the authenticate() method. This prevents duplicate calls
         // of the authenticate() method.
         setAuthorizationInProgress(true);
-        this.props.dispatch(authenticate(function (b) {
+        this.props.dispatch(authenticateOnline(function (b) {
             if (!b) {
                 // Authorization was completed successfully.
                 setAuthorized(true);
@@ -206,17 +207,6 @@ export default class Token extends React.Component {
         event.preventDefault();
         this.disconnect();
         this.props.dispatch(cancel());
-    }
-
-    handleSwitchToQRCode(event) {
-        event.preventDefault();
-        this.disconnect();
-        const switchToQRCode = this.switchToQRCode;
-        // update form data - enable offline mode, when page is refreshed user selection is remembered
-        this.props.dispatch(updateFormData(this.props.context.formData, function () {
-            // change screen after formData are stored
-            switchToQRCode();
-        }));
     }
 
     disconnect() {
@@ -235,11 +225,8 @@ export default class Token extends React.Component {
         this.setState({disconnected: true});
     }
 
-    switchToQRCode() {
-        this.props.dispatch({
-            type: "SHOW_SCREEN_QR_CODE",
-            payload: {}
-        });
+    setOfflineMode(enabled) {
+        this.setState({offlineModeEnabled: enabled});
     }
 
     componentWillReceiveProps(props) {
@@ -254,6 +241,16 @@ export default class Token extends React.Component {
                 this.setState({webSocketInitialized: true});
             }
         }
+        if (props.context.formData) {
+            // When page is loading it is unknown whether offlineMode is enabled or not (this.state.offlineModeEnabled = null).
+            // Once formData is received it can be decided whether offline mode is enabled or not (via formData.userInput.offlineModeEnabled).
+            // When user clicks the offline mode link, the formData on server is updated and switch to offline mode is done immediately by offlineModeCallback.
+            if (props.context.formData.userInput.offlineModeEnabled) {
+                this.setOfflineMode(true);
+            } else {
+                this.setOfflineMode(false);
+            }
+        }
     }
 
     render() {
@@ -262,23 +259,17 @@ export default class Token extends React.Component {
                 <form>
                     <Panel>
                         <OperationDetail/>
-                        <div className="auth-actions">
-                            <div className="attributes">
-                                <div className="image mtoken"></div>
+                        {(this.state.offlineModeEnabled != null) ? (
+                            <div>
+                                {(this.state.offlineModeEnabled) ? (
+                                    <TokenOffline cancelCallback={this.handleCancel}/>
+                                ) : (
+                                    <TokenOnline cancelCallback={this.handleCancel} offlineModeCallback={this.setOfflineMode}/>
+                                )}
                             </div>
-                            <div className="attributes">
-                                <div className="font-small message-information">
-                                    <FormattedMessage id="message.token.offline"/><br/>
-                                    <a href="#" onClick={this.handleSwitchToQRCode}><FormattedMessage
-                                        id="message.token.offline.link"/></a>
-                                </div>
-                            </div>
-                            <div className="attribute row">
-                                <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                    <FormattedMessage id="operation.cancel"/>
-                                </a>
-                            </div>
-                        </div>
+                        ) : (
+                            <Spinner/>
+                        )}
                     </Panel>
                 </form>
             </div>
