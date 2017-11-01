@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 
 /**
  * Object representing a user authentication.
@@ -36,12 +37,16 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
 
     private String userId;
     private String operationId;
+    private Boolean strongAuthentication;
+    private String language;
 
     /**
      * Default constructor
      */
     public UserOperationAuthentication() {
         super(null);
+        this.strongAuthentication = false;
+        this.language = Locale.US.getLanguage();
     }
 
     /**
@@ -54,6 +59,8 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
         super(null);
         this.operationId = operationId;
         this.userId = userId;
+        this.strongAuthentication = false;
+        this.language = Locale.US.getLanguage();
     }
 
     @Override
@@ -75,7 +82,7 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
 
     @Override
     public Object getPrincipal() {
-        return this.userId;
+        return this.userId + "." + this.operationId;
     }
 
     /**
@@ -114,4 +121,35 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
         this.operationId = operationId;
     }
 
+    /**
+     * Get information about the type of authentication (strong = more than one factor).
+     * @return True of authentication is strong, false otherwise.
+     */
+    public Boolean isStrongAuthentication() {
+        return strongAuthentication;
+    }
+
+    /**
+     * Set information about the type of authentication (strong = more than one factor).
+     * @param strongAuthentication True of authentication is strong, false otherwise.
+     */
+    public void setStrongAuthentication(Boolean strongAuthentication) {
+        this.strongAuthentication = strongAuthentication;
+    }
+
+    /**
+     * Get information about language that is set for the authentication.
+     * @return Language information in ISO format.
+     */
+    public String getLanguage() {
+        return language;
+    }
+
+    /**
+     * Set information about language that is set for the authentication.
+     * @param language Language information in ISO format.
+     */
+    public void setLanguage(String language) {
+        this.language = language;
+    }
 }

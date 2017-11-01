@@ -16,9 +16,11 @@
 
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import io.getlime.security.powerauth.app.webflow.oauth.WebFlowTokenEnhancer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
@@ -34,6 +36,9 @@ import org.springframework.security.oauth2.provider.code.AuthorizationCodeServic
 import org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices;
 import org.springframework.security.oauth2.provider.endpoint.AuthorizationEndpoint;
 import org.springframework.security.oauth2.provider.endpoint.DefaultRedirectResolver;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JdbcTokenStore;
 
@@ -75,6 +80,20 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
         return new JdbcTokenStore(dataSource);
     }
 
+    @Bean
+    public TokenEnhancer tokenEnhancer() {
+        return new WebFlowTokenEnhancer();
+    }
+
+    @Bean
+    @Primary
+    public AuthorizationServerTokenServices tokenServices() {
+        DefaultTokenServices tokenServices = new DefaultTokenServices();
+        tokenServices.setTokenStore(tokenStore());
+        tokenServices.setTokenEnhancer(tokenEnhancer());
+        return tokenServices;
+    }
+
     @Autowired
     public void configureAuthorizationEndpoint(AuthorizationEndpoint authorizationEndpoint) {
         // WORKAROUND: Cancel the session just before the redirect
@@ -94,6 +113,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
             throws Exception {
         endpoints.authorizationCodeServices(authorizationCodeServices())
                 .authenticationManager(authenticationManager)
+                .tokenEnhancer(tokenEnhancer())
                 .tokenStore(tokenStore())
                 .approvalStoreDisabled();
     }

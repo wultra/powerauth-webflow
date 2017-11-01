@@ -20,13 +20,16 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.resource.model.User;
+import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.provider.OAuth2Authentication;
+import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
+import java.util.Map;
 
 /**
  * Controller for providing information about user profiles.
@@ -37,8 +40,17 @@ import java.security.Principal;
 @RequestMapping("/api/secure/profile")
 public class UserProfileController {
 
+    private final DataAdapterClient client;
+    private final AuthorizationServerTokenServices tokenServices;
+
+    private static final String LANGUAGE = "language";
+    private static final String SCA = "sca";
+
     @Autowired
-    private DataAdapterClient client;
+    public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices) {
+        this.client = client;
+        this.tokenServices = tokenServices;
+    }
 
     /**
      * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
@@ -47,21 +59,28 @@ public class UserProfileController {
      * @return User profile.
      */
     @RequestMapping("me")
-    public @ResponseBody User me(Principal principal) {
+    public @ResponseBody UserResponse me(Principal principal, OAuth2Authentication authentication) {
         try {
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
+
+            Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
+
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
-            User user = new User();
-            user.setId(userDetail.getId());
-            user.setGivenName(userDetail.getGivenName());
-            user.setFamilyName(userDetail.getFamilyName());
+            UserResponse user = new UserResponse();
+            user.getUser().setId(userDetail.getId());
+            user.getUser().setGivenName(userDetail.getGivenName());
+            user.getUser().setFamilyName(userDetail.getFamilyName());
+            user.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
+            user.getConnection().setSca((Boolean) additionalInfo.get(SCA));
             return user;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
-            User user = new User();
-            user.setId("anonymousUser");
-            user.setGivenName(null);
-            user.setFamilyName(null);
+            UserResponse user = new UserResponse();
+            user.getUser().setId("anonymousUser");
+            user.getUser().setGivenName(null);
+            user.getUser().setFamilyName(null);
+            user.getConnection().setLanguage("cs");
+            user.getConnection().setSca(false);
             return user;
         }
     }
