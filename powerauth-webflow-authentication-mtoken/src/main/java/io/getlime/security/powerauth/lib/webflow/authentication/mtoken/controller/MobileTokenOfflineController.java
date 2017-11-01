@@ -57,14 +57,14 @@ import java.util.List;
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Controller
-@RequestMapping(value = "/api/auth/qr")
-public class QRCodeController extends AuthMethodController<QRCodeAuthenticationRequest, QRCodeAuthenticationResponse, AuthStepException> {
+@RequestMapping(value = "/api/auth/token/offline")
+public class MobileTokenOfflineController extends AuthMethodController<QRCodeAuthenticationRequest, QRCodeAuthenticationResponse, AuthStepException> {
 
     private final PowerAuthServiceClient powerAuthServiceClient;
     private final AuthMethodQueryService authMethodQueryService;
 
     @Autowired
-    public QRCodeController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService) {
+    public MobileTokenOfflineController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService) {
         this.powerAuthServiceClient = powerAuthServiceClient;
         this.authMethodQueryService = authMethodQueryService;
     }
@@ -256,10 +256,11 @@ public class QRCodeController extends AuthMethodController<QRCodeAuthenticationR
     /**
      * Generates the QR code based on operation data.
      *
+     * @param activation Activation entity.
      * @return QR code as String-based PNG image.
-     * @throws IOException Thrown when generating QR code fails.
+     * @throws QRCodeInvalidDataException Thrown when data is invalid.
      */
-    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws IOException, QRCodeInvalidDataException {
+    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException {
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
         String messageText = operation.getFormData().getMessage();

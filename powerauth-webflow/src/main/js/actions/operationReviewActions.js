@@ -23,20 +23,11 @@ export function getOperationData() {
                 // if authMethod is already chosen, skip choice and go directly to the authMethod
                 switch (response.data.formData.userInput.chosenAuthMethod) {
                     case "POWERAUTH_TOKEN":
-                        // choice between online and offline modes
-                        if (response.data.formData.userInput.offlineModeEnabled) {
-                            dispatch({
-                                type: "SHOW_SCREEN_QR_CODE",
-                                payload: response.data
-                            });
-                            return;
-                        } else {
-                            dispatch({
-                                type: "SHOW_SCREEN_TOKEN",
-                                payload: response.data
-                            });
-                            return;
-                        }
+                        dispatch({
+                            type: "SHOW_SCREEN_TOKEN",
+                            payload: response.data
+                        });
+                        return;
                     case "SMS_KEY":
                         dispatch({
                             type: "SHOW_SCREEN_SMS",

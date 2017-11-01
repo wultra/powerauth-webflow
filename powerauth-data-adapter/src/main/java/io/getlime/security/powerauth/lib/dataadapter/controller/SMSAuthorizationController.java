@@ -19,7 +19,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
-import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
+import io.getlime.security.powerauth.lib.dataadapter.impl.validation.CreateSMSAuthorizationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.VerifySMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
@@ -46,11 +46,11 @@ import javax.validation.Valid;
 public class SMSAuthorizationController {
 
     private final SMSPersistenceService smsPersistenceService;
-    private final AuthenticationRequestValidator requestValidator;
+    private final CreateSMSAuthorizationRequestValidator requestValidator;
     private final DataAdapter dataAdapter;
 
     @Autowired
-    public SMSAuthorizationController(SMSPersistenceService smsPersistenceService, AuthenticationRequestValidator requestValidator, DataAdapter dataAdapter) {
+    public SMSAuthorizationController(SMSPersistenceService smsPersistenceService, CreateSMSAuthorizationRequestValidator requestValidator, DataAdapter dataAdapter) {
         this.smsPersistenceService = smsPersistenceService;
         this.requestValidator = requestValidator;
         this.dataAdapter = dataAdapter;

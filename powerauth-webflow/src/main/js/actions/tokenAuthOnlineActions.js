@@ -29,7 +29,7 @@ export function getOperationData() {
     }
 }
 
-export function init(callback) {
+export function initOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}).then((response) => {
             // silently ignore push message failures, see #125
@@ -49,7 +49,7 @@ export function init(callback) {
     }
 }
 
-export function authenticate(callback) {
+export function authenticateOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/authenticate", {}).then((response) => {
             switch (response.data.result) {
