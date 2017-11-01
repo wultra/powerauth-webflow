@@ -118,6 +118,7 @@ public class HomeController {
             // String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
             return "redirect:/oauth/error";
         } else {
+            authenticationManagementService.setLanguage(LocaleContextHolder.getLocale().getLanguage());
             authenticationManagementService.pendingAuthenticationToAuthentication();
             redirectUrl = savedRequest.getRedirectUrl();
         }

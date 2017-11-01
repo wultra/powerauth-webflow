@@ -25,6 +25,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.util.Locale;
 
 /**
  * Class that is responsible for maintaining state of the pending authentication in session, and
@@ -101,6 +102,24 @@ public class AuthenticationManagementService {
         auth.setUserId(userId);
         setPendingUserAuthentication(auth);
         return auth.getOperationId();
+    }
+
+    /**
+     * Mark the current pending authentication autenticated.
+     */
+    public void upgradeToStrongClientAuthentication() {
+        UserOperationAuthentication auth = getPendingUserAuthentication();
+        auth.setStrongAuthentication(true);
+        setPendingUserAuthentication(auth);
+    }
+
+    /**
+     * Set locale to the authentication object.
+     */
+    public void setLanguage(String language) {
+        UserOperationAuthentication auth = getPendingUserAuthentication();
+        auth.setLanguage(language);
+        setPendingUserAuthentication(auth);
     }
 
     /**
