@@ -79,7 +79,7 @@ public class UserProfileController {
             user.getUser().setId("anonymousUser");
             user.getUser().setGivenName(null);
             user.getUser().setFamilyName(null);
-            user.getConnection().setLanguage("CZ");
+            user.getConnection().setLanguage("cs");
             user.getConnection().setSca(false);
             return user;
         }
