@@ -203,10 +203,10 @@ public class DataAdapterClient {
      * @param userId User ID of the user for this request.
      * @return A list of bank accounts for given user.
      */
-    public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId) throws DataAdapterClientErrorException {
+    public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId, String operationId) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
-            BankAccountListRequest request = new BankAccountListRequest(userId);
+            BankAccountListRequest request = new BankAccountListRequest(userId, operationId);
             HttpEntity<ObjectRequest<BankAccountListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<BankAccountListResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/account/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<BankAccountListResponse>>() {
             });

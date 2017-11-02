@@ -58,7 +58,8 @@ public class BankAccountController {
     public @ResponseBody ObjectResponse<BankAccountListResponse> fetchBankAccounts(@RequestBody ObjectRequest<BankAccountListRequest> request) throws MethodArgumentNotValidException, UserNotFoundException {
         BankAccountListRequest bankAccountListRequest = request.getRequestObject();
         String userId = bankAccountListRequest.getUserId();
-        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId);
+        String operationId = bankAccountListRequest.getOperationId();
+        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId, operationId);
         BankAccountListResponse response = new BankAccountListResponse(userId, bankAccounts);
         return new ObjectResponse<>(response);
     }
