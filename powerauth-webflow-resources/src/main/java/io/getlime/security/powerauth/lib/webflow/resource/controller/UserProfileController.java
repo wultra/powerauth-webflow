@@ -66,22 +66,22 @@ public class UserProfileController {
             Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
 
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
-            UserResponse user = new UserResponse();
-            user.getUser().setId(userDetail.getId());
-            user.getUser().setGivenName(userDetail.getGivenName());
-            user.getUser().setFamilyName(userDetail.getFamilyName());
-            user.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
-            user.getConnection().setSca((Boolean) additionalInfo.get(SCA));
-            return user;
+            UserResponse userResponse = new UserResponse();
+            userResponse.getUser().setId(userDetail.getId());
+            userResponse.getUser().setGivenName(userDetail.getGivenName());
+            userResponse.getUser().setFamilyName(userDetail.getFamilyName());
+            userResponse.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
+            userResponse.getConnection().setSca((Boolean) additionalInfo.get(SCA));
+            return userResponse;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
-            UserResponse user = new UserResponse();
-            user.getUser().setId("anonymousUser");
-            user.getUser().setGivenName(null);
-            user.getUser().setFamilyName(null);
-            user.getConnection().setLanguage("cs");
-            user.getConnection().setSca(false);
-            return user;
+            UserResponse userResponse = new UserResponse();
+            userResponse.getUser().setId("anonymousUser");
+            userResponse.getUser().setGivenName(null);
+            userResponse.getUser().setFamilyName(null);
+            userResponse.getConnection().setLanguage("en");
+            userResponse.getConnection().setSca(false);
+            return userResponse;
         }
     }
 

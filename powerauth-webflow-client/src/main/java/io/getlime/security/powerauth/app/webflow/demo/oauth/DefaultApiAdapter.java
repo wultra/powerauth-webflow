@@ -37,18 +37,18 @@ public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapte
 
     @Override
     public void setConnectionValues(T api, ConnectionValues values) {
-        UserResponse user = api.getProfile();
-        values.setProviderUserId(user.getUser().getId());
-        values.setDisplayName(user.getUser().getGivenName() + " " + user.getUser().getFamilyName());
+        UserResponse userResponse = api.getProfile();
+        values.setProviderUserId(userResponse.getUser().getId());
+        values.setDisplayName(userResponse.getUser().getGivenName() + " " + userResponse.getUser().getFamilyName());
     }
 
     @Override
     public UserProfile fetchUserProfile(T api) {
-        UserResponse user = api.getProfile();
+        UserResponse userResponse = api.getProfile();
         return new UserProfileBuilder()
-                .setUsername(user.getUser().getId())
-                .setFirstName(user.getUser().getGivenName())
-                .setLastName(user.getUser().getFamilyName())
+                .setUsername(userResponse.getUser().getId())
+                .setFirstName(userResponse.getUser().getGivenName())
+                .setLastName(userResponse.getUser().getFamilyName())
                 .build();
     }
 
