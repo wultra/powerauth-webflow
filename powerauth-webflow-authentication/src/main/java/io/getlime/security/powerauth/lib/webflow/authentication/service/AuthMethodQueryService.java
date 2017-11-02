@@ -20,7 +20,6 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.powerauth.soap.ActivationStatus;
 import io.getlime.powerauth.soap.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -29,10 +28,8 @@ import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Map;
 
 /**
  * Service for getting information about current availability of authentication methods.
@@ -93,18 +90,11 @@ public class AuthMethodQueryService {
         GetUserAuthMethodsResponse userAuthMethods = response.getResponseObject();
         for (UserAuthMethodDetail authMethodDetail : userAuthMethods.getUserAuthMethods()) {
             if (authMethodDetail.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                String config = authMethodDetail.getConfig();
-                if (config != null && !config.isEmpty()) {
-                    try {
-                        AuthMethodConfiguration configuration = objectMapper.readValue(config, AuthMethodConfiguration.class);
-                        String activationId = configuration.getParameterValue("activationId");
-                        if (activationId != null && !activationId.isEmpty()) {
-                            // set successfully parsed activationId from configuration
-                            configuredActivation = activationId;
-                        }
-                    } catch (IOException ex) {
-                        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing activation from authentication method configuration", ex);
-                    }
+                Map<String, String> config = authMethodDetail.getConfig();
+                String activationId = config.get("activationId");
+                if (activationId != null && !activationId.isEmpty()) {
+                    // set successfully parsed activationId from configuration
+                    configuredActivation = activationId;
                 }
             }
         }
