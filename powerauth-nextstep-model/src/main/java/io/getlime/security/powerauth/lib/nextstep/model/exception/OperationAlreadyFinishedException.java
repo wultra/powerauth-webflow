@@ -14,24 +14,34 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.nextstep.client;
+package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 
 /**
- * Exception for failures in Next Step service processing.
+ * Exception for case when operation is already finished.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class NextStepServiceException extends Throwable {
+public class OperationAlreadyFinishedException extends NextStepServiceException {
+
+    public static final String CODE = "OPERATION_ALREADY_FAILED";
 
     private Error error;
+
+    /**
+     * Constructor with error message.
+     * @param message Error message.
+     */
+    public OperationAlreadyFinishedException(String message) {
+        super(message);
+    }
 
     /**
      * Constructor with cause.
      * @param cause Original exception.
      */
-    public NextStepServiceException(Throwable cause) {
+    public OperationAlreadyFinishedException(Throwable cause) {
         super(cause);
     }
 
@@ -40,7 +50,7 @@ public class NextStepServiceException extends Throwable {
      * @param cause Original exception.
      * @param error Object with error information.
      */
-    public NextStepServiceException(Throwable cause, Error error) {
+    public OperationAlreadyFinishedException(Throwable cause, Error error) {
         super(cause);
         this.error = error;
     }

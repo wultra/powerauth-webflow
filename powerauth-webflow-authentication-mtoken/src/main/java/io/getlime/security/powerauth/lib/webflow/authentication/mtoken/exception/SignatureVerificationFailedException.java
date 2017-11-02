@@ -7,9 +7,9 @@ import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthentica
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class SignatureVerificationException extends PowerAuthAuthenticationException {
+public class SignatureVerificationFailedException extends PowerAuthAuthenticationException {
 
-    public SignatureVerificationException() {
+    public SignatureVerificationFailedException() {
         super("Unable to verify signature in Mobile Token API component.");
     }
 }

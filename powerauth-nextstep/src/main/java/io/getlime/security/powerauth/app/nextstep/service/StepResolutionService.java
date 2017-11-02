@@ -28,6 +28,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
@@ -116,7 +119,7 @@ public class StepResolutionService {
      * @param request request to update an existing operation
      * @return response with ordered list of next steps
      */
-    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) {
+    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws NextStepServiceException {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         checkLegitimityOfUpdate(operation, request);
         UpdateOperationResponse response = new UpdateOperationResponse();
@@ -330,7 +333,7 @@ public class StepResolutionService {
      * @param operationEntity Operation entity.
      * @param request         Update request.
      */
-    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) {
+    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws NextStepServiceException {
         if (request == null || request.getOperationId() == null) {
             throw new IllegalArgumentException("Operation update failed, because request is invalid.");
         }
@@ -356,13 +359,13 @@ public class StepResolutionService {
         }
         for (OperationHistoryEntity historyItem : operationHistory) {
             if (historyItem.getResponseResult() == AuthResult.DONE) {
-                throw new IllegalStateException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
+                throw new OperationAlreadyFinishedException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
             }
             if (historyItem.getResponseResult() == AuthResult.FAILED) {
                 // #102 - allow double cancellation requests, cancel requests may come from multiple channels, so this is a supported scenario
                 if (operationEntity.getCurrentOperationHistoryEntity().getRequestAuthStepResult() != AuthStepResult.CANCELED
                         || request.getAuthStepResult() != AuthStepResult.CANCELED) {
-                    throw new IllegalStateException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
+                    throw new OperationAlreadyFailedException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
                 }
             }
         }

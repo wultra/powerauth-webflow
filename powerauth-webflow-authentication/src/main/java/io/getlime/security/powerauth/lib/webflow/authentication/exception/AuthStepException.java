@@ -21,7 +21,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.exception;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class AuthStepException extends Throwable {
+public class AuthStepException extends Exception {
 
     /**
      * Constructor with message and cause.

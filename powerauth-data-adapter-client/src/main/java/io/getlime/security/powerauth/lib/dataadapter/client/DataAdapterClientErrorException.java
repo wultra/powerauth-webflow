@@ -23,7 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.DataAdapterErr
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class DataAdapterClientErrorException extends Throwable {
+public class DataAdapterClientErrorException extends Exception {
 
     private DataAdapterError error;
 
