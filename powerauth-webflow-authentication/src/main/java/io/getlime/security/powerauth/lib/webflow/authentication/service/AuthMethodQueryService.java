@@ -97,7 +97,7 @@ public class AuthMethodQueryService {
                 if (config != null && !config.isEmpty()) {
                     try {
                         AuthMethodConfiguration configuration = objectMapper.readValue(config, AuthMethodConfiguration.class);
-                        String activationId = configuration.getActivationId();
+                        String activationId = configuration.getParameterValue("activationId");
                         if (activationId != null && !activationId.isEmpty()) {
                             // set successfully parsed activationId from configuration
                             configuredActivation = activationId;
