@@ -15,20 +15,41 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * Configuration of authentication methods per user.
+ * Configuration of authentication methods per user. Configuration parameters are stored in a key-value Map.
  *
  * @author Roman Strobl
  */
 public class AuthMethodConfiguration {
 
-    private String activationId;
+    private Map<String, String> parameters = new HashMap<>();
 
-    public String getActivationId() {
-        return activationId;
+    /**
+     * Get all configuration parameters.
+     * @return Map with configuration parameters.
+     */
+    public Map<String, String> getParameters() {
+        return parameters;
     }
 
-    public void setActivationId(String activationId) {
-        this.activationId = activationId;
+    /**
+     * Get value of a configuration parameter.
+     * @param parameterName Parameter name.
+     * @return Parameter value.
+     */
+    public String getParameterValue(String parameterName) {
+        return parameters.get(parameterName);
+    }
+
+    /**
+     * Set value of a configuration parameter.
+     * @param parameterName Parameter name.
+     * @param parameterValue Parameter value.
+     */
+    public void setParameterValue(String parameterName, String parameterValue) {
+        parameters.put(parameterName, parameterValue);
     }
 }
