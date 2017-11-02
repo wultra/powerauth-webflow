@@ -45,7 +45,7 @@ public class QRCodeExceptionResolver {
      */
     @ExceptionHandler(QRCodeInvalidDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleInvalidRequestObjectException(QRCodeInvalidDataException ex) {
+    public @ResponseBody ErrorResponse handleQRCodeInvalidDataException(QRCodeInvalidDataException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", ex);
         Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
         return new ErrorResponse(error);

@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.app.nextstep.exception;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -48,4 +50,27 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Exception handler for operation already finished error.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyFinishedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFinishedException(OperationAlreadyFinishedException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", ex);
+        Error error = new Error(OperationAlreadyFinishedException.CODE, "Operation is already in DONE state.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for operation already failed error.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", ex);
+        Error error = new Error(OperationAlreadyFailedException.CODE, "Operation is already in FAILED state.");
+        return new ErrorResponse(error);
+    }
 }
