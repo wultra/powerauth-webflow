@@ -51,7 +51,7 @@ public class DataAdapterService implements DataAdapter {
     }
 
     @Override
-    public List<BankAccount> fetchBankAccounts(String userId) throws UserNotFoundException {
+    public List<BankAccount> fetchBankAccounts(String userId, String operationId) throws UserNotFoundException {
         // Fetch bank account list for given user here from the bank backend.
         // In case that user is not found, throw a UserNotFoundException.
         // Replace mock bank account data with real data loaded from the bank backend.
