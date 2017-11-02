@@ -256,7 +256,6 @@ export default class Token extends React.Component {
     render() {
         return (
             <div id="operation">
-                <form>
                     <Panel>
                         <OperationDetail/>
                         {(this.state.offlineModeEnabled != null) ? (
@@ -271,7 +270,6 @@ export default class Token extends React.Component {
                             <Spinner/>
                         )}
                     </Panel>
-                </form>
             </div>
         )
     }
