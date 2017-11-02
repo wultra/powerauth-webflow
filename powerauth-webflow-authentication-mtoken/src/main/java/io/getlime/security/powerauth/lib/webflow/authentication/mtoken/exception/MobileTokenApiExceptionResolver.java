@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class MobileTokenApiExceptionResolver {
 
     /**
-     * Exception handler for push registration related exception..
+     * Exception handler for push registration related exception.
      *
      * @return Response with error details.
      */
@@ -47,11 +47,11 @@ public class MobileTokenApiExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error());
+        return new ErrorResponse(new Error("PUSH_REGISTRATION_FAILED", t.getMessage()));
     }
 
     /**
-     * Exception handler for push registration related exception..
+     * Exception handler for invalid request object exception.
      *
      * @return Response with error details.
      */
@@ -59,7 +59,54 @@ public class MobileTokenApiExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error());
+        return new ErrorResponse(new Error("INVALID_REQUEST", t.getMessage()));
     }
 
+    /**
+     * Exception handler for invalid activation exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(InvalidActivationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleInvalidValidationException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("INVALID_ACTIVATION", t.getMessage()));
+    }
+
+    /**
+     * Exception handler for cancel operation failed exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(CancelOperationFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleOperationCancelFailedException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("OPERATION_CANCEL_FAILED", t.getMessage()));
+    }
+
+    /**
+     * Exception handler for pending operation list exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(PendingOperationListFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handlePendingOperationListFailedException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("OPERATION_LIST_FAILED", t.getMessage()));
+    }
+
+    /**
+     * Exception handler for signature verification exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(SignatureVerificationException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleSignatureVerificationException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("SIGNATURE_VERIFICATION_FAILED", t.getMessage()));
+    }
 }
