@@ -151,58 +151,60 @@ export default class TokenOffline extends React.Component {
 
     render() {
         return (
-            <div>
+            <form onSubmit={this.handleSubmit}>
+                <div>
 
-                {(this.state.activations && this.state.chosenActivation) ? (
-                    <div>
-                        <div className="row attribute col-sm-6 key">
-                            <FormattedMessage id="qrCode.device"/>
+                    {(this.state.activations && this.state.chosenActivation) ? (
+                        <div>
+                            <div className="row attribute col-sm-6 key">
+                                <FormattedMessage id="qrCode.device"/>
+                            </div>
+                            <ActivationSelect
+                                activations={this.state.activations}
+                                chosenActivation={this.state.chosenActivation}
+                                choiceDisabled={this.state.activations.length<2}
+                                callback={this.handleActivationChoice}
+                            />
                         </div>
-                        <ActivationSelect
-                            activations={this.state.activations}
-                            chosenActivation={this.state.chosenActivation}
-                            choiceDisabled={this.state.activations.length<2}
-                            callback={this.handleActivationChoice}
-                        />
-                    </div>
-                ) : (
-                    <Spinner/>
-                )}
+                    ) : (
+                        <Spinner/>
+                    )}
 
-                {(this.state.qrCode) ? (
-                    <div>
-                        <img src={"data:image/png;" + this.state.qrCode}/>
-                        {(this.state.message) ? (
-                            <FormGroup
-                                className={(this.state.error ? "message-error" : "message-information")}>
-                                <FormattedMessage id={this.state.message}/>
-                            </FormGroup>
-                        ) : (
-                            <FormGroup
-                                className={"message-information"}>
-                                &nbsp;
-                            </FormGroup>
-                        )}
+                    {(this.state.qrCode) ? (
+                        <div>
+                            <img src={"data:image/png;" + this.state.qrCode}/>
+                            {(this.state.message) ? (
+                                <FormGroup
+                                    className={(this.state.error ? "message-error" : "message-information")}>
+                                    <FormattedMessage id={this.state.message}/>
+                                </FormGroup>
+                            ) : (
+                                <FormGroup
+                                    className={"message-information"}>
+                                    &nbsp;
+                                </FormGroup>
+                            )}
 
-                        <FormattedMessage id="qrCode.authCodeText"/>
-                        <br/>
-                        <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                        <br/><br/>
-                        <div className="attribute row">
-                            <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                <FormattedMessage id="operation.cancel"/>
-                            </a>
+                            <FormattedMessage id="qrCode.authCodeText"/>
+                            <br/>
+                            <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
+                            <br/><br/>
+                            <div className="attribute row">
+                                <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="operation.cancel"/>
+                                </a>
+                            </div>
+                            <div className="attribute row">
+                                <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="operation.confirm"/>
+                                </a>
+                            </div>
                         </div>
-                        <div className="attribute row">
-                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
-                                <FormattedMessage id="operation.confirm"/>
-                            </a>
-                        </div>
-                    </div>
-                ) : (
-                    <Spinner/>
-                )}
-            </div>
+                    ) : (
+                        <Spinner/>
+                    )}
+                </div>
+            </form>
         )
     }
 }
