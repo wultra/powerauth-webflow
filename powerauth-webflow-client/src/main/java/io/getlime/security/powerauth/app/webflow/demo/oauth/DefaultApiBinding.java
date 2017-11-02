@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
-import io.getlime.security.powerauth.app.webflow.demo.model.User;
+import io.getlime.security.powerauth.app.webflow.demo.model.UserResponse;
 import org.springframework.social.ApiBinding;
 
 /**
@@ -31,6 +31,6 @@ public interface DefaultApiBinding extends ApiBinding {
      *
      * @return User profile.
      */
-    User getProfile();
+    UserResponse getProfile();
 
 }

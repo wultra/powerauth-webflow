@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
-import io.getlime.security.powerauth.app.webflow.demo.model.User;
+import io.getlime.security.powerauth.app.webflow.demo.model.UserResponse;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.support.URIBuilder;
 
@@ -41,8 +41,8 @@ public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding impleme
     }
 
     @Override
-    public User getProfile() {
-        return getRestTemplate().getForObject(buildUri("/api/secure/profile/me"), User.class);
+    public UserResponse getProfile() {
+        return getRestTemplate().getForObject(buildUri("/api/secure/profile/me"), UserResponse.class);
     }
 
 }

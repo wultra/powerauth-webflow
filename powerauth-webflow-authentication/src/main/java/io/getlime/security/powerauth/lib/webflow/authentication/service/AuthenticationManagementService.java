@@ -114,7 +114,8 @@ public class AuthenticationManagementService {
     }
 
     /**
-     * Set locale to the authentication object.
+     * Set language to the authentication object.
+     * @param language Language to be set.
      */
     public void setLanguage(String language) {
         UserOperationAuthentication auth = getPendingUserAuthentication();

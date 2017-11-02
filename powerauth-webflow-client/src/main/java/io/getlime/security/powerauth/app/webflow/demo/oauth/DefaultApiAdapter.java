@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
-import io.getlime.security.powerauth.app.webflow.demo.model.User;
+import io.getlime.security.powerauth.app.webflow.demo.model.UserResponse;
 import org.springframework.social.connect.ApiAdapter;
 import org.springframework.social.connect.ConnectionValues;
 import org.springframework.social.connect.UserProfile;
@@ -37,18 +37,18 @@ public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapte
 
     @Override
     public void setConnectionValues(T api, ConnectionValues values) {
-        User user = api.getProfile();
-        values.setProviderUserId(user.getId());
-        values.setDisplayName(user.getGivenName() + " " + user.getFamilyName());
+        UserResponse user = api.getProfile();
+        values.setProviderUserId(user.getUser().getId());
+        values.setDisplayName(user.getUser().getGivenName() + " " + user.getUser().getFamilyName());
     }
 
     @Override
     public UserProfile fetchUserProfile(T api) {
-        User user = api.getProfile();
+        UserResponse user = api.getProfile();
         return new UserProfileBuilder()
-                .setUsername(user.getId())
-                .setFirstName(user.getGivenName())
-                .setLastName(user.getFamilyName())
+                .setUsername(user.getUser().getId())
+                .setFirstName(user.getUser().getGivenName())
+                .setLastName(user.getUser().getFamilyName())
                 .build();
     }
 
