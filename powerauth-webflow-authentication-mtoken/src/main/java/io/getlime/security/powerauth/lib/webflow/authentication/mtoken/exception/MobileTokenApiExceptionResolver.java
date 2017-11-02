@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exceptio
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -103,10 +105,34 @@ public class MobileTokenApiExceptionResolver {
      *
      * @return Response with error details.
      */
-    @ExceptionHandler(SignatureVerificationException.class)
+    @ExceptionHandler(SignatureVerificationFailedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleSignatureVerificationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("SIGNATURE_VERIFICATION_FAILED", t.getMessage()));
+    }
+
+    /**
+     * Exception handler for operation already finished exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyFinishedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("OPERATION_ALREADY_FINISHED", t.getMessage()));
+    }
+
+    /**
+     * Exception handler for operation already failed exception.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyFailedException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("OPERATION_ALREADY_FAILED", t.getMessage()));
     }
 }

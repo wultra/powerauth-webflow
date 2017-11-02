@@ -19,12 +19,12 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 import com.google.common.io.BaseEncoding;
 import io.getlime.powerauth.soap.*;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;

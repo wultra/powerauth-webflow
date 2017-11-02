@@ -7,9 +7,9 @@ import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -177,10 +177,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new Response();
             } else {
-                throw new SignatureVerificationException();
+                throw new SignatureVerificationFailedException();
             }
         } else {
-            throw new SignatureVerificationException();
+            throw new SignatureVerificationFailedException();
         }
 
     }

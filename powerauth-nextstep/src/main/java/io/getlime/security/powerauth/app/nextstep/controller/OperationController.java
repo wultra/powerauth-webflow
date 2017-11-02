@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceSe
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -84,7 +85,7 @@ public class OperationController {
      * @return Update operation response.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) {
+    public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 

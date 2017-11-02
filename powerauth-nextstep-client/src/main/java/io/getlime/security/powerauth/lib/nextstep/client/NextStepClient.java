@@ -25,6 +25,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -373,7 +376,14 @@ public class NextStepClient {
             TypeReference<ObjectResponse<Error>> typeReference = new TypeReference<ObjectResponse<Error>>() {};
             ObjectResponse<Error> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
             Error error = errorResponse.getResponseObject();
-            return new NextStepServiceException(ex, error);
+            switch (error.getCode()) {
+                case OperationAlreadyFinishedException.CODE:
+                    throw new OperationAlreadyFinishedException(error.getMessage());
+                case OperationAlreadyFailedException.CODE:
+                    throw new OperationAlreadyFailedException(error.getMessage());
+                default:
+                    return new NextStepServiceException(ex, error);
+            }
         } catch (IOException ex2) {
             // JSON parsing failed
             Error error = new Error(Error.Code.ERROR_GENERIC, ex2.getMessage());
