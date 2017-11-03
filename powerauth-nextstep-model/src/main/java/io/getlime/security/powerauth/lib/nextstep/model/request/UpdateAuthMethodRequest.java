@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
+import java.util.Map;
+
 /**
  * Request object used for updating authentication methods for user.
  *
@@ -26,7 +28,7 @@ public class UpdateAuthMethodRequest {
 
     private String userId;
     private AuthMethod authMethod;
-    private String config;
+    private Map<String, String> config;
 
     /**
      * Get the user ID.
@@ -68,7 +70,7 @@ public class UpdateAuthMethodRequest {
      * Get the authentication method configuration.
      * @return Configuration.
      */
-    public String getConfig() {
+    public Map<String, String> getConfig() {
         return config;
     }
 
@@ -76,7 +78,7 @@ public class UpdateAuthMethodRequest {
      * Set the authentication method configuration.
      * @param config Configuration.
      */
-    public void setConfig(String config) {
+    public void setConfig(Map<String, String> config) {
         this.config = config;
     }
 }
