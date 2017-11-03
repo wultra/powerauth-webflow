@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.MapType;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
@@ -25,8 +27,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This service handles querying of user authentication methods and enabling/disabling them.
@@ -36,13 +43,15 @@ import java.util.List;
 @Service
 public class AuthMethodService {
 
-    private AuthMethodRepository authMethodRepository;
-    private UserPrefsRepository userPrefsRepository;
+    private final AuthMethodRepository authMethodRepository;
+    private final UserPrefsRepository userPrefsRepository;
+    private final ObjectMapper objectMapper;
 
     @Autowired
-    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository) {
+    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, ObjectMapper objectMapper) {
         this.authMethodRepository = authMethodRepository;
         this.userPrefsRepository = userPrefsRepository;
+        this.objectMapper = objectMapper;
     }
 
     /**
@@ -82,8 +91,16 @@ public class AuthMethodService {
                     if (userPrefs.getAuthMethodEnabled(authMethodEntity.getUserPrefsColumn())) {
                         // read configuration of method from user prefs
                         String config = userPrefs.getAuthMethodConfig(authMethodEntity.getUserPrefsColumn());
+                        Map<String, String> configMap;
+                        try {
+                            MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
+                            configMap = objectMapper.readValue(config, mapType);
+                        } catch (IOException e) {
+                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing config", e);
+                            configMap = new HashMap<>();
+                        }
                         // add method in case it is enabled in user prefs
-                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, config));
+                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, configMap));
                     }
                 } else {
                     // user prefs are not set - resolve methods with user prefs by their default value
@@ -176,7 +193,7 @@ public class AuthMethodService {
         return authMethodDetail;
     }
 
-    private UserAuthMethodDetail getUserAuthMethodDetail(String userId, AuthMethodEntity authMethodEntity, String config) {
+    private UserAuthMethodDetail getUserAuthMethodDetail(String userId, AuthMethodEntity authMethodEntity, Map<String, String> config) {
         if (authMethodEntity == null) {
             return null;
         }

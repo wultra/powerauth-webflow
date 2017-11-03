@@ -2,6 +2,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
+import java.util.Map;
+
 /**
  * Class represents state of an authentication method for given user.
  *
@@ -13,7 +15,7 @@ public class UserAuthMethodDetail {
     private AuthMethod authMethod;
     private Boolean hasUserInterface;
     private String displayNameKey;
-    private String config;
+    private Map<String, String> config;
 
     public String getUserId() {
         return userId;
@@ -47,11 +49,11 @@ public class UserAuthMethodDetail {
         this.displayNameKey = displayNameKey;
     }
 
-    public String getConfig() {
+    public Map<String, String> getConfig() {
         return config;
     }
 
-    public void setConfig(String config) {
+    public void setConfig(Map<String, String> config) {
         this.config = config;
     }
 
