@@ -19,7 +19,6 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -37,8 +36,10 @@ import java.util.logging.Logger;
  */
 
 @ControllerAdvice
-@Order(Ordered.LOWEST_PRECEDENCE-1)
+@Order(MobileTokenApiExceptionResolver.PRECEDENCE)
 public class MobileTokenApiExceptionResolver {
+
+    static final int PRECEDENCE = -101;
 
     /**
      * Exception handler for push registration related exception.
