@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller class related to Next Step authentication methods and user preferences.
@@ -102,7 +103,7 @@ public class AuthMethodController {
         if (authMethod == null) {
             throw new IllegalArgumentException("Parameter authMethod is null in request object when enabling authentication method.");
         }
-        String config = requestObject.getConfig();
+        Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, true, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
@@ -127,7 +128,7 @@ public class AuthMethodController {
         if (authMethod == null) {
             throw new IllegalArgumentException("Parameter authMethod is null in request object when disabling authentication method.");
         }
-        String config = requestObject.getConfig();
+        Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
