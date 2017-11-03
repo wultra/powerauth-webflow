@@ -162,6 +162,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
                 Date timestampLastUsed = activation.getTimestampLastUsed().toGregorianCalendar().getTime();
                 activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
                 activationEntities.add(activationEntity);
+                break;
             }
         }
 

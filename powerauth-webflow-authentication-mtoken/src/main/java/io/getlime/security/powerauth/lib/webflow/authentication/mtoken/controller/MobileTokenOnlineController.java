@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
+import io.getlime.powerauth.soap.ActivationStatus;
+import io.getlime.powerauth.soap.GetActivationListForUserResponse;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
@@ -33,11 +35,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServic
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.configuration.PushServiceConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,14 +58,17 @@ import java.util.List;
 public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
     private final PushServerClient pushServerClient;
-    private final PushServiceConfiguration configuration;
     private final WebSocketMessageService webSocketMessageService;
+    private final AuthMethodQueryService authMethodQueryService;
+    private final PowerAuthServiceClient powerAuthServiceClient;
+
 
     @Autowired
-    public MobileTokenOnlineController(PushServerClient pushServerClient, PushServiceConfiguration configuration, WebSocketMessageService webSocketMessageService) {
+    public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient) {
         this.pushServerClient = pushServerClient;
-        this.configuration = configuration;
         this.webSocketMessageService = webSocketMessageService;
+        this.authMethodQueryService = authMethodQueryService;
+        this.powerAuthServiceClient = powerAuthServiceClient;
     }
 
     @Override
@@ -88,7 +94,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenInitResponse initPushMessage() {
+    public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException {
         final GetOperationDetailResponse operation = getOperation();
 
         if (!isAuthMethodAvailable(operation)) {
@@ -125,8 +131,37 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
 
+        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+
+        // activationId is not configured, fail with error
+        if (configuredActivationId == null || configuredActivationId.isEmpty()) {
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("pushMessage.noActivation");
+            return initResponse;
+        }
+
+        Long applicationId = null;
+
+        // loading of activations
+        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
+
+        // resolve applicationId from activationId
+        for (GetActivationListForUserResponse.Activations activation: allActivations) {
+            if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
+                applicationId = activation.getApplicationId();
+                break;
+            }
+        }
+
+        // applicationId could not be resolved, cannot send push message
+        if (applicationId == null) {
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("pushMessage.noApplication");
+            return initResponse;
+        }
+
         try {
-            final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(configuration.getPushServerApplication(), message);
+            final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(applicationId, message);
             if (response.getStatus().equals(Response.Status.OK)) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
             } else {

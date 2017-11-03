@@ -14,7 +14,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.configuration.PushServiceConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenCancelOperationRequest;
@@ -48,15 +47,13 @@ import java.util.logging.Logger;
 public class MobileAppApiController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
     private final WebSocketMessageService webSocketMessageService;
-    private final PushServiceConfiguration configuration;
     private final PushServerClient pushServerClient;
     private final AuthMethodQueryService authMethodQueryService;
 
 
     @Autowired
-    public MobileAppApiController(WebSocketMessageService webSocketMessageService, PushServiceConfiguration configuration, PushServerClient pushServerClient, AuthMethodQueryService authMethodQueryService) {
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, PushServerClient pushServerClient, AuthMethodQueryService authMethodQueryService) {
         this.webSocketMessageService = webSocketMessageService;
-        this.configuration = configuration;
         this.pushServerClient = pushServerClient;
         this.authMethodQueryService = authMethodQueryService;
     }
@@ -90,13 +87,15 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         // This assures that the activation is assigned with a correct device.
         String activationId = null;
         String userId = null;
+        Long applicationId = null;
         if (apiAuthentication != null) {
             activationId = apiAuthentication.getActivationId();
             userId = apiAuthentication.getUserId();
+            applicationId = apiAuthentication.getApplicationId();
         }
 
-        // Verify that the activation ID from context matches configured activation ID for given user.
-        if (!verifyActivationId(activationId, userId)) {
+        // Verify that applicationId is set and the activation ID from context matches configured activation ID for given user.
+        if (applicationId == null || !verifyActivationId(activationId, userId)) {
             throw new InvalidActivationException();
         }
 
@@ -106,7 +105,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             p = MobilePlatform.iOS;
         }
         try {
-            boolean result = pushServerClient.createDevice(configuration.getPushServerApplication(), token, p, activationId);
+            boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
             if (result) {
                 return new Response();
             } else {
