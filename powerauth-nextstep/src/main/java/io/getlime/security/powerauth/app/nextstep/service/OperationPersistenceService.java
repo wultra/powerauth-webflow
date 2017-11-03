@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
@@ -146,8 +147,11 @@ public class OperationPersistenceService {
     public void updateFormData(UpdateFormDataRequest request) {
         OperationEntity operation = operationRepository.findOne(request.getOperationId());
         try {
-            operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
-        } catch (JsonProcessingException e) {
+            OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
+            // update only formData.userInput which should contain all input from the user
+            formData.setUserInput(request.getFormData().getUserInput());
+            operation.setOperationFormData(objectMapper.writeValueAsString(formData));
+        } catch (IOException e) {
             Logger.getLogger(this.getClass().getName()).log(
                     Level.SEVERE,
                     "Error occurred while serializing operation form data",

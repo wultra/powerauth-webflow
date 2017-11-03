@@ -11,6 +11,7 @@ public class PaymentForm {
     private String currency;
     private String account;
     private String note;
+    private String dueDate;
 
     public BigDecimal getAmount() {
         return amount;
@@ -44,4 +45,11 @@ public class PaymentForm {
         this.note = note;
     }
 
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
 }
