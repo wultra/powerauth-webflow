@@ -89,13 +89,15 @@ public class OperationFormData {
 
     /**
      * Add an amount.
-     * @param label Amount label.
+     * @param amountLabel Amount label.
+     * @param currencyLabel Currency label.
      * @param amount Amount value.
      * @param currency Amount currency.
      */
-    public void addAmount(String label, BigDecimal amount, String currency) {
+    public void addAmount(String amountLabel, String currencyLabel, BigDecimal amount, String currency) {
         OperationAmountAttribute attr = new OperationAmountAttribute();
-        attr.setLabel(label);
+        attr.setLabel(amountLabel);
+        attr.setCurrencyLabel(currencyLabel);
         attr.setAmount(amount);
         attr.setCurrency(currency);
         parameters.add(attr);
@@ -146,5 +148,9 @@ public class OperationFormData {
      */
     public void addUserInput(String key, String value) {
         userInput.put(key, value);
+    }
+
+    public void setUserInput(Map<String, String> userInput) {
+        this.userInput = userInput;
     }
 }
