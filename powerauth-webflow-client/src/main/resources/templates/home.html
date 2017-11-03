@@ -79,19 +79,19 @@
                                 </p>
                                 <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
                                     <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{amount}"
-                                               placeholder="Amount"/>
+                                        <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
                                     </div>
                                     <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{currency}"
-                                               placeholder="Currency"/>
+                                        <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
                                     </div>
                                     <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{account}"
-                                               placeholder="Account Number"/>
+                                        <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
                                     </div>
                                     <div class="form-group form-group-lg">
                                         <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
+                                    </div>
+                                    <div class="form-group form-group-lg">
+                                        <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
                                     </div>
                                     <div class="form-group form-group-lg">
                                         <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
