@@ -139,47 +139,41 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
         if (configuredActivationId == null) {
             // unexpected state - activation is not set or configuration is invalid
-            throw new QRCodeInvalidDataException("qrCode.invalidActivation");
+            throw new QRCodeInvalidDataException("qrCode.noActivation");
         }
 
         if (request.getActivationId() != null && !request.getActivationId().equals(configuredActivationId)) {
             // unexpected state - UI requests different activationId than configured activationId
-            throw new QRCodeInvalidDataException("qrCode.invalidRequest");
+            throw new QRCodeInvalidDataException("qrCode.invalidActivation");
 
         }
 
-        // loading of activations
-        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
+        // get activation status
+        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
 
-        // transfer activations into ActivationEntity list and filter data to match activationId from authentication method configuration
+        // if activation is not active, fail request
+        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("qrCode.activationNotActive");
+            return initResponse;
+        }
+
+        // transfer activation into ActivationEntity list
         List<ActivationEntity> activationEntities = new ArrayList<>();
-        for (GetActivationListForUserResponse.Activations activation: allActivations) {
-            if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                ActivationEntity activationEntity = new ActivationEntity();
-                activationEntity.setActivationId(activation.getActivationId());
-                activationEntity.setActivationName(activation.getActivationName());
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                Date timestampLastUsed = activation.getTimestampLastUsed().toGregorianCalendar().getTime();
-                activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
-                activationEntities.add(activationEntity);
-                break;
-            }
-        }
-
-        if (activationEntities.isEmpty()) {
-            // unexpected state - last activation was removed or blocked
-            throw new QRCodeInvalidDataException("qrCode.noActivation");
-        }
-
-        // currently only one activation is supported - the one which is configured
-        ActivationEntity activation = activationEntities.get(0);
+        ActivationEntity activationEntity = new ActivationEntity();
+        activationEntity.setActivationId(activationStatusResponse.getActivationId());
+        activationEntity.setActivationName(activationStatusResponse.getActivationName());
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date timestampLastUsed = activationStatusResponse.getTimestampLastUsed().toGregorianCalendar().getTime();
+        activationEntity.setTimestampLastUsed(formatter.format(timestampLastUsed));
+        activationEntities.add(activationEntity);
 
         // generating of QR code
-        OfflineSignatureQrCode qrCode = generateQRCode(activation);
+        OfflineSignatureQrCode qrCode = generateQRCode(activationEntity);
         initResponse.setQRCode(qrCode.generateImage());
         initResponse.setNonce(qrCode.getNonce());
         initResponse.setDataHash(qrCode.getDataHash());
-        initResponse.setChosenActivation(activation);
+        initResponse.setChosenActivation(activationEntity);
         // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);
         return initResponse;

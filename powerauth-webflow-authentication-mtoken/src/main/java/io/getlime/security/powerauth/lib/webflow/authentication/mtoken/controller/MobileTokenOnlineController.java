@@ -19,7 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.powerauth.soap.ActivationStatus;
-import io.getlime.powerauth.soap.GetActivationListForUserResponse;
+import io.getlime.powerauth.soap.GetActivationStatusResponse;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
@@ -140,18 +140,16 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             return initResponse;
         }
 
-        Long applicationId = null;
-
         // loading of activations
-        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
+        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
 
-        // resolve applicationId from activationId
-        for (GetActivationListForUserResponse.Activations activation: allActivations) {
-            if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                applicationId = activation.getApplicationId();
-                break;
-            }
+        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("pushMessage.activationNotActive");
+            return initResponse;
         }
+
+        Long applicationId = activationStatusResponse.getApplicationId();
 
         // applicationId could not be resolved, cannot send push message
         if (applicationId == null) {
