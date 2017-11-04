@@ -75,17 +75,17 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
         String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
 
         if (amount == null) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
         } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.invalid");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.invalid");
         }
 
         if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.currency.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.currency.empty");
         }
 
         if (account == null || account.isEmpty()) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.account.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.account.empty");
         }
 
     }

@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * This controller provides endpoints for SMS authorization.
@@ -116,6 +118,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             initResponse.setResult(AuthStepResult.CONFIRMED);
             return initResponse;
         } catch (DataAdapterClientErrorException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage(e.getMessage());
             return initResponse;
@@ -161,6 +164,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 }
             });
         } catch (AuthStepException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when validating an SMS message.", e);
             final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
@@ -184,6 +188,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             cancelResponse.setMessage("operation.canceled");
             return cancelResponse;
         } catch (NextStepServiceException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when canceling SMS message validation.", e);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage(e.getMessage());
