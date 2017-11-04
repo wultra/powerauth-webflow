@@ -42,7 +42,8 @@ export default class OperationDetail extends React.Component {
         this.resolveChosenBankAccount = this.resolveChosenBankAccount.bind(this);
         this.handleBankAccountChoice = this.handleBankAccountChoice.bind(this);
         this.storeBankAccounts = this.storeBankAccounts.bind(this);
-        this.state = {bankAccounts: null, chosenBankAccount: null};
+        this.setBankAccountChoiceDisabled = this.setBankAccountChoiceDisabled.bind(this);
+        this.state = {bankAccounts: null, chosenBankAccount: null, bankAccountChoiceDisabled: false};
     }
 
     componentWillMount() {
@@ -58,6 +59,7 @@ export default class OperationDetail extends React.Component {
                     if (this.props.context.formData.userInput.chosenBankAccountNumber) {
                         // bank account has already been chosen
                         this.resolveChosenBankAccount(item.bankAccounts, this.props.context.formData.userInput.chosenBankAccountNumber);
+                        this.setBankAccountChoiceDisabled(true);
                     } else {
                         // initial bank account is set to the first bank account found
                         this.handleBankAccountChoice(item.bankAccounts[0]);
@@ -83,6 +85,10 @@ export default class OperationDetail extends React.Component {
     handleBankAccountChoice(bankAccount) {
         this.setState({chosenBankAccount: bankAccount});
         this.props.dispatch(changeBankAccount(bankAccount.number));
+    }
+
+    setBankAccountChoiceDisabled(disabled) {
+        this.setState({bankAccountChoiceDisabled: disabled});
     }
 
     render() {
@@ -146,7 +152,7 @@ export default class OperationDetail extends React.Component {
                                                         <BankAccountSelect
                                                             bankAccounts={this.state.bankAccounts}
                                                             chosenBankAccount={this.state.chosenBankAccount}
-                                                            choiceDisabled={item.choiceDisabled}
+                                                            choiceDisabled={this.state.bankAccountChoiceDisabled}
                                                             callback={this.handleBankAccountChoice}
                                                         />
                                                     ) : (

@@ -76,6 +76,7 @@ public class HomeController {
         paymentForm.setCurrency("CZK");
         paymentForm.setAccount("238400856/0300");
         paymentForm.setNote("Utility Bill Payment - 05/2017");
+        paymentForm.setDueDate("06/29/2017");
         model.addAttribute("paymentForm", paymentForm);
 
         return "home";
@@ -85,29 +86,28 @@ public class HomeController {
     public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
         String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
-        formData.setTitle("Confirm Payment");
-        formData.setMessage("Hello, please confirm payment "
-                + paymentForm.getAmount() + " " + paymentForm.getCurrency()
-                + " to account " + paymentForm.getAccount() + ".");
+        formData.setTitle("operation.title");
+        formData.setMessage("operation.message");
 
         OperationAmountAttribute amountAttr = new OperationAmountAttribute();
-        amountAttr.setLabel("Amount");
+        amountAttr.setLabel("operation.amount");
+        amountAttr.setCurrencyLabel("operation.currency");
         amountAttr.setAmount(paymentForm.getAmount());
         amountAttr.setCurrency(paymentForm.getCurrency());
         formData.getParameters().add(amountAttr);
 
         OperationKeyValueAttribute accountAttr = new OperationKeyValueAttribute();
-        accountAttr.setLabel("To Account");
+        accountAttr.setLabel("operation.account");
         accountAttr.setValue(paymentForm.getAccount());
         formData.getParameters().add(accountAttr);
 
         OperationKeyValueAttribute dateAttr = new OperationKeyValueAttribute();
-        dateAttr.setLabel("Due Date");
-        dateAttr.setValue("06/29/2017");
+        dateAttr.setLabel("operation.dueDate");
+        dateAttr.setValue(paymentForm.getDueDate());
         formData.getParameters().add(dateAttr);
 
         OperationMessageAttribute messageAttr = new OperationMessageAttribute();
-        messageAttr.setLabel("Note");
+        messageAttr.setLabel("operation.note");
         messageAttr.setMessage(paymentForm.getNote());
         formData.getParameters().add(messageAttr);
 

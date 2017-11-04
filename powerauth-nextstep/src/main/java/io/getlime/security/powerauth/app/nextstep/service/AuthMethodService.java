@@ -124,7 +124,7 @@ public class AuthMethodService {
      * @param authMethod authentication method
      * @param enabled    true if enabled, false if disabled, null if unspecified
      */
-    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, String config) {
+    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) {
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
         // check whether this method supports modifications at all
@@ -138,6 +138,13 @@ public class AuthMethodService {
         }
         if (!authMethodFound) {
             throw new IllegalArgumentException("Authentication method " + authMethod + " is not supported.");
+        }
+        String configAsStr;
+        try {
+            configAsStr = objectMapper.writeValueAsString(config);
+        } catch (IOException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing config", e);
+            configAsStr = "{}";
         }
         UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);
         if (userPrefs == null) {
@@ -155,7 +162,7 @@ public class AuthMethodService {
                         userPrefs.setAuthMethodEnabled(authMethodEntity.getUserPrefsColumn(), authMethodEntity.getUserPrefsDefault());
                     }
                     // set authMethod configuration
-                    userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), config);
+                    userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), configAsStr);
                 }
             }
         } else {
@@ -166,7 +173,7 @@ public class AuthMethodService {
                         // set requested value for method which is being updated
                         userPrefs.setAuthMethodEnabled(authMethodEntity.getUserPrefsColumn(), enabled);
                         // set authMethod configuration
-                        userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), config);
+                        userPrefs.setAuthMethodConfig(authMethodEntity.getUserPrefsColumn(), configAsStr);
                     }
                 }
             }

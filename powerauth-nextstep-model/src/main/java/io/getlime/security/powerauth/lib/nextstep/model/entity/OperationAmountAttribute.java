@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 public class OperationAmountAttribute extends OperationFormAttribute {
 
     private String label;
+    private String currencyLabel;
     private BigDecimal amount;
     private String currency;
 
@@ -24,6 +25,14 @@ public class OperationAmountAttribute extends OperationFormAttribute {
 
     public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getCurrencyLabel() {
+        return currencyLabel;
+    }
+
+    public void setCurrencyLabel(String currencyLabel) {
+        this.currencyLabel = currencyLabel;
     }
 
     public BigDecimal getAmount() {

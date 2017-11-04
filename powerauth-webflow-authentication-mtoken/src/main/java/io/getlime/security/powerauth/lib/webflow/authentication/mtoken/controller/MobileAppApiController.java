@@ -86,16 +86,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         // Check if the context is authenticated - if it is, add activation ID.
         // This assures that the activation is assigned with a correct device.
         String activationId = null;
-        String userId = null;
         Long applicationId = null;
         if (apiAuthentication != null) {
             activationId = apiAuthentication.getActivationId();
-            userId = apiAuthentication.getUserId();
             applicationId = apiAuthentication.getApplicationId();
         }
 
-        // Verify that applicationId is set and the activation ID from context matches configured activation ID for given user.
-        if (applicationId == null || !verifyActivationId(activationId, userId)) {
+        // Verify that applicationId and activationId are set
+        if (applicationId == null || activationId == null) {
             throw new InvalidActivationException();
         }
 

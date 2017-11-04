@@ -37,6 +37,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -72,6 +73,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private DataAdapterClient dataAdapterClient;
 
+    @Autowired
+    private MessageTranslationService messageTranslationService;
+
     protected GetOperationDetailResponse getOperation() {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
@@ -91,6 +95,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
             filterStepsBasedOnActiveAuthMethods(operationDetail.getResponseObject().getSteps(), operationDetail.getResponseObject().getUserId(), operationId);
             final GetOperationDetailResponse responseObject = operationDetail.getResponseObject();
+            // translate formData messages
+            messageTranslationService.translateFormData(responseObject.getFormData());
             return responseObject;
         } catch (NextStepServiceException e) {
             return null;
@@ -116,6 +122,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, getAuthMethodName());
+            final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
+            for (GetOperationDetailResponse response: responseObject) {
+                // translate formData messages
+                messageTranslationService.translateFormData(response.getFormData());
+            }
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
             return null;
