@@ -56,7 +56,7 @@ export default class OperationDetail extends React.Component {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (this.props.context.formData.userInput.chosenBankAccountNumber) {
+                    if (this.props.context.formData.userInput.bankAccountChosen) {
                         // bank account has already been chosen
                         this.resolveChosenBankAccount(item.bankAccounts, this.props.context.formData.userInput.chosenBankAccountNumber);
                         this.setBankAccountChoiceDisabled(true);

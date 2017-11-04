@@ -54,6 +54,7 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the token screen
         if (this.props.context.formData) {
             this.props.dispatch(chooseAuthMethod("POWERAUTH_TOKEN"));
+            this.props.context.formData.userInput.bankAccountChosen = true;
             this.props.dispatch(updateFormData(this.props.context.formData, function () {
                 // change screen after form data are stored
                 switchToTokenScreen();
@@ -77,6 +78,7 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the sms screen
         if (this.props.context.formData) {
             this.props.dispatch(chooseAuthMethod("SMS_KEY"));
+            this.props.context.formData.userInput.bankAccountChosen = true;
             this.props.dispatch(updateFormData(this.props.context.formData, function () {
                 // change screen after formData are stored
                 switchToSMSScreen();
