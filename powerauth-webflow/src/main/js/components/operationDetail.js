@@ -77,7 +77,7 @@ export default class OperationDetail extends React.Component {
     resolveChosenBankAccount(bankAccounts, chosenBankAccountNumber) {
         bankAccounts.map((bankAccount) => {
             if (bankAccount.number === chosenBankAccountNumber) {
-                this.setState({chosenBankAccount: bankAccount});
+                this.handleBankAccountChoice(bankAccount);
             }
         });
     }
