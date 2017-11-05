@@ -22,29 +22,9 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
  * <p>
  * Basically, this class represents the newly created operation that is about to be confirmed.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class InitOperationResponse extends AuthStepResponse {
-
-    private String operationId;
-
-    /**
-     * Get operation ID.
-     *
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     *
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
 
 }
