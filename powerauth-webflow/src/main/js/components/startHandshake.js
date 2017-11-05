@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 import React from 'react';
+import {connect} from 'react-redux';
 // Actions
 import {authenticate} from '../actions/startHandshakeActions'
 // Components
@@ -22,6 +23,10 @@ import Spinner from 'react-spin';
 /**
  * Component for dispatching the initial web flow state.
  */
+@connect((store) => {
+    return {
+    }
+})
 export default class StartHandshake extends React.Component {
 
     componentWillMount() {
