@@ -16,7 +16,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
@@ -42,7 +43,7 @@ public class MessageTranslationService {
     }
 
     /**
-     * Translates formData strings.
+     * Translate formData strings.
      *
      * @param formData Form data.
      */
@@ -50,63 +51,97 @@ public class MessageTranslationService {
         if (formData==null) {
             return;
         }
-        // Generate localization strings for payment message
+        OperationTitleAttribute title = null;
+        OperationMessageAttribute message = null;
         Map<String, String> valueMap = new HashMap<>();
+        // Set localized labels and find title and message attributes
         for (OperationFormAttribute attribute: formData.getParameters()) {
+            String id = null;
+            String value = null;
             switch (attribute.getType()) {
+                case TITLE:
+                    OperationTitleAttribute titleAttribute = (OperationTitleAttribute) attribute;
+                    id = titleAttribute.getId();
+                    value = titleAttribute.getTitle();
+                    break;
+                case MAIN_MESSAGE:
+                    OperationMessageAttribute noteAttribute = (OperationMessageAttribute) attribute;
+                    id = noteAttribute.getId();
+                    value = noteAttribute.getMessage();
+                    break;
                 case AMOUNT:
                     OperationAmountAttribute amountAttribute = (OperationAmountAttribute) attribute;
-                    String amount = amountAttribute.getAmount().toPlainString();
-                    String currency = amountAttribute.getCurrency();
-                    valueMap.put(amountAttribute.getLabel(), amount);
-                    valueMap.put(amountAttribute.getCurrencyLabel(), currency);
-                    amountAttribute.setLabel(localize(amountAttribute.getLabel()));
-                    amountAttribute.setCurrencyLabel(localize(amountAttribute.getCurrencyLabel()));
-                    break;
-                case KEY_VALUE:
-                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
-                    valueMap.put(keyValueAttribute.getLabel(), keyValueAttribute.getValue());
-                    keyValueAttribute.setLabel(localize(keyValueAttribute.getLabel()));
+                    id = amountAttribute.getId();
+                    value = amountAttribute.getAmount().toPlainString();
+                    // special handling for translation of currency value
+                    valueMap.put(amountAttribute.getCurrencyId(), amountAttribute.getCurrency());
                     break;
                 case MESSAGE:
-                    OperationMessageAttribute messageAttribute = (OperationMessageAttribute) attribute;
-                    valueMap.put(messageAttribute.getLabel(), messageAttribute.getMessage());
-                    messageAttribute.setLabel(localize(messageAttribute.getLabel()));
+                    OperationNoteAttribute messageAttribute = (OperationNoteAttribute) attribute;
+                    id = messageAttribute.getId();
+                    value = messageAttribute.getMessage();
                     break;
                 case BANK_ACCOUNT_CHOICE:
                     OperationBankAccountChoiceAttribute bankAccountChoiceAttribute = (OperationBankAccountChoiceAttribute) attribute;
-                    valueMap.put(bankAccountChoiceAttribute.getLabel(), formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT));
-                    bankAccountChoiceAttribute.setLabel(localize(bankAccountChoiceAttribute.getLabel()));
+                    id = bankAccountChoiceAttribute.getId();
+                    value = formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT);
+                    break;
+                case KEY_VALUE:
+                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
+                    id = keyValueAttribute.getId();
+                    value = keyValueAttribute.getValue();
+                    break;
+            }
+            if (id != null) {
+                valueMap.put(id, value);
+                String localizedValue = localize(id);
+                attribute.setLabel(localizedValue);
+            }
+            switch (attribute.getType()) {
+                case TITLE:
+                    title = (OperationTitleAttribute) attribute;
+                    break;
+                case MAIN_MESSAGE:
+                    message = (OperationMessageAttribute) attribute;
                     break;
             }
         }
 
-        String messageToTranslate = localize(formData.getMessage());
-        String translatedMessage = translatedMessage(messageToTranslate, valueMap);
-        formData.setMessage(translatedMessage);
+        // Attributes title and message support substitution using the {id} notation
+        if (title != null && title.getLabel() != null) {
+            String translatedTitle = translateMessage(title.getLabel(), valueMap);
+            formData.setTitle(title.getId(), translatedTitle);
+        }
 
-        String titleToTranslate = localize(formData.getTitle());
-        String translatedTitle = translatedMessage(titleToTranslate, valueMap);
-        formData.setTitle(translatedTitle);
+        if (message != null && message.getLabel() != null) {
+            String translatedMessage = translateMessage(message.getLabel(), valueMap);
+            formData.setMessage(message.getId(), translatedMessage);
+        }
     }
 
     /**
-     * Localizes the text by i18n key.
-     * @param i18nkey I18n key.
+     * Localize the text by i18n key.
+     * @param i18nKey I18n key.
      * @return Localized text.
      */
-    private String localize(String i18nkey) {
+    private String localize(String i18nKey) {
+        if (i18nKey == null) {
+            throw new IllegalArgumentException("Missing i18n key");
+        }
         final AbstractMessageSource messageSource = i18NService.getMessageSource();
-        return messageSource.getMessage(i18nkey, null, LocaleContextHolder.getLocale());
+        return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
     }
 
     /**
-     * Parses the message and resolves strings using the {variableName} notation.
+     * Parse the message and resolve strings using the {id} notation.
      * @param message Message to parse.
      * @param valueMap Key-value map for translation.
      * @return Translated message.
      */
-    private String translatedMessage(String message, Map<String, String> valueMap) {
+    private String translateMessage(String message, Map<String, String> valueMap) {
+        if (message == null) {
+            return null;
+        }
         CharacterIterator iterator = new StringCharacterIterator(message);
         StringBuilder messageBuilder = new StringBuilder();
         StringBuilder keyBuilder = new StringBuilder();

@@ -1,4 +1,4 @@
-package io.getlime.security.powerauth.lib.nextstep.model.entity;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 /**
  * Class representing an operation display attribute for generic key-value pair.
@@ -7,19 +7,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
  */
 public class OperationKeyValueAttribute extends OperationFormAttribute {
 
-    private String label;
     private String value;
 
     public OperationKeyValueAttribute() {
         this.type = Type.KEY_VALUE;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public String getValue() {

@@ -1,38 +1,20 @@
-package io.getlime.security.powerauth.lib.nextstep.model.entity;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 import java.math.BigDecimal;
 
 /**
  * Class representing an operation display attribute for transaction amount.
- * It contains holders for amount and currency.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class OperationAmountAttribute extends OperationFormAttribute {
 
-    private String label;
-    private String currencyLabel;
     private BigDecimal amount;
     private String currency;
+    private String currencyId;
 
     public OperationAmountAttribute() {
         this.type = Type.AMOUNT;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
-    }
-
-    public String getCurrencyLabel() {
-        return currencyLabel;
-    }
-
-    public void setCurrencyLabel(String currencyLabel) {
-        this.currencyLabel = currencyLabel;
     }
 
     public BigDecimal getAmount() {
@@ -49,5 +31,13 @@ public class OperationAmountAttribute extends OperationFormAttribute {
 
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    public String getCurrencyId() {
+        return currencyId;
+    }
+
+    public void setCurrencyId(String currencyId) {
+        this.currencyId = currencyId;
     }
 }

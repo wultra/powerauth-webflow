@@ -20,10 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationKeyValueAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationMessageAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,28 +85,10 @@ public class HomeController {
         OperationFormData formData = new OperationFormData();
         formData.setTitle("operation.title");
         formData.setMessage("operation.message");
-
-        OperationAmountAttribute amountAttr = new OperationAmountAttribute();
-        amountAttr.setLabel("operation.amount");
-        amountAttr.setCurrencyLabel("operation.currency");
-        amountAttr.setAmount(paymentForm.getAmount());
-        amountAttr.setCurrency(paymentForm.getCurrency());
-        formData.getParameters().add(amountAttr);
-
-        OperationKeyValueAttribute accountAttr = new OperationKeyValueAttribute();
-        accountAttr.setLabel("operation.account");
-        accountAttr.setValue(paymentForm.getAccount());
-        formData.getParameters().add(accountAttr);
-
-        OperationKeyValueAttribute dateAttr = new OperationKeyValueAttribute();
-        dateAttr.setLabel("operation.dueDate");
-        dateAttr.setValue(paymentForm.getDueDate());
-        formData.getParameters().add(dateAttr);
-
-        OperationMessageAttribute messageAttr = new OperationMessageAttribute();
-        messageAttr.setLabel("operation.note");
-        messageAttr.setMessage(paymentForm.getNote());
-        formData.getParameters().add(messageAttr);
+        formData.setAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
+        formData.addKeyValue("operation.account", paymentForm.getAccount());
+        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());
+        formData.setNote("operation.note", paymentForm.getNote());
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());

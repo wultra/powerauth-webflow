@@ -1,4 +1,6 @@
-package io.getlime.security.powerauth.lib.nextstep.model.entity;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+
+import io.getlime.security.powerauth.lib.nextstep.model.entity.BankAccountDetail;
 
 import java.util.List;
 
@@ -9,19 +11,10 @@ import java.util.List;
  */
 public class OperationBankAccountChoiceAttribute extends OperationFormAttribute {
 
-    private String label;
     private List<BankAccountDetail> bankAccounts;
 
     public OperationBankAccountChoiceAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public void setLabel(String label) {
-        this.label = label;
     }
 
     public List<BankAccountDetail> getBankAccounts() {

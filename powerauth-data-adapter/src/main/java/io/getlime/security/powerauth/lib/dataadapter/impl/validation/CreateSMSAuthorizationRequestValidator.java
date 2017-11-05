@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -75,17 +75,17 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
         String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
 
         if (amount == null) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
         } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.amount.invalid");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.invalid");
         }
 
         if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.currency.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.currency.empty");
         }
 
         if (account == null || account.isEmpty()) {
-            errors.rejectValue("requestObject.formData", "smsAuthorization.account.empty");
+            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.account.empty");
         }
 
     }

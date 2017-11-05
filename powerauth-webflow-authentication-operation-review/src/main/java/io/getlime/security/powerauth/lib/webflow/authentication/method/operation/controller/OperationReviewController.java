@@ -60,6 +60,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
     private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
+    private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -198,7 +199,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 List<BankAccount> bankAccountEntities = response.getResponseObject().getBankAccounts();
                 List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
                 if (!bankAccountDetails.isEmpty()) {
-                    formData.addBankAccountChoice("bankAccountChoice", bankAccountDetails, null);
+                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails);
                 }
                 formData.setDynamicDataLoaded(true);
             } catch (DataAdapterClientErrorException e) {
