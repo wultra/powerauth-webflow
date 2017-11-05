@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
@@ -64,11 +65,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
             try {
+                GetOperationDetailResponse operation = getOperation();
+                if (operation == null) {
+                    throw new AuthStepException("operation.notAvailable", new NullPointerException());
+                }
                 // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
                 // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
                 if ("login.authenticationFailed".equals(e.getError().getMessage())) {
-                    UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), null, null);
+                    UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
                     if (response.getResult() == AuthResult.FAILED) {
                         // FAILED result instead of CONTINUE means the authentication method is failed
                         throw new AuthStepException("authentication.maxAttemptsExceeded", e);
@@ -136,7 +141,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody UsernamePasswordAuthenticationResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            final GetOperationDetailResponse operation = getOperation();
+            if (operation == null) {
+                // when operation is no longer available (e.g. expired), auth method should fail
+                final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
+                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+                response.setMessage("operation.notAvailable");
+                return response;
+            }
+            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

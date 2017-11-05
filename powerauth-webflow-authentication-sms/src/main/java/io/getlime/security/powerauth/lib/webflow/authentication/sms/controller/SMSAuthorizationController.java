@@ -59,6 +59,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            throw new AuthStepException("operation.notAvailable", new NullPointerException());
+        }
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, authenticate() call should always fail
             return null;
@@ -75,7 +78,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         } catch (DataAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             try {
-                UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), operation.getUserId(), null);
+                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
                 if (response.getResult() == AuthResult.FAILED) {
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new AuthStepException("authentication.maxAttemptsExceeded", e);
@@ -100,6 +103,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() {
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            return operationNotAvailable();
+        }
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, initSMSAuthorization() call should always fail
@@ -181,8 +187,12 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() {
         try {
+            final GetOperationDetailResponse operation = getOperation();
             httpSession.removeAttribute(MESSAGE_ID);
-            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            if (operation == null) {
+                return operationNotAvailable();
+            }
+            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
@@ -196,4 +206,11 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         }
     }
 
+    private SMSAuthorizationResponse operationNotAvailable() {
+        // when operation is no longer available (e.g. expired), auth method should fail
+        final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
+        response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+        response.setMessage("operation.notAvailable");
+        return response;
+    }
 }

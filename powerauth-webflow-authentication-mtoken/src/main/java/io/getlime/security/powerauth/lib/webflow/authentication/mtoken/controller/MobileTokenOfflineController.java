@@ -79,6 +79,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            throw new AuthStepException("operation.notAvailable", new NullPointerException());
+        }
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled authenticate() call should always fail
             return null;
@@ -89,14 +92,14 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         String data = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), BaseEncoding.base64().decode(dataHash));
         VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), data, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
         if (signatureResponse.isSignatureValid()) {
-            String userId = getOperation().getUserId();
+            String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
                 return userId;
             }
         }
         // otherwise fail authorization
         try {
-            UpdateOperationResponse response = failAuthorization(getOperation().getOperationId(), getOperation().getUserId(), null);
+            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), null);
             if (response.getResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
                 throw new AuthStepException("authentication.maxAttemptsExceeded", null);
@@ -124,6 +127,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException, NextStepServiceException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            // when operation is no longer available (e.g. expired), auth method should fail
+            final QRCodeInitResponse response = new QRCodeInitResponse();
+            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+            response.setMessage("operation.notAvailable");
+            return response;
+        }
         if (!isAuthMethodAvailable(operation)) {
             // QR code cannot be generated when AuthMethod is disabled
             final QRCodeInitResponse response = new QRCodeInitResponse();
@@ -132,7 +142,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             return response;
         }
 
-        String userId = getOperation().getUserId();
+        String userId = operation.getUserId();
 
         // try to get activation from authMethod configuration
         String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
@@ -235,7 +245,15 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     @ResponseBody
     public QRCodeAuthenticationResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            GetOperationDetailResponse operation = getOperation();
+            if (operation == null) {
+                // when operation is no longer available (e.g. expired), auth method should fail
+                final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
+                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+                response.setMessage("operation.notAvailable");
+                return response;
+            }
+            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
@@ -257,6 +275,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      */
     private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException {
         GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            throw new QRCodeInvalidDataException("operation.notAvailable");
+        }
         String operationData = operation.getOperationData();
         String messageText = operation.getFormData().getMessage();
 
