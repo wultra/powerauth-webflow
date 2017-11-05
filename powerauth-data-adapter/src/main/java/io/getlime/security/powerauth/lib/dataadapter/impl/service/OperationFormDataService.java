@@ -18,14 +18,14 @@ public class OperationFormDataService {
 
     public OperationAmountAttribute getAmount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
-            throw new IllegalArgumentException("Argument formData is null");
+            throw new IllegalArgumentException("Argument formData is invalid");
         }
         return formData.getAmount();
     }
 
     public String getAccount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
-            throw new IllegalArgumentException("Argument formData is null");
+            throw new IllegalArgumentException("Argument formData is invalid");
         }
         OperationFormAttribute accountAttr = formData.getAttributeById(FIELD_ACCOUNT_ID);
         if (accountAttr == null) {
