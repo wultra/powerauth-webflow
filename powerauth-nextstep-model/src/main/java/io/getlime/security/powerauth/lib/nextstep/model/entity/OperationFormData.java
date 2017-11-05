@@ -137,7 +137,6 @@ public class OperationFormData {
         OperationBankAccountChoiceAttribute attr = new OperationBankAccountChoiceAttribute();
         attr.setLabel(label);
         attr.setBankAccounts(bankAccounts);
-        attr.setChosenBankAccountNumber(chosenBankAccountNumber);
         parameters.add(attr);
     }
 

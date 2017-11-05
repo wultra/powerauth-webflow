@@ -11,8 +11,6 @@ public class OperationBankAccountChoiceAttribute extends OperationFormAttribute 
 
     private String label;
     private List<BankAccountDetail> bankAccounts;
-    private String chosenBankAccountNumber;
-    private boolean choiceDisabled;
 
     public OperationBankAccountChoiceAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
@@ -34,19 +32,4 @@ public class OperationBankAccountChoiceAttribute extends OperationFormAttribute 
         this.bankAccounts = bankAccounts;
     }
 
-    public String getChosenBankAccountNumber() {
-        return chosenBankAccountNumber;
-    }
-
-    public void setChosenBankAccountNumber(String chosenBankAccountNumber) {
-        this.chosenBankAccountNumber = chosenBankAccountNumber;
-    }
-
-    public boolean isChoiceDisabled() {
-        return choiceDisabled;
-    }
-
-    public void setChoiceDisabled(boolean choiceDisabled) {
-        this.choiceDisabled = choiceDisabled;
-    }
 }

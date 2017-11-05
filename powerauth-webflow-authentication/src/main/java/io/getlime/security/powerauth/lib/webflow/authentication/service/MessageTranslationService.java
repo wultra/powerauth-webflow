@@ -35,6 +35,7 @@ import java.util.Map;
 public class MessageTranslationService {
 
     private final I18NService i18NService;
+    private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "chosenBankAccountNumber";
 
     public MessageTranslationService(I18NService i18NService) {
         this.i18NService = i18NService;
@@ -74,7 +75,7 @@ public class MessageTranslationService {
                     break;
                 case BANK_ACCOUNT_CHOICE:
                     OperationBankAccountChoiceAttribute bankAccountChoiceAttribute = (OperationBankAccountChoiceAttribute) attribute;
-                    valueMap.put(bankAccountChoiceAttribute.getLabel(), bankAccountChoiceAttribute.getChosenBankAccountNumber());
+                    valueMap.put(bankAccountChoiceAttribute.getLabel(), formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT));
                     bankAccountChoiceAttribute.setLabel(localize(bankAccountChoiceAttribute.getLabel()));
                     break;
             }
