@@ -14,51 +14,31 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
- * Response with operation detail.
- * @author Petr Dvorak, petr@lime-company.eu
+ * Request to set chosen authentication method.
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationReviewDetailResponse {
+public class UpdateOperationChosenAuthMethodRequest extends AuthStepRequest {
 
-    private String data;
-    private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
 
     /**
-     * Get data.
-     * @return Data.
+     * Default constructor.
      */
-    public String getData() {
-        return data;
+    public UpdateOperationChosenAuthMethodRequest() {
     }
 
     /**
-     * Set data.
-     * @param data Data.
+     * Constructor with chosen authentication method.
+     * @param chosenAuthMethod Chosen authentication method.
      */
-    public void setData(String data) {
-        this.data = data;
-    }
-
-    /**
-     * Get form data.
-     * @return Form data.
-     */
-    public OperationFormData getFormData() {
-        return formData;
-    }
-
-    /**
-     * Set form data.
-     * @param formData Form data.
-     */
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
+    public UpdateOperationChosenAuthMethodRequest(AuthMethod chosenAuthMethod) {
+        this.chosenAuthMethod = chosenAuthMethod;
     }
 
     /**

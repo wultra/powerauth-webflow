@@ -129,6 +129,12 @@ public class OperationController {
             response.getHistory().add(h);
         }
 
+        // set chosen authentication method
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory != null) {
+            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
 
@@ -174,7 +180,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with given ID with a previous authentication step result.
+     * Update operation with updated formData.
      *
      * @param request Update operation request.
      * @return Update operation response.
@@ -183,6 +189,18 @@ public class OperationController {
     public @ResponseBody ObjectResponse updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) {
         // persist operation form data update
         operationPersistenceService.updateFormData(request.getRequestObject());
+        return new ObjectResponse();
+    }
+
+    /**
+     * Update operation with chosen authentication method.
+     * @param request Update operation request.
+     * @return Update operation response.
+     */
+    @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
+    public @ResponseBody ObjectResponse updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) {
+        // persist operation form data update
+        operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         return new ObjectResponse();
     }
 

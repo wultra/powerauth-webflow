@@ -191,6 +191,13 @@ public class NextStepClient {
         }
     }
 
+    /**
+     * Update operation formData.
+     * @param operationId Operation ID.
+     * @param formData Form Data.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when update request fails.
+     */
     public ObjectResponse updateOperationFormData(String operationId, OperationFormData formData) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
@@ -199,6 +206,30 @@ public class NextStepClient {
             request.setFormData(formData);
             HttpEntity<ObjectRequest<UpdateFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/operation/formData", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update chosen authentication method for current operation step.
+     * @param operationId Operation ID.
+     * @param chosenAuthMethod Chosen authentication method.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when update request fails.
+     */
+    public ObjectResponse updateChosenAuthMethod(String operationId, AuthMethod chosenAuthMethod) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateChosenAuthMethodRequest request = new UpdateChosenAuthMethodRequest();
+            request.setOperationId(operationId);
+            request.setChosenAuthMethod(chosenAuthMethod);
+            HttpEntity<ObjectRequest<UpdateChosenAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/operation/chosenAuthMethod", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

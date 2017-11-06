@@ -46,14 +46,6 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
-        case "CHOOSE_AUTH_METHOD": {
-            return {
-                ...state,
-                // do not change the current screen
-                currentScreen: state.currentScreen,
-                context: mergeContext(action.type, state.context, action.payload)
-            };
-        }
     }
     return state;
 }
@@ -86,9 +78,6 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
         case "CHANGE_ACTIVATION":
             changeActivation(oldContext, newContext);
-            break;
-        case "CHOOSE_AUTH_METHOD":
-            chooseAuthMethod(oldContext, newContext);
             break;
     }
     return newContext;
@@ -132,26 +121,4 @@ function changeActivation(oldContext, newContext) {
         }
     }
     newContext.formData.userInput.chosenActivationId = chosenActivationId;
-}
-
-function chooseAuthMethod(oldContext, newContext) {
-    const chosenAuthMethod = newContext.chosenAuthMethod;
-    // copy all oldContext properties into newContext except for chosenAuthMethod, which should be taken from newContext
-    for (const prop in oldContext) {
-        if (oldContext.hasOwnProperty(prop)) {
-            newContext[prop] = oldContext[prop];
-        }
-    }
-    const chosenBankAccountNumber = newContext.formData.userInput.chosenBankAccountNumber;
-    if (chosenBankAccountNumber) {
-        // freeze the bank account choice at this point (in case there exists a BANK_ACCOUNT_CHOICE attribute)
-        newContext.formData.parameters.map((item) => {
-            if (item.type === "BANK_ACCOUNT_CHOICE") {
-                item.choiceDisabled = true;
-                item.chosenBankAccountNumber = chosenBankAccountNumber;
-            }
-        });
-    }
-    // set chosen authMethod
-    newContext.formData.userInput.chosenAuthMethod = chosenAuthMethod;
 }
