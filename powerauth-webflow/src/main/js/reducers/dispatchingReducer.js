@@ -87,9 +87,6 @@ function mergeContext(actionType, oldContext, newContext) {
         case "CHANGE_ACTIVATION":
             changeActivation(oldContext, newContext);
             break;
-        case "CHOOSE_AUTH_METHOD":
-            chooseAuthMethod(oldContext, newContext);
-            break;
     }
     return newContext;
 }
