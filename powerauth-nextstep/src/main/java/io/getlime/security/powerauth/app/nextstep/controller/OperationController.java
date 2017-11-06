@@ -207,7 +207,7 @@ public class OperationController {
     /**
      * In case operation entity has serialized form data, attempt to deserialize the
      * object and assign it to the response with operation detail.
-     * @param response Reponse to be enriched by operation detail.
+     * @param response Response to be enriched by operation detail.
      * @param operation Database entity representing operation.
      */
     private void assignFormData(GetOperationDetailResponse response, OperationEntity operation) {

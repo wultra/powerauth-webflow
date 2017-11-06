@@ -46,6 +46,14 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
+        case "CHOOSE_AUTH_METHOD": {
+            return {
+                ...state,
+                // do not change the current screen
+                currentScreen: state.currentScreen,
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
     }
     return state;
 }
@@ -78,6 +86,9 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
         case "CHANGE_ACTIVATION":
             changeActivation(oldContext, newContext);
+            break;
+        case "CHOOSE_AUTH_METHOD":
+            chooseAuthMethod(oldContext, newContext);
             break;
     }
     return newContext;

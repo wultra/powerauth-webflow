@@ -21,8 +21,8 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationF
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.repository.SMSAuthorizationRepository;
 import io.getlime.security.powerauth.lib.dataadapter.repository.model.entity.SMSAuthorizationEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountAttribute;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;

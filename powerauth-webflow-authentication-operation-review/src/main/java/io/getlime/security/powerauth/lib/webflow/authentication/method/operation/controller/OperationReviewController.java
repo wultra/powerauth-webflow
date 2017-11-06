@@ -61,6 +61,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
     private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
+    private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -74,12 +75,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            throw new AuthStepException("operation.notAvailable", new NullPointerException());
+        }
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled authenticate() call should always fail
             return null;
         }
         //TODO: Check pre-authenticated user here
-        return getOperation().getUserId();
+        return operation.getUserId();
     }
 
     @Override
@@ -144,7 +148,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody OperationReviewResponse cancelAuthentication() {
         try {
-            cancelAuthorization(getOperation().getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            GetOperationDetailResponse operation = getOperation();
+            if (operation == null) {
+                // when operation is no longer available (e.g. expired), auth method should fail
+                final OperationReviewResponse response = new OperationReviewResponse();
+                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+                response.setMessage("operation.notAvailable");
+                return response;
+            }
+            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
@@ -158,9 +170,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
-    public @ResponseBody
-    UpdateOperationFormDataResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) {
+    public @ResponseBody UpdateOperationFormDataResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) {
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            // when operation is no longer available (e.g. expired), auth method should fail
+            final UpdateOperationFormDataResponse response = new UpdateOperationFormDataResponse();
+            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+            response.setMessage("operation.notAvailable");
+            return response;
+        }
         try {
             // update formData in Next Step server
             nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
@@ -209,7 +227,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 List<BankAccount> bankAccountEntities = response.getResponseObject().getBankAccounts();
                 List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
                 if (!bankAccountDetails.isEmpty()) {
-                    formData.addBankAccountChoice("bankAccountChoice", bankAccountDetails, null);
+                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails);
                 }
                 formData.setDynamicDataLoaded(true);
             } catch (DataAdapterClientErrorException e) {

@@ -294,9 +294,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             String userId = authenticate(request);
             UpdateOperationResponse responseObject;
             if (userId == null) {
+                GetOperationDetailResponse operation = getOperation();
+                if (operation == null) {
+                    // operation is not available
+                    return provider.failedAuthentication(null, "operation.notAvailable");
+                }
                 // user was not authenticated - fail authorization
                 authenticationManagementService.clearContext();
-                responseObject = failAuthorization(getOperation().getOperationId(), null, null);
+                responseObject = failAuthorization(operation.getOperationId(), null, null);
             } else {
                 // user was authenticated - complete authorization
                 String operationId = authenticationManagementService.updateAuthenticationWithUserId(userId);
@@ -331,6 +336,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected void authenticateCurrentBrowserSession() {
         authenticationManagementService.authenticateCurrentSession();
         final GetOperationDetailResponse operation = getOperation();
+        if (operation == null) {
+            throw new IllegalStateException("operation.notAvailable");
+        }
         if (AuthResult.DONE.equals(operation.getResult())) {
             authenticationManagementService.pendingAuthenticationToAuthentication();
         }

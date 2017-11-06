@@ -24,23 +24,4 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
  */
 public class InitOperationRequest extends AuthStepRequest {
 
-    private String operationId;
-
-    /**
-     * Get operation ID.
-     *
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     *
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
 }

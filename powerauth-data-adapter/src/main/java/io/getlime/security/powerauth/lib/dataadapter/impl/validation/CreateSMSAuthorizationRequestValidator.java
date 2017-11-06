@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
