@@ -19,7 +19,6 @@ import {dispatchError} from "../dispatcher/dispatcher";
 export function getOperationData() {
     return function (dispatch) {
         axios.get("./api/auth/operation/detail").then((response) => {
-            console.log(response.data);
             if (response.data.chosenAuthMethod) {
                 // if authMethod is already chosen, skip choice and go directly to the authMethod
                 switch (response.data.chosenAuthMethod) {
