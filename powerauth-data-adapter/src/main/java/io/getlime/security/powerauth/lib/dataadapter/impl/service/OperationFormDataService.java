@@ -1,9 +1,9 @@
 package io.getlime.security.powerauth.lib.dataadapter.impl.service;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationKeyValueAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationKeyValueFieldAttribute;
 import org.springframework.stereotype.Service;
 
 /**
@@ -14,33 +14,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class OperationFormDataService {
 
-    private static final String LABEL_TO_ACCOUNT = "To Account";
+    private static final String FIELD_ACCOUNT_ID = "operation.account";
 
-    public OperationAmountAttribute getAmount(OperationFormData formData) {
+    public OperationAmountFieldAttribute getAmount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
-            throw new IllegalArgumentException("Argument formData is invalid.");
+            throw new IllegalArgumentException("Argument formData is invalid");
         }
-        for (OperationFormAttribute attribute: formData.getParameters()) {
-            if (attribute.getType()==OperationFormAttribute.Type.AMOUNT) {
-                return (OperationAmountAttribute) attribute;
-            }
-        }
-        return null;
+        return formData.getAmount();
     }
 
     public String getAccount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
-            throw new IllegalArgumentException("Argument formData is invalid.");
+            throw new IllegalArgumentException("Argument formData is invalid");
         }
-        for (OperationFormAttribute attribute: formData.getParameters()) {
-            if (attribute.getType()==OperationFormAttribute.Type.KEY_VALUE) {
-                OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
-                if (keyValueAttribute.getLabel().equals(LABEL_TO_ACCOUNT)) {
-                    return keyValueAttribute.getValue();
-                }
-            }
+        OperationFormFieldAttribute accountAttr = formData.getAttributeById(FIELD_ACCOUNT_ID);
+        if (accountAttr == null) {
+            return null;
         }
-        return null;
+        if (!(accountAttr instanceof OperationKeyValueFieldAttribute)) {
+            throw new IllegalStateException("Invalid account in formData");
+        }
+        return ((OperationKeyValueFieldAttribute)accountAttr).getValue();
     }
 
 }

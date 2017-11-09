@@ -142,16 +142,6 @@ function chooseAuthMethod(oldContext, newContext) {
             newContext[prop] = oldContext[prop];
         }
     }
-    const chosenBankAccountNumber = newContext.formData.userInput.chosenBankAccountNumber;
-    if (chosenBankAccountNumber) {
-        // freeze the bank account choice at this point (in case there exists a BANK_ACCOUNT_CHOICE attribute)
-        newContext.formData.parameters.map((item) => {
-            if (item.type === "BANK_ACCOUNT_CHOICE") {
-                item.choiceDisabled = true;
-                item.chosenBankAccountNumber = chosenBankAccountNumber;
-            }
-        });
-    }
     // set chosen authMethod
     newContext.formData.userInput.chosenAuthMethod = chosenAuthMethod;
 }

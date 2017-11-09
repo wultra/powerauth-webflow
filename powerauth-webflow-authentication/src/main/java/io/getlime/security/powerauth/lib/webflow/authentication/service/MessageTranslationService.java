@@ -16,7 +16,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
@@ -35,13 +36,14 @@ import java.util.Map;
 public class MessageTranslationService {
 
     private final I18NService i18NService;
+    private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "chosenBankAccountNumber";
 
     public MessageTranslationService(I18NService i18NService) {
         this.i18NService = i18NService;
     }
 
     /**
-     * Translates formData strings.
+     * Translate formData strings.
      *
      * @param formData Form data.
      */
@@ -49,63 +51,100 @@ public class MessageTranslationService {
         if (formData==null) {
             return;
         }
-        // Generate localization strings for payment message
-        Map<String, String> valueMap = new HashMap<>();
-        for (OperationFormAttribute attribute: formData.getParameters()) {
-            switch (attribute.getType()) {
-                case AMOUNT:
-                    OperationAmountAttribute amountAttribute = (OperationAmountAttribute) attribute;
-                    String amount = amountAttribute.getAmount().toPlainString();
-                    String currency = amountAttribute.getCurrency();
-                    valueMap.put(amountAttribute.getLabel(), amount);
-                    valueMap.put(amountAttribute.getCurrencyLabel(), currency);
-                    amountAttribute.setLabel(localize(amountAttribute.getLabel()));
-                    amountAttribute.setCurrencyLabel(localize(amountAttribute.getCurrencyLabel()));
-                    break;
-                case KEY_VALUE:
-                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
-                    valueMap.put(keyValueAttribute.getLabel(), keyValueAttribute.getValue());
-                    keyValueAttribute.setLabel(localize(keyValueAttribute.getLabel()));
-                    break;
-                case MESSAGE:
-                    OperationMessageAttribute messageAttribute = (OperationMessageAttribute) attribute;
-                    valueMap.put(messageAttribute.getLabel(), messageAttribute.getMessage());
-                    messageAttribute.setLabel(localize(messageAttribute.getLabel()));
-                    break;
-                case BANK_ACCOUNT_CHOICE:
-                    OperationBankAccountChoiceAttribute bankAccountChoiceAttribute = (OperationBankAccountChoiceAttribute) attribute;
-                    valueMap.put(bankAccountChoiceAttribute.getLabel(), bankAccountChoiceAttribute.getChosenBankAccountNumber());
-                    bankAccountChoiceAttribute.setLabel(localize(bankAccountChoiceAttribute.getLabel()));
-                    break;
+
+        // Localize labels for form fields.
+        localizeFormFields(formData);
+
+        Map<String, String> idValueMap = createIdValueMap(formData);
+
+        // Translate title using the {id} notation
+        OperationFormAttribute title = formData.getTitle();
+        if (title != null) {
+            String titleLabel = localize(title.getId());
+            if (titleLabel != null) {
+                String translatedTitle = translateMessage(titleLabel, idValueMap);
+                formData.addTitle(title.getId(), translatedTitle);
             }
         }
 
-        String messageToTranslate = localize(formData.getMessage());
-        String translatedMessage = translatedMessage(messageToTranslate, valueMap);
-        formData.setMessage(translatedMessage);
-
-        String titleToTranslate = localize(formData.getTitle());
-        String translatedTitle = translatedMessage(titleToTranslate, valueMap);
-        formData.setTitle(translatedTitle);
+        // Translate title message the {id} notation
+        OperationFormAttribute message = formData.getMessage();
+        if (message != null) {
+            String messageLabel = localize(message.getId());
+            if (messageLabel != null) {
+                String translatedMessage = translateMessage(messageLabel, idValueMap);
+                formData.addMessage(message.getId(), translatedMessage);
+            }
+        }
     }
 
     /**
-     * Localizes the text by i18n key.
-     * @param i18nkey I18n key.
+     * Localize form fields.
+     * @param formData Form data.
+     */
+    private void localizeFormFields(OperationFormData formData) {
+        for (OperationFormFieldAttribute attribute: formData.getParameters()) {
+            String localizedValue = localize(attribute.getId());
+            attribute.setLabel(localizedValue);
+        }
+    }
+
+    /**
+     * Create ID-Value map for operation form fields.
+     * @param formData Form data
+     * @return ID-Value map.
+     */
+    private Map<String, String> createIdValueMap(OperationFormData formData) {
+        Map<String, String> idValueMap = new HashMap<>();
+        for (OperationFormFieldAttribute attribute: formData.getParameters()) {
+            String value = null;
+            switch (attribute.getType()) {
+                case AMOUNT:
+                    OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
+                    value = amountAttribute.getAmount().toPlainString();
+                    // special handling for translation of currency value
+                    idValueMap.put(amountAttribute.getCurrencyId(), amountAttribute.getCurrency());
+                    break;
+                case NOTE:
+                    OperationNoteFieldAttribute messageAttribute = (OperationNoteFieldAttribute) attribute;
+                    value = messageAttribute.getNote();
+                    break;
+                case BANK_ACCOUNT_CHOICE:
+                    value = formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT);
+                    break;
+                case KEY_VALUE:
+                    OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
+                    value = keyValueAttribute.getValue();
+                    break;
+            }
+            idValueMap.put(attribute.getId(), value);
+        }
+        return idValueMap;
+    }
+
+    /**
+     * Localize the text by i18n key.
+     * @param i18nKey I18n key.
      * @return Localized text.
      */
-    private String localize(String i18nkey) {
+    private String localize(String i18nKey) {
+        if (i18nKey == null) {
+            throw new IllegalArgumentException("Missing i18n key");
+        }
         final AbstractMessageSource messageSource = i18NService.getMessageSource();
-        return messageSource.getMessage(i18nkey, null, LocaleContextHolder.getLocale());
+        return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
     }
 
     /**
-     * Parses the message and resolves strings using the {variableName} notation.
+     * Parse the message and resolve strings using the {id} notation.
      * @param message Message to parse.
      * @param valueMap Key-value map for translation.
      * @return Translated message.
      */
-    private String translatedMessage(String message, Map<String, String> valueMap) {
+    private String translateMessage(String message, Map<String, String> valueMap) {
+        if (message == null) {
+            return null;
+        }
         CharacterIterator iterator = new StringCharacterIterator(message);
         StringBuilder messageBuilder = new StringBuilder();
         StringBuilder keyBuilder = new StringBuilder();

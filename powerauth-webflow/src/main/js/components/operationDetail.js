@@ -56,7 +56,7 @@ export default class OperationDetail extends React.Component {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (this.props.context.formData.userInput.chosenBankAccountNumber) {
+                    if (this.props.context.formData.userInput.bankAccountChosen) {
                         // bank account has already been chosen
                         this.resolveChosenBankAccount(item.bankAccounts, this.props.context.formData.userInput.chosenBankAccountNumber);
                         this.setBankAccountChoiceDisabled(true);
@@ -96,14 +96,14 @@ export default class OperationDetail extends React.Component {
             return (
                 <div>
                     <div className="operation-approve content-wrap">
-                        <h3>{this.props.context.formData.title}</h3>
-                        <p>{this.props.context.formData.message}</p>
+                        <h3>{this.props.context.formData.title.value}</h3>
+                        <p>{this.props.context.formData.message.value}</p>
                     </div>
                     <div>
                         {this.props.context.formData.parameters.map((item) => {
                             if (item.type === "AMOUNT") {
                                 return (
-                                    <div className="row attribute" key={item.label}>
+                                    <div className="row attribute" key={item.id}>
                                         <div className="col-sm-6 key">
                                             {item.label}
                                         </div>
@@ -114,7 +114,7 @@ export default class OperationDetail extends React.Component {
                                 )
                             } else if (item.type === "KEY_VALUE") {
                                 return (
-                                    <div className="row attribute" key={item.label}>
+                                    <div className="row attribute" key={item.id}>
                                         <div className="col-sm-6 key">
                                             {item.label}
                                         </div>
@@ -123,12 +123,12 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     </div>
                                 )
-                            } else if (item.type === "MESSAGE") {
+                            } else if (item.type === "NOTE") {
                                 return (
-                                    <div className="row attribute" key={item.label}>
+                                    <div className="row attribute" key={item.id}>
                                         <div className="col-sm-12">
                                             <div className="key">{item.label}</div>
-                                            <div className="value">{item.message}</div>
+                                            <div className="value">{item.note}</div>
                                         </div>
                                     </div>
                                 )
@@ -136,16 +136,16 @@ export default class OperationDetail extends React.Component {
                                 if (!item.bankAccounts || item.bankAccounts.length === 0) {
                                     // no bank account is available - display error
                                     return (
-                                        <div className={'message-error'} key={item.label}>
+                                        <div className={'message-error'} key={item.id}>
                                             <FormattedMessage id="operationReview.bankAccountsMissing"/>
                                         </div>
                                     )
                                 } else {
                                     return (
-                                        <div key={item.label} className="row attribute">
+                                        <div key={item.id} className="row attribute">
                                             <div className="col-sm-12">
                                                 <div className="key">
-                                                    <FormattedMessage id="operationReview.bankAccount.number"/>
+                                                    <FormattedMessage id={item.label}/>
                                                 </div>
                                                 <div className="value">
                                                     {(this.state.bankAccounts && this.state.chosenBankAccount) ? (

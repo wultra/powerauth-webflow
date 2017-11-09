@@ -279,7 +279,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             throw new QRCodeInvalidDataException("operation.notAvailable");
         }
         String operationData = operation.getOperationData();
-        String messageText = operation.getFormData().getMessage();
+        String messageText = operation.getFormData().getMessage().getValue();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 

@@ -54,6 +54,8 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the token screen
         if (this.props.context.formData) {
             this.props.dispatch(chooseAuthMethod("POWERAUTH_TOKEN"));
+            // bank account choice is frozen
+            this.props.context.formData.userInput.bankAccountChosen = true;
             this.props.dispatch(updateFormData(this.props.context.formData, function () {
                 // change screen after form data are stored
                 switchToTokenScreen();
@@ -77,6 +79,8 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the sms screen
         if (this.props.context.formData) {
             this.props.dispatch(chooseAuthMethod("SMS_KEY"));
+            // bank account choice is frozen
+            this.props.context.formData.userInput.bankAccountChosen = true;
             this.props.dispatch(updateFormData(this.props.context.formData, function () {
                 // change screen after formData are stored
                 switchToSMSScreen();
@@ -126,7 +130,6 @@ export default class OperationReview extends React.Component {
                                                             </div>
                                                         </div>
                                                     );
-                                                    break;
                                                 case "SMS_KEY":
                                                     return (
                                                         <div className="attribute row" key={authMethod}>
@@ -138,7 +141,6 @@ export default class OperationReview extends React.Component {
                                                             </div>
                                                         </div>
                                                     );
-                                                    break;
                                             }
                                         })}
                                         <div className="attribute row">

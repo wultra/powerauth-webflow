@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationAmountAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
@@ -69,7 +69,7 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
             errors.rejectValue("requestObject.operationName", "smsAuthorization.operationName.long");
         }
 
-        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
+        OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
         BigDecimal amount = amountAttribute.getAmount();
         String currency = amountAttribute.getCurrency();
         String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
