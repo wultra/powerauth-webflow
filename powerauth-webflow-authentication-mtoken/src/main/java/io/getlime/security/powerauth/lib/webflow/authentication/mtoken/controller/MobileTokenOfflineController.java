@@ -258,7 +258,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException {
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
-        String messageText = operation.getFormData().getMessage();
+        String messageText = operation.getFormData().getMessage().getValue();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 

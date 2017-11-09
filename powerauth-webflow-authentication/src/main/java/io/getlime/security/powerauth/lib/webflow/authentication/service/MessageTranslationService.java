@@ -51,72 +51,75 @@ public class MessageTranslationService {
         if (formData==null) {
             return;
         }
-        OperationTitleAttribute title = null;
-        OperationMessageAttribute message = null;
-        Map<String, String> valueMap = new HashMap<>();
-        // Set localized labels and find title and message attributes
-        for (OperationFormAttribute attribute: formData.getParameters()) {
-            String id = null;
+
+        // Localize labels for form fields.
+        localizeFormFields(formData);
+
+        Map<String, String> idValueMap = createIdValueMap(formData);
+
+        // Translate title using the {id} notation
+        OperationFormAttribute title = formData.getTitle();
+        if (title != null) {
+            String titleLabel = localize(title.getId());
+            if (titleLabel != null) {
+                String translatedTitle = translateMessage(titleLabel, idValueMap);
+                formData.addTitle(title.getId(), translatedTitle);
+            }
+        }
+
+        // Translate title message the {id} notation
+        OperationFormAttribute message = formData.getMessage();
+        if (message != null) {
+            String messageLabel = localize(message.getId());
+            if (messageLabel != null) {
+                String translatedMessage = translateMessage(messageLabel, idValueMap);
+                formData.addMessage(message.getId(), translatedMessage);
+            }
+        }
+    }
+
+    /**
+     * Localize form fields.
+     * @param formData Form data.
+     */
+    private void localizeFormFields(OperationFormData formData) {
+        for (OperationFormFieldAttribute attribute: formData.getParameters()) {
+            String localizedValue = localize(attribute.getId());
+            attribute.setLabel(localizedValue);
+        }
+    }
+
+    /**
+     * Create ID-Value map for operation form fields.
+     * @param formData Form data
+     * @return ID-Value map.
+     */
+    private Map<String, String> createIdValueMap(OperationFormData formData) {
+        Map<String, String> idValueMap = new HashMap<>();
+        for (OperationFormFieldAttribute attribute: formData.getParameters()) {
             String value = null;
             switch (attribute.getType()) {
-                case TITLE:
-                    OperationTitleAttribute titleAttribute = (OperationTitleAttribute) attribute;
-                    id = titleAttribute.getId();
-                    value = titleAttribute.getTitle();
-                    break;
-                case MAIN_MESSAGE:
-                    OperationMessageAttribute noteAttribute = (OperationMessageAttribute) attribute;
-                    id = noteAttribute.getId();
-                    value = noteAttribute.getMessage();
-                    break;
                 case AMOUNT:
-                    OperationAmountAttribute amountAttribute = (OperationAmountAttribute) attribute;
-                    id = amountAttribute.getId();
+                    OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
                     value = amountAttribute.getAmount().toPlainString();
                     // special handling for translation of currency value
-                    valueMap.put(amountAttribute.getCurrencyId(), amountAttribute.getCurrency());
+                    idValueMap.put(amountAttribute.getCurrencyId(), amountAttribute.getCurrency());
                     break;
-                case MESSAGE:
-                    OperationNoteAttribute messageAttribute = (OperationNoteAttribute) attribute;
-                    id = messageAttribute.getId();
-                    value = messageAttribute.getMessage();
+                case NOTE:
+                    OperationNoteFieldAttribute messageAttribute = (OperationNoteFieldAttribute) attribute;
+                    value = messageAttribute.getNote();
                     break;
                 case BANK_ACCOUNT_CHOICE:
-                    OperationBankAccountChoiceAttribute bankAccountChoiceAttribute = (OperationBankAccountChoiceAttribute) attribute;
-                    id = bankAccountChoiceAttribute.getId();
                     value = formData.getUserInput().get(CHOSEN_BANK_ACCOUNT_NUMBER_INPUT);
                     break;
                 case KEY_VALUE:
-                    OperationKeyValueAttribute keyValueAttribute = (OperationKeyValueAttribute) attribute;
-                    id = keyValueAttribute.getId();
+                    OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
                     value = keyValueAttribute.getValue();
                     break;
             }
-            if (id != null) {
-                valueMap.put(id, value);
-                String localizedValue = localize(id);
-                attribute.setLabel(localizedValue);
-            }
-            switch (attribute.getType()) {
-                case TITLE:
-                    title = (OperationTitleAttribute) attribute;
-                    break;
-                case MAIN_MESSAGE:
-                    message = (OperationMessageAttribute) attribute;
-                    break;
-            }
+            idValueMap.put(attribute.getId(), value);
         }
-
-        // Attributes title and message support substitution using the {id} notation
-        if (title != null && title.getLabel() != null) {
-            String translatedTitle = translateMessage(title.getLabel(), valueMap);
-            formData.setTitle(title.getId(), translatedTitle);
-        }
-
-        if (message != null && message.getLabel() != null) {
-            String translatedMessage = translateMessage(message.getLabel(), valueMap);
-            formData.setMessage(message.getId(), translatedMessage);
-        }
+        return idValueMap;
     }
 
     /**

@@ -3,17 +3,17 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 import java.math.BigDecimal;
 
 /**
- * Class representing an operation display attribute for transaction amount.
+ * Class representing an operation display attribute for transaction amount and currency.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationAmountAttribute extends OperationFormAttribute {
+public class OperationAmountFieldAttribute extends OperationFormFieldAttribute {
 
     private BigDecimal amount;
     private String currency;
     private String currencyId;
 
-    public OperationAmountAttribute() {
+    public OperationAmountFieldAttribute() {
         this.type = Type.AMOUNT;
     }
 

@@ -1,15 +1,15 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 /**
- * Class representing an operation display attribute for generic key-value pair.
+ * Class representing an operation form field attribute for generic key-value pair.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationKeyValueAttribute extends OperationFormAttribute {
+public class OperationKeyValueFieldAttribute extends OperationFormFieldAttribute {
 
     private String value;
 
-    public OperationKeyValueAttribute() {
+    public OperationKeyValueFieldAttribute() {
         this.type = Type.KEY_VALUE;
     }
 

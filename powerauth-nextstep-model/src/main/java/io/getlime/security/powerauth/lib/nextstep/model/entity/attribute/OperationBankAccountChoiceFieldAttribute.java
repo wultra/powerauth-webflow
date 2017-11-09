@@ -5,15 +5,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.BankAccountDetail
 import java.util.List;
 
 /**
- * Class representing a bank account choice form attribute.
+ * Class representing a bank account choice form field attribute.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationBankAccountChoiceAttribute extends OperationFormAttribute {
+public class OperationBankAccountChoiceFieldAttribute extends OperationFormFieldAttribute {
 
     private List<BankAccountDetail> bankAccounts;
 
-    public OperationBankAccountChoiceAttribute() {
+    public OperationBankAccountChoiceFieldAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 

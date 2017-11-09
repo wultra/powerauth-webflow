@@ -33,7 +33,6 @@ import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Default Spring Web MVC configuration.
@@ -75,7 +74,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public LocaleResolver localeResolver() {
         CookieLocaleResolver resolver = new CookieLocaleResolver();
         resolver.setCookieName("lang");
-        resolver.setDefaultLocale(Locale.ENGLISH);
         return resolver;
     }
 
