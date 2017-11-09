@@ -19,7 +19,6 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.operatio
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthMethodChoice;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
@@ -32,9 +31,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.OperationReviewRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
@@ -100,6 +101,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             OperationReviewDetailResponse response = new OperationReviewDetailResponse();
             response.setData(operation.getOperationData());
             response.setFormData(loadFormData(operation));
+            response.setChosenAuthMethod(operation.getChosenAuthMethod());
             return response;
         } else {
             return null;
@@ -190,15 +192,24 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
                 dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
             }
-            if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_AUTH_METHOD)) {
-                AuthMethodChoice authMethodChoice = new AuthMethodChoice();
-                String chosenAuthMethod = request.getFormData().getUserInput().get(FIELD_CHOSEN_AUTH_METHOD);
-                authMethodChoice.setChosenAuthMethod(AuthMethodChoice.ChosenAuthMethod.valueOf(chosenAuthMethod));
-                dataAdapterClient.formDataChangedNotification(authMethodChoice, operation.getUserId(), operation.getOperationId());
-            }
             return new UpdateOperationFormDataResponse();
         } catch (NextStepServiceException | DataAdapterClientErrorException e) {
             final UpdateOperationFormDataResponse response = new UpdateOperationFormDataResponse();
+            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
+            response.setMessage(e.getMessage());
+            return response;
+        }
+    }
+
+    @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
+    public @ResponseBody AuthStepResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) {
+        final GetOperationDetailResponse operation = getOperation();
+        try {
+            // update chosenAuthMethod in Next Step server
+            nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
+            return new AuthStepResponse();
+        } catch (NextStepServiceException e) {
+            final AuthStepResponse response = new AuthStepResponse();
             response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
             response.setMessage(e.getMessage());
             return response;

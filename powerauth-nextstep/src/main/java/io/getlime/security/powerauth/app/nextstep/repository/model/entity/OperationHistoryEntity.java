@@ -65,6 +65,10 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "response_timestamp_expires")
     private Date responseTimestampExpires;
 
+    @Column(name = "chosen_auth_method")
+    @Enumerated(EnumType.STRING)
+    private AuthMethod chosenAuthMethod;
+
     @ManyToOne
     @JoinColumn(name = "operation_id", insertable = false, updatable = false)
     private OperationEntity operation;
@@ -146,6 +150,14 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setResponseTimestampExpires(Date responseTimestampExpires) {
         this.responseTimestampExpires = responseTimestampExpires;
+    }
+
+    public AuthMethod getChosenAuthMethod() {
+        return chosenAuthMethod;
+    }
+
+    public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
+        this.chosenAuthMethod = chosenAuthMethod;
     }
 
     /**

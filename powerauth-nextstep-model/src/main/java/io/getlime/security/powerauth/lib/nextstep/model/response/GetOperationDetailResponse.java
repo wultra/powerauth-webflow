@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 import java.util.ArrayList;
@@ -41,6 +42,7 @@ public class GetOperationDetailResponse {
     private List<AuthStep> steps;
     private List<OperationHistory> history;
     private OperationFormData formData;
+    private AuthMethod chosenAuthMethod;
 
     /**
      * Default constructor.
@@ -203,4 +205,19 @@ public class GetOperationDetailResponse {
         this.formData = formData;
     }
 
+    /**
+     * Get chosen authentication method.
+     * @return Chosen authentication method.
+     */
+    public AuthMethod getChosenAuthMethod() {
+        return chosenAuthMethod;
+    }
+
+    /**
+     * Set chosen authentication method.
+     * @param chosenAuthMethod Chosen authentication method.
+     */
+    public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
+        this.chosenAuthMethod = chosenAuthMethod;
+    }
 }

@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {cancel, chooseAuthMethod, getOperationData, updateFormData} from "../actions/operationReviewActions";
+import {cancel, getOperationData, updateOperation} from "../actions/operationReviewActions";
 // Components
 import {Panel} from "react-bootstrap";
 import Spinner from 'react-spin';
@@ -53,11 +53,10 @@ export default class OperationReview extends React.Component {
         const switchToTokenScreen = this.switchToTokenScreen;
         // choose authMethod and send updated formData, then move to the token screen
         if (this.props.context.formData) {
-            this.props.dispatch(chooseAuthMethod("POWERAUTH_TOKEN"));
             // bank account choice is frozen
             this.props.context.formData.userInput.bankAccountChosen = true;
-            this.props.dispatch(updateFormData(this.props.context.formData, function () {
-                // change screen after form data are stored
+            this.props.dispatch(updateOperation(this.props.context.formData, "POWERAUTH_TOKEN", function () {
+                // change screen after form data and chosen authentication method are stored
                 switchToTokenScreen();
             }));
         }
@@ -78,11 +77,10 @@ export default class OperationReview extends React.Component {
         const switchToSMSScreen = this.switchToSMSScreen;
         // choose authMethod and send updated formData, then move to the sms screen
         if (this.props.context.formData) {
-            this.props.dispatch(chooseAuthMethod("SMS_KEY"));
             // bank account choice is frozen
             this.props.context.formData.userInput.bankAccountChosen = true;
-            this.props.dispatch(updateFormData(this.props.context.formData, function () {
-                // change screen after formData are stored
+            this.props.dispatch(updateOperation(this.props.context.formData, "SMS_KEY", function () {
+                // change screen after formData and chosen authentication method are stored
                 switchToSMSScreen();
             }));
         }

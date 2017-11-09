@@ -13,52 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package io.getlime.security.powerauth.lib.nextstep.model.request;
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response;
-
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
- * Response with operation detail.
- * @author Petr Dvorak, petr@lime-company.eu
+ * Request object used for updating chosen authentication method.
+ *
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationReviewDetailResponse {
+public class UpdateChosenAuthMethodRequest {
 
-    private String data;
-    private OperationFormData formData;
+    private String operationId;
     private AuthMethod chosenAuthMethod;
 
     /**
-     * Get data.
-     * @return Data.
+     * Default constructor.
      */
-    public String getData() {
-        return data;
+    public UpdateChosenAuthMethodRequest() {
     }
 
     /**
-     * Set data.
-     * @param data Data.
+     * Constructor with operation ID and chosen authentication method.
+     * @param operationId Operation ID.
+     * @param chosenAuthMethod Chosen authentication method.
      */
-    public void setData(String data) {
-        this.data = data;
+    public UpdateChosenAuthMethodRequest(String operationId, AuthMethod chosenAuthMethod) {
+        this.operationId = operationId;
+        this.chosenAuthMethod = chosenAuthMethod;
     }
 
     /**
-     * Get form data.
-     * @return Form data.
+     * Get operation ID.
+     * @return Operation ID.
      */
-    public OperationFormData getFormData() {
-        return formData;
+    public String getOperationId() {
+        return operationId;
     }
 
     /**
-     * Set form data.
-     * @param formData Form data.
+     * Set operation ID.
+     * @param operationId Operation ID.
      */
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
+    public void setOperationId(String operationId) {
+        this.operationId = operationId;
     }
 
     /**

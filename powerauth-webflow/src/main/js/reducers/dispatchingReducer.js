@@ -87,9 +87,6 @@ function mergeContext(actionType, oldContext, newContext) {
         case "CHANGE_ACTIVATION":
             changeActivation(oldContext, newContext);
             break;
-        case "CHOOSE_AUTH_METHOD":
-            chooseAuthMethod(oldContext, newContext);
-            break;
     }
     return newContext;
 }
@@ -132,16 +129,4 @@ function changeActivation(oldContext, newContext) {
         }
     }
     newContext.formData.userInput.chosenActivationId = chosenActivationId;
-}
-
-function chooseAuthMethod(oldContext, newContext) {
-    const chosenAuthMethod = newContext.chosenAuthMethod;
-    // copy all oldContext properties into newContext except for chosenAuthMethod, which should be taken from newContext
-    for (const prop in oldContext) {
-        if (oldContext.hasOwnProperty(prop)) {
-            newContext[prop] = oldContext[prop];
-        }
-    }
-    // set chosen authMethod
-    newContext.formData.userInput.chosenAuthMethod = chosenAuthMethod;
 }

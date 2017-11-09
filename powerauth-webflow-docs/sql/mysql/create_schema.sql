@@ -107,6 +107,7 @@ CREATE TABLE ns_operation_history (
   response_steps              VARCHAR(4096),
   response_timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   response_timestamp_expires  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  chosen_auth_method          VARCHAR(32),
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id),
   FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)

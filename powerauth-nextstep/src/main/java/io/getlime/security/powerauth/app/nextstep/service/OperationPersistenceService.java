@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
@@ -146,6 +147,9 @@ public class OperationPersistenceService {
      */
     public void updateFormData(UpdateFormDataRequest request) {
         OperationEntity operation = operationRepository.findOne(request.getOperationId());
+        if (operation == null) {
+            throw new IllegalArgumentException("Invalid operation");
+        }
         try {
             OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             // update only formData.userInput which should contain all input from the user
@@ -159,6 +163,23 @@ public class OperationPersistenceService {
             );
         }
         operationRepository.save(operation);
+    }
+
+    /**
+     * Updates chosen authentication method.
+     * @param request Request to update chosen authentication method.
+     */
+    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) {
+        OperationEntity operation = operationRepository.findOne(request.getOperationId());
+        if (operation == null) {
+            throw new IllegalArgumentException("Invalid operation");
+        }
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            throw new IllegalStateException("Operation is missing history");
+        }
+        currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
+        operationHistoryRepository.save(currentHistory);
     }
 
     /**
@@ -185,10 +206,13 @@ public class OperationPersistenceService {
             return entities;
         }
         List<OperationEntity> filteredList = new ArrayList<>();
-        for (OperationEntity operation : entities) {
-            List<AuthMethod> responseAuthMethods = getResponseAuthMethods(operation);
-            if (responseAuthMethods.contains(authMethod)) {
-                filteredList.add(operation);
+        for (OperationEntity operation: entities) {
+            // pending operations should be filtered by authMethods which have been chosen by the user
+            for (OperationHistoryEntity history: operation.getOperationHistory()) {
+                AuthMethod chosenAuthMethod = history.getChosenAuthMethod();
+                if (chosenAuthMethod != null && chosenAuthMethod == authMethod) {
+                    filteredList.add(operation);
+                }
             }
         }
         return filteredList;
