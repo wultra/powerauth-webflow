@@ -25,7 +25,6 @@ import Spinner from 'react-spin';
  */
 @connect((store) => {
     return {
-        operationId: store.operationId
     }
 })
 export default class StartHandshake extends React.Component {

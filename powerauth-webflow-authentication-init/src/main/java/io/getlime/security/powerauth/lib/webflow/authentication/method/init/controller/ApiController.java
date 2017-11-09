@@ -101,7 +101,6 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         clearCurrentBrowserSession();
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.AUTH_FAILED);
-        registrationResponse.setOperationId(message);
         registrationResponse.setMessage(failedReason);
         return registrationResponse;
     }
@@ -110,14 +109,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         authenticateCurrentBrowserSession();
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.CONFIRMED);
-        registrationResponse.setOperationId(null);
         return registrationResponse;
     }
 
     private InitOperationResponse continueOperationResponse(String operationId, List<AuthStep> steps) {
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.CONFIRMED);
-        registrationResponse.setOperationId(operationId);
         registrationResponse.getNext().addAll(steps);
         return registrationResponse;
     }
