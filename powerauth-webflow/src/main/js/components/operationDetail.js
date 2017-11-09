@@ -96,8 +96,8 @@ export default class OperationDetail extends React.Component {
             return (
                 <div>
                     <div className="operation-approve content-wrap">
-                        <h3>{this.props.context.formData.title}</h3>
-                        <p>{this.props.context.formData.message}</p>
+                        <h3>{this.props.context.formData.title.value}</h3>
+                        <p>{this.props.context.formData.message.value}</p>
                     </div>
                     <div>
                         {this.props.context.formData.parameters.map((item) => {
@@ -123,12 +123,12 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     </div>
                                 )
-                            } else if (item.type === "MESSAGE") {
+                            } else if (item.type === "NOTE") {
                                 return (
                                     <div className="row attribute" key={item.id}>
                                         <div className="col-sm-12">
                                             <div className="key">{item.label}</div>
-                                            <div className="value">{item.message}</div>
+                                            <div className="value">{item.note}</div>
                                         </div>
                                     </div>
                                 )
@@ -145,7 +145,7 @@ export default class OperationDetail extends React.Component {
                                         <div key={item.id} className="row attribute">
                                             <div className="col-sm-12">
                                                 <div className="key">
-                                                    <FormattedMessage id="operationReview.bankAccount.number"/>
+                                                    <FormattedMessage id={item.label}/>
                                                 </div>
                                                 <div className="value">
                                                     {(this.state.bankAccounts && this.state.chosenBankAccount) ? (

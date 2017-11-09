@@ -83,12 +83,12 @@ public class HomeController {
     public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
         String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
-        formData.setTitle("operation.title");
-        formData.setMessage("operation.message");
-        formData.setAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
+        formData.addTitle("operation.title");
+        formData.addMessage("operation.message");
+        formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
         formData.addKeyValue("operation.account", paymentForm.getAccount());
         formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());
-        formData.setNote("operation.note", paymentForm.getNote());
+        formData.addNote("operation.note", paymentForm.getNote());
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());

@@ -22,7 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormD
 import io.getlime.security.powerauth.lib.dataadapter.repository.SMSAuthorizationRepository;
 import io.getlime.security.powerauth.lib.dataadapter.repository.model.entity.SMSAuthorizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountAttribute;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -66,7 +66,7 @@ public class SMSPersistenceService {
         String messageId = UUID.randomUUID().toString();
 
         // update names of operationData JSON fields if necessary
-        OperationAmountAttribute amountAttribute = operationFormDataService.getAmount(formData);
+        OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(formData);
         BigDecimal amount = amountAttribute.getAmount();
         String currency = amountAttribute.getCurrency();
         String account = operationFormDataService.getAccount(formData);

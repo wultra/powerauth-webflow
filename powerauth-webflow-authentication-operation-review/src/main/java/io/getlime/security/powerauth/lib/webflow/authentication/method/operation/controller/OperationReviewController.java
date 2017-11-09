@@ -40,6 +40,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.UpdateOperationFormDataResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,11 +66,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
+    private final MessageTranslationService messageTranslationService;
 
     @Autowired
-    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
+    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
+        this.messageTranslationService = messageTranslationService;
     }
 
     @Override
@@ -235,6 +238,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
             }
         }
+        // translate new formData messages
+        messageTranslationService.translateFormData(formData);
         return formData;
     }
 

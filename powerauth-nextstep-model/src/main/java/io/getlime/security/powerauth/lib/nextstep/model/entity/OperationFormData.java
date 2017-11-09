@@ -15,10 +15,9 @@ import java.util.Map;
  */
 public class OperationFormData {
 
-    // TODO - consider removing title and message in favor of OperationMessageAttribute and OperationTitleAttribute which support i18n properly
-    private String title;
-    private String message;
-    private List<OperationFormAttribute> parameters;
+    private OperationFormAttribute title;
+    private OperationFormAttribute message;
+    private List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
     private Map<String, String> userInput;
 
@@ -31,7 +30,7 @@ public class OperationFormData {
      * Get form attributes.
      * @return Form attributes.
      */
-    public List<OperationFormAttribute> getParameters() {
+    public List<OperationFormFieldAttribute> getParameters() {
         return parameters;
     }
 
@@ -60,68 +59,88 @@ public class OperationFormData {
     }
 
     /**
+     * Set title form attribute.
+     * @param title Title form attribute.
+     */
+    public void setTitle(OperationFormAttribute title) {
+        if (title == null) {
+            // avoid JSON mapping null title
+            return;
+        }
+        this.title = title;
+    }
+
+    /**
      * Set title.
      * @param titleId Title ID.
      */
-    public void setTitle(String titleId) {
-        OperationTitleAttribute attr = new OperationTitleAttribute();
+    @JsonIgnore
+    public void addTitle(String titleId) {
+        OperationFormAttribute attr = new OperationFormAttribute();
         attr.setId(titleId);
-        // temporary value until label is localized
-        // TODO - migrate to OperationTitleAttribute which supports i18n
-        this.title = titleId;
-        saveAttribute(attr);
+        this.title = attr;
     }
 
     /**
      * Set localized title.
      * @param titleId Title ID.
      */
-    public void setTitle(String titleId, String title) {
-        OperationTitleAttribute attr = new OperationTitleAttribute();
+    @JsonIgnore
+    public void addTitle(String titleId, String title) {
+        OperationFormAttribute attr = new OperationFormAttribute();
         attr.setId(titleId);
-        attr.setTitle(title);
-        this.title = title;
-        saveAttribute(attr);
+        attr.setValue(title);
+        this.title = attr;
     }
 
     /**
-     * Get title.
-     * @return Title.
+     * Get title form attribute.
+     * @return Title form attribute.
      */
-    public String getTitle() {
+    public OperationFormAttribute getTitle() {
         return title;
+    }
+
+    /**
+     * Set message form attribute.
+     * @param message Message form attribute.
+     */
+    public void setMessage(OperationFormAttribute message) {
+        if (message == null) {
+            // avoid JSON mapping null title
+            return;
+        }
+        this.message = message;
     }
 
     /**
      * Set message.
      * @param messageId Message ID.
      */
-    public void setMessage(String messageId) {
-        OperationMessageAttribute attr = new OperationMessageAttribute();
+    @JsonIgnore
+    public void addMessage(String messageId) {
+        OperationFormAttribute attr = new OperationFormAttribute();
         attr.setId(messageId);
-        // temporary value until label is localized
-        // TODO - migrate to OperationMessageAttribute which supports i18n
-        this.message = messageId;
-        saveAttribute(attr);
+        this.message = attr;
     }
 
     /**
      * Set localized message.
      * @param messageId Message ID.
      */
-    public void setMessage(String messageId, String message) {
-        OperationMessageAttribute attr = new OperationMessageAttribute();
+    @JsonIgnore
+    public void addMessage(String messageId, String message) {
+        OperationFormAttribute attr = new OperationFormAttribute();
         attr.setId(messageId);
-        attr.setMessage(message);
-        this.message = message;
-        saveAttribute(attr);
+        attr.setValue(message);
+        this.message = attr;
     }
 
     /**
-     * Get message.
-     * @return Message.
+     * Get message form attribute.
+     * @return Message form attribute.
      */
-    public String getMessage() {
+    public OperationFormAttribute getMessage() {
         return message;
     }
 
@@ -133,8 +152,8 @@ public class OperationFormData {
      * @param currency Amount currency.
      */
     @JsonIgnore
-    public void setAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
-        OperationAmountAttribute amountAttr = new OperationAmountAttribute();
+    public void addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
+        OperationAmountFieldAttribute amountAttr = new OperationAmountFieldAttribute();
         amountAttr.setId(amountId);
         amountAttr.setAmount(amount);
         amountAttr.setCurrencyId(currencyId);
@@ -147,29 +166,16 @@ public class OperationFormData {
      * @return Amount.
      */
     @JsonIgnore
-    public OperationAmountAttribute getAmount() {
-        List<OperationFormAttribute> amountAttrs = getAttributesByType(OperationFormAttribute.Type.AMOUNT);
+    public OperationAmountFieldAttribute getAmount() {
+        List<OperationFormFieldAttribute> amountAttrs = getAttributesByType(OperationFormFieldAttribute.Type.AMOUNT);
         if (amountAttrs.isEmpty()) {
             return null;
         }
         if (amountAttrs.size()>1) {
             throw new IllegalStateException("Multiple attributes of type AMOUNT found");
         }
-        return (OperationAmountAttribute) amountAttrs.get(0);
+        return (OperationAmountFieldAttribute) amountAttrs.get(0);
     }
-
-
-    /**
-     * Set note.
-     * @param noteId Note ID.
-     */
-    @JsonIgnore
-    public void setNote(String noteId) {
-        OperationNoteAttribute attr = new OperationNoteAttribute();
-        attr.setId(noteId);
-        saveAttribute(attr);
-    }
-
 
     /**
      * Set localized note.
@@ -177,10 +183,10 @@ public class OperationFormData {
      * @param note Localized note.
      */
     @JsonIgnore
-    public void setNote(String noteId, String note) {
-        OperationNoteAttribute attr = new OperationNoteAttribute();
+    public void addNote(String noteId, String note) {
+        OperationNoteFieldAttribute attr = new OperationNoteFieldAttribute();
         attr.setId(noteId);
-        attr.setMessage(note);
+        attr.setNote(note);
         saveAttribute(attr);
     }
 
@@ -189,15 +195,15 @@ public class OperationFormData {
      * @return Note.
      */
     @JsonIgnore
-    public OperationNoteAttribute getNote() {
-        List<OperationFormAttribute> attrs = getAttributesByType(OperationFormAttribute.Type.MESSAGE);
+    public OperationNoteFieldAttribute getNote() {
+        List<OperationFormFieldAttribute> attrs = getAttributesByType(OperationFormFieldAttribute.Type.NOTE);
         if (attrs == null) {
             return null;
         }
         if (attrs.size()>1) {
             throw new IllegalStateException("Multiple attributes of type MESSAGE found");
         }
-        return (OperationNoteAttribute) attrs.get(0);
+        return (OperationNoteFieldAttribute) attrs.get(0);
     }
 
     /**
@@ -207,7 +213,7 @@ public class OperationFormData {
      */
     @JsonIgnore
     public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts) {
-        OperationBankAccountChoiceAttribute attr = new OperationBankAccountChoiceAttribute();
+        OperationBankAccountChoiceFieldAttribute attr = new OperationBankAccountChoiceFieldAttribute();
         attr.setId(id);
         attr.setBankAccounts(bankAccounts);
         saveAttribute(attr);
@@ -220,7 +226,7 @@ public class OperationFormData {
      */
     @JsonIgnore
     public void addKeyValue(String id, String value) {
-        OperationKeyValueAttribute attr = new OperationKeyValueAttribute();
+        OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute();
         attr.setId(id);
         attr.setValue(value);
         saveAttribute(attr);
@@ -232,8 +238,8 @@ public class OperationFormData {
      * @return Attribute.
      */
     @JsonIgnore
-    public OperationFormAttribute getAttributeById(String id) {
-        for (OperationFormAttribute attr: parameters) {
+    public OperationFormFieldAttribute getAttributeById(String id) {
+        for (OperationFormFieldAttribute attr: parameters) {
             if (attr.getId().equals(id)) {
                 return attr;
             }
@@ -247,9 +253,9 @@ public class OperationFormData {
      * @return Attribute.
      */
     @JsonIgnore
-    public List<OperationFormAttribute> getAttributesByType(OperationFormAttribute.Type type) {
-        List<OperationFormAttribute> attrs = new ArrayList<>();
-        for (OperationFormAttribute attr: parameters) {
+    public List<OperationFormFieldAttribute> getAttributesByType(OperationFormFieldAttribute.Type type) {
+        List<OperationFormFieldAttribute> attrs = new ArrayList<>();
+        for (OperationFormFieldAttribute attr: parameters) {
             if (attr.getType() == type) {
                 attrs.add(attr);
             }
@@ -278,13 +284,13 @@ public class OperationFormData {
      * Adds attribute or updates existing attribute based on its ID.
      * @param attributeToSave Attribute to save.
      */
-    private void saveAttribute(OperationFormAttribute attributeToSave) {
+    private void saveAttribute(OperationFormFieldAttribute attributeToSave) {
         if (attributeToSave == null || attributeToSave.getId() == null) {
             throw new IllegalArgumentException("Invalid attribute");
         }
         Integer existingIndex = null;
         int counter = 0;
-        for (OperationFormAttribute attr: parameters) {
+        for (OperationFormFieldAttribute attr: parameters) {
             if (attr.getId().equals(attributeToSave.getId())) {
                 existingIndex = counter;
                 break;

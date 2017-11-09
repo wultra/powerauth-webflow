@@ -127,8 +127,8 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
         PushMessageBody body = new PushMessageBody();
         if (formData != null) {
-            body.setTitle(formData.getTitle());
-            body.setBody(formData.getMessage());
+            body.setTitle(formData.getTitle().getValue());
+            body.setBody(formData.getMessage().getValue());
         } else {
             //TODO: Localize the messages
             body.setTitle("Confirm operation");
