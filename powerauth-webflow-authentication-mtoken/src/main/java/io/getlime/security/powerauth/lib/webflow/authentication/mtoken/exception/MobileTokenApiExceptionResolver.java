@@ -136,4 +136,16 @@ public class MobileTokenApiExceptionResolver {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("OPERATION_ALREADY_FAILED", t.getMessage()));
     }
+
+    /**
+     * Exception handler for expiration.
+     *
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationExpiredException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error("OPERATION_EXPIRED", t.getMessage()));
+    }
 }

@@ -134,6 +134,8 @@ public class StepResolutionService {
         }
         if (operation.isExpired()) {
             // Operation fails in case it is expired.
+            // Fail authentication method.
+            request.setAuthStepResult(AuthStepResult.AUTH_METHOD_FAILED);
             // Response expiration time matches operation expiration to avoid extending expiration time of the operation.
             response.setTimestampExpires(operation.getTimestampExpires());
             response.setResult(AuthResult.FAILED);
