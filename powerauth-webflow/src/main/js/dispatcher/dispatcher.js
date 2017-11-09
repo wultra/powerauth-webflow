@@ -20,31 +20,29 @@ export function dispatchAction(dispatch, response) {
             const next = response.data.next;
             let authMethods = [];
             for (let key in next) {
-                switch (next[key].authMethod) {
-                    case "USER_ID_ASSIGN": {
-                        // TODO - implement USER_ID_ASSIGN, for now it is ignored
-                        break;
-                    }
-                    case "USERNAME_PASSWORD_AUTH": {
-                        dispatch({
-                            type: "SHOW_SCREEN_LOGIN",
-                            payload: {
-                                loading: false,
-                                error: false,
-                                message: "login.pleaseLogIn"
-                            }
-                        });
-                        break;
-                    }
-                    case "POWERAUTH_TOKEN": {
-                        // add powerauth token authentication method for operation review step
-                        authMethods.push("POWERAUTH_TOKEN");
-                        break;
-                    }
-                    case "SMS_KEY": {
-                        // add powerauth token authentication method for operation review step
-                        authMethods.push("SMS_KEY");
-                        break;
+                if (next.hasOwnProperty(key)) {
+                    switch (next[key].authMethod) {
+                        case "USERNAME_PASSWORD_AUTH": {
+                            dispatch({
+                                type: "SHOW_SCREEN_LOGIN",
+                                payload: {
+                                    loading: false,
+                                    error: false,
+                                    message: "login.pleaseLogIn"
+                                }
+                            });
+                            break;
+                        }
+                        case "POWERAUTH_TOKEN": {
+                            // add powerauth token authentication method for operation review step
+                            authMethods.push("POWERAUTH_TOKEN");
+                            break;
+                        }
+                        case "SMS_KEY": {
+                            // add powerauth token authentication method for operation review step
+                            authMethods.push("SMS_KEY");
+                            break;
+                        }
                     }
                 }
             }

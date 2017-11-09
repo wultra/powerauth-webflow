@@ -41,13 +41,11 @@ public class AuthMethodQueryService {
 
     private final NextStepClient nextStepClient;
     private final PowerAuthServiceClient powerAuthServiceClient;
-    private final ObjectMapper objectMapper;
 
     @Autowired
     public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthServiceClient powerAuthServiceClient, ObjectMapper objectMapper) {
         this.nextStepClient = nextStepClient;
         this.powerAuthServiceClient = powerAuthServiceClient;
-        this.objectMapper = objectMapper;
     }
 
     /**
@@ -56,7 +54,7 @@ public class AuthMethodQueryService {
      * @param authMethod Authentication method.
      * @param userId User ID.
      * @param operationId Operation ID.
-     * @return Whetheo authentication method is available.
+     * @return Whether authentication method is available.
      */
     public boolean isAuthMethodEnabled(AuthMethod authMethod, String userId, String operationId) {
         try {
@@ -64,6 +62,10 @@ public class AuthMethodQueryService {
             List<UserAuthMethodDetail> enabledAuthMethods = response.getResponseObject().getUserAuthMethods();
             for (UserAuthMethodDetail authMethodDetail: enabledAuthMethods) {
                 if (authMethodDetail.getAuthMethod() == authMethod) {
+                    // Authentication methods without UI are not available
+                    if (!authMethodDetail.getHasUserInterface()) {
+                        return false;
+                    }
                     // AuthMethod POWERAUTH_TOKEN requires special logic - activation could be BLOCKED at any time
                     if (authMethod != AuthMethod.POWERAUTH_TOKEN) {
                         return true;
