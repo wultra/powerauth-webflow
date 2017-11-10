@@ -354,7 +354,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         message.setUserId(operation.getUserId());
         message.getAttributes().setPersonal(true);
         message.getAttributes().setEncrypted(true);
-        //message.getAttributes().setSilent(true);
+        message.getAttributes().setSilent(true);
 
         PushMessageBody body = new PushMessageBody();
         body.setTitle(PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
