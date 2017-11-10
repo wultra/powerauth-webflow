@@ -25,6 +25,7 @@ import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
 import io.getlime.push.model.entity.PushMessageBody;
 import io.getlime.push.model.entity.PushMessageSendResult;
+import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -35,6 +36,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServic
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.ActivationNotActiveException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.ActivationNotAvailableException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
@@ -42,6 +45,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.W
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,6 +54,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Petr Dvorak, petr@lime-company.eu
@@ -57,18 +64,22 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
+    private static final String PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE = "AUTH_STEP_FINISHED";
+    private static final String PUSH_MESSAGE_SOUND = "default";
+
     private final PushServerClient pushServerClient;
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
     private final PowerAuthServiceClient powerAuthServiceClient;
-
+    private final I18NService i18nService;
 
     @Autowired
-    public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient) {
+    public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient, I18NService i18nService) {
         this.pushServerClient = pushServerClient;
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
         this.powerAuthServiceClient = powerAuthServiceClient;
+        this.i18nService = i18nService;
     }
 
     @Override
@@ -116,56 +127,21 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             return response;
         }
 
-        final String userId = operation.getUserId();
-
-        PushMessage message = new PushMessage();
-        message.setUserId(userId);
-        message.getAttributes().setPersonal(true);
-        message.getAttributes().setEncrypted(true);
-
-        final OperationFormData formData = operation.getFormData();
-
-        PushMessageBody body = new PushMessageBody();
-        if (formData != null) {
-            body.setTitle(formData.getTitle().getValue());
-            body.setBody(formData.getMessage().getValue());
-        } else {
-            //TODO: Localize the messages
-            body.setTitle("Confirm operation");
-            body.setBody("Data: " + operation.getOperationData());
-        }
-        body.setSound("default");
-        body.setCategory(operation.getOperationName());
-
-        message.setBody(body);
+        final PushMessage message = createAuthStepInitPushMessage(operation);
 
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
 
-        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
-
-        // activationId is not configured, fail with error
-        if (configuredActivationId == null || configuredActivationId.isEmpty()) {
+        Long applicationId;
+        try {
+            applicationId = getApplicationId(operation);
+        } catch (ActivationNotAvailableException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.noActivation");
             return initResponse;
-        }
-
-        // loading of activations
-        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
-
-        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+        } catch (ActivationNotActiveException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.activationNotActive");
-            return initResponse;
-        }
-
-        Long applicationId = activationStatusResponse.getApplicationId();
-
-        // applicationId could not be resolved, cannot send push message
-        if (applicationId == null) {
-            initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            initResponse.setMessage("pushMessage.noApplication");
             return initResponse;
         }
 
@@ -200,6 +176,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("operation.timeout");
+            sendAuthStepFinishedPushMessage(operation, response.getMessage());
             return response;
         }
 
@@ -210,6 +187,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setResult(AuthStepResult.CONFIRMED);
             response.getNext().addAll(operation.getSteps());
             response.setMessage("authentication.success");
+            sendAuthStepFinishedPushMessage(operation, response.getMessage());
             return response;
         }
 
@@ -223,6 +201,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.getNext().addAll(operation.getSteps());
                 response.setMessage("authentication.success");
+                sendAuthStepFinishedPushMessage(operation, response.getMessage());
                 return response;
             }
             // in case previous authentication lead to an authentication method failure, the authentication method has already failed
@@ -234,6 +213,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
                 response.getNext().addAll(operation.getSteps());
                 response.setMessage("authentication.fail");
+                sendAuthStepFinishedPushMessage(operation, response.getMessage());
                 return response;
             }
             // in case the authentication has been canceled, the authentication method is canceled
@@ -244,6 +224,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CANCELED);
                 response.setMessage("operation.canceled");
+                sendAuthStepFinishedPushMessage(operation, response.getMessage());
                 return response;
             }
         }
@@ -257,6 +238,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("method.disabled");
+            sendAuthStepFinishedPushMessage(operation, response.getMessage());
             return response;
         }
 
@@ -278,6 +260,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
+            sendAuthStepFinishedPushMessage(operation, response.getMessage());
             return response;
         } catch (NextStepServiceException e) {
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
@@ -293,6 +276,93 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
         response.setMessage("operation.notAvailable");
         return response;
+    }
+
+    /**
+     * Send push message when authentication step is finished.
+     * @param operation Operation.
+     * @param statusMessage Status message.
+     */
+    private void sendAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String statusMessage) {
+        PushMessage message = createAuthStepFinishedPushMessage(operation, statusMessage);
+        try {
+            Long applicationId = getApplicationId(operation);
+            pushServerClient.sendPushMessage(applicationId, message);
+        } catch (Exception ex) {
+            // Exception which occurs when push message is sent is not critical, return regular response.
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", ex);
+        }
+    }
+
+    /**
+     * Resolve application ID from operation.
+     * @param operation Operation.
+     * @return Application ID.
+     * @throws NextStepServiceException Throw when communication with Next Step service fails.
+     * @throws ActivationNotActiveException Thrown when activation is not active.
+     * @throws ActivationNotAvailableException Thrown when activation is not configured.
+     */
+    private Long getApplicationId(GetOperationDetailResponse operation) throws NextStepServiceException, ActivationNotActiveException, ActivationNotAvailableException {
+        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(operation.getUserId());
+        if (configuredActivationId == null || configuredActivationId.isEmpty()) {
+            throw new ActivationNotActiveException();
+        }
+        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
+        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+            throw new ActivationNotAvailableException();
+        }
+        return activationStatusResponse.getApplicationId();
+    }
+
+    /**
+     * Create an initial push message.
+     * @param operation Operation.
+     * @return Push message.
+     */
+    private PushMessage createAuthStepInitPushMessage(GetOperationDetailResponse operation) {
+        PushMessage message = new PushMessage();
+        message.setUserId(operation.getUserId());
+        message.getAttributes().setPersonal(true);
+        message.getAttributes().setEncrypted(true);
+
+        final OperationFormData formData = operation.getFormData();
+
+        PushMessageBody body = new PushMessageBody();
+        if (formData != null) {
+            body.setTitle(formData.getTitle().getValue());
+            body.setBody(formData.getMessage().getValue());
+        } else {
+            AbstractMessageSource messageSource = i18nService.getMessageSource();
+            String[] operationData = new String[]{operation.getOperationData()};
+            body.setTitle(messageSource.getMessage("push.confirmOperation", null, LocaleContextHolder.getLocale()));
+            body.setTitle(messageSource.getMessage("push.data", operationData, LocaleContextHolder.getLocale()));
+        }
+        body.setSound(PUSH_MESSAGE_SOUND);
+        body.setCategory(operation.getOperationName());
+
+        message.setBody(body);
+        return message;
+    }
+
+    /**
+     * Create cancel push message.
+     * @param operation Operation.
+     * @return Push message.
+     */
+    private PushMessage createAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String statusMessage) {
+        PushMessage message = new PushMessage();
+        message.setUserId(operation.getUserId());
+        message.getAttributes().setPersonal(true);
+        message.getAttributes().setEncrypted(true);
+        //message.getAttributes().setSilent(true);
+
+        PushMessageBody body = new PushMessageBody();
+        body.setTitle(PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
+        body.setBody(statusMessage);
+        body.setCategory(operation.getOperationName());
+
+        message.setBody(body);
+        return message;
     }
 
 }
