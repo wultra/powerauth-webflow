@@ -53,7 +53,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,6 +66,8 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
+    private static final String PUSH_MESSAGE_TITLE = "title";
+    private static final String PUSH_MESSAGE_SUBTITLE = "subtitle";
     private static final String PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE = "AUTH_STEP_FINISHED";
     private static final String PUSH_MESSAGE_SOUND = "default";
 
@@ -356,9 +360,12 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         message.getAttributes().setEncrypted(true);
         message.getAttributes().setSilent(true);
 
+        Map<String, Object> dataMap = new HashMap<>();
+        dataMap.put(PUSH_MESSAGE_TITLE, PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
+        dataMap.put(PUSH_MESSAGE_SUBTITLE, statusMessage);
+
         PushMessageBody body = new PushMessageBody();
-        body.setTitle(PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
-        body.setBody(statusMessage);
+        body.setExtras(dataMap);
         body.setCategory(operation.getOperationName());
 
         message.setBody(body);
