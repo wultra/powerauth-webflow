@@ -79,7 +79,7 @@ export function authenticate(userAuthCode) {
                 }
                 case 'AUTH_FAILED': {
                     // handle timeout - action can not succeed anymore, show error
-                    if (response.data.message === "authentication.timeout") {
+                    if (response.data.message === "operation.timeout") {
                         dispatchAction(dispatch, response);
                         break;
                     }
