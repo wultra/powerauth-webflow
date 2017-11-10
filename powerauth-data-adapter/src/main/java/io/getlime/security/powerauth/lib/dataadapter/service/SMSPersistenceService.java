@@ -25,9 +25,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -44,12 +41,14 @@ public class SMSPersistenceService {
     private final SMSAuthorizationRepository smsAuthorizationRepository;
     private final OperationFormDataService operationFormDataService;
     private final DataAdapterConfiguration dataAdapterConfiguration;
+    private final DataAdapterI18NService dataAdapterI18NService;
 
     @Autowired
-    public SMSPersistenceService(SMSAuthorizationRepository smsAuthorizationRepository, OperationFormDataService operationFormDataService, DataAdapterConfiguration dataAdapterConfiguration) {
+    public SMSPersistenceService(SMSAuthorizationRepository smsAuthorizationRepository, OperationFormDataService operationFormDataService, DataAdapterConfiguration dataAdapterConfiguration, DataAdapterI18NService dataAdapterI18NService) {
         this.smsAuthorizationRepository = smsAuthorizationRepository;
         this.operationFormDataService = operationFormDataService;
         this.dataAdapterConfiguration = dataAdapterConfiguration;
+        this.dataAdapterI18NService = dataAdapterI18NService;
     }
 
     /**
@@ -76,7 +75,7 @@ public class SMSPersistenceService {
         final String authorizationCode = digestResult.getDigest();
         final byte[] salt = digestResult.getSalt();
         String[] messageArgs = {amount.toPlainString(), currency, account, authorizationCode};
-        String messageText = messageSource().getMessage("sms-otp.text", messageArgs, new Locale(lang));
+        String messageText = dataAdapterI18NService.messageSource().getMessage("sms-otp.text", messageArgs, new Locale(lang));
 
         SMSAuthorizationEntity smsEntity = new SMSAuthorizationEntity();
         smsEntity.setMessageId(messageId);
@@ -149,16 +148,4 @@ public class SMSPersistenceService {
         return new DataDigest().generateDigest(digestItems);
     }
 
-    /**
-     * Get MessageSource with i18n data for authorizations SMS messages.
-     *
-     * @return MessageSource.
-     */
-    @Bean
-    private MessageSource messageSource() {
-        ReloadableResourceBundleMessageSource messageSource = new ReloadableResourceBundleMessageSource();
-        messageSource.setBasename("classpath:/static/resources/messages");
-        messageSource.setDefaultEncoding("UTF-8");
-        return messageSource;
-    }
 }

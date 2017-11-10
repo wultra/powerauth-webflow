@@ -15,8 +15,6 @@
  */
 import React from 'react';
 import Select from 'react-select';
-// i18n
-import {FormattedMessage} from "react-intl";
 
 export default class BankAccountSelect extends React.Component {
 
@@ -113,7 +111,7 @@ function formatBankAccount(bankAccount) {
                     <td width="50%">
                         {(!bankAccount.usableForPayment && bankAccount.unusableForPaymentReason) ? (
                             <div className="message-error font-tiny text-right">
-                                <FormattedMessage id={bankAccount.unusableForPaymentReason}/>
+                                {bankAccount.unusableForPaymentReason}
                             </div>
                         ) : (undefined)}
                     </td>

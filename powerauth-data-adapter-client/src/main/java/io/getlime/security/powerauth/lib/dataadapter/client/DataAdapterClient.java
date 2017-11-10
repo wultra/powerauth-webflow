@@ -30,8 +30,10 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountL
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -154,7 +156,9 @@ public class DataAdapterClient {
     public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String operationId, String userId, String operationName, OperationFormData formData, String lang) throws DataAdapterClientErrorException {
         try {
             CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(operationId, userId, operationName, formData, lang);
-            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
+            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
             ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = defaultTemplate().exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<CreateSMSAuthorizationResponse>>() {
@@ -207,7 +211,9 @@ public class DataAdapterClient {
         try {
             // Exchange user details with data adapter.
             BankAccountListRequest request = new BankAccountListRequest(userId, operationId);
-            HttpEntity<ObjectRequest<BankAccountListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
+            HttpEntity<ObjectRequest<BankAccountListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
             ResponseEntity<ObjectResponse<BankAccountListResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/account/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<BankAccountListResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());

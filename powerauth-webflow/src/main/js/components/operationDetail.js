@@ -69,6 +69,17 @@ export default class OperationDetail extends React.Component {
         }
     }
 
+    componentWillReceiveProps(props) {
+        if (props.context.formData) {
+            props.context.formData.parameters.map((item) => {
+                if (item.type === "BANK_ACCOUNT_CHOICE") {
+                    // store bankAccounts again - language can change dynamically
+                    this.storeBankAccounts(item.bankAccounts);
+                }
+            });
+        }
+    }
+
     storeBankAccounts(bankAccountsReceived) {
         // bankAccount are saved for easier work with bank accounts
         this.setState({bankAccounts: bankAccountsReceived});
@@ -145,7 +156,7 @@ export default class OperationDetail extends React.Component {
                                         <div key={item.id} className="row attribute">
                                             <div className="col-sm-12">
                                                 <div className="key">
-                                                    <FormattedMessage id={item.label}/>
+                                                    {item.label}
                                                 </div>
                                                 <div className="value">
                                                     {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
