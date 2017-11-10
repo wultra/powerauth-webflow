@@ -6,6 +6,8 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationF
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.dataadapter.service.DataAdapterI18NService;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -22,7 +24,10 @@ import java.util.logging.Logger;
 @Service
 public class DataAdapterService implements DataAdapter {
 
-    public DataAdapterService() {
+    private final DataAdapterI18NService dataAdapterI18NService;
+
+    public DataAdapterService(DataAdapterI18NService dataAdapterI18NService) {
+        this.dataAdapterI18NService = dataAdapterI18NService;
     }
 
     @Override
@@ -80,7 +85,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount3.setNumber("44444444/1111");
         bankAccount3.setCurrency("EUR");
         bankAccount3.setUsableForPayment(false);
-        bankAccount3.setUnusableForPaymentReason("operationReview.balanceTooLow");
+        bankAccount3.setUnusableForPaymentReason(dataAdapterI18NService.messageSource().getMessage("operationReview.balanceTooLow", null, LocaleContextHolder.getLocale()));
         bankAccounts.add(bankAccount3);
 
         return bankAccounts;
