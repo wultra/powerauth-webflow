@@ -360,7 +360,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Validates that request is valid for current operation state.
+     * Validates that operation state is valid in current step.
      * @param operation Operation.
      */
     private void validateOperationState(GetOperationDetailResponse operation) throws AuthStepException {
