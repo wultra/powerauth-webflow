@@ -59,13 +59,6 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
-        }
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled, authenticate() call should always fail
-            return null;
-        }
         final Object messageId = httpSession.getAttribute(MESSAGE_ID);
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
@@ -101,18 +94,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * @return Authorization response.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() {
+    public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            return operationNotAvailable();
-        }
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled, initSMSAuthorization() call should always fail
-            initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            initResponse.setMessage("method.disabled");
-            return initResponse;
-        }
 
         final String userId = operation.getUserId();
         try {
@@ -185,13 +169,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * @return Authorization response.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody SMSAuthorizationResponse cancelAuthentication() {
+    public @ResponseBody SMSAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
             httpSession.removeAttribute(MESSAGE_ID);
-            if (operation == null) {
-                return operationNotAvailable();
-            }
             cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
@@ -206,11 +187,4 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         }
     }
 
-    private SMSAuthorizationResponse operationNotAvailable() {
-        // when operation is no longer available (e.g. expired), auth method should fail
-        final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
-        response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-        response.setMessage("operation.notAvailable");
-        return response;
-    }
 }

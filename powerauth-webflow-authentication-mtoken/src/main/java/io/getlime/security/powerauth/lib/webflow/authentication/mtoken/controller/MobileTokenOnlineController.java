@@ -89,13 +89,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
-        }
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled authenticate() call should always fail
-            return null;
-        }
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
@@ -112,24 +105,8 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     }
 
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException {
+    public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-
-        if (operation == null) {
-            // when operation is no longer available (e.g. expired), auth method should fail
-            final MobileTokenInitResponse response = new MobileTokenInitResponse();
-            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-            response.setMessage("operation.notAvailable");
-            return response;
-        }
-
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled, operation should fail
-            final MobileTokenInitResponse response = new MobileTokenInitResponse();
-            response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage("method.disabled");
-            return response;
-        }
 
         final PushMessage message = createAuthStepInitPushMessage(operation);
 
@@ -165,12 +142,9 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) {
+    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            return operationNotAvailable();
-        }
 
         if (operation.isExpired()) {
             // handle operation expiration
@@ -241,7 +215,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage("method.disabled");
+            response.setMessage("operation.methodNotAvailable");
             sendAuthStepFinishedPushMessage(operation, response.getMessage());
             return response;
         }
@@ -254,12 +228,9 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenAuthenticationResponse cancelAuthentication() {
+    public @ResponseBody MobileTokenAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
-            if (operation == null) {
-                return operationNotAvailable();
-            }
             cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
@@ -272,14 +243,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setMessage(e.getMessage());
             return response;
         }
-    }
-
-    private MobileTokenAuthenticationResponse operationNotAvailable() {
-        // when operation is no longer available (e.g. expired), auth method should fail
-        final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
-        response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-        response.setMessage("operation.notAvailable");
-        return response;
     }
 
     /**

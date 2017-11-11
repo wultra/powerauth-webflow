@@ -51,7 +51,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * @return Authentication initialization response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
+    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws AuthStepException {
 
         final GetOperationDetailResponse operation = getOperation();
 

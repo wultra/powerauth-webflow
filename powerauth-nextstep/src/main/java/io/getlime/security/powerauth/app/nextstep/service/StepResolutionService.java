@@ -359,6 +359,16 @@ public class StepResolutionService {
         if (initOperationItem.getRequestAuthMethod() != null || initOperationItem.getRequestAuthStepResult() != null) {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
+        // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
+        boolean stepAuthMethodValid = false;
+        for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+            if (step.getAuthMethod() == request.getAuthMethod()) {
+                stepAuthMethodValid = true;
+            }
+        }
+        if (!stepAuthMethodValid) {
+            throw new IllegalStateException("Operation update failed, because AuthMethod is invalid (operationId: " + request.getOperationId() + ").");
+        }
         for (OperationHistoryEntity historyItem : operationHistory) {
             if (historyItem.getResponseResult() == AuthResult.DONE) {
                 throw new OperationAlreadyFinishedException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
