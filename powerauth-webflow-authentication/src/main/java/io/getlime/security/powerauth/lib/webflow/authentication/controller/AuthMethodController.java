@@ -237,20 +237,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
             return provider.continueAuthentication(operationId, null, responseObject.getSteps());
         } catch (NextStepServiceException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while initiating operation", e);
             return provider.failedAuthentication(null, "error.unknown");
         }
     }
 
     /**
-     * Initiate a new operation with given name, data and parameters.
+     * Continue an operation.
      *
      * @param operationId ID of operation to be fetched.
      * @param provider    Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
-    protected R continueOperationWithId(String operationId, AuthResponseProvider provider) throws AuthStepException {
-        final GetOperationDetailResponse operation = getOperation(operationId);
-        if (operation != null) {
+    protected R continueOperationWithId(String operationId, AuthResponseProvider provider) {
+        try {
+            final GetOperationDetailResponse operation = getOperation(operationId);
             validateOperationState(operation);
             final String userId = operation.getUserId();
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), userId, operationId);
@@ -262,8 +263,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             } else {
                 return provider.continueAuthentication(operationId, userId, operation.getSteps());
             }
-        } else {
-            return provider.failedAuthentication(null, "error.unknown");
+        } catch (AuthStepException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while updating operation", e);
+            return provider.failedAuthentication(null, e.getMessage());
         }
     }
 
@@ -313,6 +315,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 }
             }
         } catch (NextStepServiceException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while building authorization response", e);
             throw new AuthStepException(e.getError().getMessage(), e);
         }
     }
