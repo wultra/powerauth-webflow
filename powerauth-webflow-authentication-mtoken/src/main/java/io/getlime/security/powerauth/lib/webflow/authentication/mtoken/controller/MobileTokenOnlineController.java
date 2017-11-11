@@ -131,18 +131,21 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             return response;
         }
 
-        final PushMessage message = createAuthStepInitPushMessage(operation);
-
         final MobileTokenInitResponse initResponse = new MobileTokenInitResponse();
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
 
+        String activationId;
         Long applicationId;
         try {
-            applicationId = getApplicationId(operation);
+            activationId = getActivationId(operation);
         } catch (ActivationNotAvailableException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.noActivation");
             return initResponse;
+        }
+
+        try {
+            applicationId = getApplicationId(activationId);
         } catch (ActivationNotActiveException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.activationNotActive");
@@ -150,6 +153,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         }
 
         try {
+            final PushMessage message = createAuthStepInitPushMessage(operation, activationId);
             final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(applicationId, message);
             if (response.getStatus().equals(Response.Status.OK)) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
@@ -288,9 +292,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @param statusMessage Status message.
      */
     private void sendAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String statusMessage) {
-        PushMessage message = createAuthStepFinishedPushMessage(operation, statusMessage);
         try {
-            Long applicationId = getApplicationId(operation);
+            String activationId = getActivationId(operation);
+            PushMessage message = createAuthStepFinishedPushMessage(operation, activationId, statusMessage);
+            Long applicationId = getApplicationId(activationId);
             pushServerClient.sendPushMessage(applicationId, message);
         } catch (Exception ex) {
             // Exception which occurs when push message is sent is not critical, return regular response.
@@ -299,21 +304,30 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     }
 
     /**
-     * Resolve application ID from operation.
+     * Resolve activation ID from operation.
      * @param operation Operation.
-     * @return Application ID.
+     * @return Activation ID.
      * @throws NextStepServiceException Throw when communication with Next Step service fails.
-     * @throws ActivationNotActiveException Thrown when activation is not active.
      * @throws ActivationNotAvailableException Thrown when activation is not configured.
      */
-    private Long getApplicationId(GetOperationDetailResponse operation) throws NextStepServiceException, ActivationNotActiveException, ActivationNotAvailableException {
+    private String getActivationId(GetOperationDetailResponse operation) throws NextStepServiceException, ActivationNotAvailableException {
         String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(operation.getUserId());
         if (configuredActivationId == null || configuredActivationId.isEmpty()) {
-            throw new ActivationNotActiveException();
-        }
-        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
-        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
             throw new ActivationNotAvailableException();
+        }
+        return configuredActivationId;
+    }
+
+    /**
+     * Resolve application ID from activation ID.
+     * @param activationId Activation ID.
+     * @return Application ID.
+     * @throws ActivationNotActiveException Thrown when activation is not active.
+     */
+    private Long getApplicationId(String activationId) throws ActivationNotActiveException {
+        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(activationId);
+        if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+            throw new ActivationNotActiveException();
         }
         return activationStatusResponse.getApplicationId();
     }
@@ -323,9 +337,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @param operation Operation.
      * @return Push message.
      */
-    private PushMessage createAuthStepInitPushMessage(GetOperationDetailResponse operation) {
+    private PushMessage createAuthStepInitPushMessage(GetOperationDetailResponse operation, String activationId) {
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
+        message.setActivationId(activationId);
         message.getAttributes().setPersonal(true);
         message.getAttributes().setEncrypted(true);
 
@@ -353,9 +368,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @param operation Operation.
      * @return Push message.
      */
-    private PushMessage createAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String statusMessage) {
+    private PushMessage createAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String activationId, String statusMessage) {
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
+        message.setActivationId(activationId);
         message.getAttributes().setPersonal(true);
         message.getAttributes().setEncrypted(true);
         message.getAttributes().setSilent(true);
