@@ -366,6 +366,7 @@ public class StepResolutionService {
             for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
                 if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod()==AuthMethod.POWERAUTH_TOKEN) {
                     stepAuthMethodValid = true;
+                    break;
                 }
             }
         } else {
@@ -373,6 +374,7 @@ public class StepResolutionService {
             for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
                 if (step.getAuthMethod() == request.getAuthMethod()) {
                     stepAuthMethodValid = true;
+                    break;
                 }
             }
         }
