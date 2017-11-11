@@ -182,6 +182,7 @@ public class OperationPersistenceService {
         for (AuthStep step: getResponseAuthSteps(operation)) {
             if (step.getAuthMethod() == request.getChosenAuthMethod()) {
                 chosenAuthMethodValid = true;
+                break;
             }
         }
         if (!chosenAuthMethodValid) {
