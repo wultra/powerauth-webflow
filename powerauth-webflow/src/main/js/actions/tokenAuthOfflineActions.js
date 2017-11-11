@@ -54,18 +54,6 @@ export function initOffline(activationId) {
     }
 }
 
-export function changeActivation(activation) {
-    return function (dispatch) {
-        dispatch({
-            type: "CHANGE_ACTIVATION",
-            payload: {
-                chosenActivation: activation,
-                init: false
-            }
-        });
-    }
-}
-
 export function authenticateOffline(activationId, authCode, nonce, dataHash) {
     return function (dispatch) {
         dispatch({
@@ -135,6 +123,18 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
                     break;
                 }
             }
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+export function updateFormData(formData, callback) {
+    return function (dispatch) {
+        axios.put("./api/auth/operation/formData", {
+            formData: formData
+        }).then((response) => {
+            callback();
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

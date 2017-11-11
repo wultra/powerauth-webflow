@@ -31,7 +31,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.OperationReviewRequest;
@@ -39,7 +38,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.UpdateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -50,6 +48,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -60,8 +59,8 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/api/auth/operation")
 public class OperationReviewController extends AuthMethodController<OperationReviewRequest, OperationReviewResponse, AuthStepException> {
 
+    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "bankAccountChoiceDisabled";
     private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
-    private final String FIELD_CHOSEN_AUTH_METHOD = "chosenAuthMethod";
     private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
 
     private final DataAdapterClient dataAdapterClient;
@@ -155,40 +154,27 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
-    public @ResponseBody UpdateOperationFormDataResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws AuthStepException {
+    public @ResponseBody ObjectResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        try {
-            // update formData in Next Step server
-            nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
-            // Send notification to Data Adapter if the bank account has changed.
-            // In case there is no bank account choice, the notification is not performed.
-            if (request.getFormData().getUserInput().containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
-                BankAccountChoice bankAccountChoice = new BankAccountChoice();
-                bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
-                dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
-            }
-            return new UpdateOperationFormDataResponse();
-        } catch (NextStepServiceException | DataAdapterClientErrorException e) {
-            final UpdateOperationFormDataResponse response = new UpdateOperationFormDataResponse();
-            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-            response.setMessage(e.getMessage());
-            return response;
+        // update formData in Next Step server
+        nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
+        // Send notification to Data Adapter if the bank account has changed.
+        // In case there is no bank account choice, the notification is not performed.
+        Map<String, String> userInput = request.getFormData().getUserInput();
+        if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
+            BankAccountChoice bankAccountChoice = new BankAccountChoice();
+            bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
+            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
         }
+        return new ObjectResponse();
     }
 
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody AuthStepResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws AuthStepException {
+    public @ResponseBody ObjectResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        try {
-            // update chosenAuthMethod in Next Step server
-            nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
-            return new AuthStepResponse();
-        } catch (NextStepServiceException e) {
-            final AuthStepResponse response = new AuthStepResponse();
-            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-            response.setMessage(e.getMessage());
-            return response;
-        }
+        // update chosenAuthMethod in Next Step server
+        nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
+        return new ObjectResponse();
     }
 
     private OperationFormData loadFormData(GetOperationDetailResponse operation) {
