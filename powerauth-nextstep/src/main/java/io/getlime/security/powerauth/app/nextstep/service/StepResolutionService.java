@@ -370,7 +370,7 @@ public class StepResolutionService {
                 }
             }
         } else {
-            // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
+            // verification of operation continuity for all other authentication methods
             for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
                 if (step.getAuthMethod() == request.getAuthMethod()) {
                     stepAuthMethodValid = true;

@@ -155,7 +155,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        GetOperationDetailResponse operation = getOperation(operationId);
+        // get operation to validate operation state
+        getOperation(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params);
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
@@ -179,7 +180,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        GetOperationDetailResponse operation = getOperation(operationId);
+        // get operation to validate operation state
+        getOperation(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
@@ -202,7 +204,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        GetOperationDetailResponse operation = getOperation(operationId);
+        // get operation to validate operation state
+        getOperation(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
