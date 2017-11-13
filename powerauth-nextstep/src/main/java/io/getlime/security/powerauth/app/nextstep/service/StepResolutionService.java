@@ -364,7 +364,7 @@ public class StepResolutionService {
         if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
             // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
             for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod()==AuthMethod.POWERAUTH_TOKEN) {
+                if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
                     stepAuthMethodValid = true;
                     break;
                 }
