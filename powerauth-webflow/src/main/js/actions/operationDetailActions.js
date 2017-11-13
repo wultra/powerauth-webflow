@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-export function changeBankAccount(bankAccountNumber) {
+import axios from "axios/index";
+import {dispatchError} from "../dispatcher/dispatcher";
+
+export function updateFormData(formData) {
     return function (dispatch) {
-        dispatch({
-            type: "CHANGE_BANK_ACCOUNT",
-            payload: {
-                chosenBankAccountNumber: bankAccountNumber
-            }
-        });
+        axios.put("./api/auth/operation/formData", {
+            formData: formData
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
     }
 }

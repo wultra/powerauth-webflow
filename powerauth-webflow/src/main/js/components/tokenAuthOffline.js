@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticateOffline, changeActivation, initOffline} from "../actions/tokenAuthOfflineActions";
+import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
 import {FormGroup} from "react-bootstrap";
 import Spinner from 'react-spin';
@@ -135,8 +135,10 @@ export default class TokenOffline extends React.Component {
 
     handleActivationChoice(activation) {
         this.setState({chosenActivation: activation});
-        this.props.dispatch(changeActivation(activation));
-        this.props.dispatch(initOffline(activation.activationId));
+        this.props.context.formData.userInput.chosenActivationId = activation.activationId;
+        this.props.dispatch(updateFormData(activation), this.props.context.formData, function () {
+            this.props.dispatch(initOffline(activation.activationId));
+        });
     }
 
     handleAuthCodeChange(event) {

@@ -54,7 +54,7 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the token screen
         if (this.props.context.formData) {
             // bank account choice is frozen
-            this.props.context.formData.userInput.bankAccountChosen = true;
+            this.props.context.formData.userInput.bankAccountChoiceDisabled = true;
             this.props.dispatch(updateOperation(this.props.context.formData, "POWERAUTH_TOKEN", function () {
                 // change screen after form data and chosen authentication method are stored
                 switchToTokenScreen();
@@ -78,7 +78,7 @@ export default class OperationReview extends React.Component {
         // choose authMethod and send updated formData, then move to the sms screen
         if (this.props.context.formData) {
             // bank account choice is frozen
-            this.props.context.formData.userInput.bankAccountChosen = true;
+            this.props.context.formData.userInput.bankAccountChoiceDisabled = true;
             this.props.dispatch(updateOperation(this.props.context.formData, "SMS_KEY", function () {
                 // change screen after formData and chosen authentication method are stored
                 switchToSMSScreen();

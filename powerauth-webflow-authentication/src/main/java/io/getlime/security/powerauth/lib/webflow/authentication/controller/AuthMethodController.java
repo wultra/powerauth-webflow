@@ -155,8 +155,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // get operation to validate operation state
-        getOperation(operationId);
+        // validate operation before requesting update
+        validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params);
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
@@ -180,8 +180,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // get operation to validate operation state
-        getOperation(operationId);
+        // validate operation before requesting update
+        validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
@@ -204,8 +204,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException In case communication fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // get operation to validate operation state
-        getOperation(operationId);
+        // validate operation before requesting update
+        validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
@@ -356,8 +356,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Validates that operation state is valid in current step.
+     * Retrieve operation and validate it.
+     * @param operationId Operation ID.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
+     * @throws AuthStepException Thrown when operation state is invalid.
+     */
+    private void validateOperationState(String operationId) throws NextStepServiceException, AuthStepException {
+        final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
+        final GetOperationDetailResponse operation = operationDetail.getResponseObject();
+        validateOperationState(operation);
+    }
+
+    /**
+     * Validate that operation state is valid in current step.
      * @param operation Operation.
+     * @throws AuthStepException Thrown when operation state is invalid.
      */
     private void validateOperationState(GetOperationDetailResponse operation) throws AuthStepException {
         if (operation == null) {
@@ -393,7 +406,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Filters the list of steps based on current availability of authentication methods.
+     * Filter the list of steps based on current availability of authentication methods.
      * @param authSteps List of authentication steps.
      * @param userId User ID, use null for unknown user ID.
      * @param operationId Operation ID.
