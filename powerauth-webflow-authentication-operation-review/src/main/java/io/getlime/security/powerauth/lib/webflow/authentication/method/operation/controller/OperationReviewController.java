@@ -78,13 +78,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
-        }
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled authenticate() call should always fail
-            return null;
-        }
         //TODO: Check pre-authenticated user here
         return operation.getUserId();
     }
@@ -95,17 +88,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/detail")
-    public @ResponseBody OperationReviewDetailResponse getOperationDetails() {
+    public @ResponseBody OperationReviewDetailResponse getOperationDetails() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation != null) {
-            OperationReviewDetailResponse response = new OperationReviewDetailResponse();
-            response.setData(operation.getOperationData());
-            response.setFormData(loadFormData(operation));
-            response.setChosenAuthMethod(operation.getChosenAuthMethod());
-            return response;
-        } else {
-            return null;
-        }
+        OperationReviewDetailResponse response = new OperationReviewDetailResponse();
+        response.setData(operation.getOperationData());
+        response.setFormData(loadFormData(operation));
+        response.setChosenAuthMethod(operation.getChosenAuthMethod());
+        return response;
     }
 
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
@@ -149,16 +138,9 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody OperationReviewResponse cancelAuthentication() {
+    public @ResponseBody OperationReviewResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
-            if (operation == null) {
-                // when operation is no longer available (e.g. expired), auth method should fail
-                final OperationReviewResponse response = new OperationReviewResponse();
-                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-                response.setMessage("operation.notAvailable");
-                return response;
-            }
             cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
@@ -173,15 +155,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
-    public @ResponseBody UpdateOperationFormDataResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) {
+    public @ResponseBody UpdateOperationFormDataResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            // when operation is no longer available (e.g. expired), auth method should fail
-            final UpdateOperationFormDataResponse response = new UpdateOperationFormDataResponse();
-            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-            response.setMessage("operation.notAvailable");
-            return response;
-        }
         try {
             // update formData in Next Step server
             nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
@@ -202,7 +177,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody AuthStepResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) {
+    public @ResponseBody AuthStepResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         try {
             // update chosenAuthMethod in Next Step server
