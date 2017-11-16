@@ -44,7 +44,6 @@ class OfflineAuthCode extends React.Component {
         }
         if (authCodeStripped.length < 16) {
             target.value = authCode;
-            return true;
         } else {
             event.preventDefault();
         }
