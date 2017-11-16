@@ -23,27 +23,74 @@ class OfflineAuthCode extends React.Component {
     constructor() {
         super();
         this.stripSpaces = this.stripSpaces.bind(this);
-        this.changeAuthCode = this.changeAuthCode.bind(this);
-        this.handleInput = this.handleInput.bind(this);
+        this.formatAuthCode = this.formatAuthCode.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
     }
 
     stripSpaces(text) {
         return text.split(" ").join("");
     }
 
-    changeAuthCode(event) {
+    formatAuthCode(event) {
+        const target = event.target;
+        const selectionStartOrig = target.selectionStart;
+        const selectionEndOrig = target.selectionEnd;
+        const authCodeStripped = this.stripSpaces(target.value);
+        let authCodeFormatted = "";
+        for (let i = 0; i < 16; i++) {
+            authCodeFormatted += authCodeStripped.substr(i, 1);
+            if (i % 4 === 3 && i < 15) {
+                authCodeFormatted += " ";
+            }
+        }
+        target.value = authCodeFormatted;
+        target.setSelectionRange(selectionStartOrig, selectionEndOrig);
+    }
+
+    handleChange(event) {
+        // always reformat value - many things can break formatting (copy & paste, delete, backspace, ...)
+        this.formatAuthCode(event);
         this.props.callback(this.stripSpaces(event.target.value));
     }
 
-    handleInput(event) {
+    handleKeyDown(event) {
+        if (event.which === 37 || event.which === 8) {
+            // left arrow key or backspace - skip spaces
+            if (event.target.selectionStart > 0 && event.target.selectionStart % 5 === 0) {
+                event.target.setSelectionRange(event.target.selectionStart-1, event.target.selectionEnd-1);
+            }
+        }
+        if (event.which === 39) {
+            // right arrow key - skip spaces
+            if (event.target.selectionStart > 0 && event.target.selectionStart % 5 === 3) {
+                event.target.setSelectionRange(event.target.selectionStart+1, event.target.selectionEnd+1);
+            }
+        }
+    }
+
+    handleKeyPress(event) {
+        const charCode = String.fromCharCode(event.which);
+        if (!charCode.match(/^[\d]$/)) {
+            event.preventDefault();
+        }
+        if (event.target.selectionStart % 5 === 4) {
+            // when user manages to move cursor on space character (e.g. by mouse), move cursor behind space to avoid overwriting it
+            event.target.setSelectionRange(event.target.selectionStart+1, event.target.selectionEnd+1);
+        }
         const target = event.currentTarget;
         let authCode = target.value;
         const authCodeStripped = this.stripSpaces(authCode);
-        if (authCodeStripped.length>0 && authCodeStripped.length % 4 === 0) {
-            authCode += " ";
-        }
         if (authCodeStripped.length < 16) {
-            target.value = authCode;
+            if (authCodeStripped.length > 0 && authCodeStripped.length % 4 === 0) {
+                // make sure space hasn't been just added (e.g. very fast typing)
+                if (!target.value.endsWith(" ")) {
+                    target.value = authCode + " ";
+                }
+            } else {
+                target.value = authCode;
+            }
         } else {
             event.preventDefault();
         }
@@ -56,8 +103,9 @@ class OfflineAuthCode extends React.Component {
                     type="text"
                     autoComplete="off"
                     size="21"
-                    onChange={(e)=> this.changeAuthCode(e)}
-                    onKeyPress={(e) => this.handleInput(e)}
+                    onChange={(e) => this.handleChange(e)}
+                    onKeyDown={(e) => this.handleKeyDown(e)}
+                    onKeyPress={(e) => this.handleKeyPress(e)}
                     placeholder="• • • •   • • • •   • • • •   • • • •"/>
             </div>
         );
