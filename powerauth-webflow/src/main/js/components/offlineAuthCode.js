@@ -39,7 +39,7 @@ class OfflineAuthCode extends React.Component {
         const target = event.currentTarget;
         let authCode = target.value;
         const authCodeStripped = this.stripSpaces(authCode);
-        if (authCodeStripped.length>0 && (authCodeStripped.length) % 4 === 0) {
+        if (authCodeStripped.length>0 && authCodeStripped.length % 4 === 0) {
             authCode += " ";
         }
         if (authCodeStripped.length < 16) {
