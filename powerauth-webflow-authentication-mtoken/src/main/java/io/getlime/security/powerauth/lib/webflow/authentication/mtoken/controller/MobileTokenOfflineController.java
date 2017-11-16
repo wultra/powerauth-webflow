@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,6 +77,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      */
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+        if (request.getAuthCode() == null || !request.getAuthCode().matches("^[0-9]{8}-[0-9]{8}$")) {
+            throw new AuthStepException("qrCode.invalidAuthCode", new IllegalArgumentException());
+        }
         final GetOperationDetailResponse operation = getOperation();
         // nonce and dataHash are received from UI - they were stored together with the QR code
         String nonce = request.getNonce();
@@ -113,7 +115,6 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Generates the QR code to be displayed to the user.
      *
      * @return Response with QR code as String-based PNG image.
-     * @throws IOException Thrown when generating QR code fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
