@@ -145,7 +145,7 @@ export default class TokenOffline extends React.Component {
     handleAuthCodeChange(value) {
         if (value.length === 16) {
             // the final value - add dash in between of the two 8-digit parts of the code
-            value = value.substr(0, 8) + "-" + value.substr(8, 17);
+            value = value.substr(0, 8) + "-" + value.substr(8);
         }
         this.setState({authCode: value});
     }
