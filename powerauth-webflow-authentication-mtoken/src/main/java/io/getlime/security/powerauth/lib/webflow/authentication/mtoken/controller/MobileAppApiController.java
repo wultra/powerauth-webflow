@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMeth
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
+import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -64,17 +65,42 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Register device for push notifications.
+     * Register device for push notifications using 1FA signature.
      * @param request Push registration request.
      * @param apiAuthentication API authentication.
      * @return Push registration response.
-     * @throws PowerAuthAuthenticationException Thrown when push registration fails.
      * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
+     * @throws InvalidRequestObjectException In case request object is not valid.
      */
     @RequestMapping(value = "/push/register", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/push/register", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException {
+    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
+        return registerDeviceImpl(request, apiAuthentication);
+    }
 
+    /**
+     * Register device for push notifications using simple token-based authentication.
+     * @param request Push registration request.
+     * @param apiAuthentication API authentication.
+     * @return Push registration response.
+     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
+     * @throws InvalidRequestObjectException In case request object is not valid.
+     */
+    @RequestMapping(value = "/token/push/register", method = RequestMethod.POST)
+    @PowerAuthToken
+    public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
+        return registerDeviceImpl(request, apiAuthentication);
+    }
+
+    /**
+     * Implementation of the push device registration business logic
+     * @param request Push registration request.
+     * @param apiAuthentication API authentication.
+     * @return Push registration response.
+     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
+     * @throws InvalidRequestObjectException In case request object is not valid.
+     */
+    private Response registerDeviceImpl(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, InvalidActivationException, PushRegistrationFailedException {
         if (request.getRequestObject() == null) {
             throw new InvalidRequestObjectException();
         }
@@ -115,15 +141,39 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * List pending operations for Mobile Token authorization.
+     * List pending operations for Mobile Token authorization, authenticate using 1FA signature.
      * @param apiAuthentication API authentication.
      * @return Response with list of pending operations.
-     * @throws PowerAuthAuthenticationException Thrown when loading of pending operations fails.
+     * @throws InvalidActivationException Thrown in case activation is not valid.
+     * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
     @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException {
+    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
+        return getOperationListImpl(apiAuthentication);
+    }
 
+    /**
+     * List pending operations for Mobile Token authorization, authenticate using simple token-based authentication.
+     * @param apiAuthentication API authentication.
+     * @return Response with list of pending operations.
+     * @throws InvalidActivationException Thrown in case activation is not valid.
+     * @throws PendingOperationListFailedException Thrown in case operation loading fails.
+     */
+    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
+    @PowerAuthToken
+    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
+        return getOperationListImpl(apiAuthentication);
+    }
+
+    /**
+     * List pending operations for Mobile Token authorization.
+     * @param apiAuthentication API authentication.
+     * @return Response with list of pending operations.
+     * @throws InvalidActivationException Thrown in case activation is not valid.
+     * @throws PendingOperationListFailedException Thrown in case operation loading fails.
+     */
+    private ObjectResponse<List<GetOperationDetailResponse>> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
             String userId = apiAuthentication.getUserId();
@@ -138,7 +188,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         } else {
             throw new PendingOperationListFailedException();
         }
-
     }
 
     /**
