@@ -243,9 +243,9 @@ export default class Token extends React.Component {
         }
         if (props.context.formData) {
             // When page is loading it is unknown whether offlineMode is enabled or not (this.state.offlineModeEnabled = null).
-            // Once formData is received it can be decided whether offline mode is enabled or not (via formData.userInput.offlineModeEnabled).
+            // Once formData is received it can be decided whether offline mode is enabled or not (via formData.userInput["offlineMode.enabled"]).
             // When user clicks the offline mode link, the formData on server is updated and switch to offline mode is done immediately by offlineModeCallback.
-            if (props.context.formData.userInput.offlineModeEnabled) {
+            if (props.context.formData.userInput["offlineMode.enabled"]) {
                 this.setOfflineMode(true);
             } else {
                 this.setOfflineMode(false);

@@ -60,13 +60,13 @@ export default class OperationDetail extends React.Component {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (props.context.formData.userInput.bankAccountChoiceDisabled) {
+                    if (props.context.formData.userInput["operation.bankAccountChoice.disabled"]) {
                         // bank account has already been chosen and choice is frozen
-                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput.chosenBankAccountNumber);
+                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
                         this.setBankAccountChoiceDisabled(true);
-                    } else if (this.props.context.formData.userInput.chosenBankAccountNumber) {
+                    } else if (this.props.context.formData.userInput["operation.bankAccountChoice"]) {
                         // bank account has already been chosen but choice is not frozen yet
-                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput.chosenBankAccountNumber);
+                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
                     } else {
                         // initial bank account is set to the first bank account found
                         this.handleBankAccountChoice(item.bankAccounts[0]);
@@ -91,7 +91,7 @@ export default class OperationDetail extends React.Component {
 
     handleBankAccountChoice(bankAccount) {
         this.setState({chosenBankAccount: bankAccount});
-        this.props.context.formData.userInput.chosenBankAccountNumber = bankAccount.number;
+        this.props.context.formData.userInput["operation.bankAccountChoice"] = bankAccount.number;
         this.props.dispatch(updateFormData(this.props.context.formData));
     }
 

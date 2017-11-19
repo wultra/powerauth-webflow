@@ -90,7 +90,7 @@ export default class TokenOffline extends React.Component {
         }
         if (activations !== undefined && activations.length>0) {
             this.storeActivations(activations);
-            if (props.context.formData.userInput.chosenActivationId) {
+            if (props.context.formData.userInput["offlineMode.device"]) {
                 this.resolveChosenActivation(activations)
             } else {
                 this.storeChosenActivation(chosenActivation);
@@ -136,7 +136,7 @@ export default class TokenOffline extends React.Component {
 
     handleActivationChoice(activation) {
         this.setState({chosenActivation: activation});
-        this.props.context.formData.userInput.chosenActivationId = activation.activationId;
+        this.props.context.formData.userInput["offlineMode.device"] = activation.activationId;
         this.props.dispatch(updateFormData(activation), this.props.context.formData, function () {
             this.props.dispatch(initOffline(activation.activationId));
         });
@@ -164,7 +164,7 @@ export default class TokenOffline extends React.Component {
                     {(this.state.activations && this.state.chosenActivation) ? (
                         <div>
                             <div className="row attribute col-sm-6 key">
-                                <FormattedMessage id="qrCode.device"/>
+                                <FormattedMessage id="offlineMode.device"/>
                             </div>
                             <ActivationSelect
                                 activations={this.state.activations}
@@ -192,7 +192,7 @@ export default class TokenOffline extends React.Component {
                                 </FormGroup>
                             )}
 
-                            <FormattedMessage id="qrCode.authCodeText"/>
+                            <FormattedMessage id="offlineMode.authCodeText"/>
                             <br/>
                             <OfflineAuthCode autoFocus callback={this.handleAuthCodeChange}/>
                             <br/><br/>
