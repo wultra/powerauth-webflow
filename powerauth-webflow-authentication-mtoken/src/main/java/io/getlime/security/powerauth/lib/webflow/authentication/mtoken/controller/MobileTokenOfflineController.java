@@ -45,7 +45,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -78,14 +77,10 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      */
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+        if (request.getAuthCode() == null || !request.getAuthCode().matches("^[0-9]{8}-[0-9]{8}$")) {
+            throw new AuthStepException("qrCode.invalidAuthCode", new IllegalArgumentException());
+        }
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
-        }
-        if (!isAuthMethodAvailable(operation)) {
-            // when AuthMethod is disabled authenticate() call should always fail
-            return null;
-        }
         // nonce and dataHash are received from UI - they were stored together with the QR code
         String nonce = request.getNonce();
         String dataHash = request.getDataHash();
@@ -120,27 +115,12 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Generates the QR code to be displayed to the user.
      *
      * @return Response with QR code as String-based PNG image.
-     * @throws IOException Thrown when generating QR code fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws IOException, QRCodeInvalidDataException, NextStepServiceException {
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws QRCodeInvalidDataException, NextStepServiceException, AuthStepException {
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            // when operation is no longer available (e.g. expired), auth method should fail
-            final QRCodeInitResponse response = new QRCodeInitResponse();
-            response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-            response.setMessage("operation.notAvailable");
-            return response;
-        }
-        if (!isAuthMethodAvailable(operation)) {
-            // QR code cannot be generated when AuthMethod is disabled
-            final QRCodeInitResponse response = new QRCodeInitResponse();
-            response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage("method.disabled");
-            return response;
-        }
 
         String userId = operation.getUserId();
 
@@ -243,16 +223,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeAuthenticationResponse cancelAuthentication() {
+    public QRCodeAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
-            if (operation == null) {
-                // when operation is no longer available (e.g. expired), auth method should fail
-                final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
-                response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
-                response.setMessage("operation.notAvailable");
-                return response;
-            }
             cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
@@ -273,11 +246,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * @return QR code as String-based PNG image.
      * @throws QRCodeInvalidDataException Thrown when data is invalid.
      */
-    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException {
+    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException, AuthStepException {
         GetOperationDetailResponse operation = getOperation();
-        if (operation == null) {
-            throw new QRCodeInvalidDataException("operation.notAvailable");
-        }
         String operationData = operation.getOperationData();
         String messageText = operation.getFormData().getMessage().getValue();
 

@@ -178,6 +178,16 @@ public class OperationPersistenceService {
         if (currentHistory == null) {
             throw new IllegalStateException("Operation is missing history");
         }
+        boolean chosenAuthMethodValid = false;
+        for (AuthStep step: getResponseAuthSteps(operation)) {
+            if (step.getAuthMethod() == request.getChosenAuthMethod()) {
+                chosenAuthMethodValid = true;
+                break;
+            }
+        }
+        if (!chosenAuthMethodValid) {
+            throw new IllegalStateException("Invalid chosen authentication method");
+        }
         currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
         operationHistoryRepository.save(currentHistory);
     }

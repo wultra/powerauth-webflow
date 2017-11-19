@@ -69,7 +69,7 @@ export function authenticateOnline(callback) {
                 }
                 case 'AUTH_FAILED': {
                     // handle case when authentication method is no longer available
-                    if (response.data.message === "method.disabled") {
+                    if (response.data.message === "operation.methodNotAvailable") {
                         dispatchAction(dispatch, response);
                         break;
                     }

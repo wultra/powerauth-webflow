@@ -30,30 +30,6 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
         case "SHOW_SCREEN_ERROR": {
             return {...state, currentScreen: "SCREEN_ERROR", context: action.payload};
         }
-        case "CHANGE_BANK_ACCOUNT": {
-            return {
-                ...state,
-                // do not change the current screen
-                currentScreen: state.currentScreen,
-                context: mergeContext(action.type, state.context, action.payload)
-            };
-        }
-        case "CHANGE_ACTIVATION": {
-            return {
-                ...state,
-                // do not change the current screen
-                currentScreen: state.currentScreen,
-                context: mergeContext(action.type, state.context, action.payload)
-            };
-        }
-        case "CHOOSE_AUTH_METHOD": {
-            return {
-                ...state,
-                // do not change the current screen
-                currentScreen: state.currentScreen,
-                context: mergeContext(action.type, state.context, action.payload)
-            };
-        }
     }
     return state;
 }
@@ -81,12 +57,6 @@ function mergeContext(actionType, oldContext, newContext) {
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
             break;
-        case "CHANGE_BANK_ACCOUNT":
-            changeBankAccount(oldContext, newContext);
-            break;
-        case "CHANGE_ACTIVATION":
-            changeActivation(oldContext, newContext);
-            break;
     }
     return newContext;
 }
@@ -107,26 +77,4 @@ function mergeAuthMethods(oldContext, newContext) {
     if (oldContext.authMethods !== undefined && newContext.authMethods === undefined) {
         newContext.authMethods = oldContext.authMethods;
     }
-}
-
-function changeBankAccount(oldContext, newContext) {
-    let chosenBankAccountNumber = newContext.chosenBankAccountNumber;
-    // copy all oldContext properties except for chosenBankAccountNumber, which should be taken from newContext
-    for (const prop in oldContext) {
-        if (oldContext.hasOwnProperty(prop)) {
-            newContext[prop] = oldContext[prop];
-        }
-    }
-    newContext.formData.userInput.chosenBankAccountNumber = chosenBankAccountNumber;
-}
-
-function changeActivation(oldContext, newContext) {
-    let chosenActivationId = newContext.chosenActivation.activationId;
-    // copy all oldContext properties except for chosenActivationId, which should be taken from newContext
-    for (const prop in oldContext) {
-        if (oldContext.hasOwnProperty(prop)) {
-            newContext[prop] = oldContext[prop];
-        }
-    }
-    newContext.formData.userInput.chosenActivationId = chosenActivationId;
 }

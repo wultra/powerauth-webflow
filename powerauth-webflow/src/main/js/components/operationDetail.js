@@ -21,7 +21,7 @@ import {FormGroup} from "react-bootstrap";
 // Custom react-select component for bank account choice with HTML content
 import BankAccountSelect from "./bankAccountSelect";
 // Actions
-import {changeBankAccount} from "../actions/operationDetailActions";
+import {updateFormData} from "../actions/operationDetailActions";
 // i18n
 import {FormattedMessage} from "react-intl";
 
@@ -38,7 +38,7 @@ export default class OperationDetail extends React.Component {
 
     constructor() {
         super();
-        this.init = this.init.bind(this);
+        this.initBankAccounts = this.initBankAccounts.bind(this);
         this.resolveChosenBankAccount = this.resolveChosenBankAccount.bind(this);
         this.handleBankAccountChoice = this.handleBankAccountChoice.bind(this);
         this.storeBankAccounts = this.storeBankAccounts.bind(this);
@@ -47,34 +47,30 @@ export default class OperationDetail extends React.Component {
     }
 
     componentWillMount() {
-        this.init();
+        this.initBankAccounts(this.props);
     }
 
-    init() {
-        if (this.props.context.formData) {
-            this.props.context.formData.parameters.map((item) => {
+    componentWillReceiveProps(props) {
+        this.initBankAccounts(props);
+    }
+
+    initBankAccounts(props) {
+        if (props.context.formData) {
+            props.context.formData.parameters.map((item) => {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
-                    if (this.props.context.formData.userInput.bankAccountChosen) {
-                        // bank account has already been chosen
-                        this.resolveChosenBankAccount(item.bankAccounts, this.props.context.formData.userInput.chosenBankAccountNumber);
+                    if (props.context.formData.userInput.bankAccountChoiceDisabled) {
+                        // bank account has already been chosen and choice is frozen
+                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput.chosenBankAccountNumber);
                         this.setBankAccountChoiceDisabled(true);
+                    } else if (this.props.context.formData.userInput.chosenBankAccountNumber) {
+                        // bank account has already been chosen but choice is not frozen yet
+                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput.chosenBankAccountNumber);
                     } else {
                         // initial bank account is set to the first bank account found
                         this.handleBankAccountChoice(item.bankAccounts[0]);
                     }
-                }
-            });
-        }
-    }
-
-    componentWillReceiveProps(props) {
-        if (props.context.formData) {
-            props.context.formData.parameters.map((item) => {
-                if (item.type === "BANK_ACCOUNT_CHOICE") {
-                    // store bankAccounts again - language can change dynamically
-                    this.storeBankAccounts(item.bankAccounts);
                 }
             });
         }
@@ -88,14 +84,15 @@ export default class OperationDetail extends React.Component {
     resolveChosenBankAccount(bankAccounts, chosenBankAccountNumber) {
         bankAccounts.map((bankAccount) => {
             if (bankAccount.number === chosenBankAccountNumber) {
-                this.handleBankAccountChoice(bankAccount);
+                this.setState({chosenBankAccount: bankAccount});
             }
         });
     }
 
     handleBankAccountChoice(bankAccount) {
         this.setState({chosenBankAccount: bankAccount});
-        this.props.dispatch(changeBankAccount(bankAccount.number));
+        this.props.context.formData.userInput.chosenBankAccountNumber = bankAccount.number;
+        this.props.dispatch(updateFormData(this.props.context.formData));
     }
 
     setBankAccountChoiceDisabled(disabled) {
