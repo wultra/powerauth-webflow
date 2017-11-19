@@ -40,7 +40,7 @@ export default class TokenOnline extends React.Component {
         event.preventDefault();
         const offlineModeCallback = this.props.offlineModeCallback;
         // set the offline mode userInput
-        this.props.context.formData.userInput.offlineModeEnabled = true;
+        this.props.context.formData.userInput["offlineMode.enabled"] = true;
         // save updated form data in the backend
         this.props.dispatch(updateFormData(this.props.context.formData, function () {
             // update Token component state - switch to offline mode immediately

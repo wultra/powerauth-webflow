@@ -59,9 +59,8 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/api/auth/operation")
 public class OperationReviewController extends AuthMethodController<OperationReviewRequest, OperationReviewResponse, AuthStepException> {
 
-    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "bankAccountChoiceDisabled";
-    private final String FIELD_CHOSEN_BANK_ACCOUNT_NUMBER = "chosenBankAccountNumber";
     private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
+    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -161,9 +160,9 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         // Send notification to Data Adapter if the bank account has changed.
         // In case there is no bank account choice, the notification is not performed.
         Map<String, String> userInput = request.getFormData().getUserInput();
-        if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER)) {
+        if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE)) {
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
-            bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_CHOSEN_BANK_ACCOUNT_NUMBER));
+            bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
         }
         return new ObjectResponse();

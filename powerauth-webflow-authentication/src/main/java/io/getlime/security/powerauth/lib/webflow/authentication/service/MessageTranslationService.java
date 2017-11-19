@@ -39,7 +39,7 @@ import java.util.logging.Logger;
 public class MessageTranslationService {
 
     private final I18NService i18NService;
-    private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "chosenBankAccountNumber";
+    private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "operation.bankAccountChoice";
     private static final String MISSING_KEY_MESSAGE = "MISSING_LOCALIZATION_FOR_FIELD";
     private static final String MISSING_VALUE_MESSAGE = "MISSING_VALUE_FOR_FIELD";
 
