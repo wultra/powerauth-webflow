@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
+import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,8 @@ import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Service which translates formData strings.
@@ -37,6 +40,8 @@ public class MessageTranslationService {
 
     private final I18NService i18NService;
     private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "chosenBankAccountNumber";
+    private static final String MISSING_KEY_MESSAGE = "MISSING_LOCALIZATION_FOR_FIELD";
+    private static final String MISSING_VALUE_MESSAGE = "MISSING_VALUE_FOR_FIELD";
 
     public MessageTranslationService(I18NService i18NService) {
         this.i18NService = i18NService;
@@ -132,7 +137,12 @@ public class MessageTranslationService {
             throw new IllegalArgumentException("Missing i18n key");
         }
         final AbstractMessageSource messageSource = i18NService.getMessageSource();
-        return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
+        try {
+            return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
+        } catch (NoSuchMessageException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while reading resource", ex);
+            return MISSING_KEY_MESSAGE+": "+i18nKey;
+        }
     }
 
     /**
@@ -156,7 +166,11 @@ public class MessageTranslationService {
                 keyBuilder = new StringBuilder();
             } else if (c == '}') {
                 String key = keyBuilder.toString();
-                messageBuilder.append(valueMap.get(key));
+                String value = valueMap.get(key);
+                if (value == null) {
+                    value = MISSING_VALUE_MESSAGE+": "+key;
+                }
+                messageBuilder.append(value);
                 betweenBrackets = false;
             } else {
                 if (betweenBrackets) {
