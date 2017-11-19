@@ -160,7 +160,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
-    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/token/operation/list", method = RequestMethod.POST)
     @PowerAuthToken
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
         return getOperationListImpl(apiAuthentication);
