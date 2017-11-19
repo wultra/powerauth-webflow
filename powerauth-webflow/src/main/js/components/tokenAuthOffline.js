@@ -20,9 +20,10 @@ import {authenticateOffline, initOffline, updateFormData} from "../actions/token
 // Components
 import {FormGroup} from "react-bootstrap";
 import Spinner from 'react-spin';
+import ActivationSelect from "./activationSelect";
+import OfflineAuthCode from "./offlineAuthCode";
 // i18n
 import {FormattedMessage} from "react-intl";
-import ActivationSelect from "./activationSelect";
 
 
 /**
@@ -141,8 +142,12 @@ export default class TokenOffline extends React.Component {
         });
     }
 
-    handleAuthCodeChange(event) {
-        this.setState({authCode: event.target.value});
+    handleAuthCodeChange(value) {
+        if (value.length === 16) {
+            // the final value - add dash in between of the two 8-digit parts of the code
+            value = value.substr(0, 8) + "-" + value.substr(8);
+        }
+        this.setState({authCode: value});
     }
 
     handleSubmit(event) {
@@ -189,7 +194,7 @@ export default class TokenOffline extends React.Component {
 
                             <FormattedMessage id="qrCode.authCodeText"/>
                             <br/>
-                            <input autoFocus type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
+                            <OfflineAuthCode autoFocus callback={this.handleAuthCodeChange}/>
                             <br/><br/>
                             <div className="attribute row">
                                 <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
