@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
+import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.FormDataChangeNotificationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +51,7 @@ public class FormDataChangeController {
      * @return Object response.
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse formDataChangedNotification(@RequestBody ObjectRequest<FormDataChangeNotificationRequest> request) {
+    public @ResponseBody ObjectResponse formDataChangedNotification(@RequestBody ObjectRequest<FormDataChangeNotificationRequest> request) throws DataAdapterRemoteException {
         FormDataChangeNotificationRequest notification = request.getRequestObject();
         String userId = notification.getUserId();
         String operationId = notification.getOperationId();

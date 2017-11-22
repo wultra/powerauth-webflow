@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFailedException;
+import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
@@ -72,7 +73,7 @@ public class AuthenticationController {
      * @throws MethodArgumentNotValidException In case form parameters are not valid.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@Valid @RequestBody ObjectRequest<AuthenticationRequest> request, BindingResult result) throws MethodArgumentNotValidException, AuthenticationFailedException {
+    public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@Valid @RequestBody ObjectRequest<AuthenticationRequest> request, BindingResult result) throws MethodArgumentNotValidException, DataAdapterRemoteException, AuthenticationFailedException {
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
             MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);
@@ -93,7 +94,7 @@ public class AuthenticationController {
      * @return Response with user details.
      */
     @RequestMapping(value = "/info", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws MethodArgumentNotValidException, UserNotFoundException {
+    public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws DataAdapterRemoteException, UserNotFoundException {
         UserDetailRequest userDetailRequest = request.getRequestObject();
         String userId = userDetailRequest.getId();
         UserDetailResponse response = dataAdapter.fetchUserDetail(userId);
