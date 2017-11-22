@@ -55,13 +55,13 @@ public class UserProfileController {
     /**
      * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
      *
-     * @param principal Currently logged user.
+     * @param authentication Original authentication of the currently logged user.
      * @return User profile.
      */
     @RequestMapping("me")
-    public @ResponseBody UserResponse me(Principal principal, OAuth2Authentication authentication) {
+    public @ResponseBody UserResponse me(OAuth2Authentication authentication) {
         try {
-            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(principal.getName());
+            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName());
 
             Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
 
