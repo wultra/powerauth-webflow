@@ -145,4 +145,17 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Handling of exceptions occurring during communication with remote backends.
+     *
+     * @return Response with error information.
+     */
+    @ExceptionHandler(DataAdapterRemoteException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleDataAdapterRemoteException(DataAdapterRemoteException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred while communicating with remote system", ex);
+        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.REMOTE_ERROR, "error.remote");
+        return new ErrorResponse(error);
+    }
+
 }

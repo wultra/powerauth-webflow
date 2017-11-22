@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
+import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.impl.validation.CreateSMSAuthorizationRequestValidator;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
@@ -74,7 +75,7 @@ public class SMSAuthorizationController {
      * @return Response with message ID.
      */
     @RequestMapping(value = "create", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@Valid @RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request, BindingResult result) throws MethodArgumentNotValidException, SMSAuthorizationFailedException {
+    public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@Valid @RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request, BindingResult result) throws MethodArgumentNotValidException, DataAdapterRemoteException, SMSAuthorizationFailedException {
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
             MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);

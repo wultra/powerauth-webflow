@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.api;
 
 import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFailedException;
+import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
@@ -39,7 +40,7 @@ public interface DataAdapter {
      * @param password Password for user authentication.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
-    UserDetailResponse authenticateUser(String username, String password) throws AuthenticationFailedException;
+    UserDetailResponse authenticateUser(String username, String password) throws DataAdapterRemoteException, AuthenticationFailedException;
 
     /**
      * Fetch user detail for given user.
@@ -47,7 +48,7 @@ public interface DataAdapter {
      * @return Response with user details.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
-    UserDetailResponse fetchUserDetail(String userId) throws UserNotFoundException;
+    UserDetailResponse fetchUserDetail(String userId) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
      * Fetch bank account details for given user.
@@ -56,7 +57,7 @@ public interface DataAdapter {
      * @return Response with bank account details.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
-    List<BankAccount> fetchBankAccounts(String userId, String operationId) throws UserNotFoundException;
+    List<BankAccount> fetchBankAccounts(String userId, String operationId) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
      * Receive notification about formData change.
@@ -64,7 +65,7 @@ public interface DataAdapter {
      * @param operationId Operation ID.
      * @param formDataChange FormData change.
      */
-    void formDataChangedNotification(String userId, String operationId, FormDataChange formDataChange);
+    void formDataChangedNotification(String userId, String operationId, FormDataChange formDataChange) throws DataAdapterRemoteException;
 
     /**
      * Receive notification about operation change.
@@ -72,7 +73,7 @@ public interface DataAdapter {
      * @param operationId Operation ID.
      * @param operationChange Operation change.
      */
-    void operationChangedNotification(String userId, String operationId, OperationChange operationChange);
+    void operationChangedNotification(String userId, String operationId, OperationChange operationChange) throws DataAdapterRemoteException;
 
     /**
      * Send an authorization SMS with generated OTP.
@@ -80,6 +81,6 @@ public interface DataAdapter {
      * @param messageText Text of SMS message.
      * @throws SMSAuthorizationFailedException Thrown when message could not be created.
      */
-    void sendAuthorizationSMS(String userId, String messageText) throws SMSAuthorizationFailedException;
+    void sendAuthorizationSMS(String userId, String messageText) throws DataAdapterRemoteException, SMSAuthorizationFailedException;
 
 }
