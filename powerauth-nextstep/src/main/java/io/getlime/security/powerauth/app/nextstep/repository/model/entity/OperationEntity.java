@@ -31,7 +31,8 @@ import java.util.List;
 @Table(name = "ns_operation")
 @NamedQueries({
         @NamedQuery(name = "OperationEntity.findPendingOperationsForUser", query = "SELECT o FROM OperationEntity o WHERE o.userId=?1 AND o.result='CONTINUE' " +
-                "AND o.timestampExpires > CURRENT_TIMESTAMP ORDER BY o.timestampExpires")
+                "AND o.timestampExpires > CURRENT_TIMESTAMP ORDER BY o.timestampExpires"),
+        @NamedQuery(name = "OperationEntity.findOtherOperationsInHttpSession", query = "SELECT o FROM OperationEntity o WHERE o.httpSessionId=?1 AND o.operationId<>?2 AND o.result='CONTINUE'")
 })
 public class OperationEntity implements Serializable {
 
@@ -52,6 +53,9 @@ public class OperationEntity implements Serializable {
 
     @Column(name = "user_id")
     private String userId;
+
+    @Column(name = "http_session_id")
+    private String httpSessionId;
 
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
@@ -105,6 +109,14 @@ public class OperationEntity implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getHttpSessionId() {
+        return httpSessionId;
+    }
+
+    public void setHttpSessionId(String httpSessionId) {
+        this.httpSessionId = httpSessionId;
     }
 
     public AuthResult getResult() {

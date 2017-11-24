@@ -90,6 +90,7 @@ CREATE TABLE ns_operation (
   operation_data            TEXT,
   operation_form_data       TEXT,
   user_id                   VARCHAR(256),
+  http_session_id           VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP

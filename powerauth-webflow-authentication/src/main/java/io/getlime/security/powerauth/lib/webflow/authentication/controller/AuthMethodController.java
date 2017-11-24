@@ -39,9 +39,11 @@ import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOpe
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationIdentificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -77,6 +79,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private MessageTranslationService messageTranslationService;
 
+    @Autowired
+    private OperationIdentificationService operationIdentificationService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     protected GetOperationDetailResponse getOperation() throws AuthStepException {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
@@ -84,10 +92,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             if (operationId != null) {
                 return getOperation(operationId);
             } else {
-                return null;
+                throw new AuthStepException("operation.notAvailable", new NullPointerException());
             }
         } else {
-            return null;
+            throw new AuthStepException("operation.notAvailable", new NullPointerException());
         }
     }
 
@@ -228,9 +236,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param provider      Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
-    protected R initiateOperationWithName(String operationName, String operationData, List<KeyValueParameter> params, AuthResponseProvider provider) {
+    protected R initiateOperationWithName(String operationName, String operationData, String httpSessionId, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
-            ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, params);
+            // at first check for an existing operation
+            try {
+                GetOperationDetailResponse operation = getOperation();
+                if (operation!=null) {
+                    // perform cleanup of previous operation
+                    cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.INTERRUPTED_OPERATION, null);
+                    clearCurrentBrowserSession();
+                }
+            } catch (AuthStepException e) {
+                // error caused by previous operation is not critical
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while canceling previous operation", e);
+            }
+            ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, httpSessionId, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), null, operationId);
@@ -376,6 +396,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (operation == null) {
             throw new AuthStepException("operation.notAvailable", new NullPointerException());
         }
+        if (operation.getResult() == AuthResult.FAILED) {
+            throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
+        }
         final AuthMethod currentAuthMethod = getAuthMethodName();
         List<OperationHistory> operationHistoryList = operation.getHistory();
         if (operationHistoryList == null || operationHistoryList.isEmpty()) {
@@ -389,6 +412,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         if (operation.getResult() == AuthResult.CONTINUE) {
+            // verify operation hash
+            String clientOperationHash = request.getHeader("X-OPERATION-HASH");
+            String currentOperationHash = operationIdentificationService.generateOperationHash(operation.getOperationId());
+            if (clientOperationHash == null) {
+                throw new AuthStepException("operation.invalid", new NullPointerException());
+            }
+            if (!clientOperationHash.equals(currentOperationHash)) {
+                throw new AuthStepException("operation.interrupted", new IllegalStateException());
+            }
             // check steps for operations with AuthResult = CONTINUE, DONE and FAILED methods do not have steps
             if (currentAuthMethod != AuthMethod.INIT && currentAuthMethod != AuthMethod.SHOW_OPERATION_DETAIL) {
                 // check whether AuthMethod is available in next steps, only done in real authentication methods

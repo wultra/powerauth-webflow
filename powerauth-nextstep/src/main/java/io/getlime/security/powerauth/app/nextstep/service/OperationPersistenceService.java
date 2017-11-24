@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
@@ -75,6 +76,7 @@ public class OperationPersistenceService {
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
+        operation.setHttpSessionId(request.getHttpSessionId());
         operation.setResult(response.getResult());
         try {
             // Store form data as serialized JSON string.
@@ -85,6 +87,9 @@ public class OperationPersistenceService {
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
         operationRepository.save(operation);
+
+        // fail other active operations within same HTTP session
+        failUnfinishedOperations(request.getHttpSessionId(), operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
@@ -265,21 +270,19 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Gets the list of @{link AuthMethod} for an operation. Authentication methods from the current response
-     * are returned. In case no history is available, empty list is returned.
-     *
-     * @param operation operation entity
-     * @return list of @{link AuthMethod}
+     * Fail all unfinished operations within same HTTP session except for current operation.
+     * @param httpSessionId HTTP session ID.
+     * @param currentOperation Current operation.
      */
-    private List<AuthMethod> getResponseAuthMethods(OperationEntity operation) {
-        List<AuthMethod> authMethods = new ArrayList<>();
-        List<AuthStep> responseSteps = getResponseAuthSteps(operation);
-        if (responseSteps.isEmpty()) {
-            return authMethods;
+    private void failUnfinishedOperations(String httpSessionId, OperationEntity currentOperation) {
+        String operationId = currentOperation.getOperationId();
+        List<OperationEntity> unfinishedOperations = operationRepository.findOtherOperationsInHttpSession(httpSessionId, operationId);
+        for (OperationEntity operation: unfinishedOperations) {
+            operation.setResult(AuthResult.FAILED);
+            if (operation.getCurrentOperationHistoryEntity()!=null) {
+                operation.getCurrentOperationHistoryEntity().setResponseResult(AuthResult.FAILED);
+                operation.getCurrentOperationHistoryEntity().setResponseResultDescription("operation.interrupted");
+            }
         }
-        for (AuthStep step : responseSteps) {
-            authMethods.add(step.getAuthMethod());
-        }
-        return authMethods;
     }
 }

@@ -37,4 +37,12 @@ public interface OperationRepository extends CrudRepository<OperationEntity, Str
      */
     List<OperationEntity> findPendingOperationsForUser(String userId);
 
+    /**
+     * Find operations in HTTP session other than operation with given operation ID.
+     * @param httpSessionId Session ID.
+     * @param operationId Operation ID.
+     * @return List other operations in HTTP session.
+     */
+    List<OperationEntity> findOtherOperationsInHttpSession(String httpSessionId, String operationId);
+
 }

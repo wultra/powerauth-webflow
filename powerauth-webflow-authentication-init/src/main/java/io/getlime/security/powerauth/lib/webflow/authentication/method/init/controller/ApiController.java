@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,11 +58,15 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         final GetOperationDetailResponse operation = getOperation();
 
+        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
+        String sessionId = attributes.getSessionId();
+
         if (operation == null) {
             final String operationName = "login";
             final String operationData = "{}";
             List<KeyValueParameter> params = new ArrayList<>();
-            return initiateOperationWithName(operationName, operationData, params, new AuthResponseProvider() {
+            return initiateOperationWithName(operationName, operationData, sessionId, params, new AuthResponseProvider() {
 
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {

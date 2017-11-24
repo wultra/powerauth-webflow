@@ -96,8 +96,8 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, operationId, operationData, null, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String httpSessionId, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, operationId, operationData, httpSessionId, null, params);
     }
 
     /**
@@ -108,8 +108,8 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, null, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, String httpSessionId, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, httpSessionId, null, params);
     }
 
 
@@ -123,13 +123,14 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String httpSessionId, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
             request.setOperationName(operationName);
             request.setOperationId(operationId);
             request.setOperationData(operationData);
+            request.setHttpSessionId(httpSessionId);
             request.setFormData(formData);
             if (params != null) {
                 request.getParams().addAll(params);
@@ -154,8 +155,8 @@ public class NextStepClient {
      * @param params        list of generic parameters
      * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, formData, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, String httpSessionId, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, httpSessionId, formData, params);
     }
 
     /**
@@ -391,7 +392,7 @@ public class NextStepClient {
      * @return Next step service exception
      * @throws NextStepServiceException exception with ErrorModel
      */
-    private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) throws NextStepServiceException {
+    private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) {
         Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
         return new NextStepServiceException(ex, error);
     }

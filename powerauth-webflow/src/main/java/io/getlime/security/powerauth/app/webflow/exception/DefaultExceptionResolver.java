@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.webflow.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -60,6 +61,19 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", t);
         final Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for AuthStepException.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(AuthStepException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", ex);
+        final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
         return new ErrorResponse(error);
     }
 

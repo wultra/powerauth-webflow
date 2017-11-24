@@ -31,6 +31,7 @@ public class CreateOperationRequest {
     private String operationName;
     private String operationId;
     private String operationData;
+    private String httpSessionId;
     private List<KeyValueParameter> params;
     private OperationFormData formData;
 
@@ -89,6 +90,14 @@ public class CreateOperationRequest {
      */
     public void setOperationData(String operationData) {
         this.operationData = operationData;
+    }
+
+    public String getHttpSessionId() {
+        return httpSessionId;
+    }
+
+    public void setHttpSessionId(String httpSessionId) {
+        this.httpSessionId = httpSessionId;
     }
 
     /**

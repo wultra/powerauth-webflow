@@ -90,6 +90,7 @@ CREATE TABLE ns_operation (
   operation_data            CLOB,
   operation_form_data       CLOB,
   user_id                   VARCHAR(256),
+  http_session_id           VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
   timestamp_expires         TIMESTAMP
