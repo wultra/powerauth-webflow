@@ -87,7 +87,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidRequestObjectException In case request object is not valid.
      */
     @RequestMapping(value = "/token/push/register", method = RequestMethod.POST)
-    @PowerAuthToken
+    @PowerAuthToken(signatureType = {
+            PowerAuthSignatureTypes.POSSESSION,
+            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
+    })
     public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
         return registerDeviceImpl(request, apiAuthentication);
     }
@@ -161,7 +166,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
     @RequestMapping(value = "/token/operation/list", method = RequestMethod.POST)
-    @PowerAuthToken
+    @PowerAuthToken(signatureType = {
+            PowerAuthSignatureTypes.POSSESSION,
+            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
+    })
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
         return getOperationListImpl(apiAuthentication);
     }
