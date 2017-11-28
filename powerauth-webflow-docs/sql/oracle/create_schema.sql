@@ -67,7 +67,7 @@ CREATE TABLE ns_auth_method (
 );
 
 -- Table ns_user_prefs stores user preferences.
--- Status of authentication methods is stored in this able per user (methods can be enabled or disabled).
+-- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY,
   auth_method_1 NUMBER(1) DEFAULT 0,
