@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationIdentificationService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -42,20 +42,20 @@ public class HomeController {
     private final WebFlowServerConfiguration webFlowConfig;
     private final AuthenticationManagementService authenticationManagementService;
     private final I18NService i18nService;
-    private final OperationIdentificationService operationIdentificationService;
+    private final OperationSessionService operationSessionService;
 
     /**
      * Initialization of the HomeController with application webflowServicesConfiguration.
      *
      * @param webFlowConfig WebFlowServicesConfiguration of the application
-     * @param operationIdentificationService Operation hash service.
+     * @param operationSessionService Operation to session mapping service.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationIdentificationService operationIdentificationService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
-        this.operationIdentificationService = operationIdentificationService;
+        this.operationSessionService = operationSessionService;
     }
 
     /**
@@ -72,8 +72,9 @@ public class HomeController {
      * Renders the main home page element.
      *
      * @param model Page model.
+     * @param request  Reference to current HttpServletRequest.
+     * @param response Reference to current HttpServletResponse.
      * @return index page
-     * @throws Exception thrown when page is not found
      */
     @RequestMapping("/authenticate")
     public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
@@ -100,7 +101,7 @@ public class HomeController {
         // JSON objects with i18n messages are inserted into the model to provide localization for the frontend
         model.put("i18n_CS", i18nService.generateMessages(new Locale("cs")));
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
-        model.put("operationHash", operationIdentificationService.generateOperationHash(operationId));
+        model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         return "index";
     }
 

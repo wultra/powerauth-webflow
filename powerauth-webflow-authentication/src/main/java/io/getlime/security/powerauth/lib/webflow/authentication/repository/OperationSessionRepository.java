@@ -13,35 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.repository;
+package io.getlime.security.powerauth.lib.webflow.authentication.repository;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.entity.OperationSessionEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 /**
- * CrudRepository for persistence of step definitions.
+ * CrudRepository for persistence of mapping of operations to HTTP sessions.
  *
  * @author Roman Strobl
  */
 @Component
-public interface StepDefinitionRepository extends CrudRepository<StepDefinitionEntity, Long> {
+public interface OperationSessionRepository extends CrudRepository<OperationSessionEntity, String> {
 
-    /**
-     * Finds all step definitions for operation specified by its name.
-     *
-     * @param operationName name of the operation
-     * @return List of step definitions
-     */
-    List<StepDefinitionEntity> findStepDefinitionsForOperation(String operationName);
+    List<OperationSessionEntity> findActiveOperationsByHttpSessionId(String httpSessionId);
 
-    /**
-     * Finds all distict operation names.
-     *
-     * @return List of operation names
-     */
-    List<String> findDistinctOperationNames();
-
+    OperationSessionEntity findByOperationId(String operationId);
 }

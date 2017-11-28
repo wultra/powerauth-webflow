@@ -30,9 +30,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.RequestAttributes;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -92,10 +89,8 @@ public class HomeController {
         formData.addKeyValue("operation.account", paymentForm.getAccount());
         formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());
         formData.addNote("operation.note", paymentForm.getNote());
-        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-        ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
-        String sessionId = attributes.getSessionId();
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, sessionId, formData, null);
+
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 
         return "redirect:/";

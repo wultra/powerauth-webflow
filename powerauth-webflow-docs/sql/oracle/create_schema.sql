@@ -90,7 +90,6 @@ CREATE TABLE ns_operation (
   operation_data            CLOB,
   operation_form_data       CLOB,
   user_id                   VARCHAR(256),
-  http_session_id           VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
   timestamp_expires         TIMESTAMP
@@ -128,6 +127,15 @@ CREATE TABLE ns_step_definition (
   response_result          VARCHAR(32),
   CONSTRAINT step_request_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
   CONSTRAINT step_response_auth_method_fk FOREIGN KEY (response_auth_method) REFERENCES ns_auth_method (auth_method)
+);
+
+-- Table wf_operation_session maps operations to HTTP sessions.
+-- Table is needed for handling of concurrent operations.
+CREATE TABLE wf_operation_session (
+  operation_id              VARCHAR(256) PRIMARY KEY,
+  http_session_id           VARCHAR(256),
+  result                    VARCHAR(32),
+  timestamp_created         TIMESTAMP
 );
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.

@@ -84,7 +84,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 }
             });
         } else {
-            return continueOperationWithId(operation.getOperationId(), new AuthResponseProvider() {
+            return continueOperationWithId(operation.getOperationId(), sessionId, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();
