@@ -136,7 +136,7 @@ CREATE TABLE da_sms_authorization (
   user_id              VARCHAR(256),
   operation_name       VARCHAR(32),
   authorization_code   VARCHAR(32),
-  salt                 RAW(16),
+  salt                 BLOB,
   message_text         CLOB,
   verify_request_count INTEGER,
   verified             NUMBER(1) DEFAULT 0,
