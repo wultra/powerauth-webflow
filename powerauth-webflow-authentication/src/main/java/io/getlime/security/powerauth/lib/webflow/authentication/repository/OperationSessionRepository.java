@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.repository;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.entity.OperationSessionEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 

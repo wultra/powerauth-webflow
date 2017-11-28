@@ -2,7 +2,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.OperationSessionRepository;
-import io.getlime.security.powerauth.lib.webflow.authentication.repository.entity.OperationSessionEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

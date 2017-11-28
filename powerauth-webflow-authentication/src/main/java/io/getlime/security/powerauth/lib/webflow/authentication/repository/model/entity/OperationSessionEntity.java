@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.repository.entity;
+package io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
