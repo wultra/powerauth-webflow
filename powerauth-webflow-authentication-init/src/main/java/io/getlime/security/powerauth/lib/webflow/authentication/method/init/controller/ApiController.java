@@ -19,7 +19,6 @@ import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -28,7 +27,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -73,8 +71,8 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             final String operationData = "{}";
             AbstractMessageSource messageSource = i18nService.getMessageSource();
             final OperationFormData formData = new OperationFormData();
-            formData.addTitle("operation.title", "login.title");
-            formData.addMessage("operation.message", "login.message");
+            formData.addTitle( "login.title");
+            formData.addMessage("login.message");
             List<KeyValueParameter> params = new ArrayList<>();
             return initiateOperationWithName(operationName, operationData, formData, params, new AuthResponseProvider() {
 
