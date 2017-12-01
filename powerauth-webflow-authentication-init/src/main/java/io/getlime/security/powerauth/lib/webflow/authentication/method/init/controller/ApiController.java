@@ -27,7 +27,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -76,12 +75,11 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         if (operation == null) {
             final String operationName = "login";
             final String operationData = "{}";
-            AbstractMessageSource messageSource = i18nService.getMessageSource();
             final OperationFormData formData = new OperationFormData();
             formData.addTitle( "login.title");
             formData.addMessage("login.message");
             List<KeyValueParameter> params = new ArrayList<>();
-            return initiateOperationWithName(operationName, operationData, formData, params, new AuthResponseProvider() {
+            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();

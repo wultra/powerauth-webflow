@@ -241,11 +241,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param operationName Name of the operation to be created.
      * @param operationData Data of the operation.
      * @param formData      Form data used for displaying the operation details.
+     * @param httpSessionId HTTP session ID.
      * @param params        Additional parameters of the operation.
      * @param provider      Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
-    protected R initiateOperationWithName(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params, AuthResponseProvider provider) {
+    protected R initiateOperationWithName(String operationName, String operationData, OperationFormData formData, String httpSessionId, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
             ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, formData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
