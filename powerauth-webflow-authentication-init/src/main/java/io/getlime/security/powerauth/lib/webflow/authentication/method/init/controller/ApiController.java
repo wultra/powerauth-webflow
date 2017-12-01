@@ -15,8 +15,10 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
+import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -24,6 +26,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -45,6 +49,13 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/init")
 public class ApiController extends AuthMethodController<InitOperationRequest, InitOperationResponse, AuthStepException> {
 
+    private final I18NService i18nService;
+
+    @Autowired
+    public ApiController(I18NService i18nService) {
+        this.i18nService = i18nService;
+    }
+
     /**
      * Initialize a new authentication flow, by creating an operation. In case operation ID is already
      * included in the request, it initializes context with the operation with this ID and starts authentication
@@ -65,9 +76,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         if (operation == null) {
             final String operationName = "login";
             final String operationData = "{}";
+            AbstractMessageSource messageSource = i18nService.getMessageSource();
+            final OperationFormData formData = new OperationFormData();
+            formData.addTitle( "login.title");
+            formData.addMessage("login.message");
             List<KeyValueParameter> params = new ArrayList<>();
-            return initiateOperationWithName(operationName, operationData, sessionId, params, new AuthResponseProvider() {
-
+            return initiateOperationWithName(operationName, operationData, formData, params, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();

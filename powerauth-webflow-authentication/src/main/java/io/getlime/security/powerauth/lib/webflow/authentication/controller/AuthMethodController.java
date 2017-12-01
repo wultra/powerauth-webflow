@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChang
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -239,15 +240,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      *
      * @param operationName Name of the operation to be created.
      * @param operationData Data of the operation.
+     * @param formData      Form data used for displaying the operation details.
      * @param params        Additional parameters of the operation.
      * @param provider      Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
-    protected R initiateOperationWithName(String operationName, String operationData, String httpSessionId, List<KeyValueParameter> params, AuthResponseProvider provider) {
+    protected R initiateOperationWithName(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params, AuthResponseProvider provider) {
         try {
-            // cancel previous active operations
-            cancelOperationsInHttpSession(httpSessionId);
-            ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, httpSessionId, params);
+            ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, formData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             // persist mapping of operation to HTTP session
