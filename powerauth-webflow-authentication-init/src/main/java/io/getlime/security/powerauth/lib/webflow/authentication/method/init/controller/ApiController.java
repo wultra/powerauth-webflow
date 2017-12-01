@@ -33,6 +33,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,6 +69,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         final GetOperationDetailResponse operation = getOperation();
 
+        RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
+        String sessionId = attributes.getSessionId();
+
         if (operation == null) {
             final String operationName = "login";
             final String operationData = "{}";
@@ -75,7 +82,6 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             formData.addMessage("login.message");
             List<KeyValueParameter> params = new ArrayList<>();
             return initiateOperationWithName(operationName, operationData, formData, params, new AuthResponseProvider() {
-
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();
@@ -92,7 +98,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 }
             });
         } else {
-            return continueOperationWithId(operation.getOperationId(), new AuthResponseProvider() {
+            return continueOperationWithId(operation.getOperationId(), sessionId, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     return completeOperationResponse();

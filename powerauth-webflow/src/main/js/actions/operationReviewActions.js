@@ -18,7 +18,11 @@ import {dispatchError} from "../dispatcher/dispatcher";
 
 export function getOperationData() {
     return function (dispatch) {
-        axios.get("./api/auth/operation/detail").then((response) => {
+        axios.post("./api/auth/operation/detail", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             if (response.data.chosenAuthMethod) {
                 // if authMethod is already chosen, skip choice and go directly to the authMethod
                 switch (response.data.chosenAuthMethod) {
@@ -49,7 +53,11 @@ export function getOperationData() {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/operation/cancel", {}).then((response) => {
+        axios.post("./api/auth/operation/cancel", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
@@ -66,9 +74,17 @@ export function updateOperation(formData, chosenAuthMethod, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {
             formData: formData
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             axios.put("./api/auth/operation/chosenAuthMethod", {
                 chosenAuthMethod: chosenAuthMethod
+            }, {
+                headers: {
+                    'X-OPERATION-HASH': operationHash,
+                }
             }).then((response) => {
                 callback();
             });

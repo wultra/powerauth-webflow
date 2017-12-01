@@ -345,7 +345,8 @@ public class StepResolutionService {
         if (request.getAuthMethod() == null) {
             throw new IllegalArgumentException("Operation update failed, because authentication method is missing (operationId: " + request.getOperationId() + ").");
         }
-        if (request.getAuthMethod() == AuthMethod.INIT) {
+        // INIT method can cancel other operations due to concurrency check
+        if (request.getAuthStepResult() != AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
             throw new IllegalArgumentException("Operation update failed, because INIT method cannot be updated (operationId: " + request.getOperationId() + ").");
         }
         if (request.getAuthStepResult() == null) {
@@ -360,21 +361,26 @@ public class StepResolutionService {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
         // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
+        // the only exception is INIT method which can cancel other operations due to concurrency check
         boolean stepAuthMethodValid = false;
-        if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
-            // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
-            for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                    stepAuthMethodValid = true;
-                    break;
-                }
-            }
+        if (request.getAuthStepResult() == AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
+            stepAuthMethodValid = true;
         } else {
-            // verification of operation continuity for all other authentication methods
-            for (AuthStep step: operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                if (step.getAuthMethod() == request.getAuthMethod()) {
-                    stepAuthMethodValid = true;
-                    break;
+            if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
+                // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
+                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                    if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                        stepAuthMethodValid = true;
+                        break;
+                    }
+                }
+            } else {
+                // verification of operation continuity for all other authentication methods
+                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                    if (step.getAuthMethod() == request.getAuthMethod()) {
+                        stepAuthMethodValid = true;
+                        break;
+                    }
                 }
             }
         }

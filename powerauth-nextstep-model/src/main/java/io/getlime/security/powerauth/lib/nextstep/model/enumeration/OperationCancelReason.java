@@ -35,6 +35,11 @@ public enum OperationCancelReason {
     /**
      * Operation was not expected.
      */
-    UNEXPECTED_OPERATION
+    UNEXPECTED_OPERATION,
+
+    /**
+     * Operation has been interrupted by another new operation.
+     */
+    INTERRUPTED_OPERATION
 
 }

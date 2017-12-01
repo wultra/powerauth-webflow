@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-import axios from "axios/index";
-import {dispatchError} from "../dispatcher/dispatcher";
+package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
-export function updateFormData(formData) {
-    return function (dispatch) {
-        axios.put("./api/auth/operation/formData", {
-            formData: formData
-        }, {
-            headers: {
-                'X-OPERATION-HASH': operationHash,
-            }
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+/**
+ * Request for operation detail.
+ *
+ * @author Roman Strobl, roman.strobl@lime-company.eu
+ */
+public class OperationDetailRequest extends AuthStepRequest {
 }

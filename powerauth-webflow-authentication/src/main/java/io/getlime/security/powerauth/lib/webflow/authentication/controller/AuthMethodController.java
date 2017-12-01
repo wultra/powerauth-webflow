@@ -36,13 +36,16 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -78,6 +81,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private MessageTranslationService messageTranslationService;
 
+    @Autowired
+    private OperationSessionService operationSessionService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     protected GetOperationDetailResponse getOperation() throws AuthStepException {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
@@ -85,10 +94,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             if (operationId != null) {
                 return getOperation(operationId);
             } else {
-                return null;
+                throw new AuthStepException("operation.notAvailable", new NullPointerException());
             }
         } else {
-            return null;
+            throw new AuthStepException("operation.notAvailable", new NullPointerException());
         }
     }
 
@@ -167,6 +176,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        // update operation result in operation to HTTP session mapping
+        operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
@@ -192,6 +203,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        // update operation result in operation to HTTP session mapping
+        operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
@@ -216,6 +229,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
         }
+        // update operation result in operation to HTTP session mapping
+        operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
         return response.getResponseObject();
     }
@@ -235,6 +250,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             ObjectResponse<CreateOperationResponse> response = nextStepClient.createOperation(operationName, operationData, formData, params);
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
+            // persist mapping of operation to HTTP session
+            operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, responseObject.getResult());
             filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), null, operationId);
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
             return provider.continueAuthentication(operationId, null, responseObject.getSteps());
@@ -245,15 +262,24 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Continue an operation.
+     * Continue an existing operation.
      *
      * @param operationId ID of operation to be fetched.
      * @param provider    Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
-    protected R continueOperationWithId(String operationId, AuthResponseProvider provider) {
+    protected R continueOperationWithId(String operationId, String httpSessionId, AuthResponseProvider provider) {
         try {
             final GetOperationDetailResponse operation = getOperation(operationId);
+            // check whether session is already initiated - page refresh could cause double initialization
+            // if it is not initiated yet, persist operation to session mapping
+            OperationSessionEntity operationSessionEntity = operationSessionService.getOperationToSessionMapping(operationId);
+            if (operationSessionEntity == null) {
+                // cancel previous active operations
+                cancelOperationsInHttpSession(httpSessionId);
+                // persist mapping of operation to HTTP session
+                operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, operation.getResult());
+            }
             final String userId = operation.getUserId();
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), userId, operationId);
             if (userId != null) {
@@ -270,6 +296,28 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
+    /**
+     * Cancel active operations within HTTP session.
+     *
+     * @param httpSessionId HTTP session ID.
+     */
+    private void cancelOperationsInHttpSession(String httpSessionId) {
+        // at first cancel operations within same HTTP session in the operation to session mapping
+        List<OperationSessionEntity> operationsToCancel = operationSessionService.cancelOperationsInHttpSession(httpSessionId);
+        for (OperationSessionEntity operationToCancel: operationsToCancel) {
+            try {
+                // cancel operations in Next Step
+                final ObjectResponse<GetOperationDetailResponse> operation = nextStepClient.getOperationDetail(operationToCancel.getOperationId());
+                final GetOperationDetailResponse operationDetail = operation.getResponseObject();
+                nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), getAuthMethodName(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null);
+                // notify Data Adapter about cancellation
+                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOperationId());
+            } catch (NextStepServiceException | DataAdapterClientErrorException e) {
+                // errors occurring when canceling previous operations are not critical
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while canceling previous operation", e);
+            }
+        }
+    }
 
     /**
      * Build next authentication step information for given operation.
@@ -378,6 +426,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (operation == null) {
             throw new AuthStepException("operation.notAvailable", new NullPointerException());
         }
+        if (operation.getResult() == AuthResult.FAILED) {
+            throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
+        }
         final AuthMethod currentAuthMethod = getAuthMethodName();
         List<OperationHistory> operationHistoryList = operation.getHistory();
         if (operationHistoryList == null || operationHistoryList.isEmpty()) {
@@ -391,6 +442,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         if (operation.getResult() == AuthResult.CONTINUE) {
+            // verify operation hash
+            String clientOperationHash = request.getHeader("X-OPERATION-HASH");
+            String currentOperationHash = operationSessionService.generateOperationHash(operation.getOperationId());
+            if (clientOperationHash == null) {
+                throw new AuthStepException("operation.invalid", new NullPointerException());
+            }
+            if (!clientOperationHash.equals(currentOperationHash)) {
+                throw new AuthStepException("operation.interrupted", new IllegalStateException());
+            }
             // check steps for operations with AuthResult = CONTINUE, DONE and FAILED methods do not have steps
             if (currentAuthMethod != AuthMethod.INIT && currentAuthMethod != AuthMethod.SHOW_OPERATION_DETAIL) {
                 // check whether AuthMethod is available in next steps, only done in real authentication methods

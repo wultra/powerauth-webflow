@@ -388,10 +388,8 @@ public class NextStepClient {
     /**
      * Handle resource access error (i.e. server not available).
      * @param ex Exception to handle
-     * @return Next step service exception
-     * @throws NextStepServiceException exception with ErrorModel
      */
-    private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) throws NextStepServiceException {
+    private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) {
         Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
         return new NextStepServiceException(ex, error);
     }

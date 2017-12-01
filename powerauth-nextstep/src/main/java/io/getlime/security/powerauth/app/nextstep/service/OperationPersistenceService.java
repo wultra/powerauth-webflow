@@ -264,22 +264,4 @@ public class OperationPersistenceService {
         return steps;
     }
 
-    /**
-     * Gets the list of @{link AuthMethod} for an operation. Authentication methods from the current response
-     * are returned. In case no history is available, empty list is returned.
-     *
-     * @param operation operation entity
-     * @return list of @{link AuthMethod}
-     */
-    private List<AuthMethod> getResponseAuthMethods(OperationEntity operation) {
-        List<AuthMethod> authMethods = new ArrayList<>();
-        List<AuthStep> responseSteps = getResponseAuthSteps(operation);
-        if (responseSteps.isEmpty()) {
-            return authMethods;
-        }
-        for (AuthStep step : responseSteps) {
-            authMethods.add(step.getAuthMethod());
-        }
-        return authMethods;
-    }
 }
