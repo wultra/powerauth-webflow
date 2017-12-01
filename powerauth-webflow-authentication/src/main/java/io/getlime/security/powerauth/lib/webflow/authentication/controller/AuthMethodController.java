@@ -446,10 +446,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             // verify operation hash
             String clientOperationHash = request.getHeader("X-OPERATION-HASH");
             String currentOperationHash = operationSessionService.generateOperationHash(operation.getOperationId());
-            if (clientOperationHash == null) {
-                throw new AuthStepException("operation.invalid", new NullPointerException());
-            }
-            if (!clientOperationHash.equals(currentOperationHash)) {
+            // mobile API clients do not send operation hash - when operation hash is missing, concurrency check is not performed
+            if (clientOperationHash != null && !clientOperationHash.equals(currentOperationHash)) {
                 throw new AuthStepException("operation.interrupted", new IllegalStateException());
             }
             // check steps for operations with AuthResult = CONTINUE, DONE and FAILED methods do not have steps
