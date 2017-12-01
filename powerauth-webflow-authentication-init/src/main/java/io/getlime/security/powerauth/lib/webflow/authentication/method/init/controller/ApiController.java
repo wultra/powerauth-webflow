@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
-import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -26,6 +25,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -48,11 +48,11 @@ import java.util.List;
 @RequestMapping(value = "/api/auth/init")
 public class ApiController extends AuthMethodController<InitOperationRequest, InitOperationResponse, AuthStepException> {
 
-    private final I18NService i18nService;
+    private final OperationSessionService operationSessionService;
 
     @Autowired
-    public ApiController(I18NService i18nService) {
-        this.i18nService = i18nService;
+    public ApiController(OperationSessionService operationSessionService) {
+        this.operationSessionService = operationSessionService;
     }
 
     /**
@@ -64,9 +64,16 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * @return Authentication initialization response.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws AuthStepException {
+    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
 
-        final GetOperationDetailResponse operation = getOperation();
+        GetOperationDetailResponse operation = null;
+
+        try {
+            operation = getOperation();
+        } catch (AuthStepException ex) {
+            // Operation is not available - this state is valid in INIT authentication method, operation was not initialized yet
+            // and it will be initialized as a new operation with default form data for a login operation.
+        }
 
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
@@ -132,9 +139,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
     }
 
     private InitOperationResponse continueOperationResponse(String operationId, List<AuthStep> steps) {
+        String operationHash = operationSessionService.generateOperationHash(operationId);
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.CONFIRMED);
         registrationResponse.getNext().addAll(steps);
+        // transfer operation hash to client for operation created in this step (required for default operation)
+        registrationResponse.setOperationHash(operationHash);
         return registrationResponse;
     }
 

@@ -27,4 +27,13 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
  */
 public class InitOperationResponse extends AuthStepResponse {
 
+    private String operationHash;
+
+    public String getOperationHash() {
+        return operationHash;
+    }
+
+    public void setOperationHash(String operationHash) {
+        this.operationHash = operationHash;
+    }
 }
