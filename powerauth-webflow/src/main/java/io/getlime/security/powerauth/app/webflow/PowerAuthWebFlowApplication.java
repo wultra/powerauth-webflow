@@ -17,6 +17,9 @@ package io.getlime.security.powerauth.app.webflow;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 /**
  * Main Spring boot class for Web Flow server.
@@ -24,6 +27,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author Roman Strobl
  */
 @SpringBootApplication
+@EnableJpaRepositories("io.getlime.security.powerauth.lib.webflow.authentication.repository")
+@ComponentScan(basePackages = "io.getlime.security.*" )
+@EntityScan("io.getlime.security.*")
 public class PowerAuthWebFlowApplication {
 
     public static void main(String[] args) {

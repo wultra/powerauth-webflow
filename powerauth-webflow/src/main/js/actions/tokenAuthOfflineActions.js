@@ -29,6 +29,10 @@ export function initOffline(activationId) {
         });
         axios.post("./api/auth/token/offline/init", {
             activationId: activationId
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
                 dispatchAction(dispatch, response);
@@ -66,10 +70,15 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
             }
         });
         axios.post("./api/auth/token/offline/authenticate", {
+            operationHash: operationHash,
             activationId: activationId,
             authCode: authCode,
             nonce: nonce,
             dataHash: dataHash
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_TOKEN",
@@ -97,6 +106,11 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
                 case 'AUTH_FAILED': {
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "operation.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the operation has been interrupted by new operation, show an error
+                    if (response.data.message === "operation.interrupted") {
                         dispatchAction(dispatch, response);
                         break;
                     }
@@ -133,6 +147,10 @@ export function updateFormData(formData, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {
             formData: formData
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             callback();
         }).catch((error) => {

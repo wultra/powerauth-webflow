@@ -18,7 +18,11 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
 export function getOperationData() {
     return function (dispatch) {
-        axios.get("./api/auth/operation/detail").then((response) => {
+        axios.post("./api/auth/operation/detail", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_SMS",
                 payload: response.data
@@ -31,7 +35,11 @@ export function getOperationData() {
 
 export function init() {
     return function (dispatch) {
-        axios.post("./api/auth/sms/init", {}).then((response) => {
+        axios.post("./api/auth/sms/init", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
                 dispatchAction(dispatch, response);
                 return;
@@ -62,6 +70,10 @@ export function authenticate(userAuthCode) {
         });
         axios.post("./api/auth/sms/authenticate", {
             authCode: userAuthCode
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
@@ -80,6 +92,11 @@ export function authenticate(userAuthCode) {
                 case 'AUTH_FAILED': {
                     // handle timeout - action can not succeed anymore, show error
                     if (response.data.message === "operation.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the operation has been interrupted by new operation, show an error
+                    if (response.data.message === "operation.interrupted") {
                         dispatchAction(dispatch, response);
                         break;
                     }
@@ -117,7 +134,11 @@ export function authenticate(userAuthCode) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/sms/cancel", {}).then((response) => {
+        axios.post("./api/auth/sms/cancel", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {

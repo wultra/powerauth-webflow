@@ -18,7 +18,11 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
 export function getOperationData() {
     return function (dispatch) {
-        axios.get("./api/auth/operation/detail").then((response) => {
+        axios.post("./api/auth/operation/detail", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
@@ -31,7 +35,11 @@ export function getOperationData() {
 
 export function initOnline(callback) {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/init", {}).then((response) => {
+        axios.post("./api/auth/token/web/init", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             // silently ignore push message failures, see #125
             if (response.data.result === 'AUTH_FAILED' && response.data.message !== 'pushMessage.fail') {
                 dispatchAction(dispatch, response);
@@ -51,7 +59,11 @@ export function initOnline(callback) {
 
 export function authenticateOnline(callback) {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/authenticate", {}).then((response) => {
+        axios.post("./api/auth/token/web/authenticate", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
                     callback(false);
@@ -103,7 +115,11 @@ export function authenticateOnline(callback) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/token/web/cancel", {}).then((response) => {
+        axios.post("./api/auth/token/web/cancel", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
@@ -120,6 +136,10 @@ export function updateFormData(formData, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {
             formData: formData
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             callback();
         }).catch((error) => {

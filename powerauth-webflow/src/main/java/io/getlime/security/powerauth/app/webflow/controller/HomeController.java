@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
@@ -38,20 +39,23 @@ import java.util.Map;
 @Controller
 public class HomeController {
 
-    private WebFlowServerConfiguration webFlowConfig;
-    private AuthenticationManagementService authenticationManagementService;
-    private I18NService i18nService;
+    private final WebFlowServerConfiguration webFlowConfig;
+    private final AuthenticationManagementService authenticationManagementService;
+    private final I18NService i18nService;
+    private final OperationSessionService operationSessionService;
 
     /**
      * Initialization of the HomeController with application webflowServicesConfiguration.
      *
      * @param webFlowConfig WebFlowServicesConfiguration of the application
+     * @param operationSessionService Operation to session mapping service.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
+        this.operationSessionService = operationSessionService;
     }
 
     /**
@@ -68,11 +72,12 @@ public class HomeController {
      * Renders the main home page element.
      *
      * @param model Page model.
+     * @param request  Reference to current HttpServletRequest.
+     * @param response Reference to current HttpServletResponse.
      * @return index page
-     * @throws Exception thrown when page is not found
      */
     @RequestMapping("/authenticate")
-    public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
@@ -84,8 +89,9 @@ public class HomeController {
         // fetch operation ID from the saved request, in case there is one present
         final Map<String, String[]> parameterMap = savedRequest.getParameterMap();
         final String[] operationIdList = parameterMap.get("operation_id");
+        String operationId = null;
         if (operationIdList != null && operationIdList.length == 1) {
-            final String operationId = operationIdList[0];
+            operationId = operationIdList[0];
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
         }
 
@@ -95,6 +101,7 @@ public class HomeController {
         // JSON objects with i18n messages are inserted into the model to provide localization for the frontend
         model.put("i18n_CS", i18nService.generateMessages(new Locale("cs")));
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
+        model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         return "index";
     }
 
@@ -147,8 +154,11 @@ public class HomeController {
         }
         String redirectUri = redirectUriParameter[0];
 
-        // Clear security context and invalidate session
-        authenticationManagementService.clearContext();
+        String clearContext = request.getParameter("clearContext");
+        if (!"false".equals(clearContext)) {
+            // Clear security context and invalidate session unless it is suppressed due to a new operation
+            authenticationManagementService.clearContext();
+        }
 
         return "redirect:" + redirectUri;
     }

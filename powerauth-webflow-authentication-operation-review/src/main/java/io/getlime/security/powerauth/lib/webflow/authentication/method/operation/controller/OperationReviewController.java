@@ -33,6 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServic
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.OperationDetailRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.OperationReviewRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
@@ -85,8 +86,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return AuthMethod.SHOW_OPERATION_DETAIL;
     }
 
-    @RequestMapping(value = "/detail")
-    public @ResponseBody OperationReviewDetailResponse getOperationDetails() throws AuthStepException {
+    @RequestMapping(value = "/detail", method = RequestMethod.POST)
+    public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());

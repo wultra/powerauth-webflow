@@ -27,7 +27,12 @@ export default class Error extends React.Component {
 
     componentWillMount() {
         setTimeout(() => {
-            window.location = './authenticate/cancel';
+            let clearContext = "true";
+            if (this.props.context.message === "operation.interrupted") {
+                // do not clear context for interrupted operation by a newer operation - this would change state of new operation
+                clearContext = "false";
+            }
+            window.location = "./authenticate/cancel?clearContext=" + clearContext;
         }, 3000)
     }
 

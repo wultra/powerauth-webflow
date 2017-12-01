@@ -14,6 +14,10 @@ export function authenticate(username, password) {
         axios.post("./api/auth/form/authenticate", {
             username: username,
             password: password
+        }, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
         }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
@@ -23,6 +27,11 @@ export function authenticate(username, password) {
                 case 'AUTH_FAILED': {
                     // handle timeout - login action can not succeed anymore, do not show login screen, show error instead
                     if (response.data.message === "operation.timeout") {
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
+                    // if the operation has been interrupted by new operation, show an error
+                    if (response.data.message === "operation.interrupted") {
                         dispatchAction(dispatch, response);
                         break;
                     }
@@ -56,7 +65,11 @@ export function authenticate(username, password) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/form/cancel", {}).then((response) => {
+        axios.post("./api/auth/form/cancel", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {
