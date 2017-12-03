@@ -8,14 +8,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.17.0</version>
+        <version>0.18.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-resources</artifactId>
     <name>powerauth-webflow-resources</name>
-    <version>0.17.0</version>
+    <version>0.18.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -44,7 +44,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-client</artifactId>
-            <version>0.17.0</version>
+            <version>0.18.0</version>
         </dependency>
 
         <!-- TEST -->
