@@ -467,6 +467,31 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
+     * Resolves the number of remaining authentication attempts.
+     * @param remainingAttemptsDA Number of remaining attempts from Data Adapter.
+     * @param remainingAttemptsNS Number of remaining attempts from Next Step.
+     * @return Resolved number of remaining attempts. Null value is returned for no limit.
+     */
+    protected Integer resolveRemainingAttempts(Integer remainingAttemptsDA, Integer remainingAttemptsNS) {
+        if (remainingAttemptsDA == null && remainingAttemptsNS == null) {
+            // no remaining attempts are set
+            return null;
+        } else if (remainingAttemptsDA == null) {
+            // only NS remaining attempts are set
+            return remainingAttemptsNS;
+        } else if (remainingAttemptsNS == null) {
+            // only DA remaining attempts are set
+            return remainingAttemptsDA;
+        } else if (remainingAttemptsDA < remainingAttemptsNS) {
+            // DA has smaller number of remaining attempts
+            return remainingAttemptsDA;
+        } else {
+            // NS has smaller number of remaining attempts
+            return remainingAttemptsNS;
+        }
+    }
+
+    /**
      * Filter the list of steps based on current availability of authentication methods.
      * @param authSteps List of authentication steps.
      * @param userId User ID, use null for unknown user ID.

@@ -43,6 +43,7 @@ public class GetOperationDetailResponse {
     private List<OperationHistory> history;
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
+    private Integer remainingAttempts;
 
     /**
      * Default constructor.
@@ -219,5 +220,21 @@ public class GetOperationDetailResponse {
      */
     public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
         this.chosenAuthMethod = chosenAuthMethod;
+    }
+
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Number of remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
     }
 }

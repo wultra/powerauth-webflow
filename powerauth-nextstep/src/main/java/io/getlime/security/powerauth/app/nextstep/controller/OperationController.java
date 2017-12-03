@@ -138,6 +138,9 @@ public class OperationController {
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
 
+        // set number of remaining authentication attempts
+        response.setRemainingAttempts(stepResolutionService.getNumberOfRemainingAttempts(operation));
+
         response.setTimestampCreated(operation.getTimestampCreated());
         response.setTimestampExpires(operation.getTimestampExpires());
         return new ObjectResponse<>(response);

@@ -62,6 +62,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleAuthenticationError(AuthenticationFailedException ex) {
         // regular authentication failed error
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.AUTHENTICATION_FAILED, ex.getMessage());
+        error.setRemainingAttempts(ex.getRemainingAttempts());
         return new ErrorResponse(error);
     }
 
@@ -76,6 +77,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleAuthenticationError(SMSAuthorizationFailedException ex) {
         // regular sms authorization failed error
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.SMS_AUTHORIZATION_FAILED, ex.getMessage());
+        error.setRemainingAttempts(ex.getRemainingAttempts());
         return new ErrorResponse(error);
     }
 

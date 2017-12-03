@@ -23,6 +23,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.exception;
  */
 public class AuthStepException extends Exception {
 
+    private Integer remainingAttempts;
+
     /**
      * Constructor with message and cause.
      *
@@ -31,5 +33,21 @@ public class AuthStepException extends Exception {
      */
     public AuthStepException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Number of remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
     }
 }

@@ -23,6 +23,8 @@ package io.getlime.security.powerauth.lib.dataadapter.exception;
  */
 public class AuthenticationFailedException extends Exception {
 
+    private Integer remainingAttempts;
+
     /**
      * Default constructor.
      */
@@ -52,5 +54,21 @@ public class AuthenticationFailedException extends Exception {
      */
     public AuthenticationFailedException(Throwable cause) {
         super(cause);
+    }
+
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Number of remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
     }
 }

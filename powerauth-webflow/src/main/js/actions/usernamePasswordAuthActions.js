@@ -51,7 +51,8 @@ export function authenticate(username, password) {
                         payload: {
                             loading: false,
                             error: true,
-                            message: response.data.message
+                            message: response.data.message,
+                            remainingAttempts: response.data.remainingAttempts
                         }
                     });
                     break;

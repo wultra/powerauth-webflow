@@ -184,6 +184,13 @@ export default class TokenOffline extends React.Component {
                                 <FormGroup
                                     className={(this.state.error ? "message-error" : "message-information")}>
                                     <FormattedMessage id={this.state.message}/>
+                                    {(this.props.context.remainingAttempts > 0) ? (
+                                        <div>
+                                            <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
+                                        </div>
+                                    ) : (
+                                        undefined
+                                    )}
                                 </FormGroup>
                             ) : (
                                 <FormGroup

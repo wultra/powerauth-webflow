@@ -41,7 +41,10 @@ public class DataAdapterService implements DataAdapter {
                 throw new AuthenticationFailedException("login.authenticationFailed");
             }
         }
-        throw new AuthenticationFailedException("login.authenticationFailed");
+        AuthenticationFailedException authFailedException = new AuthenticationFailedException("login.authenticationFailed");
+        // Set number of remaining attempts for this userId in case it is available.
+        // authFailedException.setRemainingAttempts(5);
+        throw authFailedException;
     }
 
     @Override
