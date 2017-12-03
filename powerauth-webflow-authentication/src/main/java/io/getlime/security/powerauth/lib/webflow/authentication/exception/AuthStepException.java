@@ -29,6 +29,7 @@ public class AuthStepException extends Exception {
      * Constructor with message and cause.
      *
      * @param message Error message.
+     * @param cause   Error cause (original exception, if any).
      */
     public AuthStepException(String message, Throwable cause) {
         super(message, cause);
