@@ -65,20 +65,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Register device for push notifications using 1FA signature.
-     * @param request Push registration request.
-     * @param apiAuthentication API authentication.
-     * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
-     */
-    @RequestMapping(value = "/push/register", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/push/register", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
-        return registerDeviceImpl(request, apiAuthentication);
-    }
-
-    /**
      * Register device for push notifications using simple token-based authentication.
      * @param request Push registration request.
      * @param apiAuthentication API authentication.
@@ -86,7 +72,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
      * @throws InvalidRequestObjectException In case request object is not valid.
      */
-    @RequestMapping(value = "/token/push/register", method = RequestMethod.POST)
+    @RequestMapping(value = "/push/register", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
@@ -146,26 +132,13 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * List pending operations for Mobile Token authorization, authenticate using 1FA signature.
-     * @param apiAuthentication API authentication.
-     * @return Response with list of pending operations.
-     * @throws InvalidActivationException Thrown in case activation is not valid.
-     * @throws PendingOperationListFailedException Thrown in case operation loading fails.
-     */
-    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/list", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
-        return getOperationListImpl(apiAuthentication);
-    }
-
-    /**
      * List pending operations for Mobile Token authorization, authenticate using simple token-based authentication.
      * @param apiAuthentication API authentication.
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
-    @RequestMapping(value = "/token/operation/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
