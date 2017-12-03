@@ -45,6 +45,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -92,6 +93,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
                 return userId;
             }
         }
+        BigInteger remainingAttemptsPAObj = signatureResponse.getRemainingAttempts();
+        Integer remainingAttemptsPA = null;
+        if (remainingAttemptsPAObj != null) {
+            remainingAttemptsPA = remainingAttemptsPAObj.intValue();
+        }
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
@@ -106,7 +112,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             throw new AuthStepException(e.getError().getMessage(), e);
         }
         AuthStepException authEx = new AuthStepException("offlineMode.invalidAuthCode", null);
-        authEx.setRemainingAttempts(remainingAttemptsNS);
+        Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsPA, remainingAttemptsNS);
+        authEx.setRemainingAttempts(remainingAttempts);
         throw authEx;
     }
 
