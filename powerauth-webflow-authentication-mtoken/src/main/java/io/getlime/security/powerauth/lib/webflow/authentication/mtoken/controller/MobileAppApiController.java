@@ -1,11 +1,23 @@
+/*
+ * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.push.client.MobilePlatform;
-import io.getlime.push.client.PushServerClient;
-import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
@@ -17,7 +29,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenCancelOperationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenSignRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
@@ -48,14 +59,12 @@ import java.util.logging.Logger;
 public class MobileAppApiController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
     private final WebSocketMessageService webSocketMessageService;
-    private final PushServerClient pushServerClient;
     private final AuthMethodQueryService authMethodQueryService;
 
 
     @Autowired
-    public MobileAppApiController(WebSocketMessageService webSocketMessageService, PushServerClient pushServerClient, AuthMethodQueryService authMethodQueryService) {
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService) {
         this.webSocketMessageService = webSocketMessageService;
-        this.pushServerClient = pushServerClient;
         this.authMethodQueryService = authMethodQueryService;
     }
 
@@ -65,95 +74,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Register device for push notifications using 1FA signature.
-     * @param request Push registration request.
-     * @param apiAuthentication API authentication.
-     * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
-     */
-    @RequestMapping(value = "/push/register", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/push/register", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
-        return registerDeviceImpl(request, apiAuthentication);
-    }
-
-    /**
-     * Register device for push notifications using simple token-based authentication.
-     * @param request Push registration request.
-     * @param apiAuthentication API authentication.
-     * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
-     */
-    @RequestMapping(value = "/token/push/register", method = RequestMethod.POST)
-    @PowerAuthToken(signatureType = {
-            PowerAuthSignatureTypes.POSSESSION,
-            PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
-            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
-    })
-    public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, PushRegistrationFailedException, InvalidActivationException {
-        return registerDeviceImpl(request, apiAuthentication);
-    }
-
-    /**
-     * Implementation of the push device registration business logic
-     * @param request Push registration request.
-     * @param apiAuthentication API authentication.
-     * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
-     */
-    private Response registerDeviceImpl(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws InvalidRequestObjectException, InvalidActivationException, PushRegistrationFailedException {
-        if (request.getRequestObject() == null) {
-            throw new InvalidRequestObjectException();
-        }
-
-        // Get the values from the request
-        String platform = request.getRequestObject().getPlatform();
-        String token = request.getRequestObject().getToken();
-
-        // Check if the context is authenticated - if it is, add activation ID.
-        // This assures that the activation is assigned with a correct device.
-        String activationId = null;
-        Long applicationId = null;
-        if (apiAuthentication != null) {
-            activationId = apiAuthentication.getActivationId();
-            applicationId = apiAuthentication.getApplicationId();
-        }
-
-        // Verify that applicationId and activationId are set
-        if (applicationId == null || activationId == null) {
-            throw new InvalidActivationException();
-        }
-
-        // Register the device and return response
-        MobilePlatform p = MobilePlatform.Android;
-        if ("ios".equalsIgnoreCase(platform)) {
-            p = MobilePlatform.iOS;
-        }
-        try {
-            boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
-            if (result) {
-                return new Response();
-            } else {
-                throw new PushRegistrationFailedException();
-            }
-        } catch (PushServerClientException ex) {
-            throw new PushRegistrationFailedException();
-        }
-    }
-
-    /**
      * List pending operations for Mobile Token authorization, authenticate using 1FA signature.
      * @param apiAuthentication API authentication.
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
-    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/list", signatureType = {PowerAuthSignatureTypes.POSSESSION})
+    @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
+    @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PendingOperationListFailedException {
         return getOperationListImpl(apiAuthentication);
     }
@@ -165,7 +93,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PendingOperationListFailedException Thrown in case operation loading fails.
      */
-    @RequestMapping(value = "/token/operation/list", method = RequestMethod.POST)
+    @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
             PowerAuthSignatureTypes.POSSESSION,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY,
