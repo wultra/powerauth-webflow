@@ -18,9 +18,6 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.push.client.MobilePlatform;
-import io.getlime.push.client.PushServerClient;
-import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
@@ -32,7 +29,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenCancelOperationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenSignRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
