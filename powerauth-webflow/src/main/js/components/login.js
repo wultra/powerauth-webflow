@@ -65,6 +65,13 @@ export default class Login extends React.Component {
                     <Panel>
                         <FormGroup className={(this.props.context.error ? "message-error" : "message-information" )}>
                             <FormattedMessage id={this.props.context.message}/>
+                            {(this.props.context.remainingAttempts > 0) ? (
+                                <div>
+                                    <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
+                                </div>
+                            ) : (
+                                undefined
+                            )}
                         </FormGroup>
                         <FormGroup>
                             <FormControl autoComplete="new-password" ref="username" type="text"

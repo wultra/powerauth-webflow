@@ -64,6 +64,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
+            Integer remainingAttemptsNS;
             try {
                 GetOperationDetailResponse operation = getOperation();
                 // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
@@ -76,10 +77,16 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                         throw new AuthStepException("authentication.maxAttemptsExceeded", e);
                     }
                 }
+                GetOperationDetailResponse updatedOperation = getOperation();
+                remainingAttemptsNS = updatedOperation.getRemainingAttempts();
             } catch (NextStepServiceException e2) {
                 throw new AuthStepException(e2.getError().getMessage(), e2);
             }
-            throw new AuthStepException(e.getError().getMessage(), e);
+            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
+            Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
+            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+            authEx.setRemainingAttempts(remainingAttempts);
+            throw authEx;
         }
     }
 
@@ -130,6 +137,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
+            response.setRemainingAttempts(e.getRemainingAttempts());
             return response;
         }
 

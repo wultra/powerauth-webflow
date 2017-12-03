@@ -32,6 +32,7 @@ public class AuthStepResponse {
     private AuthStepResult result;
     private List<AuthStep> next;
     private String message;
+    private Integer remainingAttempts;
 
     public AuthStepResponse() {
         this.next = new ArrayList<>();
@@ -82,4 +83,19 @@ public class AuthStepResponse {
         return next;
     }
 
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Number of remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
+    }
 }

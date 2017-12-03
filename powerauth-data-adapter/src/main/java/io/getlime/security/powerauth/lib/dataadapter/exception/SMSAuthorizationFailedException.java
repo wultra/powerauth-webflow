@@ -23,6 +23,8 @@ package io.getlime.security.powerauth.lib.dataadapter.exception;
  */
 public class SMSAuthorizationFailedException extends Exception {
 
+    private Integer remainingAttempts;
+
     /**
      * Default constructor.
      */
@@ -55,5 +57,21 @@ public class SMSAuthorizationFailedException extends Exception {
      */
     public SMSAuthorizationFailedException(Throwable cause) {
         super(cause);
+    }
+
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Get remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
     }
 }

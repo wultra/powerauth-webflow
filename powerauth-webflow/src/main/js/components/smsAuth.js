@@ -77,6 +77,13 @@ export default class SMSAuthorization extends React.Component {
                                 <FormGroup
                                     className={(this.props.context.error ? "message-error" : "message-information" )}>
                                     <FormattedMessage id={this.props.context.message}/>
+                                    {(this.props.context.remainingAttempts > 0) ? (
+                                        <div>
+                                            <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
+                                        </div>
+                                    ) : (
+                                        undefined
+                                    )}
                                 </FormGroup>
                             ) : (
                                 <FormGroup

@@ -330,6 +330,41 @@ public class StepResolutionService {
     }
 
     /**
+     * Get number of remaining authentication attempts for current authentication method.
+     * @param operation Operation.
+     * @return Number of remaining authentication attempts. Null value returned for no limit.
+     */
+    public Integer getNumberOfRemainingAttempts(OperationEntity operation) {
+        AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getRequestAuthMethod();
+        // in case authentication method previously failed, it is already failed
+        for (OperationHistoryEntity history : operation.getOperationHistory()) {
+            if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED) {
+                return 0;
+            }
+        }
+        // check whether authMethod supports check of authorization failure count
+        AuthMethodEntity authMethodEntity = authMethodRepository.findByAuthMethod(authMethod);
+        if (authMethodEntity == null) {
+            throw new IllegalStateException("AuthMethod is missing in database: " + authMethod);
+        }
+        if (authMethodEntity.getCheckAuthorizationFailures()) {
+            // count failures
+            int failureCount = 0;
+            for (OperationHistoryEntity history : operation.getOperationHistory()) {
+                // add all failures from history for this method
+                if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_FAILED) {
+                    failureCount++;
+                }
+            }
+            if (failureCount >= authMethodEntity.getMaxAuthorizationFailures()) {
+                return 0;
+            }
+            return authMethodEntity.getMaxAuthorizationFailures()-failureCount;
+        }
+        return null;
+    }
+
+    /**
      * Check whether the update of operation is legitimate and meaningful.
      *
      * @param operationEntity Operation entity.
@@ -357,7 +392,7 @@ public class StepResolutionService {
             throw new IllegalStateException("Operation update failed, because operation is missing its history (operationId: " + request.getOperationId() + ").");
         }
         OperationHistoryEntity initOperationItem = operationHistory.get(0);
-        if (initOperationItem.getRequestAuthMethod() != null || initOperationItem.getRequestAuthStepResult() != null) {
+        if (initOperationItem.getRequestAuthMethod() != AuthMethod.INIT || initOperationItem.getRequestAuthStepResult() != AuthStepResult.CONFIRMED) {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
         // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity

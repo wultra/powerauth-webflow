@@ -93,17 +93,21 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             }
         }
         // otherwise fail authorization
+        Integer remainingAttemptsNS;
         try {
             UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), null);
             if (response.getResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
                 throw new AuthStepException("authentication.maxAttemptsExceeded", null);
-
             }
+            GetOperationDetailResponse updatedOperation = getOperation();
+            remainingAttemptsNS = updatedOperation.getRemainingAttempts();
         } catch (NextStepServiceException e) {
             throw new AuthStepException(e.getError().getMessage(), e);
         }
-        throw new AuthStepException("offlineMode.invalidAuthCode", null);
+        AuthStepException authEx = new AuthStepException("offlineMode.invalidAuthCode", null);
+        authEx.setRemainingAttempts(remainingAttemptsNS);
+        throw authEx;
     }
 
     @Override
@@ -212,6 +216,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
+            response.setRemainingAttempts(e.getRemainingAttempts());
             return response;
         }
     }

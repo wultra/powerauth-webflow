@@ -131,7 +131,8 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
                             loading: false,
                             error: true,
                             init: false,
-                            message: response.data.message
+                            message: response.data.message,
+                            remainingAttempts: response.data.remainingAttempts
                         }
                     });
                     break;

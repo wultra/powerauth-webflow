@@ -112,8 +112,12 @@ public class SMSPersistenceService {
         smsEntity.setVerifyRequestCount(smsEntity.getVerifyRequestCount() + 1);
         smsAuthorizationRepository.save(smsEntity);
 
+        final Integer remainingAttempts = dataAdapterConfiguration.getSmsOtpMaxVerifyTriesPerMessage() - smsEntity.getVerifyRequestCount();
+
         if (smsEntity.getAuthorizationCode() == null || smsEntity.getAuthorizationCode().isEmpty()) {
-            throw new SMSAuthorizationFailedException("smsAuthorization.invalidCode");
+            SMSAuthorizationFailedException ex = new SMSAuthorizationFailedException("smsAuthorization.invalidCode");
+            ex.setRemainingAttempts(remainingAttempts);
+            throw ex;
         }
         if (smsEntity.isExpired()) {
             throw new SMSAuthorizationFailedException("smsAuthorization.expired");
@@ -126,7 +130,9 @@ public class SMSPersistenceService {
         }
         String authorizationCodeExpected = smsEntity.getAuthorizationCode();
         if (!authorizationCode.equals(authorizationCodeExpected)) {
-            throw new SMSAuthorizationFailedException("smsAuthorization.failed");
+            SMSAuthorizationFailedException ex = new SMSAuthorizationFailedException("smsAuthorization.failed");
+            ex.setRemainingAttempts(remainingAttempts);
+            throw ex;
         }
 
         // SMS OTP authorization succeeded when this line is reached, update entity verification status

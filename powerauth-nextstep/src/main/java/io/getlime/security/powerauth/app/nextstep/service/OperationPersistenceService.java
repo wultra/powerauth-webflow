@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
@@ -88,6 +89,8 @@ public class OperationPersistenceService {
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
+        operationHistory.setRequestAuthMethod(AuthMethod.INIT);
+        operationHistory.setRequestAuthStepResult(AuthStepResult.CONFIRMED);
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {

@@ -120,7 +120,8 @@ export function authenticate(userAuthCode) {
                         payload: {
                             loading: false,
                             error: true,
-                            message: response.data.message
+                            message: response.data.message,
+                            remainingAttempts: response.data.remainingAttempts
                         }
                     });
                     break;

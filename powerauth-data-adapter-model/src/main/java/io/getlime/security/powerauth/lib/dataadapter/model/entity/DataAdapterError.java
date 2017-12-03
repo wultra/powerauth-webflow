@@ -27,6 +27,7 @@ import java.util.List;
 public class DataAdapterError extends Error {
 
     private List<String> validationErrors;
+    private Integer remainingAttempts;
 
     /**
      * Response codes for different authentication failures.
@@ -69,5 +70,21 @@ public class DataAdapterError extends Error {
      */
     public void setValidationErrors(List<String> validationErrors) {
         this.validationErrors = validationErrors;
+    }
+
+    /**
+     * Get number of remaining authentication attempts.
+     * @return Number of remaining attempts.
+     */
+    public Integer getRemainingAttempts() {
+        return remainingAttempts;
+    }
+
+    /**
+     * Set number of remaining authentication attempts.
+     * @param remainingAttempts Number of remaining attempts.
+     */
+    public void setRemainingAttempts(Integer remainingAttempts) {
+        this.remainingAttempts = remainingAttempts;
     }
 }
