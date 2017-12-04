@@ -66,16 +66,34 @@ public class SMSPersistenceService {
 
         // update names of operationData JSON fields if necessary
         OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(formData);
-        BigDecimal amount = amountAttribute.getAmount();
-        String currency = amountAttribute.getCurrency();
-        String account = operationFormDataService.getAccount(formData);
 
-        // update localized SMS message text in resources
-        final DataDigest.Result digestResult = generateAuthorizationCode(amount, currency, account);
-        final String authorizationCode = digestResult.getDigest();
-        final byte[] salt = digestResult.getSalt();
-        String[] messageArgs = {amount.toPlainString(), currency, account, authorizationCode};
-        String messageText = dataAdapterI18NService.messageSource().getMessage("sms-otp.text", messageArgs, new Locale(lang));
+        String[] messageArgs;
+        String authorizationCode;
+        byte[] salt;
+
+        switch (operationName) {
+            case "login": {
+                final DataDigest.Result digestResult = generateAuthorizationCode(operationName);
+                authorizationCode = digestResult.getDigest();
+                salt = digestResult.getSalt();
+                messageArgs = new String[]{authorizationCode};
+                break;
+            }
+            case "authorize_payment": {
+                BigDecimal amount = amountAttribute.getAmount();
+                String currency = amountAttribute.getCurrency();
+                String account = operationFormDataService.getAccount(formData);
+                final DataDigest.Result digestResult = generateAuthorizationCode(amount, currency, account);
+                authorizationCode = digestResult.getDigest();
+                salt = digestResult.getSalt();
+                messageArgs = new String[]{amount.toPlainString(), currency, account, authorizationCode};
+                break;
+            }
+            default:
+                throw new IllegalStateException("Unsupported operation: " + operationName);
+        }
+
+        String messageText = dataAdapterI18NService.messageSource().getMessage(operationName + ".smsText", messageArgs, new Locale(lang));
 
         SMSAuthorizationEntity smsEntity = new SMSAuthorizationEntity();
         smsEntity.setMessageId(messageId);
@@ -142,7 +160,18 @@ public class SMSPersistenceService {
     }
 
     /**
-     * Authorization code generation - to be updated based on application requirements.
+     * Authorization code generation - login.
+     *
+     * @return Generated authorization code.
+     */
+    private DataDigest.Result generateAuthorizationCode(String operationName) {
+        List<String> digestItems = new ArrayList<>();
+        digestItems.add(operationName);
+        return new DataDigest().generateDigest(digestItems);
+    }
+
+    /**
+     * Authorization code generation - authorize_payment.
      *
      * @return Generated authorization code.
      */

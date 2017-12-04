@@ -69,24 +69,37 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
             errors.rejectValue("requestObject.operationName", "smsAuthorization.operationName.long");
         }
 
-        OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
-        BigDecimal amount = amountAttribute.getAmount();
-        String currency = amountAttribute.getCurrency();
-        String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
+        if (operationName != null) {
+            switch (operationName) {
+                case "login":
+                    // no field validation required
+                    break;
+                case "authorize_payment":
+                    OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
+                    if (amountAttribute == null) {
+                        errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
+                    } else {
+                        BigDecimal amount = amountAttribute.getAmount();
+                        String currency = amountAttribute.getCurrency();
 
-        if (amount == null) {
-            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
-        } else if (amount.doubleValue()<=0) {
-            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.invalid");
+                        if (amount == null) {
+                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
+                        } else if (amount.doubleValue() <= 0) {
+                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.invalid");
+                        }
+
+                        if (currency == null || currency.isEmpty()) {
+                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.currency.empty");
+                        }
+                    }
+                    String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
+                    if (account == null || account.isEmpty()) {
+                        errors.rejectValue("requestObject.operationFormData", "smsAuthorization.account.empty");
+                    }
+                    break;
+                default:
+                    throw new IllegalStateException("Unsupported operation in validator: " + operationName);
+            }
         }
-
-        if (currency == null || currency.isEmpty()) {
-            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.currency.empty");
-        }
-
-        if (account == null || account.isEmpty()) {
-            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.account.empty");
-        }
-
     }
 }

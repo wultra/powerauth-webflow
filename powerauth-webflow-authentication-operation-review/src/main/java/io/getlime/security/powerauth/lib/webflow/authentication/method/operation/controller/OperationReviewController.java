@@ -187,7 +187,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationId());
+                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationName(), operation.getOperationId());
                 List<BankAccount> bankAccountEntities = response.getResponseObject().getBankAccounts();
                 List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
                 if (!bankAccountDetails.isEmpty()) {

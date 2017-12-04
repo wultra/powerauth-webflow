@@ -24,6 +24,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 public class BankAccountListRequest {
 
     private String userId;
+    private String operationName;
     private String operationId;
 
     /**
@@ -35,9 +36,12 @@ public class BankAccountListRequest {
     /**
      * Constructor with user ID as a parameter.
      * @param userId User ID.
+     * @param operationName Operation name.
+     * @param operationId Operation ID.
      */
-    public BankAccountListRequest(String userId, String operationId) {
+    public BankAccountListRequest(String userId, String operationName, String operationId) {
         this.userId = userId;
+        this.operationName = operationName;
         this.operationId = operationId;
     }
 
@@ -55,6 +59,22 @@ public class BankAccountListRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
+    public String getOperationName() {
+        return operationName;
+    }
+
+    /**
+     * Set operation name.
+     * @param operationName Operation name.
+     */
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
     }
 
     /**

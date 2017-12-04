@@ -53,11 +53,12 @@ public interface DataAdapter {
     /**
      * Fetch bank account details for given user.
      * @param userId User ID.
+     * @param operationName Operation name.
      * @param operationId Operation ID.
      * @return Response with bank account details.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
-    List<BankAccount> fetchBankAccounts(String userId, String operationId) throws DataAdapterRemoteException, UserNotFoundException;
+    List<BankAccount> fetchBankAccounts(String userId, String operationName, String operationId) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
      * Receive notification about formData change.
