@@ -59,12 +59,17 @@ public class DataAdapterService implements DataAdapter {
     }
 
     @Override
-    public List<BankAccount> fetchBankAccounts(String userId, String operationId) throws UserNotFoundException {
+    public List<BankAccount> fetchBankAccounts(String userId, String operationName, String operationId) throws UserNotFoundException {
         // Fetch bank account list for given user here from the bank backend.
         // In case that user is not found, throw a UserNotFoundException.
         // Replace mock bank account data with real data loaded from the bank backend.
         // In case the bank account selection is disabled, return an empty list.
         List<BankAccount> bankAccounts = new ArrayList<>();
+
+        if (!"authorize_payment".equals(operationName)) {
+            // return empty list for operations other than authorize_payment
+            return bankAccounts;
+        }
 
         BankAccount bankAccount1 = new BankAccount();
         bankAccount1.setName("Běžný účet v CZK");

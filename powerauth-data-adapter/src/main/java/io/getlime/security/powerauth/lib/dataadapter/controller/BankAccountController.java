@@ -58,8 +58,9 @@ public class BankAccountController {
     public @ResponseBody ObjectResponse<BankAccountListResponse> fetchBankAccounts(@RequestBody ObjectRequest<BankAccountListRequest> request) throws DataAdapterRemoteException, UserNotFoundException {
         BankAccountListRequest bankAccountListRequest = request.getRequestObject();
         String userId = bankAccountListRequest.getUserId();
+        String operationName = bankAccountListRequest.getOperationName();
         String operationId = bankAccountListRequest.getOperationId();
-        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId, operationId);
+        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId, operationName, operationId);
         BankAccountListResponse response = new BankAccountListResponse(userId, bankAccounts);
         return new ObjectResponse<>(response);
     }
