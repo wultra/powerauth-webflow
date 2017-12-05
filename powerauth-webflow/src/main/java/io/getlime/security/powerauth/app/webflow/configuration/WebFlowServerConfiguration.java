@@ -49,6 +49,24 @@ public class WebFlowServerConfiguration {
     private String pageTitle;
 
     /**
+     * Application name.
+     */
+    @Value("${powerauth.webflow.service.applicationName}")
+    private String applicationName;
+
+    /**
+     * Application display name.
+     */
+    @Value("${powerauth.webflow.service.applicationDisplayName}")
+    private String applicationDisplayName;
+
+    /**
+     * Application environment.
+     */
+    @Value("${powerauth.webflow.service.applicationEnvironment}")
+    private String applicationEnvironment;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -74,4 +92,29 @@ public class WebFlowServerConfiguration {
     public String getPageTitle() {
         return pageTitle;
     }
+
+    /**
+     * Get application name.
+     * @return Application name.
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    /**
+     * Get application display name.
+     * @return Application display name.
+     */
+    public String getApplicationDisplayName() {
+        return applicationDisplayName;
+    }
+
+    /**
+     * Get application environment.
+     * @return Application environment.
+     */
+    public String getApplicationEnvironment() {
+        return applicationEnvironment;
+    }
+
 }
