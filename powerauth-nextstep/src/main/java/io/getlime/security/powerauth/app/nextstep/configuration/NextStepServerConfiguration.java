@@ -35,6 +35,24 @@ public class NextStepServerConfiguration {
     private int operationExpirationTime;
 
     /**
+     * Application name.
+     */
+    @Value("${powerauth.nextstep.service.applicationName}")
+    private String applicationName;
+
+    /**
+     * Application display name.
+     */
+    @Value("${powerauth.nextstep.service.applicationDisplayName}")
+    private String applicationDisplayName;
+
+    /**
+     * Application environment.
+     */
+    @Value("${powerauth.nextstep.service.applicationEnvironment}")
+    private String applicationEnvironment;
+
+    /**
      * Get the operation expiration time.
      *
      * @return expiration time for operations in seconds
@@ -42,4 +60,29 @@ public class NextStepServerConfiguration {
     public int getOperationExpirationTime() {
         return operationExpirationTime;
     }
+
+    /**
+     * Get application name.
+     * @return Application name.
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    /**
+     * Get application display name.
+     * @return Application display name.
+     */
+    public String getApplicationDisplayName() {
+        return applicationDisplayName;
+    }
+
+    /**
+     * Get application environment.
+     * @return Application environment.
+     */
+    public String getApplicationEnvironment() {
+        return applicationEnvironment;
+    }
+
 }

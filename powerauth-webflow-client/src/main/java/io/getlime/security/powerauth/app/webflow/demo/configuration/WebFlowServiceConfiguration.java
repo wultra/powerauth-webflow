@@ -55,6 +55,24 @@ public class WebFlowServiceConfiguration {
     private String nextstepServiceUrl;
 
     /**
+     * Application name.
+     */
+    @Value("${powerauth.webflow.client.service.applicationName}")
+    private String applicationName;
+
+    /**
+     * Application display name.
+     */
+    @Value("${powerauth.webflow.client.service.applicationDisplayName}")
+    private String applicationDisplayName;
+
+    /**
+     * Application environment.
+     */
+    @Value("${powerauth.webflow.client.service.applicationEnvironment}")
+    private String applicationEnvironment;
+
+    /**
      * Whether invalid SSL certificates should be accepted.
      */
     @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
@@ -78,6 +96,30 @@ public class WebFlowServiceConfiguration {
 
     public String getClientSecret() {
         return clientSecret;
+    }
+
+    /**
+     * Get application name.
+     * @return Application name.
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    /**
+     * Get application display name.
+     * @return Application display name.
+     */
+    public String getApplicationDisplayName() {
+        return applicationDisplayName;
+    }
+
+    /**
+     * Get application environment.
+     * @return Application environment.
+     */
+    public String getApplicationEnvironment() {
+        return applicationEnvironment;
     }
 
     /**

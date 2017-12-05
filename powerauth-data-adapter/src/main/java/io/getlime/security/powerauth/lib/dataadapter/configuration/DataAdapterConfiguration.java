@@ -41,6 +41,24 @@ public class DataAdapterConfiguration {
     private int smsOtpMaxVerifyTriesPerMessage;
 
     /**
+     * Application name.
+     */
+    @Value("${powerauth.dataAdapter.service.applicationName}")
+    private String applicationName;
+
+    /**
+     * Application display name.
+     */
+    @Value("${powerauth.dataAdapter.service.applicationDisplayName}")
+    private String applicationDisplayName;
+
+    /**
+     * Application environment.
+     */
+    @Value("${powerauth.dataAdapter.service.applicationEnvironment}")
+    private String applicationEnvironment;
+
+    /**
      * Get the SMS OTP message expiration time.
      *
      * @return expiration time for SMS OTP message in seconds
@@ -56,5 +74,29 @@ public class DataAdapterConfiguration {
      */
     public int getSmsOtpMaxVerifyTriesPerMessage() {
         return smsOtpMaxVerifyTriesPerMessage;
+    }
+
+    /**
+     * Get application name.
+     * @return Application name.
+     */
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    /**
+     * Get application display name.
+     * @return Application display name.
+     */
+    public String getApplicationDisplayName() {
+        return applicationDisplayName;
+    }
+
+    /**
+     * Get application environment.
+     * @return Application environment.
+     */
+    public String getApplicationEnvironment() {
+        return applicationEnvironment;
     }
 }
