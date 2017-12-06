@@ -25,11 +25,14 @@ import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simple controller, redirects to the main HTML page with JavaScript content.
@@ -63,7 +66,7 @@ public class HomeController {
      *
      * @return Redirect to /authenticate endpoint.
      */
-    @RequestMapping("/")
+    @RequestMapping(value = "/", method = RequestMethod.GET)
     public String index() {
         return "redirect:/authenticate";
     }
@@ -76,7 +79,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return index page
      */
-    @RequestMapping("/authenticate")
+    @RequestMapping(value = "/authenticate", method = RequestMethod.GET)
     public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
@@ -90,9 +93,12 @@ public class HomeController {
         final Map<String, String[]> parameterMap = savedRequest.getParameterMap();
         final String[] operationIdList = parameterMap.get("operation_id");
         String operationId = null;
-        if (operationIdList != null && operationIdList.length == 1) {
+        if (operationIdList != null && operationIdList.length >= 1) {
             operationId = operationIdList[0];
             authenticationManagementService.createAuthenticationWithOperationId(operationId);
+            if (operationIdList.length > 1) {
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "There are duplicate operation ID instances (" + operationId + ") in redirect URL, first instance will be used");
+            }
         }
 
         model.put("title", webFlowConfig.getPageTitle());
@@ -112,7 +118,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return Redirect to the /oauth/authorize page
      */
-    @RequestMapping("/authenticate/continue")
+    @RequestMapping(value = "/authenticate/continue", method = RequestMethod.GET)
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
@@ -141,7 +147,7 @@ public class HomeController {
      * @param response Reference to current HttpServletResponse.
      * @return Redirect to the originating page
      */
-    @RequestMapping("/authenticate/cancel")
+    @RequestMapping(value = "/authenticate/cancel", method = RequestMethod.GET)
     public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
@@ -169,7 +175,7 @@ public class HomeController {
      * @param model Model.
      * @return Return oauth/error template.
      */
-    @RequestMapping("/oauth/error")
+    @RequestMapping(value = "/oauth/error", method = RequestMethod.GET)
     public String oauthError(Map<String, Object> model) {
         model.put("title", webFlowConfig.getPageTitle());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
