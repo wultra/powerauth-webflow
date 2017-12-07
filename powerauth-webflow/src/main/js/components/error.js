@@ -25,7 +25,17 @@ import {FormattedMessage} from "react-intl";
 })
 export default class Error extends React.Component {
 
+    constructor() {
+        super();
+        this.state = {networkError: false};
+    }
+
     componentWillMount() {
+        if (this.props.context.message === "message.invalidRequest") {
+            // do not redirect user in case of network errors - just display the error
+            this.setState({networkError: true});
+            return;
+        }
         setTimeout(() => {
             let clearContext = "true";
             if (this.props.context.message === "operation.interrupted") {
@@ -39,17 +49,25 @@ export default class Error extends React.Component {
     render() {
         return (
             <div className="text-center">
-                <div className={'message-error'}>
-                    {(this.props.context.message) ? (
-                        <FormattedMessage id={this.props.context.message}/>
-                    ) : (
-                        <FormattedMessage id="error.unknown"/>
-                    )}
-                </div>
-                <div className="image-result error"></div>
-                <div className={'message-error'}>
-                    <FormattedMessage id="message.redirect"/>
-                </div>
+                {(this.state.networkError) ? (
+                    <div className={'network-error'}>
+                        <FormattedMessage id="message.networkError"/>
+                    </div>
+                ) : (
+                    <div>
+                        <div className={'message-error'}>
+                            {(this.props.context.message) ? (
+                                <FormattedMessage id={this.props.context.message}/>
+                            ) : (
+                                <FormattedMessage id="error.unknown"/>
+                            )}
+                        </div>
+                        <div className="image-result error"></div>
+                        <div className={'message-error'}>
+                            <FormattedMessage id="message.redirect"/>
+                        </div>
+                    </div>
+                )}
             </div>
         )
     }
