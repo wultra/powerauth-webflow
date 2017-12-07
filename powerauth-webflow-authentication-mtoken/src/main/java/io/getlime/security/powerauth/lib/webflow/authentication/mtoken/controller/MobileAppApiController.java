@@ -34,7 +34,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
-import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,12 +133,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param apiAuthentication API authentication.
      * @return Authorization response.
      * @throws NextStepServiceException Thrown when next step client fails.
-     * @throws PowerAuthAuthenticationException Thrown when authentication fails.
-     * @throws InvalidRequestObjectException Thrown when requestObject is invalid.
+     * @throws MobileAppApiException Thrown when signature verification fails.
+     * @throws AuthStepException Thrown when operation is invalid.
      */
     @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/authorize")
-    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<MobileTokenSignRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<MobileTokenSignRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, AuthStepException {
 
         if (request.getRequestObject() == null) {
             throw new InvalidRequestObjectException();
@@ -177,12 +176,13 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param request Cancel request.
      * @param apiAuthentication API authentication.
      * @return Cancel response.
-     * @throws PowerAuthAuthenticationException Thrown when operation could not be canceled.
+     * @throws MobileAppApiException Thrown when operation could not be canceled.
      * @throws NextStepServiceException Thrown when next step client fails.
+     * @throws AuthStepException Thrown when operation is invalid.
      */
     @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, NextStepServiceException, AuthStepException {
+    public @ResponseBody Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, AuthStepException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();

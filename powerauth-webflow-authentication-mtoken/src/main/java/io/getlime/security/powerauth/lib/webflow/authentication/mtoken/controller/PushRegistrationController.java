@@ -23,6 +23,7 @@ import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.InvalidRequestObjectException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.MobileAppApiException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.PushRegistrationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenPushRegisterRequest;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
@@ -58,12 +59,12 @@ public class PushRegistrationController {
      * @param request Push registration request.
      * @param apiAuthentication API authentication.
      * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
+     * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
+     * @throws MobileAppApiException Thrown when registration fails.
      */
     @RequestMapping(value = "/device/register/signature", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/device/register/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException {
+    public @ResponseBody Response registerDevice(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
     }
 
@@ -72,8 +73,8 @@ public class PushRegistrationController {
      * @param request Push registration request.
      * @param apiAuthentication API authentication.
      * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
+     * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
+     * @throws MobileAppApiException Thrown when registration fails.
      */
     @RequestMapping(value = "/device/register/token", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
@@ -82,7 +83,7 @@ public class PushRegistrationController {
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
     })
-    public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException {
+    public @ResponseBody Response registerDeviceToken(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
         return registerDeviceImpl(request, apiAuthentication);
     }
 
@@ -91,10 +92,10 @@ public class PushRegistrationController {
      * @param request Push registration request.
      * @param apiAuthentication API authentication.
      * @return Push registration response.
-     * @throws PushRegistrationFailedException Thrown when push registration fails due to client exception.
-     * @throws InvalidRequestObjectException In case request object is not valid.
+     * @throws PowerAuthAuthenticationException Thrown when PowerAuth authentication fails.
+     * @throws MobileAppApiException Thrown when registration fails.
      */
-    private Response registerDeviceImpl(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException {
+    private Response registerDeviceImpl(@RequestBody ObjectRequest<MobileTokenPushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
 
         // Check if the authentication object is present
         if (apiAuthentication == null) {
