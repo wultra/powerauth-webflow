@@ -13,6 +13,7 @@ export function authenticate() {
                 operationHash = response.data.operationHash;
             }
             dispatchAction(dispatch, response);
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
