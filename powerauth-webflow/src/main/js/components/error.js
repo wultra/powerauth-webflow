@@ -31,7 +31,7 @@ export default class Error extends React.Component {
     }
 
     componentWillMount() {
-        if (this.props.context.message === "message.invalidRequest") {
+        if (this.props.context.message === "message.networkError") {
             // do not redirect user in case of network errors - just display the error
             this.setState({networkError: true});
             return;
