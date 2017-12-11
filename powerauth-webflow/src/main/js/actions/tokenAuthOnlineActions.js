@@ -27,6 +27,7 @@ export function getOperationData() {
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -51,6 +52,7 @@ export function initOnline(callback) {
             });
             // initialization complete - mobile token authorization can start
             callback(true);
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -106,6 +108,7 @@ export function authenticateOnline(callback) {
                     break;
                 }
             }
+            return null;
         }).catch((error) => {
             callback(false);
             dispatchError(dispatch, error);
@@ -126,6 +129,7 @@ export function cancel() {
                     message: response.data.message
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -142,6 +146,7 @@ export function updateFormData(formData, callback) {
             }
         }).then((response) => {
             callback();
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

@@ -27,6 +27,7 @@ export function getOperationData() {
                 type: "SHOW_SCREEN_SMS",
                 payload: response.data
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -52,6 +53,7 @@ export function init() {
                     message: response.data.message
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -127,6 +129,7 @@ export function authenticate(userAuthCode) {
                     break;
                 }
             }
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -146,6 +149,7 @@ export function cancel() {
                     message: response.data.message
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

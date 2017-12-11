@@ -52,6 +52,7 @@ export function initOffline(activationId) {
                     activations: response.data.activations
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -138,6 +139,7 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
                     break;
                 }
             }
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -154,6 +156,7 @@ export function updateFormData(formData, callback) {
             }
         }).then((response) => {
             callback();
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

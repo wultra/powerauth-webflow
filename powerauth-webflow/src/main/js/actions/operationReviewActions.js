@@ -31,13 +31,13 @@ export function getOperationData() {
                             type: "SHOW_SCREEN_TOKEN",
                             payload: response.data
                         });
-                        return;
+                        return null;
                     case "SMS_KEY":
                         dispatch({
                             type: "SHOW_SCREEN_SMS",
                             payload: response.data
                         });
-                        return;
+                        return null;
                     // otherwise show regular operation review with authMethod choice
                 }
             }
@@ -45,6 +45,7 @@ export function getOperationData() {
                 type: "SHOW_SCREEN_OPERATION_REVIEW",
                 payload: response.data
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -64,6 +65,7 @@ export function cancel() {
                     message: response.data.message
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -85,9 +87,9 @@ export function updateOperation(formData, chosenAuthMethod, callback) {
                 headers: {
                     'X-OPERATION-HASH': operationHash,
                 }
-            }).then((response) => {
-                callback();
             });
+            callback();
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

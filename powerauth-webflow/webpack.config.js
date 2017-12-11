@@ -4,6 +4,7 @@ var node_dir = __dirname + '/node_modules';
 
 var WebpackDeployPlugin = require('./src/main/js/webpack-deploy.js');
 var HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+var webpack = require('webpack');
 
 module.exports = {
     entry: './src/main/js/client.js',
@@ -34,6 +35,9 @@ module.exports = {
     },
     plugins: [
         new WebpackDeployPlugin(),
-        new HardSourceWebpackPlugin()
+        new HardSourceWebpackPlugin(),
+        new webpack.ProvidePlugin({
+            Promise: "bluebird"
+        })
     ]
 };

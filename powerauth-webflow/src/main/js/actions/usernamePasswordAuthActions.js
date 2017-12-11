@@ -58,6 +58,7 @@ export function authenticate(username, password) {
                     break;
                 }
             }
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -77,6 +78,7 @@ export function cancel() {
                     message: response.data.message
                 }
             });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })

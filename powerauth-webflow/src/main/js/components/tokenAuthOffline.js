@@ -179,7 +179,7 @@ export default class TokenOffline extends React.Component {
 
                     {(this.state.qrCode) ? (
                         <div>
-                            <img src={"data:image/png;" + this.state.qrCode}/>
+                            <img src={this.state.qrCode}/>
                             {(this.state.message) ? (
                                 <FormGroup
                                     className={(this.state.error ? "message-error" : "message-information")}>

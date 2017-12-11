@@ -79,18 +79,9 @@ class OfflineAuthCode extends React.Component {
             // when user manages to move cursor on space character (e.g. by mouse), move cursor behind space to avoid overwriting it
             event.target.setSelectionRange(event.target.selectionStart+1, event.target.selectionEnd+1);
         }
-        const target = event.currentTarget;
-        let authCode = target.value;
-        const authCodeStripped = this.stripSpaces(authCode);
+        const authCodeStripped = this.stripSpaces(event.currentTarget.value);
         if (authCodeStripped.length < 16) {
-            if (authCodeStripped.length > 0 && authCodeStripped.length % 4 === 0) {
-                // make sure space hasn't been just added (e.g. very fast typing)
-                if (!target.value.endsWith(" ")) {
-                    target.value = authCode + " ";
-                }
-            } else {
-                target.value = authCode;
-            }
+            this.formatAuthCode(event);
         } else {
             event.preventDefault();
         }
