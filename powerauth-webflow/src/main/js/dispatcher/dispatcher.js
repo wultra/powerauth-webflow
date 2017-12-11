@@ -94,7 +94,7 @@ export function dispatchError(dispatch, error) {
     } else if (error.request) {
         // the request was made but no response was received
         // see: https://www.npmjs.com/package/axios#handling-errors
-        errorMessage = "message.invalidRequest"
+        errorMessage = "message.networkError";
     } else {
         // something happened in setting up the request that triggered an Error
         // see: https://www.npmjs.com/package/axios#handling-errors
