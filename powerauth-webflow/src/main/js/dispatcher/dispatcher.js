@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+/**
+ * Dispatch an action.
+ * @param dispatch Dispatch.
+ * @param response Response.
+ */
 export function dispatchAction(dispatch, response) {
     if (response.data.next.length > 0) {
         if (response.data.result === "CONFIRMED") {
@@ -81,6 +86,11 @@ export function dispatchAction(dispatch, response) {
     }
 }
 
+/**
+ * Dispatch an error.
+ * @param dispatch Dispatch.
+ * @param error Error.
+ */
 export function dispatchError(dispatch, error) {
     let errorMessage;
     if (error.response) {

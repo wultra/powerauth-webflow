@@ -30,7 +30,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * This controller provides endpoints for SMS authorization.
+ * Controller which provides endpoints for SMS authorization.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -41,6 +41,11 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     private final DataAdapterClient dataAdapterClient;
     private final HttpSession httpSession;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapterClient Data adapter client.
+     * @param httpSession HTTP session.
+     */
     @Autowired
     public SMSAuthorizationController(DataAdapterClient dataAdapterClient, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
@@ -90,6 +95,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         }
     }
 
+    /**
+     * Get current authentication method.
+     * @return Current authentication method.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.SMS_KEY;
@@ -99,6 +108,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * Initializes the SMS authorization process by creating authorization SMS using Data Adapter.
      *
      * @return Authorization response.
+     * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() throws AuthStepException {
@@ -175,6 +185,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * Cancels the SMS authorization.
      *
      * @return Authorization response.
+     * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() throws AuthStepException {

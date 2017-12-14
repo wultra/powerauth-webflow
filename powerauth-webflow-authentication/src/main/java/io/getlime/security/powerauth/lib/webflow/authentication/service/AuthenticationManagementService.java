@@ -38,12 +38,20 @@ public class AuthenticationManagementService {
 
     private static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
 
+    /**
+     * Get current HTTP request.
+     * @return Current HTTP request.
+     */
     private HttpServletRequest currentRequest() {
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
         ServletRequestAttributes attributes = (ServletRequestAttributes) requestAttributes;
         return attributes.getRequest();
     }
 
+    /**
+     * Set pending user authentication object.
+     * @param auth User authentication object.
+     */
     private void setPendingUserAuthentication(UserOperationAuthentication auth) {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();

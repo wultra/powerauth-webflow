@@ -32,6 +32,11 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER) // because of OAuth 2 security on some resources
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    /**
+     * Configurate http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
+     * @param http HTTP security.
+     * @throws Exception Thrown when configuration fails.
+     */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http

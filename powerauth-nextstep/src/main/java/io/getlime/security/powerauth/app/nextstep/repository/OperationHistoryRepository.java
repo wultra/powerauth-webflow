@@ -20,9 +20,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
- * CrudRepository for persistence of operation history.
+ * Crud repository for persistence of operation history.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface OperationHistoryRepository extends CrudRepository<OperationHistoryEntity, OperationHistoryEntity.OperationHistoryKey> {

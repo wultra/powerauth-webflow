@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * CrudRepository for persistence of mapping of operations to HTTP sessions.
+ * Crud repository for persistence of mapping of operations to HTTP sessions.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface OperationSessionRepository extends CrudRepository<OperationSessionEntity, String> {

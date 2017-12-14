@@ -43,9 +43,9 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This service handles communication with the Next Step server.
+ * This service handles client communication with the Next Step server.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class NextStepClient {
 
@@ -90,11 +90,12 @@ public class NextStepClient {
     /**
      * Calls the operation endpoint via POST method to create a new operation.
      *
-     * @param operationName operation name
-     * @param operationId   operation ID (optional - if null, unique ID is automatically generated)
-     * @param operationData operation data
-     * @param params        list of generic parameters
-     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     * @param operationName Operation name.
+     * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
+     * @param operationData Operation data.
+     * @param params List of generic parameters.
+     * @return A Response with CreateOperationResponse object for OK status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
         return createOperation(operationName, operationId, operationData, null, params);
@@ -103,10 +104,11 @@ public class NextStepClient {
     /**
      * Calls the operation endpoint via POST method to create a new operation.
      *
-     * @param operationName operation name
-     * @param operationData operation data
-     * @param params        list of generic parameters
-     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     * @param operationName Operation name.
+     * @param operationData Operation data.
+     * @param params List of generic parameters.
+     * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
         return createOperation(operationName, null, operationData, null, params);
@@ -116,12 +118,13 @@ public class NextStepClient {
     /**
      * Calls the operation endpoint via POST method to create a new operation.
      *
-     * @param operationName operation name
-     * @param operationId   operation ID (optional - if null, unique ID is automatically generated)
-     * @param operationData operation data
-     * @param formData operation form data, such as title, message and displayable attributes
-     * @param params        list of generic parameters
-     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     * @param operationName Operation name.
+     * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
+     * @param operationData Operation data.
+     * @param formData Operation form data, such as title, message and displayable attributes.
+     * @param params List of generic parameters.
+     * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
@@ -148,11 +151,12 @@ public class NextStepClient {
     /**
      * Calls the operation endpoint via POST method to create a new operation.
      *
-     * @param operationName operation name
-     * @param operationData operation data
-     * @param formData operation form data, such as title, message and displayable attributes
-     * @param params        list of generic parameters
-     * @return a Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status
+     * @param operationName Operation name.
+     * @param operationData Operation data.
+     * @param formData Operation form data, such as title, message and displayable attributes.
+     * @param params List of generic parameters.
+     * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
         return createOperation(operationName, null, operationData, formData, params);
@@ -161,12 +165,13 @@ public class NextStepClient {
     /**
      * Calls the operation endpoint via PUT method to update an existing.
      *
-     * @param operationId    id of the updated operation
-     * @param userId         user id
-     * @param authMethod     authentication method
-     * @param authStepResult result of the last step
-     * @param params         list of generic parameters
-     * @return a Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param authMethod Authentication method.
+     * @param authStepResult Result of the last step.
+     * @param params List of generic parameters.
+     * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params) throws NextStepServiceException {
         try {
@@ -192,11 +197,11 @@ public class NextStepClient {
     }
 
     /**
-     * Update operation formData.
+     * Update operation form data.
      * @param operationId Operation ID.
-     * @param formData Form Data.
+     * @param formData Form data.
      * @return Object response.
-     * @throws NextStepServiceException Thrown when update request fails.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse updateOperationFormData(String operationId, OperationFormData formData) throws NextStepServiceException {
         try {
@@ -220,7 +225,7 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @param chosenAuthMethod Chosen authentication method.
      * @return Object response.
-     * @throws NextStepServiceException Thrown when update request fails.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse updateChosenAuthMethod(String operationId, AuthMethod chosenAuthMethod) throws NextStepServiceException {
         try {
@@ -242,9 +247,10 @@ public class NextStepClient {
     /**
      * Calls the operation details endpoint via POST method to get operation details.
      *
-     * @param id operation id
-     * @return a Response with {@link GetOperationDetailResponse} object for OK status or
-     * {@link io.getlime.core.rest.model.base.entity.Error} for ERROR status
+     * @param id Operation ID.
+     * @return A Response with {@link GetOperationDetailResponse} object for OK status or.
+     * {@link io.getlime.core.rest.model.base.entity.Error} for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetOperationDetailResponse> getOperationDetail(String id) throws NextStepServiceException {
         try {
@@ -262,16 +268,22 @@ public class NextStepClient {
         }
     }
 
+    /**
+     * Get list of pending operations for given user.
+     * @param userId User ID.
+     * @return List of pending operations.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId) throws NextStepServiceException {
         return getPendingOperations(userId, null);
     }
 
     /**
-     * Calls the get pending operations endpoint via METHOD to get a list of pending operations.
-     * @param userId user id
-     * @param authMethod authentication method
-     * @return a Response with list of {@link GetOperationDetailResponse} for OK status
-     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
+     * Get list of pending operations for given user and authentication method.
+     * @param userId User ID.
+     * @param authMethod Authentication method.
+     * @return A Response with list of {@link GetOperationDetailResponse} for OK status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
@@ -294,7 +306,7 @@ public class NextStepClient {
      * Get all authentication methods supported by Next Step server.
      *
      * @return List of authentication methods wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
         try {
@@ -314,9 +326,9 @@ public class NextStepClient {
     /**
      * Get all enabled authentication methods for given user.
      *
-     * @param userId User ID
+     * @param userId User ID.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(String userId) throws NextStepServiceException {
         try {
@@ -337,10 +349,10 @@ public class NextStepClient {
     /**
      * Enable an authentication method for given user.
      *
-     * @param userId     User ID
-     * @param authMethod Authentication method
+     * @param userId User ID.
+     * @param authMethod Authentication method.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
@@ -362,10 +374,10 @@ public class NextStepClient {
     /**
      * Disable an authentication method for given user.
      *
-     * @param userId     User ID
-     * @param authMethod Authentication method
+     * @param userId User ID.
+     * @param authMethod Authentication method.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Exception with {@link Error} for ERROR status
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
@@ -387,7 +399,7 @@ public class NextStepClient {
 
     /**
      * Handle resource access error (i.e. server not available).
-     * @param ex Exception to handle
+     * @param ex Exception to handle.
      */
     private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) {
         Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
@@ -396,9 +408,9 @@ public class NextStepClient {
 
     /**
      * Handle HTTP error.
-     * @param ex Exception to handle
-     * @return Next step service exception
-     * @throws NextStepServiceException exception with ErrorModel
+     * @param ex Exception to handle.
+     * @return Next step service exception.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     private NextStepServiceException handleHttpError(HttpStatusCodeException ex) throws NextStepServiceException {
         try {

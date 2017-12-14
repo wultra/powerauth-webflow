@@ -38,8 +38,8 @@ public class MessageController {
      * to the clients. When authorization is complete, the removeWebSocketSession(String operationId) method should
      * be called to stop the tracking of given operation.
      *
-     * @param headerAccessor      message headers
-     * @param registrationRequest request for registration of a new WebSocket client
+     * @param headerAccessor Message headers.
+     * @param registrationRequest Request for registration of a new WebSocket client.
      */
     @MessageMapping("/registration")
     public void register(SimpMessageHeaderAccessor headerAccessor, WebSocketRegistrationRequest registrationRequest) {

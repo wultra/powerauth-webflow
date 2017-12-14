@@ -70,7 +70,7 @@ public class DataAdapterConfiguration {
     /**
      * Get the maximum number of tries for SMS OTP verification per message.
      *
-     * @return maximum number of verification tries
+     * @return Maximum number of verification tries.
      */
     public int getSmsOtpMaxVerifyTriesPerMessage() {
         return smsOtpMaxVerifyTriesPerMessage;

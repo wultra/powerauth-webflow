@@ -40,12 +40,20 @@ public class PowerAuthWebServiceConfiguration {
     @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
     private boolean acceptInvalidSslCertificate;
 
+    /**
+     * Configuration constructor.
+     * @param sslConfigurationService SSL configuration service.
+     */
     @Autowired
     public PowerAuthWebServiceConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
     }
 
-    // Must use DEPRECATED class here, wss4j2 is not yet production ready
+    /**
+     * Initialize security interceptor.
+     * Must use DEPRECATED class here, wss4j2 is not yet production ready
+     * @return Security interceptor.
+     */
     @Bean
     public Wss4jSecurityInterceptor securityInterceptor() {
         Wss4jSecurityInterceptor wss4jSecurityInterceptor = new Wss4jSecurityInterceptor();
@@ -56,6 +64,10 @@ public class PowerAuthWebServiceConfiguration {
         return wss4jSecurityInterceptor;
     }
 
+    /**
+     * Initialize JAXB marschaller.
+     * @return JAXB marschaller.
+     */
     @Bean
     public Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
@@ -63,6 +75,11 @@ public class PowerAuthWebServiceConfiguration {
         return marshaller;
     }
 
+    /**
+     * Initialize PowerAuth 2.0 client.
+     * @param marshaller JAXB marschaller.
+     * @return PowerAuth 2.0 client.
+     */
     @Bean
     public PowerAuthServiceClient powerAuthClient(Jaxb2Marshaller marshaller) {
         PowerAuthServiceClient client = new PowerAuthServiceClient();
@@ -80,6 +97,10 @@ public class PowerAuthWebServiceConfiguration {
         return client;
     }
 
+    /**
+     * Initialize PowerAuth 2.0 Push server client.
+     * @return Push server client.
+     */
     @Bean
     public PushServerClient pushServerClient() {
         PushServerClient client = new PushServerClient();

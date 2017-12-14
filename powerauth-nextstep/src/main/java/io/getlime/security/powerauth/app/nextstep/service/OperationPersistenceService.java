@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  * This service handles conversion of operation request/response objects into operation entities.
  * Operation entities are persisted, so that they can be later retrieved from the database.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class OperationPersistenceService {
@@ -55,6 +55,13 @@ public class OperationPersistenceService {
     private OperationRepository operationRepository;
     private OperationHistoryRepository operationHistoryRepository;
 
+    /**
+     * Service constructor.
+     *
+     * @param idGeneratorService ID generator service.
+     * @param operationRepository Operation repository.
+     * @param operationHistoryRepository Operation history repository.
+     */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OperationHistoryRepository operationHistoryRepository) {
@@ -235,8 +242,8 @@ public class OperationPersistenceService {
      * Gets the list of @{link AuthStep} for an operation. Steps from the current response are returned.
      * In case no history is available, empty list is returned.
      *
-     * @param operation operation entity
-     * @return list of {@link AuthStep}
+     * @param operation Operation entity.
+     * @return List of {@link AuthStep}.
      */
     public List<AuthStep> getResponseAuthSteps(OperationEntity operation) {
         List<AuthStep> steps = new ArrayList<>();

@@ -20,9 +20,9 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
 /**
- * CrudRepository for persistence of user preferences.
+ * Crud repository for persistence of user preferences.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface UserPrefsRepository extends CrudRepository<UserPrefsEntity, String> {

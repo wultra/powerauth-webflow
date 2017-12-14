@@ -50,6 +50,12 @@ public class SMSAuthorizationController {
     private final CreateSMSAuthorizationRequestValidator requestValidator;
     private final DataAdapter dataAdapter;
 
+    /**
+     * Controller constructor.
+     * @param smsPersistenceService SMS persistence service.
+     * @param requestValidator Validator for SMS requests.
+     * @param dataAdapter Data adapter.
+     */
     @Autowired
     public SMSAuthorizationController(SMSPersistenceService smsPersistenceService, CreateSMSAuthorizationRequestValidator requestValidator, DataAdapter dataAdapter) {
         this.smsPersistenceService = smsPersistenceService;
@@ -73,6 +79,9 @@ public class SMSAuthorizationController {
      * @param request Request data.
      * @param result BindingResult for input validation.
      * @return Response with message ID.
+     * @throws MethodArgumentNotValidException Thrown in case request is not valid.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
+     * @throws SMSAuthorizationFailedException Thrown in case that SMS message could not be delivered.
      */
     @RequestMapping(value = "create", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<CreateSMSAuthorizationResponse> create(@Valid @RequestBody ObjectRequest<CreateSMSAuthorizationRequest> request, BindingResult result) throws MethodArgumentNotValidException, DataAdapterRemoteException, SMSAuthorizationFailedException {
@@ -116,6 +125,7 @@ public class SMSAuthorizationController {
      *
      * @param request Request data.
      * @return Authorization response.
+     * @throws SMSAuthorizationFailedException Thrown in case that SMS verification fails.
      */
     @RequestMapping(value = "verify", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse verify(@RequestBody ObjectRequest<VerifySMSAuthorizationRequest> request) throws SMSAuthorizationFailedException {

@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.powerauth.soap.ActivationStatus;
 import io.getlime.powerauth.soap.GetActivationListForUserResponse;
@@ -42,8 +41,13 @@ public class AuthMethodQueryService {
     private final NextStepClient nextStepClient;
     private final PowerAuthServiceClient powerAuthServiceClient;
 
+    /**
+     * Service constructor.
+     * @param nextStepClient Next step client.
+     * @param powerAuthServiceClient PowerAuth 2.0 client.
+     */
     @Autowired
-    public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthServiceClient powerAuthServiceClient, ObjectMapper objectMapper) {
+    public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthServiceClient powerAuthServiceClient) {
         this.nextStepClient = nextStepClient;
         this.powerAuthServiceClient = powerAuthServiceClient;
     }
@@ -108,6 +112,7 @@ public class AuthMethodQueryService {
      * @param userId User ID.
      * @param operationId Operation ID.
      * @return Whether Mobile Token authentication method is available.
+     * @throws NextStepServiceException Thrown when Next Step request fails.
      */
     private boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) throws NextStepServiceException {
         String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);

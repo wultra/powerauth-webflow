@@ -20,13 +20,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * Spring Boot application main class
+ * Spring Boot application main class.
+ *
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @SpringBootApplication
 public class NextStepApplication {
 
     /**
-     * Spring boot - main method
+     * Spring boot - main method.
      *
      * @param args Arguments
      */

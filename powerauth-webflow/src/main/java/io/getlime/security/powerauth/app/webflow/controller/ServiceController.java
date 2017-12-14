@@ -38,6 +38,10 @@ public class ServiceController {
 
     private final WebFlowServerConfiguration webFlowServerConfiguration;
 
+    /**
+     * Service constructor.
+     * @param webFlowServerConfiguration Web Flow server configuration.
+     */
     @Autowired
     public ServiceController(WebFlowServerConfiguration webFlowServerConfiguration) {
         this.webFlowServerConfiguration = webFlowServerConfiguration;

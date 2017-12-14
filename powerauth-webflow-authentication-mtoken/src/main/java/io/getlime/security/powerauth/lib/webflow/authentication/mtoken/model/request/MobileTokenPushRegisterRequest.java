@@ -1,6 +1,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request;
 
 /**
+ * Request to register for sending push messages.
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class MobileTokenPushRegisterRequest {

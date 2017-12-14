@@ -18,6 +18,9 @@ import {connect} from "react-redux";
 // i18n
 import {FormattedMessage} from "react-intl";
 
+/**
+ * Error component with redirect to original application.
+ */
 @connect((store) => {
     return {
         context: store.dispatching.context

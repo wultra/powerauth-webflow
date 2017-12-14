@@ -27,18 +27,34 @@ public class DataAdapterClientErrorException extends Exception {
 
     private DataAdapterError error;
 
+    /**
+     * Default constructor.
+     */
     public DataAdapterClientErrorException() {
     }
 
+    /**
+     * Constructor with cause.
+     * @param cause Exception cause.
+     */
     public DataAdapterClientErrorException(Throwable cause) {
         super(cause);
     }
 
+    /**
+     * Constructor with cause and error.
+     * @param cause Exception cause.
+     * @param error Data adapter error.
+     */
     public DataAdapterClientErrorException(Throwable cause, DataAdapterError error) {
         super(cause);
         this.error = error;
     }
 
+    /**
+     * Get data adapter error.
+     * @return Data adapter error.
+     */
     public DataAdapterError getError() {
         return error;
     }

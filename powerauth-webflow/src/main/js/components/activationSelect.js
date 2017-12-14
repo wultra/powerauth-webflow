@@ -16,6 +16,9 @@
 import React from 'react';
 import Select from 'react-select';
 
+/**
+ * Select UI component for activations.
+ */
 export default class ActivationSelect extends React.Component {
 
     constructor() {

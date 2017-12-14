@@ -32,6 +32,13 @@ import java.util.Map;
  */
 public class WebFlowTokenEnhancer implements TokenEnhancer {
 
+    /**
+     * Enhance access tokens with additional information.
+     *
+     * @param accessToken Access token.
+     * @param authentication OAuth 2.0 authentication.
+     * @return Enhanced OAuth 2.0 access token.
+     */
     @Override
     public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
         DefaultOAuth2AccessToken token = ((DefaultOAuth2AccessToken) accessToken);

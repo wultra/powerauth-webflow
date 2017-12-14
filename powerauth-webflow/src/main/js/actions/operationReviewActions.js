@@ -16,6 +16,10 @@
 import axios from "axios";
 import {dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Get operation detail.
+ * @returns {Function} Operation detail.
+ */
 export function getOperationData() {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
@@ -52,6 +56,10 @@ export function getOperationData() {
     }
 }
 
+/**
+ * Cancel operation.
+ * @returns {Function} No return value.
+ */
 export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/operation/cancel", {}, {
@@ -72,6 +80,13 @@ export function cancel() {
     }
 }
 
+/**
+ * Update an operation.
+ * @param formData Operation form data.
+ * @param chosenAuthMethod Chosen authentication method.
+ * @param callback Callback to call when call is finished.
+ * @returns {Function} No return value.
+ */
 export function updateOperation(formData, chosenAuthMethod, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {

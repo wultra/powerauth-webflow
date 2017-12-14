@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * CrudRepository for persistence of step definitions.
+ * Crud repository for persistence of step definitions.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface StepDefinitionRepository extends CrudRepository<StepDefinitionEntity, Long> {

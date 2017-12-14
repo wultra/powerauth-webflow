@@ -23,9 +23,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * CrudRepository for persistence of authentication methods.
+ * Crud repository for persistence of authentication methods.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, AuthMethod> {

@@ -20,7 +20,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 /**
  * Model for a display login from response sent to the client.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class UsernamePasswordAuthenticationResponse extends AuthStepResponse {
 

@@ -54,6 +54,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Operation review controller which shows operation details to the user and handles operation form data updates.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
@@ -67,6 +69,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final NextStepClient nextStepClient;
     private final MessageTranslationService messageTranslationService;
 
+    /**
+     * Controller constructor.
+     *
+     * @param dataAdapterClient Data adapter client.
+     * @param nextStepClient Next step client.
+     * @param messageTranslationService Message translation service.
+     */
     @Autowired
     public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService) {
         this.dataAdapterClient = dataAdapterClient;
@@ -74,6 +83,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         this.messageTranslationService = messageTranslationService;
     }
 
+    /**
+     * Authentication step - step is automatically authenticated if operation is valid.
+     * @param request Authentication request.
+     * @return User ID.
+     * @throws AuthStepException Thrown when authentication fails.
+     */
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -81,11 +96,21 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return operation.getUserId();
     }
 
+    /**
+     * Get current authentication method.
+     * @return Current authentication method.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.SHOW_OPERATION_DETAIL;
     }
 
+    /**
+     * Get operation detail.
+     * @param request Operation detail request.
+     * @return Operation detail response.
+     * @throws AuthStepException Thrown when operation is invalid or not available.
+     */
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -96,6 +121,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return response;
     }
 
+    /**
+     * Perform step authentication and return response.
+     * @param request Operation review request.
+     * @return Operation review response.
+     */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody OperationReviewResponse getOperationDetails(@RequestBody OperationReviewRequest request) {
         try {
@@ -136,6 +166,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         }
     }
 
+    /**
+     * Cancel operation.
+     * @return Object response.
+     * @throws AuthStepException Thrown when operation could not be canceled.
+     */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody OperationReviewResponse cancelAuthentication() throws AuthStepException {
         try {
@@ -153,6 +188,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         }
     }
 
+    /**
+     * Update operation form data.
+     * @param request Update operation form data request.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
+     * @throws DataAdapterClientErrorException Thrown when data could not be retrieved from Data Adapter.
+     * @throws AuthStepException Thrown when operation is invalid or not available.
+     */
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -169,6 +212,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return new ObjectResponse();
     }
 
+    /**
+     * Update chosen authentication method.
+     * @param request Update chosen authentication method request.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
+     * @throws AuthStepException Thrown when operation is invalid or not available.
+     */
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -177,6 +227,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return new ObjectResponse();
     }
 
+    /**
+     * Load form data from the server.
+     * @param operation Operation.
+     * @return Operation form data.
+     */
     private OperationFormData loadFormData(GetOperationDetailResponse operation) {
         OperationFormData formData = operation.getFormData();
         if (formData==null || operation.getUserId()==null) {
@@ -204,6 +259,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         return formData;
     }
 
+    /**
+     * Convert BankAccount into BankAccountDetail.
+     * @param bankAccountEntities List of BankAccount entities.
+     * @return List of BankAccountDetail.
+     */
     private List<BankAccountDetail> convertBankAccountEntities(List<BankAccount> bankAccountEntities) {
         // TODO - move to a converter class
         List<BankAccountDetail> bankAccountDetails = new ArrayList<>();

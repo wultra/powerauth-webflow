@@ -27,7 +27,7 @@ import {FormattedMessage} from "react-intl";
 
 
 /**
- * Operation component displays the operation data to the user.
+ * Offline mobile token UI component.
  */
 @connect((store) => {
     return {

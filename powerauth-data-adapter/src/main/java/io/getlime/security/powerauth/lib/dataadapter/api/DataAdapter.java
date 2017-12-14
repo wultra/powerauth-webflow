@@ -38,6 +38,7 @@ public interface DataAdapter {
      *
      * @param username Username for user authentication.
      * @param password Password for user authentication.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
     UserDetailResponse authenticateUser(String username, String password) throws DataAdapterRemoteException, AuthenticationFailedException;
@@ -46,6 +47,7 @@ public interface DataAdapter {
      * Fetch user detail for given user.
      * @param userId User ID.
      * @return Response with user details.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
     UserDetailResponse fetchUserDetail(String userId) throws DataAdapterRemoteException, UserNotFoundException;
@@ -56,6 +58,7 @@ public interface DataAdapter {
      * @param operationName Operation name.
      * @param operationId Operation ID.
      * @return Response with bank account details.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
     List<BankAccount> fetchBankAccounts(String userId, String operationName, String operationId) throws DataAdapterRemoteException, UserNotFoundException;
@@ -65,6 +68,7 @@ public interface DataAdapter {
      * @param userId User ID.
      * @param operationId Operation ID.
      * @param formDataChange FormData change.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      */
     void formDataChangedNotification(String userId, String operationId, FormDataChange formDataChange) throws DataAdapterRemoteException;
 
@@ -73,6 +77,7 @@ public interface DataAdapter {
      * @param userId User ID.
      * @param operationId Operation ID.
      * @param operationChange Operation change.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      */
     void operationChangedNotification(String userId, String operationId, OperationChange operationChange) throws DataAdapterRemoteException;
 
@@ -80,6 +85,7 @@ public interface DataAdapter {
      * Send an authorization SMS with generated OTP.
      * @param userId User ID.
      * @param messageText Text of SMS message.
+     * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws SMSAuthorizationFailedException Thrown when message could not be created.
      */
     void sendAuthorizationSMS(String userId, String messageText) throws DataAdapterRemoteException, SMSAuthorizationFailedException;

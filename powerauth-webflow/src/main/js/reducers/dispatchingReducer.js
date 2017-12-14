@@ -1,3 +1,9 @@
+/**
+ * Reducer for screen navigation.
+ * @param state Current state.
+ * @param action Action.
+ * @returns {{currentScreen: string, context: null}} New state.
+ */
 export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE", context: null}, action) {
     switch (action.type) {
         case "SHOW_SCREEN_LOGIN": {

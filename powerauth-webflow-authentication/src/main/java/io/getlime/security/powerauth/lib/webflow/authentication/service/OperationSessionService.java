@@ -37,6 +37,10 @@ public class OperationSessionService {
 
     private final OperationSessionRepository operationSessionRepository;
 
+    /**
+     * Service constructor.
+     * @param operationSessionRepository Operation session repository.
+     */
     @Autowired
     public OperationSessionService(OperationSessionRepository operationSessionRepository) {
         this.operationSessionRepository = operationSessionRepository;

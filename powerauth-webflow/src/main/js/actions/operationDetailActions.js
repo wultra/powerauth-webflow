@@ -17,6 +17,11 @@
 import axios from "axios/index";
 import {dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Update operation form data on the server.
+ * @param formData Operation form data.
+ * @returns {Function} No response in case of OK status, otherwise error is dispatched.
+ */
 export function updateFormData(formData) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {

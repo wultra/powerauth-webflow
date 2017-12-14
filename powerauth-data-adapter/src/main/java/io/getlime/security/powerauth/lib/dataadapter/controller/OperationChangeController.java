@@ -39,6 +39,10 @@ public class OperationChangeController {
 
     private DataAdapter dataAdapter;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapter Data adapter.
+     */
     @Autowired
     public OperationChangeController(DataAdapter dataAdapter) {
         this.dataAdapter = dataAdapter;
@@ -49,6 +53,7 @@ public class OperationChangeController {
      *
      * @param request Request with change details.
      * @return Object response.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse operationChangedNotification(@RequestBody ObjectRequest<OperationChangeNotificationRequest> request) throws DataAdapterRemoteException {

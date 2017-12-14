@@ -16,6 +16,9 @@
 import React from 'react';
 import Select from 'react-select';
 
+/**
+ * Select UI component for bank account choice.
+ */
 export default class BankAccountSelect extends React.Component {
 
     constructor() {

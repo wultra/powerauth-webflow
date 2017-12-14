@@ -29,6 +29,10 @@ public class WebSocketMessageService {
     private final SimpMessagingTemplate websocket;
     private final Map<String, String> websocketIdToSessionMap;
 
+    /**
+     * Service constructor.
+     * @param websocket Web Socket simple messaging template.
+     */
     @Autowired
     public WebSocketMessageService(SimpMessagingTemplate websocket) {
         this.websocket = websocket;
@@ -38,8 +42,8 @@ public class WebSocketMessageService {
     /**
      * Create a MessageHeaders object for session.
      *
-     * @param sessionId WebSocket session ID
-     * @return MessageHeaders
+     * @param sessionId WebSocket session ID.
+     * @return Message headers.
      */
     private MessageHeaders createHeaders(String sessionId) {
         SimpMessageHeaderAccessor headerAccessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
@@ -51,8 +55,8 @@ public class WebSocketMessageService {
     /**
      * Notification of clients about completed authorization.
      *
-     * @param operationId operation ID
-     * @param authResult  authorization result
+     * @param operationId Operation ID.
+     * @param authResult Authorization result.
      */
     public void notifyAuthorizationComplete(String operationId, AuthResult authResult) {
         final String webSocketId = generateWebSocketId(operationId);
@@ -66,10 +70,10 @@ public class WebSocketMessageService {
     }
 
     /**
-     * Generates a hash from operationId which is used as webSocketId.
+     * Generates a hash from operationId which is used as Web Socket ID.
      *
-     * @param operationId operation ID
-     * @return webSocketId
+     * @param operationId Operation ID.
+     * @return webSocketId Web Socket ID.
      */
     public String generateWebSocketId(String operationId) {
         try {
@@ -83,7 +87,7 @@ public class WebSocketMessageService {
      * Sends a message about successful websocket registration to the user.
      *
      * @param webSocketId Web Socket ID.
-     * @param sessionId   Session ID.
+     * @param sessionId Session ID.
      */
     public void sendRegistrationMessage(String webSocketId, String sessionId) {
         WebSocketRegistrationResponse registrationResponse = new WebSocketRegistrationResponse();
@@ -95,7 +99,7 @@ public class WebSocketMessageService {
      * Relate a new web socket identifier to the session with given ID.
      *
      * @param webSocketId Web Socket ID.
-     * @param sessionId   Session ID.
+     * @param sessionId Session ID.
      */
     public void putWebSocketSession(String webSocketId, String sessionId) {
         websocketIdToSessionMap.put(webSocketId, sessionId);
@@ -104,7 +108,7 @@ public class WebSocketMessageService {
     /**
      * Removes WebSocket session identified by operationId from session tracking.
      *
-     * @param operationId operation ID
+     * @param operationId Operation ID.
      */
     public void removeWebSocketSession(String operationId) {
         websocketIdToSessionMap.remove(generateWebSocketId(operationId));

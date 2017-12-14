@@ -16,9 +16,9 @@
 /**
  * Reducer is used for updating the i18n messages based on locale specified in the action.
  *
- * @param state existing state
- * @param action use CHANGE_LOCALE to change the current locale
- * @returns new state
+ * @param state Existing state.
+ * @param action Use CHANGE_LOCALE to change the current locale.
+ * @returns New state.
  */
 export default function reducer(state = {locale: I18N_EN.locale, messages: I18N_EN.messages}, action) {
     switch (action.type) {

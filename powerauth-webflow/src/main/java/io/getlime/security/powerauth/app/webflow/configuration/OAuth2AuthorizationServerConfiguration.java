@@ -56,35 +56,60 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     private DataSource dataSource;
     private AuthenticationManager authenticationManager;
 
+    /**
+     * Configuration class constructor.
+     * @param dataSource Data source.
+     * @param authenticationManager Authentication manager.
+     */
     @Autowired
     public OAuth2AuthorizationServerConfiguration(DataSource dataSource, AuthenticationManager authenticationManager) {
         this.dataSource = dataSource;
         this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Client details service which stores client data in JDBC data source.
+     * @return Client details service.
+     */
     @Bean
     public ClientDetailsService clientDetailsService() {
         // client data is stored in JDBC data source (table oauth_client_details)
         return new JdbcClientDetailsService(dataSource);
     }
 
+    /**
+     * Authorization code services which stores authorization codes in JDBC data source.
+     * @return Authorization code services.
+     */
     @Bean
     protected AuthorizationCodeServices authorizationCodeServices() {
         // authorization codes are stored in JDBC data source (table oauth_code)
         return new JdbcAuthorizationCodeServices(dataSource);
     }
 
+    /**
+     * Token store which stores tokens in JDBC data source.
+     * @return Token store.
+     */
     @Bean
     public TokenStore tokenStore() {
         // tokens are stored in JDBC data source (tables oauth_access_token and oauth_refresh_token)
         return new JdbcTokenStore(dataSource);
     }
 
+    /**
+     * Custom Web Flow token enhancer.
+     * @return Token enhancer.
+     */
     @Bean
     public TokenEnhancer tokenEnhancer() {
         return new WebFlowTokenEnhancer();
     }
 
+    /**
+     * Initializes token services.
+     * @return Initialized token services.
+     */
     @Bean
     @Primary
     public AuthorizationServerTokenServices tokenServices() {
@@ -94,6 +119,10 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
         return tokenServices;
     }
 
+    /**
+     * Configures authorization endpoint.
+     * @param authorizationEndpoint Authorization endpoint.
+     */
     @Autowired
     public void configureAuthorizationEndpoint(AuthorizationEndpoint authorizationEndpoint) {
         // WORKAROUND: Cancel the session just before the redirect
@@ -108,6 +137,11 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
         authorizationEndpoint.setRedirectResolver(redirectResolver);
     }
 
+    /**
+     * Configures authorization server endpoints - mainly storage for OAuth 2.0.
+     * @param endpoints Endpoints.
+     * @throws Exception Thrown when configuration fails.
+     */
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints)
             throws Exception {
@@ -118,12 +152,22 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
                 .approvalStoreDisabled();
     }
 
+    /**
+     * Configures client details service.
+     * @param clients Client details configurer.
+     * @throws Exception Thrown when configuration fails.
+     */
     @Override
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         // get client configuration from JDBC data source
         clients.withClientDetails(clientDetailsService());
     }
 
+    /**
+     * Configures authorization server security - allows form authentication.
+     * @param security Authorization server security.
+     * @throws Exception Thrown when configuration fails.
+     */
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients();

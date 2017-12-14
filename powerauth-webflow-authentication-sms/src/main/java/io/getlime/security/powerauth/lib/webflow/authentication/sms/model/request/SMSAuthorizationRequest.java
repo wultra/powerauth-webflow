@@ -3,6 +3,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.sms.model.reque
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
+ * Request for SMS authorization.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class SMSAuthorizationRequest extends AuthStepRequest {

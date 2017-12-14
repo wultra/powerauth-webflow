@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 
 /**
- * Enum representing reason for cancelling the operation.
+ * Enum representing reason for canceling the operation.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */

@@ -19,7 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.operatio
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 
 /**
- * Response to update of form data.
+ * Response for update of form data.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */

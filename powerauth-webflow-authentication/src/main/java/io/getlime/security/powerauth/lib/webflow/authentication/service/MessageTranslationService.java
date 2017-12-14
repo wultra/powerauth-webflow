@@ -43,6 +43,10 @@ public class MessageTranslationService {
     private static final String MISSING_KEY_MESSAGE = "MISSING_LOCALIZATION_FOR_FIELD";
     private static final String MISSING_VALUE_MESSAGE = "MISSING_VALUE_FOR_FIELD";
 
+    /**
+     * Service constructor
+     * @param i18NService I18N service.
+     */
     public MessageTranslationService(I18NService i18NService) {
         this.i18NService = i18NService;
     }
