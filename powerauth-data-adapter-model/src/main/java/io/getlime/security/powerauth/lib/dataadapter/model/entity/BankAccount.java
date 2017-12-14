@@ -10,11 +10,26 @@ import java.math.BigDecimal;
 public class BankAccount {
 
     private String number;
+    private String accountId;
     private String name;
     private BigDecimal balance;
     private String currency;
     private boolean usableForPayment;
     private String unusableForPaymentReason;
+
+    public BankAccount() {
+    }
+
+    public BankAccount(String number, String accountId, String name, BigDecimal balance, String currency,
+                             boolean usableForPayment, String unusableForPaymentReason) {
+        this.number = number;
+        this.accountId = accountId;
+        this.name = name;
+        this.balance = balance;
+        this.currency = currency;
+        this.usableForPayment = usableForPayment;
+        this.unusableForPaymentReason = unusableForPaymentReason;
+    }
 
     public String getNumber() {
         return number;
@@ -22,6 +37,14 @@ public class BankAccount {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public String getAccountId() {
+        return accountId;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
     }
 
     public String getName() {

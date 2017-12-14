@@ -8,18 +8,18 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  */
 public class BankAccountChoice extends FormDataChange {
 
-    private String bankAccountNumber;
+    private String bankAccountId;
 
     public BankAccountChoice() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 
-    public String getBankAccountNumber() {
-        return bankAccountNumber;
+    public String getBankAccountId() {
+        return bankAccountId;
     }
 
-    public void setBankAccountNumber(String bankAccountNumber) {
-        this.bankAccountNumber = bankAccountNumber;
+    public void setBankAccountId(String bankAccountId) {
+        this.bankAccountId = bankAccountId;
     }
 
 }

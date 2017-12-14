@@ -81,9 +81,9 @@ export default class OperationDetail extends React.Component {
         this.setState({bankAccounts: bankAccountsReceived});
     }
 
-    resolveChosenBankAccount(bankAccounts, chosenBankAccountNumber) {
+    resolveChosenBankAccount(bankAccounts, chosenBankAccountId) {
         bankAccounts.map((bankAccount) => {
-            if (bankAccount.number === chosenBankAccountNumber) {
+            if (bankAccount.accountId === chosenBankAccountId) {
                 this.setState({chosenBankAccount: bankAccount});
             }
         });
@@ -91,7 +91,7 @@ export default class OperationDetail extends React.Component {
 
     handleBankAccountChoice(bankAccount) {
         this.setState({chosenBankAccount: bankAccount});
-        this.props.context.formData.userInput["operation.bankAccountChoice"] = bankAccount.number;
+        this.props.context.formData.userInput["operation.bankAccountChoice"] = bankAccount.accountId;
         this.props.dispatch(updateFormData(this.props.context.formData));
     }
 
