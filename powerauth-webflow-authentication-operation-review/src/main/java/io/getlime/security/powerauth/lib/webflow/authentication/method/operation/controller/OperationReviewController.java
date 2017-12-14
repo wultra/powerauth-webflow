@@ -163,7 +163,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         Map<String, String> userInput = request.getFormData().getUserInput();
         if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE)) {
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
-            bankAccountChoice.setBankAccountNumber(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
+            bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
         }
         return new ObjectResponse();
@@ -214,6 +214,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             BankAccountDetail bankAccount = new BankAccountDetail();
             bankAccount.setName(bankAccountEntity.getName());
             bankAccount.setNumber(bankAccountEntity.getNumber());
+            bankAccount.setAccountId(bankAccountEntity.getAccountId());
             bankAccount.setBalance(bankAccountEntity.getBalance());
             bankAccount.setCurrency(bankAccountEntity.getCurrency());
             bankAccount.setUsableForPayment(bankAccountEntity.isUsableForPayment());

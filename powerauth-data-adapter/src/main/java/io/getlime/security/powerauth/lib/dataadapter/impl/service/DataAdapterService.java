@@ -75,6 +75,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount1.setName("Běžný účet v CZK");
         bankAccount1.setBalance(new BigDecimal("24394.52"));
         bankAccount1.setNumber("12345678/1234");
+        bankAccount1.setAccountId("CZ40 1234 0000 0000 1234 5678");
         bankAccount1.setCurrency("CZK");
         bankAccount1.setUsableForPayment(true);
         bankAccounts.add(bankAccount1);
@@ -83,6 +84,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount2.setName("Spořící účet v CZK");
         bankAccount2.setBalance(new BigDecimal("158121.10"));
         bankAccount2.setNumber("87654321/4321");
+        bankAccount2.setAccountId("CZ40 4321 0000 0000 8765 4321");
         bankAccount2.setCurrency("CZK");
         bankAccount2.setUsableForPayment(true);
         bankAccounts.add(bankAccount2);
@@ -91,6 +93,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount3.setName("Spořící účet v EUR");
         bankAccount3.setBalance(new BigDecimal("1.90"));
         bankAccount3.setNumber("44444444/1111");
+        bankAccount3.setAccountId("CZ40 1111 0000 0000 4444 4444");
         bankAccount3.setCurrency("EUR");
         bankAccount3.setUsableForPayment(false);
         bankAccount3.setUnusableForPaymentReason(dataAdapterI18NService.messageSource().getMessage("operationReview.balanceTooLow", null, LocaleContextHolder.getLocale()));
@@ -105,7 +108,7 @@ public class DataAdapterService implements DataAdapter {
             case BANK_ACCOUNT_CHOICE:
                 // Handle bank account choice here (e.g. send notification to bank backend).
                 BankAccountChoice bankAccountChoice = (BankAccountChoice) change;
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Bank account chosen: " + bankAccountChoice.getBankAccountNumber() + ", user: " + userId + ", operationId: " + operationId);
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Bank account chosen: " + bankAccountChoice.getBankAccountId() + ", user: " + userId + ", operationId: " + operationId);
                 break;
             case AUTH_METHOD_CHOICE:
                 // Handle authorization method choice here (e.g. send notification to bank backend).
