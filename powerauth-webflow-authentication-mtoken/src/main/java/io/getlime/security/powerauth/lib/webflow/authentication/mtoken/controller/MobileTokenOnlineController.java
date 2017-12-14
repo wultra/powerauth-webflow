@@ -317,7 +317,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             AbstractMessageSource messageSource = i18nService.getMessageSource();
             String[] operationData = new String[]{operation.getOperationData()};
             body.setTitle(messageSource.getMessage("push.confirmOperation", null, LocaleContextHolder.getLocale()));
-            body.setTitle(messageSource.getMessage("push.data", operationData, LocaleContextHolder.getLocale()));
+            body.setBody(messageSource.getMessage("push.data", operationData, LocaleContextHolder.getLocale()));
         }
         body.setSound(PUSH_MESSAGE_SOUND);
         body.setCategory(operation.getOperationName());
