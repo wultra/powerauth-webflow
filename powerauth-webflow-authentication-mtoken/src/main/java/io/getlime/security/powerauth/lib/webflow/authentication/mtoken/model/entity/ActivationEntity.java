@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity;
 
 /**
+ * Activation entity.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class ActivationEntity {

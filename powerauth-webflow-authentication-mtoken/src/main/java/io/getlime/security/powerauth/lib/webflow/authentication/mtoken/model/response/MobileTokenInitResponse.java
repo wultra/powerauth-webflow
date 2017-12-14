@@ -20,7 +20,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 /**
  * Response to the init step of mobile token authentication.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class MobileTokenInitResponse extends AuthStepResponse {
 

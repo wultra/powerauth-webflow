@@ -20,7 +20,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 /**
  * Model for a username / password authentication request from client.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
 

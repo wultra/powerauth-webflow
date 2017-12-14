@@ -48,6 +48,10 @@ public class PushRegistrationController {
 
     private final PushServerClient pushServerClient;
 
+    /**
+     * Controller constructor.
+     * @param pushServerClient PowerAuth 2.0 Push server client.
+     */
     @Autowired
     public PushRegistrationController(PushServerClient pushServerClient) {
         this.pushServerClient = pushServerClient;

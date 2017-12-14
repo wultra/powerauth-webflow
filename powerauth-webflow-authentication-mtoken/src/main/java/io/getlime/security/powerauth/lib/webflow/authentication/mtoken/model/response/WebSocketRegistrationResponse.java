@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.re
 /**
  * Response to registration of a new WebSocket session.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class WebSocketRegistrationResponse {
 

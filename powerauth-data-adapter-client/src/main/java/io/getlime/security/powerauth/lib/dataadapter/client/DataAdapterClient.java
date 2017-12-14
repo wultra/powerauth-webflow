@@ -48,7 +48,7 @@ import java.io.IOException;
  * It uses the RestTemplate class to handle REST API calls. HTTP client is used instead of default client
  * so that error responses contain full response bodies.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class DataAdapterClient {
 
@@ -96,6 +96,7 @@ public class DataAdapterClient {
      * @param username username for user who is being authenticated
      * @param password password as a string
      * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<AuthenticationResponse> authenticateUser(String username, String password) throws DataAdapterClientErrorException {
         try {
@@ -121,6 +122,7 @@ public class DataAdapterClient {
      *
      * @param userId User ID for the user to be obtained.
      * @return A response user with given ID.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId) throws DataAdapterClientErrorException {
         try {
@@ -151,7 +153,7 @@ public class DataAdapterClient {
      * @param formData      Operation form data.
      * @param lang          language for i18n.
      * @return Response with generated messageId.
-     * @throws DataAdapterClientErrorException Exception thrown when action fails.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String operationId, String userId, String operationName, OperationFormData formData, String lang) throws DataAdapterClientErrorException {
         try {
@@ -181,7 +183,7 @@ public class DataAdapterClient {
      * @param messageId         Message ID.
      * @param authorizationCode User entered authorization code.
      * @return Empty response returned when action succeeds.
-     * @throws DataAdapterClientErrorException Exception is thrown when action fails with error details.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse verifyAuthorizationSMS(String messageId, String authorizationCode) throws DataAdapterClientErrorException {
         try {
@@ -208,6 +210,7 @@ public class DataAdapterClient {
      * @param operationName Operation name.
      * @param operationId Operation ID.
      * @return A list of bank accounts for given user.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId, String operationName, String operationId) throws DataAdapterClientErrorException {
         try {
@@ -236,6 +239,7 @@ public class DataAdapterClient {
      *
      * @param formDataChange Operation formData change.
      * @return Object response.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse formDataChangedNotification(FormDataChange formDataChange, String userId, String operationId) throws DataAdapterClientErrorException {
         try {
@@ -265,6 +269,7 @@ public class DataAdapterClient {
      *
      * @param operationChange Operation change.
      * @return Object response.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, String operationId) throws DataAdapterClientErrorException {
         try {
@@ -289,18 +294,34 @@ public class DataAdapterClient {
         }
     }
 
-    private DataAdapterClientErrorException resourceAccessException(ResourceAccessException ex) throws DataAdapterClientErrorException {
+    /**
+     * Create new DataAdapterClientErrorException from ResourceAccessException.
+     * @param ex ResourceAccessException
+     * @return DataAdapterClientErrorException
+     */
+    private DataAdapterClientErrorException resourceAccessException(ResourceAccessException ex) {
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
         return new DataAdapterClientErrorException(ex, error);
     }
 
-    private DataAdapterClientErrorException invalidErrorResponseBodyException(IOException ex) throws DataAdapterClientErrorException {
+    /**
+     * Create new DataAdapterClientErrorException from IOException.
+     * @param ex IOException
+     * @return DataAdapterClientErrorException
+     */
+    private DataAdapterClientErrorException invalidErrorResponseBodyException(IOException ex) {
         // JSON parsing failed
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
         return new DataAdapterClientErrorException(ex, error);
     }
 
-    private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException, DataAdapterClientErrorException {
+    /**
+     * Create new DataAdapterClientErrorException from HttpStatusCodeException.
+     * @param ex HttpStatusCodeException
+     * @return DataAdapterClientErrorException
+     * @throws IOException Thrown when response body can not be parsed.
+     */
+    private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException {
         TypeReference<ObjectResponse<DataAdapterError>> typeReference = new TypeReference<ObjectResponse<DataAdapterError>>() {
         };
         ObjectResponse<DataAdapterError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);

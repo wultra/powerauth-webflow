@@ -24,7 +24,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 /**
  * Configuration of WebSockets with a simple message broker.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 @EnableWebSocketMessageBroker
@@ -32,11 +32,19 @@ public class WebSocketConfiguration extends AbstractWebSocketMessageBrokerConfig
 
     public static final String MESSAGE_PREFIX = "/topic";
 
+    /**
+     * Stomp endpoint registration for Web Sockets.
+     * @param registry Stomp endpoint registry.
+     */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/websocket").setAllowedOrigins("*").withSockJS();
     }
 
+    /**
+     * Message broker configuration.
+     * @param registry Message broker registry.
+     */
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.enableSimpleBroker(MESSAGE_PREFIX);

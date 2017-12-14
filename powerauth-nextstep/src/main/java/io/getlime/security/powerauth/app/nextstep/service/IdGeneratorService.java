@@ -24,13 +24,17 @@ import java.util.UUID;
 /**
  * This service is used for generating ids for entities used to persist operations and their history.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class IdGeneratorService {
 
     private OperationHistoryRepository operationHistoryRepository;
 
+    /**
+     * ID generator constructor.
+     * @param operationHistoryRepository Operation history repository.
+     */
     public IdGeneratorService(OperationHistoryRepository operationHistoryRepository) {
         this.operationHistoryRepository = operationHistoryRepository;
     }
@@ -38,7 +42,7 @@ public class IdGeneratorService {
     /**
      * Generates random operationId using UUID.randomUUID().
      *
-     * @return generated operationId
+     * @return Generated operation ID.
      */
     public String generateOperationId() {
         return UUID.randomUUID().toString();
@@ -47,8 +51,8 @@ public class IdGeneratorService {
     /**
      * Generates a new id for for OperationHistory for given operation.
      *
-     * @param operationId id specifying an operation
-     * @return generated id for OperationHistory
+     * @param operationId Operation ID.
+     * @return Generated OperationHistory ID.
      */
     public synchronized Long generateOperationHistoryId(String operationId) {
         Long maxId = operationHistoryRepository.findMaxResultId(operationId);

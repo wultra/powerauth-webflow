@@ -22,9 +22,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 /**
- * CrudRepository for persistence of operations.
+ * Crud repository for persistence of operations.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface OperationRepository extends CrudRepository<OperationEntity, String> {

@@ -38,6 +38,10 @@ public class ServiceController {
 
     private final NextStepServerConfiguration nextStepServerConfiguration;
 
+    /**
+     * Controller constructor.
+     * @param nextStepServerConfiguration Next step server configuration.
+     */
     @Autowired
     public ServiceController(NextStepServerConfiguration nextStepServerConfiguration) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;

@@ -22,7 +22,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * <li>BASIC - Username and password sent via plaintext request.</li>
  * </ul>
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public enum AuthenticationType {
     BASIC

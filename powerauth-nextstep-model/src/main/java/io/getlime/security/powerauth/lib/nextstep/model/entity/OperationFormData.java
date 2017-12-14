@@ -21,6 +21,9 @@ public class OperationFormData {
     private boolean dynamicDataLoaded;
     private Map<String, String> userInput;
 
+    /**
+     * Default constructor.
+     */
     public OperationFormData() {
         this.parameters = new ArrayList<>();
         this.userInput = new LinkedHashMap<>();

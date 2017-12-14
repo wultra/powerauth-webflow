@@ -39,7 +39,7 @@ import javax.validation.Valid;
 /**
  * Controller class which handles user authentication.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Controller
 @RequestMapping("/api/auth/user")
@@ -48,6 +48,11 @@ public class AuthenticationController {
     private final AuthenticationRequestValidator requestValidator;
     private final DataAdapter dataAdapter;
 
+    /**
+     * Controller constructor.
+     * @param requestValidator Validator for authentication requests.
+     * @param dataAdapter Data adapter.
+     */
     @Autowired
     public AuthenticationController(AuthenticationRequestValidator requestValidator, DataAdapter dataAdapter) {
         this.requestValidator = requestValidator;
@@ -69,8 +74,9 @@ public class AuthenticationController {
      * @param request Authenticate user request.
      * @param result BindingResult for input validation.
      * @return Response with authenticated user ID.
-     * @throws AuthenticationFailedException In case that authentication fails.
-     * @throws MethodArgumentNotValidException In case form parameters are not valid.
+     * @throws MethodArgumentNotValidException Thrown in case form parameters are not valid.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
+     * @throws AuthenticationFailedException Thrown in case that authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<AuthenticationResponse> authenticate(@Valid @RequestBody ObjectRequest<AuthenticationRequest> request, BindingResult result) throws MethodArgumentNotValidException, DataAdapterRemoteException, AuthenticationFailedException {
@@ -92,6 +98,8 @@ public class AuthenticationController {
      *
      * @param request Request with user ID.
      * @return Response with user details.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
+     * @throws UserNotFoundException Thrown in case user is not found.
      */
     @RequestMapping(value = "/info", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws DataAdapterRemoteException, UserNotFoundException {

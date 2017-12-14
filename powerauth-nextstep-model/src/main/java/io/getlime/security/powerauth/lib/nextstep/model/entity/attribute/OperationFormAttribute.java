@@ -1,7 +1,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 /**
- * Class representing the operation form attributes.
+ * Class representing the operation form attribute.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */

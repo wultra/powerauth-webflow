@@ -43,6 +43,13 @@ public class SMSPersistenceService {
     private final DataAdapterConfiguration dataAdapterConfiguration;
     private final DataAdapterI18NService dataAdapterI18NService;
 
+    /**
+     * SMS persistence service constructor.
+     * @param smsAuthorizationRepository SMS authorization repository.
+     * @param operationFormDataService Operation form data service.
+     * @param dataAdapterConfiguration Data adapter configuration.
+     * @param dataAdapterI18NService Data adapter I18N service.
+     */
     @Autowired
     public SMSPersistenceService(SMSAuthorizationRepository smsAuthorizationRepository, OperationFormDataService operationFormDataService, DataAdapterConfiguration dataAdapterConfiguration, DataAdapterI18NService dataAdapterI18NService) {
         this.smsAuthorizationRepository = smsAuthorizationRepository;

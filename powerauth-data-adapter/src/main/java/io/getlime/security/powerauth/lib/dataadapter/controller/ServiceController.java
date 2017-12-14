@@ -38,6 +38,10 @@ public class ServiceController {
 
     private final DataAdapterConfiguration dataAdapterConfiguration;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapterConfiguration Data adapter configuration.
+     */
     @Autowired
     public ServiceController(DataAdapterConfiguration dataAdapterConfiguration) {
         this.dataAdapterConfiguration = dataAdapterConfiguration;

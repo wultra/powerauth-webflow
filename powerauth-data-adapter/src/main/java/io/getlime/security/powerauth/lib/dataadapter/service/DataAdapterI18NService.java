@@ -29,6 +29,9 @@ import org.springframework.stereotype.Service;
 public class DataAdapterI18NService {
 
 
+    /**
+     * Data adapter I18N service constructor.
+     */
     public DataAdapterI18NService() {
     }
 

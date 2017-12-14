@@ -39,16 +39,30 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
 
     private OperationFormDataService operationFormDataService;
 
+    /**
+     * Validator constructor.
+     * @param operationFormDataService Operation form data service.
+     */
     @Autowired
     public CreateSMSAuthorizationRequestValidator(OperationFormDataService operationFormDataService) {
         this.operationFormDataService = operationFormDataService;
     }
 
+    /**
+     * Return whether validator can validate given class.
+     * @param clazz Validated class.
+     * @return Whether validator can validate given class.
+     */
     @Override
     public boolean supports(Class<?> clazz) {
         return ObjectRequest.class.isAssignableFrom(clazz);
     }
 
+    /**
+     * Validate object and add validation errors.
+     * @param o Validated object.
+     * @param errors Errors object.
+     */
     @Override
     @SuppressWarnings("unchecked")
     public void validate(Object o, Errors errors) {

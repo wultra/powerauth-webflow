@@ -20,7 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 /**
  * Authorization response object for sending result of an authorization via WebSockets.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class WebSocketAuthorizationResponse {
 

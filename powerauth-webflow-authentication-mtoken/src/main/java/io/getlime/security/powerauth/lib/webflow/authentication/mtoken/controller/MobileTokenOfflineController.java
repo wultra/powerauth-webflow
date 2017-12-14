@@ -63,6 +63,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     private final PowerAuthServiceClient powerAuthServiceClient;
     private final AuthMethodQueryService authMethodQueryService;
 
+    /**
+     * Controller constructor.
+     * @param powerAuthServiceClient PowerAuth 2.0 service client.
+     * @param authMethodQueryService Authentication method query service.
+     */
     @Autowired
     public MobileTokenOfflineController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService) {
         this.powerAuthServiceClient = powerAuthServiceClient;
@@ -117,6 +122,10 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         throw authEx;
     }
 
+    /**
+     * Get current method name.
+     * @return Current method name.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.POWERAUTH_TOKEN;

@@ -1,6 +1,12 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Username and password authentication.
+ * @param username Username.
+ * @param password Password.
+ * @returns {Function} No return value.
+ */
 export function authenticate(username, password) {
     return function (dispatch) {
         dispatch({

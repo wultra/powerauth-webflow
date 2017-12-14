@@ -60,6 +60,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Online mobile token authentication controller.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
@@ -77,6 +79,15 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     private final PowerAuthServiceClient powerAuthServiceClient;
     private final I18NService i18nService;
 
+    /**
+     * Controller constructor.
+     *
+     * @param pushServerClient PowerAuth 2.0 Push server client.
+     * @param webSocketMessageService Web Socket message service.
+     * @param authMethodQueryService Authentication method query service.
+     * @param powerAuthServiceClient PowerAuth 2.0 client.
+     * @param i18nService I18N service.
+     */
     @Autowired
     public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient, I18NService i18nService) {
         this.pushServerClient = pushServerClient;
@@ -86,6 +97,12 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         this.i18nService = i18nService;
     }
 
+    /**
+     * Authenticate using online mobile token.
+     * @param request Online mobile token authentication rquest.
+     * @return User ID.
+     * @throws AuthStepException Thrown when authentication fails.
+     */
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -99,11 +116,21 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         return null;
     }
 
+    /**
+     * Get current authentication method.
+     * @return Current authentication method.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.POWERAUTH_TOKEN;
     }
 
+    /**
+     * Initialize push message.
+     * @return Initialization response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
+     * @throws AuthStepException Thrown when authentication fails.
+     */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
@@ -145,6 +172,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         return initResponse;
     }
 
+    /**
+     * Perform online mobile token authentication. Method can be called repeatedly to verify current authentication status.
+     *
+     * @param request Online mobile token authentication request.
+     * @return Authentication result.
+     * @throws AuthStepException Thrown when authentication fails.
+     */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
@@ -231,6 +265,11 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         return response;
     }
 
+    /**
+     * Cancel operation.
+     * @return Object response.
+     * @throws AuthStepException Thrown when operation could not be canceled.
+     */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody MobileTokenAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {

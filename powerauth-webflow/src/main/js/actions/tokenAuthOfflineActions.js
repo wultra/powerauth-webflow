@@ -16,6 +16,11 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Initialize offline mode for mobile token.
+ * @param activationId Chosen activation ID.
+ * @returns {Function} No return value.
+ */
 export function initOffline(activationId) {
     return function (dispatch) {
         dispatch({
@@ -59,6 +64,14 @@ export function initOffline(activationId) {
     }
 }
 
+/**
+ * Authenticate in offline mode for mobile token.
+ * @param activationId Chosen activation ID.
+ * @param authCode User supplied code.
+ * @param nonce Nonce.
+ * @param dataHash Data hash.
+ * @returns {Function} No return value.
+ */
 export function authenticateOffline(activationId, authCode, nonce, dataHash) {
     return function (dispatch) {
         dispatch({
@@ -146,6 +159,11 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
     }
 }
 
+/**
+ * Update operation form data on the server.
+ * @param formData Operation form data.
+ * @returns {Function} No response in case of OK status, otherwise error is dispatched.
+ */
 export function updateFormData(formData, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {

@@ -16,6 +16,10 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Get operation detail.
+ * @returns {Function} Operation detail.
+ */
 export function getOperationData() {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
@@ -34,6 +38,11 @@ export function getOperationData() {
     }
 }
 
+/**
+ * Initialize online mode for mobile token.
+ * @param callback Callback to call when function finishes.
+ * @returns {Function} No return value.
+ */
 export function initOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/init", {}, {
@@ -59,6 +68,11 @@ export function initOnline(callback) {
     }
 }
 
+/**
+ * Authenticate in online mode for mobile token.
+ * @param callback Callback to call when function finishes.
+ * @returns {Function} No return value.
+ */
 export function authenticateOnline(callback) {
     return function (dispatch) {
         axios.post("./api/auth/token/web/authenticate", {}, {
@@ -116,6 +130,10 @@ export function authenticateOnline(callback) {
     }
 }
 
+/**
+ * Cancel operation.
+ * @returns {Function} No return value.
+ */
 export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/token/web/cancel", {}, {
@@ -136,6 +154,12 @@ export function cancel() {
     }
 }
 
+/**
+ * Update operation form data on the server.
+ * @param formData Operation form data.
+ * @param callback Callback to call when function finishes.
+ * @returns {Function} No response in case of OK status, otherwise error is dispatched.
+ */
 export function updateFormData(formData, callback) {
     return function (dispatch) {
         axios.put("./api/auth/operation/formData", {

@@ -87,6 +87,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private HttpServletRequest request;
 
+    /**
+     * Get operation detail.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
     protected GetOperationDetailResponse getOperation() throws AuthStepException {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
@@ -101,6 +106,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
+    /**
+     * Get operation detail with given operation ID.
+     * @param operationId Operation ID.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
     protected GetOperationDetailResponse getOperation(String operationId) throws AuthStepException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
@@ -116,8 +127,17 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
+    /**
+     * Get current authentication method.
+     * @return Current authentication method.
+     */
     abstract protected AuthMethod getAuthMethodName();
 
+    /**
+     * Get pending operations for given user.
+     * @param userId User ID.
+     * @return List of operations for given user.
+     */
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
         try {
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, getAuthMethodName());
@@ -365,10 +385,16 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
     }
 
+    /**
+     * Clear current browser session.
+     */
     protected void clearCurrentBrowserSession() {
         authenticationManagementService.clearContext();
     }
 
+    /**
+     * Authenticate current browser session.
+     */
     protected void authenticateCurrentBrowserSession() {
         authenticationManagementService.authenticateCurrentSession();
         try {

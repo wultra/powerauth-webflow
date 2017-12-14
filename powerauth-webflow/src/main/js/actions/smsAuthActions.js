@@ -16,6 +16,10 @@
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
+/**
+ * Get operation detail.
+ * @returns {Function} Operation detail.
+ */
 export function getOperationData() {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
@@ -34,6 +38,10 @@ export function getOperationData() {
     }
 }
 
+/**
+ * Initialize SMS authentication.
+ * @returns {Function} No return value.
+ */
 export function init() {
     return function (dispatch) {
         axios.post("./api/auth/sms/init", {}, {
@@ -60,6 +68,11 @@ export function init() {
     }
 }
 
+/**
+ * Perform SMS authentication.
+ * @param userAuthCode User supplied code.
+ * @returns {Function} No return value.
+ */
 export function authenticate(userAuthCode) {
     return function (dispatch) {
         dispatch({
@@ -136,6 +149,10 @@ export function authenticate(userAuthCode) {
     }
 }
 
+/**
+ * Cancel operation.
+ * @returns {Function} No return value.
+ */
 export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/sms/cancel", {}, {

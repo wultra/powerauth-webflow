@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.operatio
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 
 /**
+ * Operation review response.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class OperationReviewResponse extends AuthStepResponse {

@@ -26,10 +26,15 @@ import java.security.Security;
 /**
  * Servlet initializer which handles application startup in a web container.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class ServletInitializer extends SpringBootServletInitializer {
 
+    /**
+     * Configure servlet initializer - set up Bouncy Castle crypto provider.
+     * @param application Application.
+     * @return Spring application builder.
+     */
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         // Register BC provider

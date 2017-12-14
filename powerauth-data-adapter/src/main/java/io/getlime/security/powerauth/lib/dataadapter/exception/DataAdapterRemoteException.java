@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.exception;
 
 /**
  * Exception for unexpected remote communication errors.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class DataAdapterRemoteException extends Exception {

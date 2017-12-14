@@ -1,6 +1,10 @@
 import axios from 'axios';
 import {dispatchAction, dispatchError} from '../dispatcher/dispatcher'
 
+/**
+ * Initiate authentication/authorization process.
+ * @returns {Function} No return value.
+ */
 export function authenticate() {
     return function (dispatch) {
         axios.post("./api/auth/init/authenticate", {}, {

@@ -61,13 +61,21 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
 
-
+    /**
+     * Controller constructor.
+     * @param webSocketMessageService Web Socket message service.
+     * @param authMethodQueryService Authentication method query service.
+     */
     @Autowired
     public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService) {
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
     }
 
+    /**
+     * Get current authentication name.
+     * @return Current authentication name.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.POWERAUTH_TOKEN;

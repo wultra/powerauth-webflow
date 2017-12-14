@@ -22,7 +22,7 @@ import java.util.List;
 /**
  * Error model, used to represent error responses.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class DataAdapterError extends Error {
 

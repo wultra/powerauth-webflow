@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
  * definitions match the request). Step definitions are also filtered by authentication methods available for the user,
  * authentication methods can be enabled or disabled dynamically in user preferences.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class StepResolutionService {
@@ -61,6 +61,16 @@ public class StepResolutionService {
     private AuthMethodRepository authMethodRepository;
     private Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
 
+    /**
+     * Service constructor.
+     *
+     * @param stepDefinitionRepository Step definition repository.
+     * @param operationPersistenceService Operation persistence service.
+     * @param idGeneratorService ID generator service.
+     * @param nextStepServerConfiguration Next step server configuration.
+     * @param authMethodService Authentication method service.
+     * @param authMethodRepository Authentication method repository.
+     */
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
@@ -116,8 +126,9 @@ public class StepResolutionService {
     /**
      * Resolves the next steps for given UpdateOperationRequest.
      *
-     * @param request request to update an existing operation
-     * @return response with ordered list of next steps
+     * @param request Request to update an existing operation.
+     * @return Response with ordered list of next steps.
+     * @throws NextStepServiceException Thrown when next step resolution fails.
      */
     public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws NextStepServiceException {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
@@ -368,7 +379,8 @@ public class StepResolutionService {
      * Check whether the update of operation is legitimate and meaningful.
      *
      * @param operationEntity Operation entity.
-     * @param request         Update request.
+     * @param request Update request.
+     * @throws NextStepServiceException Thrown when update is not legitimate.
      */
     private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws NextStepServiceException {
         if (request == null || request.getOperationId() == null) {

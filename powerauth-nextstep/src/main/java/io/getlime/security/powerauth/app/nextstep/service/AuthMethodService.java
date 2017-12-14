@@ -47,6 +47,12 @@ public class AuthMethodService {
     private final UserPrefsRepository userPrefsRepository;
     private final ObjectMapper objectMapper;
 
+    /**
+     * Service constructor.
+     * @param authMethodRepository Authentication method repository.
+     * @param userPrefsRepository User preferences repository.
+     * @param objectMapper Object mapper.
+     */
     @Autowired
     public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, ObjectMapper objectMapper) {
         this.authMethodRepository = authMethodRepository;
@@ -57,7 +63,7 @@ public class AuthMethodService {
     /**
      * Lists all authentication methods supported by the Next Step server.
      *
-     * @return List of all authentication methods.s
+     * @return List of all authentication methods.
      */
     public List<AuthMethodDetail> listAuthMethods() {
         List<AuthMethodDetail> allMethods = new ArrayList<>();
@@ -120,9 +126,10 @@ public class AuthMethodService {
     /**
      * Enable or disable an authentication method for given user.
      *
-     * @param userId     User ID
-     * @param authMethod authentication method
-     * @param enabled    true if enabled, false if disabled, null if unspecified
+     * @param userId User ID.
+     * @param authMethod Authentication method.
+     * @param enabled True if enabled, false if disabled, null if unspecified.
+     * @param config Authentication method configuration.
      */
     public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) {
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
@@ -200,6 +207,13 @@ public class AuthMethodService {
         return authMethodDetail;
     }
 
+    /**
+     * Converts AuthMethodEntity into UserAuthMethodDetail which contains less fields available for the UI.
+     * @param userId User ID.
+     * @param authMethodEntity Authentication method entity.
+     * @param config Authentication method configuration.
+     * @return Authentication method detail for given userId.
+     */
     private UserAuthMethodDetail getUserAuthMethodDetail(String userId, AuthMethodEntity authMethodEntity, Map<String, String> config) {
         if (authMethodEntity == null) {
             return null;

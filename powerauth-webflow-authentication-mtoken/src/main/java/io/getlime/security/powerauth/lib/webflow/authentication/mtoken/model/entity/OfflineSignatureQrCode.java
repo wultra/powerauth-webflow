@@ -35,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Signature and data for QR code in offline mode for mobile token.
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class OfflineSignatureQrCode {

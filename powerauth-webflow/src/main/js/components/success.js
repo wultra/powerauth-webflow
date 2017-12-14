@@ -18,6 +18,9 @@ import {connect} from "react-redux";
 // i18n
 import {FormattedMessage} from "react-intl";
 
+/**
+ * Success for component showing successful authentication result with redirect to original application.
+ */
 @connect((store) => {
     return {
         context: store.dispatching.context

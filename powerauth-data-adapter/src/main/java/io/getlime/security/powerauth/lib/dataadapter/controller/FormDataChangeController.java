@@ -39,6 +39,10 @@ public class FormDataChangeController {
 
     private DataAdapter dataAdapter;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapter Data adapter.
+     */
     @Autowired
     public FormDataChangeController(DataAdapter dataAdapter) {
         this.dataAdapter = dataAdapter;
@@ -49,6 +53,7 @@ public class FormDataChangeController {
      *
      * @param request Request with change details.
      * @return Object response.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse formDataChangedNotification(@RequestBody ObjectRequest<FormDataChangeNotificationRequest> request) throws DataAdapterRemoteException {

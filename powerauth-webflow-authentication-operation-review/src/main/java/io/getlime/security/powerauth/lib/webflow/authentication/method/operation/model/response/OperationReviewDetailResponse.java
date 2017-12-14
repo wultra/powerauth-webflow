@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
  * Response with operation detail.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class OperationReviewDetailResponse {

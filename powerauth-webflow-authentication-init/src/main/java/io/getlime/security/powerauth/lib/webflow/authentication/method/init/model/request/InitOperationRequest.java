@@ -20,7 +20,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 /**
  * Models a registration request received from the client.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class InitOperationRequest extends AuthStepRequest {
 

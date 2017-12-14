@@ -52,11 +52,21 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
     private final DataAdapterClient dataAdapterClient;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapterClient Data adapter client.
+     */
     @Autowired
     public FormLoginController(DataAdapterClient dataAdapterClient) {
         this.dataAdapterClient = dataAdapterClient;
     }
 
+    /**
+     * Authenticate using username / password authentiation.
+     * @param request Authentication request.
+     * @return Authenticated user ID.
+     * @throws AuthStepException Thrown when authentication fails.
+     */
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         try {
@@ -90,6 +100,10 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         }
     }
 
+    /**
+     * Get current authentication method name.
+     * @return Current authentication method name.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.USERNAME_PASSWORD_AUTH;
@@ -143,6 +157,11 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
     }
 
+    /**
+     * Cancel operation.
+     * @return Object response.
+     * @throws AuthStepException Thrown when operation could not be canceled.
+     */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     public @ResponseBody UsernamePasswordAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {

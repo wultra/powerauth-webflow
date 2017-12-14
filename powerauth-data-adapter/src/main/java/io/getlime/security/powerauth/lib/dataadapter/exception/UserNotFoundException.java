@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.lib.dataadapter.exception;
 
 /**
+ * Exception used for case when user is not found.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class UserNotFoundException extends Exception {

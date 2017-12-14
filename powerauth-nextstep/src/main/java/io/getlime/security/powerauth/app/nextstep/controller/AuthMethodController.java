@@ -47,6 +47,10 @@ public class AuthMethodController {
 
     private AuthMethodService authMethodService;
 
+    /**
+     * Controller constructor.
+     * @param authMethodService Authentication method service.
+     */
     @Autowired
     public AuthMethodController(AuthMethodService authMethodService) {
         this.authMethodService = authMethodService;

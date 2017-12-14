@@ -3,6 +3,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.re
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
+ * Request for QR code initialization in offline mode for QR token.
+ *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class QRCodeInitRequest extends AuthStepRequest {

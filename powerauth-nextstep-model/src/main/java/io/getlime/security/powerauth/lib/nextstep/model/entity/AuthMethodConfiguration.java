@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Configuration of authentication methods per user. Configuration parameters are stored in a key-value Map.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthMethodConfiguration {
 

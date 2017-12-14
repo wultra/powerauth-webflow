@@ -16,6 +16,11 @@ public class OperationFormDataService {
 
     private static final String FIELD_ACCOUNT_ID = "operation.account";
 
+    /**
+     * Extract amount from operation form data.
+     * @param formData Operation form data.
+     * @return Operation amount attribute.
+     */
     public OperationAmountFieldAttribute getAmount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
             throw new IllegalArgumentException("Argument formData is invalid");
@@ -23,6 +28,11 @@ public class OperationFormDataService {
         return formData.getAmount();
     }
 
+    /**
+     * Extract account from operation form data.
+     * @param formData Operation form data.
+     * @return Operation to account value.
+     */
     public String getAccount(OperationFormData formData) {
         if (formData==null || formData.getParameters()==null) {
             throw new IllegalArgumentException("Argument formData is invalid");

@@ -21,7 +21,7 @@ import org.springframework.stereotype.Component;
 
 
 /**
- * CrudRepository for persistence of SMS OTP authorization messages.
+ * Crud repository for persistence of SMS OTP authorization messages.
  *
  * @author Roman Strobl
  */

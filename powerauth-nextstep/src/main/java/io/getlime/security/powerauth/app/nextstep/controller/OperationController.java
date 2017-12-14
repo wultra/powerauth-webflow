@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 /**
  * Controller class related to Next Step operations.
  *
- * @author Petr Dvorak
+ * @author Petr Dvorak, petr@lime-company.eu
  */
 @Controller
 public class OperationController {
@@ -54,6 +54,11 @@ public class OperationController {
     private OperationPersistenceService operationPersistenceService;
     private StepResolutionService stepResolutionService;
 
+    /**
+     * Controller constructor.
+     * @param operationPersistenceService Operation persistence service.
+     * @param stepResolutionService Step resolution service.
+     */
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService,
                                StepResolutionService stepResolutionService) {
@@ -83,6 +88,7 @@ public class OperationController {
      *
      * @param request Update operation request.
      * @return Update operation response.
+     * @throws NextStepServiceException Thrown when next step resolution fails.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {

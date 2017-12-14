@@ -50,6 +50,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
     private final OperationSessionService operationSessionService;
 
+    /**
+     * Controller constructor.
+     * @param operationSessionService Operation session service.
+     */
     @Autowired
     public ApiController(OperationSessionService operationSessionService) {
         this.operationSessionService = operationSessionService;
@@ -123,6 +127,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
     }
 
+    /**
+     * Create a failed operation response.
+     * @param message Message.
+     * @param failedReason Failure reason.
+     * @return Failed operation response.
+     */
     private InitOperationResponse failedOperationResponse(String message, String failedReason) {
         clearCurrentBrowserSession();
         InitOperationResponse registrationResponse = new InitOperationResponse();
@@ -131,6 +141,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         return registrationResponse;
     }
 
+    /**
+     * Create a confirmed operation response.
+     * @return Confirmed operation response.
+     */
     private InitOperationResponse completeOperationResponse() {
         authenticateCurrentBrowserSession();
         InitOperationResponse registrationResponse = new InitOperationResponse();
@@ -138,6 +152,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         return registrationResponse;
     }
 
+    /**
+     * Create a continue operation response.
+     * @param operationId Operation ID.
+     * @param steps Operation authentication steps.
+     * @return Continue operation reponse.
+     */
     private InitOperationResponse continueOperationResponse(String operationId, List<AuthStep> steps) {
         String operationHash = operationSessionService.generateOperationHash(operationId);
         InitOperationResponse registrationResponse = new InitOperationResponse();
@@ -148,6 +168,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         return registrationResponse;
     }
 
+    /**
+     * Get current authentication method.
+     * @return Current authentication method.
+     */
     @Override
     protected AuthMethod getAuthMethodName() {
         return AuthMethod.INIT;

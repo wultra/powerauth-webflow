@@ -43,6 +43,10 @@ public class BankAccountController {
 
     private DataAdapter dataAdapter;
 
+    /**
+     * Controller constructor.
+     * @param dataAdapter Data adapter.
+     */
     @Autowired
     public BankAccountController(DataAdapter dataAdapter) {
         this.dataAdapter = dataAdapter;
@@ -53,6 +57,8 @@ public class BankAccountController {
      *
      * @param request Request with user ID.
      * @return Response with user details.
+     * @throws DataAdapterRemoteException Thrown in case of remote communication errors.
+     * @throws UserNotFoundException Thrown in case user is not found.
      */
     @RequestMapping(value = "/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<BankAccountListResponse> fetchBankAccounts(@RequestBody ObjectRequest<BankAccountListRequest> request) throws DataAdapterRemoteException, UserNotFoundException {

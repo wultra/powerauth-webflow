@@ -1,6 +1,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request;
 
 /**
+ * Request to cancel an operation.
+ *
  * @author Petr Dvorak, petr@lime-company.eu
  */
 public class MobileTokenCancelOperationRequest {
