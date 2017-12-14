@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {FormattedMessage} from "react-intl";
 
 /**
- * Success for component showing successful authentication result with redirect to original application.
+ * Component showing successful authentication result with redirect to original application.
  */
 @connect((store) => {
     return {
