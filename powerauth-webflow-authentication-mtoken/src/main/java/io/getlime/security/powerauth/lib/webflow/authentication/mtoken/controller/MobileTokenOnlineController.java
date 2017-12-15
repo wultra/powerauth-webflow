@@ -70,6 +70,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
     private static final String PUSH_MESSAGE_TITLE = "title";
     private static final String PUSH_MESSAGE_SUBTITLE = "subtitle";
+    private static final String PUSH_MESSAGE_TYPE = "messageType";
+    private static final String PUSH_MESSAGE_OPERATION_ID = "operationId";
+    private static final String PUSH_MESSAGE_OPERATION_NAME = "operationName";
+    private static final String PUSH_MESSAGE_TYPE_MTOKEN = "mtoken.operation";
     private static final String PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE = "AUTH_STEP_FINISHED";
     private static final String PUSH_MESSAGE_SOUND = "default";
 
@@ -357,6 +361,11 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             String[] operationData = new String[]{operation.getOperationData()};
             body.setTitle(messageSource.getMessage("push.confirmOperation", null, LocaleContextHolder.getLocale()));
             body.setBody(messageSource.getMessage("push.data", operationData, LocaleContextHolder.getLocale()));
+            Map<String, Object> extras = new HashMap<>();
+            extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN);
+            extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
+            extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
+            body.setExtras(extras);
         }
         body.setSound(PUSH_MESSAGE_SOUND);
         body.setCategory(operation.getOperationName());
@@ -378,12 +387,15 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         message.getAttributes().setEncrypted(true);
         message.getAttributes().setSilent(true);
 
-        Map<String, Object> dataMap = new HashMap<>();
-        dataMap.put(PUSH_MESSAGE_TITLE, PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
-        dataMap.put(PUSH_MESSAGE_SUBTITLE, statusMessage);
+        Map<String, Object> extras = new HashMap<>();
+        extras.put(PUSH_MESSAGE_TITLE, PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
+        extras.put(PUSH_MESSAGE_SUBTITLE, statusMessage);
+        extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN);
+        extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
+        extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
 
         PushMessageBody body = new PushMessageBody();
-        body.setExtras(dataMap);
+        body.setExtras(extras);
         body.setCategory(operation.getOperationName());
 
         message.setBody(body);
