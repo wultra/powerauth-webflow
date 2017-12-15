@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep;
+package io.getlime.security.powerauth.lib.dataadapter.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Default Web Application Configuration.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Configuration
 public class WebApplicationConfig extends WebMvcConfigurerAdapter {

@@ -16,6 +16,9 @@
 
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.datatype.joda.JodaModule;
 import io.getlime.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthWebArgumentResolver;
@@ -24,6 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperFactoryBean;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -125,6 +131,42 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
         registry.addInterceptor(powerAuthInterceptor());
         registry.addInterceptor(localeChangeInterceptor());
         super.addInterceptors(registry);
+    }
+
+    /**
+     * Custom object mapper to make sure that dates and other values serialize
+     * correctly.
+     *
+     * @return A new object mapper.
+     */
+    private ObjectMapper objectMapper() {
+        Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
+        bean.setIndentOutput(true);
+        bean.setDateFormat(new ISO8601DateFormat());
+        bean.afterPropertiesSet();
+        ObjectMapper objectMapper = bean.getObject();
+        objectMapper.registerModule(new JodaModule());
+        return objectMapper;
+    }
+
+    /**
+     * Set custom JSON converter.
+     *
+     * @return New custom converter with a correct object mapper.
+     */
+    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setObjectMapper(objectMapper());
+        return converter;
+    }
+
+    /**
+     * Register the JSON converters.
+     */
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(mappingJackson2HttpMessageConverter());
+        super.configureMessageConverters(converters);
     }
 
 }
