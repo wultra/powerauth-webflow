@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -59,7 +60,7 @@ public class MobileTokenApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(InvalidRequestObjectException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("INVALID_REQUEST", t.getMessage()));
@@ -71,46 +72,22 @@ public class MobileTokenApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(InvalidActivationException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody ErrorResponse handleInvalidValidationException(Throwable t) {
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("INVALID_ACTIVATION", t.getMessage()));
     }
 
     /**
-     * Exception handler for cancel operation failed exception.
+     * Exception handler for PowerAuth authentication exception.
      *
      * @return Response with error details.
      */
-    @ExceptionHandler(CancelOperationFailedException.class)
+    @ExceptionHandler(PowerAuthAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody ErrorResponse handleOperationCancelFailedException(Throwable t) {
+    public @ResponseBody ErrorResponse handlePowerAuthAuthenticationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_CANCEL_FAILED", t.getMessage()));
-    }
-
-    /**
-     * Exception handler for pending operation list exception.
-     *
-     * @return Response with error details.
-     */
-    @ExceptionHandler(PendingOperationListFailedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody ErrorResponse handlePendingOperationListFailedException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_LIST_FAILED", t.getMessage()));
-    }
-
-    /**
-     * Exception handler for signature verification exception.
-     *
-     * @return Response with error details.
-     */
-    @ExceptionHandler(SignatureVerificationFailedException.class)
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public @ResponseBody ErrorResponse handleSignatureVerificationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("SIGNATURE_VERIFICATION_FAILED", t.getMessage()));
+        return new ErrorResponse(new Error("POWERAUTH_AUTH_FAIL", t.getMessage()));
     }
 
     /**
