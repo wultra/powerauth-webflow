@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -72,45 +73,21 @@ public class MobileTokenApiExceptionResolver {
      */
     @ExceptionHandler(InvalidActivationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleInvalidValidationException(Throwable t) {
+    public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("INVALID_ACTIVATION", t.getMessage()));
     }
 
     /**
-     * Exception handler for cancel operation failed exception.
+     * Exception handler for PowerAuth authentication exception.
      *
      * @return Response with error details.
      */
-    @ExceptionHandler(CancelOperationFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ErrorResponse handleOperationCancelFailedException(Throwable t) {
+    @ExceptionHandler(PowerAuthAuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody ErrorResponse handlePowerAuthAuthenticationException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_CANCEL_FAILED", t.getMessage()));
-    }
-
-    /**
-     * Exception handler for pending operation list exception.
-     *
-     * @return Response with error details.
-     */
-    @ExceptionHandler(PendingOperationListFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ErrorResponse handlePendingOperationListFailedException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_LIST_FAILED", t.getMessage()));
-    }
-
-    /**
-     * Exception handler for signature verification exception.
-     *
-     * @return Response with error details.
-     */
-    @ExceptionHandler(SignatureVerificationFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ErrorResponse handleSignatureVerificationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("SIGNATURE_VERIFICATION_FAILED", t.getMessage()));
+        return new ErrorResponse(new Error("POWERAUTH_AUTH_FAIL", t.getMessage()));
     }
 
     /**
@@ -119,7 +96,7 @@ public class MobileTokenApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFinishedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("OPERATION_ALREADY_FINISHED", t.getMessage()));
@@ -131,7 +108,7 @@ public class MobileTokenApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("OPERATION_ALREADY_FAILED", t.getMessage()));
@@ -143,7 +120,7 @@ public class MobileTokenApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(OperationExpiredException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error("OPERATION_EXPIRED", t.getMessage()));
