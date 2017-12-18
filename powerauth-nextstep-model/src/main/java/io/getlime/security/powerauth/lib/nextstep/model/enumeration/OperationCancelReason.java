@@ -40,6 +40,21 @@ public enum OperationCancelReason {
     /**
      * Operation has been interrupted by another new operation.
      */
-    INTERRUPTED_OPERATION
+    INTERRUPTED_OPERATION;
 
+    /**
+     * Convert String value to OperationCancelReason enum value.
+     * @param value String value of cancellation reason.
+     * @return OperationCancelReason enum value.
+     */
+    public static OperationCancelReason fromString(String value) {
+        // resolve value by case independent String comparison
+        for (OperationCancelReason reason : OperationCancelReason.values()) {
+            if (reason.name().equalsIgnoreCase(value)) {
+                return reason;
+            }
+        }
+        // graceful fallback for unknown values
+        return UNKNOWN;
+    }
 }
