@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.configuration.WebFlowServiceConfiguration;
 import io.getlime.security.powerauth.app.webflow.demo.model.ServiceStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,10 +38,12 @@ import java.util.Date;
 public class ServiceController {
 
     private final WebFlowServiceConfiguration webFlowServiceConfiguration;
+    private final BuildProperties buildProperties;
 
     @Autowired
-    public ServiceController(WebFlowServiceConfiguration webFlowServiceConfiguration) {
+    public ServiceController(WebFlowServiceConfiguration webFlowServiceConfiguration, BuildProperties buildProperties) {
         this.webFlowServiceConfiguration = webFlowServiceConfiguration;
+        this.buildProperties = buildProperties;
     }
 
     /**
@@ -53,6 +56,8 @@ public class ServiceController {
         response.setApplicationName(webFlowServiceConfiguration.getApplicationName());
         response.setApplicationDisplayName(webFlowServiceConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(webFlowServiceConfiguration.getApplicationEnvironment());
+        response.setVersion(buildProperties.getVersion());
+        response.setBuildTime(buildProperties.getTime());
         response.setTimestamp(new Date());
         return new ObjectResponse<>(response);
     }
