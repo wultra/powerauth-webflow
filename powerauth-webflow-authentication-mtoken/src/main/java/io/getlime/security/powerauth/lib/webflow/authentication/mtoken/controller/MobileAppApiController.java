@@ -208,7 +208,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new InvalidActivationException();
             }
 
-            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.valueOf(request.getRequestObject().getReason()), null);
+            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
             return new Response();
 
