@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.configuration.DataAdapterConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.ServiceStatusResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -37,14 +38,17 @@ import java.util.Date;
 public class ServiceController {
 
     private final DataAdapterConfiguration dataAdapterConfiguration;
+    private final BuildProperties buildProperties;
 
     /**
      * Controller constructor.
      * @param dataAdapterConfiguration Data adapter configuration.
+     * @param buildProperties Build info.
      */
     @Autowired
-    public ServiceController(DataAdapterConfiguration dataAdapterConfiguration) {
+    public ServiceController(DataAdapterConfiguration dataAdapterConfiguration, BuildProperties buildProperties) {
         this.dataAdapterConfiguration = dataAdapterConfiguration;
+        this.buildProperties = buildProperties;
     }
 
     /**
@@ -58,6 +62,8 @@ public class ServiceController {
         response.setApplicationDisplayName(dataAdapterConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(dataAdapterConfiguration.getApplicationEnvironment());
         response.setTimestamp(new Date());
+        response.setVersion(buildProperties.getVersion());
+        response.setBuildTime(buildProperties.getTime());
         return new ObjectResponse<>(response);
     }
 }
