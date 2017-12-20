@@ -71,7 +71,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     private static final String PUSH_MESSAGE_TYPE = "messageType";
     private static final String PUSH_MESSAGE_TYPE_MTOKEN_INIT = "mtoken.operationInit";
     private static final String PUSH_MESSAGE_TYPE_MTOKEN_FINISHED = "mtoken.operationFinished";
-    private static final String PUSH_MESSAGE_FINISHED_RESTULT_INFO = "mtoken.operationResult";
+    private static final String PUSH_MESSAGE_FINISHED_RESTULT_INFO = "mtokenOperationResult";
     private static final String PUSH_MESSAGE_OPERATION_ID = "operationId";
     private static final String PUSH_MESSAGE_OPERATION_NAME = "operationName";
     private static final String PUSH_MESSAGE_SOUND = "default";
