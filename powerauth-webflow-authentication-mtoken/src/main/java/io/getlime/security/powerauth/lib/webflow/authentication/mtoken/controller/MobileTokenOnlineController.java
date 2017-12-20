@@ -71,7 +71,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     private static final String PUSH_MESSAGE_TYPE = "messageType";
     private static final String PUSH_MESSAGE_TYPE_MTOKEN_INIT = "mtoken.operationInit";
     private static final String PUSH_MESSAGE_TYPE_MTOKEN_FINISHED = "mtoken.operationFinished";
-    private static final String PUSH_MESSAGE_FINISHED_RESTULT_INFO = "mtokenOperationResult";
+    private static final String PUSH_MESSAGE_FINISHED_RESULT_INFO = "mtokenOperationResult";
     private static final String PUSH_MESSAGE_OPERATION_ID = "operationId";
     private static final String PUSH_MESSAGE_OPERATION_NAME = "operationName";
     private static final String PUSH_MESSAGE_SOUND = "default";
@@ -391,7 +391,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         // Add information about operation
         Map<String, Object> extras = new HashMap<>();
         extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN_FINISHED);
-        extras.put(PUSH_MESSAGE_FINISHED_RESTULT_INFO, statusMessage);
+        extras.put(PUSH_MESSAGE_FINISHED_RESULT_INFO, statusMessage);
         extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
         extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
 
