@@ -68,13 +68,12 @@ import java.util.logging.Logger;
 @RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
 
-    private static final String PUSH_MESSAGE_TITLE = "title";
-    private static final String PUSH_MESSAGE_SUBTITLE = "subtitle";
     private static final String PUSH_MESSAGE_TYPE = "messageType";
+    private static final String PUSH_MESSAGE_TYPE_MTOKEN_INIT = "mtoken.operationInit";
+    private static final String PUSH_MESSAGE_TYPE_MTOKEN_FINISHED = "mtoken.operationFinished";
+    private static final String PUSH_MESSAGE_FINISHED_RESTULT_INFO = "mtoken.operationResult";
     private static final String PUSH_MESSAGE_OPERATION_ID = "operationId";
     private static final String PUSH_MESSAGE_OPERATION_NAME = "operationName";
-    private static final String PUSH_MESSAGE_TYPE_MTOKEN = "mtoken.operation";
-    private static final String PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE = "AUTH_STEP_FINISHED";
     private static final String PUSH_MESSAGE_SOUND = "default";
 
     private final PushServerClient pushServerClient;
@@ -361,14 +360,16 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             String[] operationData = new String[]{operation.getOperationData()};
             body.setTitle(messageSource.getMessage("push.confirmOperation", null, LocaleContextHolder.getLocale()));
             body.setBody(messageSource.getMessage("push.data", operationData, LocaleContextHolder.getLocale()));
-            Map<String, Object> extras = new HashMap<>();
-            extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN);
-            extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
-            extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
-            body.setExtras(extras);
         }
         body.setSound(PUSH_MESSAGE_SOUND);
         body.setCategory(operation.getOperationName());
+
+        // Add information about operation
+        Map<String, Object> extras = new HashMap<>();
+        extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN_INIT);
+        extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
+        extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
+        body.setExtras(extras);
 
         message.setBody(body);
         return message;
@@ -387,10 +388,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         message.getAttributes().setEncrypted(true);
         message.getAttributes().setSilent(true);
 
+        // Add information about operation
         Map<String, Object> extras = new HashMap<>();
-        extras.put(PUSH_MESSAGE_TITLE, PUSH_MESSAGE_AUTH_STEP_FINISHED_TITLE);
-        extras.put(PUSH_MESSAGE_SUBTITLE, statusMessage);
-        extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN);
+        extras.put(PUSH_MESSAGE_TYPE, PUSH_MESSAGE_TYPE_MTOKEN_FINISHED);
+        extras.put(PUSH_MESSAGE_FINISHED_RESTULT_INFO, statusMessage);
         extras.put(PUSH_MESSAGE_OPERATION_ID, operation.getOperationId());
         extras.put(PUSH_MESSAGE_OPERATION_NAME, operation.getOperationName());
 
