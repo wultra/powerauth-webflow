@@ -17,6 +17,9 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
 const axiosDefaults = require('axios/lib/defaults');
+
+// Support for browsers which do not have built-in Intl support such as IE 9 and IE 10
+import 'intl';
 // imports
 import {Provider} from "react-redux";
 import {IntlProvider} from "react-intl-redux";
@@ -43,6 +46,17 @@ store.dispatch({
 });
 
 axiosDefaults.headers.common[csrf.headerName] = csrf.token;
+
+// Support: IE 9-11 only, documentMode is an IE-only property
+// https://www.w3schools.com/jsref/prop_doc_documentmode.asp
+var msie = document.documentMode;
+if (msie && msie < 9) {
+    if (lang === "cs") {
+        window.alert(I18N_CS.messages["browser.unsupported"]);
+    } else {
+        window.alert(I18N_EN.messages["browser.unsupported"]);
+    }
+}
 
 const app = document.getElementById('react');
 

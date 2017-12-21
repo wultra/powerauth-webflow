@@ -25,6 +25,12 @@ require('stompjs');
  * @param webSocketId Web Socket ID
  */
 function register(registrations, webSocketId) {
+    var msie = document.documentMode;
+    if (msie && msie < 11) {
+        // Old IE versions do not support Web Sockets, see: https://caniuse.com/#feat=websockets
+        // For IE < 11 fall back to polling.
+        return;
+    }
     let headers = {};
     headers[csrf.headerName] = csrf.token;
     const socket = SockJS('./websocket');
@@ -46,14 +52,18 @@ function register(registrations, webSocketId) {
  * @param message text of the message as JSON
  */
 function send(destination, params, message) {
-    stompClient.send(destination, params, message);
+    if (stompClient !== undefined) {
+        stompClient.send(destination, params, message);
+    }
 }
 
 /**
  * Disconnects the WebSocket.
  */
 function disconnect() {
-    stompClient.disconnect();
+    if (stompClient !== undefined) {
+        stompClient.disconnect();
+    }
 }
 
 module.exports.register = register;
