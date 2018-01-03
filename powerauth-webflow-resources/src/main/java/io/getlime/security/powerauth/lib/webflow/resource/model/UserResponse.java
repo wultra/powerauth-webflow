@@ -16,6 +16,8 @@
 
 package io.getlime.security.powerauth.lib.webflow.resource.model;
 
+import java.util.Date;
+
 /**
  * Class representing the user profile.
  *
@@ -83,13 +85,57 @@ public class UserResponse {
         }
     }
 
+    /**
+     * Information about the service.
+     */
+    public class Service {
+        private String applicationName;
+        private String applicationDisplayName;
+        private String applicationEnvironment;
+        private Date timestamp;
+
+        public String getApplicationName() {
+            return applicationName;
+        }
+
+        public void setApplicationName(String applicationName) {
+            this.applicationName = applicationName;
+        }
+
+        public String getApplicationDisplayName() {
+            return applicationDisplayName;
+        }
+
+        public void setApplicationDisplayName(String applicationDisplayName) {
+            this.applicationDisplayName = applicationDisplayName;
+        }
+
+        public String getApplicationEnvironment() {
+            return applicationEnvironment;
+        }
+
+        public void setApplicationEnvironment(String applicationEnvironment) {
+            this.applicationEnvironment = applicationEnvironment;
+        }
+
+        public Date getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(Date timestamp) {
+            this.timestamp = timestamp;
+        }
+    }
+
     private User user;
     private Connection connection;
+    private Service service;
 
     public UserResponse() {
         super();
         this.user = new User();
         this.connection = new Connection();
+        this.service = new Service();
     }
 
     public User getUser() {
@@ -108,4 +154,11 @@ public class UserResponse {
         this.connection = connection;
     }
 
+    public Service getService() {
+        return service;
+    }
+
+    public void setService(Service service) {
+        this.service = service;
+    }
 }

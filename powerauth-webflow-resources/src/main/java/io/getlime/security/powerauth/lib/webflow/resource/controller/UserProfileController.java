@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.resource.configuration.WebFlowResourcesServerConfiguration;
 import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
@@ -28,7 +29,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.security.Principal;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -42,14 +43,16 @@ public class UserProfileController {
 
     private final DataAdapterClient client;
     private final AuthorizationServerTokenServices tokenServices;
+    private final WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration;
 
     private static final String LANGUAGE = "language";
     private static final String SCA = "sca";
 
     @Autowired
-    public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices) {
+    public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
         this.client = client;
         this.tokenServices = tokenServices;
+        this.webFlowResourcesServerConfiguration = webFlowResourcesServerConfiguration;
     }
 
     /**
@@ -60,29 +63,37 @@ public class UserProfileController {
      */
     @RequestMapping("me")
     public @ResponseBody UserResponse me(OAuth2Authentication authentication) {
+        UserResponse userResponse = new UserResponse();
+
+        // Try to fetch user details from the service
         try {
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName());
 
+            // Get additional information stored with the token
             Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
 
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
-            UserResponse userResponse = new UserResponse();
             userResponse.getUser().setId(userDetail.getId());
             userResponse.getUser().setGivenName(userDetail.getGivenName());
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
             userResponse.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
             userResponse.getConnection().setSca((Boolean) additionalInfo.get(SCA));
-            return userResponse;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
-            UserResponse userResponse = new UserResponse();
             userResponse.getUser().setId("anonymousUser");
             userResponse.getUser().setGivenName(null);
             userResponse.getUser().setFamilyName(null);
             userResponse.getConnection().setLanguage("en");
             userResponse.getConnection().setSca(false);
-            return userResponse;
         }
+        // Save service information
+        userResponse.getService().setApplicationName(webFlowResourcesServerConfiguration.getApplicationName());
+        userResponse.getService().setApplicationDisplayName(webFlowResourcesServerConfiguration.getApplicationDisplayName());
+        userResponse.getService().setApplicationEnvironment(webFlowResourcesServerConfiguration.getApplicationEnvironment());
+        userResponse.getService().setTimestamp(new Date());
+
+        // Return response
+        return userResponse;
     }
 
 }
