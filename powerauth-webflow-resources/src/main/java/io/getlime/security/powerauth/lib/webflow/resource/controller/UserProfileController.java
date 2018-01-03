@@ -64,14 +64,12 @@ public class UserProfileController {
     @RequestMapping("me")
     public @ResponseBody UserResponse me(OAuth2Authentication authentication) {
         UserResponse userResponse = new UserResponse();
-        // save service information
-        userResponse.getService().setApplicationName(webFlowResourcesServerConfiguration.getApplicationName());
-        userResponse.getService().setApplicationDisplayName(webFlowResourcesServerConfiguration.getApplicationDisplayName());
-        userResponse.getService().setApplicationEnvironment(webFlowResourcesServerConfiguration.getApplicationEnvironment());
-        userResponse.getService().setTimestamp(new Date());
+
+        // Try to fetch user details from the service
         try {
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName());
 
+            // Get additional information stored with the token
             Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
 
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
@@ -80,7 +78,6 @@ public class UserProfileController {
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
             userResponse.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
             userResponse.getConnection().setSca((Boolean) additionalInfo.get(SCA));
-            return userResponse;
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
             userResponse.getUser().setId("anonymousUser");
@@ -88,8 +85,15 @@ public class UserProfileController {
             userResponse.getUser().setFamilyName(null);
             userResponse.getConnection().setLanguage("en");
             userResponse.getConnection().setSca(false);
-            return userResponse;
         }
+        // Save service information
+        userResponse.getService().setApplicationName(webFlowResourcesServerConfiguration.getApplicationName());
+        userResponse.getService().setApplicationDisplayName(webFlowResourcesServerConfiguration.getApplicationDisplayName());
+        userResponse.getService().setApplicationEnvironment(webFlowResourcesServerConfiguration.getApplicationEnvironment());
+        userResponse.getService().setTimestamp(new Date());
+
+        // Return response
+        return userResponse;
     }
 
 }
