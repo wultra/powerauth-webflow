@@ -456,6 +456,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (operation.getResult() == AuthResult.FAILED) {
             throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
         }
+        if (operation.isExpired()) {
+            throw new AuthStepException("operation.timeout", new IllegalStateException());
+        }
         final AuthMethod currentAuthMethod = getAuthMethodName();
         List<OperationHistory> operationHistoryList = operation.getHistory();
         if (operationHistoryList == null || operationHistoryList.isEmpty()) {
