@@ -52,6 +52,12 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
     private boolean acceptInvalidSslCertificate;
 
+    /**
+     * Whether offline mode is available in Mobile Token.
+     */
+    @Value("${powerauth.webflow.offlineMode.available}")
+    private boolean offlineModeAvailable;
+
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -87,4 +93,11 @@ public class WebFlowServicesConfiguration {
         return client;
     }
 
+    /**
+     * Whether offline mode is available.
+     * @return True if offline mode is available.
+     */
+    public boolean isOfflineModeAvailable() {
+        return offlineModeAvailable;
+    }
 }

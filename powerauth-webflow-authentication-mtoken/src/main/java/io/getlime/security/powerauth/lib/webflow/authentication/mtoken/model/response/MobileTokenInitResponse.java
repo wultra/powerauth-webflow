@@ -25,12 +25,37 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 public class MobileTokenInitResponse extends AuthStepResponse {
 
     private String webSocketId;
+    private boolean offlineModeAvailable;
 
+    /**
+     * Get Web Socket ID.
+     * @return Web Socket ID.
+     */
     public String getWebSocketId() {
         return webSocketId;
     }
 
+    /**
+     * Set Web Socket ID.
+     * @param webSocketId Web Socket ID.
+     */
     public void setWebSocketId(String webSocketId) {
         this.webSocketId = webSocketId;
+    }
+
+    /**
+     * Whether offline mode is available.
+     * @return True if offline mode is available.
+     */
+    public boolean isOfflineModeAvailable() {
+        return offlineModeAvailable;
+    }
+
+    /**
+     * Set whether offline mode is available.
+     * @param offlineModeAvailable True if offline mode is available.
+     */
+    public void setOfflineModeAvailable(boolean offlineModeAvailable) {
+        this.offlineModeAvailable = offlineModeAvailable;
     }
 }
