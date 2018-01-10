@@ -90,9 +90,9 @@ class BankAccountValue extends React.Component {
         const bankAccount = this.props.value;
         return (
             <div className="Select-value">
-                <span className="Select-value-label">
+                <div className="Select-value-label">
                     {formatBankAccount(bankAccount)}
-                </span>
+                </div>
             </div>
         );
     }
@@ -104,7 +104,7 @@ function formatBankAccount(bankAccount) {
             <table width="100%">
                 <tbody>
                 <tr>
-                    <td width="50%">{bankAccount.name}</td>
+                    <td width="50%" className="key">{bankAccount.name}</td>
                     <td width="50%" className="tint text-right">
                         {bankAccount.balance} {bankAccount.currency}
                     </td>

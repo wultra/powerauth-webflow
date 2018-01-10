@@ -279,7 +279,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         }
         // do not check message, some sanitization could be done by PowerAuth server
 
-        OfflineSignatureQrCode qrCode = new OfflineSignatureQrCode(250);
+        OfflineSignatureQrCode qrCode = new OfflineSignatureQrCode(200);
         qrCode.setDataHash(response.getDataHash());
         qrCode.setNonce(response.getNonce());
         qrCode.setMessage(response.getMessage());

@@ -102,6 +102,7 @@ export default class OperationReview extends React.Component {
 
     render() {
         if (this.props.context.formData || this.props.context.data) {
+            let authMethodCounter = 0;
             return (
                 <div id="operation">
                     <form>
@@ -116,33 +117,48 @@ export default class OperationReview extends React.Component {
                                     )}
                                     <div className="buttons">
                                         {this.props.context.authMethods.map((authMethod) => {
+                                            authMethodCounter++;
                                             switch (authMethod) {
                                                 case "POWERAUTH_TOKEN":
                                                     return (
-                                                        <div className="attribute row" key={authMethod}>
-                                                            <div className="col-sm-12">
-                                                                <a href="#" onClick={this.handleToken}
-                                                                   className="btn btn-lg btn-success">
-                                                                    <FormattedMessage id="method.powerauthToken"/>
-                                                                </a>
+                                                        <div key={authMethod}>
+                                                            <div className="attribute row">
+                                                                <div className="col-xs-12">
+                                                                    <a href="#" onClick={this.handleToken}
+                                                                       className="btn btn-lg btn-success">
+                                                                        <FormattedMessage id="method.powerauthToken"/>
+                                                                    </a>
+                                                                </div>
                                                             </div>
+                                                            {(this.props.context.authMethods.length > 1 && authMethodCounter < this.props.context.authMethods.length) ? (
+                                                                <FormattedMessage id="operation.methodSelectionOr"/>
+                                                            ) : (
+                                                                undefined
+                                                            )}
                                                         </div>
                                                     );
                                                 case "SMS_KEY":
                                                     return (
-                                                        <div className="attribute row" key={authMethod}>
-                                                            <div className="col-sm-12">
-                                                                <a href="#" onClick={this.handleSMS}
-                                                                   className="btn btn-lg btn-success">
-                                                                    <FormattedMessage id="method.smsKey"/>
-                                                                </a>
+                                                        <div key={authMethod}>
+                                                            <div className="attribute row">
+                                                                <div className="col-xs-12">
+                                                                    <a href="#" onClick={this.handleSMS}
+                                                                       className="btn btn-lg btn-success">
+                                                                        <FormattedMessage id="method.smsKey"/>
+                                                                    </a>
+                                                                </div>
                                                             </div>
+                                                            {(this.props.context.authMethods.length > 1 && authMethodCounter < this.props.context.authMethods.length) ? (
+                                                                <FormattedMessage id="operation.methodSelectionOr"/>
+                                                            ) : (
+                                                                undefined
+                                                            )}
                                                         </div>
                                                     );
                                             }
                                         })}
                                         <div className="attribute row">
-                                            <div className="col-sm-12">
+                                            <div className="col-xs-12">
                                                 <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                                     <FormattedMessage id="operation.cancel"/>
                                                 </a>

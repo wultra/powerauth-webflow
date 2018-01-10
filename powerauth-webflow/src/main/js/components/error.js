@@ -46,19 +46,19 @@ export default class Error extends React.Component {
                 clearContext = "false";
             }
             window.location = "./authenticate/cancel?clearContext=" + clearContext;
-        }, 3000)
+        }, 3000);
     }
 
     render() {
         return (
-            <div className="text-center">
+            <div className="panel panel-body text-center">
                 {(this.state.networkError) ? (
-                    <div className={'network-error'}>
+                    <div className="network-error">
                         <FormattedMessage id="message.networkError"/>
                     </div>
                 ) : (
                     <div>
-                        <div className={'message-error'}>
+                        <div className="message-error title">
                             {(this.props.context.message) ? (
                                 <FormattedMessage id={this.props.context.message}/>
                             ) : (
@@ -66,7 +66,7 @@ export default class Error extends React.Component {
                             )}
                         </div>
                         <div className="image-result error"></div>
-                        <div className={'message-error'}>
+                        <div className="message-information">
                             <FormattedMessage id="message.redirect"/>
                         </div>
                     </div>

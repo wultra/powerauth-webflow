@@ -14,7 +14,7 @@ export function authenticate(username, password) {
             payload: {
                 loading: true,
                 error: false,
-                message: "login.pleaseLogIn" //TODO: Update message to "Loading..."
+                message: ""
             }
         });
         axios.post("./api/auth/form/authenticate", {

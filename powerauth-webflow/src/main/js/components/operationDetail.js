@@ -104,7 +104,7 @@ export default class OperationDetail extends React.Component {
             return (
                 <div>
                     <div className="operation-approve content-wrap">
-                        <h3>{this.props.context.formData.title.value}</h3>
+                        <h3 className="title">{this.props.context.formData.title.value}</h3>
                         <p>{this.props.context.formData.message.value}</p>
                     </div>
                     <div>
@@ -112,10 +112,10 @@ export default class OperationDetail extends React.Component {
                             if (item.type === "AMOUNT") {
                                 return (
                                     <div className="row attribute" key={item.id}>
-                                        <div className="col-sm-6 key">
+                                        <div className="col-xs-6 key">
                                             {item.label}
                                         </div>
-                                        <div className="col-sm-6 value">
+                                        <div className="col-xs-6 value">
                                             <span className="amount">{item.amount}</span> {item.currency}
                                         </div>
                                     </div>
@@ -123,10 +123,10 @@ export default class OperationDetail extends React.Component {
                             } else if (item.type === "KEY_VALUE") {
                                 return (
                                     <div className="row attribute" key={item.id}>
-                                        <div className="col-sm-6 key">
+                                        <div className="col-xs-6 key">
                                             {item.label}
                                         </div>
-                                        <div className="col-sm-6 value">
+                                        <div className="col-xs-6 value">
                                             {item.value}
                                         </div>
                                     </div>
@@ -134,7 +134,7 @@ export default class OperationDetail extends React.Component {
                             } else if (item.type === "NOTE") {
                                 return (
                                     <div className="row attribute" key={item.id}>
-                                        <div className="col-sm-12">
+                                        <div className="col-xs-12">
                                             <div className="key">{item.label}</div>
                                             <div className="value">{item.note}</div>
                                         </div>
@@ -151,7 +151,7 @@ export default class OperationDetail extends React.Component {
                                 } else {
                                     return (
                                         <div key={item.id} className="row attribute">
-                                            <div className="col-sm-12">
+                                            <div className="col-xs-12">
                                                 <div className="key">
                                                     {item.label}
                                                 </div>
