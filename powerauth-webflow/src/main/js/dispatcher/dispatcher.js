@@ -33,7 +33,7 @@ export function dispatchAction(dispatch, response) {
                                 payload: {
                                     loading: false,
                                     error: false,
-                                    message: "login.pleaseLogIn"
+                                    message: ""
                                 }
                             });
                             break;

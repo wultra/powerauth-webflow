@@ -4,6 +4,16 @@ body {
     font-size: 14pt;
 }
 
+.background {
+    /* background: url('../images/background.png') 0 0 repeat-x;*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
 a {
     color: #7FC000;
     text-decoration: none;
@@ -16,6 +26,10 @@ a:hover, a:active, a:focus {
 
 .message-information {
     color: #777777;
+}
+
+.message-success {
+    color: #4BA819;
 }
 
 .network-error {
@@ -142,23 +156,23 @@ a:hover, a:active, a:focus {
     color: #333333;
 }
 
-#operation .col-sm-6.key {
+#operation .col-xs-6.key {
     text-align: left;
 }
 
-#operation .col-sm-6.value {
+#operation .col-xs-6.value {
     text-align: right;
 }
 
-#operation .col-sm-12 .key {
+#operation .col-xs-12 .key {
     text-align: left;
 }
 
-#operation .col-sm-12 {
+#operation .col-xs-12 {
     text-align: left;
 }
 
-#operation .col-sm-12 .value {
+#operation .col-xs-12 .value {
     text-align: left;
 }
 
@@ -209,10 +223,24 @@ a:hover, a:active, a:focus {
     padding: 30px;
 }
 
+#login .panel-body .title {
+    color: #7FC000;
+}
+
 #login .buttons {
     margin-top: 40px;
 }
 
 #login .btn {
     width: 100%;
+}
+
+.panel {
+    border-radius: 20px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.20);
+}
+
+.title {
+    font-size: 16pt;
+    margin: 10px 10px 20px 10px;
 }

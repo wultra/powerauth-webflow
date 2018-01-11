@@ -63,16 +63,24 @@ export default class Login extends React.Component {
             <div id="login">
                 <form onSubmit={this.handleLogin}>
                     <Panel>
-                        <FormGroup className={(this.props.context.error ? "message-error" : "message-information" )}>
-                            <FormattedMessage id={this.props.context.message}/>
-                            {(this.props.context.remainingAttempts > 0) ? (
-                                <div>
-                                    <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
-                                </div>
-                            ) : (
-                                undefined
-                            )}
+                        <FormGroup className="title">
+                            <FormattedMessage id="login.pleaseLogIn"/>
                         </FormGroup>
+                        { this.props.context.error ? (
+                            <FormGroup className="message-error">
+                                <FormattedMessage id={this.props.context.message}/>
+                                {(this.props.context.remainingAttempts > 0) ? (
+                                    <div>
+                                        <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
+                                    </div>
+                                ) : (
+                                    undefined
+                                )}
+                            </FormGroup>
+                        ) : (
+                            undefined
+                        )
+                        }
                         <FormGroup>
                             <FormControl autoComplete="new-password" ref="username" type="text"
                                          placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
@@ -83,12 +91,12 @@ export default class Login extends React.Component {
                         </FormGroup>
                         <FormGroup>
                             <div className="row buttons">
-                                <div className="col-sm-6">
+                                <div className="col-xs-6">
                                     <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                         <FormattedMessage id="login.cancel"/>
                                     </a>
                                 </div>
-                                <div className="col-sm-6">
+                                <div className="col-xs-6">
                                     <Button bsSize="lg" type="submit" bsStyle="success" block>
                                         <FormattedMessage id="login.signIn"/>
                                     </Button>

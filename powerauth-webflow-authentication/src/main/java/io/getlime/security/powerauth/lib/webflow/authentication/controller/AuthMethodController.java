@@ -454,7 +454,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             throw new AuthStepException("operation.notAvailable", new NullPointerException());
         }
         if (operation.getResult() == AuthResult.FAILED) {
-            throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
+            List<OperationHistory> operationHistory = operation.getHistory();
+            if (operationHistory.size() == 0 || operationHistory.get(operationHistory.size()-1).getRequestAuthStepResult() != AuthStepResult.CANCELED) {
+                // allow displaying of canceled operations - operation may be canceled in mobile app and later displayed in web UI
+                throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
+            }
         }
         if (operation.isExpired()) {
             throw new AuthStepException("operation.timeout", new IllegalStateException());

@@ -91,9 +91,9 @@ class ActivationValue extends React.Component {
         const activation = this.props.value;
         return (
             <div className="Select-value">
-                <span className="Select-value-label">
+                <div className="Select-value-label">
                     {formatActivation(activation)}
-                </span>
+                </div>
             </div>
         );
     }

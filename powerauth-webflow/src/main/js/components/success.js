@@ -31,13 +31,13 @@ export default class Success extends React.Component {
     componentWillMount() {
         setTimeout(() => {
             window.location = './authenticate/continue';
-        }, 3000)
+        }, 3000);
     }
 
     render() {
         return (
-            <div className="text-center">
-                <div className={'message-information'}>
+            <div className="panel panel-body text-center">
+                <div className="message-success title">
                     {(this.props.context.message) ? (
                         <FormattedMessage id={this.props.context.message}/>
                     ) : (
@@ -45,7 +45,7 @@ export default class Success extends React.Component {
                     )}
                 </div>
                 <div className="image-result success"></div>
-                <div className={'message-information'}>
+                <div className="message-information">
                     <FormattedMessage id="message.redirect"/>
                 </div>
             </div>
