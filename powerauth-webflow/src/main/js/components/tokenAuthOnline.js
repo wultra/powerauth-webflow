@@ -52,11 +52,11 @@ export default class TokenOnline extends React.Component {
         return (
             <div className="auth-actions">
                 <div className="attributes">
-                    <div className="image mtoken"/>
-                </div>
-                <div className="attributes">
                     <div className="font-small message-information">
                         <FormattedMessage id="message.token.offline"/><br/>
+                        <div className="attributes">
+                            <div className="image mtoken"/>
+                        </div>
                         <a href="#" onClick={this.handleSwitchToOfflineMode}><FormattedMessage
                             id="message.token.offline.link"/></a>
                     </div>

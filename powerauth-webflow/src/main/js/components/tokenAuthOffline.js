@@ -162,16 +162,20 @@ export default class TokenOffline extends React.Component {
                 <div>
 
                     {(this.state.activations && this.state.chosenActivation) ? (
-                        <div>
-                            <div className="row attribute col-sm-6 key">
-                                <FormattedMessage id="offlineMode.device"/>
+                        <div className="attribute row">
+                            <div className="col-xs-12">
+                                <div className="key">
+                                    <FormattedMessage id="offlineMode.device"/>
+                                </div>
+                                <div className="value">
+                                    <ActivationSelect
+                                        activations={this.state.activations}
+                                        chosenActivation={this.state.chosenActivation}
+                                        choiceDisabled={this.state.activations.length<2}
+                                        callback={this.handleActivationChoice}
+                                    />
+                                </div>
                             </div>
-                            <ActivationSelect
-                                activations={this.state.activations}
-                                chosenActivation={this.state.chosenActivation}
-                                choiceDisabled={this.state.activations.length<2}
-                                callback={this.handleActivationChoice}
-                            />
                         </div>
                     ) : (
                         <Spinner/>
@@ -179,6 +183,9 @@ export default class TokenOffline extends React.Component {
 
                     {(this.state.qrCode) ? (
                         <div>
+                            <div className="col-xs-12">
+                                <FormattedMessage id="offlineMode.instructions"/>
+                            </div>
                             <img src={this.state.qrCode}/>
                             {(this.state.message) ? (
                                 <FormGroup
@@ -193,25 +200,29 @@ export default class TokenOffline extends React.Component {
                                     )}
                                 </FormGroup>
                             ) : (
-                                <FormGroup
-                                    className={"message-information"}>
-                                    &nbsp;
-                                </FormGroup>
+                                undefined
                             )}
-
-                            <FormattedMessage id="offlineMode.authCodeText"/>
-                            <br/>
-                            <OfflineAuthCode autoFocus callback={this.handleAuthCodeChange}/>
-                            <br/><br/>
-                            <div className="attribute row">
-                                <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                    <FormattedMessage id="operation.cancel"/>
-                                </a>
+                            <div>
+                                <FormattedMessage id="offlineMode.authCodeText"/>
                             </div>
-                            <div className="attribute row">
-                                <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-default">
-                                    <FormattedMessage id="operation.confirm"/>
-                                </a>
+                            <OfflineAuthCode autoFocus callback={this.handleAuthCodeChange}/>
+                            <div className="auth-actions">
+                                <div className="buttons">
+                                    <div className="attribute row">
+                                        <div className="col-xs-12">
+                                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                                <FormattedMessage id="operation.confirm"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div className="attribute row">
+                                        <div className="col-xs-12">
+                                            <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                                <FormattedMessage id="operation.cancel"/>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     ) : (

@@ -86,31 +86,32 @@ export default class SMSAuthorization extends React.Component {
                                     )}
                                 </FormGroup>
                             ) : (
-                                <FormGroup
-                                    className={"message-information"}>
-                                    &nbsp;
-                                </FormGroup>
+                                undefined
                             )}
                             <div className="attribute row">
-                                <div className="col-sm-12">
+                                <div className="message-information">
                                     <FormattedMessage id="smsAuthorization.authCodeText"/>
                                 </div>
                             </div>
                             <div className="attribute row">
-                                <div className="col-sm-12">
+                                <div className="col-xs-12">
                                     <input autoFocus className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
                                 </div>
                             </div>
-                            <div className="attribute row">
-                                <div className="col-sm-6">
-                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                        <FormattedMessage id="operation.cancel"/>
-                                    </a>
+                            <div className="buttons">
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </a>
+                                    </div>
                                 </div>
-                                <div className="col-sm-6">
-                                    <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
-                                        <FormattedMessage id="operation.confirm"/>
-                                    </a>
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                            <FormattedMessage id="operation.cancel"/>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
