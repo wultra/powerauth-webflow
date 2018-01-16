@@ -56,12 +56,13 @@ export default class Token extends React.Component {
         this.setOfflineMode = this.setOfflineMode.bind(this);
         this.state = {
             initialized: false,
-            webSocketInitialized: false,
+            configurationInitialized: false,
             authorizationInProgress: false,
             authorized: false,
             authorizationCanceled: false,
             updateTimeout: null,
             disconnected: false,
+            offlineModeAvailable: null,
             offlineModeEnabled: null
         };
     }
@@ -230,15 +231,17 @@ export default class Token extends React.Component {
     }
 
     componentWillReceiveProps(props) {
-        if (!this.state.webSocketInitialized) {
+        if (!this.state.configurationInitialized) {
             const webSocketId = props.context.webSocketId;
-            if (webSocketId !== undefined) {
+            const offlineModeAvailable = props.context.offlineModeAvailable;
+            if (webSocketId !== undefined && offlineModeAvailable !== undefined) {
                 stompClient.register([
                     {route: '/user/topic/registration', callback: this.onRegister},
                     {route: '/user/topic/authorization', callback: this.onAuthorize}
                 ], webSocketId);
-                // WebSocket needs to be initialized only once
-                this.setState({webSocketInitialized: true});
+                this.setState({offlineModeAvailable: offlineModeAvailable});
+                // Configuration needs to be initialized only once
+                this.setState({configurationInitialized: true});
             }
         }
         if (props.context.formData) {
@@ -258,12 +261,12 @@ export default class Token extends React.Component {
             <div id="operation">
                     <Panel>
                         <OperationDetail/>
-                        {(this.state.offlineModeEnabled != null) ? (
+                        {(this.state.offlineModeAvailable !== null && this.state.offlineModeEnabled !== null) ? (
                             <div>
-                                {(this.state.offlineModeEnabled) ? (
+                                {(this.state.offlineModeAvailable && this.state.offlineModeEnabled) ? (
                                     <TokenOffline cancelCallback={this.handleCancel}/>
                                 ) : (
-                                    <TokenOnline cancelCallback={this.handleCancel} offlineModeCallback={this.setOfflineMode}/>
+                                    <TokenOnline cancelCallback={this.handleCancel} offlineModeAvailable={this.state.offlineModeAvailable} offlineModeCallback={this.setOfflineMode}/>
                                 )}
                             </div>
                         ) : (

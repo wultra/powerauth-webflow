@@ -27,6 +27,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCan
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.QRCodeInvalidDataException;
@@ -62,16 +63,19 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
     private final PowerAuthServiceClient powerAuthServiceClient;
     private final AuthMethodQueryService authMethodQueryService;
+    private final WebFlowServicesConfiguration webFlowServicesConfiguration;
 
     /**
      * Controller constructor.
      * @param powerAuthServiceClient PowerAuth 2.0 service client.
      * @param authMethodQueryService Authentication method query service.
+     * @param webFlowServicesConfiguration Web Flow configuration.
      */
     @Autowired
-    public MobileTokenOfflineController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService) {
+    public MobileTokenOfflineController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService, WebFlowServicesConfiguration webFlowServicesConfiguration) {
         this.powerAuthServiceClient = powerAuthServiceClient;
         this.authMethodQueryService = authMethodQueryService;
+        this.webFlowServicesConfiguration = webFlowServicesConfiguration;
     }
 
     /**
@@ -83,6 +87,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      */
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+        if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
+            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+        }
         if (request.getAuthCode() == null || !request.getAuthCode().matches("^[0-9]{8}-[0-9]{8}$")) {
             throw new AuthStepException("offlineMode.invalidAuthCode", new IllegalArgumentException());
         }
@@ -139,6 +146,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
     public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws QRCodeInvalidDataException, NextStepServiceException, AuthStepException {
+        if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
+            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+        }
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
 
@@ -245,6 +255,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @ResponseBody
     public QRCodeAuthenticationResponse cancelAuthentication() throws AuthStepException {
+        if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
+            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+        }
         try {
             GetOperationDetailResponse operation = getOperation();
             cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
@@ -268,6 +281,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * @throws QRCodeInvalidDataException Thrown when data is invalid.
      */
     private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException, AuthStepException {
+        if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
+            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+        }
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
         String messageText = operation.getFormData().getMessage().getValue();

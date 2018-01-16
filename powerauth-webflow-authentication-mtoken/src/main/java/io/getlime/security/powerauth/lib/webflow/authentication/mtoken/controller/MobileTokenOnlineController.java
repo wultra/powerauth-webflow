@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.ActivationNotActiveException;
@@ -81,23 +82,25 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     private final AuthMethodQueryService authMethodQueryService;
     private final PowerAuthServiceClient powerAuthServiceClient;
     private final I18NService i18nService;
+    private final WebFlowServicesConfiguration webFlowServicesConfiguration;
 
     /**
      * Controller constructor.
-     *
-     * @param pushServerClient PowerAuth 2.0 Push server client.
+     *  @param pushServerClient PowerAuth 2.0 Push server client.
      * @param webSocketMessageService Web Socket message service.
      * @param authMethodQueryService Authentication method query service.
      * @param powerAuthServiceClient PowerAuth 2.0 client.
      * @param i18nService I18N service.
+     * @param webFlowServicesConfiguration Web Flow configuration.
      */
     @Autowired
-    public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient, I18NService i18nService) {
+    public MobileTokenOnlineController(PushServerClient pushServerClient, WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient, I18NService i18nService, WebFlowServicesConfiguration webFlowServicesConfiguration) {
         this.pushServerClient = pushServerClient;
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
         this.powerAuthServiceClient = powerAuthServiceClient;
         this.i18nService = i18nService;
+        this.webFlowServicesConfiguration = webFlowServicesConfiguration;
     }
 
     /**
@@ -172,6 +175,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.fail");
         }
+        initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
         return initResponse;
     }
 
