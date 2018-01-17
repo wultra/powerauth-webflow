@@ -39,7 +39,8 @@ export default class OperationDetail extends React.Component {
     constructor() {
         super();
         this.initBankAccounts = this.initBankAccounts.bind(this);
-        this.resolveChosenBankAccount = this.resolveChosenBankAccount.bind(this);
+        this.findChosenBankAccount = this.findChosenBankAccount.bind(this);
+        this.updateChosenBankAccount = this.updateChosenBankAccount.bind(this);
         this.handleBankAccountChoice = this.handleBankAccountChoice.bind(this);
         this.storeBankAccounts = this.storeBankAccounts.bind(this);
         this.setBankAccountChoiceDisabled = this.setBankAccountChoiceDisabled.bind(this);
@@ -60,16 +61,33 @@ export default class OperationDetail extends React.Component {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
+                    if (!item.enabled) {
+                        // when item is disabled on backend, set choice to always disabled
+                        this.setBankAccountChoiceDisabled(true);
+                    }
                     if (props.context.formData.userInput["operation.bankAccountChoice.disabled"]) {
-                        // bank account has already been chosen and choice is frozen
-                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
+                        // bank account has already been chosen
+                        this.updateChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
+                        // freeze choice for item
                         this.setBankAccountChoiceDisabled(true);
                     } else if (this.props.context.formData.userInput["operation.bankAccountChoice"]) {
-                        // bank account has already been chosen but choice is not frozen yet
-                        this.resolveChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
+                        // bank account has already been chosen, set the chosen value
+                        this.updateChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
                     } else {
-                        // initial bank account is set to the first bank account found
-                        this.handleBankAccountChoice(item.bankAccounts[0]);
+                        // initial state - no value has been chosen yet
+                        let defaultBankAccount;
+                        if (item.defaultValue) {
+                            // when default value is set by backend, use it
+                            defaultBankAccount = this.findChosenBankAccount(item.bankAccounts, item.defaultValue);
+                            if (defaultBankAccount === undefined) {
+                                // default value was not found, use the first bank account
+                                defaultBankAccount = item.bankAccounts[0];
+                            }
+                        } else {
+                            // otherwise initial bank account is set to the first bank account
+                            defaultBankAccount = item.bankAccounts[0];
+                        }
+                        this.handleBankAccountChoice(defaultBankAccount);
                     }
                 }
             });
@@ -81,12 +99,19 @@ export default class OperationDetail extends React.Component {
         this.setState({bankAccounts: bankAccountsReceived});
     }
 
-    resolveChosenBankAccount(bankAccounts, chosenBankAccountId) {
+    findChosenBankAccount(bankAccounts, chosenBankAccountId) {
+        let chosenBankAccount = undefined;
         bankAccounts.map((bankAccount) => {
             if (bankAccount.accountId === chosenBankAccountId) {
-                this.setState({chosenBankAccount: bankAccount});
+                chosenBankAccount = bankAccount;
             }
         });
+        return chosenBankAccount;
+    }
+
+    updateChosenBankAccount(bankAccounts, chosenBankAccountId) {
+        const bankAccount = this.findChosenBankAccount(bankAccounts, chosenBankAccountId);
+        this.setState({chosenBankAccount: bankAccount});
     }
 
     handleBankAccountChoice(bankAccount) {

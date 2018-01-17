@@ -5,6 +5,7 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFai
 import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationFailedException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.dataadapter.service.DataAdapterI18NService;
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -59,23 +60,26 @@ public class DataAdapterService implements DataAdapter {
     }
 
     @Override
-    public List<BankAccount> fetchBankAccounts(String userId, String operationName, String operationId) throws UserNotFoundException {
+    public BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId) throws UserNotFoundException {
         // Fetch bank account list for given user here from the bank backend.
         // In case that user is not found, throw a UserNotFoundException.
         // Replace mock bank account data with real data loaded from the bank backend.
         // In case the bank account selection is disabled, return an empty list.
-        List<BankAccount> bankAccounts = new ArrayList<>();
+        BankAccountList bankAccountList = new BankAccountList();
+        BankAccountListResponse response = new BankAccountListResponse(userId, bankAccountList);
 
         if (!"authorize_payment".equals(operationName)) {
             // return empty list for operations other than authorize_payment
-            return bankAccounts;
+            return response;
         }
+
+        List<BankAccount> bankAccounts = new ArrayList<>();
 
         BankAccount bankAccount1 = new BankAccount();
         bankAccount1.setName("Běžný účet v CZK");
         bankAccount1.setBalance(new BigDecimal("24394.52"));
         bankAccount1.setNumber("12345678/1234");
-        bankAccount1.setAccountId("CZ40 1234 0000 0000 1234 5678");
+        bankAccount1.setAccountId("CZ4012340000000012345678");
         bankAccount1.setCurrency("CZK");
         bankAccount1.setUsableForPayment(true);
         bankAccounts.add(bankAccount1);
@@ -84,7 +88,7 @@ public class DataAdapterService implements DataAdapter {
         bankAccount2.setName("Spořící účet v CZK");
         bankAccount2.setBalance(new BigDecimal("158121.10"));
         bankAccount2.setNumber("87654321/4321");
-        bankAccount2.setAccountId("CZ40 4321 0000 0000 8765 4321");
+        bankAccount2.setAccountId("CZ4043210000000087654321");
         bankAccount2.setCurrency("CZK");
         bankAccount2.setUsableForPayment(true);
         bankAccounts.add(bankAccount2);
@@ -93,13 +97,19 @@ public class DataAdapterService implements DataAdapter {
         bankAccount3.setName("Spořící účet v EUR");
         bankAccount3.setBalance(new BigDecimal("1.90"));
         bankAccount3.setNumber("44444444/1111");
-        bankAccount3.setAccountId("CZ40 1111 0000 0000 4444 4444");
+        bankAccount3.setAccountId("CZ4011110000000044444444");
         bankAccount3.setCurrency("EUR");
         bankAccount3.setUsableForPayment(false);
         bankAccount3.setUnusableForPaymentReason(dataAdapterI18NService.messageSource().getMessage("operationReview.balanceTooLow", null, LocaleContextHolder.getLocale()));
         bankAccounts.add(bankAccount3);
 
-        return bankAccounts;
+        bankAccountList.setBankAccounts(bankAccounts);
+        // bank account choice can be disabled
+        // bankAccountList.setEnabled(false);
+        // default choice can be set
+        // bankAccountList.setDefaultValue("CZ4043210000000087654321");
+
+        return response;
     }
 
     @Override

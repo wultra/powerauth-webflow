@@ -20,7 +20,6 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.api.DataAdapter;
 import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.BankAccountListRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import java.util.List;
 
 /**
  * Controller class which handles retrieving bank account details.
@@ -66,8 +63,7 @@ public class BankAccountController {
         String userId = bankAccountListRequest.getUserId();
         String operationName = bankAccountListRequest.getOperationName();
         String operationId = bankAccountListRequest.getOperationId();
-        List<BankAccount> bankAccounts = dataAdapter.fetchBankAccounts(userId, operationName, operationId);
-        BankAccountListResponse response = new BankAccountListResponse(userId, bankAccounts);
+        BankAccountListResponse response = dataAdapter.fetchBankAccounts(userId, operationName, operationId);
         return new ObjectResponse<>(response);
     }
 

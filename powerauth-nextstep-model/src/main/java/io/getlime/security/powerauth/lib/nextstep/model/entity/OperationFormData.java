@@ -215,10 +215,12 @@ public class OperationFormData {
      * @param bankAccounts List of bank accounts.
      */
     @JsonIgnore
-    public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts) {
+    public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
         OperationBankAccountChoiceFieldAttribute attr = new OperationBankAccountChoiceFieldAttribute();
         attr.setId(id);
         attr.setBankAccounts(bankAccounts);
+        attr.setEnabled(enabled);
+        attr.setDefaultValue(defaultValue);
         saveAttribute(attr);
     }
 

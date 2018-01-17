@@ -12,6 +12,8 @@ import java.util.List;
 public class OperationBankAccountChoiceFieldAttribute extends OperationFormFieldAttribute {
 
     private List<BankAccountDetail> bankAccounts;
+    private boolean enabled;
+    private String defaultValue;
 
     public OperationBankAccountChoiceFieldAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
@@ -25,4 +27,19 @@ public class OperationBankAccountChoiceFieldAttribute extends OperationFormField
         this.bankAccounts = bankAccounts;
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getDefaultValue() {
+        return defaultValue;
+    }
+
+    public void setDefaultValue(String defaultValue) {
+        this.defaultValue = defaultValue;
+    }
 }
