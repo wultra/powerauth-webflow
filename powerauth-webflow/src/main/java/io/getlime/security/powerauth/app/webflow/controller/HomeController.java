@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.app.webflow.controller;
 
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,19 +48,22 @@ public class HomeController {
     private final AuthenticationManagementService authenticationManagementService;
     private final I18NService i18nService;
     private final OperationSessionService operationSessionService;
+    private final NextStepClient nextStepClient;
 
     /**
      * Initialization of the HomeController with application webflowServicesConfiguration.
      *
-     * @param webFlowConfig WebFlowServicesConfiguration of the application
+     * @param webFlowConfig WebFlowServicesConfiguration of the application.
      * @param operationSessionService Operation to session mapping service.
+     * @param nextStepClient Next step client.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
         this.operationSessionService = operationSessionService;
+        this.nextStepClient = nextStepClient;
     }
 
     /**
@@ -95,10 +100,18 @@ public class HomeController {
         String operationId = null;
         if (operationIdList != null && operationIdList.length >= 1) {
             operationId = operationIdList[0];
-            authenticationManagementService.createAuthenticationWithOperationId(operationId);
             if (operationIdList.length > 1) {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "There are duplicate operation ID instances (" + operationId + ") in redirect URL, first instance will be used");
             }
+            // check whether operation exists, if it does not exist or it could not be retrieved, redirect user to the error page
+            try {
+                nextStepClient.getOperationDetail(operationId);
+            } catch (NextStepServiceException e) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred while retrieving operation with ID: " + operationId, e);
+                return "redirect:/oauth/error";
+            }
+
+            authenticationManagementService.createAuthenticationWithOperationId(operationId);
         }
 
         model.put("title", webFlowConfig.getPageTitle());
