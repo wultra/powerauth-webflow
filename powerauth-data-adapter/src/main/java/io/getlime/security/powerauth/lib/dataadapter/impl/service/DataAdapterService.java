@@ -44,6 +44,11 @@ public class DataAdapterService implements DataAdapter {
         AuthenticationFailedException authFailedException = new AuthenticationFailedException("login.authenticationFailed");
         // Set number of remaining attempts for this userId in case it is available.
         // authFailedException.setRemainingAttempts(5);
+
+        // Use the following code to let the user know that the account has been blocked temporarily.
+        // final AuthenticationFailedException authFailedException = new AuthenticationFailedException("login.authenticationBlocked");
+        // authFailedException.setRemainingAttempts(0);
+
         throw authFailedException;
     }
 
