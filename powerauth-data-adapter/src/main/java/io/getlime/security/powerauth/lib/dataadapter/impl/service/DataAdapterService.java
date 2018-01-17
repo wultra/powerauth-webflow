@@ -8,6 +8,9 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.dataadapter.service.DataAdapterI18NService;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationBankAccountChoiceFieldConfig;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldConfig;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -60,7 +63,7 @@ public class DataAdapterService implements DataAdapter {
     }
 
     @Override
-    public BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId) throws UserNotFoundException {
+    public BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId, OperationFormData formData) throws UserNotFoundException {
         // Fetch bank account list for given user here from the bank backend.
         // In case that user is not found, throw a UserNotFoundException.
         // Replace mock bank account data with real data loaded from the bank backend.
@@ -104,10 +107,16 @@ public class DataAdapterService implements DataAdapter {
         bankAccounts.add(bankAccount3);
 
         bankAccountList.setBankAccounts(bankAccounts);
-        // bank account choice can be disabled
-        // bankAccountList.setEnabled(false);
-        // default choice can be set
-        // bankAccountList.setDefaultValue("CZ4043210000000087654321");
+
+        List<OperationFormFieldConfig> configs = formData.getConfig();
+        for (OperationFormFieldConfig config: configs) {
+            if ("operation.bankAccountChoice".equals(config.getId())) {
+                OperationBankAccountChoiceFieldConfig bankAccountChoiceConfig = (OperationBankAccountChoiceFieldConfig) config;
+                bankAccountList.setEnabled(bankAccountChoiceConfig.isEnabled());
+                // You should check the default value against list of available accounts.
+                bankAccountList.setDefaultValue(bankAccountChoiceConfig.getDefaultValue());
+            }
+        }
 
         return response;
     }

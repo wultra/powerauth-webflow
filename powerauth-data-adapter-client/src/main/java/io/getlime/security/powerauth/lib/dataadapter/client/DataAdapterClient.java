@@ -212,10 +212,10 @@ public class DataAdapterClient {
      * @return A list of bank accounts for given user.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId, String operationName, String operationId) throws DataAdapterClientErrorException {
+    public ObjectResponse<BankAccountListResponse> fetchBankAccounts(String userId, String operationName, String operationId, OperationFormData formData) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
-            BankAccountListRequest request = new BankAccountListRequest(userId, operationName, operationId);
+            BankAccountListRequest request = new BankAccountListRequest(userId, operationName, operationId, formData);
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
             HttpEntity<ObjectRequest<BankAccountListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);

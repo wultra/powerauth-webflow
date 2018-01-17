@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 
 /**
  * Interface defines methods which should be implemented for integration of Web Flow with 3rd parties.
@@ -59,7 +60,7 @@ public interface DataAdapter {
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
-    BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId) throws DataAdapterRemoteException, UserNotFoundException;
+    BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId, OperationFormData formData) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
      * Receive notification about formData change.

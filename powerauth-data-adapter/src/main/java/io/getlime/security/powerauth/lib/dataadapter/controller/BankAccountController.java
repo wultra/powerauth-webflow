@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemote
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.BankAccountListRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,7 +64,8 @@ public class BankAccountController {
         String userId = bankAccountListRequest.getUserId();
         String operationName = bankAccountListRequest.getOperationName();
         String operationId = bankAccountListRequest.getOperationId();
-        BankAccountListResponse response = dataAdapter.fetchBankAccounts(userId, operationName, operationId);
+        OperationFormData formData = bankAccountListRequest.getFormData();
+        BankAccountListResponse response = dataAdapter.fetchBankAccounts(userId, operationName, operationId, formData);
         return new ObjectResponse<>(response);
     }
 

@@ -16,6 +16,8 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+
 /**
  * Request object for obtaining bank accounts by user ID.
  *
@@ -26,6 +28,7 @@ public class BankAccountListRequest {
     private String userId;
     private String operationName;
     private String operationId;
+    private OperationFormData formData;
 
     /**
      * Default constructor
@@ -39,10 +42,11 @@ public class BankAccountListRequest {
      * @param operationName Operation name.
      * @param operationId Operation ID.
      */
-    public BankAccountListRequest(String userId, String operationName, String operationId) {
+    public BankAccountListRequest(String userId, String operationName, String operationId, OperationFormData formData) {
         this.userId = userId;
         this.operationName = operationName;
         this.operationId = operationId;
+        this.formData = formData;
     }
 
     /**
@@ -91,5 +95,21 @@ public class BankAccountListRequest {
      */
     public void setOperationId(String operationId) {
         this.operationId = operationId;
+    }
+
+    /**
+     * Get operation form data.
+     * @return Operation form data.
+     */
+    public OperationFormData getFormData() {
+        return formData;
+    }
+
+    /**
+     * Set operation form data.
+     * @param formData Operation form data.
+     */
+    public void setFormData(OperationFormData formData) {
+        this.formData = formData;
     }
 }
