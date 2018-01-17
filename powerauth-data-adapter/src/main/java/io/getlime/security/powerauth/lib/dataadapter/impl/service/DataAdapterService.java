@@ -9,7 +9,6 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountL
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.dataadapter.service.DataAdapterI18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationBankAccountChoiceFieldConfig;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldConfig;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
@@ -111,10 +110,9 @@ public class DataAdapterService implements DataAdapter {
         List<OperationFormFieldConfig> configs = formData.getConfig();
         for (OperationFormFieldConfig config: configs) {
             if ("operation.bankAccountChoice".equals(config.getId())) {
-                OperationBankAccountChoiceFieldConfig bankAccountChoiceConfig = (OperationBankAccountChoiceFieldConfig) config;
-                bankAccountList.setEnabled(bankAccountChoiceConfig.isEnabled());
+                bankAccountList.setEnabled(config.isEnabled());
                 // You should check the default value against list of available accounts.
-                bankAccountList.setDefaultValue(bankAccountChoiceConfig.getDefaultValue());
+                bankAccountList.setDefaultValue(config.getDefaultValue());
             }
         }
 
