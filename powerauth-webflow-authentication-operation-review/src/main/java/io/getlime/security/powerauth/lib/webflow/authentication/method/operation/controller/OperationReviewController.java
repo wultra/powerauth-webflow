@@ -268,7 +268,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private List<BankAccountDetail> convertBankAccountList(BankAccountList bankAccountList) {
         // TODO - move to a converter class
         List<BankAccountDetail> bankAccountDetails = new ArrayList<>();
-        if (bankAccountList == null || bankAccountList.getBankAccounts().isEmpty()) {
+        if (bankAccountList == null || bankAccountList.getBankAccounts() == null || bankAccountList.getBankAccounts().isEmpty()) {
             return bankAccountDetails;
         }
         for (BankAccount bankAccountEntity: bankAccountList.getBankAccounts()) {
