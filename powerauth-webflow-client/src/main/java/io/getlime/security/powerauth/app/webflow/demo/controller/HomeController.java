@@ -91,7 +91,7 @@ public class HomeController {
         formData.addNote("operation.note", paymentForm.getNote());
 
         // Sample operation configuration for bank account choice select.
-        // OperationBankAccountChoiceFieldConfig bankAccountConfig = new OperationBankAccountChoiceFieldConfig();
+        // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();
         // bankAccountConfig.setId("operation.bankAccountChoice");
         // bankAccountConfig.setEnabled(false);
         // bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
