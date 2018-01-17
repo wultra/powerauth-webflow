@@ -17,6 +17,7 @@ public class OperationFormData {
 
     private OperationFormAttribute title;
     private OperationFormAttribute message;
+    private List<OperationFormFieldConfig> config;
     private List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
     private Map<String, String> userInput;
@@ -25,8 +26,17 @@ public class OperationFormData {
      * Default constructor.
      */
     public OperationFormData() {
+        this.config = new ArrayList<>();
         this.parameters = new ArrayList<>();
         this.userInput = new LinkedHashMap<>();
+    }
+
+    /**
+     * Get form configuration.
+     * @return Form configuration.
+     */
+    public List<OperationFormFieldConfig> getConfig() {
+        return config;
     }
 
     /**
@@ -215,10 +225,12 @@ public class OperationFormData {
      * @param bankAccounts List of bank accounts.
      */
     @JsonIgnore
-    public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts) {
+    public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
         OperationBankAccountChoiceFieldAttribute attr = new OperationBankAccountChoiceFieldAttribute();
         attr.setId(id);
         attr.setBankAccounts(bankAccounts);
+        attr.setEnabled(enabled);
+        attr.setDefaultValue(defaultValue);
         saveAttribute(attr);
     }
 

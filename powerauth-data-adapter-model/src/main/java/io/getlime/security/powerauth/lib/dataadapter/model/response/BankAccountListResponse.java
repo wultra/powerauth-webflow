@@ -16,9 +16,7 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
-
-import java.util.List;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountList;
 
 /**
  * Response with list of user bank accounts.
@@ -28,7 +26,7 @@ import java.util.List;
 public class BankAccountListResponse {
 
     private String userId;
-    private List<BankAccount> bankAccounts;
+    private BankAccountList bankAccounts;
 
     /**
      * Default constructor.
@@ -41,7 +39,7 @@ public class BankAccountListResponse {
      * @param userId User ID.
      * @param bankAccounts Bank account list.
      */
-    public BankAccountListResponse(String userId, List<BankAccount> bankAccounts) {
+    public BankAccountListResponse(String userId, BankAccountList bankAccounts) {
         this.userId = userId;
         this.bankAccounts = bankAccounts;
     }
@@ -66,7 +64,7 @@ public class BankAccountListResponse {
      * Get list of bank accounts.
      * @return List of bank accounts.
      */
-    public List<BankAccount> getBankAccounts() {
+    public BankAccountList getBankAccounts() {
         return bankAccounts;
     }
 
@@ -74,7 +72,7 @@ public class BankAccountListResponse {
      * Set list of bank accounts.
      * @param bankAccounts List of bank accounts.
      */
-    public void setBankAccounts(List<BankAccount> bankAccounts) {
+    public void setBankAccounts(BankAccountList bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
 }

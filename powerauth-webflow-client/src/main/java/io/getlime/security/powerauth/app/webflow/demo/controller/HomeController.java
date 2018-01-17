@@ -90,6 +90,13 @@ public class HomeController {
         formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());
         formData.addNote("operation.note", paymentForm.getNote());
 
+        // Sample operation configuration for bank account choice select.
+        // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();
+        // bankAccountConfig.setId("operation.bankAccountChoice");
+        // bankAccountConfig.setEnabled(false);
+        // bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
+        // formData.getConfig().add(bankAccountConfig);
+
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 

@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountList;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -242,11 +243,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationName(), operation.getOperationId());
-                List<BankAccount> bankAccountEntities = response.getResponseObject().getBankAccounts();
-                List<BankAccountDetail> bankAccountDetails = convertBankAccountEntities(bankAccountEntities);
+                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationName(), operation.getOperationId(), operation.getFormData());
+                BankAccountList bankAccountList = response.getResponseObject().getBankAccounts();
+                List<BankAccountDetail> bankAccountDetails = convertBankAccountList(bankAccountList);
                 if (!bankAccountDetails.isEmpty()) {
-                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails);
+                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails, bankAccountList.isEnabled(), bankAccountList.getDefaultValue());
                 }
                 formData.setDynamicDataLoaded(true);
             } catch (DataAdapterClientErrorException e) {
@@ -261,16 +262,16 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     /**
      * Convert BankAccount into BankAccountDetail.
-     * @param bankAccountEntities List of BankAccount entities.
+     * @param bankAccountList List of BankAccount entities.
      * @return List of BankAccountDetail.
      */
-    private List<BankAccountDetail> convertBankAccountEntities(List<BankAccount> bankAccountEntities) {
+    private List<BankAccountDetail> convertBankAccountList(BankAccountList bankAccountList) {
         // TODO - move to a converter class
         List<BankAccountDetail> bankAccountDetails = new ArrayList<>();
-        if (bankAccountEntities==null || bankAccountEntities.isEmpty()) {
+        if (bankAccountList == null || bankAccountList.getBankAccounts() == null || bankAccountList.getBankAccounts().isEmpty()) {
             return bankAccountDetails;
         }
-        for (BankAccount bankAccountEntity: bankAccountEntities) {
+        for (BankAccount bankAccountEntity: bankAccountList.getBankAccounts()) {
             BankAccountDetail bankAccount = new BankAccountDetail();
             bankAccount.setName(bankAccountEntity.getName());
             bankAccount.setNumber(bankAccountEntity.getNumber());
