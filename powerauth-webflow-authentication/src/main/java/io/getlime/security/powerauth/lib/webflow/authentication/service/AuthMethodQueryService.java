@@ -97,10 +97,12 @@ public class AuthMethodQueryService {
         for (UserAuthMethodDetail authMethodDetail : userAuthMethods.getUserAuthMethods()) {
             if (authMethodDetail.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
                 Map<String, String> config = authMethodDetail.getConfig();
-                String activationId = config.get("activationId");
-                if (activationId != null && !activationId.isEmpty()) {
-                    // set successfully parsed activationId from configuration
-                    configuredActivation = activationId;
+                if (config != null) {
+                    String activationId = config.get("activationId");
+                    if (activationId != null && !activationId.isEmpty()) {
+                        // set successfully parsed activationId from configuration
+                        configuredActivation = activationId;
+                    }
                 }
             }
         }
