@@ -286,7 +286,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         }
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
-        String messageText = operation.getFormData().getMessage().getValue();
+        String messageText = operation.getFormData().getSummary().getValue();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 

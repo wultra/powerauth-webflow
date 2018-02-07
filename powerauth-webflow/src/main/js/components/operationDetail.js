@@ -130,7 +130,7 @@ export default class OperationDetail extends React.Component {
                 <div>
                     <div className="operation-approve content-wrap">
                         <h3 className="title">{this.props.context.formData.title.value}</h3>
-                        <p>{this.props.context.formData.message.value}</p>
+                        <p>{this.props.context.formData.greeting.value}</p>
                     </div>
                     <div>
                         {this.props.context.formData.parameters.map((item) => {

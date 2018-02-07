@@ -16,7 +16,8 @@ import java.util.Map;
 public class OperationFormData {
 
     private OperationFormAttribute title;
-    private OperationFormAttribute message;
+    private OperationFormAttribute greeting;
+    private OperationFormAttribute summary;
     private List<OperationFormFieldConfig> config;
     private List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
@@ -115,46 +116,90 @@ public class OperationFormData {
     }
 
     /**
-     * Set message form attribute.
-     * @param message Message form attribute.
+     * Set greeting form attribute.
+     * @param greeting Summary form attribute.
      */
-    public void setMessage(OperationFormAttribute message) {
-        if (message == null) {
+    public void setGreeting(OperationFormAttribute greeting) {
+        if (greeting == null) {
             // avoid JSON mapping null title
             return;
         }
-        this.message = message;
+        this.greeting = greeting;
     }
 
     /**
-     * Set message.
-     * @param messageId Message ID.
+     * Set greeting.
+     * @param greetingId Greeting ID.
      */
     @JsonIgnore
-    public void addMessage(String messageId) {
+    public void addGreeting(String greetingId) {
         OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(messageId);
-        this.message = attr;
+        attr.setId(greetingId);
+        this.greeting = attr;
     }
 
     /**
-     * Set localized message.
-     * @param messageId Message ID.
+     * Set localized greeting.
+     * @param greetingId Greeting ID.
+     * @param greeting Localized greeting.
      */
     @JsonIgnore
-    public void addMessage(String messageId, String message) {
+    public void addGreeting(String greetingId, String greeting) {
         OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(messageId);
-        attr.setValue(message);
-        this.message = attr;
+        attr.setId(greetingId);
+        attr.setValue(greeting);
+        this.greeting = attr;
     }
 
     /**
-     * Get message form attribute.
-     * @return Message form attribute.
+     * Get summary form attribute.
+     * @return Summary form attribute.
      */
-    public OperationFormAttribute getMessage() {
-        return message;
+    public OperationFormAttribute getGreeting() {
+        return greeting;
+    }
+
+    /**
+     * Set summary form attribute.
+     * @param summary Summary form attribute.
+     */
+    public void setSummary(OperationFormAttribute summary) {
+        if (summary == null) {
+            // avoid JSON mapping null title
+            return;
+        }
+        this.summary = summary;
+    }
+
+    /**
+     * Set summary.
+     * @param summaryId Message ID.
+     */
+    @JsonIgnore
+    public void addSummary(String summaryId) {
+        OperationFormAttribute attr = new OperationFormAttribute();
+        attr.setId(summaryId);
+        this.summary = attr;
+    }
+
+    /**
+     * Set localized summary.
+     * @param summaryId Message ID.
+     */
+    @JsonIgnore
+    public void addSummary(String summaryId, String summary) {
+        OperationFormAttribute attr = new OperationFormAttribute();
+        attr.setId(summaryId);
+        attr.setValue(summary);
+        this.summary = attr;
+    }
+
+    /**
+     * Get summary form attribute.
+     * @return Summary form attribute.
+     */
+    public OperationFormAttribute getSummary() {
+        return summary;
     }
 
     /**

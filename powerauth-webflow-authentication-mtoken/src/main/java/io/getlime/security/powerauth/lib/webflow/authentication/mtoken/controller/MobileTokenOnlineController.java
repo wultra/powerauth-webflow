@@ -358,7 +358,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         PushMessageBody body = new PushMessageBody();
         if (formData != null) {
             body.setTitle(formData.getTitle().getValue());
-            body.setBody(formData.getMessage().getValue());
+            body.setBody(formData.getSummary().getValue());
         } else {
             AbstractMessageSource messageSource = i18nService.getMessageSource();
             String[] operationData = new String[]{operation.getOperationData()};
