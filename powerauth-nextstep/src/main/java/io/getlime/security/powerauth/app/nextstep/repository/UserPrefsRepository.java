@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,7 @@ public interface UserPrefsRepository extends CrudRepository<UserPrefsEntity, Str
      * @param userId User ID
      * @return User preferences.
      */
+    @Query("SELECT p FROM UserPrefsEntity p WHERE p.userId=?1")
     UserPrefsEntity findUserPrefs(String userId);
 
 }

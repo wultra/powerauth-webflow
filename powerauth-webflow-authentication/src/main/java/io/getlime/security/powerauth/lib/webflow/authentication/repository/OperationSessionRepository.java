@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.repository;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @Component
 public interface OperationSessionRepository extends CrudRepository<OperationSessionEntity, String> {
 
+    @Query("SELECT o FROM OperationSessionEntity o WHERE o.httpSessionId = ?1 AND o.result='CONTINUE'")
     List<OperationSessionEntity> findActiveOperationsByHttpSessionId(String httpSessionId);
 
     OperationSessionEntity findByOperationId(String operationId);

@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +34,7 @@ public interface OperationHistoryRepository extends CrudRepository<OperationHist
      * @param operationId id of an operation
      * @return newest resultId
      */
+    @Query("SELECT max(h.primaryKey.resultId) FROM OperationHistoryEntity h WHERE h.primaryKey.operationId=?1")
     Long findMaxResultId(String operationId);
 
 }

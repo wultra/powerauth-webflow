@@ -30,10 +30,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "ns_step_definition")
-@NamedQueries({
-        @NamedQuery(name = "StepDefinitionEntity.findStepDefinitionsForOperation", query = "SELECT sd FROM StepDefinitionEntity sd WHERE sd.operationName=?1 ORDER BY sd.stepDefinitionId"),
-        @NamedQuery(name = "StepDefinitionEntity.findDistinctOperationNames", query = "SELECT DISTINCT(sd.operationName) FROM StepDefinitionEntity sd")
-})
 public class StepDefinitionEntity implements Serializable {
 
     private static final long serialVersionUID = 1125553531017608411L;
