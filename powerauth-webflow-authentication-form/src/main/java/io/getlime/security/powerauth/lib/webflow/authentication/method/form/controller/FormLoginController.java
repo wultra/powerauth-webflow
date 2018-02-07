@@ -62,7 +62,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     }
 
     /**
-     * Authenticate using username / password authentiation.
+     * Authenticate using username / password authentication.
      * @param request Authentication request.
      * @return Authenticated user ID.
      * @throws AuthStepException Thrown when authentication fails.
