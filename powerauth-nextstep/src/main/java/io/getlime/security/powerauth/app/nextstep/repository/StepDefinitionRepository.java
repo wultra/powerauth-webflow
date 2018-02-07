@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ public interface StepDefinitionRepository extends CrudRepository<StepDefinitionE
      * @param operationName name of the operation
      * @return List of step definitions
      */
+    @Query("SELECT sd FROM StepDefinitionEntity sd WHERE sd.operationName=?1 ORDER BY sd.stepDefinitionId")
     List<StepDefinitionEntity> findStepDefinitionsForOperation(String operationName);
 
     /**
@@ -42,6 +44,7 @@ public interface StepDefinitionRepository extends CrudRepository<StepDefinitionE
      *
      * @return List of operation names
      */
+    @Query("SELECT DISTINCT(sd.operationName) FROM StepDefinitionEntity sd")
     List<String> findDistinctOperationNames();
 
 }

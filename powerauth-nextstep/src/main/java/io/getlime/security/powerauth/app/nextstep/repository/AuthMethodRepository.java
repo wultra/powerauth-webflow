@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,7 @@ public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, A
      *
      * @return List of supported authentication methods.
      */
+    @Query("SELECT m FROM AuthMethodEntity m ORDER by m.orderNumber")
     List<AuthMethodEntity> findAllAuthMethods();
 
     /**
