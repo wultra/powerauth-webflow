@@ -28,11 +28,23 @@
             <artifactId>spring-context</artifactId>
             <version>4.3.12.RELEASE</version>
         </dependency>
-        <dependency>
-            <groupId>javax.annotation</groupId>
-            <artifactId>javax.annotation-api</artifactId>
-            <version>1.3.1</version>
-        </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>jdk9</id>
+            <activation>
+                <jdk>[1.9,)</jdk>
+            </activation>
+            <dependencies>
+                <!-- JDK 9 dependencies -->
+                <dependency>
+                    <groupId>javax.annotation</groupId>
+                    <artifactId>javax.annotation-api</artifactId>
+                    <version>${javax.annotation.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>
