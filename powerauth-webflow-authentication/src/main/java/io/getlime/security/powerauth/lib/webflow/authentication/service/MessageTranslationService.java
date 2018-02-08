@@ -76,13 +76,23 @@ public class MessageTranslationService {
             }
         }
 
-        // Translate title message the {id} notation
-        OperationFormAttribute message = formData.getMessage();
-        if (message != null) {
-            String messageLabel = localize(message.getId());
-            if (messageLabel != null) {
-                String translatedMessage = translateMessage(messageLabel, idValueMap);
-                formData.addMessage(message.getId(), translatedMessage);
+        // Translate greeting using the {id} notation
+        OperationFormAttribute greeting = formData.getGreeting();
+        if (greeting != null) {
+            String greetingLabel = localize(greeting.getId());
+            if (greetingLabel != null) {
+                String translatedGreeting = translateMessage(greetingLabel, idValueMap);
+                formData.addGreeting(greeting.getId(), translatedGreeting);
+            }
+        }
+
+        // Translate summary using the {id} notation
+        OperationFormAttribute summary = formData.getSummary();
+        if (summary != null) {
+            String summaryLabel = localize(summary.getId());
+            if (summaryLabel != null) {
+                String translatedSummary= translateMessage(summaryLabel, idValueMap);
+                formData.addSummary(summary.getId(), translatedSummary);
             }
         }
     }
