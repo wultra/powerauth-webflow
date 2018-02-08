@@ -88,9 +88,9 @@
 		<maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.0.0</maven-javadoc-plugin.version>
 		<maven-war-plugin.version>3.1.0</maven-war-plugin.version>
-        <jaxb.version>2.3.0</jaxb.version>
-        <javax.activation.version>1.2.0</javax.activation.version>
-        <javax.soap.version>1.4.0</javax.soap.version>
+		<jaxb.version>2.3.0</jaxb.version>
+		<javax.activation.version>1.2.0</javax.activation.version>
+		<javax.soap.version>1.4.0</javax.soap.version>
 		<javax.saaj-api.version>1.3.5</javax.saaj-api.version>
 		<javax.saaj-impl.version>1.3.28</javax.saaj-impl.version>
 	</properties>
