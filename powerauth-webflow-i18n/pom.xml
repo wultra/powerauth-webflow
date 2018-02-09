@@ -42,6 +42,8 @@
                     <groupId>javax.annotation</groupId>
                     <artifactId>javax.annotation-api</artifactId>
                     <version>${javax.annotation.version}</version>
+                    <!-- Library should be provided by runtime, otherwise there would be conflicts with jar bundled in war. -->
+                    <scope>provided</scope>
                 </dependency>
             </dependencies>
         </profile>
