@@ -53,7 +53,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Default exception handler, for unexpected errors.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(Throwable.class)
@@ -79,7 +79,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of unauthorized Exception.
-     *
+     * @param ex Exception.
      * @return Response with error details.
      */
     @ExceptionHandler(InsufficientAuthenticationException.class)

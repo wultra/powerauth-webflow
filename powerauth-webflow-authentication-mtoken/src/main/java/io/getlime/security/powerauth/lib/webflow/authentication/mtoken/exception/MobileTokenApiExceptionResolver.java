@@ -44,7 +44,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for push registration related exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(PushRegistrationFailedException.class)
@@ -56,7 +56,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for invalid request object exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(InvalidRequestObjectException.class)
@@ -68,7 +68,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for invalid activation exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(InvalidActivationException.class)
@@ -80,7 +80,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for PowerAuth authentication exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(PowerAuthAuthenticationException.class)
@@ -92,7 +92,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for operation already finished exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFinishedException.class)
@@ -104,7 +104,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for operation already failed exception.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFailedException.class)
@@ -116,7 +116,7 @@ public class MobileTokenApiExceptionResolver {
 
     /**
      * Exception handler for expiration.
-     *
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationExpiredException.class)

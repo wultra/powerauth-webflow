@@ -54,7 +54,7 @@ import java.util.logging.Logger;
 
 /**
  * Base controller for any authentication method. Controller class is templated using three attributes.
- * <p>
+ *
  * <ul>
  * <li>T - extension of AuthStepRequest.</li>
  * <li>R - extension of AuthStepResponse.</li>
@@ -170,6 +170,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param userId      User ID of user who should authorize operation.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId) throws NextStepServiceException, AuthStepException {
         return authorize(operationId, userId, null);
@@ -183,6 +184,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param params      Custom parameters.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -210,6 +212,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param params      Custom parameters.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -236,6 +239,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param cancelReason Reason for cancellation of the operation.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -286,6 +290,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * Continue an existing operation.
      *
      * @param operationId ID of operation to be fetched.
+     * @param httpSessionId HTTP session ID.
      * @param provider    Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */

@@ -169,6 +169,7 @@ public class NextStepClient {
      * @param userId User ID.
      * @param authMethod Authentication method.
      * @param authStepResult Result of the last step.
+     * @param authStepResultDescription Description of the result of the last step.
      * @param params List of generic parameters.
      * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.

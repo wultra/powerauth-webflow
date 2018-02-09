@@ -37,7 +37,7 @@ public class AuthenticationExceptionResolver {
 
     /**
      * Handling of AuthStepException.
-     *
+     * @param ex Exception.
      * @return Response with error details.
      */
     @ExceptionHandler(AuthStepException.class)

@@ -40,7 +40,7 @@ public class QRCodeExceptionResolver {
 
     /**
      * Exception handler for illegal states (e.g. activation gone missing and invalid formData)
-     *
+     * @param ex Exception.
      * @return Response with error details.
      */
     @ExceptionHandler(QRCodeInvalidDataException.class)

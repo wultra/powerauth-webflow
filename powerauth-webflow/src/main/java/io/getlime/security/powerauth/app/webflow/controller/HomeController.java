@@ -53,7 +53,9 @@ public class HomeController {
     /**
      * Initialization of the HomeController with application webflowServicesConfiguration.
      *
+     * @param authenticationManagementService Authentication management service.
      * @param webFlowConfig WebFlowServicesConfiguration of the application.
+     * @param i18nService I18n service.
      * @param operationSessionService Operation to session mapping service.
      * @param nextStepClient Next step client.
      */

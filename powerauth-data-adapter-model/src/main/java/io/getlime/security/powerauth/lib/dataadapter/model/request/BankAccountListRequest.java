@@ -41,6 +41,7 @@ public class BankAccountListRequest {
      * @param userId User ID.
      * @param operationName Operation name.
      * @param operationId Operation ID.
+     * @param formData Operation form data.
      */
     public BankAccountListRequest(String userId, String operationName, String operationId, OperationFormData formData) {
         this.userId = userId;
