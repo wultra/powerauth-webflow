@@ -39,6 +39,7 @@ public class OperationChangeNotificationRequest {
      * Constructor with user ID, operation ID and formData change.
      * @param userId User ID.
      * @param operationId Operation ID.
+     * @param operationChange Operation change request object.
      */
     public OperationChangeNotificationRequest(String userId, String operationId, OperationChange operationChange) {
         this.userId = userId;
