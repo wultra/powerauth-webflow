@@ -27,9 +27,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "ns_auth_method")
-@NamedQueries({
-        @NamedQuery(name = "AuthMethodEntity.findAllAuthMethods", query = "SELECT m FROM AuthMethodEntity m ORDER by m.orderNumber")
-})
 public class AuthMethodEntity implements Serializable {
 
     private static final long serialVersionUID = -2015768978885351433L;

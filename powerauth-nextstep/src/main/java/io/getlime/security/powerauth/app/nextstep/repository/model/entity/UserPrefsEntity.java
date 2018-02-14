@@ -25,9 +25,6 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "ns_user_prefs")
-@NamedQueries({
-        @NamedQuery(name = "UserPrefsEntity.findUserPrefs", query = "SELECT p FROM UserPrefsEntity p WHERE p.userId=?1")
-})
 public class UserPrefsEntity implements Serializable {
 
     private static final long serialVersionUID = -7165002311514127800L;

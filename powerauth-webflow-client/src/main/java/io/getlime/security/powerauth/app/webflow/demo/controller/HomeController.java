@@ -84,7 +84,8 @@ public class HomeController {
         String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
-        formData.addMessage("operation.message");
+        formData.addGreeting("operation.greeting");
+        formData.addSummary("operation.summary");
         formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
         formData.addKeyValue("operation.account", paymentForm.getAccount());
         formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());

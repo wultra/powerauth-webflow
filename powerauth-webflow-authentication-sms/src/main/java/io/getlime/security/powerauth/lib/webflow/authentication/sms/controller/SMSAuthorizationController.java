@@ -14,6 +14,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.SMSAuthorizationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +69,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final Object messageId = httpSession.getAttribute(MESSAGE_ID);
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
-            throw new AuthStepException("error.invalidRequest", new NullPointerException());
+            throw new InvalidRequestException("Message ID is missing.");
         }
         try {
             dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
@@ -80,7 +82,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
                 if (response.getResult() == AuthResult.FAILED) {
                     // FAILED result instead of CONTINUE means the authentication method is failed
-                    throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");
                 }
                 GetOperationDetailResponse updatedOperation = getOperation();
                 remainingAttemptsNS = updatedOperation.getRemainingAttempts();
@@ -174,7 +176,12 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when validating an SMS message.", e);
             final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            if (e.getMessageId() != null) {
+                // prefer localized message over regular message string
+                response.setMessage(e.getMessageId());
+            } else {
+                response.setMessage(e.getMessage());
+            }
             response.setRemainingAttempts(e.getRemainingAttempts());
             return response;
         }
