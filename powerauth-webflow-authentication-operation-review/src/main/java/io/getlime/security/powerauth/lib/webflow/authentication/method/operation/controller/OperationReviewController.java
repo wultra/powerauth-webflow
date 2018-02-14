@@ -162,7 +162,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         } catch (AuthStepException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            if (e.getMessageId() != null) {
+                // prefer localized message over regular message string
+                response.setMessage(e.getMessageId());
+            } else {
+                response.setMessage(e.getMessage());
+            }
             return response;
         }
     }

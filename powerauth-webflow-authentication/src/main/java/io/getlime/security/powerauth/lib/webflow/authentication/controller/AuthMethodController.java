@@ -35,7 +35,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
@@ -99,10 +99,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             if (operationId != null) {
                 return getOperation(operationId);
             } else {
-                throw new AuthStepException("operation.notAvailable", new NullPointerException());
+                throw new OperationNotAvailableException("Operation is not available");
             }
         } else {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
+            throw new OperationNotAvailableException("Operation is not available");
         }
     }
 
@@ -170,6 +170,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param userId      User ID of user who should authorize operation.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authentication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId) throws NextStepServiceException, AuthStepException {
         return authorize(operationId, userId, null);
@@ -183,6 +184,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param params      Custom parameters.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authentication fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -210,6 +212,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param params      Custom parameters.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authentication fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -236,6 +239,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param cancelReason Reason for cancellation of the operation.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
+     * @throws AuthStepException In case authentication fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
@@ -451,28 +455,28 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     private void validateOperationState(GetOperationDetailResponse operation) throws AuthStepException {
         if (operation == null) {
-            throw new AuthStepException("operation.notAvailable", new NullPointerException());
+            throw new OperationNotAvailableException("Operation is not available");
         }
         if (operation.getResult() == AuthResult.FAILED) {
             List<OperationHistory> operationHistory = operation.getHistory();
             if (operationHistory.size() == 0 || operationHistory.get(operationHistory.size()-1).getRequestAuthStepResult() != AuthStepResult.CANCELED) {
                 // allow displaying of canceled operations - operation may be canceled in mobile app and later displayed in web UI
-                throw new AuthStepException("operation.alreadyFailed", new IllegalStateException());
+                throw new OperationAlreadyFailedException("Operation has already failed");
             }
         }
         if (operation.isExpired()) {
-            throw new AuthStepException("operation.timeout", new IllegalStateException());
+            throw new OperationTimeoutException("Operation has timed out");
         }
         final AuthMethod currentAuthMethod = getAuthMethodName();
         List<OperationHistory> operationHistoryList = operation.getHistory();
         if (operationHistoryList == null || operationHistoryList.isEmpty()) {
-            throw new AuthStepException("operation.missingHistory", new IllegalStateException());
+            throw new OperationMissingHistoryException("Operation is missing its history");
         }
         AuthMethod chosenAuthMethod = operation.getChosenAuthMethod();
         if (chosenAuthMethod != null) {
             // check that chosen authentication method matches next steps
             if (!isAuthMethodAvailable(operation, chosenAuthMethod)) {
-                throw new AuthStepException("operation.invalidChosenMethod", new IllegalStateException());
+                throw new InvalidChosenMethodException("Invalid chosen authentication method: "+chosenAuthMethod);
             }
         }
         if (operation.getResult() == AuthResult.CONTINUE) {
@@ -481,19 +485,19 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             String currentOperationHash = operationSessionService.generateOperationHash(operation.getOperationId());
             // mobile API clients do not send operation hash - when operation hash is missing, concurrency check is not performed
             if (clientOperationHash != null && !clientOperationHash.equals(currentOperationHash)) {
-                throw new AuthStepException("operation.interrupted", new IllegalStateException());
+                throw new OperationInterruptedException("Operation was interrupted");
             }
             // check steps for operations with AuthResult = CONTINUE, DONE and FAILED methods do not have steps
             if (currentAuthMethod != AuthMethod.INIT && currentAuthMethod != AuthMethod.SHOW_OPERATION_DETAIL) {
                 // check whether AuthMethod is available in next steps, only done in real authentication methods
                 if (!isAuthMethodAvailable(operation)) {
-                    throw new AuthStepException("operation.methodNotAvailable", new IllegalStateException());
+                    throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }
             }
             // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY or POWERAUTH_TOKEN are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
                 if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN)) {
-                    throw new AuthStepException("operation.methodNotAvailable", new IllegalStateException());
+                    throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }
             }
         }
