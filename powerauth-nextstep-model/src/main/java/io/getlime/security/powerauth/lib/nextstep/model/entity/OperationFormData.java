@@ -98,6 +98,7 @@ public class OperationFormData {
     /**
      * Set localized title.
      * @param titleId Title ID.
+     * @param title Localized title.
      */
     @JsonIgnore
     public void addTitle(String titleId, String title) {
@@ -117,7 +118,7 @@ public class OperationFormData {
 
     /**
      * Set greeting form attribute.
-     * @param greeting Summary form attribute.
+     * @param greeting Greeting form attribute.
      */
     public void setGreeting(OperationFormAttribute greeting) {
         if (greeting == null) {
@@ -185,6 +186,7 @@ public class OperationFormData {
     /**
      * Set localized summary.
      * @param summaryId Message ID.
+     * @param summary Localized summary.
      */
     @JsonIgnore
     public void addSummary(String summaryId, String summary) {
@@ -268,6 +270,8 @@ public class OperationFormData {
      * Add a bank account choice.
      * @param id Bank account choice ID.
      * @param bankAccounts List of bank accounts.
+     * @param enabled Whether choice is enabled.
+     * @param defaultValue Default bank account value.
      */
     @JsonIgnore
     public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {

@@ -40,6 +40,7 @@ public class OperationFormFieldAttribute {
     // JsonIgnore added, otherwise type was serialized twice
     /**
      * Get the type of OperationFormFieldAttribute.
+     * @return Atribute type.
      */
     @JsonIgnore
     public Type getType() {

@@ -140,8 +140,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
     /**
      * Generates the QR code to be displayed to the user.
-     *
+     * @param request QR code init request.
      * @return Response with QR code as String-based PNG image.
+     * @throws QRCodeInvalidDataException In case QR code data is invalid.
+     * @throws NextStepServiceException In case communication with Next Step service fails.
+     * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
@@ -255,6 +258,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Cancels the QR code authorization.
      *
      * @return Authorization response.
+     * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @ResponseBody

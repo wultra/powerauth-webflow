@@ -40,6 +40,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Default exception handler, for unexpected errors.
+     * @param t Throwable.
      * @return Response with error details.
      */
     @ExceptionHandler(Throwable.class)
@@ -52,6 +53,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Exception handler for operation already finished error.
+     * @param ex Exception.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFinishedException.class)
@@ -64,6 +66,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Exception handler for operation already failed error.
+     * @param ex Exception.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationAlreadyFailedException.class)

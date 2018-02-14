@@ -209,6 +209,7 @@ public class DataAdapterClient {
      * @param userId User ID of the user for this request.
      * @param operationName Operation name.
      * @param operationId Operation ID.
+     * @param formData Operation form data.
      * @return A list of bank accounts for given user.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
@@ -238,6 +239,8 @@ public class DataAdapterClient {
      * Send a notification about formData change.
      *
      * @param formDataChange Operation formData change.
+     * @param userId User ID.
+     * @param operationId Operation ID.
      * @return Object response.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
@@ -269,6 +272,8 @@ public class DataAdapterClient {
      *
      * @param operationChange Operation change.
      * @return Object response.
+     * @param userId User ID.
+     * @param operationId Operation ID.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, String operationId) throws DataAdapterClientErrorException {
