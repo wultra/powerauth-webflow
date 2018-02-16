@@ -51,26 +51,29 @@ export default class Error extends React.Component {
 
     render() {
         return (
-            <div className="panel panel-body text-center">
+            <div>
                 {(this.state.networkError) ? (
                     <div className="network-error">
                         <FormattedMessage id="message.networkError"/>
                     </div>
                 ) : (
-                    <div>
-                        <div className="message-error title">
-                            {(this.props.context.message) ? (
-                                <FormattedMessage id={this.props.context.message}/>
-                            ) : (
-                                <FormattedMessage id="error.unknown"/>
-                            )}
-                        </div>
-                        <div className="image-result error"></div>
-                        <div className="message-information">
-                            <FormattedMessage id="message.redirect"/>
+                    <div className="panel panel-body text-center">
+                        <div>
+                            <div className="message-error title">
+                                {(this.props.context.message) ? (
+                                    <FormattedMessage id={this.props.context.message}/>
+                                ) : (
+                                    <FormattedMessage id="error.unknown"/>
+                                )}
+                            </div>
+                            <div className="image-result error"></div>
+                            <div className="message-information">
+                                <FormattedMessage id="message.redirect"/>
+                            </div>
                         </div>
                     </div>
-                )}
+                )
+                }
             </div>
         )
     }
