@@ -142,13 +142,12 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Generates the QR code to be displayed to the user.
      * @param request QR code init request.
      * @return Response with QR code as String-based PNG image.
-     * @throws QRCodeInvalidDataException In case QR code data is invalid.
      * @throws NextStepServiceException In case communication with Next Step service fails.
      * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws OfflineModeInvalidDataException, NextStepServiceException, AuthStepException {
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws NextStepServiceException, AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
@@ -286,9 +285,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      *
      * @param activation Activation entity.
      * @return QR code as String-based PNG image.
-     * @throws OfflineModeInvalidDataException Thrown when data is invalid.
+     * @throws AuthStepException In case QR code generation fails.
      */
-    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws OfflineModeInvalidDataException, AuthStepException {
+    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
