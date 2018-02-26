@@ -51,24 +51,20 @@ export default class TokenOnline extends React.Component {
     render() {
         return (
             <div className="auth-actions">
-                <div className="attributes">
-                    <div className="font-small message-information">
-                        <FormattedMessage id="message.token.confirm"/><br/>
-                        <div className="attributes">
-                            <div className="image mtoken"/>
-                        </div>
-                    </div>
-                    {(this.props.offlineModeAvailable) ? (
-                        <div className="font-small message-information">
-                            <FormattedMessage id="message.token.offline"/><br/>
-                            <a href="#" onClick={this.handleSwitchToOfflineMode}>
-                                <FormattedMessage id="message.token.offline.link"/>
-                            </a>
-                        </div>
-                    ) : (
-                        undefined
-                    )}
+                <div className="font-small message-information">
+                    <FormattedMessage id="message.token.confirm"/><br/>
+                    <div className="image mtoken"/>
                 </div>
+                {(this.props.offlineModeAvailable) ? (
+                    <div className="font-small message-information">
+                        <FormattedMessage id="message.token.offline"/><br/>
+                        <a href="#" onClick={this.handleSwitchToOfflineMode}>
+                            <FormattedMessage id="message.token.offline.link"/>
+                        </a>
+                    </div>
+                ) : (
+                    undefined
+                )}
                 <div className="attribute row">
                     <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
                         <FormattedMessage id="operation.cancel"/>
