@@ -102,7 +102,7 @@ a:hover, a:active, a:focus {
     background-image: url("../images/token.png");
     width: 120px;
     height: 120px;
-    margin: 0px auto;
+    margin: 20px auto;
 }
 
 .image-result {
