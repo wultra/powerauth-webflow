@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -167,10 +169,12 @@ public class HomeController {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "HTTP request not found in HttpSessionRequestCache");
             return "redirect:/oauth/error";
         }
         String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
         if (redirectUriParameter == null || redirectUriParameter.length != 1) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Multiple redirect_uri request parameters found");
             return "redirect:/oauth/error";
         }
         String redirectUri = redirectUriParameter[0];
@@ -181,7 +185,24 @@ public class HomeController {
             authenticationManagementService.clearContext();
         }
 
-        return "redirect:" + redirectUri;
+        try {
+            URI uriOrig = new URI(redirectUri);
+            // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
+            String errorQuery = "error=access_denied&error_description=User canceled authentication request";
+
+            String query = uriOrig.getQuery();
+            if (query == null) {
+                query = errorQuery;
+            } else {
+                query += "&" + errorQuery;
+            }
+
+            URI redirectWithError = new URI(uriOrig.getScheme(), uriOrig.getAuthority(), uriOrig.getPath(), query, uriOrig.getFragment());
+            return "redirect:" + redirectWithError.toString();
+        } catch (URISyntaxException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while parsing redirect_uri", ex);
+            return "redirect:/oauth/error";
+        }
     }
 
     /**
