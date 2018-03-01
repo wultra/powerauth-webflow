@@ -28,6 +28,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -167,10 +168,12 @@ public class HomeController {
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "HTTP request not found in HttpSessionRequestCache");
             return "redirect:/oauth/error";
         }
         String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
         if (redirectUriParameter == null || redirectUriParameter.length != 1) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Multiple redirect_uri request parameters found");
             return "redirect:/oauth/error";
         }
         String redirectUri = redirectUriParameter[0];
@@ -181,7 +184,13 @@ public class HomeController {
             authenticationManagementService.clearContext();
         }
 
-        return "redirect:" + redirectUri;
+        // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
+        final String redirectWithError = UriComponentsBuilder.fromUriString(redirectUri)
+                .queryParam("error", "access_denied")
+                .queryParam("error_description", "User canceled authentication request")
+                .build()
+                .toUriString();
+        return "redirect:" + redirectWithError;
     }
 
     /**
