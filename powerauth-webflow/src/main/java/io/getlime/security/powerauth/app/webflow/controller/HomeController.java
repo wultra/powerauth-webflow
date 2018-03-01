@@ -28,11 +28,10 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
@@ -185,24 +184,13 @@ public class HomeController {
             authenticationManagementService.clearContext();
         }
 
-        try {
-            URI uriOrig = new URI(redirectUri);
-            // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
-            String errorQuery = "error=access_denied&error_description=User canceled authentication request";
-
-            String query = uriOrig.getQuery();
-            if (query == null) {
-                query = errorQuery;
-            } else {
-                query += "&" + errorQuery;
-            }
-
-            URI redirectWithError = new URI(uriOrig.getScheme(), uriOrig.getAuthority(), uriOrig.getPath(), query, uriOrig.getFragment());
-            return "redirect:" + redirectWithError.toString();
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while parsing redirect_uri", ex);
-            return "redirect:/oauth/error";
-        }
+        // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
+        final String redirectWithError = UriComponentsBuilder.fromUriString(redirectUri)
+                .queryParam("error", "access_denied")
+                .queryParam("error_description", "User canceled authentication request")
+                .build()
+                .toUriString();
+        return "redirect:" + redirectWithError;
     }
 
     /**
