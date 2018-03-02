@@ -251,6 +251,20 @@ public class OperationFormData {
     }
 
     /**
+     * Set a formatted note.
+     * @param noteId Note ID.
+     * @param note Note.
+     * @param valueFormatType Value format type.
+     */
+    @JsonIgnore
+    public void addNote(String noteId, String note, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+        OperationNoteFieldAttribute attr = new OperationNoteFieldAttribute(valueFormatType);
+        attr.setId(noteId);
+        attr.setNote(note);
+        saveAttribute(attr);
+    }
+
+    /**
      * Get note.
      * @return Note.
      */
@@ -261,7 +275,7 @@ public class OperationFormData {
             return null;
         }
         if (attrs.size()>1) {
-            throw new IllegalStateException("Multiple attributes of type MESSAGE found");
+            throw new IllegalStateException("Multiple attributes of type NOTE found");
         }
         return (OperationNoteFieldAttribute) attrs.get(0);
     }
@@ -291,6 +305,20 @@ public class OperationFormData {
     @JsonIgnore
     public void addKeyValue(String id, String value) {
         OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute();
+        attr.setId(id);
+        attr.setValue(value);
+        saveAttribute(attr);
+    }
+
+    /**
+     * Add a formatted key-value attribute.
+     * @param id Attribute ID.
+     * @param value Attribute value.
+     * @param valueFormatType Value format type.
+     */
+    @JsonIgnore
+    public void addKeyValue(String id, String value, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+        OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute(valueFormatType);
         attr.setId(id);
         attr.setValue(value);
         saveAttribute(attr);
