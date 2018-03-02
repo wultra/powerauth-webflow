@@ -253,7 +253,7 @@ public class OperationFormData {
     /**
      * Set a formatted note.
      * @param noteId Note ID.
-     * @param note note.
+     * @param note Note.
      * @param valueFormatType Value format type.
      */
     @JsonIgnore
