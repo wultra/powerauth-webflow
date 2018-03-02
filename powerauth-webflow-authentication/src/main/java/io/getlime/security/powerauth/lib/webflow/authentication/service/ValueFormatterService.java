@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.money.CurrencyUnit;
 import javax.money.Monetary;
 import javax.money.MonetaryAmount;
+import javax.money.UnknownCurrencyException;
 import javax.money.format.AmountFormatQueryBuilder;
 import javax.money.format.MonetaryAmountFormat;
 import javax.money.format.MonetaryFormats;
@@ -124,32 +125,37 @@ public class ValueFormatterService {
         if (amountAttribute.getAmount() == null) {
             return "";
         }
-        if (amountAttribute.getCurrency() != null) {
-            final CurrencyUnit currency = Monetary.getCurrency(amountAttribute.getCurrency());
-            final MonetaryAmount amount = Monetary.getDefaultAmountFactory().setCurrency(currency).setNumber(amountAttribute.getAmount()).create();
-            final AbstractMessageSource messageSource = i18NService.getMessageSource();
-            String pattern = "###0.00";
-            try {
-                pattern = messageSource.getMessage("currency.pattern", null, locale);
-            } catch (NoSuchMessageException ex) {
-                // pattern is not specified - use default pattern
-            }
-            final MonetaryAmountFormat format;
-            String localizedCurrencyName = amountAttribute.getCurrency();
-            try {
-                localizedCurrencyName = messageSource.getMessage("currency." + amountAttribute.getCurrency() + ".name", null, locale);
-            } catch (NoSuchMessageException ex) {
-                // currency is not localized - display it as it was sent in the operation
-            }
-            format = MonetaryFormats.getAmountFormat(
-                    AmountFormatQueryBuilder.of(locale)
-                            .set("pattern", pattern)
-                            .build());
-            // append localized currency name
-            return format.format(amount) + " " + localizedCurrencyName;
+        if (amountAttribute.getCurrency() == null) {
+            return formatNumber(amountAttribute.getAmount(), locale);
         }
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
-        return numberFormat.format(amountAttribute.getAmount().doubleValue());
+        final CurrencyUnit currency;
+        try {
+            currency = Monetary.getCurrency(amountAttribute.getCurrency());
+        } catch (UnknownCurrencyException ex) {
+            // ignore errors for unsupported currencies, perform only basic formatting
+            return formatNumber(amountAttribute.getAmount(), locale) + " " + amountAttribute.getCurrency();
+        }
+        final MonetaryAmount amount = Monetary.getDefaultAmountFactory().setCurrency(currency).setNumber(amountAttribute.getAmount()).create();
+        final AbstractMessageSource messageSource = i18NService.getMessageSource();
+        String pattern = "###0.00";
+        try {
+            pattern = messageSource.getMessage("currency.pattern", null, locale);
+        } catch (NoSuchMessageException ex) {
+            // pattern is not specified - use default pattern
+        }
+        final MonetaryAmountFormat format;
+        String localizedCurrencyName = amountAttribute.getCurrency();
+        try {
+            localizedCurrencyName = messageSource.getMessage("currency." + amountAttribute.getCurrency() + ".name", null, locale);
+        } catch (NoSuchMessageException ex) {
+            // currency is not localized - display it as it was sent in the operation
+        }
+        format = MonetaryFormats.getAmountFormat(
+                AmountFormatQueryBuilder.of(locale)
+                        .set("pattern", pattern)
+                        .build());
+        // append localized currency name
+        return format.format(amount) + " " + localizedCurrencyName;
     }
 
     /**
