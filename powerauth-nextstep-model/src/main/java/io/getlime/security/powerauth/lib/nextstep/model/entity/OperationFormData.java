@@ -238,9 +238,9 @@ public class OperationFormData {
     }
 
     /**
-     * Set note.
+     * Set localized note.
      * @param noteId Note ID.
-     * @param note note.
+     * @param note Localized note.
      */
     @JsonIgnore
     public void addNote(String noteId, String note) {

@@ -90,7 +90,7 @@ public class HomeController {
         formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
         formData.addKeyValue("operation.account", paymentForm.getAccount(), OperationFormFieldAttributeFormatted.ValueFormatType.ACCOUNT);
         formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), OperationFormFieldAttributeFormatted.ValueFormatType.DATE);
-        formData.addNote("operation.note", paymentForm.getNote());
+        formData.addNote("operation.note", paymentForm.getNote(), OperationFormFieldAttributeFormatted.ValueFormatType.TEXT);
 
         // Sample operation configuration for bank account choice select.
         // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();
