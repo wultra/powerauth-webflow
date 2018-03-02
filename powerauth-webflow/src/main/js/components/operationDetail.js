@@ -141,7 +141,7 @@ export default class OperationDetail extends React.Component {
                                             {item.label}
                                         </div>
                                         <div className="col-xs-6 value">
-                                            <span className="amount">{item.amount}</span> {item.currency}
+                                            <span className="amount">{item.formattedValue}</span>
                                         </div>
                                     </div>
                                 )
@@ -152,7 +152,7 @@ export default class OperationDetail extends React.Component {
                                             {item.label}
                                         </div>
                                         <div className="col-xs-6 value">
-                                            {item.value}
+                                            {item.formattedValue}
                                         </div>
                                     </div>
                                 )
@@ -161,7 +161,7 @@ export default class OperationDetail extends React.Component {
                                     <div className="row attribute" key={item.id}>
                                         <div className="col-xs-12">
                                             <div className="key">{item.label}</div>
-                                            <div className="value">{item.note}</div>
+                                            <div className="value">{item.formattedValue}</div>
                                         </div>
                                     </div>
                                 )

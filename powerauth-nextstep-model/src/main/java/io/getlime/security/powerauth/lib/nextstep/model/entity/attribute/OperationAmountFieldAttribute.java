@@ -7,7 +7,7 @@ import java.math.BigDecimal;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationAmountFieldAttribute extends OperationFormFieldAttribute {
+public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFormatted {
 
     private BigDecimal amount;
     private String currency;
@@ -15,6 +15,7 @@ public class OperationAmountFieldAttribute extends OperationFormFieldAttribute {
 
     public OperationAmountFieldAttribute() {
         this.type = Type.AMOUNT;
+        this.valueFormatType = ValueFormatType.AMOUNT;
     }
 
     public BigDecimal getAmount() {

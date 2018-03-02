@@ -5,12 +5,18 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationNoteFieldAttribute extends OperationFormFieldAttribute {
+public class OperationNoteFieldAttribute extends OperationFormFieldAttributeFormatted {
 
     private String note;
 
     public OperationNoteFieldAttribute() {
         this.type = Type.NOTE;
+        this.valueFormatType = ValueFormatType.TEXT;
+    }
+
+    public OperationNoteFieldAttribute(ValueFormatType valueFormatType) {
+        this.type = Type.NOTE;
+        this.valueFormatType = valueFormatType;
     }
 
     public String getNote() {
