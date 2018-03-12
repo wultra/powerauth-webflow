@@ -26,10 +26,12 @@ a:hover, a:active, a:focus {
 
 .message-information {
     color: #777777;
+    word-wrap: break-word;
 }
 
 .message-success {
     color: #4BA819;
+    word-wrap: break-word;
 }
 
 .network-error {
@@ -51,6 +53,7 @@ a:hover, a:active, a:focus {
 
 .message-error {
     color: #C0007F;
+    word-wrap: break-word;
 }
 
 .font-small {
@@ -150,10 +153,12 @@ a:hover, a:active, a:focus {
 
 #operation .key {
     color: #777777;
+    word-wrap: break-word;
 }
 
 #operation .value {
     color: #333333;
+    word-wrap: break-word;
 }
 
 #operation .col-xs-6.key {
