@@ -196,7 +196,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      */
     @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
