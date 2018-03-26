@@ -13,25 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception;
+package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 
 /**
- * Offline mode disabled exception.
+ * Exception for state when activation is missing.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OfflineModeDisabledException extends AuthStepException {
+public class OfflineModeMissingActivationException extends AuthStepException {
 
-    /**
-     * Constructor with message.
-     *
-     * @param message Error message.
-     */
-    public OfflineModeDisabledException(String message) {
-        super(message, "offlineMode.disabled");
+    public OfflineModeMissingActivationException(String message) {
+        super(message, "offlineMode.noActivation");
     }
 
 }

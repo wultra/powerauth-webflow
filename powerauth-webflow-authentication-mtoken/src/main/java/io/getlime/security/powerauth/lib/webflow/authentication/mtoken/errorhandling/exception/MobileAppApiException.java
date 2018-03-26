@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception;
+package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception;
 
 /**
  * @author Roman Strobl, roman.strobl@lime-company.eu

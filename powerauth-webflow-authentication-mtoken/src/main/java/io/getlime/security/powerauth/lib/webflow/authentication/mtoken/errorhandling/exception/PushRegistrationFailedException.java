@@ -13,25 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception;
-
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception;
 
 /**
- * Invalid authorization code exception.
+ * Exception thrown when push registration fails.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OfflineModeInvalidAuthCodeException extends AuthStepException {
+public class PushRegistrationFailedException extends MobileAppApiException {
 
-    /**
-     * Constructor with message.
-     *
-     * @param message Error message.
-     */
-    public OfflineModeInvalidAuthCodeException(String message) {
-        super(message, "offlineMode.invalidAuthCode");
+    public PushRegistrationFailedException() {
+        super("Push registration failed in Mobile Token API component.");
     }
 
 }
