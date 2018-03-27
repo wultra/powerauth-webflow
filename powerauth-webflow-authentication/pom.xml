@@ -19,6 +19,7 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -36,6 +37,7 @@
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
 
+        <!-- PowerAuth Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-client</artifactId>
@@ -51,22 +53,22 @@
             <artifactId>powerauth-webflow-i18n</artifactId>
             <version>0.19.0</version>
         </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-java-client-spring</artifactId>
+            <version>0.18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.javamoney</groupId>
+            <artifactId>moneta</artifactId>
+            <version>1.1</version>
+        </dependency>
 
         <!-- TEST -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-java-client-spring</artifactId>
-            <version>0.17.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.javamoney</groupId>
-            <artifactId>moneta</artifactId>
-            <version>1.1</version>
         </dependency>
 
     </dependencies>

@@ -44,7 +44,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>4.3.12.RELEASE</version>
+            <version>4.3.14.RELEASE</version>
         </dependency>
 
         <!-- PowerAuth Dependencies -->
@@ -56,17 +56,12 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
-            <version>0.17.1</version>
+            <version>0.18.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
-            <version>0.17.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-java-crypto</artifactId>
-            <version>0.17.0</version>
+            <version>0.18.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
@@ -78,12 +73,12 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.2</version>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.3.0</version>
+            <version>3.3.2</version>
         </dependency>
     </dependencies>
 
