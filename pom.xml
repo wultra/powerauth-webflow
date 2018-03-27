@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>1.5.8.RELEASE</version>
+		<version>1.5.10.RELEASE</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
@@ -79,7 +79,8 @@
 		<module>powerauth-webflow-i18n</module>
 		<module>powerauth-webflow-resources</module>
 		<module>powerauth-webflow-client</module>
-	</modules>
+        <module>powerauth-mtoken-model</module>
+    </modules>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

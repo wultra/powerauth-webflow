@@ -37,8 +37,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.ActivationNotActiveException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.ActivationNotAvailableException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotActiveException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotAvailableException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;

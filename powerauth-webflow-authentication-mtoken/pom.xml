@@ -34,11 +34,20 @@
     <version>0.19.0</version>
 
     <dependencies>
+
+        <!-- Spring Dependencies -->
         <dependency>
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-security</artifactId>
             <version>2.2.4.RELEASE</version> <!-- 2.3.0 seems a bit buggy, SWS-972 and SWS-972 -->
         </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-messaging</artifactId>
+            <version>4.3.12.RELEASE</version>
+        </dependency>
+
+        <!-- PowerAuth Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
@@ -60,10 +69,12 @@
             <version>0.17.0</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-messaging</artifactId>
-            <version>4.3.12.RELEASE</version>
+            <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-mtoken-model</artifactId>
+            <version>0.19.0</version>
         </dependency>
+
+        <!-- Other Dependencies -->
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>

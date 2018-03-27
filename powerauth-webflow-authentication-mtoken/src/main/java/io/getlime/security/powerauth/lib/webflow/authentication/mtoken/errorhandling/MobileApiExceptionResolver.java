@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2018 Lime - HighTech Solutions s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception;
+package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -37,10 +42,15 @@ import java.util.logging.Logger;
  */
 
 @ControllerAdvice
-@Order(MobileTokenApiExceptionResolver.PRECEDENCE)
-public class MobileTokenApiExceptionResolver {
+@Order(MobileApiExceptionResolver.PRECEDENCE)
+public class MobileApiExceptionResolver {
 
     static final int PRECEDENCE = -101;
+
+    private ErrorResponse error(String code, Throwable t) {
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Mobile Token API component", t);
+        return new ErrorResponse(new Error(code, t.getMessage()));
+    }
 
     /**
      * Exception handler for push registration related exception.
@@ -50,8 +60,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(PushRegistrationFailedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("PUSH_REGISTRATION_FAILED", t.getMessage()));
+        return error(ErrorCode.PUSH_REGISTRATION_FAILED, t);
     }
 
     /**
@@ -62,8 +71,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(InvalidRequestObjectException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestObjectException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("INVALID_REQUEST", t.getMessage()));
+        return error(ErrorCode.INVALID_REQUEST, t);
     }
 
     /**
@@ -74,8 +82,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(InvalidActivationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("INVALID_ACTIVATION", t.getMessage()));
+        return error(ErrorCode.INVALID_ACTIVATION, t);
     }
 
     /**
@@ -86,8 +93,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(PowerAuthAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public @ResponseBody ErrorResponse handlePowerAuthAuthenticationException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("POWERAUTH_AUTH_FAIL", t.getMessage()));
+        return error(ErrorCode.POWERAUTH_AUTH_FAIL, t);
     }
 
     /**
@@ -98,8 +104,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(OperationAlreadyFinishedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_ALREADY_FINISHED", t.getMessage()));
+        return error(ErrorCode.OPERATION_ALREADY_FINISHED, t);
     }
 
     /**
@@ -110,8 +115,7 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(OperationAlreadyFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_ALREADY_FAILED", t.getMessage()));
+        return error(ErrorCode.OPERATION_ALREADY_FAILED, t);
     }
 
     /**
@@ -122,7 +126,6 @@ public class MobileTokenApiExceptionResolver {
     @ExceptionHandler(OperationExpiredException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", t);
-        return new ErrorResponse(new Error("OPERATION_EXPIRED", t.getMessage()));
+        return error(ErrorCode.OPERATION_EXPIRED, t);
     }
 }
