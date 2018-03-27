@@ -21,6 +21,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttributeFormatted;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +74,7 @@ public class HomeController {
         paymentForm.setCurrency("CZK");
         paymentForm.setAccount("238400856/0300");
         paymentForm.setNote("Utility Bill Payment - 05/2017");
-        paymentForm.setDueDate("06/29/2017");
+        paymentForm.setDueDate("2017-06-29");
         model.addAttribute("paymentForm", paymentForm);
 
         return "home";
@@ -84,11 +85,12 @@ public class HomeController {
         String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
-        formData.addMessage("operation.message");
+        formData.addGreeting("operation.greeting");
+        formData.addSummary("operation.summary");
         formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
-        formData.addKeyValue("operation.account", paymentForm.getAccount());
-        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate());
-        formData.addNote("operation.note", paymentForm.getNote());
+        formData.addKeyValue("operation.account", paymentForm.getAccount(), OperationFormFieldAttributeFormatted.ValueFormatType.ACCOUNT);
+        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), OperationFormFieldAttributeFormatted.ValueFormatType.DATE);
+        formData.addNote("operation.note", paymentForm.getNote(), OperationFormFieldAttributeFormatted.ValueFormatType.TEXT);
 
         // Sample operation configuration for bank account choice select.
         // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();

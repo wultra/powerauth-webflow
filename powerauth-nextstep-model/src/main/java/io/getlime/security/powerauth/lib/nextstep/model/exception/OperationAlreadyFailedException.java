@@ -25,7 +25,7 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class OperationAlreadyFailedException extends NextStepServiceException {
 
-    public static final String CODE = "OPERATION_ALREADY_FINISHED";
+    public static final String CODE = "OPERATION_ALREADY_FAILED";
 
     private Error error;
 

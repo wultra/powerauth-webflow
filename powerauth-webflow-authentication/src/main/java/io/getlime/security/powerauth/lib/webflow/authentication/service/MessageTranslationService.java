@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,8 @@ import java.util.logging.Logger;
 public class MessageTranslationService {
 
     private final I18NService i18NService;
+    private final ValueFormatterService valueFormatterService;
+
     private static final String CHOSEN_BANK_ACCOUNT_NUMBER_INPUT = "operation.bankAccountChoice";
     private static final String MISSING_KEY_MESSAGE = "MISSING_LOCALIZATION_FOR_FIELD";
     private static final String MISSING_VALUE_MESSAGE = "MISSING_VALUE_FOR_FIELD";
@@ -46,9 +49,11 @@ public class MessageTranslationService {
     /**
      * Service constructor
      * @param i18NService I18N service.
+     * @param valueFormatterService Value formatter service.
      */
-    public MessageTranslationService(I18NService i18NService) {
+    public MessageTranslationService(I18NService i18NService, ValueFormatterService valueFormatterService) {
         this.i18NService = i18NService;
+        this.valueFormatterService = valueFormatterService;
     }
 
     /**
@@ -76,13 +81,48 @@ public class MessageTranslationService {
             }
         }
 
-        // Translate title message the {id} notation
-        OperationFormAttribute message = formData.getMessage();
-        if (message != null) {
-            String messageLabel = localize(message.getId());
-            if (messageLabel != null) {
-                String translatedMessage = translateMessage(messageLabel, idValueMap);
-                formData.addMessage(message.getId(), translatedMessage);
+        // Translate greeting using the {id} notation
+        OperationFormAttribute greeting = formData.getGreeting();
+        if (greeting != null) {
+            String greetingLabel = localize(greeting.getId());
+            if (greetingLabel != null) {
+                String translatedGreeting = translateMessage(greetingLabel, idValueMap);
+                formData.addGreeting(greeting.getId(), translatedGreeting);
+            }
+        }
+
+        // Translate summary using the {id} notation
+        OperationFormAttribute summary = formData.getSummary();
+        if (summary != null) {
+            String summaryLabel = localize(summary.getId());
+            if (summaryLabel != null) {
+                String translatedSummary = translateMessage(summaryLabel, idValueMap);
+                formData.addSummary(summary.getId(), translatedSummary);
+            }
+        }
+
+        // Format form field attributes
+        formatFormFieldAttributes(formData.getParameters());
+    }
+
+    /**
+     * Format form field attributes.
+     * @param attributes Form field attributes
+     */
+    private void formatFormFieldAttributes(List<OperationFormFieldAttribute> attributes) {
+        if (attributes == null) {
+            return;
+        }
+        for (OperationFormFieldAttribute attribute : attributes) {
+            if (attribute instanceof OperationFormFieldAttributeFormatted) {
+                OperationFormFieldAttributeFormatted formattedAttribute = (OperationFormFieldAttributeFormatted) attribute;
+                String formattedValue;
+                if (formattedAttribute.getValueFormatType() == OperationFormFieldAttributeFormatted.ValueFormatType.LOCALIZED_TEXT) {
+                    formattedValue = localize(valueFormatterService.getValue(attribute));
+                } else {
+                    formattedValue = valueFormatterService.format(formattedAttribute, LocaleContextHolder.getLocale());
+                }
+                formattedAttribute.setFormattedValue(formattedValue);
             }
         }
     }

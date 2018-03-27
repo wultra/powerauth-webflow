@@ -29,8 +29,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.QRCodeInvalidDataException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.OfflineSignatureQrCode;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.QRCodeAuthenticationRequest;
@@ -88,10 +88,10 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     @Override
     protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
-            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+            throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         if (request.getAuthCode() == null || !request.getAuthCode().matches("^[0-9]{8}-[0-9]{8}$")) {
-            throw new AuthStepException("offlineMode.invalidAuthCode", new IllegalArgumentException());
+            throw new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
         }
         final GetOperationDetailResponse operation = getOperation();
         // nonce and dataHash are received from UI - they were stored together with the QR code
@@ -116,14 +116,14 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), null);
             if (response.getResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
-                throw new AuthStepException("authentication.maxAttemptsExceeded", null);
+                throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
             }
             GetOperationDetailResponse updatedOperation = getOperation();
             remainingAttemptsNS = updatedOperation.getRemainingAttempts();
         } catch (NextStepServiceException e) {
             throw new AuthStepException(e.getError().getMessage(), e);
         }
-        AuthStepException authEx = new AuthStepException("offlineMode.invalidAuthCode", null);
+        OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid.");
         Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsPA, remainingAttemptsNS);
         authEx.setRemainingAttempts(remainingAttempts);
         throw authEx;
@@ -140,14 +140,16 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
     /**
      * Generates the QR code to be displayed to the user.
-     *
+     * @param request QR code init request.
      * @return Response with QR code as String-based PNG image.
+     * @throws NextStepServiceException In case communication with Next Step service fails.
+     * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws QRCodeInvalidDataException, NextStepServiceException, AuthStepException {
+    public QRCodeInitResponse initQRCode(@RequestBody QRCodeInitRequest request) throws NextStepServiceException, AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
-            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+            throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
@@ -159,13 +161,12 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
         if (configuredActivationId == null) {
             // unexpected state - activation is not set or configuration is invalid
-            throw new QRCodeInvalidDataException("offlineMode.noActivation");
+            throw new OfflineModeMissingActivationException("Activation is not configured");
         }
 
         if (request.getActivationId() != null && !request.getActivationId().equals(configuredActivationId)) {
             // unexpected state - UI requests different activationId than configured activationId
-            throw new QRCodeInvalidDataException("offlineMode.invalidActivation");
-
+            throw new OfflineModeInvalidActivationException("Activation is invalid");
         }
 
         // get activation status
@@ -241,7 +242,12 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         } catch (AuthStepException e) {
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            if (e.getMessageId() != null) {
+                // prefer localized message over regular message string
+                response.setMessage(e.getMessageId());
+            } else {
+                response.setMessage(e.getMessage());
+            }
             response.setRemainingAttempts(e.getRemainingAttempts());
             return response;
         }
@@ -251,12 +257,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Cancels the QR code authorization.
      *
      * @return Authorization response.
+     * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
     @ResponseBody
     public QRCodeAuthenticationResponse cancelAuthentication() throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
-            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+            throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         try {
             GetOperationDetailResponse operation = getOperation();
@@ -278,20 +285,20 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      *
      * @param activation Activation entity.
      * @return QR code as String-based PNG image.
-     * @throws QRCodeInvalidDataException Thrown when data is invalid.
+     * @throws AuthStepException In case QR code generation fails.
      */
-    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws QRCodeInvalidDataException, AuthStepException {
+    private OfflineSignatureQrCode generateQRCode(ActivationEntity activation) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
-            throw new AuthStepException("offlineMode.disabled", new IllegalStateException());
+            throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
-        String messageText = operation.getFormData().getMessage().getValue();
+        String messageText = operation.getFormData().getSummary().getValue();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 
         if (!response.getData().equals(operationData)) {
-            throw new QRCodeInvalidDataException("offlineMode.invalidData");
+            throw new OfflineModeInvalidDataException("Invalid data received in offline mode");
         }
         // do not check message, some sanitization could be done by PowerAuth server
 

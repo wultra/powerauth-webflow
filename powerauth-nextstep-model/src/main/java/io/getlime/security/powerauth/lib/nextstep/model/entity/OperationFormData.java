@@ -16,7 +16,8 @@ import java.util.Map;
 public class OperationFormData {
 
     private OperationFormAttribute title;
-    private OperationFormAttribute message;
+    private OperationFormAttribute greeting;
+    private OperationFormAttribute summary;
     private List<OperationFormFieldConfig> config;
     private List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
@@ -97,6 +98,7 @@ public class OperationFormData {
     /**
      * Set localized title.
      * @param titleId Title ID.
+     * @param title Localized title.
      */
     @JsonIgnore
     public void addTitle(String titleId, String title) {
@@ -115,46 +117,91 @@ public class OperationFormData {
     }
 
     /**
-     * Set message form attribute.
-     * @param message Message form attribute.
+     * Set greeting form attribute.
+     * @param greeting Greeting form attribute.
      */
-    public void setMessage(OperationFormAttribute message) {
-        if (message == null) {
+    public void setGreeting(OperationFormAttribute greeting) {
+        if (greeting == null) {
             // avoid JSON mapping null title
             return;
         }
-        this.message = message;
+        this.greeting = greeting;
     }
 
     /**
-     * Set message.
-     * @param messageId Message ID.
+     * Set greeting.
+     * @param greetingId Greeting ID.
      */
     @JsonIgnore
-    public void addMessage(String messageId) {
+    public void addGreeting(String greetingId) {
         OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(messageId);
-        this.message = attr;
+        attr.setId(greetingId);
+        this.greeting = attr;
     }
 
     /**
-     * Set localized message.
-     * @param messageId Message ID.
+     * Set localized greeting.
+     * @param greetingId Greeting ID.
+     * @param greeting Localized greeting.
      */
     @JsonIgnore
-    public void addMessage(String messageId, String message) {
+    public void addGreeting(String greetingId, String greeting) {
         OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(messageId);
-        attr.setValue(message);
-        this.message = attr;
+        attr.setId(greetingId);
+        attr.setValue(greeting);
+        this.greeting = attr;
     }
 
     /**
-     * Get message form attribute.
-     * @return Message form attribute.
+     * Get summary form attribute.
+     * @return Summary form attribute.
      */
-    public OperationFormAttribute getMessage() {
-        return message;
+    public OperationFormAttribute getGreeting() {
+        return greeting;
+    }
+
+    /**
+     * Set summary form attribute.
+     * @param summary Summary form attribute.
+     */
+    public void setSummary(OperationFormAttribute summary) {
+        if (summary == null) {
+            // avoid JSON mapping null title
+            return;
+        }
+        this.summary = summary;
+    }
+
+    /**
+     * Set summary.
+     * @param summaryId Message ID.
+     */
+    @JsonIgnore
+    public void addSummary(String summaryId) {
+        OperationFormAttribute attr = new OperationFormAttribute();
+        attr.setId(summaryId);
+        this.summary = attr;
+    }
+
+    /**
+     * Set localized summary.
+     * @param summaryId Message ID.
+     * @param summary Localized summary.
+     */
+    @JsonIgnore
+    public void addSummary(String summaryId, String summary) {
+        OperationFormAttribute attr = new OperationFormAttribute();
+        attr.setId(summaryId);
+        attr.setValue(summary);
+        this.summary = attr;
+    }
+
+    /**
+     * Get summary form attribute.
+     * @return Summary form attribute.
+     */
+    public OperationFormAttribute getSummary() {
+        return summary;
     }
 
     /**
@@ -204,6 +251,20 @@ public class OperationFormData {
     }
 
     /**
+     * Set a formatted note.
+     * @param noteId Note ID.
+     * @param note Note.
+     * @param valueFormatType Value format type.
+     */
+    @JsonIgnore
+    public void addNote(String noteId, String note, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+        OperationNoteFieldAttribute attr = new OperationNoteFieldAttribute(valueFormatType);
+        attr.setId(noteId);
+        attr.setNote(note);
+        saveAttribute(attr);
+    }
+
+    /**
      * Get note.
      * @return Note.
      */
@@ -214,7 +275,7 @@ public class OperationFormData {
             return null;
         }
         if (attrs.size()>1) {
-            throw new IllegalStateException("Multiple attributes of type MESSAGE found");
+            throw new IllegalStateException("Multiple attributes of type NOTE found");
         }
         return (OperationNoteFieldAttribute) attrs.get(0);
     }
@@ -223,6 +284,8 @@ public class OperationFormData {
      * Add a bank account choice.
      * @param id Bank account choice ID.
      * @param bankAccounts List of bank accounts.
+     * @param enabled Whether choice is enabled.
+     * @param defaultValue Default bank account value.
      */
     @JsonIgnore
     public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
@@ -242,6 +305,20 @@ public class OperationFormData {
     @JsonIgnore
     public void addKeyValue(String id, String value) {
         OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute();
+        attr.setId(id);
+        attr.setValue(value);
+        saveAttribute(attr);
+    }
+
+    /**
+     * Add a formatted key-value attribute.
+     * @param id Attribute ID.
+     * @param value Attribute value.
+     * @param valueFormatType Value format type.
+     */
+    @JsonIgnore
+    public void addKeyValue(String id, String value, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+        OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute(valueFormatType);
         attr.setId(id);
         attr.setValue(value);
         saveAttribute(attr);

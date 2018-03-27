@@ -1,0 +1,251 @@
+body {
+    font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", sans-serif;
+    color: #777777;
+    font-size: 14pt;
+}
+
+.background {
+    /* background: url('../images/background.png') 0 0 repeat-x;*/
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -1;
+    width: 100%;
+    height: 100%;
+}
+
+a {
+    color: #7FC000;
+    text-decoration: none;
+}
+
+a:hover, a:active, a:focus {
+    color: #4c7400 !important;
+    text-decoration: none;
+}
+
+.message-information {
+    color: #777777;
+    word-wrap: break-word;
+}
+
+.message-success {
+    color: #4BA819;
+    word-wrap: break-word;
+}
+
+.network-error {
+    width: 200px;
+    height: auto;
+    position: absolute;
+    left: 50%;
+    margin-left: -100px;
+    background-color: #383838;
+    color: #F0F0F0;
+    font-size: 20px;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    -webkit-box-shadow: 0px 0 24px -1px rgba(150, 150, 150, 1);
+    -moz-box-shadow: 0px 0px 24px -1px rgba(150, 150, 150, 1);
+    box-shadow: 0px 0px 24px -1px rgba(150, 150, 150, 1);
+}
+
+.message-error {
+    color: #C0007F;
+    word-wrap: break-word;
+}
+
+.font-small {
+    font-size: 12pt;
+}
+
+.font-tiny {
+    font-size: 10pt;
+}
+
+#logo {
+    margin-bottom: 40px;
+    height: 60px;
+    background-image: url("../images/logo.png");
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+#page-wrap {
+    margin: 80px auto 40px auto;
+    width: 480px;
+}
+
+.content-wrap {
+    margin: 0 auto;
+    width: 320px;
+}
+
+.btn-success {
+    background-color: #7FC000;
+    border: none;
+}
+
+.btn-success:hover, .btn-success:active, .btn-success:focus {
+    background-color: #4c7400 !important;
+    color: white !important;
+    border: none;
+}
+
+.image {
+    margin: 40px auto;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.image.mtoken {
+    background-image: url("../images/token.png");
+    width: 120px;
+    height: 120px;
+    margin: 20px auto;
+}
+
+.image-result {
+    margin: 40px auto;
+    width: 80px;
+    height: 80px;
+    background-position: 50% 50%;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.image-result.error {
+    background-image: url("../images/image-error.png");
+}
+
+.image-result.success {
+    background-image: url("../images/image-information.png");
+}
+
+#lang {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#operation .panel-body {
+    padding: 30px;
+}
+
+#operation .operation-approve {
+    text-align: center;
+}
+
+#operation .operation-approve h3 {
+    color: #7FC000;
+    font-size: 18pt;
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+#operation .operation-approve p {
+    color: #777777;
+    font-size: 14pt;
+}
+
+#operation .key {
+    color: #777777;
+    word-wrap: break-word;
+}
+
+#operation .value {
+    color: #333333;
+    word-wrap: break-word;
+}
+
+#operation .col-xs-6.key {
+    text-align: left;
+}
+
+#operation .col-xs-6.value {
+    text-align: right;
+}
+
+#operation .col-xs-12 .key {
+    text-align: left;
+}
+
+#operation .col-xs-12 {
+    text-align: left;
+}
+
+#operation .col-xs-12 .value {
+    text-align: left;
+}
+
+#operation .amount {
+    font-size: 16pt;
+}
+
+#operation .attribute {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+#operation .auth-actions {
+    margin-top: 20px;
+}
+
+#operation .buttons {
+    margin-top: 20px;
+}
+
+#operation .btn {
+    width: 100%;
+}
+
+/* Base styling */
+
+.tint {
+    color: #7FC000;
+}
+
+.strong {
+    font-weight: bold;
+}
+
+/* React Select Fix */
+
+.Select-input {
+    height: 68px;
+}
+
+.Select-placeholder {
+    line-height: 68px
+}
+
+/* LOGIN */
+
+#login .panel-body {
+    padding: 30px;
+}
+
+#login .panel-body .title {
+    color: #7FC000;
+}
+
+#login .buttons {
+    margin-top: 40px;
+}
+
+#login .btn {
+    width: 100%;
+}
+
+.panel {
+    border-radius: 20px;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.20);
+}
+
+.title {
+    font-size: 16pt;
+    margin: 10px 10px 20px 10px;
+}

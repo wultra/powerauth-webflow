@@ -29,10 +29,6 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "wf_operation_session")
-@NamedQueries({
-        @NamedQuery(name = "OperationSessionEntity.findActiveOperationsByHttpSessionId", query = "SELECT o FROM OperationSessionEntity o WHERE o.httpSessionId = ?1 AND o.result='CONTINUE'")
-})
-
 public class OperationSessionEntity implements Serializable {
 
     private static final long serialVersionUID = -5370629764971469306L;

@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -26,13 +27,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.InvalidActivationException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.MobileAppApiException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.exception.OperationExpiredException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
+import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenCancelOperationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenSignRequest;
+import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
+import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
@@ -93,7 +96,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      */
     @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -111,7 +114,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
     })
-    public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -122,7 +125,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
-    private ObjectResponse<List<GetOperationDetailResponse>> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
             String userId = apiAuthentication.getUserId();
@@ -132,8 +135,27 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new InvalidActivationException();
             }
 
+            // Get the list of operations for given user
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            return new ObjectResponse<>(operationList);
+
+            // Prepare converter
+            final OperationConverter converter = new OperationConverter();
+
+            // At the moment, we only support 2FA signatures with both
+            // knowledge and biometry factors
+            AllowedSignatureType allowedSignatureType = new AllowedSignatureType();
+            allowedSignatureType.setType(AllowedSignatureType.Type.MULTIFACTOR_2FA);
+            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.toString());
+            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString());
+
+            // Prepare converted result with operations
+            OperationListResponse result = new OperationListResponse();
+            for (GetOperationDetailResponse operation: operationList) {
+                result.add(converter.fromOperationDetailResponse(operation, allowedSignatureType));
+            }
+
+            // Return response
+            return new ObjectResponse<>(result);
         } else {
             throw new PowerAuthAuthenticationException();
         }
@@ -151,7 +173,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      */
     @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/authorize")
-    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<MobileTokenSignRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (request.getRequestObject() == null) {
             throw new InvalidRequestObjectException();
@@ -196,7 +218,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      */
     @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Object cancelOperation(@RequestBody ObjectRequest<MobileTokenCancelOperationRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();

@@ -42,6 +42,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of unexpected errors.
+     * @param t Throwable.
      * @return Response with error information.
      */
     @ExceptionHandler(Throwable.class)
@@ -83,6 +84,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of validation errors.
+     * @param ex Exception.
      * @return Response with error information.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -137,7 +139,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of user not found exception.
-     *
+     * @param ex Exception.
      * @return Response with error information.
      */
     @ExceptionHandler(UserNotFoundException.class)
@@ -149,7 +151,7 @@ public class DefaultExceptionResolver {
 
     /**
      * Handling of exceptions occurring during communication with remote backends.
-     *
+     * @param ex Exception.
      * @return Response with error information.
      */
     @ExceptionHandler(DataAdapterRemoteException.class)

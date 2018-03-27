@@ -77,9 +77,9 @@ export default class Login extends React.Component {
                                     undefined
                                 )}
                             </FormGroup>
-                        ) : (
-                            undefined
-                        )
+                            ) : (
+                                undefined
+                            )
                         }
                         <FormGroup>
                             <FormControl autoComplete="new-password" ref="username" type="text"

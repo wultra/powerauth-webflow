@@ -88,7 +88,8 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             final String operationData = "{}";
             final OperationFormData formData = new OperationFormData();
             formData.addTitle( "login.title");
-            formData.addMessage("login.message");
+            formData.addGreeting("login.greeting");
+            formData.addSummary("login.summary");
             List<KeyValueParameter> params = new ArrayList<>();
             return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {
                 @Override

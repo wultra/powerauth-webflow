@@ -8,13 +8,13 @@
     <artifactId>powerauth-nextstep-model</artifactId>
     <name>powerauth-nextstep-model</name>
     <groupId>io.getlime.security</groupId>
-    <version>0.18.0</version>
+    <version>0.19.0</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.18.0</version>
+        <version>0.19.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -22,12 +22,12 @@
         <dependency>
             <groupId>io.getlime.core</groupId>
             <artifactId>rest-model-base</artifactId>
-            <version>1.0.3</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.9.2</version>
+            <version>2.9.4</version>
         </dependency>
     </dependencies>
 

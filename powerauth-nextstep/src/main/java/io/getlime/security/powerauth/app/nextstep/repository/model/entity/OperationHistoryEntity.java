@@ -30,7 +30,6 @@ import java.util.Date;
  */
 @Entity
 @Table(name = "ns_operation_history")
-@NamedQuery(name = "OperationHistoryEntity.findMaxResultId", query = "SELECT max(h.primaryKey.resultId) FROM OperationHistoryEntity h WHERE h.primaryKey.operationId=?1")
 public class OperationHistoryEntity implements Serializable {
 
     private static final long serialVersionUID = 4536813173706547247L;

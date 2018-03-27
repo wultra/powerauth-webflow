@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Component;
 
@@ -35,6 +36,8 @@ public interface OperationRepository extends CrudRepository<OperationEntity, Str
      * @param userId user ID
      * @return List of pending operations.
      */
+    @Query("SELECT o FROM OperationEntity o WHERE o.userId=?1 AND o.result='CONTINUE' " +
+            "AND o.timestampExpires > CURRENT_TIMESTAMP ORDER BY o.timestampExpires")
     List<OperationEntity> findPendingOperationsForUser(String userId);
 
 }

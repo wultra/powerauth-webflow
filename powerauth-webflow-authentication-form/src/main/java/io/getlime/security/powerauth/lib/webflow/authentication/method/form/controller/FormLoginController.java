@@ -30,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +63,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     }
 
     /**
-     * Authenticate using username / password authentiation.
+     * Authenticate using username / password authentication.
      * @param request Authentication request.
      * @return Authenticated user ID.
      * @throws AuthStepException Thrown when authentication fails.
@@ -84,7 +85,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
                     if (response.getResult() == AuthResult.FAILED) {
                         // FAILED result instead of CONTINUE means the authentication method is failed
-                        throw new AuthStepException("authentication.maxAttemptsExceeded", e);
+                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                     }
                 }
                 GetOperationDetailResponse updatedOperation = getOperation();
@@ -150,7 +151,12 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         } catch (AuthStepException e) {
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            if (e.getMessageId() != null) {
+                // prefer localized message over regular message string
+                response.setMessage(e.getMessageId());
+            } else {
+                response.setMessage(e.getMessage());
+            }
             response.setRemainingAttempts(e.getRemainingAttempts());
             return response;
         }

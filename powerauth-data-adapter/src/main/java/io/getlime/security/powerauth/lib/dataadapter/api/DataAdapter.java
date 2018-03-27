@@ -37,6 +37,7 @@ public interface DataAdapter {
      *
      * @param username Username for user authentication.
      * @param password Password for user authentication.
+     * @return UserDetailResponse Response with user details.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
@@ -56,6 +57,7 @@ public interface DataAdapter {
      * @param userId User ID.
      * @param operationName Operation name.
      * @param operationId Operation ID.
+     * @param formData Operation form data.
      * @return Response with bank account details.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws UserNotFoundException Thrown when user does not exist.
