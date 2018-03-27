@@ -29,6 +29,9 @@ public class FormDataConverter {
     private AttributeConverter attributeConverter = new AttributeConverter();
 
     public FormData fromOperationFormData(OperationFormData input) {
+        if (input == null) {
+            return null;
+        }
         FormData result = new FormData();
         result.setTitle(input.getTitle().getValue());
         result.setMessage(input.getGreeting().getValue());

@@ -31,6 +31,9 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.KeyValue
 public class AttributeConverter {
 
     public Attribute fromOperationFormFieldAttribute(OperationFormFieldAttribute input) {
+        if (input == null) {
+            return null;
+        }
         switch (input.getType()) {
             case AMOUNT: {
                 OperationAmountFieldAttribute attr = (OperationAmountFieldAttribute) input;

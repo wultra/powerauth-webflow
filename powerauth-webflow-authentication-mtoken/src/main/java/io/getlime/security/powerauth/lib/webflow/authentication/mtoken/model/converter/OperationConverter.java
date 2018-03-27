@@ -29,6 +29,9 @@ public class OperationConverter {
     private FormDataConverter formDataConverter = new FormDataConverter();
 
     public Operation fromOperationDetailResponse(GetOperationDetailResponse input, AllowedSignatureType allowedSignatureType) {
+        if (input == null || allowedSignatureType == null) { // we also do not want to have null signature type
+            return null;
+        }
         Operation result = new Operation();
         result.setId(input.getOperationId());
         result.setData(input.getOperationData());
