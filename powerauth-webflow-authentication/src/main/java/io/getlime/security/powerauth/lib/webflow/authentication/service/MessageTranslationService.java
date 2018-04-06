@@ -129,7 +129,7 @@ public class MessageTranslationService {
                 continue;
             }
             // Localization of banners
-            if (attribute instanceof OperationBannerFieldAttribute) {
+            if (attribute.getType() == OperationFormFieldAttribute.Type.BANNER) {
                 OperationBannerFieldAttribute banner = (OperationBannerFieldAttribute) attribute;
                 String localizedMessage = localize(banner.getId());
                 banner.setMessage(localizedMessage);
