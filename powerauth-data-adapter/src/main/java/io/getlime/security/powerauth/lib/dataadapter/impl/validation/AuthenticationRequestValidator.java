@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
 import org.springframework.stereotype.Component;
@@ -57,6 +58,7 @@ public class AuthenticationRequestValidator implements Validator {
         // update validation logic based on the real Data Adapter requirements
         String username = authRequest.getUsername();
         String password = authRequest.getPassword();
+        OperationContext operationContext = authRequest.getOperationContext();
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.username", "login.username.empty");
         if (username!=null && username.length() > 30) {
@@ -71,6 +73,10 @@ public class AuthenticationRequestValidator implements Validator {
         AuthenticationType authType = authRequest.getType();
         if (authType != AuthenticationType.BASIC) {
             errors.rejectValue("requestObject.type", "login.type.unsupported");
+        }
+
+        if (operationContext == null) {
+            errors.rejectValue("requestObject.operationContext", "operationContext.missing");
         }
     }
 }

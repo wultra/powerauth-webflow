@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Class representing change of operation formData.
+ * Class representing change of operation form data.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */

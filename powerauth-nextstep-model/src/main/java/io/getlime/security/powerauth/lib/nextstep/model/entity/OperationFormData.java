@@ -2,6 +2,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.BannerType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,10 +17,11 @@ import java.util.Map;
  */
 public class OperationFormData {
 
-    private OperationFormAttribute title;
-    private OperationFormAttribute greeting;
-    private OperationFormAttribute summary;
+    private OperationFormMessageAttribute title;
+    private OperationFormMessageAttribute greeting;
+    private OperationFormMessageAttribute summary;
     private List<OperationFormFieldConfig> config;
+    private List<OperationFormBanner> banners;
     private List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
     private Map<String, String> userInput;
@@ -29,6 +32,7 @@ public class OperationFormData {
     public OperationFormData() {
         this.config = new ArrayList<>();
         this.parameters = new ArrayList<>();
+        this.banners = new ArrayList<>();
         this.userInput = new LinkedHashMap<>();
     }
 
@@ -46,6 +50,14 @@ public class OperationFormData {
      */
     public List<OperationFormFieldAttribute> getParameters() {
         return parameters;
+    }
+
+    /**
+     * Get form banners.
+     * @return Form banners.
+     */
+    public List<OperationFormBanner> getBanners() {
+        return banners;
     }
 
     /**
@@ -76,7 +88,7 @@ public class OperationFormData {
      * Set title form attribute.
      * @param title Title form attribute.
      */
-    public void setTitle(OperationFormAttribute title) {
+    public void setTitle(OperationFormMessageAttribute title) {
         if (title == null) {
             // avoid JSON mapping null title
             return;
@@ -89,30 +101,18 @@ public class OperationFormData {
      * @param titleId Title ID.
      */
     @JsonIgnore
-    public void addTitle(String titleId) {
-        OperationFormAttribute attr = new OperationFormAttribute();
+    public OperationFormMessageAttribute addTitle(String titleId) {
+        OperationFormMessageAttribute attr = new OperationFormMessageAttribute();
         attr.setId(titleId);
         this.title = attr;
-    }
-
-    /**
-     * Set localized title.
-     * @param titleId Title ID.
-     * @param title Localized title.
-     */
-    @JsonIgnore
-    public void addTitle(String titleId, String title) {
-        OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(titleId);
-        attr.setValue(title);
-        this.title = attr;
+        return attr;
     }
 
     /**
      * Get title form attribute.
      * @return Title form attribute.
      */
-    public OperationFormAttribute getTitle() {
+    public OperationFormMessageAttribute getTitle() {
         return title;
     }
 
@@ -120,7 +120,7 @@ public class OperationFormData {
      * Set greeting form attribute.
      * @param greeting Greeting form attribute.
      */
-    public void setGreeting(OperationFormAttribute greeting) {
+    public void setGreeting(OperationFormMessageAttribute greeting) {
         if (greeting == null) {
             // avoid JSON mapping null title
             return;
@@ -133,30 +133,18 @@ public class OperationFormData {
      * @param greetingId Greeting ID.
      */
     @JsonIgnore
-    public void addGreeting(String greetingId) {
-        OperationFormAttribute attr = new OperationFormAttribute();
+    public OperationFormMessageAttribute addGreeting(String greetingId) {
+        OperationFormMessageAttribute attr = new OperationFormMessageAttribute();
         attr.setId(greetingId);
         this.greeting = attr;
-    }
-
-    /**
-     * Set localized greeting.
-     * @param greetingId Greeting ID.
-     * @param greeting Localized greeting.
-     */
-    @JsonIgnore
-    public void addGreeting(String greetingId, String greeting) {
-        OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(greetingId);
-        attr.setValue(greeting);
-        this.greeting = attr;
+        return attr;
     }
 
     /**
      * Get summary form attribute.
      * @return Summary form attribute.
      */
-    public OperationFormAttribute getGreeting() {
+    public OperationFormMessageAttribute getGreeting() {
         return greeting;
     }
 
@@ -164,7 +152,7 @@ public class OperationFormData {
      * Set summary form attribute.
      * @param summary Summary form attribute.
      */
-    public void setSummary(OperationFormAttribute summary) {
+    public void setSummary(OperationFormMessageAttribute summary) {
         if (summary == null) {
             // avoid JSON mapping null title
             return;
@@ -177,30 +165,18 @@ public class OperationFormData {
      * @param summaryId Message ID.
      */
     @JsonIgnore
-    public void addSummary(String summaryId) {
-        OperationFormAttribute attr = new OperationFormAttribute();
+    public OperationFormMessageAttribute addSummary(String summaryId) {
+        OperationFormMessageAttribute attr = new OperationFormMessageAttribute();
         attr.setId(summaryId);
         this.summary = attr;
-    }
-
-    /**
-     * Set localized summary.
-     * @param summaryId Message ID.
-     * @param summary Localized summary.
-     */
-    @JsonIgnore
-    public void addSummary(String summaryId, String summary) {
-        OperationFormAttribute attr = new OperationFormAttribute();
-        attr.setId(summaryId);
-        attr.setValue(summary);
-        this.summary = attr;
+        return attr;
     }
 
     /**
      * Get summary form attribute.
      * @return Summary form attribute.
      */
-    public OperationFormAttribute getSummary() {
+    public OperationFormMessageAttribute getSummary() {
         return summary;
     }
 
@@ -212,13 +188,14 @@ public class OperationFormData {
      * @param currency Amount currency.
      */
     @JsonIgnore
-    public void addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
+    public OperationAmountFieldAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
         OperationAmountFieldAttribute amountAttr = new OperationAmountFieldAttribute();
         amountAttr.setId(amountId);
         amountAttr.setAmount(amount);
         amountAttr.setCurrencyId(currencyId);
         amountAttr.setCurrency(currency);
         saveAttribute(amountAttr);
+        return amountAttr;
     }
 
     /**
@@ -243,11 +220,12 @@ public class OperationFormData {
      * @param note Localized note.
      */
     @JsonIgnore
-    public void addNote(String noteId, String note) {
+    public OperationNoteFieldAttribute addNote(String noteId, String note) {
         OperationNoteFieldAttribute attr = new OperationNoteFieldAttribute();
         attr.setId(noteId);
         attr.setNote(note);
         saveAttribute(attr);
+        return attr;
     }
 
     /**
@@ -257,11 +235,12 @@ public class OperationFormData {
      * @param valueFormatType Value format type.
      */
     @JsonIgnore
-    public void addNote(String noteId, String note, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+    public OperationNoteFieldAttribute addNote(String noteId, String note, ValueFormatType valueFormatType) {
         OperationNoteFieldAttribute attr = new OperationNoteFieldAttribute(valueFormatType);
         attr.setId(noteId);
         attr.setNote(note);
         saveAttribute(attr);
+        return attr;
     }
 
     /**
@@ -288,13 +267,14 @@ public class OperationFormData {
      * @param defaultValue Default bank account value.
      */
     @JsonIgnore
-    public void addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
+    public OperationBankAccountChoiceFieldAttribute addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
         OperationBankAccountChoiceFieldAttribute attr = new OperationBankAccountChoiceFieldAttribute();
         attr.setId(id);
         attr.setBankAccounts(bankAccounts);
         attr.setEnabled(enabled);
         attr.setDefaultValue(defaultValue);
         saveAttribute(attr);
+        return attr;
     }
 
     /**
@@ -303,11 +283,12 @@ public class OperationFormData {
      * @param value Attribute value.
      */
     @JsonIgnore
-    public void addKeyValue(String id, String value) {
+    public OperationKeyValueFieldAttribute addKeyValue(String id, String value) {
         OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute();
         attr.setId(id);
         attr.setValue(value);
         saveAttribute(attr);
+        return attr;
     }
 
     /**
@@ -317,11 +298,45 @@ public class OperationFormData {
      * @param valueFormatType Value format type.
      */
     @JsonIgnore
-    public void addKeyValue(String id, String value, OperationFormFieldAttributeFormatted.ValueFormatType valueFormatType) {
+    public OperationKeyValueFieldAttribute addKeyValue(String id, String value, ValueFormatType valueFormatType) {
         OperationKeyValueFieldAttribute attr = new OperationKeyValueFieldAttribute(valueFormatType);
         attr.setId(id);
         attr.setValue(value);
         saveAttribute(attr);
+        return attr;
+    }
+
+    /**
+     * Add a banner above the form.
+     * @param bannerType Banner type.
+     * @param bannerId Banner ID.
+     */
+    @JsonIgnore
+    public void addBanner(BannerType bannerType, String bannerId) {
+        OperationFormBanner banner = new OperationFormBanner(bannerType);
+        banner.setId(bannerId);
+        banners.add(banner);
+    }
+
+    /**
+     * Add a banner before a field.
+     * @param bannerType Banner type.
+     * @param bannerId Banner ID.
+     * @param existingField Operation form field attribute before which banner should be added.
+     */
+    public void addBannerBeforeField(BannerType bannerType, String bannerId, OperationFormFieldAttribute existingField) {
+        if (!parameters.contains(existingField)) {
+            throw new IllegalArgumentException("Field is missing in operation form data: "+existingField.getId());
+        }
+        OperationBannerFieldAttribute banner = new OperationBannerFieldAttribute(bannerType);
+        banner.setId(bannerId);
+        for (int i=0; i<parameters.size(); i++) {
+            OperationFormFieldAttribute attr = parameters.get(i);
+            if (attr == existingField) {
+                parameters.add(i, banner);
+                return;
+            }
+        }
     }
 
     /**

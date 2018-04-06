@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+
 /**
  * Request for SMS OTP message verification.
  *
@@ -32,27 +34,74 @@ public class VerifySMSAuthorizationRequest {
      */
     private String authorizationCode;
 
+    /**
+     * Operation context.
+     */
+    private OperationContext operationContext;
+
+    /**
+     * Default constructor.
+     */
     public VerifySMSAuthorizationRequest() {
     }
 
-    public VerifySMSAuthorizationRequest(String messageId, String authorizationCode) {
+    /**
+     * Constructor with message ID, authorization code and operation context.
+     * @param messageId Message ID.
+     * @param authorizationCode Authorization code from user.
+     * @param operationContext Operation context.
+     */
+    public VerifySMSAuthorizationRequest(String messageId, String authorizationCode, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
+        this.operationContext = operationContext;
     }
 
+    /**
+     * Get message ID.
+     * @return Message ID.
+     */
     public String getMessageId() {
         return messageId;
     }
 
+    /**
+     * Set message ID.
+     * @param messageId Message ID.
+     */
     public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 
+    /**
+     * Get authorization code.
+     * @return Authorization code.
+     */
     public String getAuthorizationCode() {
         return authorizationCode;
     }
 
+    /**
+     * Set authorization code.
+     * @param authorizationCode Authorization code.
+     */
     public void setAuthorizationCode(String authorizationCode) {
         this.authorizationCode = authorizationCode;
+    }
+
+    /**
+     * Get operation context.
+     * @return Operation context.
+     */
+    public OperationContext getOperationContext() {
+        return operationContext;
+    }
+
+    /**
+     * Set operation context.
+     * @param operationContext Operation context.
+     */
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
     }
 }

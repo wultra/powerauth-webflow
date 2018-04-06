@@ -3,6 +3,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -72,7 +73,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             throw new InvalidRequestException("Message ID is missing.");
         }
         try {
-            dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode(), operationContext);
             httpSession.removeAttribute(MESSAGE_ID);
             return operation.getUserId();
         } catch (DataAdapterClientErrorException e) {
@@ -119,8 +121,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
 
         final String userId = operation.getUserId();
         try {
-            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(
-                    operation.getOperationId(), userId, operation.getOperationName(), operation.getFormData(),
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
                     LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
             httpSession.setAttribute(MESSAGE_ID, messageId);

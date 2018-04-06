@@ -46,7 +46,7 @@ export default class Error extends React.Component {
                 clearContext = "false";
             }
             window.location = "./authenticate/cancel?clearContext=" + clearContext;
-        }, 3000);
+        }, 300000);
     }
 
     render() {

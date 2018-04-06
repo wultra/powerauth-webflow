@@ -29,7 +29,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.OfflineSignatureQrCode;
@@ -293,7 +294,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         }
         GetOperationDetailResponse operation = getOperation();
         String operationData = operation.getOperationData();
-        String messageText = operation.getFormData().getSummary().getValue();
+        String messageText = operation.getFormData().getSummary().getMessage();
 
         CreateOfflineSignaturePayloadResponse response = powerAuthServiceClient.createOfflineSignaturePayload(activation.getActivationId(), operationData, messageText);
 

@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.impl.validation;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.security.powerauth.lib.dataadapter.impl.service.OperationFormDataService;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.CreateSMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,16 +72,21 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
 
         // update validation logic based on the real Data Adapter requirements
         String userId = authRequest.getUserId();
-        String operationName = authRequest.getOperationName();
+        OperationContext operationContext = authRequest.getOperationContext();
+        if (operationContext == null) {
+            errors.rejectValue("requestObject.operationContext", "operationContext.missing");
+        }
+
+        String operationName = authRequest.getOperationContext().getName();
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.userId", "smsAuthorization.userId.empty");
         if (userId != null && userId.length() > 30) {
             errors.rejectValue("requestObject.userId", "smsAuthorization.userId.long");
         }
 
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.operationName", "smsAuthorization.operationName.empty");
+        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "requestObject.operationContext.name", "smsAuthorization.operationName.empty");
         if (operationName != null && operationName.length() > 32) {
-            errors.rejectValue("requestObject.operationName", "smsAuthorization.operationName.long");
+            errors.rejectValue("requestObject.operationContext.name", "smsAuthorization.operationName.long");
         }
 
         if (operationName != null) {
@@ -89,26 +95,26 @@ public class CreateSMSAuthorizationRequestValidator implements Validator {
                     // no field validation required
                     break;
                 case "authorize_payment":
-                    OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationFormData());
+                    OperationAmountFieldAttribute amountAttribute = operationFormDataService.getAmount(authRequest.getOperationContext().getFormData());
                     if (amountAttribute == null) {
-                        errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
+                        errors.rejectValue("requestObject.operationContext.formData", "smsAuthorization.amount.empty");
                     } else {
                         BigDecimal amount = amountAttribute.getAmount();
                         String currency = amountAttribute.getCurrency();
 
                         if (amount == null) {
-                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.empty");
+                            errors.rejectValue("requestObject.operationContext.formData", "smsAuthorization.amount.empty");
                         } else if (amount.doubleValue() <= 0) {
-                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.amount.invalid");
+                            errors.rejectValue("requestObject.operationContext.formData", "smsAuthorization.amount.invalid");
                         }
 
                         if (currency == null || currency.isEmpty()) {
-                            errors.rejectValue("requestObject.operationFormData", "smsAuthorization.currency.empty");
+                            errors.rejectValue("requestObject.operationContext.formData", "smsAuthorization.currency.empty");
                         }
                     }
-                    String account = operationFormDataService.getAccount(authRequest.getOperationFormData());
+                    String account = operationFormDataService.getAccount(authRequest.getOperationContext().getFormData());
                     if (account == null || account.isEmpty()) {
-                        errors.rejectValue("requestObject.operationFormData", "smsAuthorization.account.empty");
+                        errors.rejectValue("requestObject.operationContext.formData", "smsAuthorization.account.empty");
                     }
                     break;
                 default:

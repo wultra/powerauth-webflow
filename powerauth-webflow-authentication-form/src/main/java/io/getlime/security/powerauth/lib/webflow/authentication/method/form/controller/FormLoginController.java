@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.form.con
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -70,14 +71,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      */
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
+        GetOperationDetailResponse operation = getOperation();
         try {
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
             Integer remainingAttemptsNS;
             try {
-                GetOperationDetailResponse operation = getOperation();
                 // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
                 // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests

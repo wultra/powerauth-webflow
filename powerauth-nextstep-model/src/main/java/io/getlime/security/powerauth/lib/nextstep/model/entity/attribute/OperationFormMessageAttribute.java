@@ -20,27 +20,46 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationFormAttribute {
+public class OperationFormMessageAttribute {
 
     private String id;
-    private String value;
+    private String message;
 
-    public OperationFormAttribute() {
+    /**
+     * Default constructor.
+     */
+    public OperationFormMessageAttribute() {
     }
 
+    /**
+     * Get attribute ID.
+     * @return Attribute ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set attribute ID.
+     * @param id Attribute ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
-    public String getValue() {
-        return value;
+    /**
+     * Get message.
+     * @return Message.
+     */
+    public String getMessage() {
+        return message;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    /**
+     * Set message
+     * @param message Message.
+     */
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

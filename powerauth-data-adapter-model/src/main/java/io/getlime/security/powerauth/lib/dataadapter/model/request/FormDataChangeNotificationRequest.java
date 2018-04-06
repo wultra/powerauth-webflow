@@ -17,16 +17,17 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Request object for notifying data adapter about operation formData change.
+ * Request object for notifying data adapter about operation form data change.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class FormDataChangeNotificationRequest {
 
     private String userId;
-    private String operationId;
+    private OperationContext operationContext;
     private FormDataChange formDataChange;
 
     /**
@@ -36,15 +37,15 @@ public class FormDataChangeNotificationRequest {
     }
 
     /**
-     * Constructor with user ID, operation ID and formData change.
+     * Constructor with user ID, operation ID and form data change.
      * @param userId User ID.
-     * @param operationId Operation ID.
-     * @param formDataChange FormData change.
+     * @param formDataChange Form data change.
+     * @param operationContext Operation context.
      */
-    public FormDataChangeNotificationRequest(String userId, String operationId, FormDataChange formDataChange) {
+    public FormDataChangeNotificationRequest(String userId, FormDataChange formDataChange, OperationContext operationContext) {
         this.userId = userId;
-        this.operationId = operationId;
         this.formDataChange = formDataChange;
+        this.operationContext = operationContext;
     }
 
     /**
@@ -64,19 +65,19 @@ public class FormDataChangeNotificationRequest {
     }
 
     /**
-     * Get operation ID.
-     * @return Operation ID.
+     * Get operation context.
+     * @return Operation context.
      */
-    public String getOperationId() {
-        return operationId;
+    public OperationContext getOperationContext() {
+        return operationContext;
     }
 
     /**
-     * Set operation ID.
-     * @param operationId Operation ID.
+     * Set operation context.
+     * @param operationContext Operation context.
      */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
     }
 
     /**
@@ -89,7 +90,7 @@ public class FormDataChangeNotificationRequest {
 
     /**
      * Set formData change.
-     * @param formDataChange Change of formData.
+     * @param formDataChange Change of form data.
      */
     public void setFormDataChange(FormDataChange formDataChange) {
         this.formDataChange = formDataChange;

@@ -21,9 +21,9 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.SMSAuthorizationF
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 
 /**
  * Interface defines methods which should be implemented for integration of Web Flow with 3rd parties.
@@ -37,11 +37,12 @@ public interface DataAdapter {
      *
      * @param username Username for user authentication.
      * @param password Password for user authentication.
+     * @param operationContext Operation context.
      * @return UserDetailResponse Response with user details.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws AuthenticationFailedException Thrown when authentication fails.
      */
-    UserDetailResponse authenticateUser(String username, String password) throws DataAdapterRemoteException, AuthenticationFailedException;
+    UserDetailResponse authenticateUser(String username, String password, OperationContext operationContext) throws DataAdapterRemoteException, AuthenticationFailedException;
 
     /**
      * Fetch user detail for given user.
@@ -53,42 +54,41 @@ public interface DataAdapter {
     UserDetailResponse fetchUserDetail(String userId) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
-     * Fetch bank account details for given user.
+     * Decorate operation form data.
      * @param userId User ID.
-     * @param operationName Operation name.
-     * @param operationId Operation ID.
-     * @param formData Operation form data.
-     * @return Response with bank account details.
+     * @param operationContext Operation context.
+     * @return Response with decorated operation form data
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws UserNotFoundException Thrown when user does not exist.
      */
-    BankAccountListResponse fetchBankAccounts(String userId, String operationName, String operationId, OperationFormData formData) throws DataAdapterRemoteException, UserNotFoundException;
+    DecorateOperationFormDataResponse decorateFormData(String userId, OperationContext operationContext) throws DataAdapterRemoteException, UserNotFoundException;
 
     /**
-     * Receive notification about formData change.
+     * Receive notification about form data change.
      * @param userId User ID.
-     * @param operationId Operation ID.
-     * @param formDataChange FormData change.
+     * @param formDataChange Form data change.
+     * @param operationContext Operation context.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      */
-    void formDataChangedNotification(String userId, String operationId, FormDataChange formDataChange) throws DataAdapterRemoteException;
+    void formDataChangedNotification(String userId, FormDataChange formDataChange, OperationContext operationContext) throws DataAdapterRemoteException;
 
     /**
      * Receive notification about operation change.
      * @param userId User ID.
-     * @param operationId Operation ID.
      * @param operationChange Operation change.
+     * @param operationContext Operation context.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      */
-    void operationChangedNotification(String userId, String operationId, OperationChange operationChange) throws DataAdapterRemoteException;
+    void operationChangedNotification(String userId, OperationChange operationChange, OperationContext operationContext) throws DataAdapterRemoteException;
 
     /**
      * Send an authorization SMS with generated OTP.
      * @param userId User ID.
      * @param messageText Text of SMS message.
+     * @param operationContext Operation context.
      * @throws DataAdapterRemoteException Thrown when remote communication fails.
      * @throws SMSAuthorizationFailedException Thrown when message could not be created.
      */
-    void sendAuthorizationSMS(String userId, String messageText) throws DataAdapterRemoteException, SMSAuthorizationFailedException;
+    void sendAuthorizationSMS(String userId, String messageText, OperationContext operationContext) throws DataAdapterRemoteException, SMSAuthorizationFailedException;
 
 }

@@ -128,6 +128,14 @@ export default class OperationDetail extends React.Component {
         if (this.props.context.formData) {
             return (
                 <div>
+                    <div>
+                        {this.props.context.formData.banners ?
+                            this.props.context.formData.banners.map((banner) => {
+                                return this.displayBanner(banner, false);
+                            }) : (
+                                undefined
+                            )}
+                    </div>
                     <div className="operation-approve content-wrap">
                         <h3 className="title">{this.props.context.formData.title.value}</h3>
                         <p>{this.props.context.formData.greeting.value}</p>
@@ -196,6 +204,8 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     )
                                 }
+                            } else if (item.type === "BANNER") {
+                                return this.displayBanner(item, true);
                             }
                         })}
                     </div>
@@ -215,4 +225,36 @@ export default class OperationDetail extends React.Component {
             )
         }
     }
+
+    displayBanner(banner, isFieldBanner) {
+        let bannerClass = "alert";
+        if (isFieldBanner) {
+            bannerClass+= " alert-field";
+        } else {
+            bannerClass+= " alert-form";
+        }
+        let glyphIconClass = "";
+        switch (banner.bannerType) {
+            case "BANNER_INFO":
+                bannerClass += " alert-info";
+                glyphIconClass = "glyphicon glyphicon-info-sign";
+                break;
+            case "BANNER_WARNING":
+                bannerClass += " alert-warning";
+                glyphIconClass = "glyphicon glyphicon-warning-sign";
+                break;
+            case "BANNER_ERROR":
+                bannerClass += " alert-danger";
+                glyphIconClass = "glyphicon glyphicon-exclamation-sign";
+                break;
+        }
+        return (
+            <div className={bannerClass} key={banner.id}>
+                <span className={glyphIconClass}/>
+                &nbsp;&nbsp;
+                {banner.message}
+            </div>
+        );
+    }
 }
+
