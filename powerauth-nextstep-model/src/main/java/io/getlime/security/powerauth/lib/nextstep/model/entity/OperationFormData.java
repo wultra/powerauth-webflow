@@ -330,13 +330,8 @@ public class OperationFormData {
         }
         OperationBannerFieldAttribute banner = new OperationBannerFieldAttribute(bannerType);
         banner.setId(bannerId);
-        for (int i=0; i<parameters.size(); i++) {
-            OperationFormFieldAttribute attr = parameters.get(i);
-            if (attr == existingField) {
-                parameters.add(i, banner);
-                return;
-            }
-        }
+        int fieldIndex = parameters.indexOf(existingField);
+        parameters.add(fieldIndex, banner);
     }
 
     /**
