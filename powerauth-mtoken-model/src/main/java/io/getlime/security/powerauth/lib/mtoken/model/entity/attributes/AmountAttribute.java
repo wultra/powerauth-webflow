@@ -28,11 +28,21 @@ public class AmountAttribute extends Attribute {
     private BigDecimal amount;
     private String currency;
 
+    /**
+     * Default constructor.
+     */
     public AmountAttribute() {
         super();
         this.setType(Type.AMOUNT);
     }
 
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Attribute label.
+     * @param amount Amount.
+     * @param currency Currency.
+     */
     public AmountAttribute(String id, String label, BigDecimal amount, String currency) {
         this();
         this.id = id;
@@ -41,18 +51,34 @@ public class AmountAttribute extends Attribute {
         this.currency = currency;
     }
 
+    /**
+     * Get amount.
+     * @return Amount.
+     */
     public BigDecimal getAmount() {
         return amount;
     }
 
+    /**
+     * Set amount.
+     * @param amount Amount.
+     */
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
+    /**
+     * Get currency.
+     * @return Currency.
+     */
     public String getCurrency() {
         return currency;
     }
 
+    /**
+     * Set currency.
+     * @param currency Currency.
+     */
     public void setCurrency(String currency) {
         this.currency = currency;
     }

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.mtoken.model.entity.attributes;
  */
 public class Attribute {
 
+    /**
+     * Attribute type.
+     */
     public enum Type {
         AMOUNT,
         KEY_VALUE,
@@ -32,26 +35,50 @@ public class Attribute {
     protected String id;
     protected String label;
 
+    /**
+     * Get attribute type.
+     * @return Attribute type.
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Set attribute type.
+     * @param type Attribute type.
+     */
     public void setType(Type type) {
         this.type = type;
     }
 
+    /**
+     * Get attribute ID.
+     * @return Attribute ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set attribute ID.
+     * @param id Attribute ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get attribute label.
+     * @return Attribute label.
+     */
     public String getLabel() {
         return label;
     }
 
+    /**
+     * Set attribute label.
+     * @param label Attribute label.
+     */
     public void setLabel(String label) {
         this.label = label;
     }

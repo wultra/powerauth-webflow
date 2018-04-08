@@ -25,14 +25,25 @@ public class BankAccountChoice extends FormDataChange {
 
     private String bankAccountId;
 
+    /**
+     * Default constructor.
+     */
     public BankAccountChoice() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 
+    /**
+     * Get chosen bank account ID (e.g. IBAN).
+     * @return Chosen bank account ID.
+     */
     public String getBankAccountId() {
         return bankAccountId;
     }
 
+    /**
+     * Set chosen bank account ID (e.g. IBAN).
+     * @param bankAccountId Chosen bank account id.
+     */
     public void setBankAccountId(String bankAccountId) {
         this.bankAccountId = bankAccountId;
     }

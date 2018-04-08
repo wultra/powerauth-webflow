@@ -36,9 +36,9 @@ public class DataAdapterI18NService {
     }
 
     /**
-     * Get MessageSource with i18n data.
+     * Get message source with i18n data.
      *
-     * @return MessageSource.
+     * @return Message source.
      */
     @Bean
     public MessageSource messageSource() {

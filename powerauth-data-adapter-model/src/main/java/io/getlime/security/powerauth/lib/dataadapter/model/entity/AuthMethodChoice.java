@@ -23,6 +23,9 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  */
 public class AuthMethodChoice extends FormDataChange {
 
+    /**
+     * Enumeration for authentication method choice.
+     */
     public enum ChosenAuthMethod {
         POWERAUTH_TOKEN,
         SMS_KEY
@@ -30,14 +33,25 @@ public class AuthMethodChoice extends FormDataChange {
 
     private ChosenAuthMethod chosenAuthMethod;
 
+    /**
+     * Default constructor.
+     */
     public AuthMethodChoice() {
         this.type = Type.AUTH_METHOD_CHOICE;
     }
 
+    /**
+     * Get chosen authentication method.
+     * @return Chosen authentication method.
+     */
     public ChosenAuthMethod getChosenAuthMethod() {
         return chosenAuthMethod;
     }
 
+    /**
+     * Set chosen authentication method.
+     * @param chosenAuthMethod Chosen authentication method.
+     */
     public void setChosenAuthMethod(ChosenAuthMethod chosenAuthMethod) {
         this.chosenAuthMethod = chosenAuthMethod;
     }

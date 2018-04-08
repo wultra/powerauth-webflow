@@ -49,7 +49,7 @@ public class AuthenticationFailedException extends Exception {
     }
 
     /**
-     * Constructor with and cause.
+     * Constructor with cause.
      * @param cause Cause, original exception.
      */
     public AuthenticationFailedException(Throwable cause) {

@@ -31,30 +31,57 @@ public class FormData {
     private String message;
     private List<Attribute> attributes;
 
+    /**
+     * Default constructor.
+     */
     public FormData() {
         this.attributes = new ArrayList<>();
     }
 
+    /**
+     * Get localized operation title message.
+     * @return Title message.
+     */
     public String getTitle() {
         return title;
     }
 
+    /**
+     * Set localized operation title message.
+     * @param title Title message.
+     */
     public void setTitle(String title) {
         this.title = title;
     }
 
+    /**
+     * Get localized operation message.
+     * @return Operation message.
+     */
     public String getMessage() {
         return message;
     }
 
+    /**
+     * Set localized operation message.
+     * @param message Operation message.
+     */
     public void setMessage(String message) {
         this.message = message;
     }
 
+    /**
+     * Get form data attributes.
+     * @return Form data attributes.
+     */
     public List<Attribute> getAttributes() {
         return attributes;
     }
 
+    /**
+     * Set form data attributes.
+     * @param attributes Form data attributes.
+     */
     public void setAttributes(List<Attribute> attributes) {
         this.attributes = attributes;
     }

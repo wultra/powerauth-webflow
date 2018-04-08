@@ -31,50 +31,98 @@ public class Operation {
     private AllowedSignatureType allowedSignatureType;
     private FormData formData;
 
+    /**
+     * Get operation ID.
+     * @return Operation ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set operation ID.
+     * @param id Operation ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get unstructured operation data.
+     * @return Operation data.
+     */
     public String getData() {
         return data;
     }
 
+    /**
+     * Set unstructured operation data.
+     * @param data Operation data.
+     */
     public void setData(String data) {
         this.data = data;
     }
 
+    /**
+     * Get timestamp when operation was created.
+     * @return Timestamp when operation was created.
+     */
     public Date getOperationCreated() {
         return operationCreated;
     }
 
+    /**
+     * Set timestamp when operation was created.
+     * @param operationCreated Timestamp when opereration was created.
+     */
     public void setOperationCreated(Date operationCreated) {
         this.operationCreated = operationCreated;
     }
 
+    /**
+     * Get timestamp when operation expires.
+     * @return Timestamp when operation expires.
+     */
     public Date getOperationExpires() {
         return operationExpires;
     }
 
+    /**
+     * Set timestamp when operation expires.
+     * @param operationExpires Timestamp when operation expires.
+     */
     public void setOperationExpires(Date operationExpires) {
         this.operationExpires = operationExpires;
     }
 
+    /**
+     * Get allowed signature type.
+     * @return Allowed signature type.
+     */
     public AllowedSignatureType getAllowedSignatureType() {
         return allowedSignatureType;
     }
 
+    /**
+     * Set allowed signature type.
+     * @param allowedSignatureType Allowed signature type.
+     */
     public void setAllowedSignatureType(AllowedSignatureType allowedSignatureType) {
         this.allowedSignatureType = allowedSignatureType;
     }
 
+    /**
+     * Get operation form data.
+     * @return Operation form data.
+     */
     public FormData getFormData() {
         return formData;
     }
 
+    /**
+     * Set operation form data.
+     * @param formData Operation form data.
+     */
     public void setFormData(FormData formData) {
         this.formData = formData;
     }

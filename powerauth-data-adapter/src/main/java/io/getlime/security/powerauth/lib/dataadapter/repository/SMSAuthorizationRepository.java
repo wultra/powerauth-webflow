@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 /**
  * Crud repository for persistence of SMS OTP authorization messages.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Component
 public interface SMSAuthorizationRepository extends CrudRepository<SMSAuthorizationEntity, String> {

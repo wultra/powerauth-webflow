@@ -21,7 +21,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Authentic
 /**
  * Request for authenticating user with username and password.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthenticationRequest {
 
@@ -44,16 +44,16 @@ public class AuthenticationRequest {
     private OperationContext operationContext;
 
     /**
-     * Empty constructor.
+     * Default constructor.
      */
     public AuthenticationRequest() {
     }
 
     /**
      * Constructor with all parameters for convenience.
-     * @param username username for this authentication request
-     * @param password password for this authentication request
-     * @param type authentication type
+     * @param username Username for this authentication request.
+     * @param password Password for this authentication request.
+     * @param type Authentication type.
      */
     public AuthenticationRequest(String username, String password, AuthenticationType type, OperationContext operationContext) {
         this.username = username;
@@ -64,7 +64,7 @@ public class AuthenticationRequest {
 
     /**
      * Set the username.
-     * @param username username to set
+     * @param username Username.
      */
     public void setUsername(String username) {
         this.username = username;
@@ -72,7 +72,7 @@ public class AuthenticationRequest {
 
     /**
      * Get the username.
-     * @return username
+     * @return Username.
      */
     public String getUsername() {
         return username;
@@ -80,7 +80,7 @@ public class AuthenticationRequest {
 
     /**
      * Set the password.
-     * @param password password to set
+     * @param password Password.
      */
     public void setPassword(String password) {
         this.password = password;
@@ -88,7 +88,7 @@ public class AuthenticationRequest {
 
     /**
      * Get the password.
-     * @return password
+     * @return Password.
      */
     public String getPassword() {
         return password;
@@ -96,7 +96,7 @@ public class AuthenticationRequest {
 
     /**
      * Set the authentication type.
-     * @param type authentication type
+     * @param type Authentication type.
      */
     public void setType(AuthenticationType type) {
         this.type = type;
@@ -104,7 +104,7 @@ public class AuthenticationRequest {
 
     /**
      * Get the authentication type.
-     * @return authentication type
+     * @return Authentication type.
      */
     public AuthenticationType getType() {
         return type;

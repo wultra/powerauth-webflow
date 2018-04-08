@@ -19,7 +19,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Request object for obtaining bank accounts by user ID.
+ * Request object for decorating operation form data.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -35,7 +35,7 @@ public class DecorateOperationFormDataRequest {
     }
 
     /**
-     * Constructor with user ID as a parameter.
+     * Constructor with user ID and operation context as a parameter.
      * @param userId User ID.
      * @param operationContext Operation context.
      */

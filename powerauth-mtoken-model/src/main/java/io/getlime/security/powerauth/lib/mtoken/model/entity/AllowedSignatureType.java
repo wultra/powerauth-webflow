@@ -26,6 +26,9 @@ import java.util.List;
  */
 public class AllowedSignatureType {
 
+    /**
+     * Signature types.
+     */
     public enum Type {
         MULTIFACTOR_1FA("1FA"),     // 1FA signature
         MULTIFACTOR_2FA("2FA"),     // 2FA signature
@@ -46,22 +49,41 @@ public class AllowedSignatureType {
     private Type type;
     private List<String> variants;
 
+    /**
+     * Default constructor.
+     */
     public AllowedSignatureType() {
         this.variants = new ArrayList<>();
     }
 
+    /**
+     * Get signature type.
+     * @return Signature type.
+     */
     public Type getType() {
         return type;
     }
 
+    /**
+     * Set signature type.
+     * @param type Signature type.
+     */
     public void setType(Type type) {
         this.type = type;
     }
 
+    /**
+     * Extras with supported variants.
+     * @return Extras with supported variants.
+     */
     public List<String> getVariants() {
         return variants;
     }
 
+    /**
+     * Set extras with supported variants.
+     * @param variants Extras with supported variants.
+     */
     public void setVariants(List<String> variants) {
         this.variants = variants;
     }

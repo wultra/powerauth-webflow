@@ -31,7 +31,7 @@ public class OperationChangeNotificationRequest {
     private OperationChange operationChange;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public OperationChangeNotificationRequest() {
     }

@@ -26,7 +26,7 @@ public class UserDetailRequest {
     private String id;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public UserDetailRequest() {
     }

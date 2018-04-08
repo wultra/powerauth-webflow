@@ -27,17 +27,32 @@ public class CreateSMSAuthorizationResponse {
      */
     private String messageId;
 
+    /**
+     * Default constructor.
+     */
     public CreateSMSAuthorizationResponse() {
     }
 
+    /**
+     * Constructor with message ID.
+     * @param messageId Message ID.
+     */
     public CreateSMSAuthorizationResponse(String messageId) {
         this.messageId = messageId;
     }
 
+    /**
+     * Get message ID.
+     * @return Message ID.
+     */
     public String getMessageId() {
         return messageId;
     }
 
+    /**
+     * Set message ID.
+     * @param messageId Message ID.
+     */
     public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
