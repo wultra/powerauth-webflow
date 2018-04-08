@@ -24,18 +24,34 @@ public class PushRegisterRequest {
     private String platform;
     private String token;
 
+    /**
+     * Get mobile platform - "ios" / "android".
+     * @return Mobile platform.
+     */
     public String getPlatform() {
         return platform;
     }
 
+    /**
+     * Set mobile platform - "ios" / "android".
+     * @param platform Mobile platform.
+     */
     public void setPlatform(String platform) {
         this.platform = platform;
     }
 
+    /**
+     * Get push registration token.
+     * @return Push registration token.
+     */
     public String getToken() {
         return token;
     }
 
+    /**
+     * Set push registration token.
+     * @param token Push registration token.
+     */
     public void setToken(String token) {
         this.token = token;
     }

@@ -25,7 +25,7 @@ import java.util.logging.Logger;
 /**
  * Sample implementation of DataAdapter interface which should be updated in real implementation.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class DataAdapterService implements DataAdapter {

@@ -20,7 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Spring Boot application main class.
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @SpringBootApplication
 public class DataAdapterApplication {

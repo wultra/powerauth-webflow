@@ -31,7 +31,7 @@ import java.math.BigDecimal;
 import java.util.*;
 
 /**
- * Service class for generating SMS with OTP and their verification.
+ * Service class for generating SMS with OTP authorization code and verification of authorization code.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -59,7 +59,7 @@ public class SMSPersistenceService {
     }
 
     /**
-     * Create an authorization SMS message with OTP.
+     * Create an authorization SMS message with OTP authorization code.
      * @param userId User ID.
      * @param operationId Operation ID.
      * @param operationName Operation name.
@@ -123,7 +123,7 @@ public class SMSPersistenceService {
     }
 
     /**
-     * Verify an authorization code
+     * Verify an OTP authorization code.
      * @param messageId Message ID.
      * @param authorizationCode Authorization code.
      * @throws SMSAuthorizationFailedException Thrown when SMS authorization fails.

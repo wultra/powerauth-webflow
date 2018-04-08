@@ -24,7 +24,7 @@ import org.springframework.stereotype.Service;
 /**
  * Service which extracts form data from an operation based on required input for SMS text.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class OperationFormDataService {

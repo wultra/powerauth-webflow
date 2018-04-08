@@ -25,18 +25,34 @@ public class OperationRejectRequest {
     private String id;
     private String reason;
 
+    /**
+     * Get operation ID.
+     * @return Operation ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set operation ID.
+     * @param id Operation ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get reason why operation was rejected.
+     * @return Reason why operation was rejected.
+     */
     public String getReason() {
         return reason;
     }
 
+    /**
+     * Set reason why operation was rejected.
+     * @param reason Reason why operation was rejected.
+     */
     public void setReason(String reason) {
         this.reason = reason;
     }

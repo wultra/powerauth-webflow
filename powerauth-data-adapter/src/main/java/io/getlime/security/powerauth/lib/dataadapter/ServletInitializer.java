@@ -25,7 +25,7 @@ import java.security.Security;
 
 /**
  * Spring Boot servlet initializer.
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class ServletInitializer extends SpringBootServletInitializer {
 

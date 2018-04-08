@@ -35,7 +35,7 @@ import java.util.logging.Logger;
 /**
  * Controller advice responsible for default exception resolving.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @ControllerAdvice
 public class DefaultExceptionResolver {

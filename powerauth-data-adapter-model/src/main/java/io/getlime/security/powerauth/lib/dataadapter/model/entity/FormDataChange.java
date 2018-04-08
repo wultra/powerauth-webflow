@@ -32,6 +32,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public class FormDataChange {
 
+    /**
+     * Enumeration representing form data change type.
+     */
     public enum Type {
         BANK_ACCOUNT_CHOICE,
         AUTH_METHOD_CHOICE
@@ -42,6 +45,9 @@ public class FormDataChange {
     protected Type type;
 
     // JsonIgnore added, otherwise type was serialized twice
+    /**
+     * Get form data change type.
+     */
     @JsonIgnore
     public Type getType() {
         return type;

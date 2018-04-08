@@ -31,7 +31,7 @@ public class FormDataChangeNotificationRequest {
     private FormDataChange formDataChange;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public FormDataChangeNotificationRequest() {
     }

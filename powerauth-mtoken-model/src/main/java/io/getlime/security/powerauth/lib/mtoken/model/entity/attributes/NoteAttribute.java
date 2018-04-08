@@ -25,11 +25,20 @@ public class NoteAttribute extends Attribute {
 
     private String note;
 
+    /**
+     * Default constructor.
+     */
     public NoteAttribute() {
         super();
         this.setType(Type.NOTE);
     }
 
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Attribute label.
+     * @param note Note.
+     */
     public NoteAttribute(String id, String label, String note) {
         this();
         this.id = id;
@@ -37,10 +46,18 @@ public class NoteAttribute extends Attribute {
         this.note = note;
     }
 
+    /**
+     * Get note.
+     * @return Note.
+     */
     public String getNote() {
         return note;
     }
 
+    /**
+     * Set note.
+     * @param note Note.
+     */
     public void setNote(String note) {
         this.note = note;
     }

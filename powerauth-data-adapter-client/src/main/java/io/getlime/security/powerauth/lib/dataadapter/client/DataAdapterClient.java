@@ -118,10 +118,10 @@ public class DataAdapterClient {
     }
 
     /**
-     * Obtain user details based on user info.
+     * Obtain user details based for given user ID.
      *
      * @param userId User ID for the user to be obtained.
-     * @return A response user with given ID.
+     * @return A response with user details.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId) throws DataAdapterClientErrorException {
@@ -145,7 +145,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create authorization SMS OTP message.
+     * Create authorization SMS message with OTP authorization code.
      *
      * @param userId           User ID.
      * @param operationContext Operation context.
@@ -176,7 +176,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Verify authorization code for previously generated SMS OTP message.
+     * Verify OTP authorization code for previously generated SMS message.
      *
      * @param messageId         Message ID.
      * @param authorizationCode User entered authorization code.
@@ -298,8 +298,8 @@ public class DataAdapterClient {
 
     /**
      * Create new DataAdapterClientErrorException from ResourceAccessException.
-     * @param ex ResourceAccessException
-     * @return DataAdapterClientErrorException
+     * @param ex Exception used when a resource access error occurs.
+     * @return Data adapter client exception.
      */
     private DataAdapterClientErrorException resourceAccessException(ResourceAccessException ex) {
         DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
@@ -308,8 +308,8 @@ public class DataAdapterClient {
 
     /**
      * Create new DataAdapterClientErrorException from IOException.
-     * @param ex IOException
-     * @return DataAdapterClientErrorException
+     * @param ex Exception used when an I/O error occurs.
+     * @return Data adapter client exception.
      */
     private DataAdapterClientErrorException invalidErrorResponseBodyException(IOException ex) {
         // JSON parsing failed
@@ -319,9 +319,9 @@ public class DataAdapterClient {
 
     /**
      * Create new DataAdapterClientErrorException from HttpStatusCodeException.
-     * @param ex HttpStatusCodeException
-     * @return DataAdapterClientErrorException
-     * @throws IOException Thrown when response body can not be parsed.
+     * @param ex Exception used when an HTTP error occurs.
+     * @return  Data adapter client exception.
+     * @throws IOException Thrown when response body could not be parsed.
      */
     private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException {
         TypeReference<ObjectResponse<DataAdapterError>> typeReference = new TypeReference<ObjectResponse<DataAdapterError>>() {

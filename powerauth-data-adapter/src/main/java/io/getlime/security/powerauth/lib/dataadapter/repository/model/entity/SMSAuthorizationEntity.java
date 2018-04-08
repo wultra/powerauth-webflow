@@ -70,98 +70,194 @@ public class SMSAuthorizationEntity implements Serializable {
     @Column(name = "timestamp_expires")
     private Date timestampExpires;
 
+    /**
+     * Get message ID.
+     * @return Message ID.
+     */
     public String getMessageId() {
         return messageId;
     }
 
+    /**
+     * Set message ID.
+     * @param messageId Message ID.
+     */
     public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 
+    /**
+     * Get operation ID.
+     * @return Operation ID.
+     */
     public String getOperationId() {
         return operationId;
     }
 
+    /**
+     * Set operation ID.
+     * @param operationId Operation ID.
+     */
     public void setOperationId(String operationId) {
         this.operationId = operationId;
     }
 
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
     public String getUserId() {
         return userId;
     }
 
+    /**
+     * Set user ID.
+     * @param userId User ID.
+     */
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
     public String getOperationName() {
         return operationName;
     }
 
+    /**
+     * Set operation name.
+     * @param operationName Operation name.
+     */
     public void setOperationName(String operationName) {
         this.operationName = operationName;
     }
 
+    /**
+     * Get OTP authorization code.
+     * @return OTP authorization code.
+     */
     public String getAuthorizationCode() {
         return authorizationCode;
     }
 
+    /**
+     * Set OTP authorization code.
+     * @param authorizationCode OPT authorization code.
+     */
     public void setAuthorizationCode(String authorizationCode) {
         this.authorizationCode = authorizationCode;
     }
 
+    /**
+     * Get salt bytes used when generating OTP.
+     * @return Salt bytes.
+     */
     public byte[] getSalt() {
         return salt;
     }
 
+    /**
+     * Set salt bytes used when generating OTP.
+     * @param salt Salt bytes.
+     */
     public void setSalt(byte[] salt) {
         this.salt = salt;
     }
 
+    /**
+     * Get localized message text.
+     * @return Message text.
+     */
     public String getMessageText() {
         return messageText;
     }
 
+    /**
+     * Set localized message text.
+     * @param messageText Message text.
+     */
     public void setMessageText(String messageText) {
         this.messageText = messageText;
     }
 
+    /**
+     * Get verification request count.
+     * @return Verification request count.
+     */
     public int getVerifyRequestCount() {
         return verifyRequestCount;
     }
 
+    /**
+     * Set verification request count.
+     * @param verifyRequestCount Verification request count.
+     */
     public void setVerifyRequestCount(int verifyRequestCount) {
         this.verifyRequestCount = verifyRequestCount;
     }
 
+    /**
+     * Whether SMS OTP authorization code is verified.
+     * @return Whether authorization code is verified.
+     */
     public boolean isVerified() {
         return verified;
     }
 
+    /**
+     * Set whether SMS OTP authorization code is verified.
+     * @param verified Whether authorization code is verified.
+     */
     public void setVerified(boolean verified) {
         this.verified = verified;
     }
 
+    /**
+     * Get timestamp when authorization SMS was created.
+     * @return Timestamp when authorization SMS was created.
+     */
     public Date getTimestampCreated() {
         return timestampCreated;
     }
 
+    /**
+     * Set timestamp when authorization SMS was created.
+     * @param timestampCreated Timestamp when authorization SMS was created.
+     */
     public void setTimestampCreated(Date timestampCreated) {
         this.timestampCreated = timestampCreated;
     }
 
+    /**
+     * Get timestamp when authorization SMS was verified.
+     * @return Timestamp when authorization SMS was verified.
+     */
     public Date getTimestampVerified() {
         return timestampVerified;
     }
 
+    /**
+     * Set timestamp when authorization SMS was verified.
+     * @param timestampVerified Timestamp when authorization SMS was verified.
+     */
     public void setTimestampVerified(Date timestampVerified) {
         this.timestampVerified = timestampVerified;
     }
 
+    /**
+     * Get timestamp when authorization SMS expires.
+     * @return Timestamp when authorization SMS expires.
+     */
     public Date getTimestampExpires() {
         return timestampExpires;
     }
 
+    /**
+     * Set timestamp when authorization SMS expires.
+     * @param timestampExpires Timestamp when authorization SMS expires.
+     */
     public void setTimestampExpires(Date timestampExpires) {
         this.timestampExpires = timestampExpires;
     }
