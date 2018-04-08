@@ -249,3 +249,19 @@ a:hover, a:active, a:focus {
     font-size: 16pt;
     margin: 10px 10px 20px 10px;
 }
+
+.alert {
+    font-size: 12pt;
+    text-align: left;
+    width: 420px;
+}
+
+.alert-form {
+    margin: 0 0 15px 0;
+    padding: 10px 15px 10px 15px;
+}
+
+.alert-field {
+    margin: 0;
+    padding: 2px 15px 2px 15px;
+}

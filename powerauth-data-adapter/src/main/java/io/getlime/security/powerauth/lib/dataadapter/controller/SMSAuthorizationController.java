@@ -99,7 +99,7 @@ public class SMSAuthorizationController {
         String userId = smsEntity.getUserId();
         String messageId = smsEntity.getMessageId();
         String messageText = smsEntity.getMessageText();
-        dataAdapter.sendAuthorizationSMS(userId, messageText);
+        dataAdapter.sendAuthorizationSMS(userId, messageText, smsRequest.getOperationContext());
 
         // Create response.
         CreateSMSAuthorizationResponse response = new CreateSMSAuthorizationResponse(messageId);
@@ -113,9 +113,9 @@ public class SMSAuthorizationController {
      */
     private SMSAuthorizationEntity createAuthorizationSMS(@Valid CreateSMSAuthorizationRequest smsRequest) {
         String userId = smsRequest.getUserId();
-        String operationId = smsRequest.getOperationId();
-        String operationName = smsRequest.getOperationName();
-        OperationFormData formData = smsRequest.getOperationFormData();
+        String operationId = smsRequest.getOperationContext().getId();
+        String operationName = smsRequest.getOperationContext().getName();
+        OperationFormData formData = smsRequest.getOperationContext().getFormData();
         String lang = smsRequest.getLang();
         return smsPersistenceService.createAuthorizationSMS(userId, operationId, operationName, formData, lang);
     }

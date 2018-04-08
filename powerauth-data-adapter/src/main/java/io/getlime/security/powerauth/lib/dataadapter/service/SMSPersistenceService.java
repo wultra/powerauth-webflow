@@ -63,7 +63,7 @@ public class SMSPersistenceService {
      * @param userId User ID.
      * @param operationId Operation ID.
      * @param operationName Operation name.
-     * @param formData Operation formData.
+     * @param formData Operation form data.
      * @param lang Language for message text.
      * @return Created entity with SMS message details.
      */

@@ -19,13 +19,11 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.operatio
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountList;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.BankAccountDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -48,7 +46,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -117,7 +114,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         final GetOperationDetailResponse operation = getOperation();
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());
-        response.setFormData(loadFormData(operation));
+        response.setFormData(decorateFormData(operation));
         response.setChosenAuthMethod(operation.getChosenAuthMethod());
         return response;
     }
@@ -213,7 +210,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE)) {
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
             bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
-            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
         }
         return new ObjectResponse();
     }
@@ -238,7 +236,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @param operation Operation.
      * @return Operation form data.
      */
-    private OperationFormData loadFormData(GetOperationDetailResponse operation) {
+    private OperationFormData decorateFormData(GetOperationDetailResponse operation) {
         OperationFormData formData = operation.getFormData();
         if (formData==null || operation.getUserId()==null) {
             return formData;
@@ -248,13 +246,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationName(), operation.getOperationId(), operation.getFormData());
-                BankAccountList bankAccountList = response.getResponseObject().getBankAccounts();
-                List<BankAccountDetail> bankAccountDetails = convertBankAccountList(bankAccountList);
-                if (!bankAccountDetails.isEmpty()) {
-                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails, bankAccountList.isEnabled(), bankAccountList.getDefaultValue());
-                }
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operationContext);
+                DecorateOperationFormDataResponse responseObject = response.getResponseObject();
+                formData = responseObject.getFormData();
                 formData.setDynamicDataLoaded(true);
+                operation.setFormData(formData);
             } catch (DataAdapterClientErrorException e) {
                 // Failed to load dynamic data, log the error. The UI will handle missing dynamic data error separately.
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
@@ -263,31 +260,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         // translate new formData messages
         messageTranslationService.translateFormData(formData);
         return formData;
-    }
-
-    /**
-     * Convert BankAccount into BankAccountDetail.
-     * @param bankAccountList List of BankAccount entities.
-     * @return List of BankAccountDetail.
-     */
-    private List<BankAccountDetail> convertBankAccountList(BankAccountList bankAccountList) {
-        // TODO - move to a converter class
-        List<BankAccountDetail> bankAccountDetails = new ArrayList<>();
-        if (bankAccountList == null || bankAccountList.getBankAccounts() == null || bankAccountList.getBankAccounts().isEmpty()) {
-            return bankAccountDetails;
-        }
-        for (BankAccount bankAccountEntity: bankAccountList.getBankAccounts()) {
-            BankAccountDetail bankAccount = new BankAccountDetail();
-            bankAccount.setName(bankAccountEntity.getName());
-            bankAccount.setNumber(bankAccountEntity.getNumber());
-            bankAccount.setAccountId(bankAccountEntity.getAccountId());
-            bankAccount.setBalance(bankAccountEntity.getBalance());
-            bankAccount.setCurrency(bankAccountEntity.getCurrency());
-            bankAccount.setUsableForPayment(bankAccountEntity.isUsableForPayment());
-            bankAccount.setUnusableForPaymentReason(bankAccountEntity.getUnusableForPaymentReason());
-            bankAccountDetails.add(bankAccount);
-        }
-        return bankAccountDetails;
     }
 
 }

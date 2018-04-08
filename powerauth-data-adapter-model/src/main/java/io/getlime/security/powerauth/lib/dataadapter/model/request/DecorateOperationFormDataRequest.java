@@ -14,34 +14,34 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.dataadapter.model.response;
+package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountList;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Response with list of user bank accounts.
+ * Request object for obtaining bank accounts by user ID.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class BankAccountListResponse {
+public class DecorateOperationFormDataRequest {
 
     private String userId;
-    private BankAccountList bankAccounts;
+    private OperationContext operationContext;
 
     /**
      * Default constructor.
      */
-    public BankAccountListResponse() {
+    public DecorateOperationFormDataRequest() {
     }
 
     /**
-     * Constructor with user ID and bank account list.
+     * Constructor with user ID as a parameter.
      * @param userId User ID.
-     * @param bankAccounts Bank account list.
+     * @param operationContext Operation context.
      */
-    public BankAccountListResponse(String userId, BankAccountList bankAccounts) {
+    public DecorateOperationFormDataRequest(String userId, OperationContext operationContext) {
         this.userId = userId;
-        this.bankAccounts = bankAccounts;
+        this.operationContext = operationContext;
     }
 
     /**
@@ -61,18 +61,18 @@ public class BankAccountListResponse {
     }
 
     /**
-     * Get list of bank accounts.
-     * @return List of bank accounts.
+     * Get operation context.
+     * @return Operation context.
      */
-    public BankAccountList getBankAccounts() {
-        return bankAccounts;
+    public OperationContext getOperationContext() {
+        return operationContext;
     }
 
     /**
-     * Set list of bank accounts.
-     * @param bankAccounts List of bank accounts.
+     * Set operation context.
+     * @param operationContext Operation context.
      */
-    public void setBankAccounts(BankAccountList bankAccounts) {
-        this.bankAccounts = bankAccounts;
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
     }
 }

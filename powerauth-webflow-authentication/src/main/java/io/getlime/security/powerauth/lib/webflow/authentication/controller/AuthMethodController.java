@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
@@ -188,12 +189,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
-        validateOperationState(operationId);
+        GetOperationDetailResponse operation = validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params);
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
-                dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, operationId);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
@@ -216,12 +218,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
-        validateOperationState(operationId);
+        GetOperationDetailResponse operation = validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
-                dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operationId);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
@@ -243,12 +246,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
-        validateOperationState(operationId);
+        GetOperationDetailResponse operation = validateOperationState(operationId);
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operationId);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
             }
@@ -337,7 +341,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 final GetOperationDetailResponse operationDetail = operation.getResponseObject();
                 nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), getAuthMethodName(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null);
                 // notify Data Adapter about cancellation
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOperationId());
+                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), operationDetail.getFormData());
+                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationContext);
             } catch (NextStepServiceException | DataAdapterClientErrorException e) {
                 // errors occurring when canceling previous operations are not critical
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while canceling previous operation", e);
@@ -443,10 +448,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws NextStepServiceException Thrown when communication with Next Step server fails.
      * @throws AuthStepException Thrown when operation state is invalid.
      */
-    private void validateOperationState(String operationId) throws NextStepServiceException, AuthStepException {
+    private GetOperationDetailResponse validateOperationState(String operationId) throws NextStepServiceException, AuthStepException {
         final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
         final GetOperationDetailResponse operation = operationDetail.getResponseObject();
         validateOperationState(operation);
+        return operation;
     }
 
     /**

@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.exception.AuthenticationFai
 import io.getlime.security.powerauth.lib.dataadapter.exception.DataAdapterRemoteException;
 import io.getlime.security.powerauth.lib.dataadapter.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.dataadapter.impl.validation.AuthenticationRequestValidator;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AuthenticationRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.UserDetailRequest;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
@@ -88,7 +89,8 @@ public class AuthenticationController {
         AuthenticationRequest authenticationRequest = request.getRequestObject();
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();
-        UserDetailResponse userDetailResponse = dataAdapter.authenticateUser(username, password);
+        OperationContext operationContext = authenticationRequest.getOperationContext();
+        UserDetailResponse userDetailResponse = dataAdapter.authenticateUser(username, password, operationContext);
         AuthenticationResponse response = new AuthenticationResponse(userDetailResponse.getId());
         return new ObjectResponse<>(response);
     }

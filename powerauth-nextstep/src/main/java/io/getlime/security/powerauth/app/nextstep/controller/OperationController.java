@@ -189,7 +189,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with updated formData.
+     * Update operation with updated form data.
      *
      * @param request Update operation request.
      * @return Update operation response.

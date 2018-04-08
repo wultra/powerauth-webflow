@@ -21,7 +21,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttributeFormatted;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,9 +88,9 @@ public class HomeController {
         formData.addGreeting("operation.greeting");
         formData.addSummary("operation.summary");
         formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
-        formData.addKeyValue("operation.account", paymentForm.getAccount(), OperationFormFieldAttributeFormatted.ValueFormatType.ACCOUNT);
-        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), OperationFormFieldAttributeFormatted.ValueFormatType.DATE);
-        formData.addNote("operation.note", paymentForm.getNote(), OperationFormFieldAttributeFormatted.ValueFormatType.TEXT);
+        formData.addKeyValue("operation.account", paymentForm.getAccount(), ValueFormatType.ACCOUNT);
+        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), ValueFormatType.DATE);
+        formData.addNote("operation.note", paymentForm.getNote(), ValueFormatType.TEXT);
 
         // Sample operation configuration for bank account choice select.
         // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();
@@ -98,6 +98,11 @@ public class HomeController {
         // bankAccountConfig.setEnabled(false);
         // bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
         // formData.getConfig().add(bankAccountConfig);
+
+        // Sample banners displayed above the operation details.
+        // formData.addBanner(BannerType.BANNER_ERROR, "banner.error");
+        // formData.addBanner(BannerType.BANNER_WARNING, "banner.warning");
+        // formData.addBanner(BannerType.BANNER_INFO, "banner.info");
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 
 /**
@@ -38,6 +39,11 @@ public class AuthenticationRequest {
     private AuthenticationType type;
 
     /**
+     * Operation context.
+     */
+    private OperationContext operationContext;
+
+    /**
      * Empty constructor.
      */
     public AuthenticationRequest() {
@@ -49,14 +55,15 @@ public class AuthenticationRequest {
      * @param password password for this authentication request
      * @param type authentication type
      */
-    public AuthenticationRequest(String username, String password, AuthenticationType type) {
+    public AuthenticationRequest(String username, String password, AuthenticationType type, OperationContext operationContext) {
         this.username = username;
         this.password = password;
         this.type = type;
+        this.operationContext = operationContext;
     }
 
     /**
-     * Sets the username.
+     * Set the username.
      * @param username username to set
      */
     public void setUsername(String username) {
@@ -64,7 +71,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Gets the username.
+     * Get the username.
      * @return username
      */
     public String getUsername() {
@@ -72,7 +79,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Sets the password.
+     * Set the password.
      * @param password password to set
      */
     public void setPassword(String password) {
@@ -80,7 +87,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Gets the password.
+     * Get the password.
      * @return password
      */
     public String getPassword() {
@@ -88,7 +95,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Sets the authentication type.
+     * Set the authentication type.
      * @param type authentication type
      */
     public void setType(AuthenticationType type) {
@@ -96,11 +103,26 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Gets the authentication type.
+     * Get the authentication type.
      * @return authentication type
      */
     public AuthenticationType getType() {
         return type;
     }
 
+    /**
+     * Get operation context.
+     * @return Operation context.
+     */
+    public OperationContext getOperationContext() {
+        return operationContext;
+    }
+
+    /**
+     * Set operation context.
+     * @param operationContext Operation context.
+     */
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
+    }
 }
