@@ -118,7 +118,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Obtain user details based for given user ID.
+     * Obtain user details for given user ID.
      *
      * @param userId User ID for the user to be obtained.
      * @return A response with user details.
