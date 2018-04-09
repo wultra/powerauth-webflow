@@ -174,8 +174,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId) throws NextStepServiceException, AuthStepException {
-        UpdateOperationResponse response = authorize(operationId, userId, null);
-        return response;
+        return authorize(operationId, userId, null);
     }
 
     /**
