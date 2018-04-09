@@ -29,6 +29,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Controller class which handles notifications about changes of operation state.
  *
@@ -58,11 +61,14 @@ public class OperationChangeController {
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse operationChangedNotification(@RequestBody ObjectRequest<OperationChangeNotificationRequest> request) throws DataAdapterRemoteException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received operationChangedNotification request for user: {0}, operation ID: {1}",
+                new String[]{request.getRequestObject().getUserId(), request.getRequestObject().getOperationContext().getId()});
         OperationChangeNotificationRequest notification = request.getRequestObject();
         String userId = notification.getUserId();
         OperationContext operationContext = notification.getOperationContext();
         OperationChange operationChange = notification.getOperationChange();
         dataAdapter.operationChangedNotification(userId, operationChange, operationContext);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The operationChangedNotification request succeeded");
         return new ObjectResponse();
     }
 

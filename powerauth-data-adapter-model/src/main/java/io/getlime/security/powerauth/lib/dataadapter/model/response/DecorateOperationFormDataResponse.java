@@ -35,6 +35,7 @@ public class DecorateOperationFormDataResponse {
 
     /**
      * Constructor with operation form data.
+     * @param formData Operation form data.
      */
     public DecorateOperationFormDataResponse(OperationFormData formData) {
         this.formData = formData;

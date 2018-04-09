@@ -47,6 +47,7 @@ public class FormDataChange {
     // JsonIgnore added, otherwise type was serialized twice
     /**
      * Get form data change type.
+     * @return Form data change type.
      */
     @JsonIgnore
     public Type getType() {

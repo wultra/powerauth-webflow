@@ -38,6 +38,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller that handles the initialization of the authentication flow.
@@ -69,12 +71,15 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation INIT started");
 
         GetOperationDetailResponse operation = null;
 
         try {
             operation = getOperation();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation found, operation ID: {0}, operation name: {1}", new String[] {operation.getOperationId(), operation.getOperationName()});
         } catch (AuthStepException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation not found");
             // Operation is not available - this state is valid in INIT authentication method, operation was not initialized yet
             // and it will be initialized as a new operation with default form data for a login operation.
         }
@@ -91,36 +96,44 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             formData.addGreeting("login.greeting");
             formData.addSummary("login.summary");
             List<KeyValueParameter> params = new ArrayList<>();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Initialized default login operation");
             return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
                     return completeOperationResponse();
                 }
 
                 @Override
                 public InitOperationResponse failedAuthentication(String userId, String failedReason) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
                     return failedOperationResponse(null, failedReason);
                 }
 
                 @Override
                 public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
                     return continueOperationResponse(operationId, steps);
                 }
             });
         } else {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Continuing operation, operation ID: {0}, operation name: {1}", new String[] {operation.getOperationId(), operation.getOperationName()});
             return continueOperationWithId(operation.getOperationId(), sessionId, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
                     return completeOperationResponse();
                 }
 
                 @Override
                 public InitOperationResponse failedAuthentication(String userId, String failedReason) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
                     return failedOperationResponse(null, failedReason);
                 }
 
                 @Override
                 public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
                     return continueOperationResponse(operationId, steps);
                 }
             });
@@ -130,11 +143,11 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
     /**
      * Create a failed operation response.
-     * @param message Message.
+     * @param userId User ID.
      * @param failedReason Failure reason.
      * @return Failed operation response.
      */
-    private InitOperationResponse failedOperationResponse(String message, String failedReason) {
+    private InitOperationResponse failedOperationResponse(String userId, String failedReason) {
         clearCurrentBrowserSession();
         InitOperationResponse registrationResponse = new InitOperationResponse();
         registrationResponse.setResult(AuthStepResult.AUTH_FAILED);

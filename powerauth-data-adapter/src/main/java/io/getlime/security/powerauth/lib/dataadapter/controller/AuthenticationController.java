@@ -36,6 +36,8 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller class which handles user authentication.
@@ -84,14 +86,17 @@ public class AuthenticationController {
         if (result.hasErrors()) {
             // getEnclosingMethod() on new object returns a reference to current method
             MethodParameter methodParam = new MethodParameter(new Object(){}.getClass().getEnclosingMethod(),0);
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "The authenticate request failed due to validation errors");
             throw new MethodArgumentNotValidException(methodParam, result);
         }
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received authenticate request, username: {0}, operation ID: {1}", new String[]{request.getRequestObject().getUsername(), request.getRequestObject().getOperationContext().getId()});
         AuthenticationRequest authenticationRequest = request.getRequestObject();
         String username = authenticationRequest.getUsername();
         String password = authenticationRequest.getPassword();
         OperationContext operationContext = authenticationRequest.getOperationContext();
         UserDetailResponse userDetailResponse = dataAdapter.authenticateUser(username, password, operationContext);
         AuthenticationResponse response = new AuthenticationResponse(userDetailResponse.getId());
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The authenticate request succeeded, user ID: {0}, operation ID: {1}", new String[]{request.getRequestObject().getUsername(), request.getRequestObject().getOperationContext().getId()});
         return new ObjectResponse<>(response);
     }
 
@@ -105,9 +110,11 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "/info", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<UserDetailResponse> fetchUserDetail(@RequestBody ObjectRequest<UserDetailRequest> request) throws DataAdapterRemoteException, UserNotFoundException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received fetchUserDetail request, user ID: {0}", request.getRequestObject().getId());
         UserDetailRequest userDetailRequest = request.getRequestObject();
         String userId = userDetailRequest.getId();
         UserDetailResponse response = dataAdapter.fetchUserDetail(userId);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The fetchUserDetail request succeeded");
         return new ObjectResponse<>(response);
     }
 

@@ -59,7 +59,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(OperationAlreadyFinishedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFinishedException(OperationAlreadyFinishedException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", ex);
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyFinishedException.CODE, "Operation is already in DONE state.");
         return new ErrorResponse(error);
     }
@@ -72,7 +72,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(OperationAlreadyFailedException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", ex);
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyFailedException.CODE, "Operation is already in FAILED state.");
         return new ErrorResponse(error);
     }
