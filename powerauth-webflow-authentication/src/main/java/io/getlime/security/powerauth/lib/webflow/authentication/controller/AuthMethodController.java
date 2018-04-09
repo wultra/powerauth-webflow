@@ -174,9 +174,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId) throws NextStepServiceException, AuthStepException {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authorization started, operation ID: {0}, user ID: {1}, authentication method: {2}", new String[] {operationId, userId, getAuthMethodName().toString()});
         UpdateOperationResponse response = authorize(operationId, userId, null);
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authorization succeeded, operation ID: {0}, user ID: {1}, authentication method: {2}", new String[] {operationId, userId, getAuthMethodName().toString()});
         return response;
     }
 
