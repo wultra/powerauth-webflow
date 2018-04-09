@@ -89,9 +89,11 @@ public class HomeController {
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.GET)
     public String authenticate(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received /authenticate request");
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "HTTP request not found in HttpSessionRequestCache");
             return "redirect:/oauth/error";
         }
 
@@ -124,6 +126,7 @@ public class HomeController {
         model.put("i18n_CS", i18nService.generateMessages(new Locale("cs")));
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The /authenticate request succeeded");
         return "index";
     }
 
@@ -136,6 +139,7 @@ public class HomeController {
      */
     @RequestMapping(value = "/authenticate/continue", method = RequestMethod.GET)
     public String continueToRedirect(HttpServletRequest request, HttpServletResponse response) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received /authenticate/continue request");
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         String redirectUrl;
@@ -145,6 +149,7 @@ public class HomeController {
             // String uri = request.getRequestURI();
             // String ctx = request.getContextPath();
             // String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "HTTP request not found in HttpSessionRequestCache");
             return "redirect:/oauth/error";
         } else {
             authenticationManagementService.setLanguage(LocaleContextHolder.getLocale().getLanguage());
@@ -153,6 +158,7 @@ public class HomeController {
         }
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The /authenticate/continue request succeeded");
         return null;
     }
 
@@ -165,6 +171,7 @@ public class HomeController {
      */
     @RequestMapping(value = "/authenticate/cancel", method = RequestMethod.GET)
     public String cancelAuthentication(HttpServletRequest request, HttpServletResponse response) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received /authenticate/cancel request");
         HttpSessionRequestCache cache = new HttpSessionRequestCache();
         SavedRequest savedRequest = cache.getRequest(request, response);
         if (savedRequest == null) {
@@ -190,6 +197,7 @@ public class HomeController {
                 .queryParam("error_description", "User canceled authentication request")
                 .build()
                 .toUriString();
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The /authenticate/cancel request succeeded");
         return "redirect:" + redirectWithError;
     }
 

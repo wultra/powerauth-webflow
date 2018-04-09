@@ -90,7 +90,9 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         //TODO: Check pre-authenticated user here
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         return operation.getUserId();
     }
 
@@ -135,6 +137,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -144,6 +147,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -153,12 +157,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
                     return response;
                 }
             });
         } catch (AuthStepException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred while reviewing operation: {0}", e.getMessage());
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -182,11 +189,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
             return response;
         } catch (NextStepServiceException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             return response;
         }
     }

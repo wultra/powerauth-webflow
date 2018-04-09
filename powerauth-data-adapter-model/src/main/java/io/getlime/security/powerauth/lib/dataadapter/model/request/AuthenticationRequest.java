@@ -54,6 +54,7 @@ public class AuthenticationRequest {
      * @param username Username for this authentication request.
      * @param password Password for this authentication request.
      * @param type Authentication type.
+     * @param operationContext Operation context.
      */
     public AuthenticationRequest(String username, String password, AuthenticationType type, OperationContext operationContext) {
         this.username = username;

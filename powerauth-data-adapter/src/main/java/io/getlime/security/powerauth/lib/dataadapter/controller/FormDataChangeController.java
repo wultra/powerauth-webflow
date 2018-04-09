@@ -32,6 +32,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Controller class which handles notifications about changes of operation form data.
  *
@@ -61,11 +64,14 @@ public class FormDataChangeController {
      */
     @RequestMapping(value = "/change", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse formDataChangedNotification(@RequestBody ObjectRequest<FormDataChangeNotificationRequest> request) throws DataAdapterRemoteException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received formDataChangedNotification request for user: {0}, operation ID: {1}",
+                new String[]{request.getRequestObject().getUserId(), request.getRequestObject().getOperationContext().getId()});
         FormDataChangeNotificationRequest notification = request.getRequestObject();
         String userId = notification.getUserId();
         OperationContext operationContext = notification.getOperationContext();
         FormDataChange formDataChange = notification.getFormDataChange();
         dataAdapter.formDataChangedNotification(userId, formDataChange, operationContext);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The formDataChangedNotification request succeeded");
         return new ObjectResponse();
     }
 
@@ -79,10 +85,13 @@ public class FormDataChangeController {
      */
     @RequestMapping(value = "/decorate", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(@RequestBody ObjectRequest<DecorateOperationFormDataRequest> request) throws DataAdapterRemoteException, UserNotFoundException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received decorateOperationFormData request for user: {0}, operation ID: {1}",
+                new String[]{request.getRequestObject().getUserId(), request.getRequestObject().getOperationContext().getId()});
         DecorateOperationFormDataRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         OperationContext operationContext = requestObject.getOperationContext();
         DecorateOperationFormDataResponse response = dataAdapter.decorateFormData(userId, operationContext);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The decorateOperationFormData request succeeded");
         return new ObjectResponse<>(response);
     }
 }

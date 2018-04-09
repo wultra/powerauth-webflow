@@ -139,12 +139,12 @@ public class DataAdapterService implements DataAdapter {
             case BANK_ACCOUNT_CHOICE:
                 // Handle bank account choice here (e.g. send notification to bank backend).
                 BankAccountChoice bankAccountChoice = (BankAccountChoice) change;
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Bank account chosen: " + bankAccountChoice.getBankAccountId() + ", user: " + userId + ", operationId: " + operationId);
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Bank account chosen: {0}, operation ID: {1}", new String[] {bankAccountChoice.getBankAccountId(), operationContext.getId()});
                 break;
             case AUTH_METHOD_CHOICE:
                 // Handle authorization method choice here (e.g. send notification to bank backend).
                 AuthMethodChoice authMethodChoice = (AuthMethodChoice) change;
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Authorization method chosen: " + authMethodChoice.getChosenAuthMethod() + ", user: " + userId + ", operationId: " + operationId);
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Authorization method chosen: {0}, operation ID: {1}", new String[] {authMethodChoice.getChosenAuthMethod().toString(), operationContext.getId()});
                 break;
             default:
                 throw new IllegalStateException("Invalid change entity type: " + change.getType());
@@ -155,7 +155,7 @@ public class DataAdapterService implements DataAdapter {
     public void operationChangedNotification(String userId, OperationChange change, OperationContext operationContext) throws DataAdapterRemoteException {
         String operationId = operationContext.getId();
         // Handle operation change here (e.g. send notification to bank backend).
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation changed: " + change + ", user: " + userId + ", operationId: " + operationId);
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation changed, status: {0}, operation ID: {1}", new String[] {change.toString(), operationContext.getId()});
     }
 
     @Override

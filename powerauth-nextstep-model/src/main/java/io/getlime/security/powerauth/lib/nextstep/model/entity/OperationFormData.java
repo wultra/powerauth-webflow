@@ -99,6 +99,7 @@ public class OperationFormData {
     /**
      * Set title.
      * @param titleId Title ID.
+     * @return Operation form message attribute.
      */
     @JsonIgnore
     public OperationFormMessageAttribute addTitle(String titleId) {
@@ -131,6 +132,7 @@ public class OperationFormData {
     /**
      * Set greeting.
      * @param greetingId Greeting ID.
+     * @return Operation form message attribute.
      */
     @JsonIgnore
     public OperationFormMessageAttribute addGreeting(String greetingId) {
@@ -163,6 +165,7 @@ public class OperationFormData {
     /**
      * Set summary.
      * @param summaryId Message ID.
+     * @return Operation form message attribute.
      */
     @JsonIgnore
     public OperationFormMessageAttribute addSummary(String summaryId) {
@@ -186,6 +189,7 @@ public class OperationFormData {
      * @param amount Amount value.
      * @param currencyId Currency ID.
      * @param currency Amount currency.
+     * @return Operation amount field attribute.
      */
     @JsonIgnore
     public OperationAmountFieldAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
@@ -218,6 +222,7 @@ public class OperationFormData {
      * Set localized note.
      * @param noteId Note ID.
      * @param note Localized note.
+     * @return Operation note field attribute.
      */
     @JsonIgnore
     public OperationNoteFieldAttribute addNote(String noteId, String note) {
@@ -233,6 +238,7 @@ public class OperationFormData {
      * @param noteId Note ID.
      * @param note Note.
      * @param valueFormatType Value format type.
+     * @return Operation note field attribute.
      */
     @JsonIgnore
     public OperationNoteFieldAttribute addNote(String noteId, String note, ValueFormatType valueFormatType) {
@@ -265,6 +271,7 @@ public class OperationFormData {
      * @param bankAccounts List of bank accounts.
      * @param enabled Whether choice is enabled.
      * @param defaultValue Default bank account value.
+     * @return Bank account choice field attribute.
      */
     @JsonIgnore
     public OperationBankAccountChoiceFieldAttribute addBankAccountChoice(String id, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
@@ -281,6 +288,7 @@ public class OperationFormData {
      * Add a key-value attribute.
      * @param id Attribute ID.
      * @param value Attribute value.
+     * @return Key-value field attribute.
      */
     @JsonIgnore
     public OperationKeyValueFieldAttribute addKeyValue(String id, String value) {
@@ -296,6 +304,7 @@ public class OperationFormData {
      * @param id Attribute ID.
      * @param value Attribute value.
      * @param valueFormatType Value format type.
+     * @return Key-value field attribute.
      */
     @JsonIgnore
     public OperationKeyValueFieldAttribute addKeyValue(String id, String value, ValueFormatType valueFormatType) {

@@ -95,6 +95,7 @@ public class DataAdapterClient {
      *
      * @param username username for user who is being authenticated
      * @param password password as a string
+     * @param operationContext operation context
      * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
