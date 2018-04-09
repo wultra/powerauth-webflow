@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 import java.util.Objects;
 
@@ -23,7 +23,7 @@ import java.util.Objects;
  * @author Roman Strobl, roman.strobl@lime-company.eu
  *
  */
-public class OperationFormFieldConfig {
+public class FormFieldConfig {
 
     protected String id;
     private boolean enabled;
@@ -32,7 +32,7 @@ public class OperationFormFieldConfig {
     /**
      * Default constructor.
      */
-    public OperationFormFieldConfig() {
+    public FormFieldConfig() {
     }
 
     /**
@@ -41,7 +41,7 @@ public class OperationFormFieldConfig {
      * @param enabled Whether field is enabled.
      * @param defaultValue Default field value.
      */
-    public OperationFormFieldConfig(String id, boolean enabled, String defaultValue) {
+    public FormFieldConfig(String id, boolean enabled, String defaultValue) {
         this.id = id;
         this.enabled = enabled;
         this.defaultValue = defaultValue;
@@ -99,7 +99,7 @@ public class OperationFormFieldConfig {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        OperationFormFieldConfig fieldConfig = (OperationFormFieldConfig) o;
+        FormFieldConfig fieldConfig = (FormFieldConfig) o;
         return Objects.equals(id, fieldConfig.id);
     }
 

@@ -44,6 +44,23 @@ public class OperationNoteFieldAttribute extends OperationFormFieldAttributeForm
     }
 
     /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Label.
+     * @param note Note.
+     * @param valueFormatType Value format type.
+     * @param formattedValue Formatted value.
+     */
+    public OperationNoteFieldAttribute(String id, String label, String note, ValueFormatType valueFormatType, String formattedValue) {
+        this.type = Type.NOTE;
+        this.id = id;
+        this.label = label;
+        this.note = note;
+        this.valueFormatType = valueFormatType;
+        this.formattedValue = formattedValue;
+    }
+
+    /**
      * Get note.
      * @return Note.
      */

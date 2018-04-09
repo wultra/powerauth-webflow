@@ -3,6 +3,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -17,6 +18,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.SMSAuthorizationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,7 +76,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             throw new InvalidRequestException("Message ID is missing.");
         }
         try {
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode(), operationContext);
             httpSession.removeAttribute(MESSAGE_ID);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
@@ -124,7 +127,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
 
         final String userId = operation.getUserId();
         try {
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
                     LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();

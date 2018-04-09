@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.BannerType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerType;
 
 /**
  * Class representing an operation form field attribute for banner with message.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationBannerFieldAttribute extends OperationFormFieldAttribute {
+public class BannerAttribute extends Attribute {
 
     private String message;
     private final BannerType bannerType;
@@ -30,7 +30,7 @@ public class OperationBannerFieldAttribute extends OperationFormFieldAttribute {
     /**
      * Default constructor.
      */
-    public OperationBannerFieldAttribute() {
+    public BannerAttribute() {
         this.type = Type.BANNER;
         this.bannerType = BannerType.BANNER_INFO;
     }
@@ -39,7 +39,7 @@ public class OperationBannerFieldAttribute extends OperationFormFieldAttribute {
      * Constructor with banner type.
      * @param bannerType Banner type.
      */
-    public OperationBannerFieldAttribute(BannerType bannerType) {
+    public BannerAttribute(BannerType bannerType) {
         this.type = Type.BANNER;
         this.bannerType = bannerType;
     }
@@ -51,7 +51,7 @@ public class OperationBannerFieldAttribute extends OperationFormFieldAttribute {
      * @param bannerType Banner type.
      * @param message Banner message.
      */
-    public OperationBannerFieldAttribute(String id, String label, BannerType bannerType, String message) {
+    public BannerAttribute(String id, String label, BannerType bannerType, String message) {
         this.type = Type.BANNER;
         this.id = id;
         this.label = label;

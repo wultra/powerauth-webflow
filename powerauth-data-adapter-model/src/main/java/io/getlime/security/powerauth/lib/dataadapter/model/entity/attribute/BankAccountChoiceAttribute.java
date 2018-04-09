@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.BankAccountDetail;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 
 import java.util.List;
 
@@ -24,16 +24,16 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationBankAccountChoiceFieldAttribute extends OperationFormFieldAttribute {
+public class BankAccountChoiceAttribute extends Attribute {
 
-    private List<BankAccountDetail> bankAccounts;
+    private List<BankAccount> bankAccounts;
     private boolean enabled;
     private String defaultValue;
 
     /**
      * Default constructor.
      */
-    public OperationBankAccountChoiceFieldAttribute() {
+    public BankAccountChoiceAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 
@@ -45,7 +45,7 @@ public class OperationBankAccountChoiceFieldAttribute extends OperationFormField
      * @param enabled Whether choice is enabled.
      * @param defaultValue Default chosen value.
      */
-    public OperationBankAccountChoiceFieldAttribute(String id, String label, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
+    public BankAccountChoiceAttribute(String id, String label, List<BankAccount> bankAccounts, boolean enabled, String defaultValue) {
         this.type = Type.BANK_ACCOUNT_CHOICE;
         this.id = id;
         this.label = label;
@@ -58,7 +58,7 @@ public class OperationBankAccountChoiceFieldAttribute extends OperationFormField
      * Get bank account list.
      * @return Bank account list.
      */
-    public List<BankAccountDetail> getBankAccounts() {
+    public List<BankAccount> getBankAccounts() {
         return bankAccounts;
     }
 
@@ -66,7 +66,7 @@ public class OperationBankAccountChoiceFieldAttribute extends OperationFormField
      * Set bank account list.
      * @param bankAccounts Bank account list.
      */
-    public void setBankAccounts(List<BankAccountDetail> bankAccounts) {
+    public void setBankAccounts(List<BankAccount> bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
 

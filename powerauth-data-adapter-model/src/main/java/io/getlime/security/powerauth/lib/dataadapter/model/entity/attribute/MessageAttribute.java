@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 /**
  * Class representing the operation form attribute.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationFormMessageAttribute {
+public class MessageAttribute {
 
     protected String id;
     protected String message;
@@ -28,7 +28,7 @@ public class OperationFormMessageAttribute {
     /**
      * Default constructor.
      */
-    public OperationFormMessageAttribute() {
+    public MessageAttribute() {
     }
 
     /**
@@ -36,7 +36,7 @@ public class OperationFormMessageAttribute {
      * @param id Attribute ID.
      * @param message Message.
      */
-    public OperationFormMessageAttribute(String id, String message) {
+    public MessageAttribute(String id, String message) {
         this.id = id;
         this.message = message;
     }
