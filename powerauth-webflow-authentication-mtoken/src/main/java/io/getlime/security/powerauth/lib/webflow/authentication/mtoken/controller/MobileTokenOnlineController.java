@@ -322,10 +322,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      */
     private void sendAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String statusMessage) {
         try {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Send step finished push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
             String activationId = getActivationId(operation);
             PushMessage message = createAuthStepFinishedPushMessage(operation, activationId, statusMessage);
             Long applicationId = getApplicationId(activationId);
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Send step finished push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
             pushServerClient.sendPushMessage(applicationId, message);
         } catch (Exception ex) {
             // Exception which occurs when push message is sent is not critical, return regular response.
