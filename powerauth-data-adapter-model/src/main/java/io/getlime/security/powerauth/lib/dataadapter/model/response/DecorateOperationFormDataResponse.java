@@ -16,7 +16,7 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 
 /**
  * Response with decorated operation form data.
@@ -25,7 +25,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
  */
 public class DecorateOperationFormDataResponse {
 
-    private OperationFormData formData;
+    private FormData formData;
 
     /**
      * Default constructor.
@@ -37,7 +37,7 @@ public class DecorateOperationFormDataResponse {
      * Constructor with operation form data.
      * @param formData Operation form data.
      */
-    public DecorateOperationFormDataResponse(OperationFormData formData) {
+    public DecorateOperationFormDataResponse(FormData formData) {
         this.formData = formData;
     }
 
@@ -45,7 +45,7 @@ public class DecorateOperationFormDataResponse {
      * Get operation form data.
      * @return Operation form data.
      */
-    public OperationFormData getFormData() {
+    public FormData getFormData() {
         return formData;
     }
 
@@ -53,7 +53,7 @@ public class DecorateOperationFormDataResponse {
      * Set operation form data.
      * @param formData Operation form data.
      */
-    public void setFormData(OperationFormData formData) {
+    public void setFormData(FormData formData) {
         this.formData = formData;
     }
 }

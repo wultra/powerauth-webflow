@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -38,6 +39,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -219,7 +221,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE)) {
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
             bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
         }
         return new ObjectResponse();
@@ -241,34 +244,36 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     }
 
     /**
-     * Load form data from the server.
+     * Decorate form data in Data Adapter.
      * @param operation Operation.
-     * @return Operation form data.
+     * @return Decorated operation form data.
      */
     private OperationFormData decorateFormData(GetOperationDetailResponse operation) {
-        OperationFormData formData = operation.getFormData();
-        if (formData==null || operation.getUserId()==null) {
-            return formData;
+        OperationFormData formDataNS = operation.getFormData();
+        if (formDataNS==null || operation.getUserId()==null) {
+            return formDataNS;
         }
-        if (!formData.isDynamicDataLoaded()) {
+        if (!formDataNS.isDynamicDataLoaded()) {
             // Dynamic data has not been loaded yet. At this point the user is authenticated, so we can
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                FormDataConverter converter = new FormDataConverter();
+                FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA);
                 ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operationContext);
                 DecorateOperationFormDataResponse responseObject = response.getResponseObject();
-                formData = responseObject.getFormData();
-                formData.setDynamicDataLoaded(true);
-                operation.setFormData(formData);
+                formDataNS = converter.fromFormData(responseObject.getFormData());
+                formDataNS.setDynamicDataLoaded(true);
+                operation.setFormData(formDataNS);
             } catch (DataAdapterClientErrorException e) {
                 // Failed to load dynamic data, log the error. The UI will handle missing dynamic data error separately.
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
             }
         }
         // translate new formData messages
-        messageTranslationService.translateFormData(formData);
-        return formData;
+        messageTranslationService.translateFormData(formDataNS);
+        return formDataNS;
     }
 
 }

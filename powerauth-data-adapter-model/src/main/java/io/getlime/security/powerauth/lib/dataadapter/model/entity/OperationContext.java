@@ -1,7 +1,5 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-
 /**
  * Class representing context of an operation.
  *
@@ -12,7 +10,7 @@ public class OperationContext {
     private String id;
     private String name;
     private String data;
-    private OperationFormData formData;
+    private FormData formData;
 
     /**
      * Default constructor.
@@ -27,7 +25,7 @@ public class OperationContext {
      * @param data Operation data.
      * @param formData Operation form data.
      */
-    public OperationContext(String id, String name, String data, OperationFormData formData) {
+    public OperationContext(String id, String name, String data, FormData formData) {
         this.id = id;
         this.name = name;
         this.data = data;
@@ -86,7 +84,7 @@ public class OperationContext {
      * Get operation form data.
      * @return Operation form data.
      */
-    public OperationFormData getFormData() {
+    public FormData getFormData() {
         return formData;
     }
 
@@ -94,7 +92,7 @@ public class OperationContext {
      * Set operation form data.
      * @param formData Operation form data.
      */
-    public void setFormData(OperationFormData formData) {
+    public void setFormData(FormData formData) {
         this.formData = formData;
     }
 }

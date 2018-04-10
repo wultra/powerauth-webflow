@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -37,6 +38,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
@@ -195,7 +197,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
                 dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
@@ -226,7 +229,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
@@ -256,7 +260,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while notifying Data Adapter", ex);
@@ -355,7 +360,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 final GetOperationDetailResponse operationDetail = operation.getResponseObject();
                 nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), getAuthMethodName(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null);
                 // notify Data Adapter about cancellation
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), operationDetail.getFormData());
+                FormData formData = new FormDataConverter().fromOperationFormData(operation.getResponseObject().getFormData());
+                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationContext);
             } catch (NextStepServiceException | DataAdapterClientErrorException e) {
                 // errors occurring when canceling previous operations are not critical

@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.form.con
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -34,6 +35,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -76,7 +78,8 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         try {
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getFormData());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, user ID: {1}, authentication method: {2}", new String[] {operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString()});

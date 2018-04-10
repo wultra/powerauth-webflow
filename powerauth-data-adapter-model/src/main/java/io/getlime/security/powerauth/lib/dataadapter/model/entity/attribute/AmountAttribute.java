@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
 import java.math.BigDecimal;
 
@@ -24,7 +24,7 @@ import java.math.BigDecimal;
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFormatted {
+public class AmountAttribute extends AttributeFormatted {
 
     private BigDecimal amount;
     private String currency;
@@ -33,7 +33,7 @@ public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFo
     /**
      * Default constructor.
      */
-    public OperationAmountFieldAttribute() {
+    public AmountAttribute() {
         this.type = Type.AMOUNT;
         this.valueFormatType = ValueFormatType.AMOUNT;
     }
@@ -47,7 +47,7 @@ public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFo
      * @param currencyId Currency localization ID.
      * @param formattedValue Formatted value.
      */
-    public OperationAmountFieldAttribute(String id, String label, BigDecimal amount, String currency, String currencyId, String formattedValue) {
+    public AmountAttribute(String id, String label, BigDecimal amount, String currency, String currencyId, String formattedValue) {
         this.type = Type.AMOUNT;
         this.valueFormatType = ValueFormatType.AMOUNT;
         this.id = id;
@@ -105,4 +105,5 @@ public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFo
     public void setCurrencyId(String currencyId) {
         this.currencyId = currencyId;
     }
+
 }

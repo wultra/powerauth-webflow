@@ -13,32 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
 /**
  * Class representing an operation form field attribute for generic key-value pair.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationKeyValueFieldAttribute extends OperationFormFieldAttributeFormatted {
+public class KeyValueAttribute extends AttributeFormatted {
 
     private String value;
 
     /**
      * Default constructor.
      */
-    public OperationKeyValueFieldAttribute() {
+    public KeyValueAttribute() {
         this.type = Type.KEY_VALUE;
-        this.valueFormatType = ValueFormatType.TEXT;
     }
 
     /**
      * Constructor with value format type.
      * @param valueFormatType Value format type.
      */
-    public OperationKeyValueFieldAttribute(ValueFormatType valueFormatType) {
+    public KeyValueAttribute(ValueFormatType valueFormatType) {
         this.type = Type.KEY_VALUE;
         this.valueFormatType = valueFormatType;
     }
@@ -51,7 +50,7 @@ public class OperationKeyValueFieldAttribute extends OperationFormFieldAttribute
      * @param valueFormatType Value format type.
      * @param formattedValue Formatted value.
      */
-    public OperationKeyValueFieldAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
+    public KeyValueAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
         this.type = Type.KEY_VALUE;
         this.id = id;
         this.label = label;

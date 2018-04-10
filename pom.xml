@@ -65,7 +65,6 @@
 	<modules>
 		<module>powerauth-data-adapter-client</module>
 		<module>powerauth-data-adapter-model</module>
-		<module>powerauth-data-adapter</module>
         <module>powerauth-nextstep</module>
 		<module>powerauth-nextstep-client</module>
 		<module>powerauth-nextstep-model</module>

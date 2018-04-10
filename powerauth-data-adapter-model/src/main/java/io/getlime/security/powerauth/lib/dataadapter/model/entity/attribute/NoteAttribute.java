@@ -13,24 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
+package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
 /**
- * Class representing an operation form field attribute for generic key-value pair.
+ * Class representing an operation form field attribute for the operation note.
  *
  * @author Petr Dvorak, petr@lime-company.eu
  */
-public class OperationKeyValueFieldAttribute extends OperationFormFieldAttributeFormatted {
+public class NoteAttribute extends AttributeFormatted {
 
-    private String value;
+    private String note;
 
     /**
      * Default constructor.
      */
-    public OperationKeyValueFieldAttribute() {
-        this.type = Type.KEY_VALUE;
+    public NoteAttribute() {
+        this.type = Type.NOTE;
         this.valueFormatType = ValueFormatType.TEXT;
     }
 
@@ -38,8 +38,8 @@ public class OperationKeyValueFieldAttribute extends OperationFormFieldAttribute
      * Constructor with value format type.
      * @param valueFormatType Value format type.
      */
-    public OperationKeyValueFieldAttribute(ValueFormatType valueFormatType) {
-        this.type = Type.KEY_VALUE;
+    public NoteAttribute(ValueFormatType valueFormatType) {
+        this.type = Type.NOTE;
         this.valueFormatType = valueFormatType;
     }
 
@@ -47,32 +47,33 @@ public class OperationKeyValueFieldAttribute extends OperationFormFieldAttribute
      * Constructor with all details.
      * @param id Attribute ID.
      * @param label Label.
-     * @param value Value.
+     * @param note Note.
      * @param valueFormatType Value format type.
      * @param formattedValue Formatted value.
      */
-    public OperationKeyValueFieldAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
-        this.type = Type.KEY_VALUE;
+    public NoteAttribute(String id, String label, String note, ValueFormatType valueFormatType, String formattedValue) {
+        this.type = Type.NOTE;
         this.id = id;
         this.label = label;
-        this.value = value;
+        this.note = note;
         this.valueFormatType = valueFormatType;
         this.formattedValue = formattedValue;
     }
 
+
     /**
-     * Get attribute value.
-     * @return Attribute value.
+     * Get note.
+     * @return Note.
      */
-    public String getValue() {
-        return value;
+    public String getNote() {
+        return note;
     }
 
     /**
-     * Set attribute value.
-     * @param value Attribute value.
+     * Set note.
+     * @param note Note.
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setNote(String note) {
+        this.note = note;
     }
 }
