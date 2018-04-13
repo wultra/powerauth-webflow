@@ -271,11 +271,18 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         // the check for disabled method needs to be done after operation history is verified - the operation can be already moved to the next step
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, operation should fail
+            try {
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation will be canceled because authentication method is no longer available, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null);
+            } catch (NextStepServiceException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Cancel operation request failed, reason: "+ex.getMessage());
+            }
             clearCurrentBrowserSession();
             webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("operation.methodNotAvailable");
+            // push message may not be delivered when activation was blocked during authentication, error is logged and ignored
             sendAuthStepFinishedPushMessage(operation, response.getMessage());
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
             return response;

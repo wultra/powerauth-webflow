@@ -38,6 +38,11 @@ public enum OperationCancelReason {
     UNEXPECTED_OPERATION,
 
     /**
+     * Activation method is not available (e.g. activation was blocked).
+     */
+    AUTH_METHOD_NOT_AVAILABLE,
+
+    /**
      * Operation has been interrupted by another new operation.
      */
     INTERRUPTED_OPERATION;
