@@ -179,6 +179,10 @@ public class MessageTranslationService {
                     OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
                     value = keyValueAttribute.getValue();
                     break;
+                case HEADING:
+                    OperationHeadingFieldAttribute headingAttribute = (OperationHeadingFieldAttribute) attribute;
+                    value = headingAttribute.getValue();
+                    break;
             }
             idValueMap.put(attribute.getId(), value);
         }

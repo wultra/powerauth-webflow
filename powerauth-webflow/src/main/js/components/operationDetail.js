@@ -173,6 +173,14 @@ export default class OperationDetail extends React.Component {
                                         </div>
                                     </div>
                                 )
+                            } else if (item.type === "HEADING") {
+                                return (
+                                    <div className="row attribute" key={item.id}>
+                                        <div className="col-xs-6 key">
+                                            <span className="heading">{item.formattedValue}</span>
+                                        </div>
+                                    </div>
+                                )
                             } else if (item.type === "BANK_ACCOUNT_CHOICE") {
                                 if (!item.bankAccounts || item.bankAccounts.length === 0) {
                                     // no bank account is available - display error

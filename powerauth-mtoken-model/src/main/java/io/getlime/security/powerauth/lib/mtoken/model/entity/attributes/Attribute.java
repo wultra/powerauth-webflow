@@ -28,7 +28,8 @@ public class Attribute {
     public enum Type {
         AMOUNT,
         KEY_VALUE,
-        NOTE
+        NOTE,
+        HEADING
     }
 
     protected Type type;
