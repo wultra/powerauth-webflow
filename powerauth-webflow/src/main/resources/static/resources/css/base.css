@@ -74,13 +74,16 @@ a:hover, a:active, a:focus {
 }
 
 #page-wrap {
-    margin: 80px auto 40px auto;
-    width: 480px;
+    margin: 80px 10px 40px 10px;
+}
+
+#home {
+    min-height: 400px;
 }
 
 .content-wrap {
     margin: 0 auto;
-    width: 320px;
+    width: 100%;
 }
 
 .btn-success {
@@ -253,7 +256,7 @@ a:hover, a:active, a:focus {
 .alert {
     font-size: 12pt;
     text-align: left;
-    width: 420px;
+    width: 100%;
 }
 
 .alert-form {
