@@ -316,6 +316,37 @@ public class OperationFormData {
     }
 
     /**
+     * Add a heading attribute.
+     * @param id Attribute ID.
+     * @param value Attribute value.
+     * @return A heading field attribute.
+     */
+    @JsonIgnore
+    public OperationHeadingFieldAttribute addHeading(String id, String value) {
+        OperationHeadingFieldAttribute attr = new OperationHeadingFieldAttribute();
+        attr.setId(id);
+        attr.setValue(value);
+        saveAttribute(attr);
+        return attr;
+    }
+
+    /**
+     * Add a formatted heading attribute.
+     * @param id Attribute ID.
+     * @param value Attribute value.
+     * @param valueFormatType Value format type.
+     * @return A heading field attribute.
+     */
+    @JsonIgnore
+    public OperationHeadingFieldAttribute addHeading(String id, String value, ValueFormatType valueFormatType) {
+        OperationHeadingFieldAttribute attr = new OperationHeadingFieldAttribute(valueFormatType);
+        attr.setId(id);
+        attr.setValue(value);
+        saveAttribute(attr);
+        return attr;
+    }
+
+    /**
      * Add a banner above the form.
      * @param bannerType Banner type.
      * @param bannerId Banner ID.

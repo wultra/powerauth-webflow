@@ -185,6 +185,11 @@ a:hover, a:active, a:focus {
     font-size: 16pt;
 }
 
+#operation .heading {
+    font-size: 16pt;
+    color: #7FC000;
+}
+
 #operation .attribute {
     margin-top: 10px;
     margin-bottom: 10px;

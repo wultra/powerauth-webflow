@@ -18,27 +18,25 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
 /**
- * Class representing an operation form field attribute for generic key-value pair.
+ * Class representing an operation form field attribute for a heading.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class KeyValueAttribute extends AttributeFormatted {
-
-    protected String value;
+public class HeadingAttribute extends KeyValueAttribute {
 
     /**
      * Default constructor.
      */
-    public KeyValueAttribute() {
-        this.type = Type.KEY_VALUE;
+    public HeadingAttribute() {
+        this.type = Type.HEADING;
     }
 
     /**
      * Constructor with value format type.
      * @param valueFormatType Value format type.
      */
-    public KeyValueAttribute(ValueFormatType valueFormatType) {
-        this.type = Type.KEY_VALUE;
+    public HeadingAttribute(ValueFormatType valueFormatType) {
+        this.type = Type.HEADING;
         this.valueFormatType = valueFormatType;
     }
 
@@ -50,8 +48,8 @@ public class KeyValueAttribute extends AttributeFormatted {
      * @param valueFormatType Value format type.
      * @param formattedValue Formatted value.
      */
-    public KeyValueAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
-        this.type = Type.KEY_VALUE;
+    public HeadingAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
+        this.type = Type.HEADING;
         this.id = id;
         this.label = label;
         this.value = value;
@@ -59,19 +57,4 @@ public class KeyValueAttribute extends AttributeFormatted {
         this.formattedValue = formattedValue;
     }
 
-    /**
-     * Get attribute value.
-     * @return Attribute value.
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Set attribute value.
-     * @param value Attribute value.
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
 }

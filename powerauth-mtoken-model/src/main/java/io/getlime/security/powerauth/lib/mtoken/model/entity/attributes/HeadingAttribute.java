@@ -16,49 +16,29 @@
 package io.getlime.security.powerauth.lib.mtoken.model.entity.attributes;
 
 /**
- * Attribute representing a key-value item, where key and value are displayed
- * next to each other.
+ * Attribute representing a heading.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class KeyValueAttribute extends Attribute {
-
-    protected String value;
+public class HeadingAttribute extends Attribute {
 
     /**
      * Default constructor.
      */
-    public KeyValueAttribute() {
+    public HeadingAttribute() {
         super();
-        this.setType(Type.KEY_VALUE);
+        this.setType(Type.HEADING);
     }
 
     /**
      * Constructor with all details.
      * @param id Attribute ID.
-     * @param label Attribute label.
-     * @param value Value.
+     * @param label Heading text.
      */
-    public KeyValueAttribute(String id, String label, String value) {
+    public HeadingAttribute(String id, String label) {
         this();
         this.id = id;
         this.label = label;
-        this.value = value;
     }
 
-    /**
-     * Get value.
-     * @return Value.
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Set value.
-     * @param value Value.
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
 }

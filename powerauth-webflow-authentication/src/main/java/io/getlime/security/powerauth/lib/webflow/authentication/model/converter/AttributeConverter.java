@@ -59,6 +59,10 @@ public class AttributeConverter {
                 OperationBannerFieldAttribute attr = (OperationBannerFieldAttribute) input;
                 return new BannerAttribute(attr.getId(), attr.getLabel(), bannerTypeConverter.fromOperationBannerType(attr.getBannerType()), attr.getMessage());
             }
+            case HEADING: {
+                OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
+                return new HeadingAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+            }
             default: {
                 throw new IllegalStateException("Unsupported attribute type: "+input.getType());
             }
@@ -94,6 +98,10 @@ public class AttributeConverter {
             case BANNER: {
                 BannerAttribute attr = (BannerAttribute) input;
                 return new OperationBannerFieldAttribute(attr.getId(), attr.getLabel(), bannerTypeConverter.fromBannerType(attr.getBannerType()), attr.getMessage());
+            }
+            case HEADING: {
+                HeadingAttribute attr = (HeadingAttribute) input;
+                return new OperationHeadingFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
             }
             default: {
                 throw new IllegalStateException("Unsupported attribute type: "+input.getType());

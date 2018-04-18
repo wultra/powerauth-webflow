@@ -15,13 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationAmountFieldAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationKeyValueFieldAttribute;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationNoteFieldAttribute;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.AmountAttribute;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.Attribute;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.KeyValueAttribute;
+import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 
 /**
  * Converter for various attribute types.
@@ -45,7 +40,11 @@ public class AttributeConverter {
             }
             case NOTE: {
                 OperationNoteFieldAttribute attr = (OperationNoteFieldAttribute) input;
-                return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValue());
+                return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValue());
+            }
+            case HEADING: {
+                OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
+                return new HeadingAttribute(attr.getId(), attr.getFormattedValue());
             }
             default: {
                 return new KeyValueAttribute(input.getId(), input.getLabel(), null);

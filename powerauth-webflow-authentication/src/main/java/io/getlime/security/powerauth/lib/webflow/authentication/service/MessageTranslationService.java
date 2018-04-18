@@ -179,6 +179,10 @@ public class MessageTranslationService {
                     OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
                     value = keyValueAttribute.getValue();
                     break;
+                case HEADING:
+                    OperationHeadingFieldAttribute headingAttribute = (OperationHeadingFieldAttribute) attribute;
+                    value = headingAttribute.getValue();
+                    break;
             }
             idValueMap.put(attribute.getId(), value);
         }
@@ -198,7 +202,7 @@ public class MessageTranslationService {
         try {
             return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while reading resource", ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Localization key is missing: "+i18nKey);
             return MISSING_KEY_MESSAGE+": "+i18nKey;
         }
     }

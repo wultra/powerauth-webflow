@@ -24,7 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Value
  */
 public class OperationKeyValueFieldAttribute extends OperationFormFieldAttributeFormatted {
 
-    private String value;
+    protected String value;
 
     /**
      * Default constructor.
