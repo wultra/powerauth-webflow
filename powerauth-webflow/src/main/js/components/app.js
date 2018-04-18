@@ -90,9 +90,13 @@ export class App extends React.Component {
                         }}>English</a>
                     )}
                 </div>
-                <div id="home" className="text-center">
-                    <div id="logo"/>
-                    <Component intl={this.props.intl}/>
+                <div className="row">
+                    <div className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+                        <div id="home" className="text-center">
+                            <div id="logo"/>
+                            <Component intl={this.props.intl}/>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
