@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotAvailableException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
@@ -77,11 +78,15 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         try {
             operation = getOperation();
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation found, operation ID: {0}, operation name: {1}", new String[] {operation.getOperationId(), operation.getOperationName()});
-        } catch (AuthStepException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation found, operation ID: {0}, operation name: {1}", new String[]{operation.getOperationId(), operation.getOperationName()});
+        } catch (OperationNotAvailableException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation not found");
             // Operation is not available - this state is valid in INIT authentication method, operation was not initialized yet
             // and it will be initialized as a new operation with default form data for a login operation.
+        } catch (AuthStepException ex) {
+            // Operation validation failed, fail operation.
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation state is not valid, reason: {0}", ex.getMessage());
+            return failedOperationResponse(null, ex.getMessageId());
         }
 
         RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
