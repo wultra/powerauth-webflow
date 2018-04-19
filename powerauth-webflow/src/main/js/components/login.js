@@ -20,7 +20,7 @@ import {connect} from 'react-redux';
 import {authenticate, cancel} from '../actions/usernamePasswordAuthActions'
 // Components
 import {Button, FormControl, FormGroup, Panel} from 'react-bootstrap';
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from 'react-intl';
 

@@ -16,7 +16,7 @@
 import React from "react";
 import {connect} from "react-redux";
 // Components
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import {FormGroup} from "react-bootstrap";
 // Custom react-select component for bank account choice with HTML content
 import BankAccountSelect from "./bankAccountSelect";

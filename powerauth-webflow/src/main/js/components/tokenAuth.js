@@ -21,7 +21,7 @@ import {authenticateOnline, cancel, getOperationData, initOnline} from "../actio
 import OperationDetail from "./operationDetail";
 import TokenOffline from "./tokenAuthOffline";
 import TokenOnline from "./tokenAuthOnline";
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import {Panel} from "react-bootstrap";
 
 const stompClient = require('../websocket-client');

@@ -20,7 +20,7 @@ import {authenticate, cancel, getOperationData, init} from "../actions/smsAuthAc
 // Components
 import OperationDetail from "./operationDetail";
 import {FormGroup, Panel} from "react-bootstrap";
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
 
