@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
 import {FormGroup} from "react-bootstrap";
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
 // i18n

@@ -35,6 +35,7 @@ function register(registrations, webSocketId) {
     headers[csrf.headerName] = csrf.token;
     const socket = SockJS('./websocket');
     stompClient = Stomp.over(socket);
+    stompClient.debug = () => {};
     stompClient.connect(headers, function (frame) {
         registrations.forEach(function (registration) {
             stompClient.subscribe(registration.route, registration.callback);
