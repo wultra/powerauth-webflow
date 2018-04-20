@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
@@ -54,17 +53,14 @@ import javax.sql.DataSource;
 public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerConfigurerAdapter {
 
     private DataSource dataSource;
-    private AuthenticationManager authenticationManager;
 
     /**
      * Configuration class constructor.
      * @param dataSource Data source.
-     * @param authenticationManager Authentication manager.
      */
     @Autowired
-    public OAuth2AuthorizationServerConfiguration(DataSource dataSource, AuthenticationManager authenticationManager) {
+    public OAuth2AuthorizationServerConfiguration(DataSource dataSource) {
         this.dataSource = dataSource;
-        this.authenticationManager = authenticationManager;
     }
 
     /**
@@ -146,7 +142,6 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     public void configure(AuthorizationServerEndpointsConfigurer endpoints)
             throws Exception {
         endpoints.authorizationCodeServices(authorizationCodeServices())
-                .authenticationManager(authenticationManager)
                 .tokenEnhancer(tokenEnhancer())
                 .tokenStore(tokenStore())
                 .approvalStoreDisabled();
