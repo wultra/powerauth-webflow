@@ -36,6 +36,7 @@ public class DataAdapterError extends Error {
         public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
         public static final String SMS_AUTHORIZATION_FAILED = "SMS_AUTHORIZATION_FAILED";
         public static final String INPUT_INVALID = "INPUT_INVALID";
+        public static final String OPERATION_CONTEXT_INVALID = "OPERATION_CONTEXT_INVALID";
         public static final String REMOTE_ERROR = "REMOTE_ERROR";
     }
 
