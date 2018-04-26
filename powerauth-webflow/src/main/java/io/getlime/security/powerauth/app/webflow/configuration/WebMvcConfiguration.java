@@ -17,7 +17,7 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import io.getlime.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
@@ -34,7 +34,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 
@@ -46,7 +46,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@lime-company.eu
  */
 @Configuration
-public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
+public class WebMvcConfiguration implements WebMvcConfigurer {
 
     @Autowired
     private WebFlowServerConfiguration configuration;
@@ -65,7 +65,7 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
 
     @Bean
     public FilterRegistrationBean powerAuthFilterRegistration() {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        FilterRegistrationBean<PowerAuthRequestFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new PowerAuthRequestFilter());
         registrationBean.setMatchAfter(true);
         return registrationBean;
@@ -112,7 +112,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(powerAuthWebArgumentResolver());
-        super.addArgumentResolvers(argumentResolvers);
     }
 
     /**
@@ -130,7 +129,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(powerAuthInterceptor());
         registry.addInterceptor(localeChangeInterceptor());
-        super.addInterceptors(registry);
     }
 
     /**
@@ -142,10 +140,11 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     private ObjectMapper objectMapper() {
         Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
         bean.setIndentOutput(true);
-        bean.setDateFormat(new ISO8601DateFormat());
         bean.afterPropertiesSet();
         ObjectMapper objectMapper = bean.getObject();
         objectMapper.registerModule(new JodaModule());
+        // replacement for ISO8601DateFormat which is deprecated
+        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         return objectMapper;
     }
 
@@ -166,7 +165,6 @@ public class WebMvcConfiguration extends WebMvcConfigurerAdapter {
     @Override
     public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
         converters.add(mappingJackson2HttpMessageConverter());
-        super.configureMessageConverters(converters);
     }
 
 }

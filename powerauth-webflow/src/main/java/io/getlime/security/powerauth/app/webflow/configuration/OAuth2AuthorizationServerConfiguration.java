@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.oauth2.common.exceptions.OAuth2Exception;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
@@ -167,4 +168,12 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients();
     }
+
+    // TODO - start using encrypted passwords in JDBC client details service
+    // see: https://stackoverflow.com/questions/49236707/spring-security-5-password-migration
+    @Bean
+    public static NoOpPasswordEncoder passwordEncoder() {
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+    }
+
 }
