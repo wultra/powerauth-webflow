@@ -59,6 +59,12 @@ public class ErrorCode {
     public static final String OPERATION_ALREADY_FAILED     = "OPERATION_ALREADY_FAILED";
 
     /**
+     * Error code for situation when an operation was canceled and yet, some further
+     * action other than cancellation was requested with that operation.
+     */
+    public static final String OPERATION_ALREADY_CANCELED   = "OPERATION_ALREADY_CANCELED";
+
+    /**
      * Error code for situation when an operation expired and yet, some further
      * action was requested with that operation.
      */

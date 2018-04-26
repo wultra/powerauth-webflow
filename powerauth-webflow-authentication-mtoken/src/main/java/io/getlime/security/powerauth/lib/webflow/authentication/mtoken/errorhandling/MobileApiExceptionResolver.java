@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
@@ -116,6 +117,17 @@ public class MobileApiExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(Throwable t) {
         return error(ErrorCode.OPERATION_ALREADY_FAILED, t);
+    }
+
+    /**
+     * Exception handler for canceled operations.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyCanceledException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationCanceledException(Throwable t) {
+        return error(ErrorCode.OPERATION_ALREADY_CANCELED, t);
     }
 
     /**
