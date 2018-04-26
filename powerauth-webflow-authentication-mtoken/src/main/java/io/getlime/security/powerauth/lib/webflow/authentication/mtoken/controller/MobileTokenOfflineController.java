@@ -280,7 +280,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         }
         try {
             GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

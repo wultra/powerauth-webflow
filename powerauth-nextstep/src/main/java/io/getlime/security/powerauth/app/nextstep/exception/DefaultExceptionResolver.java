@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.app.nextstep.exception;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import org.springframework.http.HttpStatus;
@@ -74,6 +75,19 @@ public class DefaultExceptionResolver {
     public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyFailedException.CODE, "Operation is already in FAILED state.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for operation already canceled error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyCanceledException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public @ResponseBody ObjectResponse<Error> handleOperationCanceledException(OperationAlreadyCanceledException ex) {
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
+        Error error = new Error(OperationAlreadyCanceledException.CODE, "Operation update attempted for CANCELED operation.");
         return new ErrorResponse(error);
     }
 }

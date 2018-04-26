@@ -214,7 +214,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         try {
             final GetOperationDetailResponse operation = getOperation();
             httpSession.removeAttribute(MESSAGE_ID);
-            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");

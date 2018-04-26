@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -423,6 +424,8 @@ public class NextStepClient {
                     throw new OperationAlreadyFinishedException(error.getMessage());
                 case OperationAlreadyFailedException.CODE:
                     throw new OperationAlreadyFailedException(error.getMessage());
+                case OperationAlreadyCanceledException.CODE:
+                    throw new OperationAlreadyCanceledException(error.getMessage());
                 default:
                     return new NextStepServiceException(ex, error);
             }

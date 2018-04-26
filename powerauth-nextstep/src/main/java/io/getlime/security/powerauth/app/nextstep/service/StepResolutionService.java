@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
@@ -407,12 +408,10 @@ public class StepResolutionService {
         if (initOperationItem.getRequestAuthMethod() != AuthMethod.INIT || initOperationItem.getRequestAuthStepResult() != AuthStepResult.CONFIRMED) {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
-        // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
-        // the only exception is INIT method which can cancel other operations due to concurrency check
-        boolean stepAuthMethodValid = false;
-        if (request.getAuthStepResult() == AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
-            stepAuthMethodValid = true;
-        } else {
+        OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
+        if (currentOperationHistory.getResponseResult() == AuthResult.CONTINUE) {
+            boolean stepAuthMethodValid = false;
+            // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
             if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
                 // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
                 for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
@@ -430,18 +429,21 @@ public class StepResolutionService {
                     }
                 }
             }
-        }
-        if (!stepAuthMethodValid) {
-            throw new IllegalStateException("Operation update failed, because AuthMethod is invalid (operationId: " + request.getOperationId() + ").");
+            if (!stepAuthMethodValid) {
+                throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
+            }
         }
         for (OperationHistoryEntity historyItem : operationHistory) {
             if (historyItem.getResponseResult() == AuthResult.DONE) {
                 throw new OperationAlreadyFinishedException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
             }
             if (historyItem.getResponseResult() == AuthResult.FAILED) {
-                // #102 - allow double cancellation requests, cancel requests may come from multiple channels, so this is a supported scenario
-                if (operationEntity.getCurrentOperationHistoryEntity().getRequestAuthStepResult() != AuthStepResult.CANCELED
-                        || request.getAuthStepResult() != AuthStepResult.CANCELED) {
+                // Do not allow to update a canceled operation (e.g. authorize an operation which is canceled),
+                // unless the request is a cancellation request - double cancellation of operations is allowed.
+                if (historyItem.getRequestAuthStepResult() == AuthStepResult.CANCELED && request.getAuthStepResult() != AuthStepResult.CANCELED) {
+                    throw new OperationAlreadyCanceledException("Operation update failed, because operation is canceled (operationId: " + request.getOperationId() + ").");
+                } else if (request.getAuthStepResult() != AuthStepResult.CANCELED) {
+                    // #102 - allow double cancellation requests, cancel requests may come from multiple channels, so this is a supported scenario
                     throw new OperationAlreadyFailedException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
                 }
             }
