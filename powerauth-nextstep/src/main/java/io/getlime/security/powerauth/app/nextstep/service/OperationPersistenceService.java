@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -121,7 +122,11 @@ public class OperationPersistenceService {
      * @param response create response generated for the client
      */
     public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) {
-        OperationEntity operation = operationRepository.findOne(response.getOperationId());
+        Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new IllegalArgumentException("Operation not found, operation ID: "+response.getOperationId());
+        }
+        OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
         operation.setResult(response.getResult());
         // operation expiration time matches current response expiration time
@@ -156,10 +161,11 @@ public class OperationPersistenceService {
      * @param request Request to update form data.
      */
     public void updateFormData(UpdateFormDataRequest request) {
-        OperationEntity operation = operationRepository.findOne(request.getOperationId());
-        if (operation == null) {
-            throw new IllegalArgumentException("Invalid operation");
+        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new IllegalArgumentException("Operation not found, operation ID: "+request.getOperationId());
         }
+        OperationEntity operation = operationOptional.get();
         try {
             OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             // update only formData.userInput which should contain all input from the user
@@ -180,10 +186,11 @@ public class OperationPersistenceService {
      * @param request Request to update chosen authentication method.
      */
     public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) {
-        OperationEntity operation = operationRepository.findOne(request.getOperationId());
-        if (operation == null) {
-            throw new IllegalArgumentException("Invalid operation");
+        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new IllegalArgumentException("Operation not found, operation ID: "+request.getOperationId());
         }
+        OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
             throw new IllegalStateException("Operation is missing history");
@@ -209,7 +216,11 @@ public class OperationPersistenceService {
      * @return OperationEntity loaded from database
      */
     public OperationEntity getOperation(String operationId) {
-        return operationRepository.findOne(operationId);
+        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        if (!operationOptional.isPresent()) {
+            throw new IllegalArgumentException("Operation not found, operation ID: "+operationId);
+        }
+        return operationOptional.get();
     }
 
     /**

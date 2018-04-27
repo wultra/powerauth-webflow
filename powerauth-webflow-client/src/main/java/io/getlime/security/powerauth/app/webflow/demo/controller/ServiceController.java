@@ -57,7 +57,7 @@ public class ServiceController {
         response.setApplicationDisplayName(webFlowServiceConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(webFlowServiceConfiguration.getApplicationEnvironment());
         response.setVersion(buildProperties.getVersion());
-        response.setBuildTime(buildProperties.getTime());
+        response.setBuildTime(Date.from(buildProperties.getTime()));
         response.setTimestamp(new Date());
         return new ObjectResponse<>(response);
     }
