@@ -33,6 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
@@ -124,6 +125,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             // translate formData messages
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
+        } catch (NextStepServiceException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", e);
+            return null;
+        }
+    }
+
+    /**
+     * Get operation configuration.
+     * @param operationName Operation name.
+     * @return Operation coniguration.
+     */
+    protected GetOperationConfigResponse getOperationConfig(String operationName) {
+        try {
+            final ObjectResponse<GetOperationConfigResponse> operationConfigResponse = nextStepClient.getOperationConfig(operationName);
+            return operationConfigResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", e);
             return null;

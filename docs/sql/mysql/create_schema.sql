@@ -82,6 +82,15 @@ CREATE TABLE ns_user_prefs (
   auth_method_5_config VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_operation_config stores configuration of operations.
+-- Each operation type (defined by operation_name) has a related mobile token template and configuration.
+CREATE TABLE ns_operation_config (
+  operation_name            VARCHAR(32) PRIMARY KEY,
+  template_version          CHAR,
+  template_id               INTEGER,
+  mobile_token_mode         VARCHAR(256)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (

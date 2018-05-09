@@ -19,13 +19,13 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -50,7 +50,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,21 +139,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Get the list of operations for given user
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
+            final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
 
             // Prepare converter
             final OperationConverter converter = new OperationConverter();
 
-            // At the moment, we only support 2FA signatures with both
-            // knowledge and biometry factors
-            AllowedSignatureType allowedSignatureType = new AllowedSignatureType();
-            allowedSignatureType.setType(AllowedSignatureType.Type.MULTIFACTOR_2FA);
-            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.toString());
-            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString());
-
             // Prepare converted result with operations
             OperationListResponse result = new OperationListResponse();
             for (GetOperationDetailResponse operation: operationList) {
-                result.add(converter.fromOperationDetailResponse(operation, allowedSignatureType));
+                final GetOperationConfigResponse operationConfig = operationConfigs.get(operation.getOperationName());
+                result.add(converter.fromOperationDetailResponse(operation, operationConfig.getMobileTokenMode()));
             }
 
             // Return response
@@ -159,6 +156,23 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         } else {
             throw new PowerAuthAuthenticationException();
         }
+    }
+
+    /**
+     * Get map of operation configurations (operation name -> operation configuration).
+     * @param operations Operation list.
+     * @return Map of operation configurations.
+     */
+    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) {
+        Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
+        for (GetOperationDetailResponse operation: operations) {
+            String operationName = operation.getOperationName();
+            if (!operationConfigs.containsKey(operationName)) {
+                final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+                operationConfigs.put(operationName, operationConfig);
+            }
+        }
+        return operationConfigs;
     }
 
     /**

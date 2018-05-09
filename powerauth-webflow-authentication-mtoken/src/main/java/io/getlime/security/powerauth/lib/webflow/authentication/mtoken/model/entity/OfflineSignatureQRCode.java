@@ -16,10 +16,6 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.io.BaseEncoding;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -38,50 +34,46 @@ import java.util.logging.Logger;
  * Signature and data for QR code in offline mode for mobile token.
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OfflineSignatureQrCode {
+public class OfflineSignatureQRCode {
 
-    private int size;
-    private String dataHash;
-    private String nonce;
-    private String message;
-    private String signature;
+    private final int size;
+    private final String data;
+    private final String nonce;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
-
-    public OfflineSignatureQrCode(int size) {
+    /**
+     * QR code constructor.
+     * @param size QR code size.
+     * @param data QR code data.
+     * @param nonce Nonce.
+     */
+    public OfflineSignatureQRCode(int size, String data, String nonce) {
         this.size = size;
-    }
-
-    public String getDataHash() {
-        return dataHash;
-    }
-
-    public void setDataHash(String dataHash) {
-        this.dataHash = dataHash;
-    }
-
-    public String getNonce() {
-        return nonce;
-    }
-
-    public void setNonce(String nonce) {
+        this.data = data;
         this.nonce = nonce;
     }
 
-    public String getMessage() {
-        return message;
+    /**
+     * Get QR code size.
+     * @return QR code size.
+     */
+    public int getSize() {
+        return size;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    /**
+     * Get QR code data.
+     * @return QR code data.
+     */
+    public String getData() {
+        return data;
     }
 
-    public String getSignature() {
-        return signature;
-    }
-
-    public void setSignature(String signature) {
-        this.signature = signature;
+    /**
+     * Get nonce.
+     * @return Nonce.
+     */
+    public String getNonce() {
+        return nonce;
     }
 
     /**
@@ -90,10 +82,6 @@ public class OfflineSignatureQrCode {
      */
     public String generateImage() {
         try {
-            String data = getDataAsJson();
-            if (data==null) {
-                return null;
-            }
             BitMatrix matrix = new MultiFormatWriter().encode(
                     new String(data.getBytes("UTF-8"), "ISO-8859-1"),
                     BarcodeFormat.QR_CODE,
@@ -114,21 +102,4 @@ public class OfflineSignatureQrCode {
         return null;
     }
 
-    /**
-     * Generates data for the QR code as Json String.
-     * @return Data as Json.
-     */
-    private String getDataAsJson() {
-        ObjectNode qrNode = JsonNodeFactory.instance.objectNode();
-        qrNode.put("dt", dataHash);
-        qrNode.put("rnd", nonce);
-        qrNode.put("msg", message);
-        qrNode.put("sig", signature);
-        try {
-            return objectMapper.writeValueAsString(qrNode);
-        } catch (JsonProcessingException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing QR code", e);
-            return null;
-        }
-    }
 }
