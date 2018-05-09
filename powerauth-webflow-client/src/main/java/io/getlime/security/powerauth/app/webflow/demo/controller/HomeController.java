@@ -112,8 +112,8 @@ public class HomeController {
                 .templateId(operationConfig.getTemplateId())
                 .attr1().amount(paymentForm.getAmount(), paymentForm.getCurrency())
                 .attr2().accountGeneric(paymentForm.getAccount())
-                .attr3().date(paymentForm.getDueDate())
-                .attr4().note(paymentForm.getNote())
+                .attr4().date(paymentForm.getDueDate())
+                .attr5().note(paymentForm.getNote())
                 .build();
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
