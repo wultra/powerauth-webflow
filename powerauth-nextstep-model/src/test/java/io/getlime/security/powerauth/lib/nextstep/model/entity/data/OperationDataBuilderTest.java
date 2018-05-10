@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 /**
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class OperationDataBuilderTest {
+class OperationDataBuilderTest {
 
     private OperationDataBuilder builder;
 
