@@ -228,6 +228,16 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Return whether operation exists.
+     * @param operationId Operation ID.
+     * @return Whether operation exists.
+     */
+    public boolean operationExists(String operationId) {
+        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        return operationOptional.isPresent();
+    }
+
+    /**
      * Retrieve list of pending operations for given user id and authentication method from database.
      * Parameter authMethod can be null to return all pending operations for given user.
      *

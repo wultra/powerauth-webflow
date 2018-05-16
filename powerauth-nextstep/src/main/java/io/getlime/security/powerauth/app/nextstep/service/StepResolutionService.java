@@ -96,11 +96,8 @@ public class StepResolutionService {
         CreateOperationResponse response = new CreateOperationResponse();
         if (request.getOperationId() != null && !request.getOperationId().isEmpty()) {
             // operation ID received from the client, verify that it is available
-            try {
-                operationPersistenceService.getOperation(request.getOperationId());
+            if (operationPersistenceService.operationExists(request.getOperationId())) {
                 throw new OperationAlreadyExistsException("Operation could not be created, operation ID is already used: " + request.getOperationId());
-            } catch (OperationNotFoundException ex) {
-                // valid state - operation does not exist
             }
             response.setOperationId(request.getOperationId());
         } else {
