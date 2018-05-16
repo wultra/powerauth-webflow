@@ -343,7 +343,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
         // Set flags based on signature type variants
         String flags = "";
-        if (allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString())) {
+        if (allowedSignatureType != null && allowedSignatureType.getVariants() != null
+                && allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString())) {
             flags = OFFLINE_MODE_ALLOW_BIOMETRY;
         }
 
