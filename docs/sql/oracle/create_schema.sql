@@ -82,6 +82,15 @@ CREATE TABLE ns_user_prefs (
   auth_method_5_config VARCHAR(256)
 );
 
+-- Table ns_operation_config stores configuration of operations.
+-- Each operation type (defined by operation_name) has a related mobile token template and configuration of signatures.
+CREATE TABLE ns_operation_config (
+  operation_name            VARCHAR(32),
+  template_version          VARCHAR(4),
+  template_id               VARCHAR(4),
+  mobile_token_mode         VARCHAR(256)
+);
+
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (

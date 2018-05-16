@@ -18,8 +18,11 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.init.con
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
@@ -95,11 +98,25 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         if (operation == null) {
             final String operationName = "login";
-            final String operationData = "{}";
+            final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+            if (operationConfig == null) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Operation configuration is missing, operation name: {0}", operationName);
+                return failedOperationResponse(null, "operationConfig.missing");
+            }
             final OperationFormData formData = new OperationFormData();
             formData.addTitle( "login.title");
             formData.addGreeting("login.greeting");
             formData.addSummary("login.summary");
+            String operationData;
+            try {
+                 operationData = new OperationDataBuilder()
+                        .templateVersion(operationConfig.getTemplateVersion())
+                        .templateId(operationConfig.getTemplateId())
+                        .build();
+            } catch (InvalidOperationDataException ex) {
+                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Operation data is invalid, error: {0}", ex.getMessage());
+                return failedOperationResponse(null, "operationData.invalid");
+            }
             List<KeyValueParameter> params = new ArrayList<>();
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Initialized default login operation");
             return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {

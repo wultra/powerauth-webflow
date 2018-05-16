@@ -12,37 +12,53 @@ public class QRCodeAuthenticationRequest extends AuthStepRequest {
     private String activationId;
     private String authCode;
     private String nonce;
-    private String dataHash;
 
+    /**
+     * Get activation ID.
+     * @return Activation ID.
+     */
     public String getActivationId() {
         return activationId;
     }
 
+    /**
+     * Set activation ID.
+     * @param activationId Activation ID.
+     */
     public void setActivationId(String activationId) {
         this.activationId = activationId;
     }
 
+    /**
+     * Get authorization code.
+     * @return Authorization code.
+     */
     public String getAuthCode() {
         return authCode;
     }
 
+    /**
+     * Set authorization code.
+     * @param authCode Authorization code.
+     */
     public void setAuthCode(String authCode) {
         this.authCode = authCode;
     }
 
+    /**
+     * Get nonce.
+     * @return Nonce.
+     */
     public String getNonce() {
         return nonce;
     }
 
+    /**
+     * Set nonce.
+     * @param nonce Nonce.
+     */
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
 
-    public String getDataHash() {
-        return dataHash;
-    }
-
-    public void setDataHash(String dataHash) {
-        this.dataHash = dataHash;
-    }
 }

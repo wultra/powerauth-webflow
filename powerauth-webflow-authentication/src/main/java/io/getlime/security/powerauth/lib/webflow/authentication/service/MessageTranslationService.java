@@ -101,10 +101,8 @@ public class MessageTranslationService {
      */
     private void localizeAndTranslateFormAttributeValue(OperationFormMessageAttribute attribute, Map<String, String> idValueMap) {
         String message = localize(attribute.getId());
-        if (message != null) {
-            String translatedMessage = translateMessage(message, idValueMap);
-            attribute.setMessage(translatedMessage);
-        }
+        String translatedMessage = translateMessage(message, idValueMap);
+        attribute.setMessage(translatedMessage);
     }
 
     /**

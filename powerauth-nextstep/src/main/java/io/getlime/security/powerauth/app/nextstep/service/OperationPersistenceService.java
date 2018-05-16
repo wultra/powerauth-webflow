@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateChosenAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRequest;
@@ -51,14 +52,13 @@ import java.util.logging.Logger;
 @Service
 public class OperationPersistenceService {
 
-    private ObjectMapper objectMapper;
-    private IdGeneratorService idGeneratorService;
-    private OperationRepository operationRepository;
-    private OperationHistoryRepository operationHistoryRepository;
+    private final ObjectMapper objectMapper;
+    private final IdGeneratorService idGeneratorService;
+    private final OperationRepository operationRepository;
+    private final OperationHistoryRepository operationHistoryRepository;
 
     /**
      * Service constructor.
-     *
      * @param idGeneratorService ID generator service.
      * @param operationRepository Operation repository.
      * @param operationHistoryRepository Operation history repository.
@@ -120,11 +120,12 @@ public class OperationPersistenceService {
      *
      * @param request  create request received from the client
      * @param response create response generated for the client
+     * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) {
+    public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new IllegalArgumentException("Operation not found, operation ID: "+response.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: "+response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
@@ -159,11 +160,12 @@ public class OperationPersistenceService {
     /**
      * Updates form data for given operation.
      * @param request Request to update form data.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateFormData(UpdateFormDataRequest request) {
+    public void updateFormData(UpdateFormDataRequest request) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new IllegalArgumentException("Operation not found, operation ID: "+request.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: "+request.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         try {
@@ -184,11 +186,12 @@ public class OperationPersistenceService {
     /**
      * Updates chosen authentication method.
      * @param request Request to update chosen authentication method.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) {
+    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new IllegalArgumentException("Operation not found, operation ID: "+request.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: "+request.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
@@ -214,13 +217,24 @@ public class OperationPersistenceService {
      *
      * @param operationId id of an operation
      * @return OperationEntity loaded from database
+     * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public OperationEntity getOperation(String operationId) {
+    public OperationEntity getOperation(String operationId) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
-            throw new IllegalArgumentException("Operation not found, operation ID: "+operationId);
+            throw new OperationNotFoundException("Operation not found, operation ID: "+operationId);
         }
         return operationOptional.get();
+    }
+
+    /**
+     * Return whether operation exists.
+     * @param operationId Operation ID.
+     * @return Whether operation exists.
+     */
+    public boolean operationExists(String operationId) {
+        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        return operationOptional.isPresent();
     }
 
     /**

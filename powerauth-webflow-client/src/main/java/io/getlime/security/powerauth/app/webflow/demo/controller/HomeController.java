@@ -16,14 +16,15 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -82,7 +83,6 @@ public class HomeController {
 
     @RequestMapping("/payment/create")
     public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
-        String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
         formData.addGreeting("operation.greeting");
@@ -104,7 +104,19 @@ public class HomeController {
         // formData.addBanner(BannerType.BANNER_WARNING, "banner.warning");
         // formData.addBanner(BannerType.BANNER_INFO, "banner.info");
 
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
+        final String operationName = "authorize_payment";
+        final GetOperationConfigResponse operationConfig = client.getOperationConfig(operationName).getResponseObject();
+
+        String operationData = new OperationDataBuilder()
+                .templateVersion(operationConfig.getTemplateVersion())
+                .templateId(operationConfig.getTemplateId())
+                .attr1().amount(paymentForm.getAmount(), paymentForm.getCurrency())
+                .attr2().accountGeneric(paymentForm.getAccount())
+                .attr4().date(paymentForm.getDueDate())
+                .attr5().note(paymentForm.getNote())
+                .build();
+
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 
         return "redirect:/";

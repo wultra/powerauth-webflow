@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.mtoken.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +32,11 @@ public class AllowedSignatureType {
      * Signature types.
      */
     public enum Type {
+        @JsonProperty("1FA")
         MULTIFACTOR_1FA("1FA"),     // 1FA signature
+        @JsonProperty("2FA")
         MULTIFACTOR_2FA("2FA"),     // 2FA signature
+        @JsonProperty("ECDSA")
         ASSYMETRIC_ECDSA("ECDSA");  // ECDSA private key signature
 
         private final String type;

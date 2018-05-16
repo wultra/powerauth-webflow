@@ -52,7 +52,6 @@ export function initOffline(activationId) {
                     message: "",
                     qrCode: response.data.qrcode,
                     nonce: response.data.nonce,
-                    dataHash: response.data.dataHash,
                     chosenActivation: response.data.chosenActivation,
                     activations: response.data.activations
                 }
@@ -69,10 +68,9 @@ export function initOffline(activationId) {
  * @param activationId Chosen activation ID.
  * @param authCode User supplied code.
  * @param nonce Nonce.
- * @param dataHash Data hash.
  * @returns {Function} No return value.
  */
-export function authenticateOffline(activationId, authCode, nonce, dataHash) {
+export function authenticateOffline(activationId, authCode, nonce) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_TOKEN",
@@ -88,7 +86,6 @@ export function authenticateOffline(activationId, authCode, nonce, dataHash) {
             activationId: activationId,
             authCode: authCode,
             nonce: nonce,
-            dataHash: dataHash
         }, {
             headers: {
                 'X-OPERATION-HASH': operationHash,

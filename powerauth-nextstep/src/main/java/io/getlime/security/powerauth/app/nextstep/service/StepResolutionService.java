@@ -28,10 +28,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
@@ -93,13 +90,14 @@ public class StepResolutionService {
      *
      * @param request request to create a new operation
      * @return response with ordered list of next steps
+     * @throws OperationAlreadyExistsException Thrown when operation already exists.
      */
-    public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) {
+    public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) throws OperationAlreadyExistsException {
         CreateOperationResponse response = new CreateOperationResponse();
         if (request.getOperationId() != null && !request.getOperationId().isEmpty()) {
             // operation ID received from the client, verify that it is available
-            if (operationPersistenceService.getOperation(request.getOperationId()) != null) {
-                throw new IllegalArgumentException("Operation could not be created, operation ID is already used: " + request.getOperationId());
+            if (operationPersistenceService.operationExists(request.getOperationId())) {
+                throw new OperationAlreadyExistsException("Operation could not be created, operation ID is already used: " + request.getOperationId());
             }
             response.setOperationId(request.getOperationId());
         } else {
@@ -410,27 +408,30 @@ public class StepResolutionService {
         }
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
         if (currentOperationHistory.getResponseResult() == AuthResult.CONTINUE) {
-            boolean stepAuthMethodValid = false;
-            // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
-            if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
-                // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                    if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                        stepAuthMethodValid = true;
-                        break;
+            // do not check operation continuity for cancellation requests from INIT authentication method (done when new operation superseeds previous one)
+            if (!(request.getAuthMethod() == AuthMethod.INIT && request.getAuthStepResult() == AuthStepResult.CANCELED)) {
+                boolean stepAuthMethodValid = false;
+                // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
+                if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
+                    // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
+                    for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                        if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                            stepAuthMethodValid = true;
+                            break;
+                        }
+                    }
+                } else {
+                    // verification of operation continuity for all other authentication methods
+                    for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                        if (step.getAuthMethod() == request.getAuthMethod()) {
+                            stepAuthMethodValid = true;
+                            break;
+                        }
                     }
                 }
-            } else {
-                // verification of operation continuity for all other authentication methods
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                    if (step.getAuthMethod() == request.getAuthMethod()) {
-                        stepAuthMethodValid = true;
-                        break;
-                    }
+                if (!stepAuthMethodValid) {
+                    throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
                 }
-            }
-            if (!stepAuthMethodValid) {
-                throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
             }
         }
         for (OperationHistoryEntity historyItem : operationHistory) {
