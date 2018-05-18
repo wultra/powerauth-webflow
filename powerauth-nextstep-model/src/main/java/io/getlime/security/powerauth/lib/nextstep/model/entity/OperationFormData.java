@@ -347,6 +347,19 @@ public class OperationFormData {
     }
 
     /**
+     * Add party information.
+     * @param id Attribute ID.
+     * @param partyInfo Party information.
+     * @return A party information attribute.
+     */
+    public OperationPartyInfoFieldAttribute addPartyInfo(String id, PartyInfo partyInfo) {
+        OperationPartyInfoFieldAttribute attr = new OperationPartyInfoFieldAttribute();
+        attr.setId(id);
+        attr.setPartyInfo(partyInfo);
+        return attr;
+    }
+
+    /**
      * Add a banner above the form.
      * @param bannerType Banner type.
      * @param bannerId Banner ID.

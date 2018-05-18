@@ -143,75 +143,19 @@ export default class OperationDetail extends React.Component {
                     <div>
                         {this.props.context.formData.parameters.map((item) => {
                             if (item.type === "AMOUNT") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-6 key">
-                                            {item.label}
-                                        </div>
-                                        <div className="col-xs-6 value">
-                                            <span className="amount">{item.formattedValue}</span>
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayAmount(item);
                             } else if (item.type === "KEY_VALUE") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-6 key">
-                                            {item.label}
-                                        </div>
-                                        <div className="col-xs-6 value">
-                                            {item.formattedValue}
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayKeyValue(item);
                             } else if (item.type === "NOTE") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-12">
-                                            <div className="key">{item.label}</div>
-                                            <div className="value">{item.formattedValue}</div>
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayNote(item);
                             } else if (item.type === "HEADING") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-12 heading">{item.formattedValue}</div>
-                                    </div>
-                                )
+                                return this.displayHeading(item);
                             } else if (item.type === "BANK_ACCOUNT_CHOICE") {
-                                if (!item.bankAccounts || item.bankAccounts.length === 0) {
-                                    // no bank account is available - display error
-                                    return (
-                                        <div className={'message-error'} key={item.id}>
-                                            <FormattedMessage id="operationReview.bankAccountsMissing"/>
-                                        </div>
-                                    )
-                                } else {
-                                    return (
-                                        <div key={item.id} className="row attribute">
-                                            <div className="col-xs-12">
-                                                <div className="key">
-                                                    {item.label}
-                                                </div>
-                                                <div className="value">
-                                                    {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
-                                                        <BankAccountSelect
-                                                            bankAccounts={this.state.bankAccounts}
-                                                            chosenBankAccount={this.state.chosenBankAccount}
-                                                            choiceDisabled={this.state.bankAccountChoiceDisabled}
-                                                            callback={this.handleBankAccountChoice}
-                                                        />
-                                                    ) : (
-                                                        undefined
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                }
+                                return this.displayBankAccountChoice(item);
                             } else if (item.type === "BANNER") {
                                 return this.displayBanner(item, true);
+                            } else if (item.type === "PARTY_INFO") {
+                                return this.displayPartyInfo(item);
                             }
                         })}
                     </div>
@@ -228,6 +172,84 @@ export default class OperationDetail extends React.Component {
         } else {
             return (
                 <Spinner/>
+            )
+        }
+    }
+
+    displayAmount(amount) {
+        return (
+            <div className="row attribute" key={amount.id}>
+                <div className="col-xs-6 key">
+                    {amount.label}
+                </div>
+                <div className="col-xs-6 value">
+                    <span className="amount">{amount.formattedValue}</span>
+                </div>
+            </div>
+        )
+    }
+
+    displayKeyValue(keyValue) {
+        return (
+            <div className="row attribute" key={keyValue.id}>
+                <div className="col-xs-6 key">
+                    {keyValue.label}
+                </div>
+                <div className="col-xs-6 value">
+                    {keyValue.formattedValue}
+                </div>
+            </div>
+        )
+    }
+
+    displayNote(note) {
+        return (
+            <div className="row attribute" key={note.id}>
+                <div className="col-xs-12">
+                    <div className="key">{note.label}</div>
+                    <div className="value">{note.formattedValue}</div>
+                </div>
+            </div>
+        )
+    }
+
+    displayHeading(heading) {
+        return (
+            <div className="row attribute" key={heading.id}>
+                <div className="col-xs-12 heading">{heading.formattedValue}</div>
+            </div>
+        )
+    }
+
+    displayBankAccountChoice(bankAccountChoice) {
+        if (!bankAccountChoice.bankAccounts || bankAccountChoice.bankAccounts.length === 0) {
+            // no bank account is available - display error
+            return (
+                <div className={'message-error'} key={bankAccountChoice.id}>
+                    <FormattedMessage id="operationReview.bankAccountsMissing"/>
+                </div>
+            )
+        } else {
+            return (
+                <div key={bankAccountChoice.id} className="row attribute">
+                    <div className="col-xs-12">
+                        <div className="key">
+                            {bankAccountChoice.label}
+                        </div>
+                        <div className="value">
+                            {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
+                                <BankAccountSelect
+                                    bankAccounts={this.state.bankAccounts}
+                                    chosenBankAccount={this.state.chosenBankAccount}
+                                    choiceDisabled={this.state.bankAccountChoiceDisabled}
+                                    callback={this.handleBankAccountChoice}
+                                />
+                            ) : (
+                                undefined
+                            )}
+                        </div>
+                    </div>
+                </div>
             )
         }
     }
@@ -261,6 +283,28 @@ export default class OperationDetail extends React.Component {
                 {banner.message}
             </div>
         );
+    }
+
+    displayPartyInfo(info) {
+        const partyInfo = info.partyInfo;
+        return (
+            <div className="row attribute" key={info.id}>
+                <div className="col-xs-6 key">
+                    {info.label}
+                    <br/>
+                    <span className="party-info-name">{partyInfo.name}</span>
+                </div>
+                <div className="col-xs-6 value">
+                    <img src={partyInfo.logoURL} className="party-info-logo"/>
+                    <br/>
+                    <span className="party-info-description">{partyInfo.description}</span>
+                    <br/>
+                    <a href={partyInfo.websiteURL} target="_blank" className="party-info-link">
+                        <FormattedMessage id="partyInfo.websiteLink"/>
+                    </a>
+                </div>
+            </div>
+        )
     }
 }
 

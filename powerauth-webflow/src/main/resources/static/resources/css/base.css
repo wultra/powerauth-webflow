@@ -279,3 +279,20 @@ a:hover, a:active, a:focus {
     margin: 0;
     padding: 2px 15px 2px 15px;
 }
+
+.party-info-logo {
+    width: 100px;
+}
+
+.party-info-name {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.party-info-description {
+    font-size: 11px;
+}
+
+.party-info-link {
+    font-size: 11px;
+}
