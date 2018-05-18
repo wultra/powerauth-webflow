@@ -21,9 +21,7 @@ import {FormGroup} from "react-bootstrap";
 // Custom react-select component for bank account choice with HTML content
 import BankAccountSelect from "./bankAccountSelect";
 // Actions
-import {updateFormData} from "../actions/operationDetailActions";
-// i18n
-import {FormattedMessage} from "react-intl";
+import {missingBankAccountsError, updateFormData} from "../actions/operationDetailActions";
 
 /**
  * Operation details which can be embedded in other components.
@@ -59,6 +57,10 @@ export default class OperationDetail extends React.Component {
         if (props.context.formData) {
             props.context.formData.parameters.map((item) => {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
+                    if (item.bankAccounts === undefined || item.bankAccounts.length === 0) {
+                        props.dispatch(missingBankAccountsError());
+                        return;
+                    }
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
                     if (!item.enabled) {
@@ -180,36 +182,27 @@ export default class OperationDetail extends React.Component {
                                     </div>
                                 )
                             } else if (item.type === "BANK_ACCOUNT_CHOICE") {
-                                if (!item.bankAccounts || item.bankAccounts.length === 0) {
-                                    // no bank account is available - display error
-                                    return (
-                                        <div className={'message-error'} key={item.id}>
-                                            <FormattedMessage id="operationReview.bankAccountsMissing"/>
-                                        </div>
-                                    )
-                                } else {
-                                    return (
-                                        <div key={item.id} className="row attribute">
-                                            <div className="col-xs-12">
-                                                <div className="key">
-                                                    {item.label}
-                                                </div>
-                                                <div className="value">
-                                                    {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
-                                                        <BankAccountSelect
-                                                            bankAccounts={this.state.bankAccounts}
-                                                            chosenBankAccount={this.state.chosenBankAccount}
-                                                            choiceDisabled={this.state.bankAccountChoiceDisabled}
-                                                            callback={this.handleBankAccountChoice}
-                                                        />
-                                                    ) : (
-                                                        undefined
-                                                    )}
-                                                </div>
+                                return (
+                                    <div key={item.id} className="row attribute">
+                                        <div className="col-xs-12">
+                                            <div className="key">
+                                                {item.label}
+                                            </div>
+                                            <div className="value">
+                                                {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
+                                                    <BankAccountSelect
+                                                        bankAccounts={this.state.bankAccounts}
+                                                        chosenBankAccount={this.state.chosenBankAccount}
+                                                        choiceDisabled={this.state.bankAccountChoiceDisabled}
+                                                        callback={this.handleBankAccountChoice}
+                                                    />
+                                                ) : (
+                                                    undefined
+                                                )}
                                             </div>
                                         </div>
-                                    )
-                                }
+                                    </div>
+                                )
                             } else if (item.type === "BANNER") {
                                 return this.displayBanner(item, true);
                             }
