@@ -295,11 +295,11 @@ export default class OperationDetail extends React.Component {
                     <span className="party-info-name">{partyInfo.name}</span>
                 </div>
                 <div className="col-xs-6 value">
-                    <img src={partyInfo.logoURL} className="party-info-logo"/>
+                    <img src={partyInfo.logoUrl} className="party-info-logo"/>
                     <br/>
                     <span className="party-info-description">{partyInfo.description}</span>
                     <br/>
-                    <a href={partyInfo.websiteURL} target="_blank" className="party-info-link">
+                    <a href={partyInfo.websiteUrl} target="_blank" className="party-info-link">
                         <FormattedMessage id="partyInfo.websiteLink"/>
                     </a>
                 </div>

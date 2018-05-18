@@ -33,7 +33,7 @@ public class PartyInfoConverter {
         if (input == null) {
             return null;
         }
-        return new io.getlime.security.powerauth.lib.dataadapter.model.entity.PartyInfo(input.getLogoURL(), input.getName(), input.getDescription(), input.getWebsiteURL());
+        return new io.getlime.security.powerauth.lib.dataadapter.model.entity.PartyInfo(input.getLogoUrl(), input.getName(), input.getDescription(), input.getWebsiteUrl());
     }
 
     /**
@@ -45,6 +45,6 @@ public class PartyInfoConverter {
         if (input == null) {
             return null;
         }
-        return new PartyInfo(input.getLogoURL(), input.getName(), input.getDescription(), input.getWebsiteURL());
+        return new PartyInfo(input.getLogoUrl(), input.getName(), input.getDescription(), input.getWebsiteUrl());
     }
 }

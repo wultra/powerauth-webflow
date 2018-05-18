@@ -7,10 +7,10 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  */
 public class PartyInfo {
 
-    private String logoURL;
+    private String logoUrl;
     private String name;
     private String description;
-    private String websiteURL;
+    private String websiteUrl;
 
     /**
      * Default constructor.
@@ -20,32 +20,32 @@ public class PartyInfo {
 
     /**
      * Constructor with party details.
-     * @param logoURL URL with party logo.
+     * @param logoUrl URL with party logo.
      * @param name Party name.
      * @param description Party description.
-     * @param websiteURL Party website URL.
+     * @param websiteUrl Party website URL.
      */
-    public PartyInfo(String logoURL, String name, String description, String websiteURL) {
-        this.logoURL = logoURL;
+    public PartyInfo(String logoUrl, String name, String description, String websiteUrl) {
+        this.logoUrl = logoUrl;
         this.name = name;
         this.description = description;
-        this.websiteURL = websiteURL;
+        this.websiteUrl = websiteUrl;
     }
 
     /**
      * Get URL with party logo.
      * @return URL with party logo.
      */
-    public String getLogoURL() {
-        return logoURL;
+    public String getLogoUrl() {
+        return logoUrl;
     }
 
     /**
      * Set URL with party logo.
-     * @param logoURL URL with party logo.
+     * @param logoUrl URL with party logo.
      */
-    public void setLogoURL(String logoURL) {
-        this.logoURL = logoURL;
+    public void setLogoUrl(String logoUrl) {
+        this.logoUrl = logoUrl;
     }
 
     /**
@@ -84,16 +84,16 @@ public class PartyInfo {
      * Get party website URL.
      * @return Party website URL.
      */
-    public String getWebsiteURL() {
-        return websiteURL;
+    public String getWebsiteUrl() {
+        return websiteUrl;
     }
 
     /**
      * Set party website URL.
-     * @param websiteURL Party website URL.
+     * @param websiteUrl Party website URL.
      */
-    public void setWebsiteURL(String websiteURL) {
-        this.websiteURL = websiteURL;
+    public void setWebsiteUrl(String websiteUrl) {
+        this.websiteUrl = websiteUrl;
     }
 
 }
