@@ -356,6 +356,7 @@ public class OperationFormData {
         OperationPartyInfoFieldAttribute attr = new OperationPartyInfoFieldAttribute();
         attr.setId(id);
         attr.setPartyInfo(partyInfo);
+        saveAttribute(attr);
         return attr;
     }
 
