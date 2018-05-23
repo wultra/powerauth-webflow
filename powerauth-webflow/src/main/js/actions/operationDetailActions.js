@@ -35,3 +35,18 @@ export function updateFormData(formData) {
         })
     }
 }
+
+/**
+ * Interrupt operation and show unexpected error about missing bank accounts.
+ * @returns {Function} Missing bank accounts error is dispatched.
+ */
+export function missingBankAccountsError() {
+    return function (dispatch) {
+        dispatch({
+            type: "SHOW_SCREEN_ERROR",
+            payload: {
+                message: "operationReview.bankAccountsMissing"
+            }
+        })
+    }
+}
