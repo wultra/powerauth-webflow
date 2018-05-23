@@ -46,6 +46,7 @@ public class OperationConverter {
         }
         Operation result = new Operation();
         result.setId(input.getOperationId());
+        result.setName(input.getOperationName());
         result.setData(input.getOperationData());
         result.setOperationCreated(input.getTimestampCreated());
         result.setOperationExpires(input.getTimestampExpires());
