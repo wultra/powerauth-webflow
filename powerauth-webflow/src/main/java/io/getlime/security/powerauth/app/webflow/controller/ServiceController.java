@@ -64,8 +64,10 @@ public class ServiceController {
         response.setApplicationName(webFlowServerConfiguration.getApplicationName());
         response.setApplicationDisplayName(webFlowServerConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(webFlowServerConfiguration.getApplicationEnvironment());
-        response.setVersion(buildProperties.getVersion());
-        response.setBuildTime(Date.from(buildProperties.getTime()));
+        if (buildProperties != null) {
+            response.setVersion(buildProperties.getVersion());
+            response.setBuildTime(Date.from(buildProperties.getTime()));
+        }
         response.setTimestamp(new Date());
         Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getServiceStatus request succeeded");
         return new ObjectResponse<>(response);
