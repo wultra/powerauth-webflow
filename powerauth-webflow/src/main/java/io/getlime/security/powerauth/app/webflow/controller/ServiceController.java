@@ -40,16 +40,23 @@ import java.util.logging.Logger;
 public class ServiceController {
 
     private final WebFlowServerConfiguration webFlowServerConfiguration;
-    private final BuildProperties buildProperties;
+    private BuildProperties buildProperties;
 
     /**
      * Service constructor.
      * @param webFlowServerConfiguration Web Flow server configuration.
-     * @param buildProperties Build info.
      */
     @Autowired
-    public ServiceController(WebFlowServerConfiguration webFlowServerConfiguration, BuildProperties buildProperties) {
+    public ServiceController(WebFlowServerConfiguration webFlowServerConfiguration) {
         this.webFlowServerConfiguration = webFlowServerConfiguration;
+    }
+
+    /**
+     * Set build information.
+     * @param buildProperties Build properties.
+     */
+    @Autowired(required = false)
+    public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
 

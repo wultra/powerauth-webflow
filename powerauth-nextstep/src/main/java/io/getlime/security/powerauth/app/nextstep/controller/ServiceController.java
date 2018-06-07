@@ -40,18 +40,26 @@ import java.util.logging.Logger;
 public class ServiceController {
 
     private final NextStepServerConfiguration nextStepServerConfiguration;
-    private final BuildProperties buildProperties;
+    private BuildProperties buildProperties;
 
     /**
      * Controller constructor.
      * @param nextStepServerConfiguration Next step server configuration.
-     * @param buildProperties Build info.
      */
     @Autowired
-    public ServiceController(NextStepServerConfiguration nextStepServerConfiguration, BuildProperties buildProperties) {
+    public ServiceController(NextStepServerConfiguration nextStepServerConfiguration) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+    }
+
+    /**
+     * Set build information.
+     * @param buildProperties Build properties.
+     */
+    @Autowired(required = false)
+    public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
+
 
     /**
      * Controller resource with system information.
