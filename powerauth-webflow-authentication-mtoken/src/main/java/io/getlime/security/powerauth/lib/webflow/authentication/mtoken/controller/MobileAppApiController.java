@@ -299,7 +299,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         // Get configuration for operation with given name
         final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
 
-        // Convert lose JSON format to AllowedSignatureType structure
+        // Convert loose JSON format to AllowedSignatureType structure
         OperationConverter operationConverter = new OperationConverter();
         AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
 
