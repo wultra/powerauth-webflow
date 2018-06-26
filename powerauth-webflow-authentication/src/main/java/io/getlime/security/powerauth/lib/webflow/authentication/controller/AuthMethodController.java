@@ -134,7 +134,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     /**
      * Get operation configuration.
      * @param operationName Operation name.
-     * @return Operation coniguration.
+     * @return Operation configuration.
      */
     protected GetOperationConfigResponse getOperationConfig(String operationName) {
         try {
