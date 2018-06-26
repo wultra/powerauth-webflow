@@ -309,23 +309,19 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 case MULTIFACTOR_1FA: {
                     // Is the signature correct 1FA type - "possession"?
                     // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
-                    if (!PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
-                            && !PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
-                            && !PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
-                        return false;
-                    }
-                    break;
+                    return PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
+                            || PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
+                            || PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes);
                 }
                 case MULTIFACTOR_2FA: {
                     // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
-                    if (!PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
-                            && !PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
-                        return false;
+                    // Check for "possession_knowledge" first
+                    if (PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
+                        return true;
                     }
-                    // Is biometry allowed for this 2FA request?
-                    if (!allowedSignatureType.getVariants().contains("possession_biometry")
-                            && PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
-                        return false;
+                    // Is "possession_biometry" allowed for this 2FA request?
+                    if (PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                        return allowedSignatureType.getVariants() != null && allowedSignatureType.getVariants().contains("possession_biometry");
                     }
                     break;
                 }
@@ -335,7 +331,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 }
             }
         }
-        return true;
+        return false;
     }
 
 }
