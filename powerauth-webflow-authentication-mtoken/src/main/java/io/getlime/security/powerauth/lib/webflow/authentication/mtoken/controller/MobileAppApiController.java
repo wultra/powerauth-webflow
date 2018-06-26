@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
@@ -186,7 +187,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws AuthStepException Thrown when operation is invalid.
      */
     @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/authorize")
+    @PowerAuth(resourceId = "/operation/authorize", signatureType = {
+            PowerAuthSignatureTypes.POSSESSION,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
+            PowerAuthSignatureTypes.POSSESSION_BIOMETRY
+    })
     public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (request.getRequestObject() == null) {
@@ -204,9 +209,17 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
+
+            // Check for expired operation
             if (operation.isExpired()) {
                 throw new OperationExpiredException();
             }
+
+            // Check if signature type is allowed
+            if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
+                throw new PowerAuthAuthenticationException();
+            }
+
             if (operation.getOperationData().equals(request.getRequestObject().getData())
                     && operation.getUserId() != null
                     && operation.getUserId().equals(apiAuthentication.getUserId())) {
@@ -272,6 +285,57 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not verify activationId", ex);
         }
         return false;
+    }
+
+    /**
+     * Verify if provided PowerAuth signature type is allowed for operation with provided name.
+     *
+     * @param operationName Operation name.
+     * @param signatureTypes Signature type that was returned from signature verification.
+     * @return True if the signature type is allowed, false otherwise.
+     */
+    private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthSignatureTypes signatureTypes)  {
+
+        // Get configuration for operation with given name
+        final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+
+        // Convert lose JSON format to AllowedSignatureType structure
+        OperationConverter operationConverter = new OperationConverter();
+        AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
+
+        // Evaluate various signature types
+        if (allowedSignatureType != null) {
+            switch (allowedSignatureType.getType()) {
+                case MULTIFACTOR_1FA: {
+                    // Is the signature correct 1FA type - "possession"?
+                    // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
+                    if (!PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
+                            && !PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
+                            && !PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                        return false;
+                    }
+                    break;
+                }
+                case MULTIFACTOR_2FA: {
+                    // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
+                    if (!PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
+                            && !PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                        return false;
+                    }
+                    // Is biometry allowed for this 2FA request?
+                    if (!allowedSignatureType.getVariants().contains("possession_biometry")
+                            && PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                        return false;
+                    }
+                    break;
+                }
+                case ASSYMETRIC_ECDSA: {
+                    // Not allowed at this moment
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
 }
