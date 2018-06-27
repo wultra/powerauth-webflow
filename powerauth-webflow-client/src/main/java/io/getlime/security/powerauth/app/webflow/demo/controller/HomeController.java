@@ -69,13 +69,19 @@ public class HomeController {
         model.addAttribute("providerIds", connectionFactoryLocator.registeredProviderIds());
         model.addAttribute("operationId", operationId);
 
-        // MOCK PAYMENT
-        final PaymentForm paymentForm = new PaymentForm();
-        paymentForm.setAmount(BigDecimal.valueOf(100));
-        paymentForm.setCurrency("CZK");
-        paymentForm.setAccount("238400856/0300");
-        paymentForm.setNote("Utility Bill Payment - 05/2017");
-        paymentForm.setDueDate("2017-06-29");
+        PaymentForm paymentForm = (PaymentForm) session.getAttribute("paymentForm");
+        if (paymentForm == null) {
+            // MOCK PAYMENT
+            paymentForm = new PaymentForm();
+            paymentForm.setAmount(BigDecimal.valueOf(100));
+            paymentForm.setCurrency("CZK");
+            paymentForm.setAccount("238400856/0300");
+            paymentForm.setNote("Utility Bill Payment - 05/2017");
+            paymentForm.setDueDate("2017-06-29");
+        } else {
+            session.removeAttribute("paymentForm");
+        }
+
         model.addAttribute("paymentForm", paymentForm);
 
         return "home";
@@ -118,6 +124,7 @@ public class HomeController {
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
+        session.setAttribute("paymentForm", paymentForm);
 
         return "redirect:/";
     }
