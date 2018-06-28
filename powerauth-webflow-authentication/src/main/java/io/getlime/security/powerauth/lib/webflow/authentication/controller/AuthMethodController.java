@@ -137,6 +137,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws OperationTimeoutException Thrown when operation is expired.
      */
     protected void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
+        if (operation == null) {
+            throw new IllegalArgumentException("Operation is null in checkOperationExpiration");
+        }
         if (operation.isExpired()) {
             Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has timed out, operation ID: {0}", operation.getOperationId());
             throw new OperationTimeoutException("Operation has timed out");
