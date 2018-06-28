@@ -24,7 +24,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlrea
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
@@ -129,17 +128,6 @@ public class MobileApiExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationCanceledException(Throwable t) {
         return error(ErrorCode.OPERATION_ALREADY_CANCELED, t);
-    }
-
-    /**
-     * Exception handler for expiration.
-     * @param t Throwable.
-     * @return Response with error details.
-     */
-    @ExceptionHandler(OperationExpiredException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
-        return error(ErrorCode.OPERATION_EXPIRED, t);
     }
 
     /**
