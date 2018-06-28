@@ -322,7 +322,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                     }
                     break;
                 }
-                case ASSYMETRIC_ECDSA: {
+                case ASYMMETRIC_ECDSA: {
                     // Not allowed at this moment
                     return false;
                 }
