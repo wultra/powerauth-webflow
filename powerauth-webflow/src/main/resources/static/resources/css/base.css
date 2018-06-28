@@ -280,19 +280,33 @@ a:hover, a:active, a:focus {
     padding: 2px 15px 2px 15px;
 }
 
+.party-info-wrapper {
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.party-info-wrapper * {
+    margin: 0;
+}
+
+.party-info-logo-wrapper {
+    padding: 10px;
+}
+
 .party-info-logo {
-    width: 100px;
+    width: 100%;
 }
 
 .party-info-name {
-    font-size: 14px;
+    font-size: 16pt;
     font-weight: bold;
 }
 
 .party-info-description {
-    font-size: 11px;
+    font-size: 14pt;
 }
 
 .party-info-link {
-    font-size: 11px;
+    font-size: 12pt;
 }

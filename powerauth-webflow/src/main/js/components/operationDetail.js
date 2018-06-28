@@ -22,6 +22,8 @@ import {FormGroup} from "react-bootstrap";
 import BankAccountSelect from "./bankAccountSelect";
 // Actions
 import {missingBankAccountsError, updateFormData} from "../actions/operationDetailActions";
+// i18n
+import {FormattedMessage} from "react-intl";
 
 /**
  * Operation details which can be embedded in other components.
@@ -142,6 +144,7 @@ export default class OperationDetail extends React.Component {
                         <h3 className="title">{this.props.context.formData.title.message}</h3>
                         <p>{this.props.context.formData.greeting.message}</p>
                     </div>
+                    <hr/>
                     <div>
                         {this.props.context.formData.parameters.map((item) => {
                             if (item.type === "AMOUNT") {
@@ -282,22 +285,30 @@ export default class OperationDetail extends React.Component {
         const partyInfo = info.partyInfo;
         return (
             <div className="row attribute" key={info.id}>
-                <div className="col-xs-6 key">
-                    {info.label}
-                    <br/>
-                    <span className="party-info-name">{partyInfo.name}</span>
-                </div>
-                <div className="col-xs-6 value">
-                    <img src={partyInfo.logoUrl} className="party-info-logo"/>
-                    <br/>
-                    <span className="party-info-description">{partyInfo.description}</span>
-                    <br/>
-                    <a href={partyInfo.websiteUrl} target="_blank" className="party-info-link">
-                        <FormattedMessage id="partyInfo.websiteLink"/>
-                    </a>
+                <div className="col-xs-12">
+                    <div className="row attribute">
+                        <div className="col-xs-12 key">{info.label}</div>
+                    </div>
+                    <div className="party-info-wrapper">
+                        <div className="row attribute">
+                            <div className="col-xs-3">
+                                <div className="party-info-logo-wrapper">
+                                    <img src={partyInfo.logoUrl} className="party-info-logo"/>
+                                </div>
+                            </div>
+                            <div className="col-xs-9">
+                                <h3 className="party-info-name">{partyInfo.name}</h3>
+                                <p className="party-info-description">{partyInfo.description}</p>
+                                <p>
+                                    <a href={partyInfo.websiteUrl} target="_blank" className="party-info-link">
+                                        <FormattedMessage id="partyInfo.websiteLink"/>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         )
     }
 }
-
