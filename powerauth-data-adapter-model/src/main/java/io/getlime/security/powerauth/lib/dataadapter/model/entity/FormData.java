@@ -168,21 +168,41 @@ public class FormData {
 
 
     /**
-     * Set amount.
-     * @param amountId Amount ID.
+     * Add an amount.
+     * @param attrId Attribute ID.
      * @param amount Amount value.
      * @param currencyId Currency ID.
      * @param currency Amount currency.
      * @return Operation amount field attribute.
      */
     @JsonIgnore
-    public AmountAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
+    public AmountAttribute addAmount(String attrId, BigDecimal amount, String currencyId, String currency) {
         AmountAttribute amountAttr = new AmountAttribute();
-        amountAttr.setId(amountId);
+        amountAttr.setId(attrId);
         amountAttr.setAmount(amount);
         amountAttr.setCurrencyId(currencyId);
         amountAttr.setCurrency(currency);
         saveAttribute(amountAttr);
+        return amountAttr;
+    }
+
+    /**
+     * Add an amount before existing field.
+     * @param attrId Attribute ID.
+     * @param amount Amount value.
+     * @param currencyId Currency ID.
+     * @param currency Amount currency.
+     * @param existingField Existing field.
+     * @return Operation amount field attribute.
+     */
+    @JsonIgnore
+    public AmountAttribute addAmountBeforeField(String attrId, BigDecimal amount, String currencyId, String currency, Attribute existingField) {
+        AmountAttribute amountAttr = new AmountAttribute();
+        amountAttr.setId(attrId);
+        amountAttr.setAmount(amount);
+        amountAttr.setCurrencyId(currencyId);
+        amountAttr.setCurrency(currency);
+        addAttributeBeforeField(amountAttr, existingField);
         return amountAttr;
     }
 
@@ -203,23 +223,39 @@ public class FormData {
     }
 
     /**
-     * Set localized note.
-     * @param noteId Note ID.
+     * Add localized note.
+     * @param attrId Attribute ID.
      * @param note Localized note.
      * @return Operation note field attribute.
      */
     @JsonIgnore
-    public NoteAttribute addNote(String noteId, String note) {
+    public NoteAttribute addNote(String attrId, String note) {
         NoteAttribute attr = new NoteAttribute();
-        attr.setId(noteId);
+        attr.setId(attrId);
         attr.setNote(note);
         saveAttribute(attr);
         return attr;
     }
 
     /**
-     * Set a formatted note.
-     * @param noteId Note ID.
+     * Add localized note before existing field.
+     * @param attrId Attribute ID.
+     * @param note Localized note.
+     * @param existingField Existing field.
+     * @return Operation note field attribute.
+     */
+    @JsonIgnore
+    public NoteAttribute addNoteBeforeField(String attrId, String note, Attribute existingField) {
+        NoteAttribute noteAttr = new NoteAttribute();
+        noteAttr.setId(attrId);
+        noteAttr.setNote(note);
+        addAttributeBeforeField(noteAttr, existingField);
+        return noteAttr;
+    }
+
+    /**
+     * Add a formatted note.
+     * @param noteId Attribute ID.
      * @param note Note.
      * @param valueFormatType Value format type.
      * @return Operation note field attribute.
@@ -231,6 +267,23 @@ public class FormData {
         attr.setNote(note);
         saveAttribute(attr);
         return attr;
+    }
+
+    /**
+     * Add a formatted note before existing field.
+     * @param attrId Attribute ID.
+     * @param note Note.
+     * @param valueFormatType Value format type.
+     * @param existingField Existing field.
+     * @return Operation note field attribute.
+     */
+    @JsonIgnore
+    public NoteAttribute addNoteBeforeField(String attrId, String note, ValueFormatType valueFormatType, Attribute existingField) {
+        NoteAttribute noteAttr = new NoteAttribute(valueFormatType);
+        noteAttr.setId(attrId);
+        noteAttr.setNote(note);
+        addAttributeBeforeField(noteAttr, existingField);
+        return noteAttr;
     }
 
     /**
@@ -251,16 +304,16 @@ public class FormData {
 
     /**
      * Add a bank account choice.
-     * @param id Bank account choice ID.
+     * @param attrId Attribute ID.
      * @param bankAccounts List of bank accounts.
      * @param enabled Whether choice is enabled.
      * @param defaultValue Default bank account value.
      * @return Bank account choice field attribute.
      */
     @JsonIgnore
-    public BankAccountChoiceAttribute addBankAccountChoice(String id, List<BankAccount> bankAccounts, boolean enabled, String defaultValue) {
+    public BankAccountChoiceAttribute addBankAccountChoice(String attrId, List<BankAccount> bankAccounts, boolean enabled, String defaultValue) {
         BankAccountChoiceAttribute attr = new BankAccountChoiceAttribute();
-        attr.setId(id);
+        attr.setId(attrId);
         attr.setBankAccounts(bankAccounts);
         attr.setEnabled(enabled);
         attr.setDefaultValue(defaultValue);
@@ -269,62 +322,142 @@ public class FormData {
     }
 
     /**
+     * Add a bank account choice before existing field.
+     * @param attrId Attribute ID.
+     * @param bankAccounts List of bank accounts.
+     * @param enabled Whether choice is enabled.
+     * @param defaultValue Default bank account value.
+     * @param existingField Existing field.
+     * @return Bank account choice field attribute.
+     */
+    @JsonIgnore
+    public BankAccountChoiceAttribute addBankAccountChoiceBeforeField(String attrId, List<BankAccount> bankAccounts, boolean enabled, String defaultValue, Attribute existingField) {
+        BankAccountChoiceAttribute attr = new BankAccountChoiceAttribute();
+        attr.setId(attrId);
+        attr.setBankAccounts(bankAccounts);
+        attr.setEnabled(enabled);
+        attr.setDefaultValue(defaultValue);
+        addAttributeBeforeField(attr, existingField);
+        return attr;
+    }
+
+    /**
      * Add a key-value attribute.
-     * @param id Attribute ID.
+     * @param attrId Attribute ID.
      * @param value Attribute value.
      * @return Key-value field attribute.
      */
     @JsonIgnore
-    public KeyValueAttribute addKeyValue(String id, String value) {
+    public KeyValueAttribute addKeyValue(String attrId, String value) {
         KeyValueAttribute attr = new KeyValueAttribute();
-        attr.setId(id);
+        attr.setId(attrId);
         attr.setValue(value);
         saveAttribute(attr);
         return attr;
     }
 
     /**
+     * Add a key-value attribute before an existing field.
+     * @param attrId Attribute ID.
+     * @param value Attribute value.
+     * @param existingField Existing field.
+     * @return Key-value field attribute.
+     */
+    @JsonIgnore
+    public KeyValueAttribute addKeyValueBeforeField(String attrId, String value, Attribute existingField) {
+        KeyValueAttribute keyValueAttr = new KeyValueAttribute();
+        keyValueAttr.setId(attrId);
+        keyValueAttr.setValue(value);
+        addAttributeBeforeField(keyValueAttr, existingField);
+        return keyValueAttr;
+    }
+
+    /**
      * Add a formatted key-value attribute.
-     * @param id Attribute ID.
+     * @param attrId Attribute ID.
      * @param value Attribute value.
      * @param valueFormatType Value format type.
      * @return Key-value field attribute.
      */
     @JsonIgnore
-    public KeyValueAttribute addKeyValue(String id, String value, ValueFormatType valueFormatType) {
+    public KeyValueAttribute addKeyValue(String attrId, String value, ValueFormatType valueFormatType) {
         KeyValueAttribute attr = new KeyValueAttribute(valueFormatType);
-        attr.setId(id);
+        attr.setId(attrId);
         attr.setValue(value);
         saveAttribute(attr);
         return attr;
+    }
+
+    /**
+     * Add a formatted key-value attribute before existing field.
+     * @param attrId Attribute ID.
+     * @param value Attribute value.
+     * @param valueFormatType Value format type.
+     * @param existingField Existing field.
+     * @return Key-value field attribute.
+     */
+    @JsonIgnore
+    public KeyValueAttribute addKeyValueBeforeField(String attrId, String value, ValueFormatType valueFormatType, Attribute existingField) {
+        KeyValueAttribute keyValueAttr = new KeyValueAttribute(valueFormatType);
+        keyValueAttr.setId(attrId);
+        keyValueAttr.setValue(value);
+        addAttributeBeforeField(keyValueAttr, existingField);
+        return keyValueAttr;
     }
 
     /**
      * Add a banner above the form.
      * @param bannerType Banner type.
      * @param bannerId Banner ID.
+     * @return Form banner.
      */
     @JsonIgnore
-    public void addBanner(BannerType bannerType, String bannerId) {
+    public FormBanner addBanner(BannerType bannerType, String bannerId) {
         FormBanner banner = new FormBanner(bannerType);
         banner.setId(bannerId);
         banners.add(banner);
+        return banner;
     }
 
     /**
      * Add a banner before a field.
      * @param bannerType Banner type.
-     * @param bannerId Banner ID.
+     * @param attrId Attribute ID.
      * @param existingField Operation form field attribute before which banner should be added.
+     * @return Banner attribute.
      */
-    public void addBannerBeforeField(BannerType bannerType, String bannerId, Attribute existingField) {
-        if (!parameters.contains(existingField)) {
-            throw new IllegalArgumentException("Field is missing in operation form data: "+existingField.getId());
-        }
-        BannerAttribute banner = new BannerAttribute(bannerType);
-        banner.setId(bannerId);
-        int fieldIndex = parameters.indexOf(existingField);
-        parameters.add(fieldIndex, banner);
+    public BannerAttribute addBannerBeforeField(BannerType bannerType, String attrId, Attribute existingField) {
+        BannerAttribute bannerAttr = new BannerAttribute(bannerType);
+        bannerAttr.setId(attrId);
+        addAttributeBeforeField(bannerAttr, existingField);
+        return bannerAttr;
+    }
+
+    /**
+     * Add party information.
+     * @param attrId Attribute ID.
+     * @param partyInfo Party information.
+     * @return Party information.
+     */
+    @JsonIgnore
+    public PartyInfoAttribute addPartyInfo(String attrId, PartyInfo partyInfo) {
+        PartyInfoAttribute partyInfoAttr = new PartyInfoAttribute(attrId, partyInfo);
+        saveAttribute(partyInfoAttr);
+        return partyInfoAttr;
+    }
+
+    /**
+     * Add party information before an existing field.
+     * @param attrId Attribute ID.
+     * @param partyInfo Party information.
+     * @param existingField Existing field.
+     * @return Party information attribute.
+     */
+    @JsonIgnore
+    public PartyInfoAttribute addPartyInfoBeforeField(String attrId, PartyInfo partyInfo, Attribute existingField) {
+        PartyInfoAttribute partyInfoAttr = new PartyInfoAttribute(attrId, partyInfo);
+        addAttributeBeforeField(partyInfoAttr, existingField);
+        return partyInfoAttr;
     }
 
     /**
@@ -376,26 +509,42 @@ public class FormData {
     }
 
     /**
-     * Adds attribute or updates existing attribute based on its ID.
-     * @param attributeToSave Attribute to save.
+     * Add attribute or update existing attribute based on its ID.
+     * @param attrToSave Attribute to save.
      */
-    private void saveAttribute(Attribute attributeToSave) {
-        if (attributeToSave == null || attributeToSave.getId() == null) {
+    private void saveAttribute(Attribute attrToSave) {
+        if (attrToSave == null || attrToSave.getId() == null) {
             throw new IllegalArgumentException("Invalid attribute");
         }
         Integer existingIndex = null;
         int counter = 0;
         for (Attribute attr: parameters) {
-            if (attr.getId().equals(attributeToSave.getId())) {
+            if (attr.getId().equals(attrToSave.getId())) {
                 existingIndex = counter;
                 break;
             }
             counter++;
         }
         if (existingIndex != null) {
-            parameters.set(existingIndex, attributeToSave);
+            parameters.set(existingIndex, attrToSave);
         } else {
-            parameters.add(attributeToSave);
+            parameters.add(attrToSave);
         }
+    }
+
+    /**
+     * Add attribute before existing field.
+     * @param addedAttr Added attribute.
+     * @param existingField Existing field.
+     */
+    private void addAttributeBeforeField(Attribute addedAttr, Attribute existingField) {
+        if (getAttributeById(addedAttr.getId()) != null) {
+            throw new IllegalArgumentException("Field is already present in operation form data: "+addedAttr.getId());
+        }
+        if (!parameters.contains(existingField)) {
+            throw new IllegalArgumentException("Field is missing in operation form data: "+existingField.getId());
+        }
+        int fieldIndex = parameters.indexOf(existingField);
+        parameters.add(fieldIndex, addedAttr);
     }
 }

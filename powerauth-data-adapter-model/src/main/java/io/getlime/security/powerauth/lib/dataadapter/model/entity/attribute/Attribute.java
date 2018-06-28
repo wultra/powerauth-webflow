@@ -35,7 +35,8 @@ import java.util.Objects;
         @JsonSubTypes.Type(value = BankAccountChoiceAttribute.class, name = "BANK_ACCOUNT_CHOICE"),
         @JsonSubTypes.Type(value = KeyValueAttribute.class, name = "KEY_VALUE"),
         @JsonSubTypes.Type(value = BannerAttribute.class, name = "BANNER"),
-        @JsonSubTypes.Type(value = HeadingAttribute.class, name = "HEADING")
+        @JsonSubTypes.Type(value = HeadingAttribute.class, name = "HEADING"),
+        @JsonSubTypes.Type(value = PartyInfoAttribute.class, name = "PARTY_INFO"),
 })
 public class Attribute {
 
@@ -45,7 +46,8 @@ public class Attribute {
         BANK_ACCOUNT_CHOICE,
         KEY_VALUE,
         BANNER,
-        HEADING
+        HEADING,
+        PARTY_INFO
     }
 
     // JsonIgnore added, otherwise type was serialized twice

@@ -181,6 +181,12 @@ public class MessageTranslationService {
                     OperationHeadingFieldAttribute headingAttribute = (OperationHeadingFieldAttribute) attribute;
                     value = headingAttribute.getValue();
                     break;
+                case PARTY_INFO:
+                    OperationPartyInfoFieldAttribute partyInfoAttribute = (OperationPartyInfoFieldAttribute) attribute;
+                    if (partyInfoAttribute.getPartyInfo() != null) {
+                        value = partyInfoAttribute.getPartyInfo().getName();
+                    }
+                    break;
             }
             idValueMap.put(attribute.getId(), value);
         }

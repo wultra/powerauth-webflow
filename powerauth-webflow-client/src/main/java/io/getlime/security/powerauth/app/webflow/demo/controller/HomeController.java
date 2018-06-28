@@ -110,6 +110,15 @@ public class HomeController {
         // formData.addBanner(BannerType.BANNER_WARNING, "banner.warning");
         // formData.addBanner(BannerType.BANNER_INFO, "banner.info");
 
+        // Sample party information added to form data.
+        // PartyInfo partyInfo = new PartyInfo();
+        // partyInfo.setName("Tesco");
+        // partyInfo.setLogoUrl("https://itesco.cz/img/logo/logo.svg");
+        // partyInfo.setDescription("Objevte více příběhů psaných s chutí");
+        // partyInfo.setWebsiteUrl("https://itesco.cz/hello/vse-o-jidle/pribehy-psane-s-chuti/clanek/tomovy-burgery-pro-zapalene-fanousky/15012");
+        // formData.addPartyInfo("operation.partyInfo", partyInfo);
+
+
         final String operationName = "authorize_payment";
         final GetOperationConfigResponse operationConfig = client.getOperationConfig(operationName).getResponseObject();
 

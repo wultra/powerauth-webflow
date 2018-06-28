@@ -28,6 +28,7 @@ public class AttributeConverter {
     private ValueFormatTypeConverter valueFormatTypeConverter = new ValueFormatTypeConverter();
     private BannerTypeConverter bannerTypeConverter = new BannerTypeConverter();
     private BankAccountListConverter bankAccountListConverter = new BankAccountListConverter();
+    private PartyInfoConverter partyInfoConverter = new PartyInfoConverter();
 
     /**
      * Converter from OperationFormFieldAttribute.
@@ -62,6 +63,10 @@ public class AttributeConverter {
             case HEADING: {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
                 return new HeadingAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+            }
+            case PARTY_INFO: {
+                OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
+                return new PartyInfoAttribute(attr.getId(), partyInfoConverter.fromOperationPartyInfo(attr.getPartyInfo()));
             }
             default: {
                 throw new IllegalStateException("Unsupported attribute type: "+input.getType());
@@ -102,6 +107,10 @@ public class AttributeConverter {
             case HEADING: {
                 HeadingAttribute attr = (HeadingAttribute) input;
                 return new OperationHeadingFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+            }
+            case PARTY_INFO: {
+                PartyInfoAttribute attr = (PartyInfoAttribute) input;
+                return new OperationPartyInfoFieldAttribute(attr.getId(), partyInfoConverter.fromPartyInfo(attr.getPartyInfo()));
             }
             default: {
                 throw new IllegalStateException("Unsupported attribute type: "+input.getType());
