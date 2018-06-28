@@ -29,7 +29,8 @@ public class Attribute {
         AMOUNT,
         KEY_VALUE,
         NOTE,
-        HEADING
+        HEADING,
+        PARTY
     }
 
     protected Type type;

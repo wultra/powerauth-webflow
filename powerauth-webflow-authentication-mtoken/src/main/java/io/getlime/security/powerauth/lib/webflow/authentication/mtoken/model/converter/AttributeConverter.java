@@ -46,6 +46,14 @@ public class AttributeConverter {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
                 return new HeadingAttribute(attr.getId(), attr.getFormattedValue());
             }
+            case PARTY_INFO: {
+                OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
+                // TODO - we use KeyValueAttribute until mobile token supports PartyInfo
+                if (attr.getPartyInfo() != null) {
+                    return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getPartyInfo().getName());
+                }
+                return new KeyValueAttribute(input.getId(), input.getLabel(), null);
+            }
             default: {
                 return new KeyValueAttribute(input.getId(), input.getLabel(), null);
             }
