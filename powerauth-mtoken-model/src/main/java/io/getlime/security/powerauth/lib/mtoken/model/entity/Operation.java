@@ -25,6 +25,7 @@ import java.util.Date;
 public class Operation {
 
     private String id;
+    private String name;
     private String data;
     private Date operationCreated;
     private Date operationExpires;
@@ -45,6 +46,23 @@ public class Operation {
      */
     public void setId(String id) {
         this.id = id;
+    }
+
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Set operation name.
+     *
+     * @param name Operation name.
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**

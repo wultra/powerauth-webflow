@@ -114,6 +114,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         }
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         // nonce and dataHash are received from UI - they were stored together with the QR code
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
@@ -176,6 +177,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         QRCodeInitResponse initResponse = new QRCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
 
         String userId = operation.getUserId();
 
@@ -235,6 +237,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
     public QRCodeAuthenticationResponse verifyAuthCode(@RequestBody QRCodeAuthenticationRequest request) {
         try {
             GetOperationDetailResponse operation = getOperation();
+            checkOperationExpiration(operation);
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
@@ -327,6 +330,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         String operationId = operation.getOperationId();
         String operationData = operation.getOperationData();
         String operationName = operation.getOperationName();

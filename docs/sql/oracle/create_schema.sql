@@ -85,9 +85,9 @@ CREATE TABLE ns_user_prefs (
 -- Table ns_operation_config stores configuration of operations.
 -- Each operation type (defined by operation_name) has a related mobile token template and configuration of signatures.
 CREATE TABLE ns_operation_config (
-  operation_name            VARCHAR(32),
-  template_version          VARCHAR(4),
-  template_id               VARCHAR(4),
+  operation_name            VARCHAR(32) PRIMARY KEY,
+  template_version          VARCHAR(1),
+  template_id               INTEGER,
   mobile_token_mode         VARCHAR(256)
 );
 

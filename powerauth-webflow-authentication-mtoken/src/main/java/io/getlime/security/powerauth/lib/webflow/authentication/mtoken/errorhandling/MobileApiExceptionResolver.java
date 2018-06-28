@@ -21,9 +21,9 @@ import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
@@ -131,13 +131,14 @@ public class MobileApiExceptionResolver {
     }
 
     /**
-     * Exception handler for expiration.
+     * Exception handler for operation timeout exception.
      * @param t Throwable.
      * @return Response with error details.
      */
-    @ExceptionHandler(OperationExpiredException.class)
+    @ExceptionHandler(OperationTimeoutException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
+    public @ResponseBody ErrorResponse handleOperationTimeoutException(Throwable t) {
         return error(ErrorCode.OPERATION_EXPIRED, t);
     }
+
 }

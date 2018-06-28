@@ -38,11 +38,19 @@ import java.util.Date;
 public class ServiceController {
 
     private final WebFlowServiceConfiguration webFlowServiceConfiguration;
-    private final BuildProperties buildProperties;
+    private BuildProperties buildProperties;
 
     @Autowired
-    public ServiceController(WebFlowServiceConfiguration webFlowServiceConfiguration, BuildProperties buildProperties) {
+    public ServiceController(WebFlowServiceConfiguration webFlowServiceConfiguration) {
         this.webFlowServiceConfiguration = webFlowServiceConfiguration;
+    }
+
+    /**
+     * Set build information.
+     * @param buildProperties Build properties.
+     */
+    @Autowired(required = false)
+    public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
 
@@ -56,8 +64,10 @@ public class ServiceController {
         response.setApplicationName(webFlowServiceConfiguration.getApplicationName());
         response.setApplicationDisplayName(webFlowServiceConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(webFlowServiceConfiguration.getApplicationEnvironment());
-        response.setVersion(buildProperties.getVersion());
-        response.setBuildTime(Date.from(buildProperties.getTime()));
+        if (buildProperties != null) {
+            response.setVersion(buildProperties.getVersion());
+            response.setBuildTime(Date.from(buildProperties.getTime()));
+        }
         response.setTimestamp(new Date());
         return new ObjectResponse<>(response);
     }

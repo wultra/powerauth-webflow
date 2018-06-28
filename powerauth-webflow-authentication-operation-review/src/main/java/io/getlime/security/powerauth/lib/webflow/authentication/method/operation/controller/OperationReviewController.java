@@ -93,6 +93,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         return operation.getUserId();
@@ -116,6 +117,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());
         response.setFormData(decorateFormData(operation));
@@ -213,6 +215,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         // update formData in Next Step server
         nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
         // Send notification to Data Adapter if the bank account has changed.
@@ -238,6 +241,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         // update chosenAuthMethod in Next Step server
         nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
         return new ObjectResponse();

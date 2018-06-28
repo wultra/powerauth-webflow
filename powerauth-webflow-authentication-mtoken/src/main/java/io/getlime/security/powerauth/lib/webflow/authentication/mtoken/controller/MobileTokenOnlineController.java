@@ -77,6 +77,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     @Override
     protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
@@ -106,6 +107,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
 
         MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, getAuthMethodName());
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
@@ -128,7 +130,9 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         // Log level is set to FINE due to large amount of requests caused by polling.
         Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
 
+        // Custom handling of operation expiration, checkOperationExpiration() method is not called
         if (operation.isExpired()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has timed out, operation ID: {0}", operation.getOperationId());
             // handle operation expiration
             // remove WebSocket session, it is expired
             clearCurrentBrowserSession();
