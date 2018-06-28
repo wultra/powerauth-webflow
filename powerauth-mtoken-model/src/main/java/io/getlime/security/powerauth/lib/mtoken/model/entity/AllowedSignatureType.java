@@ -37,7 +37,7 @@ public class AllowedSignatureType {
         @JsonProperty("2FA")
         MULTIFACTOR_2FA("2FA"),     // 2FA signature
         @JsonProperty("ECDSA")
-        ASSYMETRIC_ECDSA("ECDSA");  // ECDSA private key signature
+        ASYMMETRIC_ECDSA("ECDSA");  // ECDSA private key signature
 
         private final String type;
 
