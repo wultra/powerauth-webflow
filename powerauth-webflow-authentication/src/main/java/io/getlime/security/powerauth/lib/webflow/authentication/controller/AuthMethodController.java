@@ -132,6 +132,18 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
+     * Check whether operation is expired. In case it is expired, thrown an OperationTimeoutException.
+     * @param operation Operation.
+     * @throws OperationTimeoutException Thrown when operation is expired.
+     */
+    protected void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
+        if (operation.isExpired()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has timed out, operation ID: {0}", operation.getOperationId());
+            throw new OperationTimeoutException("Operation has timed out");
+        }
+    }
+
+    /**
      * Get operation configuration.
      * @param operationName Operation name.
      * @return Operation configuration.
@@ -509,10 +521,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has already failed, operation ID: {0}", operation.getOperationId());
                 throw new OperationAlreadyFailedException("Operation has already failed");
             }
-        }
-        if (operation.isExpired()) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has timed out, operation ID: {0}", operation.getOperationId());
-            throw new OperationTimeoutException("Operation has timed out");
         }
         final AuthMethod currentAuthMethod = getAuthMethodName();
         List<OperationHistory> operationHistoryList = operation.getHistory();

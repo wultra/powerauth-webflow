@@ -70,6 +70,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         final Object messageId = httpSession.getAttribute(MESSAGE_ID);
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
@@ -123,6 +124,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
 
         final String userId = operation.getUserId();
