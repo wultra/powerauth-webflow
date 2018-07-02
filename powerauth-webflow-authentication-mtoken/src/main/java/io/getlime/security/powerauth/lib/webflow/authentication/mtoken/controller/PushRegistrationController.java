@@ -16,16 +16,17 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
-import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
@@ -161,7 +162,7 @@ public class PushRegistrationController {
             boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
             if (result) {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Push registration succeeded, user ID: {0}", apiAuthentication.getUserId());
-                return new Response();
+                return new ObjectResponse();
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Push registration failed, user ID: {0}", apiAuthentication.getUserId());
                 throw new PushRegistrationFailedException();

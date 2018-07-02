@@ -222,7 +222,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                     && operation.getUserId().equals(apiAuthentication.getUserId())) {
                 final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
-                return new Response();
+                return new ObjectResponse();
             } else {
                 throw new PowerAuthAuthenticationException();
             }
@@ -258,7 +258,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
             webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
-            return new Response();
+            return new ObjectResponse();
 
         } else {
             throw new PowerAuthAuthenticationException();
