@@ -16,7 +16,6 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
-import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
@@ -162,7 +161,7 @@ public class PushRegistrationController {
             boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
             if (result) {
                 Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Push registration succeeded, user ID: {0}", apiAuthentication.getUserId());
-                return new ObjectResponse();
+                return new Response();
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Push registration failed, user ID: {0}", apiAuthentication.getUserId());
                 throw new PushRegistrationFailedException();

@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
@@ -244,12 +245,12 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/formData", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+    public @ResponseBody Response updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received updateOperationFormData request, operation ID: {0}", request.getRequestObject().getOperationId());
         // persist operation form data update
         operationPersistenceService.updateFormData(request.getRequestObject());
         Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The updateOperationFormData request succeeded");
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
@@ -259,12 +260,12 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+    public @ResponseBody Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received updateChosenAuthMethod request, operation ID: {0}, chosen authentication method: {1}", new String[]{request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString()});
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The updateChosenAuthMethod request succeeded");
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
