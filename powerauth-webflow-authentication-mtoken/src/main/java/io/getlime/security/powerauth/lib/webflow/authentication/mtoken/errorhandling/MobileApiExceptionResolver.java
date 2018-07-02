@@ -59,7 +59,7 @@ public class MobileApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(PushRegistrationFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
         return error(ErrorCode.PUSH_REGISTRATION_FAILED, t);
     }

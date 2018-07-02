@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -435,8 +436,8 @@ public class NextStepClient {
      */
     private NextStepServiceException handleHttpError(HttpStatusCodeException ex) throws NextStepServiceException {
         try {
-            TypeReference<ObjectResponse<Error>> typeReference = new TypeReference<ObjectResponse<Error>>() {};
-            ObjectResponse<Error> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+            TypeReference<ErrorResponse> typeReference = new TypeReference<ErrorResponse>() {};
+            ErrorResponse errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
             Error error = errorResponse.getResponseObject();
             switch (error.getCode()) {
                 case OperationAlreadyFinishedException.CODE:

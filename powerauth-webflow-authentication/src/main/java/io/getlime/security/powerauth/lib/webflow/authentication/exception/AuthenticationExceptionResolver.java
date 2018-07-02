@@ -42,7 +42,7 @@ public class AuthenticationExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(AuthStepException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
         // Web Flow returns message ID for front-end localization instead of message.
