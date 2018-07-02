@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.app.nextstep.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
-import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,7 +43,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public @ResponseBody ObjectResponse<Error> handleDefaultException(Throwable t) {
+    public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Next Step server", t);
         Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
         return new ErrorResponse(error);
@@ -57,7 +56,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(OperationAlreadyFinishedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFinishedException(OperationAlreadyFinishedException ex) {
+    public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(OperationAlreadyFinishedException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyFinishedException.CODE, "Operation is already in DONE state.");
         return new ErrorResponse(error);
@@ -70,7 +69,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(OperationAlreadyFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
+    public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyFailedException.CODE, "Operation is already in FAILED state.");
         return new ErrorResponse(error);
@@ -83,7 +82,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(OperationAlreadyCanceledException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleOperationCanceledException(OperationAlreadyCanceledException ex) {
+    public @ResponseBody ErrorResponse handleOperationCanceledException(OperationAlreadyCanceledException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationAlreadyCanceledException.CODE, "Operation update attempted for CANCELED operation.");
         return new ErrorResponse(error);
@@ -96,7 +95,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(OperationNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleOperationNotFoundException(OperationNotFoundException ex) {
+    public @ResponseBody ErrorResponse handleOperationNotFoundException(OperationNotFoundException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationNotFoundException.CODE, "Operation not found.");
         return new ErrorResponse(error);
@@ -109,7 +108,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(OperationNotConfiguredException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleOperationNotConfiguredException(OperationNotConfiguredException ex) {
+    public @ResponseBody ErrorResponse handleOperationNotConfiguredException(OperationNotConfiguredException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(OperationNotFoundException.CODE, "Operation is not configured.");
         return new ErrorResponse(error);
@@ -122,7 +121,7 @@ public class DefaultExceptionResolver {
      */
     @ExceptionHandler(InvalidOperationDataException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ObjectResponse<Error> handleInvalidOperationDataException(InvalidOperationDataException ex) {
+    public @ResponseBody ErrorResponse handleInvalidOperationDataException(InvalidOperationDataException ex) {
         Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Next Step server: {0}", ex.getMessage());
         Error error = new Error(InvalidOperationDataException.CODE, "Operation contains invalid data.");
         return new ErrorResponse(error);
