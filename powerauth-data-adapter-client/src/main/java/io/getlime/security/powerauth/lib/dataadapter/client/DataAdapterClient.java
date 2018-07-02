@@ -20,6 +20,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.DataAdapterError;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
@@ -185,13 +186,13 @@ public class DataAdapterClient {
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse verifyAuthorizationSMS(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public Response verifyAuthorizationSMS(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             VerifySMSAuthorizationRequest request = new VerifySMSAuthorizationRequest(messageId, authorizationCode, operationContext);
             HttpEntity<ObjectRequest<VerifySMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             defaultTemplate().exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
-            return new ObjectResponse();
+            return new Response();
         } catch (HttpStatusCodeException ex) {
             try {
                 throw httpStatusException(ex);

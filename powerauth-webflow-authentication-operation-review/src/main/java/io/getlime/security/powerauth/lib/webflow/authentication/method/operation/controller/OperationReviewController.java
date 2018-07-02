@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
@@ -213,7 +214,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
+    public @ResponseBody Response updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         checkOperationExpiration(operation);
         // update formData in Next Step server
@@ -228,7 +229,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
         }
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
@@ -239,12 +240,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
+    public @ResponseBody Response updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         checkOperationExpiration(operation);
         // update chosenAuthMethod in Next Step server
         nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
