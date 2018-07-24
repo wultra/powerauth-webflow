@@ -136,13 +136,17 @@ public class MessageTranslationService {
     }
 
     /**
-     * Localize form field attributes.
+     * Localize the form field labels.
      * @param formData Operation form data.
      */
     private void localizeFormFieldLabels(OperationFormData formData) {
         for (OperationFormFieldAttribute attribute: formData.getParameters()) {
             // Banners do not have labels, skip localization
             if (attribute.getType() == OperationFormFieldAttribute.Type.BANNER) {
+                continue;
+            }
+            // Headings do not have labels, skip localization
+            if (attribute.getType() == OperationFormFieldAttribute.Type.HEADING) {
                 continue;
             }
             String localizedValue = localize(attribute.getId());
