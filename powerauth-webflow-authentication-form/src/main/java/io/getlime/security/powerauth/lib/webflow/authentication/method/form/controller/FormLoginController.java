@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.form.con
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -33,6 +35,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,6 +44,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for username / password authentication step.
@@ -70,14 +75,19 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      */
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
+        GetOperationDetailResponse operation = getOperation();
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         try {
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, user ID: {1}, authentication method: {2}", new String[] {operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString()});
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
             Integer remainingAttemptsNS;
             try {
-                GetOperationDetailResponse operation = getOperation();
                 // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
                 // to switch to an alternate authentication method in case it is available.
                 // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
@@ -127,6 +137,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -136,6 +147,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -145,12 +157,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
                     return response;
                 }
             });
         } catch (AuthStepException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred while authenticating user: {0}", e.getMessage());
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -172,15 +187,17 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     public @ResponseBody UsernamePasswordAuthenticationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
             return response;
         } catch (NextStepServiceException e) {
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             return response;
         }
     }

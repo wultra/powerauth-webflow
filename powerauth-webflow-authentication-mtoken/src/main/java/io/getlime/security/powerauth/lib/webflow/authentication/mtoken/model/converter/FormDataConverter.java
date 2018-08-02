@@ -15,9 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
+import io.getlime.security.powerauth.lib.mtoken.model.entity.FormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttribute;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.FormData;
 
 /**
  * Converter for the form data objects used for mobile API.
@@ -33,8 +33,8 @@ public class FormDataConverter {
             return null;
         }
         FormData result = new FormData();
-        result.setTitle(input.getTitle().getValue());
-        result.setMessage(input.getGreeting().getValue());
+        result.setTitle(input.getTitle().getMessage());
+        result.setMessage(input.getGreeting().getMessage());
         for (OperationFormFieldAttribute attribute : input.getParameters()) {
             result.getAttributes().add(attributeConverter.fromOperationFormFieldAttribute(attribute));
         }

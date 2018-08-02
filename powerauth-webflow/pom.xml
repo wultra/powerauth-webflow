@@ -7,14 +7,14 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.19.0</version>
+        <version>0.20.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow</artifactId>
     <name>powerauth-webflow</name>
     <description>Federated Authentication and Authorization Server for Web</description>
-    <version>0.19.0</version>
+    <version>0.20.0</version>
     <packaging>war</packaging>
 
     <properties>
@@ -38,8 +38,9 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security.oauth</groupId>
-            <artifactId>spring-security-oauth2</artifactId>
+            <groupId>org.springframework.security.oauth.boot</groupId>
+            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
+            <version>2.0.0.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,6 +63,13 @@
             <artifactId>spring-security-messaging</artifactId>
         </dependency>
 
+        <!-- Set scope of tomcat-embed-websocket to provided to avoid startup errors on WildFly -->
+        <dependency>
+            <artifactId>tomcat-embed-websocket</artifactId>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Other Dependencies -->
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -81,44 +89,44 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.59</version>
+            <version>1.60</version>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-form</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-init</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-operation-review</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-sms</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-resources</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-i18n</artifactId>
-            <version>0.19.0</version>
+            <version>0.20.0</version>
         </dependency>
 
         <!-- Documentation -->

@@ -23,13 +23,22 @@ package io.getlime.security.powerauth.lib.mtoken.model.entity.attributes;
  */
 public class KeyValueAttribute extends Attribute {
 
-    private String value;
+    protected String value;
 
+    /**
+     * Default constructor.
+     */
     public KeyValueAttribute() {
         super();
         this.setType(Type.KEY_VALUE);
     }
 
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Attribute label.
+     * @param value Value.
+     */
     public KeyValueAttribute(String id, String label, String value) {
         this();
         this.id = id;
@@ -37,10 +46,18 @@ public class KeyValueAttribute extends Attribute {
         this.value = value;
     }
 
+    /**
+     * Get value.
+     * @return Value.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Set value.
+     * @param value Value.
+     */
     public void setValue(String value) {
         this.value = value;
     }

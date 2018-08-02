@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 /**
  * This service handles querying of user authentication methods and enabling/disabling them.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 @Service
 public class AuthMethodService {

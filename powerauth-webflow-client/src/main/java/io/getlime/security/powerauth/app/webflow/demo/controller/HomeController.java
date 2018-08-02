@@ -16,14 +16,15 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttributeFormatted;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -68,13 +69,19 @@ public class HomeController {
         model.addAttribute("providerIds", connectionFactoryLocator.registeredProviderIds());
         model.addAttribute("operationId", operationId);
 
-        // MOCK PAYMENT
-        final PaymentForm paymentForm = new PaymentForm();
-        paymentForm.setAmount(BigDecimal.valueOf(100));
-        paymentForm.setCurrency("CZK");
-        paymentForm.setAccount("238400856/0300");
-        paymentForm.setNote("Utility Bill Payment - 05/2017");
-        paymentForm.setDueDate("2017-06-29");
+        PaymentForm paymentForm = (PaymentForm) session.getAttribute("paymentForm");
+        if (paymentForm == null) {
+            // MOCK PAYMENT
+            paymentForm = new PaymentForm();
+            paymentForm.setAmount(BigDecimal.valueOf(100));
+            paymentForm.setCurrency("CZK");
+            paymentForm.setAccount("238400856/0300");
+            paymentForm.setNote("Utility Bill Payment - 05/2017");
+            paymentForm.setDueDate("2017-06-29");
+        } else {
+            session.removeAttribute("paymentForm");
+        }
+
         model.addAttribute("paymentForm", paymentForm);
 
         return "home";
@@ -82,15 +89,14 @@ public class HomeController {
 
     @RequestMapping("/payment/create")
     public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
-        String data = new ObjectMapper().writeValueAsString(paymentForm);
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
         formData.addGreeting("operation.greeting");
         formData.addSummary("operation.summary");
         formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
-        formData.addKeyValue("operation.account", paymentForm.getAccount(), OperationFormFieldAttributeFormatted.ValueFormatType.ACCOUNT);
-        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), OperationFormFieldAttributeFormatted.ValueFormatType.DATE);
-        formData.addNote("operation.note", paymentForm.getNote(), OperationFormFieldAttributeFormatted.ValueFormatType.TEXT);
+        formData.addKeyValue("operation.account", paymentForm.getAccount(), ValueFormatType.ACCOUNT);
+        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), ValueFormatType.DATE);
+        formData.addNote("operation.note", paymentForm.getNote(), ValueFormatType.TEXT);
 
         // Sample operation configuration for bank account choice select.
         // OperationFormFieldConfig bankAccountConfig = new OperationFormFieldConfig();
@@ -99,8 +105,35 @@ public class HomeController {
         // bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
         // formData.getConfig().add(bankAccountConfig);
 
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
+        // Sample banners displayed above the operation details.
+        // formData.addBanner(BannerType.BANNER_ERROR, "banner.error");
+        // formData.addBanner(BannerType.BANNER_WARNING, "banner.warning");
+        // formData.addBanner(BannerType.BANNER_INFO, "banner.info");
+
+        // Sample party information added to form data.
+        // PartyInfo partyInfo = new PartyInfo();
+        // partyInfo.setName("Tesco");
+        // partyInfo.setLogoUrl("https://itesco.cz/img/logo/logo.svg");
+        // partyInfo.setDescription("Objevte více příběhů psaných s chutí");
+        // partyInfo.setWebsiteUrl("https://itesco.cz/hello/vse-o-jidle/pribehy-psane-s-chuti/clanek/tomovy-burgery-pro-zapalene-fanousky/15012");
+        // formData.addPartyInfo("operation.partyInfo", partyInfo);
+
+
+        final String operationName = "authorize_payment";
+        final GetOperationConfigResponse operationConfig = client.getOperationConfig(operationName).getResponseObject();
+
+        String operationData = new OperationDataBuilder()
+                .templateVersion(operationConfig.getTemplateVersion())
+                .templateId(operationConfig.getTemplateId())
+                .attr1().amount(paymentForm.getAmount(), paymentForm.getCurrency())
+                .attr2().accountGeneric(paymentForm.getAccount())
+                .attr4().date(paymentForm.getDueDate())
+                .attr5().note(paymentForm.getNote())
+                .build();
+
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
         session.setAttribute("operationId", payment.getResponseObject().getOperationId());
+        session.setAttribute("paymentForm", paymentForm);
 
         return "redirect:/";
     }

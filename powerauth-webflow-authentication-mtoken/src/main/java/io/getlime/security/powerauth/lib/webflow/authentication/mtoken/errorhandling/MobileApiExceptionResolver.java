@@ -18,11 +18,12 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
@@ -58,7 +59,7 @@ public class MobileApiExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(PushRegistrationFailedException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handlePushRegistrationException(Throwable t) {
         return error(ErrorCode.PUSH_REGISTRATION_FAILED, t);
     }
@@ -119,13 +120,25 @@ public class MobileApiExceptionResolver {
     }
 
     /**
-     * Exception handler for expiration.
+     * Exception handler for canceled operations.
      * @param t Throwable.
      * @return Response with error details.
      */
-    @ExceptionHandler(OperationExpiredException.class)
+    @ExceptionHandler(OperationAlreadyCanceledException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleOperationExpiredException(Throwable t) {
+    public @ResponseBody ErrorResponse handleOperationCanceledException(Throwable t) {
+        return error(ErrorCode.OPERATION_ALREADY_CANCELED, t);
+    }
+
+    /**
+     * Exception handler for operation timeout exception.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationTimeoutException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationTimeoutException(Throwable t) {
         return error(ErrorCode.OPERATION_EXPIRED, t);
     }
+
 }

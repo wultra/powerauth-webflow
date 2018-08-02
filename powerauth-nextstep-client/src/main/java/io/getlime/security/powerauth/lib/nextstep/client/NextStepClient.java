@@ -20,14 +20,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
+import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -270,6 +269,28 @@ public class NextStepClient {
     }
 
     /**
+     * Get operation configuration.
+     * @param operationName Operation name.
+     * @return Operation configuration.
+     * @throws NextStepServiceException Thrown when operation configuration is missing.
+     */
+    public ObjectResponse<GetOperationConfigResponse> getOperationConfig(String operationName) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetOperationConfigRequest request = new GetOperationConfigRequest();
+            request.setOperationName(operationName);
+            HttpEntity<ObjectRequest<GetOperationConfigRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationConfigResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/config", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigResponse>>() {});
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            // Next Step service is down
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
      * Get list of pending operations for given user.
      * @param userId User ID.
      * @return List of pending operations.
@@ -415,14 +436,24 @@ public class NextStepClient {
      */
     private NextStepServiceException handleHttpError(HttpStatusCodeException ex) throws NextStepServiceException {
         try {
-            TypeReference<ObjectResponse<Error>> typeReference = new TypeReference<ObjectResponse<Error>>() {};
-            ObjectResponse<Error> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+            TypeReference<ErrorResponse> typeReference = new TypeReference<ErrorResponse>() {};
+            ErrorResponse errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
             Error error = errorResponse.getResponseObject();
             switch (error.getCode()) {
                 case OperationAlreadyFinishedException.CODE:
                     throw new OperationAlreadyFinishedException(error.getMessage());
                 case OperationAlreadyFailedException.CODE:
                     throw new OperationAlreadyFailedException(error.getMessage());
+                case OperationAlreadyCanceledException.CODE:
+                    throw new OperationAlreadyCanceledException(error.getMessage());
+                case OperationNotFoundException.CODE:
+                    throw new OperationNotFoundException(error.getMessage());
+                case OperationNotConfiguredException.CODE:
+                    throw new OperationNotConfiguredException(error.getMessage());
+                case OperationAlreadyExistsException.CODE:
+                    throw new OperationAlreadyExistsException(error.getMessage());
+                case InvalidOperationDataException.CODE:
+                    throw new InvalidOperationDataException(error.getMessage());
                 default:
                     return new NextStepServiceException(ex, error);
             }

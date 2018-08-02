@@ -18,23 +18,23 @@ package io.getlime.security.powerauth.lib.dataadapter.model.response;
 /**
  * Response of the authentication using username and password.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthenticationResponse {
 
     /**
-     * Unique userId which identifies the user.
+     * Unique user ID which identifies the user.
      */
     private String userId;
 
     /**
-     * Empty constructor.
+     * Default constructor.
      */
     public AuthenticationResponse() {
     }
 
     /**
-     * Constructor with userId parameter for convenience.
+     * Constructor with user ID parameter for convenience.
      * @param userId Identification of the user.
      */
     public AuthenticationResponse(String userId) {
@@ -42,16 +42,16 @@ public class AuthenticationResponse {
     }
 
     /**
-     * Sets the userId.
-     * @param userId userId to set
+     * Set the user ID.
+     * @param userId User ID.
      */
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
     /**
-     * Gets the userId.
-     * @return userID
+     * Get the user ID.
+     * @return userID User ID.
      */
     public String getUserId() {
         return userId;

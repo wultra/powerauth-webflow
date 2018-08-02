@@ -21,11 +21,11 @@ import io.getlime.push.client.MobilePlatform;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
-import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
@@ -36,6 +36,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller that is responsible for handling mobile device registrations
@@ -119,15 +122,18 @@ public class PushRegistrationController {
      * @throws MobileAppApiException Thrown when registration fails.
      */
     private Response registerDeviceImpl(@RequestBody ObjectRequest<PushRegisterRequest> request, PowerAuthApiAuthentication apiAuthentication) throws PowerAuthAuthenticationException, MobileAppApiException {
-
         // Check if the authentication object is present
         if (apiAuthentication == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Unable to verify device registration");
             throw new PowerAuthAuthenticationException("Unable to verify device registration");
         }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Push registration started, user ID: {0}", apiAuthentication.getUserId());
 
         // Check the request body presence
         final PushRegisterRequest requestObject = request.getRequestObject();
         if (requestObject == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Invalid request object in push registration, user ID: {0}", apiAuthentication.getUserId());
             throw new InvalidRequestObjectException();
         }
 
@@ -142,6 +148,7 @@ public class PushRegistrationController {
 
         // Verify that applicationId and activationId are set
         if (applicationId == null || activationId == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Invalid activation in push registration, user ID: {0}", apiAuthentication.getUserId());
             throw new InvalidActivationException();
         }
 
@@ -153,11 +160,14 @@ public class PushRegistrationController {
         try {
             boolean result = pushServerClient.createDevice(applicationId, token, p, activationId);
             if (result) {
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Push registration succeeded, user ID: {0}", apiAuthentication.getUserId());
                 return new Response();
             } else {
+                Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Push registration failed, user ID: {0}", apiAuthentication.getUserId());
                 throw new PushRegistrationFailedException();
             }
         } catch (PushServerClientException ex) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Push registration failed", ex);
             throw new PushRegistrationFailedException();
         }
     }

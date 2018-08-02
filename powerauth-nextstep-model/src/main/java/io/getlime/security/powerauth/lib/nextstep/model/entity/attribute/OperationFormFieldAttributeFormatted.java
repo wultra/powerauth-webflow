@@ -15,24 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+
 /**
  * Class that represents a formatted form field attribute. Formatting is done based on value format type.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttribute {
-
-    /**
-     * Supported value format types.
-     */
-    public enum ValueFormatType {
-        TEXT,
-        LOCALIZED_TEXT,
-        DATE,
-        NUMBER,
-        AMOUNT,
-        ACCOUNT
-    }
 
     protected ValueFormatType valueFormatType;
 

@@ -17,15 +17,15 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccount;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountChoice;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountList;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.BankAccountListResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.BankAccountDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -40,6 +40,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -48,7 +49,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -93,7 +93,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         return operation.getUserId();
     }
 
@@ -115,9 +118,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());
-        response.setFormData(loadFormData(operation));
+        response.setFormData(decorateFormData(operation));
         response.setChosenAuthMethod(operation.getChosenAuthMethod());
         return response;
     }
@@ -138,6 +142,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -147,6 +152,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -156,12 +162,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
+                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
                     return response;
                 }
             });
         } catch (AuthStepException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred while reviewing operation: {0}", e.getMessage());
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -181,15 +190,17 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     public @ResponseBody OperationReviewResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), null, OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
             return response;
         } catch (NextStepServiceException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
             return response;
         }
     }
@@ -203,8 +214,9 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/formData", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
+    public @ResponseBody Response updateFormData(@RequestBody UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         // update formData in Next Step server
         nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
         // Send notification to Data Adapter if the bank account has changed.
@@ -213,9 +225,11 @@ public class OperationReviewController extends AuthMethodController<OperationRev
         if (userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE_DISABLED) && userInput.containsKey(FIELD_BANK_ACCOUNT_CHOICE)) {
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
             bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
-            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOperationId());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
+            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
         }
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
@@ -226,68 +240,45 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
+    public @ResponseBody Response updateChosenAuthenticationMethod(@RequestBody UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        checkOperationExpiration(operation);
         // update chosenAuthMethod in Next Step server
         nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
-        return new ObjectResponse();
+        return new Response();
     }
 
     /**
-     * Load form data from the server.
+     * Decorate form data in Data Adapter.
      * @param operation Operation.
-     * @return Operation form data.
+     * @return Decorated operation form data.
      */
-    private OperationFormData loadFormData(GetOperationDetailResponse operation) {
-        OperationFormData formData = operation.getFormData();
-        if (formData==null || operation.getUserId()==null) {
-            return formData;
+    private OperationFormData decorateFormData(GetOperationDetailResponse operation) {
+        OperationFormData formDataNS = operation.getFormData();
+        if (formDataNS==null || operation.getUserId()==null) {
+            return formDataNS;
         }
-        if (!formData.isDynamicDataLoaded()) {
+        if (!formDataNS.isDynamicDataLoaded()) {
             // Dynamic data has not been loaded yet. At this point the user is authenticated, so we can
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.
             try {
-                ObjectResponse<BankAccountListResponse> response = dataAdapterClient.fetchBankAccounts(operation.getUserId(), operation.getOperationName(), operation.getOperationId(), operation.getFormData());
-                BankAccountList bankAccountList = response.getResponseObject().getBankAccounts();
-                List<BankAccountDetail> bankAccountDetails = convertBankAccountList(bankAccountList);
-                if (!bankAccountDetails.isEmpty()) {
-                    formData.addBankAccountChoice(FIELD_BANK_ACCOUNT_CHOICE, bankAccountDetails, bankAccountList.isEnabled(), bankAccountList.getDefaultValue());
-                }
-                formData.setDynamicDataLoaded(true);
+                FormDataConverter converter = new FormDataConverter();
+                FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA);
+                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operationContext);
+                DecorateOperationFormDataResponse responseObject = response.getResponseObject();
+                formDataNS = converter.fromFormData(responseObject.getFormData());
+                formDataNS.setDynamicDataLoaded(true);
+                operation.setFormData(formDataNS);
             } catch (DataAdapterClientErrorException e) {
                 // Failed to load dynamic data, log the error. The UI will handle missing dynamic data error separately.
                 Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
             }
         }
         // translate new formData messages
-        messageTranslationService.translateFormData(formData);
-        return formData;
-    }
-
-    /**
-     * Convert BankAccount into BankAccountDetail.
-     * @param bankAccountList List of BankAccount entities.
-     * @return List of BankAccountDetail.
-     */
-    private List<BankAccountDetail> convertBankAccountList(BankAccountList bankAccountList) {
-        // TODO - move to a converter class
-        List<BankAccountDetail> bankAccountDetails = new ArrayList<>();
-        if (bankAccountList == null || bankAccountList.getBankAccounts() == null || bankAccountList.getBankAccounts().isEmpty()) {
-            return bankAccountDetails;
-        }
-        for (BankAccount bankAccountEntity: bankAccountList.getBankAccounts()) {
-            BankAccountDetail bankAccount = new BankAccountDetail();
-            bankAccount.setName(bankAccountEntity.getName());
-            bankAccount.setNumber(bankAccountEntity.getNumber());
-            bankAccount.setAccountId(bankAccountEntity.getAccountId());
-            bankAccount.setBalance(bankAccountEntity.getBalance());
-            bankAccount.setCurrency(bankAccountEntity.getCurrency());
-            bankAccount.setUsableForPayment(bankAccountEntity.isUsableForPayment());
-            bankAccount.setUnusableForPaymentReason(bankAccountEntity.getUnusableForPaymentReason());
-            bankAccountDetails.add(bankAccount);
-        }
-        return bankAccountDetails;
+        messageTranslationService.translateFormData(formDataNS);
+        return formDataNS;
     }
 
 }

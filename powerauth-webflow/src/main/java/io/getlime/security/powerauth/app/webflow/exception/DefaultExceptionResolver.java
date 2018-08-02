@@ -70,10 +70,11 @@ public class DefaultExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(AuthStepException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", ex);
-        final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
+        // Web Flow returns message ID for front-end localization instead of message.
+        final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
     }
 
@@ -85,7 +86,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(InsufficientAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorizedException(InsufficientAuthenticationException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", ex);
+        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
         authenticationManagementService.clearContext();
         return "redirect:/oauth/error";
     }

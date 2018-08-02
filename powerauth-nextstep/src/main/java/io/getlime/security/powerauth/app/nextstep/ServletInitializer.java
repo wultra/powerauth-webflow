@@ -17,7 +17,7 @@
 package io.getlime.security.powerauth.app.nextstep;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 
 /**
  * Spring Boot servlet initializer.

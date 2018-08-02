@@ -29,54 +29,69 @@ public class QRCodeInitResponse extends AuthStepResponse {
 
     private String qrCode;
     private String nonce;
-    private String dataHash;
     private ActivationEntity chosenActivation;
     private List<ActivationEntity> activations;
 
+    /**
+     * Get QR code as string.
+     * @return QR code.
+     */
     public String getQRCode() {
         return qrCode;
     }
 
+    /**
+     * Set QR code as string.
+      * @param qrCode QR code.
+     */
     public void setQRCode(String qrCode) {
         this.qrCode = qrCode;
     }
 
-    public String getQrCode() {
-        return qrCode;
-    }
-
-    public void setQrCode(String qrCode) {
-        this.qrCode = qrCode;
-    }
-
+    /**
+     * Get nonce.
+     * @return Nonce.
+     */
     public String getNonce() {
         return nonce;
     }
 
+    /**
+     * Set nonce.
+     * @param nonce Nonce.
+     */
     public void setNonce(String nonce) {
         this.nonce = nonce;
     }
 
-    public String getDataHash() {
-        return dataHash;
-    }
-
-    public void setDataHash(String dataHash) {
-        this.dataHash = dataHash;
-    }
-
+    /**
+     * Get chosen activation.
+     * @return Chosen activation.
+     */
     public ActivationEntity getChosenActivation() {
         return chosenActivation;
     }
 
+    /**
+     * Set chosen activation.
+     * @param chosenActivation Chosen activation.
+     */
     public void setChosenActivation(ActivationEntity chosenActivation) {
         this.chosenActivation = chosenActivation;
     }
 
+    /**
+     * Get list of activations.
+     * @return List of activations.
+     */
     public List<ActivationEntity> getActivations() {
         return activations;
     }
 
+    /**
+     * Set list of activations.
+     * @param activations List of activations.
+     */
     public void setActivations(List<ActivationEntity> activations) {
         this.activations = activations;
     }

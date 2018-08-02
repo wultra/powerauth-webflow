@@ -19,15 +19,22 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,18 +58,21 @@ import java.util.logging.Logger;
 @Controller
 public class OperationController {
 
-    private OperationPersistenceService operationPersistenceService;
-    private StepResolutionService stepResolutionService;
+    private final OperationPersistenceService operationPersistenceService;
+    private final OperationConfigurationService operationConfigurationService;
+    private final StepResolutionService stepResolutionService;
 
     /**
      * Controller constructor.
      * @param operationPersistenceService Operation persistence service.
+     * @param operationConfigurationService Operation configuration service.
      * @param stepResolutionService Step resolution service.
      */
     @Autowired
-    public OperationController(OperationPersistenceService operationPersistenceService,
+    public OperationController(OperationPersistenceService operationPersistenceService, OperationConfigurationService operationConfigurationService,
                                StepResolutionService stepResolutionService) {
         this.operationPersistenceService = operationPersistenceService;
+        this.operationConfigurationService = operationConfigurationService;
         this.stepResolutionService = stepResolutionService;
     }
 
@@ -71,15 +81,21 @@ public class OperationController {
      *
      * @param request Create operation request.
      * @return Create operation response.
+     * @throws OperationAlreadyExistsException Thrown when operation already exists.
      */
     @RequestMapping(value = "/operation", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) {
+    public @ResponseBody ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received createOperation request, operation ID: {0}, operation name: {1}", new String[] {request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName()});
         // resolve response based on dynamic step definitions
         CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist new operation
         operationPersistenceService.createOperation(request.getRequestObject(), response);
 
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The createOperation request succeeded, operation ID: {0}, result: {1}", new String[]{response.getOperationId(), response.getResult().toString()});
+        for (AuthStep step: response.getSteps()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Next authentication method for operation ID: {0}, authentication method: {1}", new String[]{response.getOperationId(), step.getAuthMethod().toString()});
+        }
         return new ObjectResponse<>(response);
     }
 
@@ -92,12 +108,17 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received updateOperation request, operation ID: {0}", request.getRequestObject().getOperationId());
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist operation update
         operationPersistenceService.updateOperation(request.getRequestObject(), response);
 
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "The updateOperation request succeeded, operation ID: {0}, result: {1}", new String[]{response.getOperationId(), response.getResult().toString()});
+        for (AuthStep step: response.getSteps()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Next authentication method for operation ID: {0}, authentication method: {1}", new String[]{response.getOperationId(), step.getAuthMethod().toString()});
+        }
         return new ObjectResponse<>(response);
     }
 
@@ -106,18 +127,18 @@ public class OperationController {
      *
      * @param request Get operation detail request.
      * @return Get operation detail response.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     @RequestMapping(value = "/operation/detail", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestBody ObjectRequest<GetOperationDetailRequest> request) {
+    public @ResponseBody ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Received operationDetail request, operation ID: {0}", request.getRequestObject().getOperationId());
 
         GetOperationDetailRequest requestObject = request.getRequestObject();
 
         GetOperationDetailResponse response = new GetOperationDetailResponse();
 
         OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId());
-        if (operation == null) {
-            throw new IllegalArgumentException("Invalid operationId: " + requestObject.getOperationId());
-        }
         response.setOperationId(operation.getOperationId());
         response.setOperationName(operation.getOperationName());
         response.setUserId(operation.getUserId());
@@ -149,6 +170,28 @@ public class OperationController {
 
         response.setTimestampCreated(operation.getTimestampCreated());
         response.setTimestampExpires(operation.getTimestampExpires());
+
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The operationDetail request succeeded, operation ID: {0}", response.getOperationId());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get configuration of an operation with given operation name.
+     *
+     * @param request Get operation configuration request.
+     * @return Get operation configuration response.
+     * @throws OperationNotConfiguredException Thrown when operation is not configured.
+     */
+    @RequestMapping(value = "/operation/config", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetOperationConfigResponse> operationConfig(@RequestBody ObjectRequest<GetOperationConfigRequest> request) throws OperationNotConfiguredException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Received operationConfig request, operation name: {0}", request.getRequestObject().getOperationName());
+
+        GetOperationConfigRequest requestObject = request.getRequestObject();
+
+        GetOperationConfigResponse response = operationConfigurationService.getOperationConfig(requestObject.getOperationName());
+
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The operationConfig request succeeded, operation name: {0}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
 
@@ -161,6 +204,8 @@ public class OperationController {
      */
     @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Received getPendingOperations request, user ID: {0}, authentication method: {1}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
 
         GetPendingOperationsRequest requestObject = request.getRequestObject();
 
@@ -168,6 +213,8 @@ public class OperationController {
 
         List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.getAuthMethod());
         if (operations == null) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Invalid query for pending operations, userId: " + requestObject.getUserId()
+                    + ", authMethod: " + requestObject.getAuthMethod());
             throw new IllegalArgumentException("Invalid query for pending operations, userId: " + requestObject.getUserId()
                     + ", authMethod: " + requestObject.getAuthMethod());
         }
@@ -185,32 +232,40 @@ public class OperationController {
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
         }
+
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getPendingOperations request succeeded, operation list size: ", responseList.size());
         return new ObjectResponse<>(responseList);
     }
 
     /**
-     * Update operation with updated formData.
+     * Update operation with updated form data.
      *
      * @param request Update operation request.
      * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/formData", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) {
+    public @ResponseBody Response updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received updateOperationFormData request, operation ID: {0}", request.getRequestObject().getOperationId());
         // persist operation form data update
         operationPersistenceService.updateFormData(request.getRequestObject());
-        return new ObjectResponse();
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The updateOperationFormData request succeeded");
+        return new Response();
     }
 
     /**
      * Update operation with chosen authentication method.
      * @param request Update operation request.
      * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
-    public @ResponseBody ObjectResponse updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) {
+    public @ResponseBody Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received updateChosenAuthMethod request, operation ID: {0}, chosen authentication method: {1}", new String[]{request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString()});
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
-        return new ObjectResponse();
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The updateChosenAuthMethod request succeeded");
+        return new Response();
     }
 
     /**

@@ -16,12 +16,12 @@
 import React from "react";
 import {connect} from "react-redux";
 // Components
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import {FormGroup} from "react-bootstrap";
 // Custom react-select component for bank account choice with HTML content
 import BankAccountSelect from "./bankAccountSelect";
 // Actions
-import {updateFormData} from "../actions/operationDetailActions";
+import {missingBankAccountsError, updateFormData} from "../actions/operationDetailActions";
 // i18n
 import {FormattedMessage} from "react-intl";
 
@@ -59,6 +59,10 @@ export default class OperationDetail extends React.Component {
         if (props.context.formData) {
             props.context.formData.parameters.map((item) => {
                 if (item.type === "BANK_ACCOUNT_CHOICE") {
+                    if (item.bankAccounts === undefined || item.bankAccounts.length === 0) {
+                        props.dispatch(missingBankAccountsError());
+                        return;
+                    }
                     // save bank accounts for easier switching of bank accounts
                     this.storeBankAccounts(item.bankAccounts);
                     if (!item.enabled) {
@@ -128,74 +132,35 @@ export default class OperationDetail extends React.Component {
         if (this.props.context.formData) {
             return (
                 <div>
-                    <div className="operation-approve content-wrap">
-                        <h3 className="title">{this.props.context.formData.title.value}</h3>
-                        <p>{this.props.context.formData.greeting.value}</p>
+                    <div>
+                        {this.props.context.formData.banners ?
+                            this.props.context.formData.banners.map((banner) => {
+                                return this.displayBanner(banner, false);
+                            }) : (
+                                undefined
+                            )}
                     </div>
+                    <div className="operation-approve content-wrap">
+                        <h3 className="title">{this.props.context.formData.title.message}</h3>
+                        <p>{this.props.context.formData.greeting.message}</p>
+                    </div>
+                    <hr/>
                     <div>
                         {this.props.context.formData.parameters.map((item) => {
                             if (item.type === "AMOUNT") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-6 key">
-                                            {item.label}
-                                        </div>
-                                        <div className="col-xs-6 value">
-                                            <span className="amount">{item.formattedValue}</span>
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayAmount(item);
                             } else if (item.type === "KEY_VALUE") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-6 key">
-                                            {item.label}
-                                        </div>
-                                        <div className="col-xs-6 value">
-                                            {item.formattedValue}
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayKeyValue(item);
                             } else if (item.type === "NOTE") {
-                                return (
-                                    <div className="row attribute" key={item.id}>
-                                        <div className="col-xs-12">
-                                            <div className="key">{item.label}</div>
-                                            <div className="value">{item.formattedValue}</div>
-                                        </div>
-                                    </div>
-                                )
+                                return this.displayNote(item);
+                            } else if (item.type === "HEADING") {
+                                return this.displayHeading(item);
                             } else if (item.type === "BANK_ACCOUNT_CHOICE") {
-                                if (!item.bankAccounts || item.bankAccounts.length === 0) {
-                                    // no bank account is available - display error
-                                    return (
-                                        <div className={'message-error'} key={item.id}>
-                                            <FormattedMessage id="operationReview.bankAccountsMissing"/>
-                                        </div>
-                                    )
-                                } else {
-                                    return (
-                                        <div key={item.id} className="row attribute">
-                                            <div className="col-xs-12">
-                                                <div className="key">
-                                                    {item.label}
-                                                </div>
-                                                <div className="value">
-                                                    {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
-                                                        <BankAccountSelect
-                                                            bankAccounts={this.state.bankAccounts}
-                                                            chosenBankAccount={this.state.chosenBankAccount}
-                                                            choiceDisabled={this.state.bankAccountChoiceDisabled}
-                                                            callback={this.handleBankAccountChoice}
-                                                        />
-                                                    ) : (
-                                                        undefined
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )
-                                }
+                                return this.displayBankAccountChoice(item);
+                            } else if (item.type === "BANNER") {
+                                return this.displayBanner(item, true);
+                            } else if (item.type === "PARTY_INFO") {
+                                return this.displayPartyInfo(item);
                             }
                         })}
                     </div>
@@ -214,5 +179,136 @@ export default class OperationDetail extends React.Component {
                 <Spinner/>
             )
         }
+    }
+
+    displayAmount(amount) {
+        return (
+            <div className="row attribute" key={amount.id}>
+                <div className="col-xs-6 key">
+                    {amount.label}
+                </div>
+                <div className="col-xs-6 value">
+                    <span className="amount">{amount.formattedValue}</span>
+                </div>
+            </div>
+        )
+    }
+
+    displayKeyValue(keyValue) {
+        return (
+            <div className="row attribute" key={keyValue.id}>
+                <div className="col-xs-6 key">
+                    {keyValue.label}
+                </div>
+                <div className="col-xs-6 value">
+                    {keyValue.formattedValue}
+                </div>
+            </div>
+        )
+    }
+
+    displayNote(note) {
+        return (
+            <div className="row attribute" key={note.id}>
+                <div className="col-xs-12">
+                    <div className="key">{note.label}</div>
+                    <div className="value">{note.formattedValue}</div>
+                </div>
+            </div>
+        )
+    }
+
+    displayHeading(heading) {
+        return (
+            <div className="row attribute" key={heading.id}>
+                <div className="col-xs-12 heading">{heading.formattedValue}</div>
+            </div>
+        )
+    }
+
+    displayBankAccountChoice(bankAccountChoice) {
+        return (
+            <div key={bankAccountChoice.id} className="row attribute">
+                <div className="col-xs-12">
+                    <div className="key">
+                        {bankAccountChoice.label}
+                    </div>
+                    <div className="value">
+                        {(this.state.bankAccounts && this.state.chosenBankAccount) ? (
+                            <BankAccountSelect
+                                bankAccounts={this.state.bankAccounts}
+                                chosenBankAccount={this.state.chosenBankAccount}
+                                choiceDisabled={this.state.bankAccountChoiceDisabled}
+                                callback={this.handleBankAccountChoice}
+                            />
+                        ) : (
+                            undefined
+                        )}
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    displayBanner(banner, isFieldBanner) {
+        let bannerClass = "alert";
+        if (isFieldBanner) {
+            bannerClass+= " alert-field";
+        } else {
+            bannerClass+= " alert-form";
+        }
+        let glyphIconClass = "";
+        switch (banner.bannerType) {
+            case "BANNER_INFO":
+                bannerClass += " alert-info";
+                glyphIconClass = "glyphicon glyphicon-info-sign";
+                break;
+            case "BANNER_WARNING":
+                bannerClass += " alert-warning";
+                glyphIconClass = "glyphicon glyphicon-warning-sign";
+                break;
+            case "BANNER_ERROR":
+                bannerClass += " alert-danger";
+                glyphIconClass = "glyphicon glyphicon-exclamation-sign";
+                break;
+        }
+        return (
+            <div className={bannerClass} key={banner.id}>
+                <span className={glyphIconClass}/>
+                &nbsp;&nbsp;
+                {banner.message}
+            </div>
+        );
+    }
+
+    displayPartyInfo(info) {
+        const partyInfo = info.partyInfo;
+        return (
+            <div className="row attribute" key={info.id}>
+                <div className="col-xs-12">
+                    <div className="row attribute">
+                        <div className="col-xs-12 key">{info.label}</div>
+                    </div>
+                    <div className="party-info-wrapper">
+                        <div className="row attribute">
+                            <div className="col-xs-3">
+                                <div className="party-info-logo-wrapper">
+                                    <img src={partyInfo.logoUrl} className="party-info-logo"/>
+                                </div>
+                            </div>
+                            <div className="col-xs-9">
+                                <h3 className="party-info-name">{partyInfo.name}</h3>
+                                <p className="party-info-description">{partyInfo.description}</p>
+                                <p>
+                                    <a href={partyInfo.websiteUrl} target="_blank" className="party-info-link">
+                                        <FormattedMessage id="partyInfo.websiteLink"/>
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 }

@@ -75,12 +75,21 @@ a:hover, a:active, a:focus {
 
 #page-wrap {
     margin: 80px auto 40px auto;
-    width: 480px;
+    max-width: 980px;
+}
+
+#react {
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#home {
+    min-height: 400px;
 }
 
 .content-wrap {
     margin: 0 auto;
-    width: 320px;
+    width: 100%;
 }
 
 .btn-success {
@@ -185,6 +194,11 @@ a:hover, a:active, a:focus {
     font-size: 16pt;
 }
 
+#operation .heading {
+    font-size: 16pt;
+    color: #7FC000;
+}
+
 #operation .attribute {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -248,4 +262,51 @@ a:hover, a:active, a:focus {
 .title {
     font-size: 16pt;
     margin: 10px 10px 20px 10px;
+}
+
+.alert {
+    font-size: 12pt;
+    text-align: left;
+    width: 100%;
+}
+
+.alert-form {
+    margin: 0 0 15px 0;
+    padding: 10px 15px 10px 15px;
+}
+
+.alert-field {
+    margin: 0;
+    padding: 2px 15px 2px 15px;
+}
+
+.party-info-wrapper {
+    background-color: #FAFAFA;
+    border-radius: 5px;
+    padding: 10px;
+}
+
+.party-info-wrapper * {
+    margin: 0;
+}
+
+.party-info-logo-wrapper {
+    padding: 10px;
+}
+
+.party-info-logo {
+    width: 100%;
+}
+
+.party-info-name {
+    font-size: 16pt;
+    font-weight: bold;
+}
+
+.party-info-description {
+    font-size: 14pt;
+}
+
+.party-info-link {
+    font-size: 12pt;
 }

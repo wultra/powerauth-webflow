@@ -33,7 +33,10 @@ import java.util.Objects;
         @JsonSubTypes.Type(value = OperationAmountFieldAttribute.class, name = "AMOUNT"),
         @JsonSubTypes.Type(value = OperationNoteFieldAttribute.class, name = "NOTE"),
         @JsonSubTypes.Type(value = OperationBankAccountChoiceFieldAttribute.class, name = "BANK_ACCOUNT_CHOICE"),
-        @JsonSubTypes.Type(value = OperationKeyValueFieldAttribute.class, name = "KEY_VALUE")
+        @JsonSubTypes.Type(value = OperationKeyValueFieldAttribute.class, name = "KEY_VALUE"),
+        @JsonSubTypes.Type(value = OperationBannerFieldAttribute.class, name = "BANNER"),
+        @JsonSubTypes.Type(value = OperationHeadingFieldAttribute.class, name = "HEADING"),
+        @JsonSubTypes.Type(value = OperationPartyInfoFieldAttribute.class, name = "PARTY_INFO")
 })
 public class OperationFormFieldAttribute {
 
@@ -41,7 +44,10 @@ public class OperationFormFieldAttribute {
         AMOUNT,
         NOTE,
         BANK_ACCOUNT_CHOICE,
-        KEY_VALUE
+        KEY_VALUE,
+        BANNER,
+        HEADING,
+        PARTY_INFO
     }
 
     // JsonIgnore added, otherwise type was serialized twice

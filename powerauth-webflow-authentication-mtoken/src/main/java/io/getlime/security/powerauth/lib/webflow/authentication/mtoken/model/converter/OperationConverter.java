@@ -15,9 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.Operation;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Converter for the Operation objects used for mobile API.
@@ -26,20 +31,43 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.Operation;
  */
 public class OperationConverter {
 
-    private FormDataConverter formDataConverter = new FormDataConverter();
+    private final FormDataConverter formDataConverter = new FormDataConverter();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public Operation fromOperationDetailResponse(GetOperationDetailResponse input, AllowedSignatureType allowedSignatureType) {
-        if (input == null || allowedSignatureType == null) { // we also do not want to have null signature type
+    /**
+     * Convert operation detail to Operation.
+     * @param input Operation detail.
+     * @param mobileTokenMode Mobile token mode.
+     * @return Operation.
+     */
+    public Operation fromOperationDetailResponse(GetOperationDetailResponse input, String mobileTokenMode) {
+        if (input == null || mobileTokenMode == null) { // we also do not want to have null signature type
             return null;
         }
         Operation result = new Operation();
         result.setId(input.getOperationId());
+        result.setName(input.getOperationName());
         result.setData(input.getOperationData());
         result.setOperationCreated(input.getTimestampCreated());
         result.setOperationExpires(input.getTimestampExpires());
-        result.setAllowedSignatureType(allowedSignatureType);
+        result.setAllowedSignatureType(fromMobileTokenMode(mobileTokenMode));
         result.setFormData(formDataConverter.fromOperationFormData(input.getFormData()));
         return result;
     }
 
+    /**
+     * Convert mobile token mode JSON string to allowed signature type class.
+     * @param mobileTokenMode Mobile token mode JSON string.
+     * @return Allowed signature type class.
+     */
+    public AllowedSignatureType fromMobileTokenMode(String mobileTokenMode) {
+        AllowedSignatureType allowedSignatureType;
+        try {
+            allowedSignatureType = objectMapper.readValue(mobileTokenMode, AllowedSignatureType.class);
+        } catch (IOException e) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing mobile token mode", e);
+            return null;
+        }
+        return allowedSignatureType;
+    }
 }

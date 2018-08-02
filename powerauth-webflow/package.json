@@ -1,10 +1,10 @@
 {
   "name": "powerauth-webflow",
-  "version": "0.1.0",
+  "version": "0.20.0",
   "description": "Federated Authentication and Authorization Server for Web",
   "repository": {
     "type": "git",
-    "url": "git@github.com:lime-company/lime-security-powerauth-webflow.git"
+    "url": "git@github.com:lime-company/powerauth-webflow.git"
   },
   "keywords": [
     "security",
@@ -15,9 +15,9 @@
   "author": "Roman Strobl",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/lime-company/lime-security-powerauth-webflow/issues"
+    "url": "https://github.com/lime-company/powerauth-webflow/issues"
   },
-  "homepage": "https://github.com/lime-company/lime-security-powerauth-webflow",
+  "homepage": "https://github.com/lime-company/powerauth-webflow",
   "dependencies": {
     "axios": "^v0.16.1",
     "react": "^15.4.2",
@@ -25,7 +25,7 @@
     "react-select": "1.0.0-beta14",
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
-    "react-spin": "^0.6.2",
+    "react-tiny-spin": "^0.6.5",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "redux-promise-middleware": "^4.2.0",

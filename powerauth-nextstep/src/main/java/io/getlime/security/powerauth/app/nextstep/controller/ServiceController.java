@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class representing controller used for service and maintenance purpose.
@@ -38,18 +40,26 @@ import java.util.Date;
 public class ServiceController {
 
     private final NextStepServerConfiguration nextStepServerConfiguration;
-    private final BuildProperties buildProperties;
+    private BuildProperties buildProperties;
 
     /**
      * Controller constructor.
      * @param nextStepServerConfiguration Next step server configuration.
-     * @param buildProperties Build info.
      */
     @Autowired
-    public ServiceController(NextStepServerConfiguration nextStepServerConfiguration, BuildProperties buildProperties) {
+    public ServiceController(NextStepServerConfiguration nextStepServerConfiguration) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+    }
+
+    /**
+     * Set build information.
+     * @param buildProperties Build properties.
+     */
+    @Autowired(required = false)
+    public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
+
 
     /**
      * Controller resource with system information.
@@ -57,13 +67,17 @@ public class ServiceController {
      */
     @RequestMapping(value = "status", method = RequestMethod.GET)
     public @ResponseBody ObjectResponse<ServiceStatusResponse> getServiceStatus() {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received getServiceStatus request");
         ServiceStatusResponse response = new ServiceStatusResponse();
         response.setApplicationName(nextStepServerConfiguration.getApplicationName());
         response.setApplicationDisplayName(nextStepServerConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(nextStepServerConfiguration.getApplicationEnvironment());
-        response.setVersion(buildProperties.getVersion());
-        response.setBuildTime(buildProperties.getTime());
+        if (buildProperties != null) {
+            response.setVersion(buildProperties.getVersion());
+            response.setBuildTime(Date.from(buildProperties.getTime()));
+        }
         response.setTimestamp(new Date());
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getServiceStatus request succeeded");
         return new ObjectResponse<>(response);
     }
 }

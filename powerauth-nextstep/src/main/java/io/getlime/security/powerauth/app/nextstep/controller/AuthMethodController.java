@@ -36,6 +36,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller class related to Next Step authentication methods and user preferences.
@@ -64,12 +66,15 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodsRequest> request) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received getAuthMethods request");
         List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
         if (authMethods == null || authMethods.isEmpty()) {
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "No authentication method is configured in Next Step server");
             throw new IllegalStateException("No authentication method is configured in Next Step server.");
         }
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.setAuthMethods(authMethods);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getAuthMethods request succeeded, available authentication method count: {0}", authMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -81,12 +86,15 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Received getAuthMethodsEnabledForUser request, user ID: {0}", request.getRequestObject().getUserId());
         GetUserAuthMethodsRequest requestObject = request.getRequestObject();
         // userId can be null - in this case default setting is returned when user is not known
         String userId = requestObject.getUserId();
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.setUserAuthMethods(userAuthMethods);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getAuthMethodsEnabledForUser request succeeded, available authentication method count: {0}", userAuthMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -98,20 +106,24 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received enableAuthMethodForUser request, user ID: {0}, authentication method: {1}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object when enabling authentication method.");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Parameter userId is null in request object when enabling authentication method");
+            throw new IllegalArgumentException("Parameter userId is null in request object when enabling authentication method");
         }
         AuthMethod authMethod = requestObject.getAuthMethod();
         if (authMethod == null) {
-            throw new IllegalArgumentException("Parameter authMethod is null in request object when enabling authentication method.");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Parameter authMethod is null in request object when enabling authentication method");
+            throw new IllegalArgumentException("Parameter authMethod is null in request object when enabling authentication method");
         }
         Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, true, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.setUserAuthMethods(userAuthMethods);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The enableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
     }
 
@@ -123,20 +135,24 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received disableAuthMethodForUser request, user ID: {0}, authentication method: {1}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
-            throw new IllegalArgumentException("Parameter userId is null in request object when disabling authentication method.");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Parameter userId is null in request object when disabling authentication method");
+            throw new IllegalArgumentException("Parameter userId is null in request object when disabling authentication method");
         }
         AuthMethod authMethod = requestObject.getAuthMethod();
         if (authMethod == null) {
-            throw new IllegalArgumentException("Parameter authMethod is null in request object when disabling authentication method.");
+            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Parameter authMethod is null in request object when disabling authentication method");
+            throw new IllegalArgumentException("Parameter authMethod is null in request object when disabling authentication method");
         }
         Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.setUserAuthMethods(userAuthMethods);
+        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The disableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
     }
 

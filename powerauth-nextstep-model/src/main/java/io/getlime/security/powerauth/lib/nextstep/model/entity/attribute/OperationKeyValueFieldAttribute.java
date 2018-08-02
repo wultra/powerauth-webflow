@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+
 /**
  * Class representing an operation form field attribute for generic key-value pair.
  *
@@ -22,22 +24,54 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
  */
 public class OperationKeyValueFieldAttribute extends OperationFormFieldAttributeFormatted {
 
-    private String value;
+    protected String value;
 
+    /**
+     * Default constructor.
+     */
     public OperationKeyValueFieldAttribute() {
         this.type = Type.KEY_VALUE;
         this.valueFormatType = ValueFormatType.TEXT;
     }
 
+    /**
+     * Constructor with value format type.
+     * @param valueFormatType Value format type.
+     */
     public OperationKeyValueFieldAttribute(ValueFormatType valueFormatType) {
         this.type = Type.KEY_VALUE;
         this.valueFormatType = valueFormatType;
     }
 
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Label.
+     * @param value Value.
+     * @param valueFormatType Value format type.
+     * @param formattedValue Formatted value.
+     */
+    public OperationKeyValueFieldAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
+        this.type = Type.KEY_VALUE;
+        this.id = id;
+        this.label = label;
+        this.value = value;
+        this.valueFormatType = valueFormatType;
+        this.formattedValue = formattedValue;
+    }
+
+    /**
+     * Get attribute value.
+     * @return Attribute value.
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Set attribute value.
+     * @param value Attribute value.
+     */
     public void setValue(String value) {
         this.value = value;
     }

@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+
 /**
  * Class representing an operation form field attribute for the operation note.
  *
@@ -24,20 +26,52 @@ public class OperationNoteFieldAttribute extends OperationFormFieldAttributeForm
 
     private String note;
 
+    /**
+     * Default constructor.
+     */
     public OperationNoteFieldAttribute() {
         this.type = Type.NOTE;
         this.valueFormatType = ValueFormatType.TEXT;
     }
 
+    /**
+     * Constructor with value format type.
+     * @param valueFormatType Value format type.
+     */
     public OperationNoteFieldAttribute(ValueFormatType valueFormatType) {
         this.type = Type.NOTE;
         this.valueFormatType = valueFormatType;
     }
 
+    /**
+     * Constructor with all details.
+     * @param id Attribute ID.
+     * @param label Label.
+     * @param note Note.
+     * @param valueFormatType Value format type.
+     * @param formattedValue Formatted value.
+     */
+    public OperationNoteFieldAttribute(String id, String label, String note, ValueFormatType valueFormatType, String formattedValue) {
+        this.type = Type.NOTE;
+        this.id = id;
+        this.label = label;
+        this.note = note;
+        this.valueFormatType = valueFormatType;
+        this.formattedValue = formattedValue;
+    }
+
+    /**
+     * Get note.
+     * @return Note.
+     */
     public String getNote() {
         return note;
     }
 
+    /**
+     * Set note.
+     * @param note Note.
+     */
     public void setNote(String note) {
         this.note = note;
     }

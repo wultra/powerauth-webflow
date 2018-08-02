@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
 import {FormGroup} from "react-bootstrap";
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
 // i18n
@@ -41,16 +41,16 @@ export default class TokenOffline extends React.Component {
         this.init = this.init.bind(this);
         this.storeQRCode = this.storeQRCode.bind(this);
         this.storeNonce = this.storeNonce.bind(this);
-        this.storeDataHash = this.storeDataHash.bind(this);
         this.storeActivations = this.storeActivations.bind(this);
         this.storeChosenActivation = this.storeChosenActivation.bind(this);
         this.storeError = this.storeError.bind(this);
         this.storeMessage = this.storeMessage.bind(this);
+        this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.resolveChosenActivation = this.resolveChosenActivation.bind(this);
         this.handleActivationChoice = this.handleActivationChoice.bind(this);
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.state = {authCode: '', activations: null, chosenActivation: null, qrCode: null, nonce: null, dataHash: null, error: null, message: null};
+        this.state = {authCode: '', activations: null, chosenActivation: null, qrCode: null, nonce: null, error: null, message: null, remainingAttempts: null};
     }
 
     componentWillMount() {
@@ -70,13 +70,15 @@ export default class TokenOffline extends React.Component {
             if (props.context.message !== undefined) {
                 this.storeMessage(props.context.message);
             }
+            if (props.context.remainingAttempts !== undefined) {
+                this.storeRemainingAttempts(props.context.remainingAttempts);
+            }
             return;
         }
         // offline mode initialization
         props.context.init = false;
         const qrCode = props.context.qrCode;
         const nonce = props.context.nonce;
-        const dataHash = props.context.dataHash;
         const chosenActivation = props.context.chosenActivation;
         const activations = props.context.activations;
         if (qrCode !== undefined) {
@@ -84,9 +86,6 @@ export default class TokenOffline extends React.Component {
         }
         if (nonce !== undefined) {
             this.storeNonce(nonce);
-        }
-        if (dataHash !== undefined) {
-            this.storeDataHash(dataHash);
         }
         if (activations !== undefined && activations.length>0) {
             this.storeActivations(activations);
@@ -106,10 +105,6 @@ export default class TokenOffline extends React.Component {
         this.setState({nonce: nonceReceived});
     }
 
-    storeDataHash(dataHashReceived) {
-        this.setState({dataHash: dataHashReceived});
-    }
-
     storeActivations(activationsReceived) {
         this.setState({activations: activationsReceived});
     }
@@ -124,6 +119,10 @@ export default class TokenOffline extends React.Component {
 
     storeMessage(messageReceived) {
         this.setState({message: messageReceived});
+    }
+
+    storeRemainingAttempts(remainingAttemptsReceived) {
+        this.setState({remainingAttempts: remainingAttemptsReceived});
     }
 
     resolveChosenActivation(activations, chosenActivationId) {
@@ -153,7 +152,7 @@ export default class TokenOffline extends React.Component {
     handleSubmit(event) {
         // prevent regular form submission
         event.preventDefault();
-        this.props.dispatch(authenticateOffline(this.state.chosenActivation.activationId, this.state.authCode, this.state.nonce, this.state.dataHash));
+        this.props.dispatch(authenticateOffline(this.state.chosenActivation.activationId, this.state.authCode, this.state.nonce));
     }
 
     render() {
@@ -191,9 +190,9 @@ export default class TokenOffline extends React.Component {
                                 <FormGroup
                                     className={(this.state.error ? "message-error" : "message-information")}>
                                     <FormattedMessage id={this.state.message}/>
-                                    {(this.props.context.remainingAttempts > 0) ? (
+                                    {(this.state.remainingAttempts > 0) ? (
                                         <div>
-                                            <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
+                                            <FormattedMessage id="authentication.attemptsRemaining"/> {this.state.remainingAttempts}
                                         </div>
                                     ) : (
                                         undefined

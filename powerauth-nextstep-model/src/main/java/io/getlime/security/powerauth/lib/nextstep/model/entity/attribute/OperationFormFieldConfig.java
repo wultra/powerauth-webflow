@@ -29,26 +29,68 @@ public class OperationFormFieldConfig {
     private boolean enabled;
     private String defaultValue;
 
+    /**
+     * Default constructor.
+     */
+    public OperationFormFieldConfig() {
+    }
+
+    /**
+     * Constructor with all details.
+     * @param id Field ID.
+     * @param enabled Whether field is enabled.
+     * @param defaultValue Default field value.
+     */
+    public OperationFormFieldConfig(String id, boolean enabled, String defaultValue) {
+        this.id = id;
+        this.enabled = enabled;
+        this.defaultValue = defaultValue;
+    }
+
+    /**
+     * Get field ID.
+     * @return Field ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set field ID.
+     * @param id Field ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get whether field is enabled.
+     * @return Whether field is enabled.
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * Set whether field is enabled.
+     * @param enabled Whether field is enabled.
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * Get default value.
+     * @return Default value.
+     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     * Set default value.
+     * @param defaultValue Default value.
+     */
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }

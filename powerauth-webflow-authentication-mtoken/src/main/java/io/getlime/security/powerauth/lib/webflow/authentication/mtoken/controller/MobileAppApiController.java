@@ -19,10 +19,14 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
+import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -30,12 +34,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OperationExpiredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
-import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
-import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
-import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
@@ -50,7 +50,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -137,21 +139,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Get the list of operations for given user
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
+            final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
 
             // Prepare converter
             final OperationConverter converter = new OperationConverter();
 
-            // At the moment, we only support 2FA signatures with both
-            // knowledge and biometry factors
-            AllowedSignatureType allowedSignatureType = new AllowedSignatureType();
-            allowedSignatureType.setType(AllowedSignatureType.Type.MULTIFACTOR_2FA);
-            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.toString());
-            allowedSignatureType.getVariants().add(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString());
-
             // Prepare converted result with operations
             OperationListResponse result = new OperationListResponse();
             for (GetOperationDetailResponse operation: operationList) {
-                result.add(converter.fromOperationDetailResponse(operation, allowedSignatureType));
+                final GetOperationConfigResponse operationConfig = operationConfigs.get(operation.getOperationName());
+                result.add(converter.fromOperationDetailResponse(operation, operationConfig.getMobileTokenMode()));
             }
 
             // Return response
@@ -159,6 +156,23 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         } else {
             throw new PowerAuthAuthenticationException();
         }
+    }
+
+    /**
+     * Get map of operation configurations (operation name -> operation configuration).
+     * @param operations Operation list.
+     * @return Map of operation configurations.
+     */
+    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) {
+        Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
+        for (GetOperationDetailResponse operation: operations) {
+            String operationName = operation.getOperationName();
+            if (!operationConfigs.containsKey(operationName)) {
+                final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+                operationConfigs.put(operationName, operationConfig);
+            }
+        }
+        return operationConfigs;
     }
 
     /**
@@ -172,7 +186,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws AuthStepException Thrown when operation is invalid.
      */
     @RequestMapping(value = "/operation/authorize", method = RequestMethod.POST)
-    @PowerAuth(resourceId = "/operation/authorize")
+    @PowerAuth(resourceId = "/operation/authorize", signatureType = {
+            PowerAuthSignatureTypes.POSSESSION,
+            PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
+            PowerAuthSignatureTypes.POSSESSION_BIOMETRY
+    })
     public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (request.getRequestObject() == null) {
@@ -190,10 +208,18 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
-            if (operation.isExpired()) {
-                throw new OperationExpiredException();
+
+            // Check for expired operation
+            checkOperationExpiration(operation);
+
+            // Check if signature type is allowed
+            if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
+                throw new PowerAuthAuthenticationException();
             }
-            if (operation.getOperationData().equals(request.getRequestObject().getData()) && operation.getUserId().equals(apiAuthentication.getUserId())) {
+
+            if (operation.getOperationData().equals(request.getRequestObject().getData())
+                    && operation.getUserId() != null
+                    && operation.getUserId().equals(apiAuthentication.getUserId())) {
                 final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new Response();
@@ -254,6 +280,53 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
         } catch (NextStepServiceException ex) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not verify activationId", ex);
+        }
+        return false;
+    }
+
+    /**
+     * Verify if provided PowerAuth signature type is allowed for operation with provided name.
+     *
+     * @param operationName Operation name.
+     * @param signatureTypes Signature type that was returned from signature verification.
+     * @return True if the signature type is allowed, false otherwise.
+     */
+    private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthSignatureTypes signatureTypes)  {
+
+        // Get configuration for operation with given name
+        final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+
+        // Convert loose JSON format to AllowedSignatureType structure
+        OperationConverter operationConverter = new OperationConverter();
+        AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
+
+        // Evaluate various signature types
+        if (allowedSignatureType != null) {
+            switch (allowedSignatureType.getType()) {
+                case MULTIFACTOR_1FA: {
+                    // Is the signature correct 1FA type - "possession"?
+                    // Also, allow any 2FA signature as they are more strict than 1FA signature, as a fallback
+                    return PowerAuthSignatureTypes.POSSESSION.equals(signatureTypes)
+                            || PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)
+                            || PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes);
+                }
+                case MULTIFACTOR_2FA: {
+                    // Is the signature correct 2FA type - "possession_knowledge" or "possession_biometry"?
+                    // Check for "possession_knowledge" first
+                    if (PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE.equals(signatureTypes)) {
+                        return true;
+                    }
+                    // Is "possession_biometry" allowed for this 2FA request?
+                    if (PowerAuthSignatureTypes.POSSESSION_BIOMETRY.equals(signatureTypes)) {
+                        return allowedSignatureType.getVariants() != null && allowedSignatureType.getVariants().contains("possession_biometry");
+                    }
+                    break;
+                }
+                case ASYMMETRIC_ECDSA: {
+                    // Not allowed at this moment
+                    return false;
+                }
+            }
         }
         return false;
     }

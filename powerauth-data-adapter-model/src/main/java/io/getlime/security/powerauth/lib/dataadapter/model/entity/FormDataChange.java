@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
- * Class representing change of operation formData.
+ * Class representing change of operation form data.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -32,6 +32,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 })
 public class FormDataChange {
 
+    /**
+     * Enumeration representing form data change type.
+     */
     public enum Type {
         BANK_ACCOUNT_CHOICE,
         AUTH_METHOD_CHOICE
@@ -42,6 +45,10 @@ public class FormDataChange {
     protected Type type;
 
     // JsonIgnore added, otherwise type was serialized twice
+    /**
+     * Get form data change type.
+     * @return Form data change type.
+     */
     @JsonIgnore
     public Type getType() {
         return type;

@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 
 
 /**
- * Enum representing change of operation.
+ * Enumeration representing change of operation status.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */

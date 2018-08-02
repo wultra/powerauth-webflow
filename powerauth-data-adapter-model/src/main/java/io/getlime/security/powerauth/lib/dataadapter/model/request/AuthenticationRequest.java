@@ -15,12 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 
 /**
  * Request for authenticating user with username and password.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@lime-company.eu
  */
 public class AuthenticationRequest {
 
@@ -38,69 +39,91 @@ public class AuthenticationRequest {
     private AuthenticationType type;
 
     /**
-     * Empty constructor.
+     * Operation context.
+     */
+    private OperationContext operationContext;
+
+    /**
+     * Default constructor.
      */
     public AuthenticationRequest() {
     }
 
     /**
      * Constructor with all parameters for convenience.
-     * @param username username for this authentication request
-     * @param password password for this authentication request
-     * @param type authentication type
+     * @param username Username for this authentication request.
+     * @param password Password for this authentication request.
+     * @param type Authentication type.
+     * @param operationContext Operation context.
      */
-    public AuthenticationRequest(String username, String password, AuthenticationType type) {
+    public AuthenticationRequest(String username, String password, AuthenticationType type, OperationContext operationContext) {
         this.username = username;
         this.password = password;
         this.type = type;
+        this.operationContext = operationContext;
     }
 
     /**
-     * Sets the username.
-     * @param username username to set
+     * Set the username.
+     * @param username Username.
      */
     public void setUsername(String username) {
         this.username = username;
     }
 
     /**
-     * Gets the username.
-     * @return username
+     * Get the username.
+     * @return Username.
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * Sets the password.
-     * @param password password to set
+     * Set the password.
+     * @param password Password.
      */
     public void setPassword(String password) {
         this.password = password;
     }
 
     /**
-     * Gets the password.
-     * @return password
+     * Get the password.
+     * @return Password.
      */
     public String getPassword() {
         return password;
     }
 
     /**
-     * Sets the authentication type.
-     * @param type authentication type
+     * Set the authentication type.
+     * @param type Authentication type.
      */
     public void setType(AuthenticationType type) {
         this.type = type;
     }
 
     /**
-     * Gets the authentication type.
-     * @return authentication type
+     * Get the authentication type.
+     * @return Authentication type.
      */
     public AuthenticationType getType() {
         return type;
     }
 
+    /**
+     * Get operation context.
+     * @return Operation context.
+     */
+    public OperationContext getOperationContext() {
+        return operationContext;
+    }
+
+    /**
+     * Set operation context.
+     * @param operationContext Operation context.
+     */
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
+    }
 }

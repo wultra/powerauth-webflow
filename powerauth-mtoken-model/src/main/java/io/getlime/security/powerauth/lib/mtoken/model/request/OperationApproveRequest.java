@@ -25,18 +25,34 @@ public class OperationApproveRequest {
     private String id;
     private String data;
 
+    /**
+     * Get operation ID.
+     * @return Operation ID.
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Set operation ID.
+     * @param id Operation ID.
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Get unstructured operation data.
+     * @return Operation data.
+     */
     public String getData() {
         return data;
     }
 
+    /**
+     * Set unstructured operation data.
+     * @param data Operation data.
+     */
     public void setData(String data) {
         this.data = data;
     }

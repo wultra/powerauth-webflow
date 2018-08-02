@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
  * Request for creating SMS OTP authorization message.
@@ -24,10 +24,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
  */
 public class CreateSMSAuthorizationRequest {
 
-    /**
-     * Operation ID related to this authorization request.
-     */
-    private String operationId;
 
     /**
      * User ID for this authorization request.
@@ -35,68 +31,77 @@ public class CreateSMSAuthorizationRequest {
     private String userId;
 
     /**
-     * Name of operation.
+     * Operation context.
      */
-    private String operationName;
-
-    /**
-     * Operation formData.
-     */
-    private OperationFormData operationFormData;
+    private OperationContext operationContext;
 
     /**
      * Language used in the SMS OTP messages.
      */
     private String lang;
 
+    /**
+     * Default constructor.
+     */
     public CreateSMSAuthorizationRequest() {
     }
 
-    public CreateSMSAuthorizationRequest(String operationId, String userId, String operationName,
-                                         OperationFormData operationFormData, String lang) {
-        this.operationId = operationId;
+    /**
+     * Constructor with user ID, language and operation context.
+     * @param userId User ID.
+     * @param lang SMS language.
+     * @param operationContext Operation context.
+     */
+    public CreateSMSAuthorizationRequest(String userId, String lang, OperationContext operationContext) {
         this.userId = userId;
-        this.operationName = operationName;
-        this.operationFormData = operationFormData;
         this.lang = lang;
+        this.operationContext = operationContext;
     }
 
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
     public String getUserId() {
         return userId;
     }
 
+    /**
+     * Set user ID.
+     * @param userId user ID.
+     */
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getOperationName() {
-        return operationName;
+    /**
+     * Get operation context.
+     * @return Operation context.
+     */
+    public OperationContext getOperationContext() {
+        return operationContext;
     }
 
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
+    /**
+     * Set operation context.
+     * @param operationContext Operation context.
+     */
+    public void setOperationContext(OperationContext operationContext) {
+        this.operationContext = operationContext;
     }
 
-    public OperationFormData getOperationFormData() {
-        return operationFormData;
-    }
-
-    public void setOperationFormData(OperationFormData operationFormData) {
-        this.operationFormData = operationFormData;
-    }
-
+    /**
+     * Get SMS language.
+     * @return SMS language.
+     */
     public String getLang() {
         return lang;
     }
 
+    /**
+     * Set SMS language.
+     * @param lang SMS language.
+     */
     public void setLang(String lang) {
         this.lang = lang;
     }

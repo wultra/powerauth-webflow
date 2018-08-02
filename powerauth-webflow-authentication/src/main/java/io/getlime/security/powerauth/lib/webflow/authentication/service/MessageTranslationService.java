@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
@@ -32,7 +33,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Service which translates formData strings.
+ * Service which localizes and translates form data messages.
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
@@ -57,7 +58,7 @@ public class MessageTranslationService {
     }
 
     /**
-     * Translate formData strings.
+     * Translate form data strings.
      *
      * @param formData Form data.
      */
@@ -66,43 +67,42 @@ public class MessageTranslationService {
             return;
         }
 
-        // Localize labels for form fields.
-        localizeFormFields(formData);
+        // Localize labels for form fields
+        localizeFormFieldLabels(formData);
 
+        // Create id -> value map for translation using the {id} notation
         Map<String, String> idValueMap = createIdValueMap(formData);
 
-        // Translate title using the {id} notation
-        OperationFormAttribute title = formData.getTitle();
-        if (title != null) {
-            String titleLabel = localize(title.getId());
-            if (titleLabel != null) {
-                String translatedTitle = translateMessage(titleLabel, idValueMap);
-                formData.addTitle(title.getId(), translatedTitle);
-            }
-        }
+        // Localize and translate title using the {id} notation
+        OperationFormMessageAttribute title = formData.getTitle();
+        localizeAndTranslateFormAttributeValue(title, idValueMap);
 
-        // Translate greeting using the {id} notation
-        OperationFormAttribute greeting = formData.getGreeting();
-        if (greeting != null) {
-            String greetingLabel = localize(greeting.getId());
-            if (greetingLabel != null) {
-                String translatedGreeting = translateMessage(greetingLabel, idValueMap);
-                formData.addGreeting(greeting.getId(), translatedGreeting);
-            }
-        }
+        // Localize and translate greeting using the {id} notation
+        OperationFormMessageAttribute greeting = formData.getGreeting();
+        localizeAndTranslateFormAttributeValue(greeting, idValueMap);
 
-        // Translate summary using the {id} notation
-        OperationFormAttribute summary = formData.getSummary();
-        if (summary != null) {
-            String summaryLabel = localize(summary.getId());
-            if (summaryLabel != null) {
-                String translatedSummary = translateMessage(summaryLabel, idValueMap);
-                formData.addSummary(summary.getId(), translatedSummary);
-            }
+        // Localize and translate summary using the {id} notation
+        OperationFormMessageAttribute summary = formData.getSummary();
+        localizeAndTranslateFormAttributeValue(summary, idValueMap);
+
+        // Localize and translate banners using the {id} notation
+        for (OperationFormBanner banner: formData.getBanners()) {
+            localizeAndTranslateFormAttributeValue(banner, idValueMap);
         }
 
         // Format form field attributes
         formatFormFieldAttributes(formData.getParameters());
+    }
+
+    /**
+     * Localize value of operation form attribute.
+     * @param attribute Operation form attribute.
+     * @param idValueMap Id -> value map for translation using the {id} notation.
+     */
+    private void localizeAndTranslateFormAttributeValue(OperationFormMessageAttribute attribute, Map<String, String> idValueMap) {
+        String message = localize(attribute.getId());
+        String translatedMessage = translateMessage(message, idValueMap);
+        attribute.setMessage(translatedMessage);
     }
 
     /**
@@ -114,25 +114,41 @@ public class MessageTranslationService {
             return;
         }
         for (OperationFormFieldAttribute attribute : attributes) {
+            // Formatting of attributes with specified format
             if (attribute instanceof OperationFormFieldAttributeFormatted) {
                 OperationFormFieldAttributeFormatted formattedAttribute = (OperationFormFieldAttributeFormatted) attribute;
                 String formattedValue;
-                if (formattedAttribute.getValueFormatType() == OperationFormFieldAttributeFormatted.ValueFormatType.LOCALIZED_TEXT) {
+                if (formattedAttribute.getValueFormatType() == ValueFormatType.LOCALIZED_TEXT) {
                     formattedValue = localize(valueFormatterService.getValue(attribute));
                 } else {
                     formattedValue = valueFormatterService.format(formattedAttribute, LocaleContextHolder.getLocale());
                 }
                 formattedAttribute.setFormattedValue(formattedValue);
+                continue;
+            }
+            // Localization of banners
+            if (attribute.getType() == OperationFormFieldAttribute.Type.BANNER) {
+                OperationBannerFieldAttribute banner = (OperationBannerFieldAttribute) attribute;
+                String localizedMessage = localize(banner.getId());
+                banner.setMessage(localizedMessage);
             }
         }
     }
 
     /**
-     * Localize form fields.
-     * @param formData Form data.
+     * Localize the form field labels.
+     * @param formData Operation form data.
      */
-    private void localizeFormFields(OperationFormData formData) {
+    private void localizeFormFieldLabels(OperationFormData formData) {
         for (OperationFormFieldAttribute attribute: formData.getParameters()) {
+            // Banners do not have labels, skip localization
+            if (attribute.getType() == OperationFormFieldAttribute.Type.BANNER) {
+                continue;
+            }
+            // Headings do not have labels, skip localization
+            if (attribute.getType() == OperationFormFieldAttribute.Type.HEADING) {
+                continue;
+            }
             String localizedValue = localize(attribute.getId());
             attribute.setLabel(localizedValue);
         }
@@ -165,6 +181,16 @@ public class MessageTranslationService {
                     OperationKeyValueFieldAttribute keyValueAttribute = (OperationKeyValueFieldAttribute) attribute;
                     value = keyValueAttribute.getValue();
                     break;
+                case HEADING:
+                    OperationHeadingFieldAttribute headingAttribute = (OperationHeadingFieldAttribute) attribute;
+                    value = headingAttribute.getValue();
+                    break;
+                case PARTY_INFO:
+                    OperationPartyInfoFieldAttribute partyInfoAttribute = (OperationPartyInfoFieldAttribute) attribute;
+                    if (partyInfoAttribute.getPartyInfo() != null) {
+                        value = partyInfoAttribute.getPartyInfo().getName();
+                    }
+                    break;
             }
             idValueMap.put(attribute.getId(), value);
         }
@@ -184,7 +210,7 @@ public class MessageTranslationService {
         try {
             return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while reading resource", ex);
+            Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Localization key is missing: "+i18nKey);
             return MISSING_KEY_MESSAGE+": "+i18nKey;
         }
     }

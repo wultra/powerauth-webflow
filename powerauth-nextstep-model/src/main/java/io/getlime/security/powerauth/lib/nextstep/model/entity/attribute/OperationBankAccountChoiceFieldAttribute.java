@@ -30,30 +30,74 @@ public class OperationBankAccountChoiceFieldAttribute extends OperationFormField
     private boolean enabled;
     private String defaultValue;
 
+    /**
+     * Default constructor.
+     */
     public OperationBankAccountChoiceFieldAttribute() {
         this.type = Type.BANK_ACCOUNT_CHOICE;
     }
 
+    /**
+     * Constructor with all details.
+     * @param id ID.
+     * @param label Label.
+     * @param bankAccounts List of bank accounts.
+     * @param enabled Whether choice is enabled.
+     * @param defaultValue Default chosen value.
+     */
+    public OperationBankAccountChoiceFieldAttribute(String id, String label, List<BankAccountDetail> bankAccounts, boolean enabled, String defaultValue) {
+        this.type = Type.BANK_ACCOUNT_CHOICE;
+        this.id = id;
+        this.label = label;
+        this.bankAccounts = bankAccounts;
+        this.enabled = enabled;
+        this.defaultValue = defaultValue;
+    }
+
+    /**
+     * Get bank account list.
+     * @return Bank account list.
+     */
     public List<BankAccountDetail> getBankAccounts() {
         return bankAccounts;
     }
 
+    /**
+     * Set bank account list.
+     * @param bankAccounts Bank account list.
+     */
     public void setBankAccounts(List<BankAccountDetail> bankAccounts) {
         this.bankAccounts = bankAccounts;
     }
 
+    /**
+     * Whether choice is enabled.
+     * @return Whether choice is enabled.
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * Set whether choice is enabled.
+     * @param enabled Whether choice is enabled.
+     */
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    /**
+     * Get default chosen value.
+     * @return Default chosen value.
+     */
     public String getDefaultValue() {
         return defaultValue;
     }
 
+    /**
+     * Set default chosen value.
+     * @param defaultValue Default chosen value.
+     */
     public void setDefaultValue(String defaultValue) {
         this.defaultValue = defaultValue;
     }

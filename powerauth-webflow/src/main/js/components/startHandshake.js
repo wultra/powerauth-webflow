@@ -18,7 +18,7 @@ import {connect} from 'react-redux';
 // Actions
 import {authenticate} from '../actions/startHandshakeActions'
 // Components
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 
 /**
  * Component for dispatching the initial web flow state.

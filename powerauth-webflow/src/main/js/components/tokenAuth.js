@@ -21,7 +21,7 @@ import {authenticateOnline, cancel, getOperationData, initOnline} from "../actio
 import OperationDetail from "./operationDetail";
 import TokenOffline from "./tokenAuthOffline";
 import TokenOnline from "./tokenAuthOnline";
-import Spinner from 'react-spin';
+import Spinner from 'react-tiny-spin';
 import {Panel} from "react-bootstrap";
 
 const stompClient = require('../websocket-client');
@@ -171,11 +171,14 @@ export default class Token extends React.Component {
     }
 
     onRegister() {
-        console.log('WebSocket has been registered.');
+        // disabled debug logging
+        // console.log('WebSocket has been registered.');
     }
 
     onAuthorize() {
-        console.log('Authorization request received from WebSocket.');
+        // disabled debug logging
+        // console.log('Authorization request received from WebSocket.');
+
         // Save references to the methods for the calls from anonymous functions.
         const setAuthorized = this.setAuthorized;
         const setAuthorizationInProgress = this.setAuthorizationInProgress;
