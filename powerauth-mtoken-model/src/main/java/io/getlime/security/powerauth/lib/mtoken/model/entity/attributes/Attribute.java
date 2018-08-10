@@ -30,7 +30,7 @@ public class Attribute {
         KEY_VALUE,
         NOTE,
         HEADING,
-        PARTY
+        PARTY_INFO
     }
 
     protected Type type;

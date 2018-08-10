@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
+import io.getlime.security.powerauth.lib.mtoken.model.entity.PartyInfo;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 
@@ -48,16 +49,29 @@ public class AttributeConverter {
             }
             case PARTY_INFO: {
                 OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
-                // TODO - we use KeyValueAttribute until mobile token supports PartyInfo
-                if (attr.getPartyInfo() != null) {
-                    return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getPartyInfo().getName());
-                }
-                return new KeyValueAttribute(input.getId(), input.getLabel(), null);
+                return new PartyAttribute(attr.getId(), attr.getLabel(), fromPartyInfo(attr.getPartyInfo()));
             }
             default: {
                 return new KeyValueAttribute(input.getId(), input.getLabel(), null);
             }
         }
+    }
+
+    /**
+     * Convert PartyInfo from Next Step model to mToken model.
+     * @param input Input PartyInfo.
+     * @return Converted PartyInfo.
+     */
+    private PartyInfo fromPartyInfo(io.getlime.security.powerauth.lib.nextstep.model.entity.PartyInfo input) {
+        if (input == null) {
+            return null;
+        }
+        PartyInfo partyInfo = new PartyInfo();
+        partyInfo.setLogoUrl(input.getLogoUrl());
+        partyInfo.setName(input.getName());
+        partyInfo.setDescription(input.getDescription());
+        partyInfo.setWebsiteUrl(input.getWebsiteUrl());
+        return partyInfo;
     }
 
 }
