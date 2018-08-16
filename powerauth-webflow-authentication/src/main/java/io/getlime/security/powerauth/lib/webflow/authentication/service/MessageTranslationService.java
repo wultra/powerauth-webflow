@@ -117,13 +117,13 @@ public class MessageTranslationService {
             // Formatting of attributes with specified format
             if (attribute instanceof OperationFormFieldAttributeFormatted) {
                 OperationFormFieldAttributeFormatted formattedAttribute = (OperationFormFieldAttributeFormatted) attribute;
-                String formattedValue;
-                if (formattedAttribute.getValueFormatType() == ValueFormatType.LOCALIZED_TEXT) {
-                    formattedValue = localize(valueFormatterService.getValue(attribute));
+                ValueFormatType valueFormatType = formattedAttribute.getValueFormatType();
+                if (valueFormatType == ValueFormatType.LOCALIZED_TEXT) {
+                    String formattedValue = localize(valueFormatterService.getValue(attribute));
+                    formattedAttribute.addFormattedValue("value", formattedValue);
                 } else {
-                    formattedValue = valueFormatterService.format(formattedAttribute, LocaleContextHolder.getLocale());
+                    valueFormatterService.addFormattedValue(formattedAttribute, LocaleContextHolder.getLocale());
                 }
-                formattedAttribute.setFormattedValue(formattedValue);
                 continue;
             }
             // Localization of banners

@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 
+import java.util.Map;
+
 /**
  * Class representing an operation form field attribute for a heading.
  *
@@ -47,15 +49,15 @@ public class OperationHeadingFieldAttribute extends OperationKeyValueFieldAttrib
      * @param label Label.
      * @param value Value.
      * @param valueFormatType Value format type.
-     * @param formattedValue Formatted value.
+     * @param formattedValues Formatted values.
      */
-    public OperationHeadingFieldAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
+    public OperationHeadingFieldAttribute(String id, String label, String value, ValueFormatType valueFormatType, Map<String, String> formattedValues) {
         this.type = Type.HEADING;
         this.id = id;
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        this.formattedValue = formattedValue;
+        this.formattedValues.putAll(formattedValues);
     }
 
 }

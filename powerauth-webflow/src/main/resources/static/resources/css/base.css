@@ -194,6 +194,11 @@ a:hover, a:active, a:focus {
     font-size: 16pt;
 }
 
+#operation .currency {
+    color: #7FC000;
+    font-size: 16pt;
+}
+
 #operation .heading {
     font-size: 16pt;
     color: #7FC000;

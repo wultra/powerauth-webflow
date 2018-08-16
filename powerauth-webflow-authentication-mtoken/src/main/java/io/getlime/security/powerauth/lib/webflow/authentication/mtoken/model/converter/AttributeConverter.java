@@ -33,19 +33,20 @@ public class AttributeConverter {
         switch (input.getType()) {
             case AMOUNT: {
                 OperationAmountFieldAttribute attr = (OperationAmountFieldAttribute) input;
-                return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency());
+                return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(),
+                        attr.getFormattedValues().get("amount"), attr.getFormattedValues().get("currency"));
             }
             case KEY_VALUE: {
                 OperationKeyValueFieldAttribute attr = (OperationKeyValueFieldAttribute) input;
-                return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValue());
+                return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValues().get("value"));
             }
             case NOTE: {
                 OperationNoteFieldAttribute attr = (OperationNoteFieldAttribute) input;
-                return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValue());
+                return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getFormattedValues().get("value"));
             }
             case HEADING: {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
-                return new HeadingAttribute(attr.getId(), attr.getFormattedValue());
+                return new HeadingAttribute(attr.getId(), attr.getFormattedValues().get("value"));
             }
             case PARTY_INFO: {
                 OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;

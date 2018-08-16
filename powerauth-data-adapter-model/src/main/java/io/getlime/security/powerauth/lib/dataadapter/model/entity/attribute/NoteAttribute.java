@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
+import java.util.Map;
+
 /**
  * Class representing an operation form field attribute for the operation note.
  *
@@ -49,15 +51,15 @@ public class NoteAttribute extends AttributeFormatted {
      * @param label Label.
      * @param note Note.
      * @param valueFormatType Value format type.
-     * @param formattedValue Formatted value.
+     * @param formattedValues Formatted values.
      */
-    public NoteAttribute(String id, String label, String note, ValueFormatType valueFormatType, String formattedValue) {
+    public NoteAttribute(String id, String label, String note, ValueFormatType valueFormatType, Map<String, String> formattedValues) {
         this.type = Type.NOTE;
         this.id = id;
         this.label = label;
         this.note = note;
         this.valueFormatType = valueFormatType;
-        this.formattedValue = formattedValue;
+        this.formattedValues.putAll(formattedValues);
     }
 
 

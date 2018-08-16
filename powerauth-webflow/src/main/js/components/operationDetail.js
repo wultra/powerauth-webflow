@@ -188,7 +188,7 @@ export default class OperationDetail extends React.Component {
                     {amount.label}
                 </div>
                 <div className="col-xs-6 value">
-                    <span className="amount">{amount.formattedValue}</span>
+                    <span className="amount">{amount.formattedValues['amount']}</span>&nbsp;<span className="currency">{amount.formattedValues['currency']}</span>
                 </div>
             </div>
         )
@@ -201,7 +201,7 @@ export default class OperationDetail extends React.Component {
                     {keyValue.label}
                 </div>
                 <div className="col-xs-6 value">
-                    {keyValue.formattedValue}
+                    {keyValue.formattedValues['value']}
                 </div>
             </div>
         )
@@ -212,7 +212,7 @@ export default class OperationDetail extends React.Component {
             <div className="row attribute" key={note.id}>
                 <div className="col-xs-12">
                     <div className="key">{note.label}</div>
-                    <div className="value">{note.formattedValue}</div>
+                    <div className="value">{note.formattedValues['value']}</div>
                 </div>
             </div>
         )
@@ -221,7 +221,7 @@ export default class OperationDetail extends React.Component {
     displayHeading(heading) {
         return (
             <div className="row attribute" key={heading.id}>
-                <div className="col-xs-12 heading">{heading.formattedValue}</div>
+                <div className="col-xs-12 heading">{heading.formattedValues['value']}</div>
             </div>
         )
     }

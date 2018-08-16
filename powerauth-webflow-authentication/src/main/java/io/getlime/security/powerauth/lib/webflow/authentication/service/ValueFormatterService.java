@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.support.AbstractMessageSource;
 import org.springframework.stereotype.Service;
@@ -54,57 +55,68 @@ public class ValueFormatterService {
     }
 
     /**
-     * Format form field attribute based on value format type.
+     * Add formatted value(s) based on value format type.
      * @param attribute Form field attribute.
      * @param locale Locale used for formatting.
-     * @return Formatted form field attribute.
      */
-    public String format(OperationFormFieldAttributeFormatted attribute, Locale locale) {
+    public void addFormattedValue(OperationFormFieldAttributeFormatted attribute, Locale locale) {
         if (attribute == null) {
-            return "";
+            return;
         }
 
-        switch (attribute.getValueFormatType()) {
+        ValueFormatType valueFormatType = attribute.getValueFormatType();
+
+        switch (valueFormatType) {
 
             case TEXT: {
-                return getValue(attribute);
+                attribute.addFormattedValue("value", getValue(attribute));
+                return;
             }
 
             case AMOUNT: {
                 if (attribute instanceof OperationAmountFieldAttribute) {
                     OperationAmountFieldAttribute amountAttribute = (OperationAmountFieldAttribute) attribute;
-                    return formatAmount(amountAttribute, locale);
+                    addFormattedAmount(amountAttribute, locale);
+                    return;
                 }
-                String value = getValue(attribute);
-                try {
-                    BigDecimal numericValue = new BigDecimal(value);
-                    return formatNumber(numericValue, locale);
-                } catch (NumberFormatException ex) {
-                    // do not interrupt operation by exception due to broken formatting
-                    return value;
-                }
+                addNumericValue(attribute, locale);
+                return;
             }
 
             case NUMBER: {
-                String value = getValue(attribute);
-                try {
-                    BigDecimal numericValue = new BigDecimal(value);
-                    return formatNumber(numericValue, locale);
-                } catch (NumberFormatException ex) {
-                    // do not interrupt operation by exception due to broken formatting
-                    return value;
-                }
+                addNumericValue(attribute, locale);
+                return;
             }
 
             case DATE:
-                return formatDate(getValue(attribute), locale);
+                attribute.addFormattedValue("value", formatDate(getValue(attribute), locale));
+                return;
 
             case ACCOUNT:
-                return formatAccount(getValue(attribute), locale);
+                attribute.addFormattedValue("value", formatAccount(getValue(attribute), locale));
+                return;
 
             default:
                 throw new IllegalStateException("Unexpected value format type: "+attribute.getValueFormatType());
 
+        }
+    }
+
+    /**
+     * Add a formatted numeric value to attribute.
+     * @param attribute Form field attribute.
+     * @param locale Locale used for formatting.
+     */
+    private void addNumericValue(OperationFormFieldAttributeFormatted attribute, Locale locale) {
+        String value = getValue(attribute);
+        try {
+            BigDecimal numericValue = new BigDecimal(value);
+            attribute.addFormattedValue("value", formatNumber(numericValue, locale));
+            return;
+        } catch (NumberFormatException ex) {
+            // do not interrupt operation by exception due to broken formatting
+            attribute.addFormattedValue("value", value);
+            return;
         }
     }
 
@@ -134,21 +146,25 @@ public class ValueFormatterService {
      * Formats the amount for given locale using configured pattern and appends localized currency name.
      * @param amountAttribute Amount form field attribute.
      * @param locale Used locale.
-     * @return Formatted amount.
      */
-    private String formatAmount(OperationAmountFieldAttribute amountAttribute, Locale locale) {
+    private void addFormattedAmount(OperationAmountFieldAttribute amountAttribute, Locale locale) {
         if (amountAttribute.getAmount() == null) {
-            return "";
+            return;
         }
         if (amountAttribute.getCurrency() == null) {
-            return formatNumber(amountAttribute.getAmount(), locale);
+            amountAttribute.addFormattedValue("amount", formatNumber(amountAttribute.getAmount(), locale));
+            // set empty currency to avoid displaying null value
+            amountAttribute.addFormattedValue("currency", "");
+            return;
         }
         final CurrencyUnit currency;
         try {
             currency = Monetary.getCurrency(amountAttribute.getCurrency());
         } catch (UnknownCurrencyException ex) {
             // ignore errors for unsupported currencies, perform only basic formatting
-            return formatNumber(amountAttribute.getAmount(), locale) + " " + amountAttribute.getCurrency();
+            amountAttribute.addFormattedValue("amount", formatNumber(amountAttribute.getAmount(), locale));
+            amountAttribute.addFormattedValue("currency", amountAttribute.getCurrency());
+            return;
         }
         final MonetaryAmount amount = Monetary.getDefaultAmountFactory().setCurrency(currency).setNumber(amountAttribute.getAmount()).create();
         final AbstractMessageSource messageSource = i18NService.getMessageSource();
@@ -170,7 +186,8 @@ public class ValueFormatterService {
                         .set("pattern", pattern)
                         .build());
         // append localized currency name
-        return format.format(amount) + " " + localizedCurrencyName;
+        amountAttribute.addFormattedValue("amount", format.format(amount));
+        amountAttribute.addFormattedValue("currency", localizedCurrencyName);
     }
 
     /**
