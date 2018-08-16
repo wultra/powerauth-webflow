@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 
+import java.util.Map;
+
 /**
  * Class representing an operation form field attribute for the operation note.
  *
@@ -49,15 +51,15 @@ public class OperationNoteFieldAttribute extends OperationFormFieldAttributeForm
      * @param label Label.
      * @param note Note.
      * @param valueFormatType Value format type.
-     * @param formattedValue Formatted value.
+     * @param formattedValues Formatted values.
      */
-    public OperationNoteFieldAttribute(String id, String label, String note, ValueFormatType valueFormatType, String formattedValue) {
+    public OperationNoteFieldAttribute(String id, String label, String note, ValueFormatType valueFormatType, Map<String, String> formattedValues) {
         this.type = Type.NOTE;
         this.id = id;
         this.label = label;
         this.note = note;
         this.valueFormatType = valueFormatType;
-        this.formattedValue = formattedValue;
+        this.formattedValues.putAll(formattedValues);
     }
 
     /**

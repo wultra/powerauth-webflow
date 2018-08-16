@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class that represents a formatted form field attribute. Formatting is done based on value format type.
  *
@@ -27,7 +30,7 @@ public class AttributeFormatted extends Attribute {
 
     protected ValueFormatType valueFormatType;
 
-    protected String formattedValue;
+    protected Map<String, String> formattedValues = new HashMap<>();
 
     /**
      * Get value format type of this attribute.
@@ -38,19 +41,20 @@ public class AttributeFormatted extends Attribute {
     }
 
     /**
-     * Get formatted value of this attribute.
+     * Get formatted values for this attribute.
      * @return Formatted value.
      */
-    public String getFormattedValue() {
-        return formattedValue;
+    public Map<String, String> getFormattedValues() {
+        return formattedValues;
     }
 
     /**
-     * Set formatted value of this attribute.
+     * Add formatted value for this attribute.
+     * @param key Value key.
      * @param formattedValue Formatted value.
      */
-    public void setFormattedValue(String formattedValue) {
-        this.formattedValue = formattedValue;
+    public void addFormattedValue(String key, String formattedValue) {
+        formattedValues.put(key, formattedValue);
     }
 
 }
