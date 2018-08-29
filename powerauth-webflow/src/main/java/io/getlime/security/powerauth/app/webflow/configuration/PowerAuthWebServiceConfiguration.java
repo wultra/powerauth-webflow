@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
