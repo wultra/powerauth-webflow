@@ -112,6 +112,16 @@
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
             <version>0.21.0</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>geronimo-javamail_1.4_mail</artifactId>
+                    <groupId>org.apache.geronimo.javamail</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
