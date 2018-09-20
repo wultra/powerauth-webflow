@@ -16,8 +16,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.powerauth.soap.ActivationStatus;
-import io.getlime.powerauth.soap.GetActivationListForUserResponse;
+import io.getlime.powerauth.soap.v3.ActivationStatus;
+import io.getlime.powerauth.soap.v3.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
