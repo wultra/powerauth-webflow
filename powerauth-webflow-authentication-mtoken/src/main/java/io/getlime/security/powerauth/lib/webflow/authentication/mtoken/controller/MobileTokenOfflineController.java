@@ -17,7 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import com.google.common.io.BaseEncoding;
-import io.getlime.powerauth.soap.*;
+import io.getlime.powerauth.soap.v3.*;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
