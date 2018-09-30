@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import io.getlime.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
+import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthEncryptionArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthWebArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.filter.PowerAuthRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +57,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Bean
     public PowerAuthWebArgumentResolver powerAuthWebArgumentResolver() {
         return new PowerAuthWebArgumentResolver();
+    }
+
+    @Bean
+    public PowerAuthEncryptionArgumentResolver powerAuthEncryptionArgumentResolver() {
+        return new PowerAuthEncryptionArgumentResolver();
     }
 
     @Bean
@@ -112,6 +118,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(powerAuthWebArgumentResolver());
+        argumentResolvers.add(powerAuthEncryptionArgumentResolver());
     }
 
     /**
