@@ -22,7 +22,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
  */
 public class InvalidActivationException extends MobileAppApiException {
 
-    public InvalidActivationException() {
-        super("Invalid activation found in Mobile Token API component.");
+    public InvalidActivationException(String activationId) {
+        super("Invalid activation configured in Mobile Token API component: "+activationId);
     }
 }

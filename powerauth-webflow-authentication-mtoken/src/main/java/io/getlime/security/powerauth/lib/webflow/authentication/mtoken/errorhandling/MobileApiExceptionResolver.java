@@ -22,9 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlrea
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -76,6 +74,29 @@ public class MobileApiExceptionResolver {
     }
 
     /**
+     * Exception handler for activation not active exception.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(ActivationNotActiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleActivationNotActiveException(Throwable t) {
+        return error(ErrorCode.ACTIVATION_NOT_ACTIVE, t);
+    }
+
+
+    /**
+     * Exception handler for activation not configured exception.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(ActivationNotConfiguredException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleActivationNotConfiguredException(Throwable t) {
+        return error(ErrorCode.ACTIVATION_NOT_CONFIGURED, t);
+    }
+
+    /**
      * Exception handler for invalid activation exception.
      * @param t Throwable.
      * @return Response with error details.
@@ -83,7 +104,9 @@ public class MobileApiExceptionResolver {
     @ExceptionHandler(InvalidActivationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
-        return error(ErrorCode.INVALID_ACTIVATION, t);
+        // Special handling of invalid activation exception because this is a very common error
+        Logger.getLogger(this.getClass().getName()).log(Level.INFO, t.getMessage());
+        return new ErrorResponse(new Error(ErrorCode.INVALID_ACTIVATION, t.getMessage()));
     }
 
     /**

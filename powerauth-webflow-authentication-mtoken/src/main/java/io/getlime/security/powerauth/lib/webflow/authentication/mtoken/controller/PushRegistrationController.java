@@ -22,7 +22,6 @@ import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.lib.mtoken.model.request.PushRegisterRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
@@ -149,7 +148,7 @@ public class PushRegistrationController {
         // Verify that applicationId and activationId are set
         if (applicationId == null || activationId == null) {
             Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Invalid activation in push registration, user ID: {0}", apiAuthentication.getUserId());
-            throw new InvalidActivationException();
+            throw new PushRegistrationFailedException();
         }
 
         // Register the device and return response

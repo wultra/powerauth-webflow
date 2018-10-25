@@ -20,9 +20,9 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
  *
  * @author Roman Strobl, roman.strobl@lime-company.eu
  */
-public class ActivationNotAvailableException extends MobileAppApiException {
+public class ActivationNotConfiguredException extends MobileAppApiException {
 
-    public ActivationNotAvailableException() {
+    public ActivationNotConfiguredException() {
         super("Activation is not configured in Mobile Token API component.");
     }
 }
