@@ -115,7 +115,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         checkOperationExpiration(operation);
-        // nonce and dataHash are received from UI - they were stored together with the QR code
+        // nonce is received from the UI - it was stored together with the QR code
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
         String data = operation.getOperationId() + '&' + operation.getOperationData();

@@ -36,6 +36,16 @@ public class ErrorCode {
     public static final String INVALID_REQUEST              = "INVALID_REQUEST";
 
     /**
+     * Error code for situation when an activation is not active.
+     */
+    public static final String ACTIVATION_NOT_ACTIVE        = "ACTIVATION_NOT_ACTIVE";
+
+    /**
+     * Error code for situation when an activation is not configured.
+     */
+    public static final String ACTIVATION_NOT_CONFIGURED    = "ACTIVATION_NOT_CONFIGURED";
+
+    /**
      * Error code for situation when an invalid activation / device is
      * attempted for operation manipulation.
      */

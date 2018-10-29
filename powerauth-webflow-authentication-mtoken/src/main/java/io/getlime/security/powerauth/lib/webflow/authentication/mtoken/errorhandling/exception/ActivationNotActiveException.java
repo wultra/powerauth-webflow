@@ -22,7 +22,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
  */
 public class ActivationNotActiveException extends MobileAppApiException {
 
-    public ActivationNotActiveException() {
-        super("Activation is not active in Mobile Token API component.");
+    public ActivationNotActiveException(String activationId) {
+        super("Activation is not active in Mobile Token API component: "+activationId);
     }
 }

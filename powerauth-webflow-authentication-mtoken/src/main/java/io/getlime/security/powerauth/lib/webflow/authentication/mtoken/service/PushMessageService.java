@@ -16,7 +16,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotActiveException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotAvailableException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotConfiguredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
@@ -79,7 +79,7 @@ public class PushMessageService {
         Long applicationId;
         try {
             activationId = getActivationId(operation);
-        } catch (ActivationNotAvailableException e) {
+        } catch (ActivationNotConfiguredException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.noActivation");
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
@@ -212,12 +212,12 @@ public class PushMessageService {
      * @param operation Operation.
      * @return Activation ID.
      * @throws NextStepServiceException Throw when communication with Next Step service fails.
-     * @throws ActivationNotAvailableException Thrown when activation is not configured.
+     * @throws ActivationNotConfiguredException Thrown when activation is not configured.
      */
-    private String getActivationId(GetOperationDetailResponse operation) throws NextStepServiceException, ActivationNotAvailableException {
+    private String getActivationId(GetOperationDetailResponse operation) throws NextStepServiceException, ActivationNotConfiguredException {
         String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(operation.getUserId());
         if (configuredActivationId == null || configuredActivationId.isEmpty()) {
-            throw new ActivationNotAvailableException();
+            throw new ActivationNotConfiguredException();
         }
         return configuredActivationId;
     }
@@ -231,7 +231,7 @@ public class PushMessageService {
     private Long getApplicationId(String activationId) throws ActivationNotActiveException {
         GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(activationId);
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
-            throw new ActivationNotActiveException();
+            throw new ActivationNotActiveException(activationId);
         }
         return activationStatusResponse.getApplicationId();
     }

@@ -134,7 +134,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             // Get the list of operations for given user
@@ -204,7 +204,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
@@ -253,7 +253,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
