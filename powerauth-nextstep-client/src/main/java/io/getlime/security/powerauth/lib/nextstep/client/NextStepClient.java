@@ -40,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This service handles client communication with the Next Step server.
@@ -373,14 +374,16 @@ public class NextStepClient {
      *
      * @param userId User ID.
      * @param authMethod Authentication method.
+     * @param config Authentication method configuration.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod, Map<String, String> config) throws NextStepServiceException {
         try {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
+            request.setConfig(config);
             HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
             ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
