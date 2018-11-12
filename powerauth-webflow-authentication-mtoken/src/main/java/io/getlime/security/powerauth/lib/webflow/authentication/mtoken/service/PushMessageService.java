@@ -147,7 +147,6 @@ public class PushMessageService {
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);
         message.getAttributes().setPersonal(true);
-        message.getAttributes().setEncrypted(true);
 
         final OperationFormData formData = operation.getFormData();
 
@@ -189,7 +188,6 @@ public class PushMessageService {
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);
         message.getAttributes().setPersonal(true);
-        message.getAttributes().setEncrypted(true);
         message.getAttributes().setSilent(true);
 
         // Add information about operation
