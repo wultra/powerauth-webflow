@@ -37,7 +37,7 @@ import java.util.logging.Logger;
 /**
  * Controller which provides endpoints for SMS authorization.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/sms")

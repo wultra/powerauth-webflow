@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.data;
 /**
  * Generic (non-IBAN) account in operation data.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationGenericAccountAttribute extends OperationDataAttribute {
 

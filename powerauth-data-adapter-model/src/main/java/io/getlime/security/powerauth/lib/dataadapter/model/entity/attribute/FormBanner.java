@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.BannerTyp
 /**
  * Class representing a banner in an operation.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class FormBanner extends MessageAttribute {
 

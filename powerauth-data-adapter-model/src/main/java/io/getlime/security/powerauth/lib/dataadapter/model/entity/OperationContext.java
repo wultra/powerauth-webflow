@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 /**
  * Class representing context of an operation.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationContext {
 

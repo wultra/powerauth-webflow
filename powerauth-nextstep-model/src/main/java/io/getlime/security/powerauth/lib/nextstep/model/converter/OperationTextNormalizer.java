@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.converter;
 /**
  * Normalizer for text used in QR codes.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationTextNormalizer {
 

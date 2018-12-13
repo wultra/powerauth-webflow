@@ -33,7 +33,7 @@ import java.util.logging.Logger;
 /**
  * Service for sending push messages.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Component
 public class PushMessageService {

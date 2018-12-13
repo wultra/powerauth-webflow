@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -67,13 +67,13 @@ import java.util.logging.Logger;
 /**
  * Controller for offline authorization based on a QR code.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/token/offline")
 public class MobileTokenOfflineController extends AuthMethodController<QRCodeAuthenticationRequest, QRCodeAuthenticationResponse, AuthStepException> {
 
-    // See: https://github.com/lime-company/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#flags
+    // See: https://github.com/wultra/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#flags
     private static final String OFFLINE_MODE_ALLOW_BIOMETRY = "B";
     private static final int QR_CODE_SIZE = 250;
 

@@ -21,7 +21,7 @@ import java.util.Map;
  * Service that handles web socket to session pairing and notifying
  * clients about events.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Service
 public class WebSocketMessageService {
