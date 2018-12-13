@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 /**
  * Class representing information about third party.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class PartyInfo {
 

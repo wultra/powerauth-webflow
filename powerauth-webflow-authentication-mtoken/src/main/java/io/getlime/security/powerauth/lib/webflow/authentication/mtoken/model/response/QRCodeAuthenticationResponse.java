@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 /**
  * Response for QR code based authentication in offline mode for mobile token.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class QRCodeAuthenticationResponse extends AuthStepResponse {
 }

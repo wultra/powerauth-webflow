@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
 /**
  * Request for online mobile token authentication.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class MobileTokenAuthenticationRequest extends AuthStepRequest {
 }

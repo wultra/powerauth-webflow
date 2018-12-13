@@ -16,7 +16,7 @@ import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})

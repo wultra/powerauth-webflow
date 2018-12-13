@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * Operation form data represents data visible to the user during the operation and collected responses.
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class OperationFormData {
 

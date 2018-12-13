@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * Amount and currency in operation data.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationAmountAttribute extends OperationDataAttribute {
 

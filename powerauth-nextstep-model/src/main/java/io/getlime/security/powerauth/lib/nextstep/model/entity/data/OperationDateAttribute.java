@@ -7,7 +7,7 @@ import java.util.Date;
 /**
  * Date in operation data.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationDateAttribute extends OperationDataAttribute {
 

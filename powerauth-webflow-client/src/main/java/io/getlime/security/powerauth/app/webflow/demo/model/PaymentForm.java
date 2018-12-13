@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.app.webflow.demo.model;
 import java.math.BigDecimal;
 
 /**
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class PaymentForm {
 

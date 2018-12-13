@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * Class representing details of a bank account.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class BankAccountDetail {
 

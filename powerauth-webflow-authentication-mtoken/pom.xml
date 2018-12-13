@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright 2017 Lime - HighTech Solutions s.r.o.
+  ~ Copyright 2017 Wultra s.r.o.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-messaging</artifactId>
-            <version>4.3.14.RELEASE</version>
+            <version>4.3.21.RELEASE</version>
         </dependency>
 
         <!-- PowerAuth Dependencies -->
@@ -72,12 +72,12 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
-            <version>3.3.2</version>
+            <version>3.3.3</version>
         </dependency>
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.3.2</version>
+            <version>3.3.3</version>
         </dependency>
     </dependencies>
 

@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
 /**
  * Class representing party information.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class PartyInfo {
 
