@@ -14,8 +14,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Service that handles web socket to session pairing and notifying
@@ -27,7 +27,7 @@ import java.util.Map;
 public class WebSocketMessageService {
 
     private final SimpMessagingTemplate websocket;
-    private final Map<String, String> websocketIdToSessionMap;
+    private final ConcurrentMap<String, String> websocketIdToSessionMap;
 
     /**
      * Service constructor.
@@ -36,7 +36,7 @@ public class WebSocketMessageService {
     @Autowired
     public WebSocketMessageService(SimpMessagingTemplate websocket) {
         this.websocket = websocket;
-        websocketIdToSessionMap = new HashMap<>();
+        websocketIdToSessionMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -101,7 +101,7 @@ public class WebSocketMessageService {
      * @param webSocketId Web socket ID
      * @return Session ID.
      */
-    public synchronized String getSessionId(String webSocketId) {
+    public String getSessionId(String webSocketId) {
         return websocketIdToSessionMap.get(webSocketId);
     }
 
@@ -111,7 +111,7 @@ public class WebSocketMessageService {
      * @param webSocketId Web Socket ID.
      * @param sessionId Session ID.
      */
-    public synchronized void putWebSocketSession(String webSocketId, String sessionId) {
+    public void putWebSocketSession(String webSocketId, String sessionId) {
         websocketIdToSessionMap.put(webSocketId, sessionId);
     }
 
@@ -120,7 +120,7 @@ public class WebSocketMessageService {
      *
      * @param operationId Operation ID.
      */
-    public synchronized void removeWebSocketSession(String operationId) {
+    public void removeWebSocketSession(String operationId) {
         websocketIdToSessionMap.remove(generateWebSocketId(operationId));
     }
 
