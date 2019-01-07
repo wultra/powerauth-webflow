@@ -14,8 +14,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Service that handles web socket to session pairing and notifying
@@ -27,7 +27,7 @@ import java.util.Map;
 public class WebSocketMessageService {
 
     private final SimpMessagingTemplate websocket;
-    private final Map<String, String> websocketIdToSessionMap;
+    private final ConcurrentMap<String, String> websocketIdToSessionMap;
 
     /**
      * Service constructor.
@@ -36,7 +36,7 @@ public class WebSocketMessageService {
     @Autowired
     public WebSocketMessageService(SimpMessagingTemplate websocket) {
         this.websocket = websocket;
-        websocketIdToSessionMap = new HashMap<>();
+        websocketIdToSessionMap = new ConcurrentHashMap<>();
     }
 
     /**
@@ -60,7 +60,7 @@ public class WebSocketMessageService {
      */
     public void notifyAuthorizationComplete(String operationId, AuthResult authResult) {
         final String webSocketId = generateWebSocketId(operationId);
-        final String sessionId = websocketIdToSessionMap.get(webSocketId);
+        final String sessionId = getSessionId(webSocketId);
         WebSocketAuthorizationResponse authorizationResponse = new WebSocketAuthorizationResponse();
         authorizationResponse.setWebSocketId(webSocketId);
         authorizationResponse.setAuthResult(authResult);
@@ -93,6 +93,16 @@ public class WebSocketMessageService {
         WebSocketRegistrationResponse registrationResponse = new WebSocketRegistrationResponse();
         registrationResponse.setWebSocketId(webSocketId);
         websocket.convertAndSendToUser(sessionId, "/topic/registration", registrationResponse, createHeaders(sessionId));
+    }
+
+    /**
+     * Get session ID for given Web Socket ID.
+     *
+     * @param webSocketId Web socket ID
+     * @return Session ID.
+     */
+    public String getSessionId(String webSocketId) {
+        return websocketIdToSessionMap.get(webSocketId);
     }
 
     /**

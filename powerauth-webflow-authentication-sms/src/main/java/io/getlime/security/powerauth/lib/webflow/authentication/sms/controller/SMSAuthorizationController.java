@@ -71,7 +71,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final GetOperationDetailResponse operation = getOperation();
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
         checkOperationExpiration(operation);
-        final Object messageId = httpSession.getAttribute(MESSAGE_ID);
+        final Object messageId;
+        synchronized (httpSession.getServletContext()) {
+            messageId = httpSession.getAttribute(MESSAGE_ID);
+        }
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
             throw new InvalidRequestException("Message ID is missing.");
@@ -80,7 +83,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode(), operationContext);
-            httpSession.removeAttribute(MESSAGE_ID);
+            synchronized (httpSession.getServletContext()) {
+                httpSession.removeAttribute(MESSAGE_ID);
+            }
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
             return operation.getUserId();
         } catch (DataAdapterClientErrorException e) {
@@ -134,7 +139,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
                     LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
-            httpSession.setAttribute(MESSAGE_ID, messageId);
+            synchronized (httpSession.getServletContext()) {
+                httpSession.setAttribute(MESSAGE_ID, messageId);
+            }
             initResponse.setResult(AuthStepResult.CONFIRMED);
             Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
             return initResponse;
@@ -215,7 +222,9 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            httpSession.removeAttribute(MESSAGE_ID);
+            synchronized (httpSession.getServletContext()) {
+                httpSession.removeAttribute(MESSAGE_ID);
+            }
             cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);

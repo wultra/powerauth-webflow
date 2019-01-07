@@ -347,6 +347,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation continue with ID started, operation ID: {0}", operationId);
         try {
             final GetOperationDetailResponse operation = getOperation(operationId);
+            if (operation == null) {
+                // Next step call failed, next step could not be decided
+                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation failed because operation could not be retreived, operation ID: {0}", operationId);
+                return provider.failedAuthentication(null, "Operation is not available");
+            }
             // check whether session is already initiated - page refresh could cause double initialization
             // if it is not initiated yet, persist operation to session mapping
             OperationSessionEntity operationSessionEntity = operationSessionService.getOperationToSessionMapping(operationId);

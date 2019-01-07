@@ -345,11 +345,15 @@ public class StepResolutionService {
      * @return Number of remaining authentication attempts. Null value returned for no limit.
      */
     public Integer getNumberOfRemainingAttempts(OperationEntity operation) {
-        AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getRequestAuthMethod();
+        OperationHistoryEntity currentOperationHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentOperationHistory == null) {
+            return null;
+        }
+        AuthMethod authMethod = currentOperationHistory.getRequestAuthMethod();
         // in case authentication method previously failed, it is already failed
         for (OperationHistoryEntity history : operation.getOperationHistory()) {
             if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED) {
-                return 0;
+                return null;
             }
         }
         // check whether authMethod supports check of authorization failure count
@@ -407,7 +411,7 @@ public class StepResolutionService {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
-        if (currentOperationHistory.getResponseResult() == AuthResult.CONTINUE) {
+        if (currentOperationHistory != null && currentOperationHistory.getResponseResult() == AuthResult.CONTINUE) {
             // do not check operation continuity for cancellation requests from INIT authentication method (done when new operation superseeds previous one)
             if (!(request.getAuthMethod() == AuthMethod.INIT && request.getAuthStepResult() == AuthStepResult.CANCELED)) {
                 boolean stepAuthMethodValid = false;
