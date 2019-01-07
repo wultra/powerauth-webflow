@@ -57,7 +57,9 @@ public class AuthenticationManagementService {
     private void setPendingUserAuthentication(UserOperationAuthentication auth) {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
-        session.setAttribute(PENDING_AUTH_OBJECT, auth);
+        synchronized (session.getServletContext()) {
+            session.setAttribute(PENDING_AUTH_OBJECT, auth);
+        }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "PENDING_AUTH_OBJECT was added into HTTP session");
     }
 
@@ -80,7 +82,9 @@ public class AuthenticationManagementService {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Security context was cleared");
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
-        session.removeAttribute(PENDING_AUTH_OBJECT);
+        synchronized (session.getServletContext()) {
+            session.removeAttribute(PENDING_AUTH_OBJECT);
+        }
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "PENDING_AUTH_OBJECT was removed from HTTP session");
 
     }

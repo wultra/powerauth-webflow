@@ -342,14 +342,16 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
         // Convert mobile token mode to AllowedSignatureType object
         GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
-        OperationConverter operationConverter = new OperationConverter();
-        AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
 
-        // Set flags based on signature type variants
         String flags = "";
-        if (allowedSignatureType != null && allowedSignatureType.getVariants() != null
-                && allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString())) {
-            flags = OFFLINE_MODE_ALLOW_BIOMETRY;
+        if (operationConfig != null) {
+            OperationConverter operationConverter = new OperationConverter();
+            AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
+            // Set flags based on signature type variants
+            if (allowedSignatureType != null && allowedSignatureType.getVariants() != null
+                    && allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString())) {
+                flags = OFFLINE_MODE_ALLOW_BIOMETRY;
+            }
         }
 
         // Construct offline signature data payload as {OPERATION_ID}\n{TITLE}\n{MESSAGE}\n{OPERATION_DATA}\n{FLAGS}

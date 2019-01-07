@@ -60,7 +60,7 @@ public class WebSocketMessageService {
      */
     public void notifyAuthorizationComplete(String operationId, AuthResult authResult) {
         final String webSocketId = generateWebSocketId(operationId);
-        final String sessionId = websocketIdToSessionMap.get(webSocketId);
+        final String sessionId = getSessionId(webSocketId);
         WebSocketAuthorizationResponse authorizationResponse = new WebSocketAuthorizationResponse();
         authorizationResponse.setWebSocketId(webSocketId);
         authorizationResponse.setAuthResult(authResult);
@@ -96,12 +96,22 @@ public class WebSocketMessageService {
     }
 
     /**
+     * Get session ID for given Web Socket ID.
+     *
+     * @param webSocketId Web socket ID
+     * @return Session ID.
+     */
+    public synchronized String getSessionId(String webSocketId) {
+        return websocketIdToSessionMap.get(webSocketId);
+    }
+
+    /**
      * Relate a new web socket identifier to the session with given ID.
      *
      * @param webSocketId Web Socket ID.
      * @param sessionId Session ID.
      */
-    public void putWebSocketSession(String webSocketId, String sessionId) {
+    public synchronized void putWebSocketSession(String webSocketId, String sessionId) {
         websocketIdToSessionMap.put(webSocketId, sessionId);
     }
 
@@ -110,7 +120,7 @@ public class WebSocketMessageService {
      *
      * @param operationId Operation ID.
      */
-    public void removeWebSocketSession(String operationId) {
+    public synchronized void removeWebSocketSession(String operationId) {
         websocketIdToSessionMap.remove(generateWebSocketId(operationId));
     }
 

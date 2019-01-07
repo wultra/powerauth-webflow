@@ -280,7 +280,7 @@ public class OperationPersistenceService {
             return steps;
         }
         // get steps from the current response
-        String responseSteps = operation.getCurrentOperationHistoryEntity().getResponseSteps();
+        String responseSteps = currentHistory.getResponseSteps();
         if (responseSteps == null) {
             return steps;
         }

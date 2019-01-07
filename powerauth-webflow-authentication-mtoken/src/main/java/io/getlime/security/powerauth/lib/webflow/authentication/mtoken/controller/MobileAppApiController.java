@@ -139,6 +139,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Get the list of operations for given user
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
+            if (operationList == null) {
+                // Next step operation failed, return empty operation list
+                return new ObjectResponse<>(new OperationListResponse());
+            }
             final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
 
             // Prepare converter
@@ -295,6 +299,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
         // Get configuration for operation with given name
         final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+
+        if (operationConfig == null) {
+            // Next step request failed, cannot decide
+            return false;
+        }
 
         // Convert loose JSON format to AllowedSignatureType structure
         OperationConverter operationConverter = new OperationConverter();
