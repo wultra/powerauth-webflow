@@ -15,14 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service for configuring SSL parameters for HTTPS connections.
@@ -31,6 +31,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class SSLConfigurationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SSLConfigurationService.class);
 
     /**
      * Whether trusting invalid SSL certificates is already enabled.
@@ -68,8 +70,7 @@ public class SSLConfigurationService {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             trustAllCertificatesEnabled = true;
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while setting SSL socket factory",
                     e
             );
