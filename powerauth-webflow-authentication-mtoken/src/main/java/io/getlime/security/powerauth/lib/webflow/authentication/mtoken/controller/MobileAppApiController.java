@@ -43,6 +43,8 @@ import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAu
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,8 +55,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This controller presents endpoints that are consumed by the native mobile app,
@@ -65,6 +65,8 @@ import java.util.logging.Logger;
 @Controller
 @RequestMapping(value = "/api/auth/token/app")
 public class MobileAppApiController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MobileAppApiController.class);
 
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
@@ -283,7 +285,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 return true;
             }
         } catch (NextStepServiceException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not verify activationId", ex);
+            logger.error("Could not verify activationId", ex);
         }
         return false;
     }

@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
@@ -29,8 +31,6 @@ import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service which localizes and translates form data messages.
@@ -39,6 +39,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class MessageTranslationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MessageTranslationService.class);
 
     private final I18NService i18NService;
     private final ValueFormatterService valueFormatterService;
@@ -210,7 +212,7 @@ public class MessageTranslationService {
         try {
             return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Localization key is missing: "+i18nKey);
+            logger.debug("Localization key is missing: "+i18nKey);
             return MISSING_KEY_MESSAGE+": "+i18nKey;
         }
     }

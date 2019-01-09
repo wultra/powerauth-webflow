@@ -24,15 +24,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlrea
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Handler for mobile token related exceptions.
@@ -46,8 +45,10 @@ public class MobileApiExceptionResolver {
 
     static final int PRECEDENCE = -101;
 
+    private final Logger logger = LoggerFactory.getLogger(MobileApiExceptionResolver.class);
+
     private ErrorResponse error(String code, Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Mobile Token API component", t);
+        logger.warn("Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error(code, t.getMessage()));
     }
 
@@ -105,7 +106,7 @@ public class MobileApiExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
         // Special handling of invalid activation exception because this is a very common error
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, t.getMessage());
+        logger.info(t.getMessage());
         return new ErrorResponse(new Error(ErrorCode.INVALID_ACTIVATION, t.getMessage()));
     }
 

@@ -18,14 +18,13 @@ package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller advice responsible for authentication exceptions.
@@ -34,6 +33,8 @@ import java.util.logging.Logger;
  */
 @ControllerAdvice
 public class AuthenticationExceptionResolver {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationExceptionResolver.class);
 
     /**
      * Handling of AuthStepException.
@@ -44,7 +45,7 @@ public class AuthenticationExceptionResolver {
     @ExceptionHandler(AuthStepException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
+        logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
         // Web Flow returns message ID for front-end localization instead of message.
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);

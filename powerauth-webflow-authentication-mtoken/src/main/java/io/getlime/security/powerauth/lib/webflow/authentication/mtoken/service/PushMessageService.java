@@ -20,6 +20,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhand
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
@@ -27,8 +29,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service for sending push messages.
@@ -37,6 +37,8 @@ import java.util.logging.Logger;
  */
 @Component
 public class PushMessageService {
+
+    private final Logger logger = LoggerFactory.getLogger(PushMessageService.class);
 
     private static final String PUSH_MESSAGE_TYPE = "messageType";
     private static final String PUSH_MESSAGE_TYPE_MTOKEN_INIT = "mtoken.operationInit";
@@ -82,7 +84,7 @@ public class PushMessageService {
         } catch (ActivationNotConfiguredException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.noActivation");
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), authMethod.toString()});
             return initResponse;
         }
 
@@ -91,26 +93,26 @@ public class PushMessageService {
         } catch (ActivationNotActiveException e) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.activationNotActive");
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), authMethod.toString()});
             return initResponse;
         }
 
         try {
             final PushMessage message = createAuthStepInitPushMessage(operation, activationId, authMethod);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Send init push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), authMethod.toString()});
+            logger.info("Send init push message, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), authMethod.toString()});
             final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(applicationId, message);
             if (response.getStatus().equals(Response.Status.OK)) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
+                logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), authMethod.toString()});
             } else {
                 initResponse.setResult(AuthStepResult.AUTH_FAILED);
                 initResponse.setMessage("pushMessage.fail");
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
+                logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), authMethod.toString()});
             }
         } catch (PushServerClientException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.fail");
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), authMethod.toString()});
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), authMethod.toString()});
         }
         return initResponse;
     }
@@ -126,11 +128,11 @@ public class PushMessageService {
             String activationId = getActivationId(operation);
             PushMessage message = createAuthStepFinishedPushMessage(operation, activationId, statusMessage, authMethod);
             Long applicationId = getApplicationId(activationId);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Send step finished push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), authMethod.toString()});
+            logger.info("Send step finished push message, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), authMethod.toString()});
             pushServerClient.sendPushMessage(applicationId, message);
         } catch (Exception ex) {
             // Exception which occurs when push message is sent is not critical, return regular response.
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Mobile Token API component", ex);
+            logger.error("Error occurred in Mobile Token API component", ex);
         }
     }
 
@@ -142,7 +144,7 @@ public class PushMessageService {
      * @return Constructed push message.
      */
     private PushMessage createAuthStepInitPushMessage(GetOperationDetailResponse operation, String activationId, AuthMethod authMethod) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Create init push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), authMethod.toString()});
+        logger.info("Create init push message, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), authMethod.toString()});
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);
@@ -183,7 +185,7 @@ public class PushMessageService {
      * @return Constructed push message.
      */
     private PushMessage createAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String activationId, String statusMessage, AuthMethod authMethod) {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Create step finished push message, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), authMethod.toString()});
+        logger.info("Create step finished push message, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), authMethod.toString()});
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);

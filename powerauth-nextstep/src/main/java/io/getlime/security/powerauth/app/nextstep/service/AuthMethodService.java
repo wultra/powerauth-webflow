@@ -24,6 +24,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPr
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This service handles querying of user authentication methods and enabling/disabling them.
@@ -42,6 +42,8 @@ import java.util.logging.Logger;
  */
 @Service
 public class AuthMethodService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthMethodService.class);
 
     private final AuthMethodRepository authMethodRepository;
     private final UserPrefsRepository userPrefsRepository;
@@ -102,7 +104,7 @@ public class AuthMethodService {
                             MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
                             configMap = objectMapper.readValue(config, mapType);
                         } catch (IOException e) {
-                            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing config", e);
+                            logger.error("Error while deserializing config", e);
                             configMap = new HashMap<>();
                         }
                         // add method in case it is enabled in user prefs
@@ -150,7 +152,7 @@ public class AuthMethodService {
         try {
             configAsStr = objectMapper.writeValueAsString(config);
         } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing config", e);
+            logger.error("Error while serializing config", e);
             configAsStr = "{}";
         }
         UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);

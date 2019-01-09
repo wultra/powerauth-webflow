@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.app.webflow.demo.configuration;
 
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,8 +27,6 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Demo application configuration.
@@ -35,6 +35,8 @@ import java.util.logging.Logger;
  */
 @Configuration
 public class WebFlowServiceConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebFlowServiceConfiguration.class);
 
     @Value("${powerauth.webflow.service.url}")
     private String webFlowServiceUrl;
@@ -162,8 +164,7 @@ public class WebFlowServiceConfiguration {
             sc.init(null, trustAllCerts, new java.security.SecureRandom());
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while setting SSL socket factory",
                     e
             );
