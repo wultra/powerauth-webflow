@@ -6,7 +6,7 @@ Typical use-case for the software stack is securing the RESTful API interfaces, 
 
 ## Documentation
 
-Visit our wiki for [technical details about PowerAuth 2.0 Web Flow](https://github.com/wultra/powerauth-webflow/wiki).
+For the most recent documentation and tutorials, please visit [PowerAuth Web Flow Documentation](./docs/Home.md).
 
 ## License
 
