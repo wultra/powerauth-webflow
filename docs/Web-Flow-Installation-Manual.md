@@ -74,7 +74,7 @@ Edit "/opt/tomcat/conf/server.xml" so that the HTTP connector has the correct IP
 
 ### Create database schema - MySQL
 
-* Create a new database or reuse an existing PowerAuth 2.0 database.
+* Create a new database or reuse an existing PowerAuth database.
 * Run the [create_schema.sql](./sql/mysql/create_schema.sql) script to create tables.
 * Run the [initial_data.sql](./sql/mysql/initial_data.sql) script to load initial data.
 
@@ -82,7 +82,7 @@ For more details see document [Database Table Structure](./Database-Table-Struct
 
 ### Create database schema - Oracle
 
-* Create a new database or reuse an existing PowerAuth 2.0 database.
+* Create a new database or reuse an existing PowerAuth database.
 * Run the [create_schema.sql](./sql/oracle/create_schema.sql) script to create tables.
 * Run the [initial_data.sql](./sql/oracle/initial_data.sql) script to load initial data.
 
@@ -92,7 +92,7 @@ For more details see document [Database Table Structure](./Database-Table-Struct
 
 Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, update configurations in the files to reflect expected values. Make sure to use absolute URLs, not references to `localhost`, for example:
 
-`<Parameter name="powerauth.credentials.service.url" value="http://10.x.x.x:8080/powerauth-credential-server-sample"/>`
+`<Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>`
 
 `<Parameter name="powerauth.nextstep.service.url" value="http://10.x.x.x:8080/powerauth-nextstep"/>`
 
@@ -102,25 +102,25 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth 2.0 Credential Service URL -->
-    <Parameter name="powerauth.credentials.service.url" value="http://10.x.x.x:8080/powerauth-credential-server-sample"/>
+    <!-- PowerAuth Credential Service URL -->
+    <Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>
 
-    <!-- PowerAuth 2.0 Next Step Service URL -->
+    <!-- PowerAuth Next Step Service URL -->
     <Parameter name="powerauth.nextstep.service.url" value="http://10.x.x.x:8080/powerauth-nextstep"/>
 
-    <!-- PowerAuth 2.0 Server Service URL -->
+    <!-- PowerAuth Server Service URL -->
     <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
 
-    <!-- PowerAuth 2.0 Server Service Security Settings -->
+    <!-- PowerAuthServer Service Security Settings -->
     <Parameter name="powerauth.service.security.clientToken" value=""/>
     <Parameter name="powerauth.service.security.clientSecret" value=""/>
     <Parameter name="powerauth.service.ssl.acceptInvalidSslCertificate" value="false"/>
 
-    <!-- PowerAuth 2.0 Push Server URL -->
+    <!-- PowerAuth Push Server URL -->
     <Parameter name="powerauth.push.service.url" value="http://10.x.x.x:8080/powerauth-push-server"/>
     <Parameter name="powerauth.push.service.appId" value="2"/>
 
-    <!-- PowerAuth 2.0 WebFlow Page Customization -->
+    <!-- PowerAuth WebFlow Page Customization -->
     <Parameter name="powerauth.webflow.page.title" value="XYZ Bank - Web Authentication"/>
     <Parameter name="powerauth.webflow.page.ext-resources.location" value="file:/opt/ext-resources/"/>
     <Parameter name="powerauth.webflow.page.custom-css.url" value=""/>
@@ -152,7 +152,7 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 
     <!-- Application Configuration -->
     <Parameter name="powerauth.service.applicationName" value="powerauth"/>
-    <Parameter name="powerauth.service.applicationDisplayName" value="PowerAuth 2.0 Server"/>
+    <Parameter name="powerauth.service.applicationDisplayName" value="PowerAuth Server"/>
     <Parameter name="powerauth.service.applicationEnvironment" value=""/>
 
     <!-- Security Configuration -->
@@ -167,7 +167,7 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth 2.0 Server Service URL -->
+    <!-- PowerAuth Server Service URL -->
     <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
 
 </Context>
@@ -196,10 +196,10 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth 2.0 Server Service URL -->
+    <!-- PowerAuth Server Service URL -->
     <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
 
-    <!-- PowerAuth 2.0 Server Service Security Settings -->
+    <!-- PowerAuth Server Service Security Settings -->
     <Parameter name="powerauth.service.security.clientToken" value=""/>
     <Parameter name="powerauth.service.security.clientSecret" value=""/>
     <Parameter name="powerauth.service.ssl.acceptInvalidSslCertificate" value="false"/>
@@ -224,14 +224,14 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth 2.0 OAuth 2.0 API Config -->
+    <!-- PowerAuth OAuth 2.0 API Config -->
     <Parameter name="powerauth.webflow.service.url" value="http://10.x.x.x:8080/powerauth-webflow"/>
     <Parameter name="powerauth.webflow.service.oauth.authorizeUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/authorize"/>
     <Parameter name="powerauth.webflow.service.oauth.tokenUrl" value="http://10.x.x.x:8080/powerauth-webflow/oauth/token"/>
     <Parameter name="powerauth.webflow.service.oauth.clientId" value="foo"/>
     <Parameter name="powerauth.webflow.service.oauth.clientSecret" value="bar"/>
 
-    <!-- PowerAuth 2.0 Next Step Config -->
+    <!-- PowerAuth Next Step Config -->
     <Parameter name="powerauth.nextstep.service.url" value="http://10.x.x.x:8080/powerauth-nextstep"/>
 
     <!-- Database Configuration - JDBC -->

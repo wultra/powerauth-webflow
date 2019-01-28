@@ -31,7 +31,7 @@ http[s]://[host]:[port]/powerauth-nextstep/swagger-ui.html
 
 ## Status codes and error handling
 
-PowerAuth 2.0 Web Auth Server uses a unified format for error response body, accompanied with an appropriate HTTP status code. Besides the HTTP error codes that application server may return regardless of server application (such as 404 when resource is not found or 503 when server is down).
+PowerAuth Web Flow Server uses a unified format for error response body, accompanied with an appropriate HTTP status code. Besides the HTTP error codes that application server may return regardless of server application (such as 404 when resource is not found or 503 when server is down).
 
 The list of error status codes:
 
@@ -74,7 +74,7 @@ Get a system status response, with basic information about the running applicati
     "status" : "OK",
     "responseObject": {
         "applicationName" : "powerauth-nextstep",
-        "applicationDisplayName" : "PowerAuth 2.0 Next Step Server",
+        "applicationDisplayName" : "PowerAuth Next Step Server",
         "applicationEnvironment" : "",
         "version" : "0.20.0",
         "buildTime" : "2017-03-11T09:34:52Z",

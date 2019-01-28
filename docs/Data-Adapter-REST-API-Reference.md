@@ -59,7 +59,7 @@ Get a system status response, with basic information about the running applicati
     "status" : "OK",
     "responseObject": {
         "applicationName" : "powerauth-data-adapter",
-        "applicationDisplayName" : "PowerAuth 2.0 Data Adapter",
+        "applicationDisplayName" : "PowerAuth Data Adapter",
         "applicationEnvironment" : "",
         "version": "0.20.0",
         "buildTime": "2017-03-11T11:24:33Z",

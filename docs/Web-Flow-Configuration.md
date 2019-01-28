@@ -22,18 +22,18 @@ powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
 # Next Step Server Service URL
 powerauth.nextstep.service.url=http://localhost:8080/powerauth-nextstep
 
-# PowerAuth 2.0 Server URL
+# PowerAuth Server URL
 powerauth.service.url=http://localhost:8080/powerauth-java-server/soap
 powerauth.service.security.clientToken=
 powerauth.service.security.clientSecret=
 # Whether invalid SSL certificates should be accepted
 powerauth.service.ssl.acceptInvalidSslCertificate=false
 
-# PowerAuth 2.0 Push Server URL
+# PowerAuth Push Server URL
 powerauth.push.service.url=http://localhost:8080/powerauth-push-server
 
 # Dynamic CSS stylesheet URL
-powerauth.webflow.page.title=PowerAuth 2.0 Web Flow
+powerauth.webflow.page.title=PowerAuth Web Flow
 powerauth.webflow.page.ext-resources.location=classpath:/static/resources/
 powerauth.webflow.page.custom-css.url=
 
@@ -62,7 +62,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Application Service Configuration
 powerauth.webflow.service.applicationName=powerauth-webflow
-powerauth.webflow.service.applicationDisplayName=PowerAuth 2.0 Web Flow Server
+powerauth.webflow.service.applicationDisplayName=PowerAuth Web Flow Server
 powerauth.webflow.service.applicationEnvironment=
 
 # Configuration of Offline mode
@@ -104,7 +104,7 @@ powerauth.nextstep.operation.expirationTimeInSeconds=300
 
 # Application Service Configuration
 powerauth.nextstep.service.applicationName=powerauth-nextstep
-powerauth.nextstep.service.applicationDisplayName=PowerAuth 2.0 Next Step Server
+powerauth.nextstep.service.applicationDisplayName=PowerAuth Next Step Server
 powerauth.nextstep.service.applicationEnvironment=
 ```
 
@@ -146,7 +146,7 @@ powerauth.authorization.sms-otp.max-verify-tries-per-message=5
 
 # Application Service Configuration
 powerauth.dataAdapter.service.applicationName=powerauth-data-adapter
-powerauth.dataAdapter.service.applicationDisplayName=PowerAuth 2.0 Data Adapter
+powerauth.dataAdapter.service.applicationDisplayName=PowerAuth Data Adapter
 powerauth.dataAdapter.service.applicationEnvironment=
 ```
 
@@ -176,7 +176,7 @@ powerauth.service.ssl.acceptInvalidSslCertificate=false
 
 # Application Service Configuration
 powerauth.webflow.client.service.applicationName=powerauth-webflow-client
-powerauth.webflow.client.service.applicationDisplayName=PowerAuth 2.0 Web Flow Client
+powerauth.webflow.client.service.applicationDisplayName=PowerAuth Web Flow Client
 powerauth.webflow.client.service.applicationEnvironment=
 ```
 
