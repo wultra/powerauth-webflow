@@ -222,6 +222,7 @@ Reject an operation with given ID, with a provided reason.
 | `KEY_VALUE` | Form field representing a key value item, where items are displayed next to each other. This realistically impose limitation on value length - it should fit into the single line. |
 | `NOTE` | Form field representing a generic text note, where label is displayed above the note. As a result, note can be of an arbitrary length and can be multi-line. |
 | `HEADING` | Form field representing a heading, where label is displayed as the heading text. |
+| `PARTY_INFO` | Form field representing a structured object with information about a third party. |
 
 ### Operation Rejection Reasons
 
