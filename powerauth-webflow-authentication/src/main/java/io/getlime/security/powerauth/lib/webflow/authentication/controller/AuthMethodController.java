@@ -351,7 +351,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final GetOperationDetailResponse operation = getOperation(operationId);
             if (operation == null) {
                 // Next step call failed, next step could not be decided
-                logger.info("Operation failed because operation could not be retreived, operation ID: {}", operationId);
+                logger.info("Operation failed because operation could not be retrieved, operation ID: {}", operationId);
                 return provider.failedAuthentication(null, "Operation is not available");
             }
             // check whether session is already initiated - page refresh could cause double initialization
