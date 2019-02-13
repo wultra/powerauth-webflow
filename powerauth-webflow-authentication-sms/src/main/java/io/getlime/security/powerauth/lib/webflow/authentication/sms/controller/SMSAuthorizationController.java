@@ -71,7 +71,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        logger.info("Step authentication started, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         final Object messageId;
         synchronized (httpSession.getServletContext()) {
@@ -88,7 +88,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             synchronized (httpSession.getServletContext()) {
                 httpSession.removeAttribute(MESSAGE_ID);
             }
-            logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return operation.getUserId();
         } catch (DataAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
@@ -130,7 +130,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        logger.info("Init step started, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
 
@@ -145,12 +145,12 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 httpSession.setAttribute(MESSAGE_ID, messageId);
             }
             initResponse.setResult(AuthStepResult.CONFIRMED);
-            logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return initResponse;
         } catch (DataAdapterClientErrorException e) {
             logger.error("Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             initResponse.setMessage(e.getMessage());
             return initResponse;
         }
@@ -193,7 +193,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
             });
@@ -231,7 +231,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return cancelResponse;
         } catch (NextStepServiceException e) {
             logger.error("Error when canceling SMS message validation.", e);

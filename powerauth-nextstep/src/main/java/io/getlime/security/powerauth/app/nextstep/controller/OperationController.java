@@ -87,16 +87,16 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException {
-        logger.info("Received createOperation request, operation ID: {}, operation name: {}", new String[] {request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName()});
+        logger.info("Received createOperation request, operation ID: {}, operation name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName());
         // resolve response based on dynamic step definitions
         CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist new operation
         operationPersistenceService.createOperation(request.getRequestObject(), response);
 
-        logger.info("The createOperation request succeeded, operation ID: {}, result: {}", new String[]{response.getOperationId(), response.getResult().toString()});
+        logger.info("The createOperation request succeeded, operation ID: {}, result: {}", response.getOperationId(), response.getResult().toString());
         for (AuthStep step: response.getSteps()) {
-            logger.info("Next authentication method for operation ID: {}, authentication method: {}", new String[]{response.getOperationId(), step.getAuthMethod().toString()});
+            logger.info("Next authentication method for operation ID: {}, authentication method: {}", response.getOperationId(), step.getAuthMethod().toString());
         }
         return new ObjectResponse<>(response);
     }
@@ -117,9 +117,9 @@ public class OperationController {
         // persist operation update
         operationPersistenceService.updateOperation(request.getRequestObject(), response);
 
-        logger.info("The updateOperation request succeeded, operation ID: {}, result: {}", new String[]{response.getOperationId(), response.getResult().toString()});
+        logger.info("The updateOperation request succeeded, operation ID: {}, result: {}", response.getOperationId(), response.getResult().toString());
         for (AuthStep step: response.getSteps()) {
-            logger.info("Next authentication method for operation ID: {}, authentication method: {}", new String[]{response.getOperationId(), step.getAuthMethod().toString()});
+            logger.info("Next authentication method for operation ID: {}, authentication method: {}", response.getOperationId(), step.getAuthMethod().toString());
         }
         return new ObjectResponse<>(response);
     }
@@ -207,7 +207,7 @@ public class OperationController {
     @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getPendingOperations request, user ID: {}, authentication method: {}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
+        logger.debug("Received getPendingOperations request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
 
         GetPendingOperationsRequest requestObject = request.getRequestObject();
 
@@ -263,7 +263,7 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
     public @ResponseBody Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
-        logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", new String[]{request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString()});
+        logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         logger.debug("The updateChosenAuthMethod request succeeded");

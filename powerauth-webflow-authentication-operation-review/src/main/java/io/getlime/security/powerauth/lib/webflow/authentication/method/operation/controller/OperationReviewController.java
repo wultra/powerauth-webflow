@@ -95,10 +95,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        logger.info("Step authentication started, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
-        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return operation.getUserId();
     }
 
@@ -164,7 +164,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
             });
@@ -196,7 +196,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
             final OperationReviewResponse response = new OperationReviewResponse();

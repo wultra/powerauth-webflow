@@ -78,14 +78,14 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     @Override
     protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
-        logger.info("Step authentication started, operation ID: {}, authentication method: {}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
-            logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", new String[] {operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString()});
+            logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString());
             return responseObject.getUserId();
         } catch (DataAdapterClientErrorException e) {
             Integer remainingAttemptsNS;
@@ -159,7 +159,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
             });
@@ -193,7 +193,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
