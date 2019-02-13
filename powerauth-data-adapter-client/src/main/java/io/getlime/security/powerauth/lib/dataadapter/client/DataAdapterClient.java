@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,26 +49,20 @@ import java.io.IOException;
  * It uses the RestTemplate class to handle REST API calls. HTTP client is used instead of default client
  * so that error responses contain full response bodies.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class DataAdapterClient {
 
-    private String serviceUrl;
-    private ObjectMapper objectMapper;
-
-    /**
-     * Default constructor.
-     */
-    public DataAdapterClient() {
-    }
+    private final String serviceUrl;
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
 
     /**
      * Create a new client with provided base URL.
      * @param serviceUrl Base URL.
      */
     public DataAdapterClient(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
-        this.objectMapper = new ObjectMapper();
+        this(serviceUrl, new ObjectMapper());
     }
 
     /**
@@ -79,16 +73,16 @@ public class DataAdapterClient {
     public DataAdapterClient(String serviceUrl, ObjectMapper objectMapper) {
         this.serviceUrl = serviceUrl;
         this.objectMapper = objectMapper;
+        restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     /**
-     * Prepare a default instance of REST client.
+     * Get default instance of REST client.
      * @return RestTemplate with default configuration.
      */
-    private RestTemplate defaultTemplate() {
-        RestTemplate template = new RestTemplate();
-        template.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        return template;
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
     }
 
     /**
@@ -105,7 +99,7 @@ public class DataAdapterClient {
             // Exchange authentication request with data adapter.
             AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC, operationContext);
             HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
+            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -131,7 +125,7 @@ public class DataAdapterClient {
             // Exchange user details with data adapter.
             UserDetailRequest request = new UserDetailRequest(userId);
             HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UserDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/auth/user/info", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
+            ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/info", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -161,7 +155,7 @@ public class DataAdapterClient {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
             HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
-            ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = defaultTemplate().exchange(
+            ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<CreateSMSAuthorizationResponse>>() {
                     });
@@ -190,7 +184,7 @@ public class DataAdapterClient {
         try {
             VerifySMSAuthorizationRequest request = new VerifySMSAuthorizationRequest(messageId, authorizationCode, operationContext);
             HttpEntity<ObjectRequest<VerifySMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            defaultTemplate().exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new Response();
         } catch (HttpStatusCodeException ex) {
@@ -219,7 +213,7 @@ public class DataAdapterClient {
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
             HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
-            ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = defaultTemplate().exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
+            ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -251,7 +245,7 @@ public class DataAdapterClient {
             request.setOperationContext(operationContext);
             request.setFormDataChange(formDataChange);
             HttpEntity<ObjectRequest<FormDataChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/api/operation/formdata/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -283,7 +277,7 @@ public class DataAdapterClient {
             request.setOperationContext(operationContext);
             request.setOperationChange(operationChange);
             HttpEntity<ObjectRequest<OperationChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/api/operation/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/api/operation/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Lime - HighTech Solutions s.r.o.
+ * Copyright 2018 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,10 +22,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlrea
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.PushRegistrationFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,13 +33,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Handler for mobile token related exceptions.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 
 @ControllerAdvice
@@ -48,8 +45,10 @@ public class MobileApiExceptionResolver {
 
     static final int PRECEDENCE = -101;
 
+    private final Logger logger = LoggerFactory.getLogger(MobileApiExceptionResolver.class);
+
     private ErrorResponse error(String code, Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Mobile Token API component", t);
+        logger.warn("Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error(code, t.getMessage()));
     }
 
@@ -76,6 +75,29 @@ public class MobileApiExceptionResolver {
     }
 
     /**
+     * Exception handler for activation not active exception.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(ActivationNotActiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleActivationNotActiveException(Throwable t) {
+        return error(ErrorCode.ACTIVATION_NOT_ACTIVE, t);
+    }
+
+
+    /**
+     * Exception handler for activation not configured exception.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(ActivationNotConfiguredException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleActivationNotConfiguredException(Throwable t) {
+        return error(ErrorCode.ACTIVATION_NOT_CONFIGURED, t);
+    }
+
+    /**
      * Exception handler for invalid activation exception.
      * @param t Throwable.
      * @return Response with error details.
@@ -83,7 +105,9 @@ public class MobileApiExceptionResolver {
     @ExceptionHandler(InvalidActivationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidActivationException(Throwable t) {
-        return error(ErrorCode.INVALID_ACTIVATION, t);
+        // Special handling of invalid activation exception because this is a very common error
+        logger.info(t.getMessage());
+        return new ErrorResponse(new Error(ErrorCode.INVALID_ACTIVATION, t.getMessage()));
     }
 
     /**

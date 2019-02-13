@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 /**
  * Converter for various attribute types.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class AttributeConverter {
 
@@ -42,15 +42,15 @@ public class AttributeConverter {
         switch (input.getType()) {
             case AMOUNT: {
                 OperationAmountFieldAttribute attr = (OperationAmountFieldAttribute) input;
-                return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValue());
+                return new AmountAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValues());
             }
             case KEY_VALUE: {
                 OperationKeyValueFieldAttribute attr = (OperationKeyValueFieldAttribute) input;
-                return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new KeyValueAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case NOTE: {
                 OperationNoteFieldAttribute attr = (OperationNoteFieldAttribute) input;
-                return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new NoteAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case BANK_ACCOUNT_CHOICE: {
                 OperationBankAccountChoiceFieldAttribute attr = (OperationBankAccountChoiceFieldAttribute) input;
@@ -62,7 +62,7 @@ public class AttributeConverter {
             }
             case HEADING: {
                 OperationHeadingFieldAttribute attr = (OperationHeadingFieldAttribute) input;
-                return new HeadingAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new HeadingAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromOperationValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case PARTY_INFO: {
                 OperationPartyInfoFieldAttribute attr = (OperationPartyInfoFieldAttribute) input;
@@ -86,15 +86,15 @@ public class AttributeConverter {
         switch (input.getType()) {
             case AMOUNT: {
                 AmountAttribute attr = (AmountAttribute) input;
-                return new OperationAmountFieldAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValue());
+                return new OperationAmountFieldAttribute(attr.getId(), attr.getLabel(), attr.getAmount(), attr.getCurrency(), attr.getCurrencyId(), attr.getFormattedValues());
             }
             case KEY_VALUE: {
                 KeyValueAttribute attr = (KeyValueAttribute) input;
-                return new OperationKeyValueFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new OperationKeyValueFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case NOTE: {
                 NoteAttribute attr = (NoteAttribute) input;
-                return new OperationNoteFieldAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new OperationNoteFieldAttribute(attr.getId(), attr.getLabel(), attr.getNote(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case BANK_ACCOUNT_CHOICE: {
                 BankAccountChoiceAttribute attr = (BankAccountChoiceAttribute) input;
@@ -106,7 +106,7 @@ public class AttributeConverter {
             }
             case HEADING: {
                 HeadingAttribute attr = (HeadingAttribute) input;
-                return new OperationHeadingFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValue());
+                return new OperationHeadingFieldAttribute(attr.getId(), attr.getLabel(), attr.getValue(), valueFormatTypeConverter.fromValueFormatType(attr.getValueFormatType()), attr.getFormattedValues());
             }
             case PARTY_INFO: {
                 PartyInfoAttribute attr = (PartyInfoAttribute) input;

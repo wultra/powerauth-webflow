@@ -1,10 +1,10 @@
 {
   "name": "powerauth-webflow",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Federated Authentication and Authorization Server for Web",
   "repository": {
     "type": "git",
-    "url": "git@github.com:lime-company/powerauth-webflow.git"
+    "url": "git@github.com:wultra/powerauth-webflow.git"
   },
   "keywords": [
     "security",
@@ -15,9 +15,9 @@
   "author": "Roman Strobl",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/lime-company/powerauth-webflow/issues"
+    "url": "https://github.com/wultra/powerauth-webflow/issues"
   },
-  "homepage": "https://github.com/lime-company/powerauth-webflow",
+  "homepage": "https://github.com/wultra/powerauth-webflow",
   "dependencies": {
     "axios": "^v0.16.1",
     "react": "^15.4.2",

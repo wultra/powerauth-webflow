@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,22 +15,24 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service for configuring SSL parameters for HTTPS connections.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
 public class SSLConfigurationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SSLConfigurationService.class);
 
     /**
      * Whether trusting invalid SSL certificates is already enabled.
@@ -68,8 +70,7 @@ public class SSLConfigurationService {
             HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
             trustAllCertificatesEnabled = true;
         } catch (Exception e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while setting SSL socket factory",
                     e
             );

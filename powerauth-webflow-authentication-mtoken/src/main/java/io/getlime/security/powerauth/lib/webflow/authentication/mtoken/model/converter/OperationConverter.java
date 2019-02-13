@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,17 +19,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.Operation;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Converter for the Operation objects used for mobile API.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class OperationConverter {
+
+    private static final Logger logger = LoggerFactory.getLogger(OperationConverter.class);
 
     private final FormDataConverter formDataConverter = new FormDataConverter();
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +67,7 @@ public class OperationConverter {
         try {
             allowedSignatureType = objectMapper.readValue(mobileTokenMode, AllowedSignatureType.class);
         } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while deserializing mobile token mode", e);
+            logger.error("Error while deserializing mobile token mode", e);
             return null;
         }
         return allowedSignatureType;

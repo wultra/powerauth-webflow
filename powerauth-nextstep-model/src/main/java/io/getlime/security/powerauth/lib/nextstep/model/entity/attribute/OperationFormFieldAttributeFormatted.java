@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Lime - HighTech Solutions s.r.o.
+ * Copyright 2018 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,19 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Class that represents a formatted form field attribute. Formatting is done based on value format type.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttribute {
 
     protected ValueFormatType valueFormatType;
 
-    protected String formattedValue;
+    protected Map<String, String> formattedValues = new HashMap<>();
 
     /**
      * Get value format type of this attribute.
@@ -37,19 +40,20 @@ public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttr
     }
 
     /**
-     * Get formatted value of this attribute.
+     * Get formatted values for this attribute.
      * @return Formatted value.
      */
-    public String getFormattedValue() {
-        return formattedValue;
+    public Map<String, String> getFormattedValues() {
+        return formattedValues;
     }
 
     /**
-     * Set formatted value of this attribute.
+     * Add formatted value for this attribute.
+     * @param key Value key.
      * @param formattedValue Formatted value.
      */
-    public void setFormattedValue(String formattedValue) {
-        this.formattedValue = formattedValue;
+    public void addFormattedValue(String key, String formattedValue) {
+        formattedValues.put(key, formattedValue);
     }
 
 }

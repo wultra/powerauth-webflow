@@ -7,7 +7,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 /**
  * Class representing operation history entities.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class OperationHistory {
 

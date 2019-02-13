@@ -21,6 +21,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAtt
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.SMSAuthorizationResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
@@ -31,17 +33,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Controller which provides endpoints for SMS authorization.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/sms")
 public class SMSAuthorizationController extends AuthMethodController<SMSAuthorizationRequest, SMSAuthorizationResponse, AuthStepException> {
+
+    private static final Logger logger = LoggerFactory.getLogger(SMSAuthorizationController.class);
 
     private final DataAdapterClient dataAdapterClient;
     private final HttpSession httpSession;
@@ -69,9 +71,12 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @Override
     protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
-        final Object messageId = httpSession.getAttribute(MESSAGE_ID);
+        final Object messageId;
+        synchronized (httpSession.getServletContext()) {
+            messageId = httpSession.getAttribute(MESSAGE_ID);
+        }
         if (messageId == null) {
             // verify called before create or other error occurred, request is rejected
             throw new InvalidRequestException("Message ID is missing.");
@@ -80,8 +85,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
             dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode(), operationContext);
-            httpSession.removeAttribute(MESSAGE_ID);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+            synchronized (httpSession.getServletContext()) {
+                httpSession.removeAttribute(MESSAGE_ID);
+            }
+            logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return operation.getUserId();
         } catch (DataAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
@@ -123,7 +130,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody SMSAuthorizationResponse initSMSAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
 
@@ -134,14 +141,16 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
                     LocaleContextHolder.getLocale().getLanguage());
             String messageId = baResponse.getResponseObject().getMessageId();
-            httpSession.setAttribute(MESSAGE_ID, messageId);
+            synchronized (httpSession.getServletContext()) {
+                httpSession.setAttribute(MESSAGE_ID, messageId);
+            }
             initResponse.setResult(AuthStepResult.CONFIRMED);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return initResponse;
         } catch (DataAdapterClientErrorException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when sending SMS message.", e);
+            logger.error("Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             initResponse.setMessage(e.getMessage());
             return initResponse;
         }
@@ -164,7 +173,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                     final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
+                    logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -174,7 +183,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                     final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+                    logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -184,15 +193,15 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
             });
         } catch (AuthStepException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred while verifying authorization code from SMS message: {0}", e.getMessage());
+            logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
             final SMSAuthorizationResponse response = new SMSAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -215,19 +224,21 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
     public @ResponseBody SMSAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            httpSession.removeAttribute(MESSAGE_ID);
+            synchronized (httpSession.getServletContext()) {
+                httpSession.removeAttribute(MESSAGE_ID);
+            }
             cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return cancelResponse;
         } catch (NextStepServiceException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error when canceling SMS message validation.", e);
+            logger.error("Error when canceling SMS message validation.", e);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage(e.getMessage());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }
     }

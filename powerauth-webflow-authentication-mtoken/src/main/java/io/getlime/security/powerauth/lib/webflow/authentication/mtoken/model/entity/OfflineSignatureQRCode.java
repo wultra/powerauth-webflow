@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,19 +22,21 @@ import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.google.zxing.client.j2se.MatrixToImageWriter;
 import com.google.zxing.common.BitMatrix;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Signature and data for QR code in offline mode for mobile token.
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OfflineSignatureQRCode {
+
+    private static final Logger logger = LoggerFactory.getLogger(OfflineSignatureQRCode.class);
 
     private final int size;
     private final String data;
@@ -93,8 +95,7 @@ public class OfflineSignatureQRCode {
             byte[] bytes = baos.toByteArray();
             return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
         } catch (WriterException | IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while generating QR code",
                     e
             );

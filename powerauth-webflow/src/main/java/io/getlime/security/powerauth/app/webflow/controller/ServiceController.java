@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.model.ServiceStatusResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Controller;
@@ -27,17 +29,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Class representing controller used for service and maintenance purpose.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/service")
 public class ServiceController {
+
+    private final Logger logger = LoggerFactory.getLogger(ServiceController.class);
 
     private final WebFlowServerConfiguration webFlowServerConfiguration;
     private BuildProperties buildProperties;
@@ -66,7 +68,7 @@ public class ServiceController {
      */
     @RequestMapping(value = "status", method = RequestMethod.GET)
     public @ResponseBody ObjectResponse<ServiceStatusResponse> getServiceStatus() {
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received getServiceStatus request");
+        logger.info("Received getServiceStatus request");
         ServiceStatusResponse response = new ServiceStatusResponse();
         response.setApplicationName(webFlowServerConfiguration.getApplicationName());
         response.setApplicationDisplayName(webFlowServerConfiguration.getApplicationDisplayName());
@@ -76,7 +78,7 @@ public class ServiceController {
             response.setBuildTime(Date.from(buildProperties.getTime()));
         }
         response.setTimestamp(new Date());
-        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "The getServiceStatus request succeeded");
+        logger.debug("The getServiceStatus request succeeded");
         return new ObjectResponse<>(response);
     }
 }

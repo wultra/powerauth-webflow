@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
-import org.apache.ws.security.WSConstants;
+import org.apache.wss4j.dom.WSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +16,7 @@ import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
@@ -65,19 +65,19 @@ public class PowerAuthWebServiceConfiguration {
     }
 
     /**
-     * Initialize JAXB marschaller.
-     * @return JAXB marschaller.
+     * Initialize JAXB marshaller.
+     * @return JAXB marshaller.
      */
     @Bean
     public Jaxb2Marshaller marshaller() {
         Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
-        marshaller.setContextPath("io.getlime.powerauth.soap");
+        marshaller.setContextPaths("io.getlime.powerauth.soap.v2", "io.getlime.powerauth.soap.v3");
         return marshaller;
     }
 
     /**
      * Initialize PowerAuth 2.0 client.
-     * @param marshaller JAXB marschaller.
+     * @param marshaller JAXB marshaller.
      * @return PowerAuth 2.0 client.
      */
     @Bean

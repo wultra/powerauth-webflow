@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.data;
 /**
  * Abstract operation data field.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public abstract class OperationDataAttribute {
 

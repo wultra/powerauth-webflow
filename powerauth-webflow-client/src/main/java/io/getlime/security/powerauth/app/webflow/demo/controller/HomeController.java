@@ -61,25 +61,31 @@ public class HomeController {
     public String home(Principal currentUser, Model model, HttpSession session) {
 
         // Fetch operation ID, if any
-        String operationId = (String) session.getAttribute("operationId");
-        session.removeAttribute("operationId");
+        String operationId;
+        synchronized (session.getServletContext()) {
+            operationId = (String) session.getAttribute("operationId");
+            session.removeAttribute("operationId");
+        }
 
         // Add attributes
         model.addAttribute("connectionMap", getConnectionRepository().findAllConnections());
         model.addAttribute("providerIds", connectionFactoryLocator.registeredProviderIds());
         model.addAttribute("operationId", operationId);
 
-        PaymentForm paymentForm = (PaymentForm) session.getAttribute("paymentForm");
-        if (paymentForm == null) {
-            // MOCK PAYMENT
-            paymentForm = new PaymentForm();
-            paymentForm.setAmount(BigDecimal.valueOf(100));
-            paymentForm.setCurrency("CZK");
-            paymentForm.setAccount("238400856/0300");
-            paymentForm.setNote("Utility Bill Payment - 05/2017");
-            paymentForm.setDueDate("2017-06-29");
-        } else {
-            session.removeAttribute("paymentForm");
+        PaymentForm paymentForm;
+        synchronized (session.getServletContext()) {
+            paymentForm = (PaymentForm) session.getAttribute("paymentForm");
+            if (paymentForm == null) {
+                // MOCK PAYMENT
+                paymentForm = new PaymentForm();
+                paymentForm.setAmount(BigDecimal.valueOf(100));
+                paymentForm.setCurrency("CZK");
+                paymentForm.setAccount("238400856/0300");
+                paymentForm.setNote("Utility Bill Payment - 05/2017");
+                paymentForm.setDueDate("2017-06-29");
+            } else {
+                session.removeAttribute("paymentForm");
+            }
         }
 
         model.addAttribute("paymentForm", paymentForm);
@@ -132,8 +138,10 @@ public class HomeController {
                 .build();
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
-        session.setAttribute("operationId", payment.getResponseObject().getOperationId());
-        session.setAttribute("paymentForm", paymentForm);
+        synchronized (session.getServletContext()) {
+            session.setAttribute("operationId", payment.getResponseObject().getOperationId());
+            session.setAttribute("paymentForm", paymentForm);
+        }
 
         return "redirect:/";
     }

@@ -1,0 +1,216 @@
+# Basic Definitions
+
+This chapter describes basic definitions of terminology used during the Web Flow authentication and authorization process.
+
+The terminology described below is used widely in documentation, Web Flow database model and Web Flow source code. Understanding of most of these terms is required when deploying Web Flow.
+
+## General Terminology
+
+### Authentication
+
+Authentication is the process of verifying the identity of a user.
+
+Web Flow authentication step identifies the user and stores the user identity.
+
+_A typical example of authentication is signing in using a login form with username and password._
+
+### Authorization
+
+Authorization is the process of verifying permission granted by an authority.
+
+Web Flow authorization step verifies that the user grants a permission to perform an operation.
+
+_A typical example of authorization is verifying that user grants a permission to process a payment using PIN code/fingerprint/SMS code on a mobile device owned by the user._
+
+### Federated authentication and authorization
+
+Federated authentication and authorization allows user to become authenticated and authorize the operation in one system while accessing another system.
+
+_Web Flow is used for authentication and authorization in order to secure another otherwise unprotected system._
+
+### Authentication and authorization process
+
+Authentication and authorization process in Web Flow is a process which includes one or more authentication steps. Given the security requirements of the operation different authentication and/or authorization steps are required.
+
+_Example of a single step process (login):_
+- _User authentication using a login form with username and password._
+
+_Example of a process with multiple steps (payment authorization):_
+- _User authentication using a login form with username and password._
+- _Review of payment details by the user with choice of next authorization step._
+- _(option 1) Authorization of payment using SMS message with one time password (OTP) rewritten to a web form._
+- _(option 2) Authorization of payment using fingerprint in application running on user mobile device (online mobile token authorization)._
+- _(option 3) Authorization of payment using QR code with offline signature rewritten to a web form (offline mobile token authorization)._
+
+In the example above, the authentication and authorization process is completed once all required steps succeed.  In case any of the steps fails, the whole process fails and operation is not authorized.
+
+We also refer to this process as **authentication flow**, hence the name **Web Flow**.
+
+## Web Flow Terminology
+
+### Operation
+
+A new operation is created with every authentication process in Web Flow. The operation is mapped 1:1 to the OAuth 2.0 dance.
+
+There are two possible outcomes of an operation:
+- **Operation succeeds** - the HTTP session becomes authenticated and the user is redirected
+- **Operation fails** - the HTTP session is not authenticated, an error is displayed and the user is redirected with an error
+
+The operation succeeds only when all required authentication/authorization steps are successfully completed.
+
+The operation may fail due to different reasons, such as:
+- An authentication/authorization step fails (e.g. signature is not valid).
+- Maximum number of attempts is reached causing authentication method to fail.
+- Operation times out.
+- User cancels the operation.
+
+### Operation ID
+
+Each operation is identified by a unique operation ID in [UUID format](https://en.wikipedia.org/wiki/Universally_unique_identifier). The operation ID is used during the authentication process to access status of the operation and update the operation in Next Step Server.
+
+### Operation name
+
+When deploying Web Flow you can define various operation names, which identify the type of operation.
+
+Examples:
+- `login`
+- `authorize_payment`
+
+There need to be different authentication/authorization steps defined for each operation name.
+
+### Operation status
+
+Operation status is the most current status of the operation. The operation status is continuously updated as user proceeds through different authentication/authorization steps. Operation detail is another term used for operation status.
+
+### Authentication result
+
+Authentication result is one of the following:
+- `CONTINUE` - additional authentication steps need to be performed
+- `FAILED` - authentication has failed
+- `DONE` - authentication has succeeded
+
+### Authentication step
+
+Operation consists of multiple authentication/authorization steps. These steps are executed sequentially until there are no more steps to execute or the operation fails.
+
+### Authentication step result
+
+Result of the authentication step is one of the following:
+- `CONFIRMED` - the authentication step has succeeded
+- `CANCELED` - user canceled the authentication step
+- `AUTH_FAILED` - the authentication step has failed, however the user can retry the step
+- `AUTH_METHOD_FAILED` - the authentication method has failed and this step cannot be retried
+
+### Operation data
+
+Arbitrary data which is stored together with the operation. Web Flow does not try to interpret this data and only stores it in the database.
+
+_For example a payment operation contains following data (as string value):_
+
+```pre
+"{\"amount\":100,\"currency\":\"CZK\",\"account\":\"238400856/0300\",\"note\":\"Utility Bill Payment - 05/2017\",\"dueDate\":\"2017-06-29\"}"
+```
+
+Since Web Flow version 0.20.0 the [suggested format of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) to allow interpretation of data by Mobile token.
+
+### Operation form data
+
+Structured data which is used when displaying operation details. The structure of form data is documented [in Next Step documentation](./Next-Step-Server-REST-API-Reference.md#operation-formdata).
+
+_For example a payment operation contains following form data:_
+
+- _title: Confirm Payment_
+- _greeting: Hello, please confirm following payment_
+- _summary: Hello, please confirm payment 100 CZK to account 238400856/0300._
+- _amount: 100 CZK_
+- _account: 238400856/0300_
+- _due date: 2017-06-29_
+- _note: Utility Bill Payment - 05/2017_
+
+### Operation form field attribute
+
+A structured type of form field in operation form data:
+- `AMOUNT`
+- `NOTE`
+- `BANK_ACCOUNT_CHOICE`
+- `KEY_VALUE`
+- `HEADING`
+- `PARTY_INFO`
+
+See [Next Step documentation](./Next-Step-Server-REST-API-Reference.md#operation-formdata).
+
+### Operation history
+
+Whenever operation progresses to the next step, previous status of operation is stored in operation history.
+
+### Operation review
+
+Operation review is a special authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
+
+### Authentication method
+
+Each step has an associated authentication method which performs either authentication or authorization during the operation.
+
+See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for more details.
+
+### Authentication method choice
+
+The user becomes authenticated and there are multiple choices available for the next authentication method (which is usually performing authorization, not authentication). The next authentication method is executed based on user choice.
+
+### Next step of an operation
+
+Each operation consists of multiple steps. The next step of the operation is decided based on following inputs:
+- Authentication step result of the current step.
+- Next step server configuration (definition of next steps).
+- Available authentication methods (some methods may be disabled or temporarily unavailable).
+- Status of the operation (operation may time out, authentication method may fail because of too many attempts, etc.).
+
+### Next step definition
+
+Before starting Next Step Server the next step definition has to be defined for all operation names. All steps are defined in database table `ns_step_definition`.
+
+See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for more details.
+
+### Next step user preferences
+
+Next step user preferences store configuration for different authentication methods.
+
+### Authorization failure count
+
+A counter of failures during an authentication step.
+
+### Maximum authorization failure count
+
+Maximum number of allowed failures during an authentication step.
+
+The maximum number of allowed failures is defined in two areas:
+- Configuration per authentication method, actual number of remaining attempts is decremented with each failure.
+- Each authentication method may provide number of remaining attempts based on information from remote backend.
+
+The effective number of remaining attempts is the lower of the two above mentioned values.
+
+### HTTP session
+
+The HTTP session is used in Web Flow in following ways:
+- A client may create an operation with operation data before the OAuth 2.0 authentication is started and store assigned operationId in HTTP session in the `operationId` attribute. This attribute is picked when authentication is started and Web Flow continues an already existing operation. In case the `operationId` attribute is not found, Web Flow creates a new login operation with default operation data.
+- During the authentication process, the `PENDING_AUTH_OBJECT` attribute stored in HTTP session is updated with OAuth 2.0 `UserOperationAuthentication` token which contains the most current state of authentication.
+- When the authentication process is succcessfully completed, the HTTP session becomes authenticated with the OAuth 2.0 `UserOperationAuthentication` token.
+- When the authentication process fails, the `PENDING_AUTH_OBJECT` attribute is removed from HTTP session. The HTTP session does not become authenticated.
+
+### Web Flow operation to session mapping
+
+Each operation has a related HTTP session which is stored in database table `wf_operation_session` which maps operations to HTTP sessions. The reason for this mapping is to prevent concurrent execution of operations within same HTTP session.
+
+The main impact of verifying presence of operations within HTTP session is that a new operation cancels previous operation started within same HTTP session.
+
+### Web socket session
+
+Each operation which includes a PowerAuth mobile token authorization step has a Web Socket session which is open during this step. The Web Socket communication is used for nearly immediate response in the web browser when an operation is confirmed or canceled in the Mobile Token application.
+
+### Resource localization
+
+Web Flow contains message resources which can be localized to different languages.
+
+### Resource translation
+
+Web Flow supports translation of resources which contain references to values of operation form data. This process is called resource translation.

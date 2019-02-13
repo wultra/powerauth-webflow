@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.powerauth.soap.ActivationStatus;
-import io.getlime.powerauth.soap.GetActivationListForUserResponse;
+import io.getlime.powerauth.soap.v3.ActivationStatus;
+import io.getlime.powerauth.soap.v3.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -33,7 +33,7 @@ import java.util.Map;
 /**
  * Service for getting information about current availability of authentication methods.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
 public class AuthMethodQueryService {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.social.connect.UserProfileBuilder;
 /**
  * Default API Adapter for provided OAuth 2.0 protected service.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapter<T> {
 
@@ -38,13 +38,18 @@ public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapte
     @Override
     public void setConnectionValues(T api, ConnectionValues values) {
         UserResponse userResponse = api.getProfile();
-        values.setProviderUserId(userResponse.getUser().getId());
-        values.setDisplayName(userResponse.getUser().getGivenName() + " " + userResponse.getUser().getFamilyName());
+        if (userResponse != null) {
+            values.setProviderUserId(userResponse.getUser().getId());
+            values.setDisplayName(userResponse.getUser().getGivenName() + " " + userResponse.getUser().getFamilyName());
+        }
     }
 
     @Override
     public UserProfile fetchUserProfile(T api) {
         UserResponse userResponse = api.getProfile();
+        if (userResponse == null) {
+            return null;
+        }
         return new UserProfileBuilder()
                 .setUsername(userResponse.getUser().getId())
                 .setFirstName(userResponse.getUser().getGivenName())

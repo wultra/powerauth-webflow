@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,30 +15,52 @@
  */
 package io.getlime.security.powerauth.lib.mtoken.model.entity.attributes;
 
+import io.getlime.security.powerauth.lib.mtoken.model.entity.PartyInfo;
+
 /**
  * Attribute representing a party.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class PartyAttribute extends KeyValueAttribute {
+public class PartyAttribute extends Attribute {
+
+    private PartyInfo partyInfo;
 
     /**
      * Default constructor.
      */
     public PartyAttribute() {
         super();
-        this.setType(Type.PARTY);
+        this.setType(Type.PARTY_INFO);
     }
 
     /**
      * Constructor with all details.
      * @param id Attribute ID.
      * @param label Heading text.
+     * @param partyInfo Party information.
      */
-    public PartyAttribute(String id, String label) {
+    public PartyAttribute(String id, String label, PartyInfo partyInfo) {
         this();
         this.id = id;
         this.label = label;
+        this.partyInfo = partyInfo;
+    }
+
+    /**
+     * Get party info.
+     * @return Party info.
+     */
+    public PartyInfo getPartyInfo() {
+        return partyInfo;
+    }
+
+    /**
+     * Set party info.
+     * @param partyInfo Party info.
+     */
+    public void setPartyInfo(PartyInfo partyInfo) {
+        this.partyInfo = partyInfo;
     }
 
 }

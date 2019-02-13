@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
@@ -28,16 +30,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 /**
  * Controller advice responsible for default exception resolving.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @ControllerAdvice
 public class DefaultExceptionResolver {
+
+    private final Logger logger = LoggerFactory.getLogger(DefaultExceptionResolver.class);
 
     private AuthenticationManagementService authenticationManagementService;
 
@@ -59,7 +60,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
-        Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error occurred in Web Flow server", t);
+        logger.error("Error occurred in Web Flow server", t);
         final Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
         return new ErrorResponse(error);
     }
@@ -72,7 +73,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(AuthStepException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
+        logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
         // Web Flow returns message ID for front-end localization instead of message.
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
@@ -86,7 +87,7 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(InsufficientAuthenticationException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorizedException(InsufficientAuthenticationException ex) {
-        Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred in Web Flow server: {0}", ex.getMessage());
+        logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
         authenticationManagementService.clearContext();
         return "redirect:/oauth/error";
     }

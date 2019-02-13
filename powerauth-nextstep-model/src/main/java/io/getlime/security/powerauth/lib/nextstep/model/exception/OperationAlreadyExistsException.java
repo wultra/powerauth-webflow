@@ -5,7 +5,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 /**
  * Exception for case when operation already exists.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationAlreadyExistsException extends NextStepServiceException {
 

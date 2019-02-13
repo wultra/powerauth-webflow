@@ -12,7 +12,7 @@ import java.util.Calendar;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 class OperationDataBuilderTest {
 

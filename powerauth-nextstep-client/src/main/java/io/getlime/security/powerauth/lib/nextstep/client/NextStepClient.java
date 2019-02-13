@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,30 +40,25 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This service handles client communication with the Next Step server.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class NextStepClient {
 
-    private String serviceUrl;
-    private ObjectMapper objectMapper;
-
-    /**
-     * Default constructor.
-     */
-    public NextStepClient() {
-    }
+    private final String serviceUrl;
+    private final ObjectMapper objectMapper;
+    private final RestTemplate restTemplate;
 
     /**
      * Create a new client with provided base URL.
      * @param serviceUrl Base URL.
      */
     public NextStepClient(String serviceUrl) {
-        this.serviceUrl = serviceUrl;
-        this.objectMapper = new ObjectMapper();
+        this(serviceUrl, new ObjectMapper());
     }
 
     /**
@@ -74,16 +69,16 @@ public class NextStepClient {
     public NextStepClient(String serviceUrl, ObjectMapper objectMapper) {
         this.serviceUrl = serviceUrl;
         this.objectMapper = objectMapper;
+        restTemplate = new RestTemplate();
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     /**
-     * Prepare a default instance of REST client.
+     * Get default instance of REST client.
      * @return RestTemplate with default configuration.
      */
-    private RestTemplate defaultTemplate() {
-        RestTemplate template = new RestTemplate();
-        template.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-        return template;
+    public RestTemplate getRestTemplate() {
+        return restTemplate;
     }
 
     /**
@@ -137,7 +132,7 @@ public class NextStepClient {
                 request.getParams().addAll(params);
             }
             HttpEntity<ObjectRequest<CreateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<CreateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateOperationResponse>>() {});
+            ResponseEntity<ObjectResponse<CreateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateOperationResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -186,7 +181,7 @@ public class NextStepClient {
                 request.getParams().addAll(params);
             }
             HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
+            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -210,7 +205,7 @@ public class NextStepClient {
             request.setOperationId(operationId);
             request.setFormData(formData);
             HttpEntity<ObjectRequest<UpdateFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/operation/formData", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/formData", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -234,7 +229,7 @@ public class NextStepClient {
             request.setOperationId(operationId);
             request.setChosenAuthMethod(chosenAuthMethod);
             HttpEntity<ObjectRequest<UpdateChosenAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = defaultTemplate().exchange(serviceUrl + "/operation/chosenAuthMethod", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/chosenAuthMethod", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -258,7 +253,7 @@ public class NextStepClient {
             GetOperationDetailRequest request = new GetOperationDetailRequest();
             request.setOperationId(id);
             HttpEntity<ObjectRequest<GetOperationDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOperationDetailResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationDetailResponse>>() {});
+            ResponseEntity<ObjectResponse<GetOperationDetailResponse>> response = restTemplate.exchange(serviceUrl + "/operation/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationDetailResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -280,7 +275,7 @@ public class NextStepClient {
             GetOperationConfigRequest request = new GetOperationConfigRequest();
             request.setOperationName(operationName);
             HttpEntity<ObjectRequest<GetOperationConfigRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOperationConfigResponse>> response = defaultTemplate().exchange(serviceUrl + "/operation/config", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigResponse>>() {});
+            ResponseEntity<ObjectResponse<GetOperationConfigResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -314,7 +309,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
             HttpEntity<ObjectRequest<GetPendingOperationsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<List<GetOperationDetailResponse>>> response = defaultTemplate().exchange(serviceUrl + "/user/operation/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {
+            ResponseEntity<ObjectResponse<List<GetOperationDetailResponse>>> response = restTemplate.exchange(serviceUrl + "/user/operation/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -335,7 +330,7 @@ public class NextStepClient {
             // Exchange next step request with NextStep server.
             GetAuthMethodsRequest request = new GetAuthMethodsRequest();
             HttpEntity<ObjectRequest<GetAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -358,7 +353,7 @@ public class NextStepClient {
             GetUserAuthMethodsRequest request = new GetUserAuthMethodsRequest();
             request.setUserId(userId);
             HttpEntity<ObjectRequest<GetUserAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetUserAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetUserAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetUserAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetUserAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -373,17 +368,19 @@ public class NextStepClient {
      *
      * @param userId User ID.
      * @param authMethod Authentication method.
+     * @param config Authentication method configuration.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<GetAuthMethodsResponse> enableAuthMethodForUser(String userId, AuthMethod authMethod, Map<String, String> config) throws NextStepServiceException {
         try {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
+            request.setConfig(config);
             HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -408,7 +405,7 @@ public class NextStepClient {
             request.setAuthMethod(authMethod);
             HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = defaultTemplate().exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

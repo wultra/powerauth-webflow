@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import io.getlime.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
+import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthEncryptionArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthWebArgumentResolver;
 import io.getlime.security.powerauth.rest.api.spring.filter.PowerAuthRequestFilter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ import java.util.List;
 /**
  * Default Spring Web MVC configuration.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Configuration
 public class WebMvcConfiguration implements WebMvcConfigurer {
@@ -56,6 +57,11 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Bean
     public PowerAuthWebArgumentResolver powerAuthWebArgumentResolver() {
         return new PowerAuthWebArgumentResolver();
+    }
+
+    @Bean
+    public PowerAuthEncryptionArgumentResolver powerAuthEncryptionArgumentResolver() {
+        return new PowerAuthEncryptionArgumentResolver();
     }
 
     @Bean
@@ -112,6 +118,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
         argumentResolvers.add(powerAuthWebArgumentResolver());
+        argumentResolvers.add(powerAuthEncryptionArgumentResolver());
     }
 
     /**

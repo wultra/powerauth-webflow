@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateFormDataRe
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,17 +42,17 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This service handles conversion of operation request/response objects into operation entities.
  * Operation entities are persisted, so that they can be later retrieved from the database.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
 public class OperationPersistenceService {
+
+    private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
     private final ObjectMapper objectMapper;
     private final IdGeneratorService idGeneratorService;
@@ -89,7 +91,7 @@ public class OperationPersistenceService {
             // Store form data as serialized JSON string.
             operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation form data", ex);
+            logger.error("Error while serializing operation form data", ex);
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
@@ -107,7 +109,7 @@ public class OperationPersistenceService {
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Error while serializing operation history", ex);
+            logger.error("Error while serializing operation history", ex);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
@@ -146,8 +148,7 @@ public class OperationPersistenceService {
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while serializing operation history",
                     e
             );
@@ -174,8 +175,7 @@ public class OperationPersistenceService {
             formData.setUserInput(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
         } catch (IOException e) {
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while serializing operation form data",
                     e
             );
@@ -280,7 +280,7 @@ public class OperationPersistenceService {
             return steps;
         }
         // get steps from the current response
-        String responseSteps = operation.getCurrentOperationHistoryEntity().getResponseSteps();
+        String responseSteps = currentHistory.getResponseSteps();
         if (responseSteps == null) {
             return steps;
         }
@@ -290,8 +290,7 @@ public class OperationPersistenceService {
             return steps;
         } catch (IOException e) {
             // in case of an error empty list is returned
-            Logger.getLogger(this.getClass().getName()).log(
-                    Level.SEVERE,
+            logger.error(
                     "Error occurred while deserializing response steps",
                     e
             );

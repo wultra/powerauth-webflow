@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 /**
  * Class represents details of an authentication method.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class AuthMethodDetail {
 

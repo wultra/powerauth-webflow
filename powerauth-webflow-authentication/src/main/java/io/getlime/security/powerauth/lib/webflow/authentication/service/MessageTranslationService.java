@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.NoSuchMessageException;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.AbstractMessageSource;
@@ -29,16 +31,16 @@ import java.text.StringCharacterIterator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Service which localizes and translates form data messages.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
 public class MessageTranslationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MessageTranslationService.class);
 
     private final I18NService i18NService;
     private final ValueFormatterService valueFormatterService;
@@ -117,13 +119,13 @@ public class MessageTranslationService {
             // Formatting of attributes with specified format
             if (attribute instanceof OperationFormFieldAttributeFormatted) {
                 OperationFormFieldAttributeFormatted formattedAttribute = (OperationFormFieldAttributeFormatted) attribute;
-                String formattedValue;
-                if (formattedAttribute.getValueFormatType() == ValueFormatType.LOCALIZED_TEXT) {
-                    formattedValue = localize(valueFormatterService.getValue(attribute));
+                ValueFormatType valueFormatType = formattedAttribute.getValueFormatType();
+                if (valueFormatType == ValueFormatType.LOCALIZED_TEXT) {
+                    String formattedValue = localize(valueFormatterService.getValue(attribute));
+                    formattedAttribute.addFormattedValue("value", formattedValue);
                 } else {
-                    formattedValue = valueFormatterService.format(formattedAttribute, LocaleContextHolder.getLocale());
+                    valueFormatterService.addFormattedValue(formattedAttribute, LocaleContextHolder.getLocale());
                 }
-                formattedAttribute.setFormattedValue(formattedValue);
                 continue;
             }
             // Localization of banners
@@ -210,7 +212,7 @@ public class MessageTranslationService {
         try {
             return messageSource.getMessage(i18nKey, null, LocaleContextHolder.getLocale());
         } catch (NoSuchMessageException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Localization key is missing: "+i18nKey);
+            logger.debug("Localization key is missing: "+i18nKey);
             return MISSING_KEY_MESSAGE+": "+i18nKey;
         }
     }

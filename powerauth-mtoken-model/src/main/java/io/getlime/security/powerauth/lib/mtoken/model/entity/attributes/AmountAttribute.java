@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,14 @@ import java.math.BigDecimal;
  * Attribute representing a financial amount item, with attributes for amount
  * and currency, that can be rendered on a mobile application.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class AmountAttribute extends Attribute {
 
     private BigDecimal amount;
     private String currency;
+    private String amountFormatted;
+    private String currencyFormatted;
 
     /**
      * Default constructor.
@@ -42,13 +44,17 @@ public class AmountAttribute extends Attribute {
      * @param label Attribute label.
      * @param amount Amount.
      * @param currency Currency.
+     * @param amountFormatted Formatted amount.
+     * @param currencyFormatted  Formatted currency.
      */
-    public AmountAttribute(String id, String label, BigDecimal amount, String currency) {
+    public AmountAttribute(String id, String label, BigDecimal amount, String currency, String amountFormatted, String currencyFormatted) {
         this();
         this.id = id;
         this.label = label;
         this.amount = amount;
         this.currency = currency;
+        this.amountFormatted = amountFormatted;
+        this.currencyFormatted = currencyFormatted;
     }
 
     /**
@@ -81,5 +87,37 @@ public class AmountAttribute extends Attribute {
      */
     public void setCurrency(String currency) {
         this.currency = currency;
+    }
+
+    /**
+     * Get formatted amount.
+     * @return Formatted amount.
+     */
+    public String getAmountFormatted() {
+        return amountFormatted;
+    }
+
+    /**
+     * Set formatted amount.
+     * @param amountFormatted Formatted amount.
+     */
+    public void setAmountFormatted(String amountFormatted) {
+        this.amountFormatted = amountFormatted;
+    }
+
+    /**
+     * Get formatted currency.
+     * @return Formatted currency.
+     */
+    public String getCurrencyFormatted() {
+        return currencyFormatted;
+    }
+
+    /**
+     * Set formatted currency.
+     * @param currencyFormatted Formatted currency.
+     */
+    public void setCurrencyFormatted(String currencyFormatted) {
+        this.currencyFormatted = currencyFormatted;
     }
 }

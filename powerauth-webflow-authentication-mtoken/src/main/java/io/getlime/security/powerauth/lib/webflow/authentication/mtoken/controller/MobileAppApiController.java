@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAu
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthToken;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,18 +55,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This controller presents endpoints that are consumed by the native mobile app,
  * not the web application.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/token/app")
 public class MobileAppApiController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MobileAppApiController.class);
 
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
@@ -134,11 +136,15 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             // Get the list of operations for given user
             final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
+            if (operationList == null) {
+                // Next step operation failed, return empty operation list
+                return new ObjectResponse<>(new OperationListResponse());
+            }
             final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
 
             // Prepare converter
@@ -204,7 +210,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
@@ -253,7 +259,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
-                throw new InvalidActivationException();
+                throw new InvalidActivationException(activationId);
             }
 
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
@@ -279,7 +285,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 return true;
             }
         } catch (NextStepServiceException ex) {
-            Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Could not verify activationId", ex);
+            logger.error("Could not verify activationId", ex);
         }
         return false;
     }
@@ -295,6 +301,11 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
         // Get configuration for operation with given name
         final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+
+        if (operationConfig == null) {
+            // Next step request failed, cannot decide
+            return false;
+        }
 
         // Convert loose JSON format to AllowedSignatureType structure
         OperationConverter operationConverter = new OperationConverter();

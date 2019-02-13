@@ -7,7 +7,7 @@ import java.util.Map;
 /**
  * Class represents state of an authentication method for given user.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class UserAuthMethodDetail {
 

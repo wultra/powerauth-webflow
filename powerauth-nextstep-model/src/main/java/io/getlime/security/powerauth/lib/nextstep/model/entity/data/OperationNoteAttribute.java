@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.converter.OperationTextN
 /**
  * Note in operation data.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationNoteAttribute extends OperationDataAttribute {
 

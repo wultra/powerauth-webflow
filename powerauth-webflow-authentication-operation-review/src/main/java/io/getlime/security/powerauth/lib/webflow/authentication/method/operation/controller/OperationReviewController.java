@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,6 +42,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -51,17 +53,17 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Operation review controller which shows operation details to the user and handles operation form data updates.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/operation")
 public class OperationReviewController extends AuthMethodController<OperationReviewRequest, OperationReviewResponse, AuthStepException> {
+
+    private static final Logger logger = LoggerFactory.getLogger(OperationReviewController.class);
 
     private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
     private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
@@ -93,10 +95,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @Override
     protected String authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step authentication succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return operation.getUserId();
     }
 
@@ -142,7 +144,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, authentication method: {0}", getAuthMethodName().toString());
+                    logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -152,7 +154,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     final OperationReviewResponse response = new OperationReviewResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+                    logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
                     return response;
                 }
 
@@ -162,15 +164,15 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
-                    Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
             });
         } catch (AuthStepException e) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Error occurred while reviewing operation: {0}", e.getMessage());
+            logger.warn("Error occurred while reviewing operation: {}", e.getMessage());
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -194,13 +196,13 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }
     }
@@ -273,7 +275,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 operation.setFormData(formDataNS);
             } catch (DataAdapterClientErrorException e) {
                 // Failed to load dynamic data, log the error. The UI will handle missing dynamic data error separately.
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Failed to load dynamic operation data", e);
+                logger.error("Failed to load dynamic operation data", e);
             }
         }
         // translate new formData messages

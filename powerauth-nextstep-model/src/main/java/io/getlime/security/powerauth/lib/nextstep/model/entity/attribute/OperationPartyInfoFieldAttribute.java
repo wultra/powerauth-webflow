@@ -5,7 +5,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.PartyInfo;
 /**
  * Class representing an operation form field attribute for party information.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class OperationPartyInfoFieldAttribute extends OperationFormFieldAttribute {
 

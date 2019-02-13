@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import java.util.Properties;
  * Custom ResourceBundleMessageSource which is both reloadable and supports listing. Cache is disabled to allow
  * immediate reload of messages.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class ReloadableResourceBundleMessageSourceWithListing extends ReloadableResourceBundleMessageSource {
 

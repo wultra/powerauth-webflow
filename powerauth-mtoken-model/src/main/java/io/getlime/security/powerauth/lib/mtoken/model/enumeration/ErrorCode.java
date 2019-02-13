@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Lime - HighTech Solutions s.r.o.
+ * Copyright 2018 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ package io.getlime.security.powerauth.lib.mtoken.model.enumeration;
  * {@link io.getlime.core.rest.model.base.response.ErrorResponse} responses.
  *
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 public class ErrorCode {
 
@@ -34,6 +34,16 @@ public class ErrorCode {
      * Error code for situation when an invalid / malformed request is sent.
      */
     public static final String INVALID_REQUEST              = "INVALID_REQUEST";
+
+    /**
+     * Error code for situation when an activation is not active.
+     */
+    public static final String ACTIVATION_NOT_ACTIVE        = "ACTIVATION_NOT_ACTIVE";
+
+    /**
+     * Error code for situation when an activation is not configured.
+     */
+    public static final String ACTIVATION_NOT_CONFIGURED    = "ACTIVATION_NOT_CONFIGURED";
 
     /**
      * Error code for situation when an invalid activation / device is

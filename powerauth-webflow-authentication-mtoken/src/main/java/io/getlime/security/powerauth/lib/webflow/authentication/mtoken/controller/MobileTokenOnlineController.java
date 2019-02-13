@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Lime - HighTech Solutions s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -39,17 +41,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Online mobile token authentication controller.
  *
- * @author Petr Dvorak, petr@lime-company.eu
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Controller
 @RequestMapping(value = "/api/auth/token/web")
 public class MobileTokenOnlineController extends AuthMethodController<MobileTokenAuthenticationRequest, MobileTokenAuthenticationResponse, AuthStepException> {
+
+    private static final Logger logger = LoggerFactory.getLogger(MobileTokenOnlineController.class);
 
     private final WebSocketMessageService webSocketMessageService;
     private final WebFlowServicesConfiguration webFlowServicesConfiguration;
@@ -106,13 +108,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Init step started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
 
         MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, getAuthMethodName());
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
         initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
-        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Step initialization succeeded, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return initResponse;
     }
 
@@ -128,11 +130,11 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
         final GetOperationDetailResponse operation = getOperation();
         // Log level is set to FINE due to large amount of requests caused by polling.
-        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Step authentication started, operation ID: {0}, authentication method: {1}", new String[] {operation.getOperationId(), getAuthMethodName().toString()});
+        logger.debug("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
 
         // Custom handling of operation expiration, checkOperationExpiration() method is not called
         if (operation.isExpired()) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING, "Operation has timed out, operation ID: {0}", operation.getOperationId());
+            logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
             // handle operation expiration
             // remove WebSocket session, it is expired
             clearCurrentBrowserSession();
@@ -141,7 +143,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("operation.timeout");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         }
 
@@ -153,7 +155,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.getNext().addAll(operation.getSteps());
             response.setMessage("authentication.success");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         }
 
@@ -168,7 +170,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.getNext().addAll(operation.getSteps());
                 response.setMessage("authentication.success");
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CONFIRMED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+                logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             }
             // in case previous authentication lead to an authentication method failure, the authentication method has already failed
@@ -181,7 +183,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.getNext().addAll(operation.getSteps());
                 response.setMessage("authentication.fail");
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_METHOD_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+                logger.info("Step result: AUTH_METHOD_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             }
             // in case the authentication has been canceled, the authentication method is canceled
@@ -193,7 +195,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.setResult(AuthStepResult.CANCELED);
                 response.setMessage("operation.canceled");
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+                logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             }
         }
@@ -203,10 +205,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         if (!isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, operation should fail
             try {
-                Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Operation will be canceled because authentication method is no longer available, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+                logger.info("Operation will be canceled because authentication method is no longer available, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null);
             } catch (NextStepServiceException ex) {
-                Logger.getLogger(this.getClass().getName()).log(Level.SEVERE, "Cancel operation request failed, reason: "+ex.getMessage());
+                logger.error("Cancel operation request failed, reason: "+ex.getMessage());
             }
             clearCurrentBrowserSession();
             webSocketMessageService.removeWebSocketSession(operation.getOperationId());
@@ -215,7 +217,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setMessage("operation.methodNotAvailable");
             // push message may not be delivered when activation was blocked during authentication, error is logged and ignored
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         }
 
@@ -224,7 +226,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         response.setResult(AuthStepResult.AUTH_FAILED);
         response.setMessage("authentication.fail");
         // Log level is set to FINE due to large amount of requests caused by polling.
-        Logger.getLogger(this.getClass().getName()).log(Level.FINE, "Step result: AUTH_FAILED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+        logger.debug("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return response;
     }
 
@@ -242,13 +244,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), getAuthMethodName());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: CANCELED, operation ID: {0}, authentication method: {1}", new String[]{operation.getOperationId(), getAuthMethodName().toString()});
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage(e.getMessage());
-            Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Step result: AUTH_FAILED, authentication method: {0}", getAuthMethodName().toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }
     }

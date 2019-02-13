@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Lime - HighTech Solutions s.r.o.
+ * Copyright 2018 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,10 +17,12 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.ValueFormatType;
 
+import java.util.Map;
+
 /**
  * Class representing an operation form field attribute for a heading.
  *
- * @author Roman Strobl, roman.strobl@lime-company.eu
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class HeadingAttribute extends KeyValueAttribute {
 
@@ -46,15 +48,15 @@ public class HeadingAttribute extends KeyValueAttribute {
      * @param label Label.
      * @param value Value.
      * @param valueFormatType Value format type.
-     * @param formattedValue Formatted value.
+     * @param formattedValues Formatted values.
      */
-    public HeadingAttribute(String id, String label, String value, ValueFormatType valueFormatType, String formattedValue) {
+    public HeadingAttribute(String id, String label, String value, ValueFormatType valueFormatType, Map<String, String> formattedValues) {
         this.type = Type.HEADING;
         this.id = id;
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        this.formattedValue = formattedValue;
+        this.formattedValues.putAll(formattedValues);
     }
 
 }
