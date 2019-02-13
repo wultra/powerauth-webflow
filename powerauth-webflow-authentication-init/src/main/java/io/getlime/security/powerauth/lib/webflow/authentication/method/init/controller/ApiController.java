@@ -83,7 +83,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         try {
             operation = getOperation();
-            logger.info("Operation found, operation ID: {}, operation name: {}", new String[]{operation.getOperationId(), operation.getOperationName()});
+            logger.info("Operation found, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
             checkOperationExpiration(operation);
         } catch (OperationNotAvailableException ex) {
             logger.info("Operation not found");
@@ -137,12 +137,12 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
                 @Override
                 public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return continueOperationResponse(operationId, steps);
                 }
             });
         } else {
-            logger.info("Continuing operation, operation ID: {}, operation name: {}", new String[] {operation.getOperationId(), operation.getOperationName()});
+            logger.info("Continuing operation, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
             return continueOperationWithId(operation.getOperationId(), sessionId, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
@@ -158,7 +158,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
                 @Override
                 public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", new String[]{operationId, getAuthMethodName().toString()});
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return continueOperationResponse(operationId, steps);
                 }
             });

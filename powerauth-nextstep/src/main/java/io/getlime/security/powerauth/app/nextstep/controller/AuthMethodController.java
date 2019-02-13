@@ -108,7 +108,7 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
+        logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
@@ -137,7 +137,7 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        logger.info("Received disableAuthMethodForUser request, user ID: {}, authentication method: {}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
+        logger.info("Received disableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
         if (userId == null) {
