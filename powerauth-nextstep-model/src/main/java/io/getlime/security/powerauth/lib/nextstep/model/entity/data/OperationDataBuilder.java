@@ -124,7 +124,7 @@ public class OperationDataBuilder {
          * @param currency Currency.
          * @return Operation data builder.
          */
-        public OperationDataBuilder amount(BigDecimal amount, String currency) {
+        public OperationDataBuilder amount(BigDecimal amount, String currency) throws InvalidOperationDataException {
             OperationAmountAttribute amountField = new OperationAmountAttribute(amount, currency);
             attributes.put(attributeId, amountField);
             return OperationDataBuilder.this;
