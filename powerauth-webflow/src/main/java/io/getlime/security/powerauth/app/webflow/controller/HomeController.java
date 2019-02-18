@@ -196,7 +196,7 @@ public class HomeController {
         // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
         final String redirectWithError = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", "access_denied")
-                .queryParam("error_description", "User canceled authentication request")
+                .queryParam("error_description", "User%20canceled%20authentication%20request")
                 .build()
                 .toUriString();
         logger.info("The /authenticate/cancel request succeeded");
