@@ -137,4 +137,39 @@ class OperationDataBuilderTest {
         });
     }
 
+    @Test
+    void testInvalidAmount() {
+        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
+            builder
+                    .templateId(1)
+                    .templateVersion("A")
+                    .attr1().accountGeneric("12345678/0100")
+                    .attr2().amount(new BigDecimal("0.0099"), "EUR")
+                    .build();
+        });
+    }
+
+    @Test
+    void testZeroAmount() {
+        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
+            builder
+                    .templateId(1)
+                    .templateVersion("A")
+                    .attr1().accountGeneric("12345678/0100")
+                    .attr2().amount(BigDecimal.ZERO, "EUR")
+                    .build();
+        });
+    }
+
+    @Test
+    void testNegativeAmount() {
+        Assertions.assertThrows(InvalidOperationDataException.class, () -> {
+            builder
+                    .templateId(1)
+                    .templateVersion("A")
+                    .attr1().accountGeneric("12345678/0100")
+                    .attr2().amount(new BigDecimal("-100"), "EUR")
+                    .build();
+        });
+    }
 }

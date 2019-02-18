@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.BannerType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.validator.AmountValidator;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -192,7 +194,8 @@ public class OperationFormData {
      * @return Operation amount field attribute.
      */
     @JsonIgnore
-    public OperationAmountFieldAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) {
+    public OperationAmountFieldAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) throws InvalidOperationDataException {
+        AmountValidator.validateAmount(amount);
         OperationAmountFieldAttribute amountAttr = new OperationAmountFieldAttribute();
         amountAttr.setId(amountId);
         amountAttr.setAmount(amount);
