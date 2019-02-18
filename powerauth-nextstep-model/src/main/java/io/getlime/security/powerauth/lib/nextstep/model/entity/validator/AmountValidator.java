@@ -12,11 +12,21 @@ import java.math.BigDecimal;
 public class AmountValidator {
 
     /**
-     * Validate amount attribute.
+     * Validate amount attribute with precision of 2 digits.
      * @param amount Amount attribute value.
      * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
     public static void validateAmount(BigDecimal amount) throws InvalidOperationDataException {
+        validateAmount(amount, 2);
+    }
+
+    /**
+     * Validate amount attribute with given precision.
+     * @param amount Amount attribute value.
+     * @param expectedPrecision Expected precision.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
+     */
+    public static void validateAmount(BigDecimal amount, int expectedPrecision) throws InvalidOperationDataException {
         if (amount == null) {
             throw new InvalidOperationDataException("Amount was not set");
         }
@@ -24,7 +34,7 @@ public class AmountValidator {
             throw new InvalidOperationDataException("Amount is zero or negative: " + amount);
         }
         // Reject amount with more than 2 decimal places.
-        if (amount.stripTrailingZeros().scale() > 2) {
+        if (amount.stripTrailingZeros().scale() > expectedPrecision) {
             throw new InvalidOperationDataException("Invalid amount: " + amount);
         }
     }
