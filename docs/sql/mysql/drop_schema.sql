@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS wf_operation_session;
 DROP TABLE IF EXISTS ns_step_definition;
 DROP TABLE IF EXISTS ns_operation_history;
 DROP TABLE IF EXISTS ns_operation;
+DROP TABLE IF EXISTS ns_operation_config;
 DROP TABLE IF EXISTS ns_user_prefs;
 DROP TABLE IF EXISTS ns_auth_method;
 DROP TABLE IF EXISTS oauth_code;
