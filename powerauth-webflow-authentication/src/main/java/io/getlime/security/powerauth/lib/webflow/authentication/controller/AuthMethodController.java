@@ -32,10 +32,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
@@ -157,6 +154,20 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         try {
             final ObjectResponse<GetOperationConfigResponse> operationConfigResponse = nextStepClient.getOperationConfig(operationName);
             return operationConfigResponse.getResponseObject();
+        } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
+            return null;
+        }
+    }
+
+    /**
+     * Get operation configurations.
+     * @return Operation configurations.
+     */
+    protected GetOperationConfigsResponse getOperationConfigs() {
+        try {
+            final ObjectResponse<GetOperationConfigsResponse> operationConfigsResponse = nextStepClient.getOperationConfigs();
+            return operationConfigsResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);
             return null;

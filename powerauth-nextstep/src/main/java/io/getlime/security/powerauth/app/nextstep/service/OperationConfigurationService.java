@@ -15,10 +15,12 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.OperationConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +35,7 @@ import java.util.Optional;
 public class OperationConfigurationService {
 
     private final OperationConfigRepository operationConfigRepository;
+    private final OperationConfigConverter configConverter = new OperationConfigConverter();
 
     /**
      * Service constructor.
@@ -56,12 +59,21 @@ public class OperationConfigurationService {
             throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
         }
         OperationConfigEntity operationConfig = operationConfigOptional.get();
-        GetOperationConfigResponse response = new GetOperationConfigResponse();
-        response.setOperationName(operationConfig.getOperationName());
-        response.setTemplateVersion(operationConfig.getTemplateVersion());
-        response.setTemplateId(operationConfig.getTemplateId());
-        response.setMobileTokenMode(operationConfig.getMobileTokenMode());
-        return response;
+        return configConverter.fromOperationConfigEntity(operationConfig);
+    }
+
+    /**
+     * Get all operation configurations.
+     * @return All operation configurations.
+     */
+    public GetOperationConfigsResponse getOperationConfigs() {
+        GetOperationConfigsResponse configsResponse = new GetOperationConfigsResponse();
+        Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
+        for (OperationConfigEntity operationConfig: allConfigs) {
+            GetOperationConfigResponse config = configConverter.fromOperationConfigEntity(operationConfig);
+            configsResponse.addOperationConfig(config);
+        }
+        return configsResponse;
     }
 
 }

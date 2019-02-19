@@ -26,6 +26,7 @@ public class OperationAmountAttribute extends OperationDataAttribute {
      * Constructor with amount and currency.
      * @param amount Amount.
      * @param currency Currency.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
     public OperationAmountAttribute(BigDecimal amount, String currency) throws InvalidOperationDataException {
         this.type = Type.AMOUNT;
@@ -45,6 +46,7 @@ public class OperationAmountAttribute extends OperationDataAttribute {
     /**
      * Set amount.
      * @param amount Amount.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
     public void setAmount(BigDecimal amount) throws InvalidOperationDataException {
         AmountValidator.validateAmount(amount);

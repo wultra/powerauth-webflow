@@ -33,10 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlrea
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -197,6 +194,21 @@ public class OperationController {
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Get configurations of all operations.
+     *
+     * @return Get operation configurations response.
+     */
+    @RequestMapping(value = "/operation/config/list", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetOperationConfigsResponse> operationConfigs() {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received operationConfigs request");
+
+        GetOperationConfigsResponse response = operationConfigurationService.getOperationConfigs();
+
+        logger.debug("The operationConfigs request succeeded");
+        return new ObjectResponse<>(response);
+    }
 
     /**
      * Get the list of pending operations for user.

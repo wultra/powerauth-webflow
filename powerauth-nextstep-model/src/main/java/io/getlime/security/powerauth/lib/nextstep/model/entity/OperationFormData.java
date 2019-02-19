@@ -192,6 +192,7 @@ public class OperationFormData {
      * @param currencyId Currency ID.
      * @param currency Amount currency.
      * @return Operation amount field attribute.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
     @JsonIgnore
     public OperationAmountFieldAttribute addAmount(String amountId, BigDecimal amount, String currencyId, String currency) throws InvalidOperationDataException {
