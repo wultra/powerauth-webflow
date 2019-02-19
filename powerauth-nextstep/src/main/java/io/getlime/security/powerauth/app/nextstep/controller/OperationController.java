@@ -200,7 +200,7 @@ public class OperationController {
      * @return Get operation configurations response.
      */
     @RequestMapping(value = "/operation/config/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOperationConfigsResponse> operationConfigs() {
+    public @ResponseBody ObjectResponse<GetOperationConfigsResponse> operationConfigs(@RequestBody ObjectRequest<GetOperationConfigsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received operationConfigs request");
 

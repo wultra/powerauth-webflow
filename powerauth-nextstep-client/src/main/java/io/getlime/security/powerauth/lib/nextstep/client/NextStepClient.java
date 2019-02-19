@@ -293,7 +293,9 @@ public class NextStepClient {
     public ObjectResponse<GetOperationConfigsResponse> getOperationConfigs() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            ResponseEntity<ObjectResponse<GetOperationConfigsResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/list", HttpMethod.POST, null, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigsResponse>>() {});
+            GetOperationConfigsRequest request = new GetOperationConfigsRequest();
+            HttpEntity<ObjectRequest<GetOperationConfigsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationConfigsResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigsResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
