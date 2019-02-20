@@ -26,7 +26,9 @@ import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResp
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -100,7 +102,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      */
     @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -118,7 +120,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
     })
-    public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -129,7 +131,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
-    private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
+    private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
             String userId = apiAuthentication.getUserId();
@@ -165,16 +167,27 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Get map of operation configurations (operation name -> operation configuration).
+     * Get map of all operation configurations (operation name -> operation configuration).
      * @param operations Operation list.
      * @return Map of operation configurations.
      */
-    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) {
-        Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
+    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) throws OperationNotConfiguredException {
+        final Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
+        final GetOperationConfigsResponse allConfigsResponse = getOperationConfigs();
+        // Construct Map for all configured operations on server (operation name -> operation configuration)
+        final Map<String, GetOperationConfigResponse> allOperationConfigs = new HashMap<>();
+        for (GetOperationConfigResponse config: allConfigsResponse.getOperationConfigs()) {
+            allOperationConfigs.put(config.getOperationName(), config);
+        }
+        // Go through operations for which a configuration was requested and construct response map
         for (GetOperationDetailResponse operation: operations) {
             String operationName = operation.getOperationName();
             if (!operationConfigs.containsKey(operationName)) {
-                final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+                final GetOperationConfigResponse operationConfig = allOperationConfigs.get(operationName);
+                // In case the operation configuration is not found, throw an OperationNotConfiguredException to alert about misconfigured server
+                if (operationConfig == null) {
+                    throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
+                }
                 operationConfigs.put(operationName, operationConfig);
             }
         }

@@ -286,6 +286,26 @@ public class NextStepClient {
     }
 
     /**
+     * Get all operation configurations.
+     * @return All operation configurations.
+     * @throws NextStepServiceException Thrown when communication with Next Step service fails.
+     */
+    public ObjectResponse<GetOperationConfigsResponse> getOperationConfigs() throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetOperationConfigsRequest request = new GetOperationConfigsRequest();
+            HttpEntity<ObjectRequest<GetOperationConfigsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationConfigsResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigsResponse>>() {});
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            // Next Step service is down
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
      * Get list of pending operations for given user.
      * @param userId User ID.
      * @return List of pending operations.
