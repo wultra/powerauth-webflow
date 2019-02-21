@@ -39,8 +39,8 @@ public class FormDataConverter {
         result.setTitle(input.getTitle().getMessage());
         result.setMessage(input.getGreeting().getMessage());
         List<Attribute> attributes = result.getAttributes();
-        Integer existingIndex = null;
         for (OperationFormFieldAttribute attribute : input.getParameters()) {
+            Integer existingIndex = null;
             int counter = 0;
             for (Attribute attr: attributes) {
                 // Make sure attribute with already existing ID is present only once
