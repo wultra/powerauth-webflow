@@ -16,8 +16,11 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter;
 
 import io.getlime.security.powerauth.lib.mtoken.model.entity.FormData;
+import io.getlime.security.powerauth.lib.mtoken.model.entity.attributes.Attribute;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.OperationFormFieldAttribute;
+
+import java.util.List;
 
 /**
  * Converter for the form data objects used for mobile API.
@@ -35,8 +38,24 @@ public class FormDataConverter {
         FormData result = new FormData();
         result.setTitle(input.getTitle().getMessage());
         result.setMessage(input.getGreeting().getMessage());
+        List<Attribute> attributes = result.getAttributes();
+        Integer existingIndex = null;
         for (OperationFormFieldAttribute attribute : input.getParameters()) {
-            result.getAttributes().add(attributeConverter.fromOperationFormFieldAttribute(attribute));
+            int counter = 0;
+            for (Attribute attr: attributes) {
+                // Make sure attribute with already existing ID is present only once
+                if (attr.getId().equals(attribute.getId())) {
+                    existingIndex = counter;
+                    break;
+                }
+                counter++;
+            }
+            Attribute attributeToSave = attributeConverter.fromOperationFormFieldAttribute(attribute);
+            if (existingIndex != null) {
+                attributes.set(existingIndex, attributeToSave);
+            } else {
+                attributes.add(attributeToSave);
+            }
         }
         return result;
     }
