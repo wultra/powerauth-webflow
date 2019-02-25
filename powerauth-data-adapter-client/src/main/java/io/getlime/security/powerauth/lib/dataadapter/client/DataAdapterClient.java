@@ -17,7 +17,9 @@
 package io.getlime.security.powerauth.lib.dataadapter.client;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
@@ -38,11 +40,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Authentication services provides services for communication with the Data Adapter.
@@ -62,7 +68,7 @@ public class DataAdapterClient {
      * @param serviceUrl Base URL.
      */
     public DataAdapterClient(String serviceUrl) {
-        this(serviceUrl, new ObjectMapper());
+        this(serviceUrl, null);
     }
 
     /**
@@ -72,9 +78,31 @@ public class DataAdapterClient {
      */
     public DataAdapterClient(String serviceUrl, ObjectMapper objectMapper) {
         this.serviceUrl = serviceUrl;
-        this.objectMapper = objectMapper;
+        if (objectMapper != null) {
+            this.objectMapper = objectMapper;
+        } else {
+            this.objectMapper = objectMapper();
+        }
         restTemplate = new RestTemplate();
+
+        // Prepare message converters
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(this.objectMapper);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        converters.add(converter);
+        restTemplate.setMessageConverters(converters);
+
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+    }
+
+    /**
+     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
+     * @return Constructed object mapper.
+     */
+    private ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
     }
 
     /**
