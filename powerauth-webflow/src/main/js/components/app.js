@@ -48,6 +48,10 @@ export class App extends React.Component {
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
     }
 
+    /**
+     * Confirm the security warning override.
+     * @param event Related event triggered by user click.
+     */
     securityWarningOverride(event) {
         event.preventDefault();
         this.props.dispatch({
