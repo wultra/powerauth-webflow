@@ -26,6 +26,7 @@
     "react-dom": "^15.4.2",
     "react-redux": "^5.0.3",
     "react-tiny-spin": "^0.6.5",
+    "react-device-detect": "^1.6.2",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "redux-promise-middleware": "^4.2.0",

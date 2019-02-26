@@ -1,5 +1,6 @@
 import React from "react";
 import {connect} from "react-redux";
+import {isAndroid} from 'react-device-detect';
 
 import StartHandshake from "./startHandshake";
 import Login from "./login";
@@ -9,7 +10,7 @@ import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
 import SMSAuthorization from "./smsAuth";
 // i18n
-import {injectIntl} from "react-intl";
+import {FormattedMessage, injectIntl} from "react-intl";
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -18,7 +19,8 @@ import {injectIntl} from "react-intl";
  */
 @connect((store) => {
     return {
-        screen: store.dispatching.currentScreen
+        screen: store.dispatching.currentScreen,
+        security: store.security
     }
 })
 export class App extends React.Component {
@@ -26,6 +28,7 @@ export class App extends React.Component {
     constructor() {
         super();
         this.changeLang = this.changeLang.bind(this);
+        this.securityWarningOverride = this.securityWarningOverride.bind(this);
     }
 
     /**
@@ -43,6 +46,13 @@ export class App extends React.Component {
         // cookie expiration is set to 30 days
         d.setTime(d.getTime() + (30 * 24 * 60 * 60 * 1000));
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
+    }
+
+    securityWarningOverride(event) {
+        event.preventDefault();
+        this.props.dispatch({
+            type: "SECURITY_WARNING_OVERRIDE"
+        });
     }
 
     render() {
@@ -94,7 +104,17 @@ export class App extends React.Component {
                     <div className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
-                            <Component intl={this.props.intl}/>
+                            {(!isAndroid && !this.props.security.warningOverride) ? (
+                                <div className="jumbotron text-center">
+                                    <h3><FormattedMessage id="security.warning.android.title"/></h3>
+                                    <hr className="my-4"/>
+                                    <span className="lead"><FormattedMessage id="security.warning.android.text"/></span>
+                                    <a className="btn btn-primary btn-lg" href="#" role="button"
+                                       onClick={this.securityWarningOverride}><FormattedMessage id="security.warning.android.override"/></a>
+                                </div>
+                            ) : (
+                                <Component intl={this.props.intl}/>
+                            )}
                         </div>
                     </div>
                 </div>
