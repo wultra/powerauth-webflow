@@ -50,7 +50,7 @@ export class App extends React.Component {
 
     render() {
         let Component;
-        if (isAndroid && !this.props.security.warningOverride) {
+        if (showAndroidSecurityWarning && isAndroid && !this.props.security.warningOverride) {
             Component = SecurityOverride;
         } else {
             switch (this.props.screen) {
