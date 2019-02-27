@@ -19,7 +19,7 @@ Other dependencies are resolved automatically by Maven by downloading packages f
 
 ## Building Web Flow
 
-Web Flow can be built using [the parent pom.xml file](../pom.xml) of project [powerauth-webflow](https://github.com/wultra/powerauth-webflow). Use the "package" goal to generate the war artifacts. The war files will be built in target subfolders of project folders. In case the compilation fails, check for missing PowerAuth dependencies to be installed.
+Web Flow can be built using [the parent pom.xml file](../pom.xml) of project [powerauth-webflow](https://github.com/wultra/powerauth-webflow#docucheck-keep-link). Use the "package" goal to generate the war artifacts. The war files will be built in target subfolders of project folders. In case the compilation fails, check for missing PowerAuth dependencies to be installed.
 
 ## Deployment
 
@@ -38,8 +38,8 @@ The whole installation process is described in the [Web Flow Installation Manual
 You can test the web flow demo application by navigating to: http://localhost:8080/powerauth-webflow-client
 
 * Use the "Login" action to test the user authentication. The Credential Server Sample project uses "test" as password for any username.
-* Use the "Payment (DEMO)" action to test payment authorization. You will need to enable POWERAUTH_TOKEN authentication method for the user who will authorize the payment (using [Next Step REST API](https://github.com/wultra/powerauth-webflow/wiki/Next-Step-Server-REST-API-Reference#user-content-enable-an-authentication-method-for-given-user)).
-* Use the "Authorization" action to test operation authorization. In order to test this action you will need to create an operation and obtain its operationId (using [Next Step REST API](https://github.com/wultra/powerauth-webflow/wiki/Next-Step-Server-REST-API-Reference#user-content-create-an-operation]])).
+* Use the "Payment (DEMO)" action to test payment authorization. You will need to enable POWERAUTH_TOKEN authentication method for the user who will authorize the payment (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#enable-an-authentication-method-for-given-user)).
+* Use the "Authorization" action to test operation authorization. In order to test this action you will need to create an operation and obtain its operationId (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#create-an-operation)).
 
 ## Maven Profiles (Advanced)
 
@@ -68,4 +68,4 @@ To start the frontend part in the IDE, use the **package** phase with the "dev" 
 
 `mvn package -P dev`
 
-Maven builds the application and stops the deployment in the moment when webpack starts watching for changes. When you make any change in JavaScript code, you should see a message from compiler and bundle.js in target folder should be redeployed automatically using the WebpackDeployPlugin (see [webpack.config.js](https://github.com/wultra/powerauth-webflow/blob/master/powerauth-webflow/webpack.config.js) and [webpack-deploy.js](https://github.com/wultra/powerauth-webflow/blob/master/powerauth-webflow/src/main/js/webpack-deploy.js)). Note that bundle.js is built in full debug mode, hence the large size of the output of the compiler. Compiled frontend code is located in target/classes/static/built/bundle.js
+Maven builds the application and stops the deployment in the moment when webpack starts watching for changes. When you make any change in JavaScript code, you should see a message from compiler and bundle.js in target folder should be redeployed automatically using the WebpackDeployPlugin (see [webpack.config.js](../powerauth-webflow/webpack.config.js) and [webpack-deploy.js](../powerauth-webflow/src/main/js/webpack-deploy.js)). Note that bundle.js is built in full debug mode, hence the large size of the output of the compiler. Compiled frontend code is located in target/classes/static/built/bundle.js

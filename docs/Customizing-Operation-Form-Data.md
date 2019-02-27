@@ -42,7 +42,7 @@ The value is formatted based on specified format type. The following format type
 
 ## Resource Localization
 
-Form data labels are specified using localization key, such as "operation.title". This key is localized using resources. See chapter [Customizing Web Flow Appearance](https://github.com/wultra/powerauth-webflow-customization/wiki/Customizing-Web-Flow-Appearance) for details about updating resources.
+Form data labels are specified using localization key, such as "operation.title". This key is localized using resources. See chapter [Customizing Web Flow Appearance](https://github.com/wultra/powerauth-webflow-customization/blob/develop/docs/Customizing-Web-Flow-Appearance.md) for details about updating resources.
 
 Form data value localization for custom attributes:
 - Form data values are localized in case they use the `LOCALIZED_TEXT` value format type.
