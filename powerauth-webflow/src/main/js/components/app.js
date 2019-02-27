@@ -8,9 +8,10 @@ import Success from "./success";
 import Error from "./error";
 import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
+import SecurityOverride from "./securityOverride";
 import SMSAuthorization from "./smsAuth";
 // i18n
-import {FormattedMessage, injectIntl} from "react-intl";
+import {injectIntl} from "react-intl";
 
 /**
  * The App class is the main React component of this application. It handles incoming WebSocket messages
@@ -28,7 +29,6 @@ export class App extends React.Component {
     constructor() {
         super();
         this.changeLang = this.changeLang.bind(this);
-        this.securityWarningOverride = this.securityWarningOverride.bind(this);
     }
 
     /**
@@ -48,47 +48,40 @@ export class App extends React.Component {
         document.cookie = "lang=" + lang + ";expires=" + d.toUTCString() + ";path=/";
     }
 
-    /**
-     * Confirm the security warning override.
-     * @param event Related event triggered by user click.
-     */
-    securityWarningOverride(event) {
-        event.preventDefault();
-        this.props.dispatch({
-            type: "SECURITY_WARNING_OVERRIDE"
-        });
-    }
-
     render() {
         let Component;
-        switch (this.props.screen) {
-            case "SCREEN_LOGIN": {
-                Component = Login;
-                break;
-            }
-            case "SCREEN_SUCCESS": {
-                Component = Success;
-                break;
-            }
-            case "SCREEN_ERROR": {
-                Component = Error;
-                break;
-            }
-            case "SCREEN_OPERATION_REVIEW": {
-                Component = OperationReview;
-                break;
-            }
-            case "SCREEN_TOKEN": {
-                Component = Token;
-                break;
-            }
-            case "SCREEN_SMS": {
-                Component = SMSAuthorization;
-                break;
-            }
-            default: {
-                Component = StartHandshake;
-                break;
+        if (isAndroid && !this.props.security.warningOverride) {
+            Component = SecurityOverride;
+        } else {
+            switch (this.props.screen) {
+                case "SCREEN_LOGIN": {
+                    Component = Login;
+                    break;
+                }
+                case "SCREEN_SUCCESS": {
+                    Component = Success;
+                    break;
+                }
+                case "SCREEN_ERROR": {
+                    Component = Error;
+                    break;
+                }
+                case "SCREEN_OPERATION_REVIEW": {
+                    Component = OperationReview;
+                    break;
+                }
+                case "SCREEN_TOKEN": {
+                    Component = Token;
+                    break;
+                }
+                case "SCREEN_SMS": {
+                    Component = SMSAuthorization;
+                    break;
+                }
+                default: {
+                    Component = StartHandshake;
+                    break;
+                }
             }
         }
         return (
@@ -108,17 +101,7 @@ export class App extends React.Component {
                     <div className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
-                            {(isAndroid && !this.props.security.warningOverride) ? (
-                                <div className="jumbotron text-center">
-                                    <h3><FormattedMessage id="security.warning.android.title"/></h3>
-                                    <hr className="my-4"/>
-                                    <span className="lead"><FormattedMessage id="security.warning.android.text"/></span>
-                                    <a className="btn btn-primary btn-lg" href="#" role="button"
-                                       onClick={this.securityWarningOverride}><FormattedMessage id="security.warning.android.override"/></a>
-                                </div>
-                            ) : (
                                 <Component intl={this.props.intl}/>
-                            )}
                         </div>
                     </div>
                 </div>
