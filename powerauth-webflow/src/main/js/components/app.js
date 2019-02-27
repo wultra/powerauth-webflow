@@ -108,7 +108,7 @@ export class App extends React.Component {
                     <div className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
-                            {(!isAndroid && !this.props.security.warningOverride) ? (
+                            {(isAndroid && !this.props.security.warningOverride) ? (
                                 <div className="jumbotron text-center">
                                     <h3><FormattedMessage id="security.warning.android.title"/></h3>
                                     <hr className="my-4"/>
