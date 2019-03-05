@@ -126,7 +126,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             return operation;
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);
-            return null;
+            throw new CommunicationFailedException("Operation is not available");
         }
     }
 
@@ -150,13 +150,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param operationName Operation name.
      * @return Operation configuration.
      */
-    protected GetOperationConfigResponse getOperationConfig(String operationName) {
+    protected GetOperationConfigResponse getOperationConfig(String operationName) throws AuthStepException {
         try {
             final ObjectResponse<GetOperationConfigResponse> operationConfigResponse = nextStepClient.getOperationConfig(operationName);
             return operationConfigResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);
-            return null;
+            throw new CommunicationFailedException("Operation configuration is not available");
         }
     }
 
@@ -164,13 +164,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * Get operation configurations.
      * @return Operation configurations.
      */
-    protected GetOperationConfigsResponse getOperationConfigs() {
+    protected GetOperationConfigsResponse getOperationConfigs() throws AuthStepException {
         try {
             final ObjectResponse<GetOperationConfigsResponse> operationConfigsResponse = nextStepClient.getOperationConfigs();
             return operationConfigsResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);
-            return null;
+            throw new CommunicationFailedException("Operation configuration is not available");
         }
     }
 
@@ -185,7 +185,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param userId User ID.
      * @return List of operations for given user.
      */
-    protected List<GetOperationDetailResponse> getOperationListForUser(String userId) {
+    protected List<GetOperationDetailResponse> getOperationListForUser(String userId) throws AuthStepException {
         try {
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, getAuthMethodName());
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
@@ -195,7 +195,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
-            return null;
+            logger.error("Error occurred in Next Step server", e);
+            throw new CommunicationFailedException("Operations are not available");
         }
     }
 
@@ -344,7 +345,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             return initResponse;
         } catch (NextStepServiceException e) {
             logger.error("Error while initiating operation", e);
-            return provider.failedAuthentication(null, "error.unknown");
+            return provider.failedAuthentication(null, "error.communication");
         }
     }
 
@@ -460,7 +461,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         } catch (NextStepServiceException e) {
             logger.error("Error while building authorization response", e);
-            throw new AuthStepException(e.getError().getMessage(), e);
+            throw new CommunicationFailedException("Step authorization failed");
         }
     }
 

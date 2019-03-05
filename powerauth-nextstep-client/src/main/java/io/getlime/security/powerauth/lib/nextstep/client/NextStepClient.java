@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -469,7 +470,7 @@ public class NextStepClient {
      * @param ex Exception to handle.
      */
     private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) {
-        Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessage());
+        Error error = new Error(NextStepServiceException.ERROR_COMMUNICATION, ex.getMessage());
         return new NextStepServiceException(ex, error);
     }
 
@@ -477,35 +478,39 @@ public class NextStepClient {
      * Handle HTTP error.
      * @param ex Exception to handle.
      * @return Next step service exception.
-     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    private NextStepServiceException handleHttpError(HttpStatusCodeException ex) throws NextStepServiceException {
+    private NextStepServiceException handleHttpError(HttpStatusCodeException ex) {
         try {
             TypeReference<ErrorResponse> typeReference = new TypeReference<ErrorResponse>() {};
             ErrorResponse errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
             Error error = errorResponse.getResponseObject();
             switch (error.getCode()) {
                 case OperationAlreadyFinishedException.CODE:
-                    throw new OperationAlreadyFinishedException(error.getMessage());
+                    return new OperationAlreadyFinishedException(error.getMessage());
                 case OperationAlreadyFailedException.CODE:
-                    throw new OperationAlreadyFailedException(error.getMessage());
+                    return new OperationAlreadyFailedException(error.getMessage());
                 case OperationAlreadyCanceledException.CODE:
-                    throw new OperationAlreadyCanceledException(error.getMessage());
+                    return new OperationAlreadyCanceledException(error.getMessage());
                 case OperationNotFoundException.CODE:
-                    throw new OperationNotFoundException(error.getMessage());
+                    return new OperationNotFoundException(error.getMessage());
                 case OperationNotConfiguredException.CODE:
-                    throw new OperationNotConfiguredException(error.getMessage());
+                    return new OperationNotConfiguredException(error.getMessage());
                 case OperationAlreadyExistsException.CODE:
-                    throw new OperationAlreadyExistsException(error.getMessage());
+                    return new OperationAlreadyExistsException(error.getMessage());
                 case InvalidOperationDataException.CODE:
-                    throw new InvalidOperationDataException(error.getMessage());
+                    return new InvalidOperationDataException(error.getMessage());
                 default:
                     return new NextStepServiceException(ex, error);
             }
         } catch (IOException ex2) {
-            // JSON parsing failed
-            Error error = new Error(Error.Code.ERROR_GENERIC, ex2.getMessage());
-            return new NextStepServiceException(ex, error);
+            Error error;
+            if (ex.getStatusCode() != HttpStatus.OK) {
+                error = new Error(NextStepServiceException.ERROR_COMMUNICATION, "HTTP error occurred: " + ex.getMessage());
+                return new NextStepServiceException(ex, error);
+            } else {
+                error = new Error(Error.Code.ERROR_GENERIC, "IO error occurred: " + ex2.getMessage());
+                return new NextStepServiceException(ex2, error);
+            }
         }
     }
 

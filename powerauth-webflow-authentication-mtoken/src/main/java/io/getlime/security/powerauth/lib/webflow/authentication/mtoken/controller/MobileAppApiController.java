@@ -26,13 +26,13 @@ import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResp
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
@@ -99,6 +99,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
+     * @throws OperationNotConfiguredException Thrown in case operation is not configured.
      */
     @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
@@ -112,6 +113,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
+     * @throws OperationNotConfiguredException Thrown in case operation is not configured.
      */
     @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
@@ -142,12 +144,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             // Get the list of operations for given user
-            final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            if (operationList == null) {
-                // Next step operation failed, return empty operation list
+            List<GetOperationDetailResponse> operationList;
+            Map<String, GetOperationConfigResponse> operationConfigs;
+            try {
+                operationList = getOperationListForUser(userId);
+                operationConfigs = getOperationConfigs(operationList);
+            } catch (AuthStepException e) {
+                // Next step operation list failed, return empty operation list
                 return new ObjectResponse<>(new OperationListResponse());
             }
-            final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
+
 
             // Prepare converter
             final OperationConverter converter = new OperationConverter();
@@ -171,7 +177,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param operations Operation list.
      * @return Map of operation configurations.
      */
-    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) throws OperationNotConfiguredException {
+    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) throws AuthStepException {
         final Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
         final GetOperationConfigsResponse allConfigsResponse = getOperationConfigs();
         // Construct Map for all configured operations on server (operation name -> operation configuration)
@@ -313,9 +319,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthSignatureTypes signatureTypes)  {
 
         // Get configuration for operation with given name
-        final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
-
-        if (operationConfig == null) {
+        GetOperationConfigResponse operationConfig;
+        try {
+            operationConfig = getOperationConfig(operationName);
+        } catch (AuthStepException e) {
             // Next step request failed, cannot decide
             return false;
         }

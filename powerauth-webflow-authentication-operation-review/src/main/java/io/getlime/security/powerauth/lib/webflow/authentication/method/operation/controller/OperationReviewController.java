@@ -199,9 +199,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            response.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }

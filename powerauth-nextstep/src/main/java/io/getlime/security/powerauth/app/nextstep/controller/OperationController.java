@@ -197,6 +197,7 @@ public class OperationController {
     /**
      * Get configurations of all operations.
      *
+     * @param request Get configurations of all operations request.
      * @return Get operation configurations response.
      */
     @RequestMapping(value = "/operation/config/list", method = RequestMethod.POST)

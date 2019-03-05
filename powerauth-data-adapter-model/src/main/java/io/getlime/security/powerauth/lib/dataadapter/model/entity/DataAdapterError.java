@@ -38,6 +38,7 @@ public class DataAdapterError extends Error {
         public static final String INPUT_INVALID = "INPUT_INVALID";
         public static final String OPERATION_CONTEXT_INVALID = "OPERATION_CONTEXT_INVALID";
         public static final String REMOTE_ERROR = "REMOTE_ERROR";
+        public static final String COMMUNICATION_ERROR = "COMMUNICATION_ERROR";
     }
 
     /**

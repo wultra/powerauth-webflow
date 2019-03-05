@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeDisabledException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeInvalidActivationException;
@@ -146,7 +147,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             GetOperationDetailResponse updatedOperation = getOperation();
             remainingAttemptsNS = updatedOperation.getRemainingAttempts();
         } catch (NextStepServiceException e) {
-            throw new AuthStepException(e.getError().getMessage(), e);
+            logger.error("Error occurred in Next Step server", e);
+            throw new CommunicationFailedException("Authorization failed due to communication error");
         }
         OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid.");
         Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsPA, remainingAttemptsNS);
@@ -312,9 +314,10 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
             final QRCodeAuthenticationResponse response = new QRCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            response.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }

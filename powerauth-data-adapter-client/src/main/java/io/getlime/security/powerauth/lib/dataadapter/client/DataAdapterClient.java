@@ -35,10 +35,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOper
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -131,11 +128,7 @@ public class DataAdapterClient {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -157,12 +150,7 @@ public class DataAdapterClient {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -189,11 +177,7 @@ public class DataAdapterClient {
                     });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -216,11 +200,7 @@ public class DataAdapterClient {
             });
             return new Response();
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -245,12 +225,7 @@ public class DataAdapterClient {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -277,12 +252,7 @@ public class DataAdapterClient {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -309,12 +279,7 @@ public class DataAdapterClient {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
-            try {
-                throw httpStatusException(ex);
-            } catch (IOException ex2) { // JSON parsing failed
-                throw invalidErrorResponseBodyException(ex2);
-
-            }
+            throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
             throw resourceAccessException(ex);
         }
@@ -326,37 +291,36 @@ public class DataAdapterClient {
      * @return Data adapter client exception.
      */
     private DataAdapterClientErrorException resourceAccessException(ResourceAccessException ex) {
-        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
-        return new DataAdapterClientErrorException(ex, error);
-    }
-
-    /**
-     * Create new DataAdapterClientErrorException from IOException.
-     * @param ex Exception used when an I/O error occurs.
-     * @return Data adapter client exception.
-     */
-    private DataAdapterClientErrorException invalidErrorResponseBodyException(IOException ex) {
-        // JSON parsing failed
-        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, ex.getMessage());
+        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.COMMUNICATION_ERROR, ex.getMessage());
         return new DataAdapterClientErrorException(ex, error);
     }
 
     /**
      * Create new DataAdapterClientErrorException from HttpStatusCodeException.
      * @param ex Exception used when an HTTP error occurs.
-     * @return  Data adapter client exception.
-     * @throws IOException Thrown when response body could not be parsed.
+     * @return Data adapter client exception.
      */
-    private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) throws IOException {
-        TypeReference<ObjectResponse<DataAdapterError>> typeReference = new TypeReference<ObjectResponse<DataAdapterError>>() {
-        };
-        ObjectResponse<DataAdapterError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-        DataAdapterError error = errorResponse.getResponseObject();
-        if (error.getCode() == null) { // process malformed errors with undefined error code
-            error.setCode(DataAdapterError.Code.ERROR_GENERIC);
-            error.setMessage(ex.getMessage());
+    private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) {
+        try {
+            TypeReference<ObjectResponse<DataAdapterError>> typeReference = new TypeReference<ObjectResponse<DataAdapterError>>() {
+            };
+            ObjectResponse<DataAdapterError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+            DataAdapterError error = errorResponse.getResponseObject();
+            if (error.getCode() == null) { // process malformed errors with undefined error code
+                error.setCode(DataAdapterError.Code.ERROR_GENERIC);
+                error.setMessage(ex.getMessage());
+            }
+            return new DataAdapterClientErrorException(ex, error);
+        } catch (IOException ex2) {
+            DataAdapterError error;
+            if (ex.getStatusCode() != HttpStatus.OK) {
+                error = new DataAdapterError(DataAdapterError.Code.COMMUNICATION_ERROR, "HTTP error occurred: " + ex.getMessage());
+                return new DataAdapterClientErrorException(ex, error);
+            } else {
+                error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, "IO error occurred: " + ex2.getMessage());
+                return new DataAdapterClientErrorException(ex2, error);
+            }
         }
-        return new DataAdapterClientErrorException(ex, error);
     }
 
 }
