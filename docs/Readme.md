@@ -1,6 +1,6 @@
 # PowerAuth Web Flow Documentation
 
-PowerAuth Web Flow provides federated authentication and authorization services for securing web applications. Web Flow is built using [PowerAuth security protocol](https://github.com/wultra/powerauth-crypto/wiki) and performs role of [an OAuth 2.0 provider](http://projects.spring.io/spring-security-oauth/docs/oauth2.html).
+PowerAuth Web Flow provides federated authentication and authorization services for securing web applications. Web Flow is built using [PowerAuth security protocol](https://github.com/wultra/powerauth-crypto) and performs role of [an OAuth 2.0 provider](http://projects.spring.io/spring-security-oauth/docs/oauth2.html).
 
 Typical use-case for the software stack is securing the RESTful API interfaces, or authentication / authorization for internet banking via central authentication / authorization component.
 

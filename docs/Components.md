@@ -54,6 +54,12 @@ Data Adapter handles following use cases:
 * Notify backend about operation status changes: finished operation, failed operation and canceled operation.
 * Send authorization SMS messages with OTP code -- message text is prepared and localized, however SMS message needs to be sent by the remote backend.
 
+## Mobile Token
+
+Mobile Token is a standalone mobile application which allows user to confirm authentication, or authorization operations, created by Web Flow Server. 
+
+For more information see our [Mobile Token product page](https://www.wultra.com/product/powerauth-mobile-token).
+
 ## PowerAuth Server
 
 PowerAuth Server is used as a backend in authorization steps which require signature verification, token verification or access to the secure vault. These services are required by the Mobile Token application. PowerAuth Server is deployed in internal network and does not have a public facing API, for this reason all requests to PowerAuth Server are handled by Web Flow Server.

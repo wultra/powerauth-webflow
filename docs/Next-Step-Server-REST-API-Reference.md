@@ -450,7 +450,7 @@ Operation detail contains following data:
 * **result** - result of the last authentication step: CONTINUE, FAILED or DONE (required)
 * **timestampCreated** - timestamp when operation was created (required)
 * **timestampExpires** - timestamp when operation expires (required)
-* **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code#operation-data) for easier interpretation of data in Mobile token.
+* **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) for easier interpretation of data in Mobile token.
 * **steps** - next steps for the operation (required)
 * **history** - operation history with completed authentication steps (required)
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
@@ -1445,3 +1445,4 @@ Sets chosen authentication method for current operation step.
   "status" : "OK",
   "responseObject" : null
 }
+```
