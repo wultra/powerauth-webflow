@@ -99,11 +99,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
-     * @throws OperationNotConfiguredException Thrown in case operation is not configured.
      */
     @RequestMapping(value = "/operation/list/signature", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/list/signature", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationList(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -113,7 +112,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @return Response with list of pending operations.
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
-     * @throws OperationNotConfiguredException Thrown in case operation is not configured.
      */
     @RequestMapping(value = "/operation/list", method = RequestMethod.POST)
     @PowerAuthToken(signatureType = {
@@ -122,7 +120,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE_BIOMETRY
     })
-    public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
+    public @ResponseBody ObjectResponse<OperationListResponse> getOperationListTokens(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         return getOperationListImpl(apiAuthentication);
     }
 
@@ -133,7 +131,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @throws InvalidActivationException Thrown in case activation is not valid.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      */
-    private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException, OperationNotConfiguredException {
+    private ObjectResponse<OperationListResponse> getOperationListImpl(PowerAuthApiAuthentication apiAuthentication) throws InvalidActivationException, PowerAuthAuthenticationException {
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
             String userId = apiAuthentication.getUserId();
