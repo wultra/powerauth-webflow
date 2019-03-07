@@ -69,7 +69,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
      * Client details service which stores client data in JDBC data source.
      * @return Client details service.
      */
-    @Bean("JdbcClientsDetailService")
+    @Bean("jdbcClientsDetailService")
     public ClientDetailsService clientDetailsService() {
         // client data is stored in JDBC data source (table oauth_client_details)
         return new JdbcClientDetailsService(dataSource);
