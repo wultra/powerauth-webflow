@@ -470,7 +470,7 @@ public class NextStepClient {
      * @param ex Exception to handle.
      */
     private NextStepServiceException handleResourceAccessError(ResourceAccessException ex) {
-        Error error = new Error(NextStepServiceException.ERROR_COMMUNICATION, ex.getMessage());
+        Error error = new Error(NextStepServiceException.COMMUNICATION_ERROR, ex.getMessage());
         return new NextStepServiceException(ex, error);
     }
 
@@ -505,7 +505,7 @@ public class NextStepClient {
         } catch (IOException ex2) {
             Error error;
             if (ex.getStatusCode() != HttpStatus.OK) {
-                error = new Error(NextStepServiceException.ERROR_COMMUNICATION, "HTTP error occurred: " + ex.getMessage());
+                error = new Error(NextStepServiceException.COMMUNICATION_ERROR, "HTTP error occurred: " + ex.getMessage());
                 return new NextStepServiceException(ex, error);
             } else {
                 error = new Error(Error.Code.ERROR_GENERIC, "IO error occurred: " + ex2.getMessage());
