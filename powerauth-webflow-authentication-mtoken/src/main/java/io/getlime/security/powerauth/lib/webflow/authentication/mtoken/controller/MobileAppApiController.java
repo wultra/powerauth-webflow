@@ -174,6 +174,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * Get map of all operation configurations (operation name -> operation configuration).
      * @param operations Operation list.
      * @return Map of operation configurations.
+     * @throws AuthStepException Thrown in case operation configuration query fails.
      */
     private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) throws AuthStepException {
         final Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
