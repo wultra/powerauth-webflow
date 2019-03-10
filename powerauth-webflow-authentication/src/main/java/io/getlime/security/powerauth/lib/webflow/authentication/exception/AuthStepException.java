@@ -48,6 +48,17 @@ public class AuthStepException extends Exception {
     }
 
     /**
+     * Constructor with message, cause and message ID.
+     *
+     * @param message Error message.
+     * @param cause   Error cause (original exception, if any).
+     * @param messageId Error message localization key.
+     */
+    public AuthStepException(String message, Throwable cause, String messageId) {
+        super(message, cause);
+        this.messageId = messageId;
+    }
+    /**
      * Get number of remaining authentication attempts.
      * @return Number of remaining attempts.
      */

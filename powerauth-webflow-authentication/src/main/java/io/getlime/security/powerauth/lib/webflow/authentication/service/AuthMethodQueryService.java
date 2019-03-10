@@ -24,6 +24,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,6 +39,8 @@ import java.util.Map;
  */
 @Service
 public class AuthMethodQueryService {
+
+    private static final Logger logger = LoggerFactory.getLogger(AuthMethodQueryService.class);
 
     private final NextStepClient nextStepClient;
     private final PowerAuthServiceClient powerAuthServiceClient;
@@ -80,6 +84,7 @@ public class AuthMethodQueryService {
             }
             return false;
         } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
             return false;
         }
     }

@@ -102,9 +102,10 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 GetOperationDetailResponse updatedOperation = getOperation();
                 remainingAttemptsNS = updatedOperation.getRemainingAttempts();
             } catch (NextStepServiceException e2) {
-                throw new AuthStepException(e2.getError().getMessage(), e2);
+                logger.error("Error occurred in Next Step server", e);
+                throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
             }
-            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
+            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e, "error.communication");
             Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
             Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
             authEx.setRemainingAttempts(remainingAttempts);
@@ -151,7 +152,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             logger.error("Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-            initResponse.setMessage(e.getMessage());
+            initResponse.setMessage("error.communication");
             return initResponse;
         }
     }
@@ -237,7 +238,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             logger.error("Error when canceling SMS message validation.", e);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
-            cancelResponse.setMessage(e.getMessage());
+            cancelResponse.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }
