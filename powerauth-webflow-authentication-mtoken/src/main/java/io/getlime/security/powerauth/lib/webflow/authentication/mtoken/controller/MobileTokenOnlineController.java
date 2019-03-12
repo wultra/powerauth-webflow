@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
@@ -73,18 +74,18 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     /**
      * Authenticate using online mobile token.
      * @param request Online mobile token authentication rquest.
-     * @return User ID.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected String authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         checkOperationExpiration(operation);
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
                     && !AuthResult.FAILED.equals(h.getAuthResult())) {
-                return operation.getUserId();
+                return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
             }
         }
         return null;

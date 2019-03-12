@@ -244,7 +244,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             if (operation.getOperationData().equals(request.getRequestObject().getData())
                     && operation.getUserId() != null
                     && operation.getUserId().equals(apiAuthentication.getUserId())) {
-                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
+                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId());
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new Response();
             } else {

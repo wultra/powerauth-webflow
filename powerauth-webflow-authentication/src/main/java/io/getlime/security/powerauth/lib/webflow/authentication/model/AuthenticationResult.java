@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,55 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
-
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+package io.getlime.security.powerauth.lib.webflow.authentication.model;
 
 /**
- * Model for a username / password authentication request from client.
+ * Result of user authentication.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
+public class AuthenticationResult {
 
-    private String username;
-    private String password;
+    private String userId;
     private String organizationId;
 
     /**
-     * Get username.
-     *
-     * @return Username.
+     * Default constructor.
      */
-    public String getUsername() {
-        return username;
+    public AuthenticationResult() {
     }
 
     /**
-     * Set username.
-     *
-     * @param username Username.
+     * Constructor with authentication details.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
      */
-    public void setUsername(String username) {
-        this.username = username;
+    public AuthenticationResult(String userId, String organizationId) {
+        this.userId = userId;
+        this.organizationId = organizationId;
     }
 
     /**
-     * Get password.
-     *
-     * @return Password.
+     * Get user ID.
+     * @return User ID.
      */
-    public String getPassword() {
-        return password;
+    public String getUserId() {
+        return userId;
     }
 
     /**
-     * Set password.
-     *
-     * @param password Password.
+     * Set user ID.
+     * @param userId User ID.
      */
-    public void setPassword(String password) {
-        this.password = password;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     /**

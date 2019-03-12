@@ -113,16 +113,17 @@ public class DataAdapterClient {
     /**
      * Perform authentication with provided username and password.
      *
-     * @param username username for user who is being authenticated
-     * @param password password as a string
-     * @param operationContext operation context
-     * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation
+     * @param username Username for user who is being authenticated.
+     * @param password Password as a string.
+     * @param organizationId Organization ID.
+     * @param operationContext Operation context.
+     * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<AuthenticationResponse> authenticateUser(String username, String password, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<AuthenticationResponse> authenticateUser(String username, String password, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange authentication request with data adapter.
-            AuthenticationRequest request = new AuthenticationRequest(username, password, AuthenticationType.BASIC, operationContext);
+            AuthenticationRequest request = new AuthenticationRequest(username, password, organizationId, AuthenticationType.BASIC, operationContext);
             HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<AuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
             });
@@ -160,14 +161,15 @@ public class DataAdapterClient {
      * Create authorization SMS message with OTP authorization code.
      *
      * @param userId           User ID.
+     * @param organizationId   Organization ID.
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, String organizationId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
         try {
-            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, lang, operationContext);
+            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, organizationId, lang, operationContext);
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
             HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
@@ -210,14 +212,15 @@ public class DataAdapterClient {
      * Decorate operation form data.
      *
      * @param userId User ID of the user for this request.
+     * @param organizationId Organization ID for this request.
      * @param operationContext Operation context.
      * @return Decorated operation form data.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(String userId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
-            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, operationContext);
+            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, operationContext);
             HttpHeaders headers = new HttpHeaders();
             headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
             HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
@@ -236,15 +239,17 @@ public class DataAdapterClient {
      *
      * @param formDataChange Operation form data change.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @return Object response.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse formDataChangedNotification(FormDataChange formDataChange, String userId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse formDataChangedNotification(FormDataChange formDataChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
             FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
             request.setUserId(userId);
+            request.setOrganizationId(organizationId);
             request.setOperationContext(operationContext);
             request.setFormDataChange(formDataChange);
             HttpEntity<ObjectRequest<FormDataChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
@@ -264,14 +269,16 @@ public class DataAdapterClient {
      * @param operationChange Operation change.
      * @return Object response.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
             OperationChangeNotificationRequest request = new OperationChangeNotificationRequest();
             request.setUserId(userId);
+            request.setOrganizationId(organizationId);
             request.setOperationContext(operationContext);
             request.setOperationChange(operationChange);
             HttpEntity<ObjectRequest<OperationChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));

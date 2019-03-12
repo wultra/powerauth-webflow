@@ -21,6 +21,9 @@ VALUES ('SMS_KEY', 6, 0, NULL, NULL, 1, 5, 1, 'method.smsKey');
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('login', 'A', 2, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
+-- organization configuration
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (1, 'login', 'CREATE', NULL, NULL, 1, 'USER_ID_ASSIGN', 'CONTINUE');

@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 public class DecorateOperationFormDataRequest {
 
     private String userId;
+    private String organizationId;
     private OperationContext operationContext;
 
     /**
@@ -37,10 +38,12 @@ public class DecorateOperationFormDataRequest {
     /**
      * Constructor with user ID and operation context as a parameter.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      */
-    public DecorateOperationFormDataRequest(String userId, OperationContext operationContext) {
+    public DecorateOperationFormDataRequest(String userId, String organizationId, OperationContext operationContext) {
         this.userId = userId;
+        this.organizationId = organizationId;
         this.operationContext = operationContext;
     }
 
@@ -58,6 +61,22 @@ public class DecorateOperationFormDataRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

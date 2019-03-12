@@ -17,9 +17,15 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 // Actions
-import {authenticate, cancel} from '../actions/usernamePasswordAuthActions'
+import {
+    authenticate,
+    cancel,
+    getOrganizationList,
+    organizationConfigurationError,
+    selectOrganization
+} from '../actions/usernamePasswordAuthActions'
 // Components
-import {Button, FormControl, FormGroup, Panel} from 'react-bootstrap';
+import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
 import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from 'react-intl';
@@ -38,74 +44,160 @@ export default class Login extends React.Component {
         super();
         this.handleLogin = this.handleLogin.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
+        this.organizationChanged = this.organizationChanged.bind(this);
+    }
+
+    componentWillMount() {
+        this.props.dispatch(getOrganizationList());
     }
 
     handleLogin(event) {
         event.preventDefault();
-        var username = ReactDOM.findDOMNode(this.refs.username);
-        var password = ReactDOM.findDOMNode(this.refs.password);
-        this.props.dispatch(authenticate(username.value, password.value));
+        const organizationId = this.props.context.chosenOrganizationId;
+        let usernameField = "username" + "_" + organizationId;
+        let passwordField = "password" + "_" + organizationId;
+        var username = ReactDOM.findDOMNode(this.refs[usernameField]);
+        var password = ReactDOM.findDOMNode(this.refs[passwordField]);
+        this.props.dispatch(authenticate(username.value, password.value, organizationId));
         password.value = "";
     }
 
     handleCancel(event) {
         event.preventDefault();
-        var username = ReactDOM.findDOMNode(this.refs.username);
-        var password = ReactDOM.findDOMNode(this.refs.password);
+        const organizationId = this.props.context.chosenOrganizationId;
+        let usernameField = "username" + "_" + organizationId;
+        let passwordField = "password" + "_" + organizationId;
+        var username = ReactDOM.findDOMNode(this.refs[usernameField]);
+        var password = ReactDOM.findDOMNode(this.refs[passwordField]);
         this.props.dispatch(cancel());
         username.value = "";
         password.value = "";
     }
 
     render() {
-        const formatMessage = this.props.intl.formatMessage;
         return (
             <div id="login">
-                <form onSubmit={this.handleLogin}>
-                    <Panel>
-                        <FormGroup className="title">
-                            <FormattedMessage id="login.pleaseLogIn"/>
-                        </FormGroup>
-                        { this.props.context.error ? (
-                            <FormGroup className="message-error">
-                                <FormattedMessage id={this.props.context.message}/>
-                                {(this.props.context.remainingAttempts > 0) ? (
-                                    <div>
-                                        <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
-                                    </div>
-                                ) : (
-                                    undefined
-                                )}
-                            </FormGroup>
-                            ) : (
-                                undefined
+                {this.props.context.loading ?
+                    <Spinner/>
+                    :
+                    <form onSubmit={this.handleLogin}>
+                        {this.mainPanel()}
+                    </form>
+                }
+            </div>
+        )
+    }
+
+    mainPanel() {
+        const organizations = this.props.context.organizations;
+        if (organizations === undefined) {
+            // Organization list is not loaded yet
+            return undefined;
+        }
+        if (organizations.length === 1) {
+            return this.singleOrganization();
+        } else if (organizations.length < 4) {
+            return this.fewOrganizations();
+        } else if (organizations >= 4) {
+            return this.manyOrganizations();
+        } else {
+            this.props.dispatch(organizationConfigurationError());
+        }
+    }
+
+    singleOrganization() {
+        const organizations = this.props.context.organizations;
+        return (
+            <Panel>
+                {this.loginForm(organizations[0].organizationId)}
+            </Panel>
+        )
+    }
+
+    fewOrganizations() {
+        const formatMessage = this.props.intl.formatMessage;
+        const organizations = this.props.context.organizations;
+        if (this.props.context.chosenOrganizationId === undefined) {
+            let defaultOrganizationId = organizations[0].organizationId;
+            organizations.forEach(function (org) {
+                if (org.default === true) {
+                    defaultOrganizationId = org.organizationId;
+                }
+            });
+            this.props.dispatch(selectOrganization(defaultOrganizationId));
+        } else {
+            return (
+                <Panel>
+                    <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
+                        {organizations.map((org) => {
+                            return (
+                                <Tab eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                                    {this.loginForm(org.organizationId)}
+                                </Tab>
                             )
-                        }
-                        <FormGroup>
-                            <FormControl autoComplete="new-password" ref="username" type="text"
-                                         placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
-                        </FormGroup>
-                        <FormGroup>
-                            <FormControl autoComplete="new-password" ref="password" type="password"
-                                         placeholder={formatMessage({id: 'login.password'})}/>
-                        </FormGroup>
-                        <FormGroup>
-                            <div className="row buttons">
-                                <div className="col-xs-6">
-                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                        <FormattedMessage id="login.cancel"/>
-                                    </a>
-                                </div>
-                                <div className="col-xs-6">
-                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                        <FormattedMessage id="login.signIn"/>
-                                    </Button>
-                                </div>
+                        })}
+                    </Tabs>
+                </Panel>
+            )
+        }
+    }
+
+    manyOrganizations() {
+        // TODO - combobox implementation
+        return this.fewOrganizations();
+    }
+
+    organizationChanged(organizationId) {
+        this.props.dispatch(selectOrganization(organizationId));
+    }
+
+    loginForm(organizationId) {
+        let usernameField = "username" + "_" + organizationId;
+        let passwordField = "password" + "_" + organizationId;
+        const formatMessage = this.props.intl.formatMessage;
+        return(
+            <div>
+                <FormGroup className="title">
+                    <FormattedMessage id="login.pleaseLogIn"/>
+                </FormGroup>
+                {this.props.context.error ? (
+                    <FormGroup className="message-error">
+                        <FormattedMessage id={this.props.context.message}/>
+                        {(this.props.context.remainingAttempts > 0) ? (
+                            <div>
+                                <FormattedMessage
+                                    id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
                             </div>
-                        </FormGroup>
-                    </Panel>
-                </form>
-                {this.props.context.loading ? <Spinner/> : undefined}
+                        ) : (
+                            undefined
+                        )}
+                    </FormGroup>
+                ) : (
+                    undefined
+                )
+                }
+                <FormGroup>
+                    <FormControl autoComplete="new-password" ref={usernameField} type="text"
+                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
+                </FormGroup>
+                <FormGroup>
+                    <FormControl autoComplete="new-password" ref={passwordField} type="password"
+                                 placeholder={formatMessage({id: 'login.password'})}/>
+                </FormGroup>
+                <FormGroup>
+                    <div className="row buttons">
+                        <div className="col-xs-6">
+                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                <FormattedMessage id="login.cancel"/>
+                            </a>
+                        </div>
+                        <div className="col-xs-6">
+                            <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                <FormattedMessage id="login.signIn"/>
+                            </Button>
+                        </div>
+                    </div>
+                </FormGroup>
             </div>
         )
     }

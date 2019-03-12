@@ -47,6 +47,7 @@ public class UserProfileController {
 
     private static final String LANGUAGE = "language";
     private static final String SCA = "sca";
+    private static final String ORGANIZATION_ID = "organizationId";
 
     @Autowired
     public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
@@ -76,6 +77,7 @@ public class UserProfileController {
             userResponse.getUser().setId(userDetail.getId());
             userResponse.getUser().setGivenName(userDetail.getGivenName());
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
+            userResponse.getConnection().setOrganizationId((String) additionalInfo.get(ORGANIZATION_ID));
             userResponse.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
             userResponse.getConnection().setSca((Boolean) additionalInfo.get(SCA));
         } catch (DataAdapterClientErrorException e) {
@@ -83,6 +85,7 @@ public class UserProfileController {
             userResponse.getUser().setId("anonymousUser");
             userResponse.getUser().setGivenName(null);
             userResponse.getUser().setFamilyName(null);
+            userResponse.getConnection().setOrganizationId(null);
             userResponse.getConnection().setLanguage("en");
             userResponse.getConnection().setSca(false);
         }

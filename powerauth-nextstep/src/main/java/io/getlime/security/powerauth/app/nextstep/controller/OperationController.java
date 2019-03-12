@@ -141,6 +141,7 @@ public class OperationController {
         response.setOperationId(operation.getOperationId());
         response.setOperationName(operation.getOperationName());
         response.setUserId(operation.getUserId());
+        response.setOrganizationId(operation.getOrganizationId());
         response.setOperationData(operation.getOperationData());
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
@@ -238,6 +239,7 @@ public class OperationController {
             response.setOperationId(operation.getOperationId());
             response.setOperationName(operation.getOperationName());
             response.setUserId(operation.getUserId());
+            response.setOrganizationId(operation.getOrganizationId());
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());

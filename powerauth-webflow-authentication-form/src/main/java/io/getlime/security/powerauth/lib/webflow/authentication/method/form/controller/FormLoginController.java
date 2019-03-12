@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -29,12 +30,21 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationsResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.converter.OrganizationConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.OrganizationDetailRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.OrganizationListRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationListResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,34 +69,39 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     private static final Logger logger = LoggerFactory.getLogger(FormLoginController.class);
 
     private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
+
+    private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
     /**
      * Controller constructor.
-     * @param dataAdapterClient Data adapter client.
+     * @param dataAdapterClient Data Adapter client.
+     * @param nextStepClient Next Step client.
      */
     @Autowired
-    public FormLoginController(DataAdapterClient dataAdapterClient) {
+    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
         this.dataAdapterClient = dataAdapterClient;
+        this.nextStepClient = nextStepClient;
     }
 
     /**
      * Authenticate using username / password authentication.
      * @param request Authentication request.
-     * @return Authenticated user ID.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), request.getOrganizationId(), operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString());
-            return responseObject.getUserId();
+            return new AuthenticationResult(responseObject.getUserId(), responseObject.getOrganizationId());
         } catch (DataAdapterClientErrorException e) {
             Integer remainingAttemptsNS;
             try {
@@ -106,7 +121,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 logger.error("Error occurred in Next Step server", e);
                 throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
             }
-            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e, "error.communication");
+            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
             Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
             Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
             authEx.setRemainingAttempts(remainingAttempts);
@@ -204,5 +219,57 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }
+    }
+
+    /**
+     * Get organization detail.
+     * @param request Get organization detail request.
+     * @return Get organization detail response.
+     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
+     */
+    @RequestMapping(value = "/organization", method = RequestMethod.POST)
+    public @ResponseBody OrganizationDetailResponse getOrganizationDetail(@RequestBody OrganizationDetailRequest request) throws AuthStepException {
+        if (request == null || request.getOrganizationId() == null) {
+            throw new AuthStepException("Invalid request in getOrganization", "error.invalidRequest");
+        }
+        String organizationId = request.getOrganizationId();
+        logger.info("Get organization detail started, organization ID: {}", organizationId);
+        final OrganizationDetailResponse response;
+        try {
+            ObjectResponse<GetOrganizationResponse> nsObjectResponse = nextStepClient.getOrganization(organizationId);
+            GetOrganizationResponse nsResponse = nsObjectResponse.getResponseObject();
+            response = organizationConverter.fromNSOrganization(nsResponse);
+        } catch (NextStepServiceException e) {
+            throw new CommunicationFailedException("Organization is not available");
+        }
+        logger.info("Get organization detail succeeded, organization ID: {}", organizationId);
+        return response;
+    }
+
+    /**
+     * Get organizations.
+     * @param request Get organizations request.
+     * @return Get organizations response.
+     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
+     */
+    @RequestMapping(value = "/organization/list", method = RequestMethod.POST)
+    public @ResponseBody OrganizationListResponse getOrganizationList(@RequestBody OrganizationListRequest request) throws AuthStepException {
+        if (request == null) {
+            throw new AuthStepException("Invalid request in getOrganizations", "error.invalidRequest");
+        }
+        logger.info("Get organization list started");
+        final OrganizationListResponse response = new OrganizationListResponse();
+        try {
+            ObjectResponse<GetOrganizationsResponse> nsObjectResponse = nextStepClient.getOrganizations();
+            List<GetOrganizationResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
+            for (GetOrganizationResponse nsResponse: nsResponseList) {
+                OrganizationDetailResponse organization = organizationConverter.fromNSOrganization(nsResponse);
+                response.addOrganization(organization);
+            }
+        } catch (NextStepServiceException e) {
+            throw new CommunicationFailedException("Organization is not available");
+        }
+        logger.info("Get organization list succeeded");
+        return response;
     }
 }

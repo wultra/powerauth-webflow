@@ -4,10 +4,12 @@
 
 ### Database Changes
 
-We added `NOT NULL` definitions to database tables to improve data integrity.
+#### Improved Data Integrity
+
+Many `NOT NULL` definitions were added to database tables to improve data integrity.
 
 DDL update script for Oracle:
-```
+```sql
 ALTER TABLE NS_AUTH_METHOD MODIFY AUTH_METHOD NOT NULL;
 ALTER TABLE NS_AUTH_METHOD MODIFY ORDER_NUMBER NOT NULL;
 ALTER TABLE NS_AUTH_METHOD MODIFY CHECK_AUTH_FAILS NOT NULL;
@@ -42,7 +44,7 @@ ALTER TABLE DA_SMS_AUTHORIZATION MODIFY MESSAGE_TEXT NOT NULL;
 ```
 
 DDL update script for MySQL:
-```
+```sql
 ALTER TABLE `ns_auth_method` MODIFY `auth_method` VARCHAR(32) NOT NULL;
 ALTER TABLE `ns_auth_method` MODIFY `order_number` INTEGER NOT NULL;
 ALTER TABLE `ns_auth_method` MODIFY `check_auth_fails` BOOLEAN NOT NULL;
@@ -74,4 +76,46 @@ ALTER TABLE `da_sms_authorization` MODIFY `operation_name` VARCHAR(32) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `authorization_code` VARCHAR(32) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `salt` VARBINARY(16) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `message_text` TEXT NOT NULL;
+```
+
+#### Organization Context Support
+
+Table `ns_organization` has been added for organization context in Web Flow.
+
+DDL update script for Oracle:
+```sql
+CREATE TABLE ns_organization (
+  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
+  display_name_key         VARCHAR(256),
+  is_default               NUMBER(1) DEFAULT 0 NOT NULL,
+  order_number             INTEGER NOT NULL
+);
+
+ALTER TABLE ns_operation ADD organization_id VARCHAR(256);
+
+ALTER TABLE ns_operation ADD CONSTRAINT organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id);
+
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+
+ALTER TABLE da_sms_authorization ADD organization_id VARCHAR(256);
+
+COMMIT;
+```
+
+DDL update script for MySQL:
+```sql
+CREATE TABLE ns_organization (
+  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
+  display_name_key         VARCHAR(256),
+  is_default               BOOLEAN NOT NULL,
+  order_number             INTEGER NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+ALTER TABLE ns_operation ADD organization_id VARCHAR(256);
+
+ALTER TABLE ns_operation ADD FOREIGN KEY organization_fk (organization_id) REFERENCES ns_organization (organization_id);
+
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
+
+ALTER TABLE da_sms_authorization ADD organization_id VARCHAR(256);
 ```

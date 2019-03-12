@@ -99,9 +99,20 @@ CREATE TABLE ns_operation (
   operation_data            CLOB NOT NULL,
   operation_form_data       CLOB,
   user_id                   VARCHAR(256),
+  organization_id           VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
   timestamp_expires         TIMESTAMP
+);
+
+-- Table ns_organization stores definitions of organizations related to the operations.
+-- At least one default organization must be configured.
+-- Data in this table needs to be loaded before Web Flow is started.
+CREATE TABLE ns_organization (
+  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
+  display_name_key         VARCHAR(256),
+  is_default               NUMBER(1) DEFAULT 0 NOT NULL,
+  order_number             INTEGER NOT NULL
 );
 
 -- Table ns_operation_history stores all changes of operations.
@@ -152,6 +163,7 @@ CREATE TABLE da_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY NOT NULL,
   operation_id         VARCHAR(256) NOT NULL,
   user_id              VARCHAR(256) NOT NULL,
+  organization_id      VARCHAR(256),
   operation_name       VARCHAR(32) NOT NULL,
   authorization_code   VARCHAR(32) NOT NULL,
   salt                 BLOB NOT NULL,

@@ -26,6 +26,7 @@ public class AuthenticationResponse {
      * Unique user ID which identifies the user.
      */
     private String userId;
+    private String organizationId;
 
     /**
      * Default constructor.
@@ -36,9 +37,11 @@ public class AuthenticationResponse {
     /**
      * Constructor with user ID parameter for convenience.
      * @param userId Identification of the user.
+     * @param organizationId Organization ID.
      */
-    public AuthenticationResponse(String userId) {
+    public AuthenticationResponse(String userId, String organizationId) {
         this.userId = userId;
+        this.organizationId = organizationId;
     }
 
     /**
@@ -57,4 +60,19 @@ public class AuthenticationResponse {
         return userId;
     }
 
+    /**
+     * Get the organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set the organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
 }

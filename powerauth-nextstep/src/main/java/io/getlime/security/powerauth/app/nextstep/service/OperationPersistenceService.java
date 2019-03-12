@@ -86,6 +86,7 @@ public class OperationPersistenceService {
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
+        operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
         try {
             // Store form data as serialized JSON string.
@@ -131,6 +132,7 @@ public class OperationPersistenceService {
         }
         OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
+        operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
         // operation expiration time matches current response expiration time
         operation.setTimestampExpires(response.getTimestampExpires());

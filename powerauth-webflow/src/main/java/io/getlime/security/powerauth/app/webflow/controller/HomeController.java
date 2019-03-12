@@ -15,10 +15,12 @@
  */
 package io.getlime.security.powerauth.app.webflow.controller;
 
+import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.slf4j.Logger;
@@ -111,14 +113,16 @@ public class HomeController {
                 logger.info("There are duplicate operation ID instances (" + operationId + ") in redirect URL, first instance will be used");
             }
             // check whether operation exists, if it does not exist or it could not be retrieved, redirect user to the error page
+            String organizationId;
             try {
-                nextStepClient.getOperationDetail(operationId);
+                ObjectResponse<GetOperationDetailResponse> objectResponse = nextStepClient.getOperationDetail(operationId);
+                organizationId = objectResponse.getResponseObject().getOrganizationId();
             } catch (NextStepServiceException e) {
                 logger.error("Error occurred while retrieving operation with ID: " + operationId, e);
                 return "redirect:/oauth/error";
             }
 
-            authenticationManagementService.createAuthenticationWithOperationId(operationId);
+            authenticationManagementService.createAuthenticationWithOperationId(operationId, organizationId);
         }
 
         model.put("title", webFlowConfig.getPageTitle());

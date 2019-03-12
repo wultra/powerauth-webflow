@@ -31,6 +31,7 @@ public class CreateOperationRequest {
     private String operationName;
     private String operationId;
     private String operationData;
+    private String organizationId;
     private List<KeyValueParameter> params;
     private OperationFormData formData;
 
@@ -89,6 +90,22 @@ public class CreateOperationRequest {
      */
     public void setOperationData(String operationData) {
         this.operationData = operationData;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,54 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
-
 /**
- * Model for a username / password authentication request from client.
+ * Request object used for querying an organization.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
+public class OrganizationDetailRequest {
 
-    private String username;
-    private String password;
     private String organizationId;
-
-    /**
-     * Get username.
-     *
-     * @return Username.
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Set username.
-     *
-     * @param username Username.
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Get password.
-     *
-     * @return Password.
-     */
-    public String getPassword() {
-        return password;
-    }
-
-    /**
-     * Set password.
-     *
-     * @param password Password.
-     */
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     /**
      * Get organization ID.

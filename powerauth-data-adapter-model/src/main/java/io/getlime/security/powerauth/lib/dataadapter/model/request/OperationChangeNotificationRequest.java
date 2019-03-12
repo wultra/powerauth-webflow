@@ -27,6 +27,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 public class OperationChangeNotificationRequest {
 
     private String userId;
+    private String organizationId;
     private OperationContext operationContext;
     private OperationChange operationChange;
 
@@ -39,11 +40,13 @@ public class OperationChangeNotificationRequest {
     /**
      * Constructor with user ID, operation ID and form data change.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationChange Operation change request object.
      * @param operationContext Operation context.
      */
-    public OperationChangeNotificationRequest(String userId, OperationChange operationChange, OperationContext operationContext) {
+    public OperationChangeNotificationRequest(String userId, String organizationId, OperationChange operationChange, OperationContext operationContext) {
         this.userId = userId;
+        this.organizationId = organizationId;
         this.operationChange = operationChange;
         this.operationContext = operationContext;
     }
@@ -62,6 +65,22 @@ public class OperationChangeNotificationRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**
