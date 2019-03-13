@@ -321,5 +321,16 @@ a:hover, a:active, a:focus {
 }
 
 .organization .Select-input {
-    height: 42px;
+    height: 34px;
 }
+
+.organization .Select-value-label {
+    font-size: 14px;
+    text-align: left;
+}
+
+.organization .Select-option {
+    font-size: 14px;
+    text-align: left;
+}
+
