@@ -103,7 +103,7 @@ export function getOrganizationList() {
                 message: ""
             }
         });
-        axios.post("./api/auth/form/organization/list", {}).then((response) => {
+        axios.post("./api/auth/form/setup", {}).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_LOGIN",
                 payload: response.data

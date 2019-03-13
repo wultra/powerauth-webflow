@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.converter;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 
 /**
  * Converter for operation configuration.
@@ -30,8 +30,8 @@ public class OperationConfigConverter {
      * @param operationConfig Operation config entity.
      * @return Operation config response.
      */
-    public GetOperationConfigResponse fromOperationConfigEntity(OperationConfigEntity operationConfig) {
-        GetOperationConfigResponse response = new GetOperationConfigResponse();
+    public GetOperationConfigDetailResponse fromOperationConfigEntity(OperationConfigEntity operationConfig) {
+        GetOperationConfigDetailResponse response = new GetOperationConfigDetailResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
         response.setTemplateId(operationConfig.getTemplateId());

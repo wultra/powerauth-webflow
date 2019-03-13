@@ -65,9 +65,9 @@ public class OrganizationController {
      * @return Get organizations response.
      * @throws OrganizationNotFoundException Thrown in case organization does not exist.
      */
-    @RequestMapping(value = "/organization", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOrganizationResponse> getOrganization(@RequestBody ObjectRequest<GetOrganizationRequest> request) throws OrganizationNotFoundException {
-        logger.info("Received getOrganization request");
+    @RequestMapping(value = "/organization/detail", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
+        logger.info("Received getOrganizationDetail request");
         if (request == null || request.getRequestObject() == null) {
             throw new OrganizationNotFoundException("Invalid request");
         }
@@ -76,8 +76,8 @@ public class OrganizationController {
             throw new OrganizationNotFoundException("Organization not found, organization ID: " + request.getRequestObject().getOrganizationId());
         }
         OrganizationEntity organization = organizationOptional.get();
-        GetOrganizationResponse response = organizationConverter.fromOrganizationEntity(organization);
-        logger.info("The getOrganization request succeeded");
+        GetOrganizationDetailResponse response = organizationConverter.fromOrganizationEntity(organization);
+        logger.info("The getOrganizationDetail request succeeded");
         return new ObjectResponse<>(response);
     }
 
@@ -88,15 +88,15 @@ public class OrganizationController {
      * @return Get organizations response.
      */
     @RequestMapping(value = "/organization/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOrganizationsResponse> getOrganizations(@RequestBody ObjectRequest<GetOrganizationsRequest> request) {
-        logger.info("Received listOrganizations request");
-        GetOrganizationsResponse response = new GetOrganizationsResponse();
+    public @ResponseBody ObjectResponse<GetOrganizationListResponse> getOrganizationList(@RequestBody ObjectRequest<GetOrganizationListRequest> request) {
+        logger.info("Received getOrganizationList request");
+        GetOrganizationListResponse response = new GetOrganizationListResponse();
         List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
         for (OrganizationEntity organization: organizations) {
-            GetOrganizationResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
+            GetOrganizationDetailResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
             response.addOrganization(orgResponse);
         }
-        logger.info("The listOrganizations request succeeded, number of organizations: {}", response.getOrganizations().size());
+        logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);
     }
 

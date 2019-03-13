@@ -182,16 +182,16 @@ public class OperationController {
      * @return Get operation configuration response.
      * @throws OperationNotConfiguredException Thrown when operation is not configured.
      */
-    @RequestMapping(value = "/operation/config", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOperationConfigResponse> operationConfig(@RequestBody ObjectRequest<GetOperationConfigRequest> request) throws OperationNotConfiguredException {
+    @RequestMapping(value = "/operation/config/detail", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationNotConfiguredException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received operationConfig request, operation name: {}", request.getRequestObject().getOperationName());
+        logger.debug("Received getOperationConfigDetail request, operation name: {}", request.getRequestObject().getOperationName());
 
-        GetOperationConfigRequest requestObject = request.getRequestObject();
+        GetOperationConfigDetailRequest requestObject = request.getRequestObject();
 
-        GetOperationConfigResponse response = operationConfigurationService.getOperationConfig(requestObject.getOperationName());
+        GetOperationConfigDetailResponse response = operationConfigurationService.getOperationConfig(requestObject.getOperationName());
 
-        logger.debug("The operationConfig request succeeded, operation name: {}", request.getRequestObject().getOperationName());
+        logger.debug("The getOperationConfigDetail request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
 
@@ -202,13 +202,13 @@ public class OperationController {
      * @return Get operation configurations response.
      */
     @RequestMapping(value = "/operation/config/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetOperationConfigsResponse> operationConfigs(@RequestBody ObjectRequest<GetOperationConfigsRequest> request) {
+    public @ResponseBody ObjectResponse<GetOperationConfigListResponse> getOperationConfigList(@RequestBody ObjectRequest<GetOperationConfigListRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received operationConfigs request");
+        logger.debug("Received getOperationConfigList request");
 
-        GetOperationConfigsResponse response = operationConfigurationService.getOperationConfigs();
+        GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigs();
 
-        logger.debug("The operationConfigs request succeeded");
+        logger.debug("The getOperationConfigList request succeeded");
         return new ObjectResponse<>(response);
     }
 

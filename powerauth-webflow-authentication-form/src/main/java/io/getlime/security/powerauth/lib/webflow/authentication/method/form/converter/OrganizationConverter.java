@@ -15,8 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.converter;
 
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetail;
 
 /**
  * Converter for organizations.
@@ -30,8 +30,8 @@ public class OrganizationConverter {
      * @param organization Organization from Next Step.
      * @return Organization used in Web Flow.
      */
-    public OrganizationDetailResponse fromNSOrganization(GetOrganizationResponse organization) {
-        OrganizationDetailResponse response = new OrganizationDetailResponse();
+    public OrganizationDetail fromNSOrganization(GetOrganizationDetailResponse organization) {
+        OrganizationDetail response = new OrganizationDetail();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
         response.setOrderNumber(organization.getOrderNumber());

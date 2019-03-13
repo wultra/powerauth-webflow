@@ -301,13 +301,13 @@ public class NextStepClient {
      * @return Operation configuration.
      * @throws NextStepServiceException Thrown when operation configuration is missing.
      */
-    public ObjectResponse<GetOperationConfigResponse> getOperationConfig(String operationName) throws NextStepServiceException {
+    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(String operationName) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetOperationConfigRequest request = new GetOperationConfigRequest();
+            GetOperationConfigDetailRequest request = new GetOperationConfigDetailRequest();
             request.setOperationName(operationName);
-            HttpEntity<ObjectRequest<GetOperationConfigRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOperationConfigResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigResponse>>() {});
+            HttpEntity<ObjectRequest<GetOperationConfigDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationConfigDetailResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigDetailResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -322,12 +322,12 @@ public class NextStepClient {
      * @return All operation configurations.
      * @throws NextStepServiceException Thrown when communication with Next Step service fails.
      */
-    public ObjectResponse<GetOperationConfigsResponse> getOperationConfigs() throws NextStepServiceException {
+    public ObjectResponse<GetOperationConfigListResponse> getOperationConfigList() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetOperationConfigsRequest request = new GetOperationConfigsRequest();
-            HttpEntity<ObjectRequest<GetOperationConfigsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOperationConfigsResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigsResponse>>() {});
+            GetOperationConfigListRequest request = new GetOperationConfigListRequest();
+            HttpEntity<ObjectRequest<GetOperationConfigListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOperationConfigListResponse>> response = restTemplate.exchange(serviceUrl + "/operation/config/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOperationConfigListResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -343,13 +343,13 @@ public class NextStepClient {
      * @return Organization detail.
      * @throws NextStepServiceException Thrown when organization is missing or communication with Next Step service fails.
      */
-    public ObjectResponse<GetOrganizationResponse> getOrganization(String organizationId) throws NextStepServiceException {
+    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(String organizationId) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetOrganizationRequest request = new GetOrganizationRequest();
+            GetOrganizationDetailRequest request = new GetOrganizationDetailRequest();
             request.setOrganizationId(organizationId);
-            HttpEntity<ObjectRequest<GetOrganizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOrganizationResponse>> response = restTemplate.exchange(serviceUrl + "/organization", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOrganizationResponse>>() {});
+            HttpEntity<ObjectRequest<GetOrganizationDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOrganizationDetailResponse>> response = restTemplate.exchange(serviceUrl + "/organization/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOrganizationDetailResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -364,12 +364,12 @@ public class NextStepClient {
      * @return All organizations.
      * @throws NextStepServiceException Thrown when communication with Next Step service fails.
      */
-    public ObjectResponse<GetOrganizationsResponse> getOrganizations() throws NextStepServiceException {
+    public ObjectResponse<GetOrganizationListResponse> getOrganizationList() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetOrganizationsRequest request = new GetOrganizationsRequest();
-            HttpEntity<ObjectRequest<GetOrganizationsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GetOrganizationsResponse>> response = restTemplate.exchange(serviceUrl + "/organization/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOrganizationsResponse>>() {});
+            GetOrganizationListRequest request = new GetOrganizationListRequest();
+            HttpEntity<ObjectRequest<GetOrganizationListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetOrganizationListResponse>> response = restTemplate.exchange(serviceUrl + "/organization/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetOrganizationListResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
@@ -422,8 +422,8 @@ public class NextStepClient {
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethods() throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
-            GetAuthMethodsRequest request = new GetAuthMethodsRequest();
-            HttpEntity<ObjectRequest<GetAuthMethodsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            GetAuthMethodListRequest request = new GetAuthMethodListRequest();
+            HttpEntity<ObjectRequest<GetAuthMethodListRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/auth-method/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());

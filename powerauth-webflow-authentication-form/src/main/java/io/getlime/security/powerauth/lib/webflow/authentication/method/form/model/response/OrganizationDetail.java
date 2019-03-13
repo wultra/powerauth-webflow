@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.response;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response;
 
 /**
- * Response object used for querying an organization.
+ * Object used for storing information about organizations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetOrganizationResponse {
+public class OrganizationDetail {
 
     private String organizationId;
     private String displayNameKey;

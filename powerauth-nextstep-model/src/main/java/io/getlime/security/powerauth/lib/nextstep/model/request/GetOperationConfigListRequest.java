@@ -16,10 +16,10 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used for querying authentication methods.
+ * Request object used for querying operation configurations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetAuthMethodsRequest {
+public class GetOperationConfigListRequest {
 
 }

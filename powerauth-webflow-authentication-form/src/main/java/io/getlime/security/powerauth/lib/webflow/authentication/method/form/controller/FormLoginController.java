@@ -30,19 +30,18 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationsResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.converter.OrganizationConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.OrganizationDetailRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.OrganizationListRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.PrepareLoginFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationListResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetail;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
@@ -222,54 +221,29 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     }
 
     /**
-     * Get organization detail.
-     * @param request Get organization detail request.
-     * @return Get organization detail response.
+     * Prepare login form data.
+     * @param request Prepare login form data request.
+     * @return Prepare login form response.
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
-    @RequestMapping(value = "/organization", method = RequestMethod.POST)
-    public @ResponseBody OrganizationDetailResponse getOrganizationDetail(@RequestBody OrganizationDetailRequest request) throws AuthStepException {
-        if (request == null || request.getOrganizationId() == null) {
-            throw new AuthStepException("Invalid request in getOrganization", "error.invalidRequest");
-        }
-        String organizationId = request.getOrganizationId();
-        logger.info("Get organization detail started, organization ID: {}", organizationId);
-        final OrganizationDetailResponse response;
-        try {
-            ObjectResponse<GetOrganizationResponse> nsObjectResponse = nextStepClient.getOrganization(organizationId);
-            GetOrganizationResponse nsResponse = nsObjectResponse.getResponseObject();
-            response = organizationConverter.fromNSOrganization(nsResponse);
-        } catch (NextStepServiceException e) {
-            throw new CommunicationFailedException("Organization is not available");
-        }
-        logger.info("Get organization detail succeeded, organization ID: {}", organizationId);
-        return response;
-    }
-
-    /**
-     * Get organizations.
-     * @param request Get organizations request.
-     * @return Get organizations response.
-     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
-     */
-    @RequestMapping(value = "/organization/list", method = RequestMethod.POST)
-    public @ResponseBody OrganizationListResponse getOrganizationList(@RequestBody OrganizationListRequest request) throws AuthStepException {
+    @RequestMapping(value = "/setup", method = RequestMethod.POST)
+    public @ResponseBody PrepareLoginFormDataResponse prepareLoginForm(@RequestBody PrepareLoginFormDataRequest request) throws AuthStepException {
         if (request == null) {
-            throw new AuthStepException("Invalid request in getOrganizations", "error.invalidRequest");
+            throw new AuthStepException("Invalid request in prepareLoginForm", "error.invalidRequest");
         }
-        logger.info("Get organization list started");
-        final OrganizationListResponse response = new OrganizationListResponse();
+        logger.info("Prepare login form data started");
+        final PrepareLoginFormDataResponse response = new PrepareLoginFormDataResponse();
         try {
-            ObjectResponse<GetOrganizationsResponse> nsObjectResponse = nextStepClient.getOrganizations();
-            List<GetOrganizationResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
-            for (GetOrganizationResponse nsResponse: nsResponseList) {
-                OrganizationDetailResponse organization = organizationConverter.fromNSOrganization(nsResponse);
+            ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
+            List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
+            for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
+                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
                 response.addOrganization(organization);
             }
         } catch (NextStepServiceException e) {
             throw new CommunicationFailedException("Organization is not available");
         }
-        logger.info("Get organization list succeeded");
+        logger.info("Prepare login form data succeeded");
         return response;
     }
 }

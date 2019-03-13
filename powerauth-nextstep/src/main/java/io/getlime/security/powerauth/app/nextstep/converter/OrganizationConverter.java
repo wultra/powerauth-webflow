@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.converter;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 
 /**
  * Converter for organization entity.
@@ -30,8 +30,8 @@ public class OrganizationConverter {
      * @param organization Organization entity.
      * @return Get organization response.
      */
-    public GetOrganizationResponse fromOrganizationEntity(OrganizationEntity organization) {
-        GetOrganizationResponse response = new GetOrganizationResponse();
+    public GetOrganizationDetailResponse fromOrganizationEntity(OrganizationEntity organization) {
+        GetOrganizationDetailResponse response = new GetOrganizationDetailResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
         response.setOrderNumber(organization.getOrderNumber());

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,27 +16,10 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used obtaining operation configuration.
+ * Request object used for querying organizations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetOperationConfigRequest {
+public class GetOrganizationListRequest {
 
-    private String operationName;
-
-    /**
-     * Get the operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
-
-    /**
-     * Set the operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
 }

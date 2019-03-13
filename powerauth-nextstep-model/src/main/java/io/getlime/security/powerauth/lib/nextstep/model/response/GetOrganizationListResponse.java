@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response;
+package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,15 +23,15 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OrganizationListResponse {
+public class GetOrganizationListResponse {
 
-    private List<OrganizationDetailResponse> organizations = new ArrayList<>();
+    private List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
 
     /**
      * Get organizations.
      * @return Organizations.
      */
-    public List<OrganizationDetailResponse> getOrganizations() {
+    public List<GetOrganizationDetailResponse> getOrganizations() {
         return organizations;
     }
 
@@ -39,7 +39,7 @@ public class OrganizationListResponse {
      * Set organizations.
      * @param organizations Organizations.
      */
-    public void setOrganizations(List<OrganizationDetailResponse> organizations) {
+    public void setOrganizations(List<GetOrganizationDetailResponse> organizations) {
         this.organizations = organizations;
     }
 
@@ -47,7 +47,7 @@ public class OrganizationListResponse {
      * Add an organization.
      * @param organization Organization.
      */
-    public void addOrganization(OrganizationDetailResponse organization) {
+    public void addOrganization(GetOrganizationDetailResponse organization) {
         organizations.add(organization);
     }
 

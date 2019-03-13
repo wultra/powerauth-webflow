@@ -152,9 +152,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @return Operation configuration.
      * @throws AuthStepException Thrown in case communication with Next Step fails.
      */
-    protected GetOperationConfigResponse getOperationConfig(String operationName) throws AuthStepException {
+    protected GetOperationConfigDetailResponse getOperationConfig(String operationName) throws AuthStepException {
         try {
-            final ObjectResponse<GetOperationConfigResponse> operationConfigResponse = nextStepClient.getOperationConfig(operationName);
+            final ObjectResponse<GetOperationConfigDetailResponse> operationConfigResponse = nextStepClient.getOperationConfigDetail(operationName);
             return operationConfigResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);
@@ -167,9 +167,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @return Operation configurations.
      * @throws AuthStepException Thrown in case communication with Next Step fails.
      */
-    protected GetOperationConfigsResponse getOperationConfigs() throws AuthStepException {
+    protected GetOperationConfigListResponse getOperationConfigs() throws AuthStepException {
         try {
-            final ObjectResponse<GetOperationConfigsResponse> operationConfigsResponse = nextStepClient.getOperationConfigs();
+            final ObjectResponse<GetOperationConfigListResponse> operationConfigsResponse = nextStepClient.getOperationConfigList();
             return operationConfigsResponse.getResponseObject();
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);

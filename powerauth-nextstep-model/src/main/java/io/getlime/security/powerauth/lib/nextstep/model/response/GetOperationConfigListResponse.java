@@ -23,15 +23,15 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetOperationConfigsResponse {
+public class GetOperationConfigListResponse {
 
-    private List<GetOperationConfigResponse> operationConfigs = new ArrayList<>();
+    private List<GetOperationConfigDetailResponse> operationConfigs = new ArrayList<>();
 
     /**
      * Get operation configurations.
      * @return Operation configurations.
      */
-    public List<GetOperationConfigResponse> getOperationConfigs() {
+    public List<GetOperationConfigDetailResponse> getOperationConfigs() {
         return operationConfigs;
     }
 
@@ -39,7 +39,7 @@ public class GetOperationConfigsResponse {
      * Set operation configurations.
      * @param operationConfigs Operation configurations.
      */
-    public void setOperationConfigs(List<GetOperationConfigResponse> operationConfigs) {
+    public void setOperationConfigs(List<GetOperationConfigDetailResponse> operationConfigs) {
         this.operationConfigs = operationConfigs;
     }
 
@@ -47,7 +47,7 @@ public class GetOperationConfigsResponse {
      * Add operation configuration.
      * @param operationConfig Add operation configuration.
      */
-    public void addOperationConfig(GetOperationConfigResponse operationConfig) {
+    public void addOperationConfig(GetOperationConfigDetailResponse operationConfig) {
         operationConfigs.add(operationConfig);
     }
 }

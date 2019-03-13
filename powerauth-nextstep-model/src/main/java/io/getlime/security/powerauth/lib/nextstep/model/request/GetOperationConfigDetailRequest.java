@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Wultra s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,30 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used for querying an organization.
+ * Request object used obtaining operation configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OrganizationDetailRequest {
+public class GetOperationConfigDetailRequest {
 
-    private String organizationId;
+    private String operationName;
 
     /**
-     * Get organization ID.
-     * @return Organization ID.
+     * Get the operation name.
+     * @return Operation name.
      */
-    public String getOrganizationId() {
-        return organizationId;
+    public String getOperationName() {
+        return operationName;
     }
 
     /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
+     * Set the operation name.
+     * @param operationName Operation name.
      */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
     }
 }

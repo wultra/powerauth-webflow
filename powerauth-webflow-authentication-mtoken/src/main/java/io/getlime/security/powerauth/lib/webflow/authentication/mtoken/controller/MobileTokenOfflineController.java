@@ -28,7 +28,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
@@ -347,7 +347,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         String message = operationTextNormalizer.normalizeText(operation.getFormData().getSummary().getMessage());
 
         // Convert mobile token mode to AllowedSignatureType object
-        GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+        GetOperationConfigDetailResponse operationConfig = getOperationConfig(operationName);
 
         String flags = "";
         if (operationConfig != null) {

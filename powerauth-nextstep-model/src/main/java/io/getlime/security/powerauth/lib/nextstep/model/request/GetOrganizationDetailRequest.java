@@ -13,13 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used for querying organizations.
+ * Request object used for querying an organization.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OrganizationListRequest {
+public class GetOrganizationDetailRequest {
 
+    private String organizationId;
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
 }
