@@ -110,6 +110,7 @@ export default class Login extends React.Component {
         const organizations = this.props.context.organizations;
         return (
             <Panel>
+                {this.title()}
                 {this.loginForm(organizations[0].organizationId)}
             </Panel>
         )
@@ -127,6 +128,7 @@ export default class Login extends React.Component {
                         {organizations.map((org) => {
                             return (
                                 <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                                    {this.title()}
                                     {this.loginForm(org.organizationId)}
                                 </Tab>
                             )
@@ -154,13 +156,16 @@ export default class Login extends React.Component {
             });
             return (
                 <Panel>
+                    {this.title()}
                     <div className="row">
-                        <OrganizationSelect
-                            organizations={organizations}
-                            chosenOrganization={chosenOrganization}
-                            intl={this.props.intl}
-                            callback={organization => this.organizationChanged(organization.organizationId)}
-                        />
+                        <div className="col-xs-12">
+                            <OrganizationSelect
+                                organizations={organizations}
+                                chosenOrganization={chosenOrganization}
+                                intl={this.props.intl}
+                                callback={organization => this.organizationChanged(organization.organizationId)}
+                            />
+                        </div>
                     </div>
                     {this.loginForm(chosenOrganizationId)}
                 </Panel>
@@ -183,15 +188,21 @@ export default class Login extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
+    title() {
+        return (
+            <FormGroup className="title">
+                <FormattedMessage id="login.pleaseLogIn"/>
+            </FormGroup>
+        )
+    }
+
     loginForm(organizationId) {
         const usernameField = "username" + "_" + organizationId;
         const passwordField = "password" + "_" + organizationId;
         const formatMessage = this.props.intl.formatMessage;
         return(
             <div>
-                <FormGroup className="title">
-                    <FormattedMessage id="login.pleaseLogIn"/>
-                </FormGroup>
+
                 {this.props.context.error ? (
                     <FormGroup className="message-error">
                         <FormattedMessage id={this.props.context.message}/>

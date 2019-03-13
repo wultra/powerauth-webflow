@@ -317,13 +317,7 @@ a:hover, a:active, a:focus {
 }
 
 .organization .Select-control {
-    margin-left: 15px;
-    width: 40%;
-}
-
-.organization .Select-menu-outer {
-    margin-left: 15px;
-    width: 40%;
+    margin-bottom: 15px;
 }
 
 .organization .Select-input {
