@@ -29,6 +29,7 @@ import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap'
 import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from 'react-intl';
+import OrganizationSelect from "./organizationSelect";
 
 /**
  * Login component handles the user authentication using username and password.
@@ -54,10 +55,10 @@ export default class Login extends React.Component {
     handleLogin(event) {
         event.preventDefault();
         const organizationId = this.props.context.chosenOrganizationId;
-        let usernameField = "username" + "_" + organizationId;
-        let passwordField = "password" + "_" + organizationId;
-        var username = ReactDOM.findDOMNode(this.refs[usernameField]);
-        var password = ReactDOM.findDOMNode(this.refs[passwordField]);
+        const usernameField = "username" + "_" + organizationId;
+        const passwordField = "password" + "_" + organizationId;
+        const username = ReactDOM.findDOMNode(this.refs[usernameField]);
+        const password = ReactDOM.findDOMNode(this.refs[passwordField]);
         this.props.dispatch(authenticate(username.value, password.value, organizationId));
         password.value = "";
     }
@@ -65,10 +66,10 @@ export default class Login extends React.Component {
     handleCancel(event) {
         event.preventDefault();
         const organizationId = this.props.context.chosenOrganizationId;
-        let usernameField = "username" + "_" + organizationId;
-        let passwordField = "password" + "_" + organizationId;
-        var username = ReactDOM.findDOMNode(this.refs[usernameField]);
-        var password = ReactDOM.findDOMNode(this.refs[passwordField]);
+        const usernameField = "username" + "_" + organizationId;
+        const passwordField = "password" + "_" + organizationId;
+        const username = ReactDOM.findDOMNode(this.refs[usernameField]);
+        const password = ReactDOM.findDOMNode(this.refs[passwordField]);
         this.props.dispatch(cancel());
         username.value = "";
         password.value = "";
@@ -118,20 +119,14 @@ export default class Login extends React.Component {
         const formatMessage = this.props.intl.formatMessage;
         const organizations = this.props.context.organizations;
         if (this.props.context.chosenOrganizationId === undefined) {
-            let defaultOrganizationId = organizations[0].organizationId;
-            organizations.forEach(function (org) {
-                if (org.default === true) {
-                    defaultOrganizationId = org.organizationId;
-                }
-            });
-            this.props.dispatch(selectOrganization(defaultOrganizationId));
+            this.setDefaultOrganization();
         } else {
             return (
                 <Panel>
                     <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
                         {organizations.map((org) => {
                             return (
-                                <Tab eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                                <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
                                     {this.loginForm(org.organizationId)}
                                 </Tab>
                             )
@@ -143,8 +138,45 @@ export default class Login extends React.Component {
     }
 
     manyOrganizations() {
-        // TODO - combobox implementation
-        return this.fewOrganizations();
+        const organizations = this.props.context.organizations;
+        const chosenOrganizationId = this.props.context.chosenOrganizationId;
+        const formatMessage = this.props.intl.formatMessage;
+        if (chosenOrganizationId === undefined) {
+            this.setDefaultOrganization();
+        } else {
+            let chosenOrganization = organizations[0];
+            organizations.forEach(function (org) {
+                // perform i18n, the select component does not support i18n
+                org.displayName = formatMessage({id: org.displayNameKey});
+                if (org.organizationId === chosenOrganizationId) {
+                    chosenOrganization = org;
+                }
+            });
+            return (
+                <Panel>
+                    <div className="row">
+                        <OrganizationSelect
+                            organizations={organizations}
+                            chosenOrganization={chosenOrganization}
+                            intl={this.props.intl}
+                            callback={organization => this.organizationChanged(organization.organizationId)}
+                        />
+                    </div>
+                    {this.loginForm(chosenOrganizationId)}
+                </Panel>
+            )
+        }
+    }
+
+    setDefaultOrganization() {
+        const organizations = this.props.context.organizations;
+        let defaultOrganizationId = organizations[0].organizationId;
+        organizations.forEach(function (org) {
+            if (org.default === true) {
+                defaultOrganizationId = org.organizationId;
+            }
+        });
+        this.props.dispatch(selectOrganization(defaultOrganizationId));
     }
 
     organizationChanged(organizationId) {
@@ -152,8 +184,8 @@ export default class Login extends React.Component {
     }
 
     loginForm(organizationId) {
-        let usernameField = "username" + "_" + organizationId;
-        let passwordField = "password" + "_" + organizationId;
+        const usernameField = "username" + "_" + organizationId;
+        const passwordField = "password" + "_" + organizationId;
         const formatMessage = this.props.intl.formatMessage;
         return(
             <div>

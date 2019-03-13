@@ -315,3 +315,17 @@ a:hover, a:active, a:focus {
 .party-info-link {
     font-size: 12pt;
 }
+
+.organization .Select-control {
+    margin-left: 15px;
+    width: 40%;
+}
+
+.organization .Select-menu-outer {
+    margin-left: 15px;
+    width: 40%;
+}
+
+.organization .Select-input {
+    height: 42px;
+}
