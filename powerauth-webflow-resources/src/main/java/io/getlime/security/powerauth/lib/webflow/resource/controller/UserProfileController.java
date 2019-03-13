@@ -27,6 +27,7 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.Date;
@@ -61,7 +62,7 @@ public class UserProfileController {
      * @param authentication Original authentication of the currently logged user.
      * @return User profile.
      */
-    @RequestMapping("me")
+    @RequestMapping(value = "me", method = RequestMethod.GET)
     public @ResponseBody UserResponse me(OAuth2Authentication authentication) {
         UserResponse userResponse = new UserResponse();
 
