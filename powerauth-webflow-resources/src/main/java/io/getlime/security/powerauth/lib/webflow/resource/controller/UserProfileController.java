@@ -68,26 +68,29 @@ public class UserProfileController {
 
         // Try to fetch user details from the service
         try {
-            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName());
-
             // Get additional information stored with the token
             Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
+            String language = (String) additionalInfo.get(LANGUAGE);
+            Boolean sca = (Boolean) additionalInfo.get(SCA);
+            String organizationId = (String) additionalInfo.get(ORGANIZATION_ID);
+
+            final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName(), organizationId);
 
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
             userResponse.getUser().setId(userDetail.getId());
             userResponse.getUser().setGivenName(userDetail.getGivenName());
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
-            userResponse.getConnection().setOrganizationId((String) additionalInfo.get(ORGANIZATION_ID));
-            userResponse.getConnection().setLanguage((String) additionalInfo.get(LANGUAGE));
-            userResponse.getConnection().setSca((Boolean) additionalInfo.get(SCA));
+            userResponse.getConnection().setLanguage(language);
+            userResponse.getConnection().setSca(sca);
+            userResponse.getConnection().setOrganizationId(organizationId);
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
             userResponse.getUser().setId("anonymousUser");
             userResponse.getUser().setGivenName(null);
             userResponse.getUser().setFamilyName(null);
-            userResponse.getConnection().setOrganizationId(null);
             userResponse.getConnection().setLanguage("en");
             userResponse.getConnection().setSca(false);
+            userResponse.getConnection().setOrganizationId(null);
         }
         // Save service information
         userResponse.getService().setApplicationName(webFlowResourcesServerConfiguration.getApplicationName());

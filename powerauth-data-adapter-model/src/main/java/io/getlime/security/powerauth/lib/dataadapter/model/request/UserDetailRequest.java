@@ -23,7 +23,8 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
  */
 public class UserDetailRequest {
 
-    private String id;
+    private String userId;
+    private String organizationId;
 
     /**
      * Default constructor.
@@ -33,25 +34,44 @@ public class UserDetailRequest {
 
     /**
      * Constructor with user ID as a parameter.
-     * @param id User ID.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
      */
-    public UserDetailRequest(String id) {
-        this.id = id;
+    public UserDetailRequest(String userId, String organizationId) {
+        this.userId = userId;
+        this.organizationId = organizationId;
     }
 
     /**
      * Get user ID.
      * @return User ID.
      */
-    public String getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
     /**
      * Set user ID.
-     * @param id User ID.
+     * @param userId User ID.
      */
-    public void setId(String id) {
-        this.id = id;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
 }

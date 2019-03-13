@@ -139,13 +139,14 @@ public class DataAdapterClient {
      * Obtain user details for given user ID.
      *
      * @param userId User ID for the user to be obtained.
+     * @param organizationId Organization ID.
      * @return A response with user details.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId) throws DataAdapterClientErrorException {
+    public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId, String organizationId) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
-            UserDetailRequest request = new UserDetailRequest(userId);
+            UserDetailRequest request = new UserDetailRequest(userId, organizationId);
             HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/info", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
             });
