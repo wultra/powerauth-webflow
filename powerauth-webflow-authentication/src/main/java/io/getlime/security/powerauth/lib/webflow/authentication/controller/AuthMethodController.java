@@ -188,9 +188,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param userId User ID.
      * @return List of operations for given user.
      * @throws AuthStepException Thrown in case communication with Next Step fails.
-     *
-     *
-     *
      */
     protected List<GetOperationDetailResponse> getOperationListForUser(String userId) throws AuthStepException {
         try {
