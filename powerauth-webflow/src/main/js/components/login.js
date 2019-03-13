@@ -99,7 +99,7 @@ export default class Login extends React.Component {
             return this.singleOrganization();
         } else if (organizations.length > 1 && organizations.length < 4) {
             return this.fewOrganizations();
-        } else if (organizations >= 4) {
+        } else if (organizations.length >= 4) {
             return this.manyOrganizations();
         } else {
             this.props.dispatch(organizationConfigurationError());
