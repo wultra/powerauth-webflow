@@ -109,6 +109,7 @@ The list of expected status codes during authentication:
   "requestObject": {
     "username": "userxyz",
     "password": "s3cret",
+    "organizationId": "RETAIL",
     "type": "BASIC",
     "operationContext": {
       "id": "feaec766-1b44-42cb-9872-596a4fed689f",
@@ -351,6 +352,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "roman",
+    "organizationId": "RETAIL",    
     "operationContext": {
       "id": "52710b20-86ab-40d0-be07-8d59a765150d",
       "name": "authorize_payment",
@@ -551,6 +553,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "roman",
+    "organizationId": "RETAIL",    
     "operationContext": {
       "id": "38511d38-f4de-4e50-a9ab-2d176d6a8cd4",
       "name": "authorize_payment",
@@ -667,6 +670,7 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
 {
   "requestObject": {
     "userId": "roman",
+    "organizationId": "RETAIL",    
     "operationContext": {
       "id": "63046cce-731b-4a0d-89ef-5ff18c07e1d9",
       "name": "authorize_payment",
@@ -778,6 +782,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "roman",
+    "organizationId": "RETAIL",    
     "operationContext": {
       "id": "817db0c4-2d07-4ab4-86b3-b94ba10cd5b8",
       "name": "authorize_payment",

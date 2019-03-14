@@ -22,6 +22,9 @@ Following topics are covered in this chapter:
   - [List pending operations](#list-pending-operations)
   - [Update operation form data](#update-operation-formdata)
   - [Set chosen authentication method](#set-chosen-authentication-method)
+- [Organizations](#organizations)
+  - [Organization list](#list-organizations)
+  - [Organization detail](#organization-detail)
 
 You can access the generated REST API documentation in deployed Next Step:
 
@@ -1444,5 +1447,106 @@ Sets chosen authentication method for current operation step.
 {
   "status" : "OK",
   "responseObject" : null
+}
+```
+
+## Organizations
+
+### List organizations
+
+Lists all organizations configured on the server.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/organization/list</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "organizations": [
+      {
+        "organizationId": "RETAIL",
+        "displayNameKey": "organization.retail",
+        "orderNumber": 1,
+        "default": true
+      },
+      {
+        "organizationId": "SME",
+        "displayNameKey": "organization.sme",
+        "orderNumber": 2,
+        "default": false
+      }
+    ]
+  }
+}
+```
+
+### Organization detail
+
+Get detail of an organization configured on the server.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/organization/detail</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+	"requestObject": {
+		"organizationId": "RETAIL"
+	}
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "organizationId": "RETAIL",
+    "displayNameKey": "organization.retail",
+    "orderNumber": 1,
+    "default": true
+  }
 }
 ```

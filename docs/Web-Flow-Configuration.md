@@ -196,6 +196,43 @@ Note: bcrypt('changeme', 12) => '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/
 
 You can use [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) from Apache HTTP server to generate bcrypt hashes.
 
+
+## Organization configuration
+
+Web Flow requires at least one organization configured. The default configuration is following:
+
+Oracle:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+```
+
+MySQL:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
+```
+
+The default configuration assigns the `DEFAULT` organization to all operations. You can define multiple organizations to support
+authentication for multiple segments which can have overlapping user IDs, e.g.:
+
+Oracle:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
+```
+
+MySQL:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
+```
+
+Such configuration defines two organizations `RETAIL` and `SME`. The user sees two tabs when authenticating with localized labels 
+based on keys `organization.retail` and `organization.sme`. The user can switch the organization against which the authentication is performed. 
+The `RETAIL` organization is the default one (it is preselected in the UI). The order of displayed organizations is defined as 
+`RETAIL`, `SME` using the last parameter. 
+
+_Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
+
 ## Authentication methods and next step definitions
 
 Authentication methods and next step definitions need to be configured during Web Flow deployment.

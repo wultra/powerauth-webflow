@@ -124,11 +124,11 @@ export default class Login extends React.Component {
         } else {
             return (
                 <Panel>
+                    {this.title()}
                     <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
                         {organizations.map((org) => {
                             return (
                                 <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
-                                    {this.title()}
                                     {this.loginForm(org.organizationId)}
                                 </Tab>
                             )

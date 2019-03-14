@@ -327,10 +327,16 @@ a:hover, a:active, a:focus {
 .organization .Select-value-label {
     font-size: 14px;
     text-align: left;
+    padding-left: 2px;
 }
 
 .organization .Select-option {
     font-size: 14px;
     text-align: left;
+    padding-left: 12px;
+}
+
+.nav-tabs {
+    margin-bottom: 15px;
 }
 
