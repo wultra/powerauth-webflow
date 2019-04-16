@@ -25,6 +25,7 @@
 **Deployment**
 
 - [Web Flow Installation Manual](./Web-Flow-Installation-Manual.md)
+- [Deploying Web Flow on JBoss / Wildfly](./Deploying-Wildfly.md)
 - [Database Table Structure](./Database-Table-Structure.md)
 - [Migration Instructions](./Migration-Instructions.md)
 - [Docker Deployment](./Docker-Deployment.md)
