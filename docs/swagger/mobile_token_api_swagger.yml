@@ -1,0 +1,396 @@
+swagger: '2.0'
+
+info:
+  title: Mobile Token Operations
+  version: 1.0-DRAFT
+  description: |
+    Mobile Token API documentation.
+
+basePath: /api/auth/token/app/operation
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+
+  /list:
+    post:
+      description: Get the list with all operations that are pending confirmation.
+      parameters:
+        - name: Accept-Language
+          in: header
+          type: string
+          description: Endpoint should return localized data base on prefered language, e.g. `cs-CZ`.
+        - name: X-PowerAuth-Token
+          in: header
+          required: true
+          type: string
+      responses:
+        200:
+          description: Successful response
+          schema:
+            $ref: '#/definitions/OperationListResponse'
+          examples:
+            application/json:
+              {
+                "status": "OK",
+                "responseObject": [
+                {
+                  "id": "7e0ba60f-bf22-4ff5-b999-2733784e5eaa",
+                  "name": "authorize_payment",
+                  "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+                  "operationCreated": "2018-07-02T14:43:13+0000",
+                  "operationExpires": "2018-07-02T14:48:17+0000",
+                  "allowedSignatureType": {
+                    "type": "2FA",
+                    "variants": [
+                      "possession_knowledge",
+                      "possession_biometry"
+                    ]
+                  },
+                  "formData": {
+                    "title": "Confirm Payment",
+                    "message": "Hello,\nplease confirm following payment:",
+                    "attributes": [
+                    {
+                      "type": "HEADING",
+                      "id": "operation.heading",
+                      "label": "Utility Payment"
+                    },
+                    {
+                      "type": "AMOUNT",
+                      "id": "operation.amount",
+                      "label": "Amount",
+                      "amount": 100,
+                      "currency": "CZK",
+                      "amountFormatted": "100,00",
+                      "currencyFormatted": "KÄ"
+                    },
+                    {
+                      "type": "KEY_VALUE",
+                      "id": "operation.account",
+                      "label": "To Account",
+                      "value": "238400856/0300"
+                    },
+                    {
+                      "type": "KEY_VALUE",
+                      "id": "operation.dueDate",
+                      "label": "Due Date",
+                      "value": "Jun 29, 2017"
+                    },
+                    {
+                      "type": "NOTE",
+                      "id": "operation.note",
+                      "label": "Note",
+                      "note": "Utility Bill Payment - 05/2017"
+                    },
+                    {
+                      "type": "PARTY_INFO",
+                      "id": "operation.partyInfo",
+                      "label": "Application",
+                      "partyInfo": {
+                        "logoUrl": "https://itesco.cz/img/logo/logo.svg",
+                        "name": "Tesco",
+                        "description": "Find out more about Tesco...",
+                        "websiteUrl": "https://itesco.cz/hello"
+                      }
+                    }
+                    ]
+                  }
+                }
+                ]
+              }
+        400:
+          $ref: '#/responses/400'
+        401:
+          $ref: '#/responses/401'
+        500:
+          $ref: '#/responses/500'
+        503:
+          $ref: '#/responses/503'
+
+  /authorize:
+    post:
+      description: Confirms an operation with given ID and data. This endpoint requires a signature of a type specified by the operation.
+      parameters:
+        - name: X-PowerAuth-Authorization
+          in: header
+          required: true
+          type: string
+          description: The endpoind checks whether `POSSESSION`, `POSSESSION_KNOWLEDGE`, or `POSSESSION_BIOMETRY` signature is used.
+        - name: requestObject
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/AuthorizeRequest'
+            example:
+              {
+                "requestObject": {
+                  "id": "3699a9c0-45f0-458d-84bc-5bde7ec384f7",
+                  "data": "A1*A100CZK*Q238400856\/0300**D20170629*NUtility Bill Payment - 05\/2017"
+                }
+              }
+      responses:
+        200:
+          description: Successful response
+          examples:
+            application/json:
+              {
+                "status": "OK"
+              }
+        400:
+          $ref: '#/responses/400'
+        401:
+          $ref: '#/responses/401'
+        500:
+          $ref: '#/responses/500'
+        503:
+          $ref: '#/responses/503'
+
+  /cancel:
+    post:
+      description: Reject an operation with given ID, with a provided reason.
+      parameters:
+        - name: X-PowerAuth-Authorization
+          in: header
+          required: true
+          type: string
+          description: The endpoind checks whether `POSSESSION` signature is used.
+        - name: requestObject
+          in: body
+          required: true
+          schema:
+            $ref: '#/definitions/CancelRequest'
+            example:
+              {
+                "requestObject": {
+                  "id": "352d6cfa-b8d7-4366-af1f-c99b071b4dc4",
+                  "reason": "INCORRECT_DATA"
+                }
+              }
+      responses:
+        200:
+          description: Successful response
+          examples:
+            application/json:
+              {
+                "status": "OK"
+              }
+        400:
+          $ref: '#/responses/400'
+        401:
+          $ref: '#/responses/400'
+        500:
+          $ref: '#/responses/500'
+        503:
+          $ref: '#/responses/503'
+
+responses:
+
+  400:
+    description: Bad request
+    schema:
+      type: object
+      required:
+        - status
+        - responseObject
+      properties:
+        status:
+          type: string
+          default: ERROR
+        responseObject:
+          type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              enum:
+                - INVALID_REQUEST
+                - INVALID_ACTIVATION
+                - OPERATION_ALREADY_FINISHED
+                - OPERATION_ALREADY_FAILED
+                - OPERATION_ALREADY_CANCELED
+                - OPERATION_EXPIRED
+            message:
+              type: string
+      example:
+        {
+          "status": "ERROR",
+          "responseObject": {
+            "code": "SOME_ERROR_CODE",
+            "message": "Some message, for debugging purposes"
+          }
+        }
+
+  401:
+    description: Authentication failed
+    schema:
+      type: object
+      required:
+        - status
+        - responseObject
+      properties:
+        status:
+          type: string
+          default: ERROR
+        responseObject:
+          type: object
+          required:
+            - code
+          properties:
+            code:
+              type: string
+              enum:
+                - POWERAUTH_AUTH_FAIL
+            message:
+              type: string
+      example:
+        {
+          "status": "ERROR",
+          "responseObject": {
+            "code": "SOME_ERROR_CODE",
+            "message": "Some message, for debugging purposes"
+          }
+        }
+
+  500:
+    description: Internal Server Error
+    schema:
+      type: object
+      properties:
+        traceId:
+          type: string
+
+  503:
+    description: External system is not available at the moment
+    schema:
+      type: object
+      properties:
+        traceId:
+          type: string
+
+definitions:
+
+  OperationListResponse:
+    type: object
+    required:
+      - responseObject
+      - status
+    properties:
+      responseObject:
+        type: array
+        items:
+          $ref: '#/definitions/Operation'
+      status:
+        type: string
+
+  Operation:
+    type: object
+    properties:
+      allowedSignatureType:
+        $ref: '#/definitions/AllowedSignatureType'
+      data:
+        type: string
+        description: Operation data format, see https://developers.wultra.com/docs/current/powerauth-webflow/Off-line-Signatures-QR-Code#operation-data
+      formData:
+        $ref: '#/definitions/FormData'
+      id:
+        type: string
+      name:
+        type: string
+      operationCreated:
+        type: string
+        format: date-time
+        example: 2018-07-02T14:43:13+0000
+      operationExpires:
+        type: string
+        format: date-time
+        example: 2018-07-02T14:43:13+0000
+
+  AllowedSignatureType:
+    type: object
+    properties:
+      type:
+        type: string
+        enum:
+          - 1FA
+          - 2FA
+          - ECDSA
+      variants:
+        type: array
+        items:
+          type: string
+
+  FormData:
+    type: object
+    properties:
+      attributes:
+        type: array
+        items:
+          $ref: '#/definitions/Attribute'
+      message:
+        type: string
+      title:
+        type: string
+
+  Attribute:
+    type: object
+    properties:
+      id:
+        type: string
+        description: >-
+          `id` must be unique in the array of the attributes.
+      label:
+        type: string
+      type:
+        type: string
+        enum:
+          - AMOUNT
+          - KEY_VALUE
+          - NOTE
+          - HEADING
+          - PARTY_INFO
+
+  AuthorizeRequest:
+    type: object
+    required:
+      - requestObject
+    properties:
+      requestObject:
+        type: object
+        required:
+          - id
+          - data
+        properties:
+          id:
+            type: string
+            description: Operation identifier.
+          data:
+            type: string
+            description: Data
+
+  CancelRequest:
+    type: object
+    required:
+      - requestObject
+    properties:
+      requestObject:
+        type: object
+        required:
+          - id
+          - reason
+        properties:
+          id:
+            type: string
+            description: Operation identifier.
+          reason:
+            type: string
+            description: Rejection reason
+            enum:
+              - UNKNOWN
+              - INCORRECT_DATA
+              - UNEXPECTED_OPERATION
