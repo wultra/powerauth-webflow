@@ -141,7 +141,7 @@ A1*A100CZK*ICZ2730300000001165254011*R/VS123456/SS/KS*D20180425
 | Attribute | Title                        |
 |-----------|:-----------------------------|
 | Title     | Login request                |
-| Message   | Please confirm login into *internet banking.* |
+| Message   | Please confirm login into internet banking. |
 
 Data fields for this type of teplate are not specified, so any available fields will be interpreted as for generic template.
 
