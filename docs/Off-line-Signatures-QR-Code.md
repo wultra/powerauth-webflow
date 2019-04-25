@@ -1,29 +1,21 @@
 # Off-line Signature QR Code
 
-## Table of contents
+## Table of Contents
 
 - [Introduction](#introduction)
-- [Operation attributes](#operation-attributes)
-- [Operation data](#operation-data)
-  - [Header](#header)
-  - [Known template types](#known-template-types)
-  - [Data types](#data-types)
-  - [Data fields](#data-fields)
+- [Operation Attributes](#operation-attributes)
+- [Operation Data](#operation-data)
 - [Flags](#flags)
-- [Signature calculation](#signature)
-- [Template details](#template-details)
-  - [`0` Generic](#0-generic)
-  - [`1` Payment](#1-payment)
-  - [`2` Login request](#2-login-request)
-- [Forward compatibility](#forward-compatibility)
-- [How to generate QR codes](#how-to-generate-qr-codes)
+- [Signature Calculation](#signature)
+- [Forward Compatibility](#forward-compatibility)
+- [How to Generate QR Codes](#how-to-generate-qr-codes)
 
 ## Introduction
 
 This chapter describes how operation data is encoded into QR code for the purpose of off-line verification.
 
 
-## Operation attributes
+## Operation Attributes
 
 The format of QR code for offline operations is a high density string composed from several main operation attributes:
 
@@ -64,96 +56,13 @@ AD8bOO0Df73kNaIGb3Vmpg==
 0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
 ```
 
-## Operation data
+## Operation Data
 
 Operation data is an asterisk separated list of fields, where the first field defines a version of operation data and template. Other fields are additional and contains typically significant attributes, which has to be presented to the user, before the operation is confirmed and signed.
 
-Each field has its unique type, defined by first letter. For example, following string contains header `A1` and three additional fields: "Amount", "Account" and "Date":
-```
-A1*A100CZK*ICZ2730300000001165254011*D20180425
-```
+An exact details of the operation data structure can be found in the separate documentation:
 
-### Header
-
-Header is composed from two parts:
-* `{VERSION}{TEMPLATE}`, where
-  * `{VERSION}` is an one capital letter defining version of operation data. First version is `A`, then `B`, `C`, etc...
-  * `{TEMPLATE}` is a decimal number defining a template which helps with other fields interpretation.
-
-Version `A` has following limitations:
-  * Templates from `0` up to `99` are supported
-  * Up to 5 additional fields are supported
-
-### Known template types
-
-* `0` - generic template. Each field will be displayed with "default" title.
-* `1` - payment data
-* `2` - confirm login
-
-If template defines an optional field and this field is not present in operation data, then an empty string can be used. For example, following strings defines various forms of payment:
-- `A1*A100CZK*ICZ2730300000001165254011***` - all optional parameters are empty
-- `A1*A100CZK*ICZ2730300000001165254011` - the same as above, but with omitted asterisks
-- `A1*A100CZK*ICZ2730300000001165254011***Nnote for recipient` - Last note is optional but used, so asterisks must be used to put note field at the right position
-
-Note that templates other than `0` may have an implicit `{TITLE}` and `{MESSAGE}` attributes. For example, it's not required to issue "Payment" and "Please confirm this payment" titles, when the "payment" template is used. In this case, simple empty newline is used for both data attributes. This rule unfortunately goes agains our forward compatibility principle, so it's recommended only for version `A` templates.
-
-### Data types
-
-This section defines data types available for data fields:
-
-* `{DECIMAL}` - a decimal number with dot as decimal separator. The Examples:
-  * `100.10` - number with a fractional part
-  * `1492` - number without a fractional part
-
-* `{CURRENCY}` - Currency code from [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
-
-* `{IBAN}` - Fully qualified IBAN with optional, comma separated BIC. For example:
-  * `CZ2730300000001165254011` - IBAN without BIC code
-  * `CZ2730300000001165254011,AIRACZPP` - IBAN with BIC code
-
-* `{TEXT}` - UTF-8 encoded text with few escaped characters:
-  * `\n` - newline
-  * `\\` - escape for backslash
-  * `\*` - escape for asterisk
-  * All characters with ASCII code < 32 are forbidden (e.g. `\t` should not be in the string)
-  * In the QR code generator, it is recommended to compress spaces. That means that two and more consequent space characters
-    should be replaced with just one space character.
-
-
-### Data fields
-
-* `A{DECIMAL}{CURRENCY}` - **Amount** with currency.
-  * `A100CZK`
-  * `A1492.50EUR`
-  * **"Amount"** is a default title, when template is not recognized.
-
-* `I{IBAN}` - **Counter account** in IBAN format, with optional BIC code:
-  * `ICZ2730300000001165254011`
-  * `ICZ2730300000001165254011,AIRACZPP`
-  * **"Account"** is a default title, when template is not recognized.
-
-* `Q{TEXT}` - **Counter account** in arbitrary format:
-  * `Q1165254011/3030` - an example for czech account
-  * **"Account"** is a default title, when template is not recognized.
-
-* `D{DATE}` - **date field** in `YYYYMMDD` format. For example:
-  * `D20180425`
-  * **"Date"** is a default title
-
-* `R{TEXT}` - **Operation's reference**. This field contains a general reference associated with the operation.
-  For example, for payment it can be a payment reference or in case of czech domestic payment, for trasmission of
-  symbols asscociated with payment:
-  * `RID3343432434` - some payment reference
-  * `R/VS123456/SS345/KS` - Czech specific, defines: VS=123456, SS=345, KS=empty
-  * **"Reference"** is a default title
-
-* `N{TEXT}` - **Note** associated with the operation. It can be for example note associated with the payment.
-  * `NZa vecerne pivo`
-  * **"Note"** is a default title
-
-* `T{TEXT}` - **Arbitrary textual** field, displayed as is, without any additional processing.
-  * `TRate 1EUR = 25,49CZK`
-  * **Attribute N**, is a default title, where N is an auto incremented number, starting with 1. For example, if you use two `T` fields in data, then the first in row will have "Attribute 1" and second "Attributer 2" title.
+- [Operation Data Structure](./Operation-Data.md)
 
 ## Flags
 
@@ -187,67 +96,7 @@ Then the signed data payload is composed as:
 {SIGNING_KEY_TYPE}
 ```
 
-## Template details
-
-### `0` Generic
-
-Generic template has no predefined order of fields. You can use up to 5 fields with any type in the operation data. Note that `{TITLE}` and `{MESSAGE}` data attributes are required for this kind of template.
-
-
-### `1` Payment
-
-*Available since version `A`*
-
-| Attribute | Title                        |
-|-----------|:-----------------------------|
-| Title     | Payment                      |
-| Message   | Please confirm this payment  |
-
-Data fields
-
-| # | Type | Title                        | Required |
-|---|:------:|:-----------------------------|:--------:|
-| 1 | A      | Amount                       | yes      |
-| 2 | I or Q | Counter account              | yes      |
-| 3 | R      | Payment Reference (or parsed symbols in CZ) | |
-| 4 | D      | Due date                     |          |
-| 5 | N      | Note                         |          |
-
-Example data:
-```
-5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
-Domestic payment
-
-A1*A100CZK*ICZ2730300000001165254011*R/VS123456/SS/KS*D20180425
-
-AD8bOO0Df73kNaIGb3Vmpg==
-0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
-```
-
-
-### `2` Login request
-
-*Available since version `A`*
-
-| Attribute | Title                        |
-|-----------|:-----------------------------|
-| Title     | Login request                |
-| Message   | Please confirm login into *internet banking.* |
-
-Data fields for this type of teplate are not specified, so any available fields will be interpreted as for generic template.
-
-Example data:
-```
-5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
-
-
-A2
-B
-AD8bOO0Df73kNaIGb3Vmpg==
-0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
-```
-
-## Forward compatibility
+## Forward Compatibility
 
 The data format is designed with forward compatibility in mind. This means that QR codes issued in newer data format can be processed in older data parsers. This is possible due to following contract rules:
 
@@ -281,7 +130,7 @@ The data format is designed with forward compatibility in mind. This means that 
   - All unsupported data fields are treated as `T{TEXT}` (e.g. arbitrary attribute with text as it is)
   - All unsupported templates are treated as [`0` Generic](#0-generic)
 
-## How to generate QR codes
+## How to Generate QR Codes
 
 The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md).
 

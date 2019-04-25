@@ -40,6 +40,7 @@
 
 **Technical Notes**
 
+- [Operation Data Structure](./Operation-Data.md)
 - [Off-line Signatures QR Code](./Off-line-Signatures-QR-Code.md)
 - [Web Socket Communication Protocol](./Web-Socket-Communication-Protocol.md)
 - [Used Push Message Extras](./Used-Push-Message-Extras.md)
