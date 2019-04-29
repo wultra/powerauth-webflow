@@ -128,7 +128,7 @@ The data format is designed with forward compatibility in mind. This means that 
     ```
 - Rules for data fields and templates:
   - All unsupported data fields are treated as `T{TEXT}` (e.g. arbitrary attribute with text as it is)
-  - All unsupported templates are treated as [`0` Generic](#0-generic)
+  - All unsupported templates are treated as [`0` Generic](./Operation-Data.md#0-generic)
 
 ## How to Generate QR Codes
 
