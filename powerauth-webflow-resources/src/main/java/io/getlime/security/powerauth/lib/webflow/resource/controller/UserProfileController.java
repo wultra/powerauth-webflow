@@ -125,7 +125,7 @@ public class UserProfileController {
             final String givenName = user.getGivenName();
             final String familyName = user.getFamilyName();
             logger.info("Found user with ID: {}, given name: {}, family name: {}", usedId, givenName, familyName);
-            return new UserInfoResponse(id, givenName, familyName);
+            return new UserInfoResponse(id, id, givenName, familyName);
         } catch (DataAdapterClientErrorException e) {
             throw new UnauthorizedUserException("Unable to fetch user details from data adapter");
         }

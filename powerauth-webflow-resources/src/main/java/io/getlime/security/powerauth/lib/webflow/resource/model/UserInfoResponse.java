@@ -26,6 +26,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class UserInfoResponse {
 
+    @JsonProperty("id")
+    private String id;
+
     @JsonProperty("sub")
     private String sub;
 
@@ -40,14 +43,32 @@ public class UserInfoResponse {
 
     /**
      * Constructor with the minimal attribute set.
-     * @param sub Identifier of the subject.
+     * @param id Identifier of the subject, mapped to id.
+     * @param sub Identifier of the subject, mapped to sub.
      * @param givenName Given name of the subject.
      * @param familyName Family name of the subject.
      */
-    public UserInfoResponse(String sub, String givenName, String familyName) {
+    public UserInfoResponse(String id, String sub, String givenName, String familyName) {
+        this.id = id;
         this.sub = sub;
         this.givenName = givenName;
         this.familyName = familyName;
+    }
+
+    /**
+     * Get identifier of the subject.
+     * @return Identifier of the subject.
+     */
+    public String getId() {
+        return id;
+    }
+
+    /**
+     * Set identifier of the subject.
+     * @param id Identifier of the subject.
+     */
+    public void setId(String id) {
+        this.id = id;
     }
 
     /**
