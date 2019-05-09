@@ -21,8 +21,12 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.resource.configuration.WebFlowResourcesServerConfiguration;
+import io.getlime.security.powerauth.lib.webflow.resource.model.UserInfoResponse;
 import io.getlime.security.powerauth.lib.webflow.resource.model.UserResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.oauth2.common.exceptions.UnauthorizedUserException;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.AuthorizationServerTokenServices;
 import org.springframework.stereotype.Controller;
@@ -49,6 +53,8 @@ public class UserProfileController {
     private static final String LANGUAGE = "language";
     private static final String SCA = "sca";
 
+    private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
+
     @Autowired
     public UserProfileController(DataAdapterClient client, AuthorizationServerTokenServices tokenServices, WebFlowResourcesServerConfiguration webFlowResourcesServerConfiguration) {
         this.client = client;
@@ -58,6 +64,9 @@ public class UserProfileController {
 
     /**
      * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
+     * This endpoint is specifically designed to return additional context information related to PSD2/SCA process,
+     * such as info about if SCA (Strong Customer Authentication) was used or not, or about a language used to finalize
+     * the flow.
      *
      * @param authentication Original authentication of the currently logged user.
      * @return User profile.
@@ -95,6 +104,31 @@ public class UserProfileController {
 
         // Return response
         return userResponse;
+    }
+
+    /**
+     * Returns user profile of authenticated user, or anonymous user in case there is an error fetching user details.
+     * This method returns a minimal format compatible with OpenID Connect specification (basic JWT claims).
+     *
+     * @param authentication Original authentication of the currently logged user.
+     * @return User profile.
+     */
+    @RequestMapping(value = "me/info", method = { RequestMethod.GET, RequestMethod.POST })
+    public @ResponseBody UserInfoResponse userInfo(OAuth2Authentication authentication) {
+        // Try to fetch user details from the service
+        try {
+            final String usedId = authentication.getUserAuthentication().getName();
+            logger.info("Fetching user details for user with ID: {}", usedId);
+            final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId);
+            final UserDetailResponse user = userDetail.getResponseObject();
+            final String id = user.getId();
+            final String givenName = user.getGivenName();
+            final String familyName = user.getFamilyName();
+            logger.info("Found user with ID: {}, given name: {}, family name: {}", usedId, givenName, familyName);
+            return new UserInfoResponse(id, id, givenName, familyName);
+        } catch (DataAdapterClientErrorException e) {
+            throw new UnauthorizedUserException("Unable to fetch user details from data adapter");
+        }
     }
 
 }
