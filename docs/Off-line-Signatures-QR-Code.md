@@ -132,13 +132,15 @@ The data format is designed with forward compatibility in mind. This means that 
 
 ## Offline Signature Process Description
 
+The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md). This chapter provides an more detailed description of the step-by-step process.
+
 ### 1. Generate QR Codes
 
-The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md).
-
-The concrete steps for generating offline signature QR codes using PowerAuth SOAP service for Web Flow are following:
+The first step of the process is to generate a QR code to be displayed to the user.
 
 #### 1.1. Construct offline signature data payload:
+
+First, you need to prepare a QR code data stup from the information you already should know - operation ID, operation title and description, operation data and additional flags:
 
 ```
 {OPERATION_ID}\n
@@ -149,6 +151,7 @@ The concrete steps for generating offline signature QR codes using PowerAuth SOA
 ```
 
 For example:
+
 ```
 5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
 Payment
@@ -161,28 +164,29 @@ The meaning of individual fields is explained in chapter [Operation Attributes](
 
 #### 1.2. Fetch Data For Offline Signatures
 
-Call PowerAuth SOAP method to create personalized offline signature payload. The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+Now, you need to prepare the data for the QR code display. Call the PowerAuth SOAP method to create a personalized offline signature payload. The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
 
 - `activationId` - ID of the activation of mobile device
 - `data` - data constructed in step 1
 
-The SOAP method is documented in [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
+The SOAP method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
 
-The response from SOAP method `createPersonalizedOfflineSignaturePayload` contains:
+In the response from the SOAP method `createPersonalizedOfflineSignaturePayload`, you will receive:
 
-- Data required to display the QR code in field `offlineData`
-- Random cryptographic nonce.
+- `offlineData` - The exact data to be displayed inside the QR code.
+- `nonce` - A random cryptographic nonce.
 
-The format of `offlineData` is following:
+The format of the `offlineData` is the following:
+
 ```
 {DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_SIGNATURE}
 ```
 
-The `nonce` field is available separately in response, so that the `nonce` can be used for signature verification as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
+The `nonce` field is available separately in response, so that it can be used for signature verification later, as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
 
 #### 1.3. Display Data To The User
 
-To display correct information in the web browser, generate the QR code from `offlineData`.
+To display QR code in the web browser, generate the QR code from `offlineData` you obtained in 1.2 (no changes to the data are needed).
 
 Code example in Java:
 
@@ -199,9 +203,9 @@ Code example in Java:
             return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
 ```
 
-Display this QR code to the user so that it can be scanned via the mobile app.
+The user can now scan the QR code via the mobile token app.
 
-The value of `nonce` must be stored on a browser level, either as a hidden HTML form input field or as v React.js variable, or alternatively, it can also be stored in the user session. `Nonce` value is required for later offline signature validation.
+The value of `nonce` must be stored somewhere - for example on a browser level, either as a hidden HTML form input field or as a React.js variable, or alternatively, it can be stored in the user session by the specific operation. The `nonce` value is required for later offline signature validation, see step 3.
 
 ### 2. Computing Signatures on Mobile Device
 
@@ -211,17 +215,25 @@ After user scans the QR code using a mobile app, the `ECDSA_SIGNATURE` should be
 
 #### 2.2. Computing the Signature
 
-Mobile device prompts the user for the PIN code or use of a biometry and computes 4x4 digit long authentication code.
+Mobile device prompts the user for the PIN code or use of a biometry and computes 4x4 digit long authentication code to be rewritten manually.
 
 ### 3. Validating the Signature
 
-#### 3.1. Processing User Input
+#### 3.1. Processing The User Input
 
-After user enters 4x4 digits, the value must be converted to standard PowerAuth signature format that uses 2x8 digits.
+After user enters 4x4 digits in the browser, the value must be converted into a standard PowerAuth signature format that uses 2x8 digits. For example, an offline signature `1234-5678-9012-3456` needs to be converted into `12345678-90123456` (removing 1st and 3rd dash).
 
 #### 3.2. Preparing Signature Base String
 
-Now, you need to prepare a normalized data package. For this, you need `data` (as obtained in 1.1.), `nonce` value (as obtained in 1.2) andn two constants: `POST` and `/operation/authorize/offline`.
+Now, you need to prepare a normalized data package called "signature base string". This is the payload that mobile app used to compute the signature - you need to have the same signature base string in order to be able to verify the signature.
+
+To compute the signature base string, you need:
+
+- `data` (as obtained in 1.1.)
+- `nonce` value (as obtained in 1.2)
+- two static constants: `POST` and `/operation/authorize/offline`
+
+The [algorithm for signature data normalization](https://developers.wultra.com/docs/develop/powerauth-crypto/Computing-and-Validating-Signatures#normalized-data-for-http-requests) is available in the cryptography description. The Java code for computing the normalized signature base string follows:
 
 ```java
 String signatureBaseString
