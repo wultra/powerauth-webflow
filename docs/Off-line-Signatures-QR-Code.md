@@ -187,7 +187,7 @@ The `nonce` field is available separately in response, so that it can be used fo
 Note: The format of the `offlineData` is the following:
 
 ```
-{DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_SIGNATURE}
+{DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_QRDATA_SIGNATURE_BASE64}
 ```
 
 As you can see, the `offlineData` already contain `nonce` value (in Base64 format) since the mobile app needs to scan the `nonce` value to compute the signature. However, the SOAP service still returns the value separately - since `nonce` must be used later on the back-end side, we wanted to avoid the necessity to parse the `offlineData` and hence we return `nonce` as a standalone response attribute.
@@ -219,7 +219,7 @@ The value of `nonce` must be stored somewhere - for example on a browser level, 
 
 #### 2.1. Verify ECDSA Signature of Offline Data
 
-After user scans the QR code using a mobile app, the `ECDSA_SIGNATURE` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_SIGNATURE` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
+After user scans the QR code using a mobile app, the `ECDSA_QRDATA_SIGNATURE_BASE64` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_QRDATA_SIGNATURE_BASE64` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
 
 #### 2.2. Computing the Signature
 
@@ -264,4 +264,15 @@ To verify signature, you need to call the SOAP method [`verifyOfflineSignature`]
 - `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
 - `signatureType` - type of the signature (`POSSESSION_KNOWLEDGE`).
 
-The method returns information about signature verification, see the SOAP method documentation for details.
+The method returns information about signature verification:
+
+- `signatureValid` You can use this value to determine if the signature verification was successful or not.
+- `activationStatus` - Activation status after this attempt of the signature validation.
+- `blockedReason` - In case the activation is blocked, this attribute contains additional info about the reason.
+- `activationId` - Activation ID used for validating the signature.
+- `userId` - User ID associated with the activation who authenticated to compute the signature.
+- `applicationId` - Application ID of the application that is associated with given activation ID and was used to compute the signature.
+- `signatureType` - Signature type that was used to compute the signature value.
+- `remainingAttempts` - How many attempts are remaining for the signature validation (single, activation related counter).
+
+See the SOAP method documentation for details.
