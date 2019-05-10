@@ -182,13 +182,15 @@ In the response from the SOAP method `createPersonalizedOfflineSignaturePayload`
 - `offlineData` - The exact data to be displayed inside the QR code.
 - `nonce` - A random cryptographic nonce.
 
-The format of the `offlineData` is the following:
+The `nonce` field is available separately in response, so that it can be used for signature verification later, as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
+
+Note: The format of the `offlineData` is the following:
 
 ```
 {DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_SIGNATURE}
 ```
 
-The `nonce` field is available separately in response, so that it can be used for signature verification later, as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
+As you can see, the `offlineData` already contain `nonce` value (in Base64 format) since the mobile app needs to scan the `nonce` value to compute the signature. However, the SOAP service still returns the value separately - since `nonce` must be used later on the back-end side, we wanted to avoid the necessity to parse the `offlineData` and hence we return `nonce` as a standalone response attribute.
 
 #### 1.3. Display Data To The User
 
