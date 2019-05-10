@@ -213,7 +213,7 @@ Code example in Java:
 
 The user can now scan the QR code via the mobile token app.
 
-The value of `nonce` must be stored somewhere - for example on a browser level, either as a hidden HTML form input field or as a React.js variable, or alternatively, it can be stored in the user session by the specific operation. The `nonce` value is required for later offline signature validation, see step 3.
+The value of `nonce` must be stored somewhere - for example on a browser level, either as a hidden HTML form input field or as a JavaScript variable, or alternatively, it can be stored in the user session by the specific operation. The `nonce` value is required for later offline signature validation, see step 3.
 
 ### 2. Computing Signatures on Mobile Device
 
@@ -241,7 +241,9 @@ To compute the signature base string, you need:
 - `nonce` value (as obtained in 1.2)
 - two static constants: `POST` and `/operation/authorize/offline`
 
-The [algorithm for signature data normalization](https://developers.wultra.com/docs/develop/powerauth-crypto/Computing-and-Validating-Signatures#normalized-data-for-http-requests) is available in the cryptography description. The Java code for computing the normalized signature base string follows:
+The [algorithm for signature data normalization](https://developers.wultra.com/docs/develop/powerauth-crypto/Computing-and-Validating-Signatures#normalized-data-for-http-requests) is available in the cryptography description.
+
+The Java class [PowerAuthHttpBody](https://github.com/wultra/powerauth-crypto/blob/master/powerauth-java-http/src/main/java/io/getlime/security/powerauth/http/PowerAuthHttpBody.java) already contains a ready to use method for computing the normalized signature base string:
 
 ```java
 String signatureBaseString
@@ -257,9 +259,9 @@ String signatureBaseString
 
 To verify signature, you need to call the SOAP method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
 
-- `signatureBaseString` (as obtained in 3.2.) - as data for verification
-- `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
 - `activationId` - identifier of the activation (to know which device is responsible for verification)
+- `data` (represented by `signatureBaseString` as obtained in 3.2.) - as data for verification
+- `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
 - `signatureType` - type of the signature (`POSSESSION_KNOWLEDGE`).
 
 The method returns information about signature verification, see the SOAP method documentation for details.
