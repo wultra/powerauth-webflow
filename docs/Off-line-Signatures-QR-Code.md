@@ -31,7 +31,7 @@ The format of QR code for offline operations is a high density string composed f
 4. `{OPERATION_DATA}` - content of operation data
 5. `{FLAGS}` - various flags affecting how operation is processed
 6. `{NONCE_B64}` - nonce, 16 random bytes in Base64 format. Required for pure offline signature.
-7. `{SIGNING_KEY_TYPE}{SIGNATURE_B64}` - ECDSA signature in Base64 format. The signature string has an one prefix character, containing an information about signing key type.
+7. `{SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}` - ECDSA signature in Base64 format. The signature string has an one prefix character, containing an information about signing key type.
 
 Then, the final string for QR code is simple, new-line separated list of attributes:
 
@@ -42,7 +42,7 @@ Then, the final string for QR code is simple, new-line separated list of attribu
 {OPERATION_DATA}\n
 {FLAGS}\n
 {NONCE_B64}\n
-{SIGNING_KEY_TYPE}{SIGNATURE_B64}
+{SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}
 ```
 
 For example:
@@ -82,7 +82,7 @@ Signature attribute is composed from two separate fields:
 - `{SIGNING_KEY_TYPE}` is one character defining which key was used for signature calculation. Available options are:
    - `0` - `KEY_SERVER_MASTER_PRIVATE` was used for ECDSA signature calculation
    - `1` - `KEY_SERVER_PRIVATE` personalized key was used for ECDSA signature calculation
-- `{SIGNATURE_B64}` is ECDSA signature calculated with selected private key.
+- `{ECDSA_QRDATA_SIGNATURE_BASE64}` is ECDSA signature calculated with selected private key.
 
 Then the signed data payload is composed as:
 
@@ -113,7 +113,7 @@ The data format is designed with forward compatibility in mind. This means that 
     {FLAGS}\n
     {XXX_NEW_ATTRIBUTE}\n
     {NONCE_B64}\n
-    {SIGNING_KEY_TYPE}{SIGNATURE_B64}
+    {SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}
     ```
     then, the signature will be calculated from following data:
     ```
@@ -130,13 +130,15 @@ The data format is designed with forward compatibility in mind. This means that 
   - All unsupported data fields are treated as `T{TEXT}` (e.g. arbitrary attribute with text as it is)
   - All unsupported templates are treated as [`0` Generic](./Operation-Data.md#0-generic)
 
-## How to Generate QR Codes
+## Process of Offline Signature Signing
+
+### 1. Generate QR Codes
 
 The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md).
 
 The concrete steps for generating offline signature QR codes using PowerAuth SOAP service for Web Flow are following:
 
-### 1. Construct offline signature data payload:
+#### 1.1. Construct offline signature data payload:
 
 ```
 {OPERATION_ID}\n
@@ -157,17 +159,19 @@ B
 
 The meaning of individual fields is explained in chapter [Operation Attributes](#operation-attributes). Note that the field values should be normalized as discussed in the same chapter.
 
-### 2. Call PowerAuth SOAP method 'create personalized offline signature payload'
+#### 1.2. Fetch Data For Offline Signatures
 
-The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+Call PowerAuth SOAP method to create personalized offline signature payload. The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+
 - `activationId` - ID of the activation of mobile device
 - `data` - data constructed in step 1
 
 The SOAP method is documented in [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
 
-### 3. Obtain response from 'create personalized offline signature payload' SOAP method and validate QR code data
+The response from SOAP method `createPersonalizedOfflineSignaturePayload` contains:
 
-The response from SOAP method `createPersonalizedOfflineSignaturePayload` contains data required to display the QR code in field `offlineData`.
+- Data required to display the QR code in field `offlineData`
+- Random cryptographic nonce.
 
 The format of `offlineData` is following:
 ```
@@ -176,9 +180,12 @@ The format of `offlineData` is following:
 
 The `nonce` field is available separately in response, so that the `nonce` can be used for signature verification as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
 
-### 4. Generate QR code
+#### 1.3. Display Data To The User
 
-Generate the QR code from `offlineData`. Code example in Java:
+To display correct information in the web browser, generate the QR code from `offlineData`.
+
+Code example in Java:
+
 ```java
             BitMatrix matrix = new MultiFormatWriter().encode(
                     new String(offlineData.getBytes("UTF-8"), "ISO-8859-1"),
@@ -192,6 +199,47 @@ Generate the QR code from `offlineData`. Code example in Java:
             return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
 ```
 
-### 5. Verify ECDSA signature of offlineData
+Display this QR code to the user so that it can be scanned via the mobile app.
 
-The `ECDSA_SIGNATURE` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_SIGNATURE` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
+The value of `nonce` must be stored on a browser level, either as a hidden HTML form input field or as v React.js variable, or alternatively, it can also be stored in the user session. `Nonce` value is required for later offline signature validation.
+
+### 2. Computing Signatures on Mobile Device
+
+#### 2.1. Verify ECDSA Signature of Offline Data
+
+After user scans the QR code using a mobile app, the `ECDSA_SIGNATURE` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_SIGNATURE` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
+
+#### 2.2. Computing the Signature
+
+Mobile device prompts the user for the PIN code or use of a biometry and computes 4x4 digit long authentication code.
+
+### 3. Validating the Signature
+
+#### 3.1. Processing User Input
+
+After user enters 4x4 digits, the value must be converted to standard PowerAuth signature format that uses 2x8 digits.
+
+#### 3.2. Preparing Signature Base String
+
+Now, you need to prepare a normalized data package. For this, you need `data` (as obtained in 1.1.), `nonce` value (as obtained in 1.2) andn two constants: `POST` and `/operation/authorize/offline`.
+
+```java
+String signatureBaseString
+    = PowerAuthHttpBody.getSignatureBaseString(
+        "POST",
+        "/operation/authorize/offline",
+        BaseEncoding.base64().decode(nonce),
+        data.getBytes()
+);
+```
+
+#### 3.4. Verifying Signature
+
+To verify signature, you need to call the SOAP method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
+
+- `signatureBaseString` (as obtained in 3.2.) - as data for verification
+- `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
+- `activationId` - identifier of the activation (to know which device is responsible for verification)
+- `signatureType` - type of the signature (`POSSESSION_KNOWLEDGE`).
+
+The method returns information about signature verification, see the SOAP method documentation for details.
