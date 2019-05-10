@@ -8,7 +8,7 @@
 - [Flags](#flags)
 - [Signature Calculation](#signature)
 - [Forward Compatibility](#forward-compatibility)
-- [How to Generate QR Codes](#how-to-generate-qr-codes)
+- [Offline Signature Process Description](#offline-signature-process-description)
 
 ## Introduction
 
@@ -130,7 +130,7 @@ The data format is designed with forward compatibility in mind. This means that 
   - All unsupported data fields are treated as `T{TEXT}` (e.g. arbitrary attribute with text as it is)
   - All unsupported templates are treated as [`0` Generic](./Operation-Data.md#0-generic)
 
-## Process of Offline Signature Signing
+## Offline Signature Process Description
 
 ### 1. Generate QR Codes
 
