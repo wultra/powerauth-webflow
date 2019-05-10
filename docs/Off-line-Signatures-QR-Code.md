@@ -134,6 +134,12 @@ The data format is designed with forward compatibility in mind. This means that 
 
 The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md). This chapter provides an more detailed description of the step-by-step process.
 
+There are three stages of offline signature verification:
+
+1) Generate QR code and display it to the user.
+2) User uses mobile app to scan the QR code and compute offline signature.
+3) Verify the offline signature.
+
 ### 1. Generate QR Codes
 
 The first step of the process is to generate a QR code to be displayed to the user.
