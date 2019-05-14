@@ -239,8 +239,8 @@ To compute the signature base string, you need:
 
 - `data` - data for off-line signature verification are built from `operationId` and `operationData` attributes in a following way:
   - format: `${operationId}&${operationData}` (values separated by `&` character)
-  - example (for login operation with ID `9326edcd-5375-4847-abd1-5eacb6d95125` where data is `A2`):
-    - `9326edcd-5375-4847-abd1-5eacb6d95125&A2`
+  - example: `9326edcd-5375-4847-abd1-5eacb6d95125&A1*A100CZK*ICZ2730300000001165254011`
+    - Payment operation with ID `9326edcd-5375-4847-abd1-5eacb6d95125`, where data is `A1*A100CZK*ICZ2730300000001165254011` (representing amount of "100 CZK" to IBAN account "CZ2730300000001165254011")
 - `nonce` value (as obtained in 1.2)
 - two static constants: `POST` and `/operation/authorize/offline`
 
