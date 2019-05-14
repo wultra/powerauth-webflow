@@ -237,7 +237,10 @@ Now, you need to prepare a normalized data package called "signature base string
 
 To compute the signature base string, you need:
 
-- `data` (as obtained in 1.1.)
+- `data` - data for off-line signature verification are built from `operationId` and `operationData` attributes in a following way:
+  - format: `${operationId}&${operationData}` (values separated by `&` character)
+  - example (for login operation with ID `9326edcd-5375-4847-abd1-5eacb6d95125` where data is `A2`):
+    - `9326edcd-5375-4847-abd1-5eacb6d95125&A2`
 - `nonce` value (as obtained in 1.2)
 - two static constants: `POST` and `/operation/authorize/offline`
 
