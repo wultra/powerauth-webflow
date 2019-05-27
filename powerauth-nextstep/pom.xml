@@ -75,8 +75,15 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
         </dependency>
+		<!-- Upgrade Swagger Guava dependency due to CVE-2018-10237 -->
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>27.0.1-jre</version>
+		</dependency>
 
-        <!-- Testing -->
+
+		<!-- Testing -->
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
