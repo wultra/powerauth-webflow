@@ -116,7 +116,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             throw new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
         }
         final GetOperationDetailResponse operation = getOperation();
-        final String operatioName = operation.getOperationName();
+        final String operationName = operation.getOperationName();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         // nonce is received from the UI - it was stored together with the QR code
@@ -125,7 +125,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         String data = operation.getOperationId() + '&' + operation.getOperationData();
         String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
-        boolean biometryAllowed = isBiometryAllowedInOfflineMode(operatioName);
+        boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
         VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();

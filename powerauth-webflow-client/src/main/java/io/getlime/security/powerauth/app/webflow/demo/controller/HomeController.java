@@ -19,6 +19,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationExtras;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
@@ -137,7 +139,17 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null);
+        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.setId("DEMO");
+        applicationContext.setName("Demo application");
+        applicationContext.setDescription("Web Flow demo application");
+        ApplicationExtras extras = new ApplicationExtras();
+        extras.setApplicationOwner("Wultra");
+        extras.getRequestedScopes().add("OAUTH");
+        applicationContext.setExtras(extras);
+
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (session.getServletContext()) {
             session.setAttribute("operationId", payment.getResponseObject().getOperationId());
             session.setAttribute("paymentForm", paymentForm);

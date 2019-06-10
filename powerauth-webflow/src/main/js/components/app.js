@@ -8,6 +8,7 @@ import Error from "./error";
 import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
 import SMSAuthorization from "./smsAuth";
+import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
 
@@ -70,6 +71,10 @@ export class App extends React.Component {
             }
             case "SCREEN_SMS": {
                 Component = SMSAuthorization;
+                break;
+            }
+            case "SCREEN_CONSENT": {
+                Component = Consent;
                 break;
             }
             default: {

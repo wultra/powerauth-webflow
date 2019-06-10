@@ -23,17 +23,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.DataAdapterError;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormDataChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
-import org.springframework.context.i18n.LocaleContextHolder;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -168,9 +161,7 @@ public class DataAdapterClient {
     public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
         try {
             CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, lang, operationContext);
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
-            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
+            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<CreateSMSAuthorizationResponse>>() {
@@ -218,9 +209,7 @@ public class DataAdapterClient {
         try {
             // Exchange user details with data adapter.
             DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, operationContext);
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Accept-Language", LocaleContextHolder.getLocale().getLanguage());
-            HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request), headers);
+            HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
@@ -286,6 +275,79 @@ public class DataAdapterClient {
     }
 
     /**
+     * Create OAuth 2.0 consent form.
+     * @param userId User ID.
+     * @param operationContext Operation context.
+     * @param lang Language of the text in the consent form.
+     * @return Consent form with text and options to select by the user.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<CreateConsentFormResponse> createConsentForm(String userId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
+        try {
+            CreateConsentFormRequest request = new CreateConsentFormRequest(userId, lang, operationContext);
+            HttpEntity<ObjectRequest<CreateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<CreateConsentFormResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/auth/consent/create", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<CreateConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Validate options selected by the user in the OAuth 2.0 consent form.
+     * @param userId User ID.
+     * @param operationContext Operation context.
+     * @param lang Language of the text in the consent form.
+     * @param options Consent options selected by the user.
+     * @return Consent form with text and options to select by the user.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<ValidateConsentFormResponse> validateConsentForm(String userId, OperationContext operationContext, String lang, List<ConsentOption> options) throws DataAdapterClientErrorException {
+        try {
+            ValidateConsentFormRequest request = new ValidateConsentFormRequest(userId, operationContext, lang, options);
+            HttpEntity<ObjectRequest<ValidateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<ValidateConsentFormResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/auth/consent/validate", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<ValidateConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Save options selected by the user in the OAuth 2.0 consent form.
+     * @param userId User ID.
+     * @param operationContext Operation context.
+     * @param options Consent options selected by the user.
+     * @return Consent form with text and options to select by the user.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<SaveConsentFormResponse> saveConsentForm(String userId, OperationContext operationContext, List<ConsentOption> options) throws DataAdapterClientErrorException {
+        try {
+            SaveConsentFormRequest request = new SaveConsentFormRequest(userId, operationContext, options);
+            HttpEntity<ObjectRequest<SaveConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<SaveConsentFormResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/auth/consent/save", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<SaveConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
      * Create new DataAdapterClientErrorException from ResourceAccessException.
      * @param ex Exception used when a resource access error occurs.
      * @return Data adapter client exception.
@@ -306,6 +368,9 @@ public class DataAdapterClient {
             };
             ObjectResponse<DataAdapterError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
             DataAdapterError error = errorResponse.getResponseObject();
+            if (error == null) {
+                error = new DataAdapterError();
+            }
             if (error.getCode() == null) { // process malformed errors with undefined error code
                 error.setCode(DataAdapterError.Code.ERROR_GENERIC);
                 error.setMessage(ex.getMessage());

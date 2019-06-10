@@ -25,9 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -146,6 +144,7 @@ public class OperationController {
             response.setResult(operation.getResult());
         }
         assignFormData(response, operation);
+        assignApplicationContext(response, operation);
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
@@ -243,6 +242,7 @@ public class OperationController {
                 response.setResult(operation.getResult());
             }
             assignFormData(response, operation);
+            assignApplicationContext(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
@@ -299,6 +299,31 @@ public class OperationController {
                 logger.error("Error while deserializing operation display formData", ex);
             }
             response.setFormData(formData);
+        }
+    }
+
+    /**
+     * In case operation entity has an application context, assign it to the operation.
+     * The application extras are deserialized from JSON.
+     * @param response Response to be enriched by application context.
+     * @param operation Database entity representing operation.
+     */
+    private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
+        if (operation.getApplicationId() != null) {
+            ApplicationContext applicationContext = new ApplicationContext();
+            applicationContext.setId(operation.getApplicationId());
+            applicationContext.setName(operation.getApplicationName());
+            applicationContext.setDescription(operation.getApplicationDescription());
+            if (operation.getApplicationExtras() != null) {
+                ApplicationExtras extras;
+                try {
+                    extras = new ObjectMapper().readValue(operation.getApplicationExtras(), ApplicationExtras.class);
+                    applicationContext.setExtras(extras);
+                } catch (IOException ex) {
+                    logger.error("Error while deserializing application extras", ex);
+                }
+            }
+            response.setApplicationContext(applicationContext);
         }
     }
 
