@@ -146,7 +146,7 @@ public class AuthMethodController {
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
-    @RequestMapping(value = "/user/auth-method/disable", method = RequestMethod.POST)
+    @RequestMapping(value = "/user/auth-method/delete", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserPost(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
         return disableAuthMethodForUserImpl(request);
     }
