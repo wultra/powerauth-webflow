@@ -128,13 +128,28 @@ public class AuthMethodController {
     }
 
     /**
-     * Disable an authentication method for given user.
+     * Disable an authentication method for given user (DELETE method).
      *
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
     @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
     public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+        return disableAuthMethodForUserImpl(request);
+    }
+
+    /**
+     * Disable an authentication method for given user (POST method alternative).
+     *
+     * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     */
+    @RequestMapping(value = "/user/auth-method/delete", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserPost(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+        return disableAuthMethodForUserImpl(request);
+    }
+
+    private ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserImpl(ObjectRequest<UpdateAuthMethodRequest> request) {
         Logger.getLogger(this.getClass().getName()).log(Level.INFO, "Received disableAuthMethodForUser request, user ID: {0}, authentication method: {1}", new String[] {request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString()});
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
