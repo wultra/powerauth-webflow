@@ -377,6 +377,18 @@ Disables an authentication method for given user and lists all authentication me
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `DELETE` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/user/auth-method/delete</code></td>
+    </tr>
+</table>
+
 #### Request
 
 - Headers:
@@ -1001,6 +1013,18 @@ Updates an operation in Next Step server.
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/update</code></td>
+    </tr>
+</table>
+
 #### Request
 
 - Headers:
@@ -1292,6 +1316,19 @@ Updates operation formData for given operation. Only the userInput part of formD
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/formData/update</code></td>
+    </tr>
+</table>
+
+
 #### Request
 
 - Headers:
@@ -1418,6 +1455,18 @@ Sets chosen authentication method for current operation step.
     <tr>
         <td>Resource URI</td>
         <td><code>/operation/chosenAuthMethod</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/chosenAuthMethod/update</code></td>
     </tr>
 </table>
 
