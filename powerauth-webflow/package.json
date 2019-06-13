@@ -36,7 +36,8 @@
     "react-intl-redux": "^0.5.0",
     "hard-source-webpack-plugin": "^0.5.0-rc.2",
     "bluebird": "^3.5.0",
-    "intl": "^1.2.5"
+    "intl": "^1.2.5",
+    "sanitize-html": "^1.20.1"
   },
   "scripts": {
     "watch": "webpack --watch -d"

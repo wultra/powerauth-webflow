@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -25,9 +26,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -46,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller class related to Next Step operations.
@@ -60,6 +60,8 @@ public class OperationController {
     private final OperationPersistenceService operationPersistenceService;
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Controller constructor.
@@ -162,6 +164,7 @@ public class OperationController {
             response.setResult(operation.getResult());
         }
         assignFormData(response, operation);
+        assignApplicationContext(response, operation);
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
@@ -259,6 +262,7 @@ public class OperationController {
                 response.setResult(operation.getResult());
             }
             assignFormData(response, operation);
+            assignApplicationContext(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
@@ -346,6 +350,32 @@ public class OperationController {
                 logger.error("Error while deserializing operation display formData", ex);
             }
             response.setFormData(formData);
+        }
+    }
+
+    /**
+     * In case operation entity has an application context, assign it to the operation.
+     * The application extras are deserialized from JSON.
+     * @param response Response to be enriched by application context.
+     * @param operation Database entity representing operation.
+     */
+    private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
+        if (operation.getApplicationId() != null) {
+            ApplicationContext applicationContext = new ApplicationContext();
+            applicationContext.setId(operation.getApplicationId());
+            applicationContext.setName(operation.getApplicationName());
+            applicationContext.setDescription(operation.getApplicationDescription());
+            if (operation.getApplicationExtras() != null) {
+                Map<String, Object> extras;
+                try {
+                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+                    extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    applicationContext.getExtras().putAll(extras);
+                } catch (IOException ex) {
+                    logger.error("Error while deserializing application extras", ex);
+                }
+            }
+            response.setApplicationContext(applicationContext);
         }
     }
 

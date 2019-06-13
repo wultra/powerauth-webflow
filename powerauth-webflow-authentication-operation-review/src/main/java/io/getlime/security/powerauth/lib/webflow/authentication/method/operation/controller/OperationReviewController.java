@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -246,7 +247,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             BankAccountChoice bankAccountChoice = new BankAccountChoice();
             bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
         }
         return new Response();
@@ -301,7 +303,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             try {
                 FormDataConverter converter = new FormDataConverter();
                 FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA);
+                ApplicationContext applicationContext = operation.getApplicationContext();
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA, applicationContext);
                 ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operationContext);
                 DecorateOperationFormDataResponse responseObject = response.getResponseObject();
                 formDataNS = converter.fromFormData(responseObject.getFormData());
