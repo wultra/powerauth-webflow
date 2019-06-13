@@ -40,6 +40,7 @@ import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.util.Collections;
 
 /**
  * Default demo controller class.
@@ -144,10 +145,8 @@ public class HomeController {
         applicationContext.setId("DEMO");
         applicationContext.setName("Demo application");
         applicationContext.setDescription("Web Flow demo application");
-        ApplicationExtras extras = new ApplicationExtras();
-        extras.setApplicationOwner("Wultra");
-        extras.getRequestedScopes().add("OAUTH");
-        applicationContext.setExtras(extras);
+        applicationContext.getExtras().put("requestedScopes", Collections.singletonList("OAUTH"));
+        applicationContext.getExtras().put("applicationOwner", "Wultra");
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (session.getServletContext()) {

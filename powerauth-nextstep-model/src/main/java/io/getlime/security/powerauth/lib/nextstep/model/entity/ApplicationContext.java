@@ -15,6 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Application context for OAuth 2.0 consent screen.
  *
@@ -25,12 +28,13 @@ public class ApplicationContext {
     private String id;
     private String name;
     private String description;
-    private ApplicationExtras extras;
+    private Map<String, Object> extras;
 
     /**
      * Default constructor.
      */
     public ApplicationContext() {
+        extras = new HashMap<>();
     }
 
     /**
@@ -44,7 +48,7 @@ public class ApplicationContext {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.extras = extras;
+        this.extras = new HashMap<>();
     }
 
     /**
@@ -99,15 +103,8 @@ public class ApplicationContext {
      * Get extra information for OAuth 2.0 consent screen.
      * @return Extra information for OAuth 2.0 consent screen.
      */
-    public ApplicationExtras getExtras() {
+    public Map<String, Object> getExtras() {
         return extras;
     }
 
-    /**
-     * Set extra information for OAuth 2.0 consent screen.
-     * @param extras Extra information for OAuth 2.0 consent screen.
-     */
-    public void setExtras(ApplicationExtras extras) {
-        this.extras = extras;
-    }
 }

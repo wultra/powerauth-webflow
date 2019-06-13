@@ -57,11 +57,11 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
-     * Verifies the authorization code entered by user against code generated during initialization.
+     * Validate the consent form and persist the selected options.
      *
-     * @param request Request with authentication object information.
+     * @param request Consent validation request.
      * @return User ID.
-     * @throws AuthStepException Exception is thrown when authorization fails.
+     * @throws AuthStepException Exception is thrown when consent validation or persistence fails.
      */
     @Override
     protected String authenticate(ConsentAuthRequest request) throws AuthStepException {

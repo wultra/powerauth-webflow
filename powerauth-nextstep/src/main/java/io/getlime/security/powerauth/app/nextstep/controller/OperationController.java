@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -44,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller class related to Next Step operations.
@@ -58,6 +60,8 @@ public class OperationController {
     private final OperationPersistenceService operationPersistenceService;
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Controller constructor.
@@ -315,10 +319,11 @@ public class OperationController {
             applicationContext.setName(operation.getApplicationName());
             applicationContext.setDescription(operation.getApplicationDescription());
             if (operation.getApplicationExtras() != null) {
-                ApplicationExtras extras;
+                Map<String, Object> extras;
                 try {
-                    extras = new ObjectMapper().readValue(operation.getApplicationExtras(), ApplicationExtras.class);
-                    applicationContext.setExtras(extras);
+                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+                    extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application extras", ex);
                 }
