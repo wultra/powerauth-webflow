@@ -102,7 +102,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with given ID with a previous authentication step result.
+     * Update operation with given ID with a previous authentication step result (PUT method).
      *
      * @param request Update operation request.
      * @return Update operation response.
@@ -110,6 +110,22 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+        return updateOperationImpl(request);
+    }
+
+    /**
+     * Update operation with given ID with a previous authentication step result (POST method alternative).
+     *
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws NextStepServiceException Thrown when next step resolution fails.
+     */
+    @RequestMapping(value = "/operation/update", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+        return updateOperationImpl(request);
+    }
+
+    private @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperationImpl(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
@@ -240,7 +256,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with updated form data.
+     * Update operation with updated form data (PUT method).
      *
      * @param request Update operation request.
      * @return Update operation response.
@@ -248,6 +264,22 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation/formData", method = RequestMethod.PUT)
     public @ResponseBody Response updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+        return updateOperationFormDataImpl(request);
+    }
+
+    /**
+     * Update operation with updated form data (POST method alternative).
+     *
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/formData/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateOperationFormDataPost(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+        return updateOperationFormDataImpl(request);
+    }
+
+    private Response updateOperationFormDataImpl(ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
         logger.info("Received updateOperationFormData request, operation ID: {}", request.getRequestObject().getOperationId());
         // persist operation form data update
         operationPersistenceService.updateFormData(request.getRequestObject());
@@ -256,13 +288,28 @@ public class OperationController {
     }
 
     /**
-     * Update operation with chosen authentication method.
+     * Update operation with chosen authentication method (PUT method).
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
     public @ResponseBody Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+        return updateChosenAuthMethodImpl(request);
+    }
+
+    /**
+     * Update operation with chosen authentication method (POST method alternative).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/chosenAuthMethod/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateChosenAuthMethodPost(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+        return updateChosenAuthMethodImpl(request);
+    }
+
+    public Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
