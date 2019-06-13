@@ -266,10 +266,26 @@ public class OperationPersistenceService {
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
             // pending operations should be filtered by authMethods which have been chosen by the user
+            OperationEntity operationToAdd = null;
             for (OperationHistoryEntity history : operation.getOperationHistory()) {
                 AuthMethod chosenAuthMethod = history.getChosenAuthMethod();
                 if (chosenAuthMethod != null && chosenAuthMethod == authMethod) {
-                    filteredList.add(operation);
+                    operationToAdd = operation;
+                }
+            }
+            if (operationToAdd != null) {
+                // operation must not be added in case the authMethod was already processed (confirmed, canceled or method failed)
+                boolean alreadyProcessed = false;
+                for (OperationHistoryEntity history : operation.getOperationHistory()) {
+                    if (history.getRequestAuthMethod() == authMethod && (
+                            history.getRequestAuthStepResult() == AuthStepResult.CONFIRMED
+                            || history.getRequestAuthStepResult() == AuthStepResult.CANCELED
+                            || history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED)) {
+                        alreadyProcessed = true;
+                    }
+                }
+                if (!alreadyProcessed) {
+                    filteredList.add(operationToAdd);
                 }
             }
         }

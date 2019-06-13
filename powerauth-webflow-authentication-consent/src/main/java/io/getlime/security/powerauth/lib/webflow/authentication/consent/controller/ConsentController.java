@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * Controller which provides endpoints for SMS authorization.
+ * Controller which provides endpoints for OAuth 2.0 consent screen.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
