@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOption;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOptionValidationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateConsentFormResponse;
@@ -37,6 +38,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.consent.exceptio
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.request.ConsentAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentAuthResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.consent.service.HtmlSanitizationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
@@ -61,14 +63,17 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     private static final Logger logger = LoggerFactory.getLogger(ConsentController.class);
 
     private final DataAdapterClient dataAdapterClient;
+    private final HtmlSanitizationService htmlSanitizationService;
 
     /**
      * Controller constructor.
      * @param dataAdapterClient Data adapter client.
+     * @param htmlSanitizationService Html sanitization service.
      */
     @Autowired
-    public ConsentController(DataAdapterClient dataAdapterClient) {
+    public ConsentController(DataAdapterClient dataAdapterClient, HtmlSanitizationService htmlSanitizationService) {
         this.dataAdapterClient = dataAdapterClient;
+        this.htmlSanitizationService = htmlSanitizationService;
     }
 
     /**
@@ -104,6 +109,13 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                 // Validation succeeded, however save failed, allow user to retry the consent confirmation
                 throw new AuthStepException("User consent could not be saved", "error.communication");
             }
+
+            // Sanitize validation HTML error message and individual option validation error messages
+            validateResponse.setValidationErrorMessage(htmlSanitizationService.sanitize(validateResponse.getValidationErrorMessage()));
+            for (ConsentOptionValidationResult validationResult: validateResponse.getOptionValidationResults()) {
+                validationResult.setErrorMessage(htmlSanitizationService.sanitize(validationResult.getErrorMessage()));
+            }
+
             // Validation failed, return information about errors
             ConsentValidationFailedException ex = new ConsentValidationFailedException("Consent validation failed", "error.consentValidationFailed");
             ex.setErrorMessage(validateResponse.getValidationErrorMessage());
@@ -166,7 +178,11 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                     LocaleContextHolder.getLocale().getLanguage());
             CreateConsentFormResponse createResponse = daResponse.getResponseObject();
             initResponse.setResult(AuthStepResult.CONFIRMED);
-            initResponse.setConsentHtml(createResponse.getConsentHtml());
+            // Sanitize consent HTML text and individual option description
+            initResponse.setConsentHtml(htmlSanitizationService.sanitize(createResponse.getConsentHtml()));
+            for (ConsentOption option: createResponse.getOptions()) {
+                option.setDescriptionHtml(htmlSanitizationService.sanitize(option.getDescriptionHtml()));
+            }
             initResponse.getOptions().addAll(createResponse.getOptions());
             logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return initResponse;
