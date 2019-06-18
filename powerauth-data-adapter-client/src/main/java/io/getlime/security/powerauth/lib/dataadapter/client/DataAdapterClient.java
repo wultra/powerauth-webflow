@@ -213,7 +213,6 @@ public class DataAdapterClient {
         try {
             // Exchange user details with data adapter.
             DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, operationContext);
-            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, operationContext);
             HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
             });

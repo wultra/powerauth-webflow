@@ -124,8 +124,11 @@ public class UserProfileController {
         // Try to fetch user details from the service
         try {
             final String usedId = authentication.getUserAuthentication().getName();
-            logger.info("Fetching user details for user with ID: {}", usedId);
-            final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId);
+            // Get additional information stored with the token
+            final Map<String, Object> additionalInfo = tokenServices.getAccessToken(authentication).getAdditionalInformation();
+            final String organizationId = (String) additionalInfo.get(ORGANIZATION_ID);
+            logger.info("Fetching user details for user with ID: {}, organization ID: {}", usedId, organizationId);
+            final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId, organizationId);
             final UserDetailResponse user = userDetail.getResponseObject();
             final String id = user.getId();
             final String givenName = user.getGivenName();

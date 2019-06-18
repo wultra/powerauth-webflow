@@ -150,7 +150,7 @@ public class NextStepClient {
      * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         return createOperation(operationName, null, operationData, null, formData, params, applicationContext);
     }
 
@@ -204,7 +204,7 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, formData, organizationId, params, applicationContext);
+        return createOperation(operationName, null, operationData, organizationId, formData, params, applicationContext);
     }
 
     /**

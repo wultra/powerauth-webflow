@@ -369,7 +369,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * @throws AuthStepException In case communication with Next Step service fails.
      */
     private boolean isBiometryAllowedInOfflineMode(String operationName) throws AuthStepException {
-        GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+        GetOperationConfigDetailResponse operationConfig = getOperationConfig(operationName);
         if (operationConfig != null) {
             // Convert mobile token mode to AllowedSignatureType object
             OperationConverter operationConverter = new OperationConverter();

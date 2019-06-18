@@ -215,24 +215,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     /**
      * Authorize operation with provided ID with user with given user ID.
      *
-     * @param operationId    Operation ID of operation to be authorized.
-     * @param userId         User ID of user who should authorize operation.
-     * @param organizationId Organization ID of organization related to the operation.
-     * @return Response with information about operation update result.
-     * @throws NextStepServiceException In case communication fails.
-     * @throws AuthStepException In case authorization fails.
-     */
-    protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId) throws NextStepServiceException, AuthStepException {
-        return authorize(operationId, userId, null, null);
-    }
-
-    /**
-     * Authorize operation with provided ID with user with given user ID.
-     *
-     * @param operationId    Operation ID of operation to be authorized.
-     * @param userId         User ID of user who should authorize operation.
-     * @param organizationId Organization ID of organization related to the operation.
-     * @param params         Custom parameters.
+     * @param operationId        Operation ID of operation to be authorized.
+     * @param userId             User ID of user who should authorize operation.
+     * @param organizationId     Organization ID of organization related to the operation.
+     * @param params             Custom parameters.
+     * @param applicationContext Application context.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
      * @throws AuthStepException In case authorization fails.

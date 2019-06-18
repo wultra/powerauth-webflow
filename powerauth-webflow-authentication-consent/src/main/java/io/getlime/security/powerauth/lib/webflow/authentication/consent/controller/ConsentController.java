@@ -42,6 +42,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.consent.service.
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +85,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
      * @throws AuthStepException Exception is thrown when consent validation or persistence fails.
      */
     @Override
-    protected String authenticate(ConsentAuthRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(ConsentAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
@@ -104,7 +105,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                 SaveConsentFormResponse saveResponse = daResponse2.getResponseObject();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                    return operation.getUserId();
+                    return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                 }
                 // Validation succeeded, however save failed, allow user to retry the consent confirmation
                 throw new AuthStepException("User consent could not be saved", "error.communication");

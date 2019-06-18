@@ -124,6 +124,7 @@ public class OperationEntity implements Serializable {
 
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
 
     public String getApplicationId() {
         return applicationId;
