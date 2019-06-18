@@ -20,7 +20,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetOperationConfigResponse {
+public class GetOperationConfigDetailResponse {
 
     private String operationName;
     private String templateVersion;

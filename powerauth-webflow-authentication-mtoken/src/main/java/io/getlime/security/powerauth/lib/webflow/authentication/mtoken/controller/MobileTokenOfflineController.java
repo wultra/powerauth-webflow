@@ -28,7 +28,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
@@ -36,6 +36,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeDisabledException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeInvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeInvalidAuthCodeException;
@@ -104,11 +105,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
      * Verifies the authorization code.
      *
      * @param request Request with authentication object information.
-     * @return User ID if successfully authorized, otherwise null.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Thrown when authorization step fails.
      */
     @Override
-    protected String authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(@RequestBody QRCodeAuthenticationRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
@@ -131,7 +132,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
                 logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                return userId;
+                return new AuthenticationResult(userId, operation.getOrganizationId());
             }
         }
         BigInteger remainingAttemptsPAObj = signatureResponse.getRemainingAttempts();

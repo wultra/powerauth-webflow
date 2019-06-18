@@ -266,7 +266,7 @@ a:hover, a:active, a:focus {
 
 .title {
     font-size: 16pt;
-    margin: 10px 10px 20px 10px;
+    margin: 20px 10px 20px 10px;
 }
 
 .alert {
@@ -314,6 +314,30 @@ a:hover, a:active, a:focus {
 
 .party-info-link {
     font-size: 12pt;
+}
+
+.organization .Select-control {
+    margin-bottom: 15px;
+}
+
+.organization .Select-input {
+    height: 34px;
+}
+
+.organization .Select-value-label {
+    font-size: 14px;
+    text-align: left;
+    padding-left: 2px;
+}
+
+.organization .Select-option {
+    font-size: 14px;
+    text-align: left;
+    padding-left: 12px;
+}
+
+.nav-tabs {
+    margin-bottom: 15px;
 }
 
 .consent-text {

@@ -39,28 +39,32 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
     private String operationId;
     private Boolean strongAuthentication;
     private String language;
+    private String organizationId;
 
     /**
-     * Default constructor
+     * Default constructor.
      */
     public UserOperationAuthentication() {
         super(null);
         this.strongAuthentication = false;
         this.language = Locale.US.getLanguage();
+        this.organizationId = null;
     }
 
     /**
-     * Constructor for a new UserOperationAuthentication
+     * Constructor with operation and user details.
      *
-     * @param operationId Operation ID
-     * @param userId      User ID
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
      */
-    public UserOperationAuthentication(String operationId, String userId) {
+    public UserOperationAuthentication(String operationId, String userId, String organizationId) {
         super(null);
         this.operationId = operationId;
         this.userId = userId;
         this.strongAuthentication = false;
         this.language = Locale.US.getLanguage();
+        this.organizationId = organizationId;
     }
 
     @Override
@@ -102,6 +106,23 @@ public class UserOperationAuthentication extends AbstractAuthenticationToken imp
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
 
     /**
      * Get operation ID.

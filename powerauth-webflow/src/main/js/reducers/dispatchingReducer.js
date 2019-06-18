@@ -7,7 +7,11 @@
 export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE", context: null}, action) {
     switch (action.type) {
         case "SHOW_SCREEN_LOGIN": {
-            return {...state, currentScreen: "SCREEN_LOGIN", context: action.payload};
+            return {
+                ...state,
+                currentScreen: "SCREEN_LOGIN",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
         }
         case "SHOW_SCREEN_OPERATION_REVIEW": {
             return {
@@ -60,6 +64,9 @@ function mergeContext(actionType, oldContext, newContext) {
         return newContext;
     }
     switch (actionType) {
+        case "SHOW_SCREEN_LOGIN":
+            mergeOrganizations(oldContext, newContext);
+            break;
         case "SHOW_SCREEN_OPERATION_REVIEW":
             mergeAuthMethods(oldContext, newContext);
             mergeData(oldContext, newContext);
@@ -75,6 +82,17 @@ function mergeContext(actionType, oldContext, newContext) {
             break;
     }
     return newContext;
+}
+
+function mergeOrganizations(oldContext, newContext) {
+    // organizations need to remain in context
+    if (oldContext.organizations !== undefined && newContext.organizations === undefined) {
+        newContext.organizations = oldContext.organizations;
+    }
+    // chosenOrganizationId need to remain in context
+    if (oldContext.chosenOrganizationId !== undefined && newContext.chosenOrganizationId === undefined) {
+        newContext.chosenOrganizationId = oldContext.chosenOrganizationId;
+    }
 }
 
 function mergeData(oldContext, newContext) {

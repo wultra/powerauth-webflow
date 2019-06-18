@@ -22,7 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDat
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
@@ -101,7 +101,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         if (operation == null) {
             final String operationName = "login";
-            GetOperationConfigResponse operationConfig;
+            GetOperationConfigDetailResponse operationConfig;
             try {
                 operationConfig = getOperationConfig(operationName);
             } catch (AuthStepException e) {

@@ -29,10 +29,17 @@ public class AuthenticationRequest {
      * Username for this authentication request.
      */
     private String username;
+
     /**
      * Password for this authentication request.
      */
     private String password;
+
+    /**
+     * Organization ID for this authentication request.
+     */
+    private String organizationId;
+
     /**
      * Authentication type which defines how username and password fields are used.
      */
@@ -53,12 +60,14 @@ public class AuthenticationRequest {
      * Constructor with all parameters for convenience.
      * @param username Username for this authentication request.
      * @param password Password for this authentication request.
+     * @param organizationId Organization ID for this authentication request.
      * @param type Authentication type.
      * @param operationContext Operation context.
      */
-    public AuthenticationRequest(String username, String password, AuthenticationType type, OperationContext operationContext) {
+    public AuthenticationRequest(String username, String password, String organizationId, AuthenticationType type, OperationContext operationContext) {
         this.username = username;
         this.password = password;
+        this.organizationId = organizationId;
         this.type = type;
         this.operationContext = operationContext;
     }
@@ -93,6 +102,22 @@ public class AuthenticationRequest {
      */
     public String getPassword() {
         return password;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

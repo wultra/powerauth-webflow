@@ -49,6 +49,9 @@ public class OperationEntity implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "organization_id")
+    private String organizationId;
+
     @Column(name = "application_id")
     private String applicationId;
 
@@ -114,6 +117,13 @@ public class OperationEntity implements Serializable {
     public void setUserId(String userId) {
         this.userId = userId;
     }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
 
     public String getApplicationId() {
         return applicationId;

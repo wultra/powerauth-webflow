@@ -65,6 +65,7 @@ public class UserResponse {
 
         private String language;
         private boolean sca;
+        private String organizationId;
 
         public String getLanguage() {
             return language;
@@ -80,6 +81,14 @@ public class UserResponse {
 
         public void setSca(boolean sca) {
             this.sca = sca;
+        }
+
+        public String getOrganizationId() {
+            return organizationId;
+        }
+
+        public void setOrganizationId(String organizationId) {
+            this.organizationId = organizationId;
         }
     }
 

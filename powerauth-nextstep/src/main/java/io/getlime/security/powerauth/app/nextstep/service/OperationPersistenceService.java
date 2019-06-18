@@ -88,6 +88,7 @@ public class OperationPersistenceService {
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
+        operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Assign operation context to entity in case it was sent in request
@@ -137,6 +138,7 @@ public class OperationPersistenceService {
         }
         OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
+        operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Do not remove application context in case it was not sent in request

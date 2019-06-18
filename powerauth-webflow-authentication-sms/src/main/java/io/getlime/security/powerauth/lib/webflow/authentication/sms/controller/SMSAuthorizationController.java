@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SMSAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.SMSAuthorizationResponse;
@@ -66,11 +67,11 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
      * Verifies the authorization code entered by user against code generated during initialization.
      *
      * @param request Request with authentication object information.
-     * @return User ID.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Exception is thrown when authorization fails.
      */
     @Override
-    protected String authenticate(SMSAuthorizationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(SMSAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
@@ -94,7 +95,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 httpSession.removeAttribute(MESSAGE_ID);
             }
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-            return operation.getUserId();
+            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
         } catch (DataAdapterClientErrorException e) {
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             Integer remainingAttemptsNS;
@@ -141,6 +142,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         SMSAuthorizationResponse initResponse = new SMSAuthorizationResponse();
 
         final String userId = operation.getUserId();
+        final String organizationId = operation.getOrganizationId();
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
@@ -148,8 +150,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
-            ObjectResponse<CreateSMSAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
-                    LocaleContextHolder.getLocale().getLanguage());
+            ObjectResponse<CreateSMSAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSMS(userId, organizationId, operationContext,
+            LocaleContextHolder.getLocale().getLanguage());
             String messageId = daResponse.getResponseObject().getMessageId();
             synchronized (httpSession.getServletContext()) {
                 httpSession.setAttribute(MESSAGE_ID, messageId);

@@ -41,6 +41,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.slf4j.Logger;
@@ -90,17 +91,17 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     /**
      * Authentication step - step is automatically authenticated if operation is valid.
      * @param request Authentication request.
-     * @return User ID.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected String authenticate(OperationReviewRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        return operation.getUserId();
+        return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
     }
 
     /**
@@ -249,7 +250,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
-            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operationContext);
+            dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOrganizationId(), operationContext);
         }
         return new Response();
     }
@@ -305,7 +306,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
                 ApplicationContext applicationContext = operation.getApplicationContext();
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA, applicationContext);
-                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operationContext);
+                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operation.getOrganizationId(), operationContext);
                 DecorateOperationFormDataResponse responseObject = response.getResponseObject();
                 formDataNS = converter.fromFormData(responseObject.getFormData());
                 formDataNS.setDynamicDataLoaded(true);

@@ -26,6 +26,7 @@ public class UserDetailResponse {
     private String id;
     private String givenName;
     private String familyName;
+    private String organizationId;
 
     /**
      * Get user ID.
@@ -73,5 +74,21 @@ public class UserDetailResponse {
      */
     public void setFamilyName(String familyName) {
         this.familyName = familyName;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 }

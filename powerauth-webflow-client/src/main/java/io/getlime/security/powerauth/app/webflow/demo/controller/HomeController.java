@@ -26,7 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -129,7 +129,7 @@ public class HomeController {
 
 
         final String operationName = "authorize_payment";
-        final GetOperationConfigResponse operationConfig = client.getOperationConfig(operationName).getResponseObject();
+        final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
 
         String operationData = new OperationDataBuilder()
                 .templateVersion(operationConfig.getTemplateVersion())

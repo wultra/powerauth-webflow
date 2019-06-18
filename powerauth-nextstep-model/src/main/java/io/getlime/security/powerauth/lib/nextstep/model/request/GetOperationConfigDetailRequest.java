@@ -16,10 +16,27 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 /**
- * Request object used for querying authentication methods.
+ * Request object used obtaining operation configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class GetAuthMethodsRequest {
+public class GetOperationConfigDetailRequest {
 
+    private String operationName;
+
+    /**
+     * Get the operation name.
+     * @return Operation name.
+     */
+    public String getOperationName() {
+        return operationName;
+    }
+
+    /**
+     * Set the operation name.
+     * @param operationName Operation name.
+     */
+    public void setOperationName(String operationName) {
+        this.operationName = operationName;
+    }
 }

@@ -31,6 +31,11 @@ public class CreateSMSAuthorizationRequest {
     private String userId;
 
     /**
+     * Organization ID for this authorization request.
+     */
+    private String organizationId;
+
+    /**
      * Operation context.
      */
     private OperationContext operationContext;
@@ -49,11 +54,13 @@ public class CreateSMSAuthorizationRequest {
     /**
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param lang SMS language.
      * @param operationContext Operation context.
      */
-    public CreateSMSAuthorizationRequest(String userId, String lang, OperationContext operationContext) {
+    public CreateSMSAuthorizationRequest(String userId, String organizationId, String lang, OperationContext operationContext) {
         this.userId = userId;
+        this.organizationId = organizationId;
         this.lang = lang;
         this.operationContext = operationContext;
     }
@@ -72,6 +79,22 @@ public class CreateSMSAuthorizationRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

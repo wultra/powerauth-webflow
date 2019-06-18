@@ -32,6 +32,7 @@ public class CreateOperationResponse {
 
     private String operationId;
     private String operationName;
+    private String organizationId;
     private AuthResult result;
     private String resultDescription;
     private Date timestampCreated;
@@ -85,6 +86,22 @@ public class CreateOperationResponse {
      */
     public String getOperationData() {
         return operationData;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

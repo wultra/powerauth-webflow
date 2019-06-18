@@ -32,6 +32,7 @@ public class UpdateOperationRequest {
 
     private String operationId;
     private String userId;
+    private String organizationId;
     private AuthMethod authMethod;
     private AuthStepResult authStepResult;
     private String authStepResultDescription;
@@ -75,6 +76,22 @@ public class UpdateOperationRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**
