@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Configuration for the Web Flow application.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Configuration
 @ConfigurationProperties("ext")
@@ -67,6 +67,12 @@ public class WebFlowServerConfiguration {
      */
     @Value("${powerauth.webflow.service.applicationEnvironment}")
     private String applicationEnvironment;
+
+    /**
+     * Whether security warning should be displayed on Android devices.
+     */
+    @Value("${powerauth.webflow.android.showSecurityWarning}")
+    private boolean showAndroidSecurityWarning;
 
     /**
      * Get custom external stylesheet URL.
@@ -119,4 +125,11 @@ public class WebFlowServerConfiguration {
         return applicationEnvironment;
     }
 
+    /**
+     * Get whether security warning should be displayed on Android devices.
+     * @return Whether security warning should be displayed on Android devices.
+     */
+    public boolean getShowAndroidSecurityWarning() {
+        return showAndroidSecurityWarning;
+    }
 }
