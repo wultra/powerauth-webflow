@@ -30,6 +30,11 @@ public class CreateConsentFormRequest {
     private String userId;
 
     /**
+     * Organization ID for this request.
+     */
+    private String organizationId;
+
+    /**
      * Operation context which provides context for creating the consent form.
      */
     private OperationContext operationContext;
@@ -71,6 +76,22 @@ public class CreateConsentFormRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**
