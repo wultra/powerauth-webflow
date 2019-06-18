@@ -12,6 +12,9 @@ Following topics are covered in this chapter:
 - [Operation change notification](#operation-change-notification)
 - [Generate authorization SMS](#generate-sms-authorization-code)
 - [Verify authorization SMS code](#verify-authorization-sms-code)
+- [Create OAuth 2.0 consent form](#create-oauth-20-consent-form)
+- [Validate OAuth 2.0 consent form](#validate-oauth-20-consent-form)
+- [Save OAuth 2.0 consent form](#save-oauth-20-consent-form)
 
 You can access the generated REST API documentation in deployed Data Adapter:
 
@@ -968,5 +971,496 @@ The list of expected status codes:
 {
   "status": "OK",
   "responseObject": null
+}
+```
+
+## Create OAuth 2.0 Consent Form
+
+### Create consent form - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/auth/consent/create</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - consent form has been successfully created |
+| 400  | Invalid request - the request validation failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Create consent form - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "roman",
+    "operationContext": {
+      "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2017"
+            },
+            "value": "2017-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2017"
+            },
+            "note": "Utility Bill Payment - 05/2017"
+          }
+        ],
+        "userInput": {
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "requestedScopes": [
+            "OAUTH"
+          ],
+          "applicationOwner": "Wultra"
+        }
+      }
+    },
+    "lang": "en"
+  }
+}
+```
+
+### Response - consent form has been successfully created
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "consentHtml": "I consent that I have initiated this payment request and give consent to complete the operation.",
+    "options": [
+      {
+        "id": "CONSENT_INIT",
+        "descriptionHtml": "I consent that I have initiated this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      },
+      {
+        "id": "CONSENT_PAYMENT",
+        "descriptionHtml": "I give consent to complete this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      }
+    ]
+  }
+}
+```
+
+## Validate OAuth 2.0 Consent Form
+
+### Validate consent form - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/auth/consent/validate</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - consent form has been successfully validated (however it may contain validation errors) |
+| 400  | Invalid request - the request validation failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Validate consent form - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "roman",
+    "operationContext": {
+      "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2017"
+            },
+            "value": "2017-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2017"
+            },
+            "note": "Utility Bill Payment - 05/2017"
+          }
+        ],
+        "userInput": {
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "requestedScopes": [
+            "OAUTH"
+          ],
+          "applicationOwner": "Wultra"
+        }
+      }
+    },
+    "lang": "en",
+    "options": [
+      {
+        "id": "CONSENT_INIT",
+        "descriptionHtml": "I consent that I have initiated this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      },
+      {
+        "id": "CONSENT_PAYMENT",
+        "descriptionHtml": "I give consent to complete this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      }
+    ]
+  }
+}
+```
+
+### Response - consent form has been successfully validated
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "consentValidationPassed": true,
+    "validationErrorMessage": null,
+    "optionValidationResults": []
+  }
+}
+```
+
+### Response - consent form options validation failed
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "consentValidationPassed": false,
+    "validationErrorMessage": "Please fill in the whole consent form.",
+    "optionValidationResults": [
+      {
+        "id": "CONSENT_INIT",
+        "validationPassed": false,
+        "errorMessage": "Confirm this option to complete the operation."
+      },
+      {
+        "id": "CONSENT_PAYMENT",
+        "validationPassed": false,
+        "errorMessage": "Confirm this option to complete the operation."
+      }
+    ]
+  }
+}
+```
+
+## Save OAuth 2.0 Consent Form
+
+### Save consent form - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/auth/consent/save</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - consent form has been successfully saved |
+| 400  | Invalid request - the request validation failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Save consent form - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "roman",
+    "operationContext": {
+      "id": "4a04667b-8a1a-46af-813c-cf71ffcde478",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2017"
+            },
+            "value": "2017-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2017"
+            },
+            "note": "Utility Bill Payment - 05/2017"
+          }
+        ],
+        "userInput": {
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "requestedScopes": [
+            "OAUTH"
+          ],
+          "applicationOwner": "Wultra"
+        }
+      }
+    },
+    "options": [
+      {
+        "id": "CONSENT_INIT",
+        "descriptionHtml": "I consent that I have initiated this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": "CHECKED"
+      },
+      {
+        "id": "CONSENT_PAYMENT",
+        "descriptionHtml": "I give consent to complete this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": "CHECKED"
+      }
+    ]
+  }
+}
+```
+
+### Response - consent form has been successfully saved
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "saveSucceeded": true
+  }
+}
+```
+
+### Response - the processing was correct however consent form could not be saved at this time
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "saveSucceeded": false
+  }
 }
 ```

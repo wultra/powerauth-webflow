@@ -10,6 +10,7 @@ import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
 import SecurityOverride from "./securityOverride";
 import SMSAuthorization from "./smsAuth";
+import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
 
@@ -78,6 +79,10 @@ export class App extends React.Component {
                     Component = SMSAuthorization;
                     break;
                 }
+                case "SCREEN_CONSENT": {
+                    Component = Consent;
+                    break;
+                }                
                 default: {
                     Component = StartHandshake;
                     break;

@@ -6,6 +6,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSMSAuthorizationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -83,7 +84,11 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         }
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
+            String operationId = operation.getOperationId();
+            String operationName = operation.getOperationName();
+            String operationData = operation.getOperationData();
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
             dataAdapterClient.verifyAuthorizationSMS(messageId.toString(), request.getAuthCode(), operationContext);
             synchronized (httpSession.getServletContext()) {
                 httpSession.removeAttribute(MESSAGE_ID);
@@ -102,7 +107,8 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
                 GetOperationDetailResponse updatedOperation = getOperation();
                 remainingAttemptsNS = updatedOperation.getRemainingAttempts();
             } catch (NextStepServiceException e2) {
-                throw new AuthStepException(e2.getError().getMessage(), e2);
+                logger.error("Error occurred in Next Step server", e);
+                throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
             }
             AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
             Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
@@ -137,10 +143,14 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
         final String userId = operation.getUserId();
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
-            ObjectResponse<CreateSMSAuthorizationResponse> baResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            String operationId = operation.getOperationId();
+            String operationName = operation.getOperationName();
+            String operationData = operation.getOperationData();
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            ObjectResponse<CreateSMSAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSMS(userId, operationContext,
                     LocaleContextHolder.getLocale().getLanguage());
-            String messageId = baResponse.getResponseObject().getMessageId();
+            String messageId = daResponse.getResponseObject().getMessageId();
             synchronized (httpSession.getServletContext()) {
                 httpSession.setAttribute(MESSAGE_ID, messageId);
             }
@@ -151,7 +161,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             logger.error("Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-            initResponse.setMessage(e.getMessage());
+            initResponse.setMessage("error.communication");
             return initResponse;
         }
     }
@@ -237,7 +247,7 @@ public class SMSAuthorizationController extends AuthMethodController<SMSAuthoriz
             logger.error("Error when canceling SMS message validation.", e);
             final SMSAuthorizationResponse cancelResponse = new SMSAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
-            cancelResponse.setMessage(e.getMessage());
+            cancelResponse.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }

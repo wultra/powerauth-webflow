@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -25,9 +26,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -46,6 +45,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Controller class related to Next Step operations.
@@ -60,6 +60,8 @@ public class OperationController {
     private final OperationPersistenceService operationPersistenceService;
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Controller constructor.
@@ -99,7 +101,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with given ID with a previous authentication step result.
+     * Update operation with given ID with a previous authentication step result (PUT method).
      *
      * @param request Update operation request.
      * @return Update operation response.
@@ -107,6 +109,22 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation", method = RequestMethod.PUT)
     public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+        return updateOperationImpl(request);
+    }
+
+    /**
+     * Update operation with given ID with a previous authentication step result (POST method alternative).
+     *
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws NextStepServiceException Thrown when next step resolution fails.
+     */
+    @RequestMapping(value = "/operation/update", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+        return updateOperationImpl(request);
+    }
+
+    private @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperationImpl(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
@@ -146,6 +164,7 @@ public class OperationController {
             response.setResult(operation.getResult());
         }
         assignFormData(response, operation);
+        assignApplicationContext(response, operation);
 
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
             OperationHistory h = new OperationHistory();
@@ -197,6 +216,7 @@ public class OperationController {
     /**
      * Get configurations of all operations.
      *
+     * @param request Get configurations of all operations request.
      * @return Get operation configurations response.
      */
     @RequestMapping(value = "/operation/config/list", method = RequestMethod.POST)
@@ -242,6 +262,7 @@ public class OperationController {
                 response.setResult(operation.getResult());
             }
             assignFormData(response, operation);
+            assignApplicationContext(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
@@ -252,7 +273,7 @@ public class OperationController {
     }
 
     /**
-     * Update operation with updated form data.
+     * Update operation with updated form data (PUT method).
      *
      * @param request Update operation request.
      * @return Update operation response.
@@ -260,6 +281,22 @@ public class OperationController {
      */
     @RequestMapping(value = "/operation/formData", method = RequestMethod.PUT)
     public @ResponseBody Response updateOperationFormData(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+        return updateOperationFormDataImpl(request);
+    }
+
+    /**
+     * Update operation with updated form data (POST method alternative).
+     *
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/formData/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateOperationFormDataPost(@RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
+        return updateOperationFormDataImpl(request);
+    }
+
+    private Response updateOperationFormDataImpl(ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
         logger.info("Received updateOperationFormData request, operation ID: {}", request.getRequestObject().getOperationId());
         // persist operation form data update
         operationPersistenceService.updateFormData(request.getRequestObject());
@@ -268,13 +305,28 @@ public class OperationController {
     }
 
     /**
-     * Update operation with chosen authentication method.
+     * Update operation with chosen authentication method (PUT method).
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "/operation/chosenAuthMethod", method = RequestMethod.PUT)
     public @ResponseBody Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+        return updateChosenAuthMethodImpl(request);
+    }
+
+    /**
+     * Update operation with chosen authentication method (POST method alternative).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/chosenAuthMethod/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateChosenAuthMethodPost(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+        return updateChosenAuthMethodImpl(request);
+    }
+
+    public Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
@@ -298,6 +350,32 @@ public class OperationController {
                 logger.error("Error while deserializing operation display formData", ex);
             }
             response.setFormData(formData);
+        }
+    }
+
+    /**
+     * In case operation entity has an application context, assign it to the operation.
+     * The application extras are deserialized from JSON.
+     * @param response Response to be enriched by application context.
+     * @param operation Database entity representing operation.
+     */
+    private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
+        if (operation.getApplicationId() != null) {
+            ApplicationContext applicationContext = new ApplicationContext();
+            applicationContext.setId(operation.getApplicationId());
+            applicationContext.setName(operation.getApplicationName());
+            applicationContext.setDescription(operation.getApplicationDescription());
+            if (operation.getApplicationExtras() != null) {
+                Map<String, Object> extras;
+                try {
+                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+                    extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    applicationContext.getExtras().putAll(extras);
+                } catch (IOException ex) {
+                    logger.error("Error while deserializing application extras", ex);
+                }
+            }
+            response.setApplicationContext(applicationContext);
         }
     }
 

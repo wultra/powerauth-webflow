@@ -9,7 +9,7 @@ import java.util.TreeMap;
 /**
  * Operation data contains structured data used for signatures.
  *
- * See <a href="https://github.com/wultra/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#operation-data">operation data documentation</a>.
+ * See <a href="https://developers.wultra.com/docs/develop/powerauth-webflow/Operation-Data">operation data documentation</a>.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

@@ -377,6 +377,18 @@ Disables an authentication method for given user and lists all authentication me
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `DELETE` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/user/auth-method/delete</code></td>
+    </tr>
+</table>
+
 #### Request
 
 - Headers:
@@ -450,7 +462,7 @@ Operation detail contains following data:
 * **result** - result of the last authentication step: CONTINUE, FAILED or DONE (required)
 * **timestampCreated** - timestamp when operation was created (required)
 * **timestampExpires** - timestamp when operation expires (required)
-* **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code#operation-data) for easier interpretation of data in Mobile token.
+* **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) for easier interpretation of data in Mobile token.
 * **steps** - next steps for the operation (required)
 * **history** - operation history with completed authentication steps (required)
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
@@ -1001,6 +1013,18 @@ Updates an operation in Next Step server.
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/update</code></td>
+    </tr>
+</table>
+
 #### Request
 
 - Headers:
@@ -1292,6 +1316,19 @@ Updates operation formData for given operation. Only the userInput part of formD
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/formData/update</code></td>
+    </tr>
+</table>
+
+
 #### Request
 
 - Headers:
@@ -1421,6 +1458,18 @@ Sets chosen authentication method for current operation step.
     </tr>
 </table>
 
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/chosenAuthMethod/update</code></td>
+    </tr>
+</table>
+
 #### Request
 
 - Headers:
@@ -1445,3 +1494,4 @@ Sets chosen authentication method for current operation step.
   "status" : "OK",
   "responseObject" : null
 }
+```

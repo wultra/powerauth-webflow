@@ -38,6 +38,17 @@ export function dispatchAction(dispatch, response) {
                             });
                             break;
                         }
+                        case "CONSENT": {
+                            dispatch({
+                                type: "SHOW_SCREEN_CONSENT",
+                                payload: {
+                                    loading: false,
+                                    error: false,
+                                    message: ""
+                                }
+                            });
+                            break;
+                        }
                         case "POWERAUTH_TOKEN": {
                             // add powerauth token authentication method for operation review step
                             authMethods.push("POWERAUTH_TOKEN");

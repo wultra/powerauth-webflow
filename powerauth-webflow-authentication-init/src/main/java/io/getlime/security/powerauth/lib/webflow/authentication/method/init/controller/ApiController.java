@@ -101,8 +101,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         if (operation == null) {
             final String operationName = "login";
-            final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
-            if (operationConfig == null) {
+            GetOperationConfigResponse operationConfig;
+            try {
+                operationConfig = getOperationConfig(operationName);
+            } catch (AuthStepException e) {
                 logger.error("Operation configuration is missing, operation name: {}", operationName);
                 return failedOperationResponse(null, "operationConfig.missing");
             }
@@ -122,7 +124,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             }
             List<KeyValueParameter> params = new ArrayList<>();
             logger.info("Initialized default login operation");
-            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {
+            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, null, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
