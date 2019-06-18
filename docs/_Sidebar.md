@@ -25,6 +25,7 @@
 **Deployment**
 
 - [Web Flow Installation Manual](./Web-Flow-Installation-Manual.md)
+- [Deploying Web Flow on JBoss / Wildfly](./Deploying-Wildfly.md)
 - [Database Table Structure](./Database-Table-Structure.md)
 - [Migration Instructions](./Migration-Instructions.md)
 - [Docker Deployment](./Docker-Deployment.md)
@@ -39,6 +40,7 @@
 
 **Technical Notes**
 
+- [Operation Data Structure](./Operation-Data.md)
 - [Off-line Signatures QR Code](./Off-line-Signatures-QR-Code.md)
 - [Web Socket Communication Protocol](./Web-Socket-Communication-Protocol.md)
 - [Used Push Message Extras](./Used-Push-Message-Extras.md)

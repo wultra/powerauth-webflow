@@ -34,6 +34,13 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
+        case "SHOW_SCREEN_CONSENT": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_CONSENT",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
         case "SHOW_SCREEN_SUCCESS": {
             return {...state, currentScreen: "SCREEN_SUCCESS", context: action.payload};
         }
@@ -70,6 +77,9 @@ function mergeContext(actionType, oldContext, newContext) {
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
             break;
+        case "SHOW_SCREEN_CONSENT":
+            mergeConsent(oldContext, newContext);
+            break;
     }
     return newContext;
 }
@@ -100,5 +110,12 @@ function mergeAuthMethods(oldContext, newContext) {
     // authMethods need to remain in context
     if (oldContext.authMethods !== undefined && newContext.authMethods === undefined) {
         newContext.authMethods = oldContext.authMethods;
+    }
+}
+
+function mergeConsent(oldContext, newContext) {
+    // consent need to remain in context
+    if (oldContext.consent !== undefined && newContext.consent === undefined) {
+        newContext.consent = oldContext.consent;
     }
 }

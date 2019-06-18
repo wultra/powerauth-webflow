@@ -24,6 +24,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -111,7 +112,7 @@ public class NextStepClient {
     }
 
     /**
-     * Calls the operation endpoint via POST method to create a new operation.
+     * Calls the create operation endpoint via POST method to create a new operation.
      *
      * @param operationName Operation name.
      * @param operationData Operation data.
@@ -120,39 +121,41 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, null, null, params);
+        return createOperation(operationName, null, operationData, null, null, params, null);
     }
 
     /**
-     * Calls the operation endpoint via POST method to create a new operation.
+     * Calls the create operation endpoint via POST method to create a new operation.
      *
      * @param operationName Operation name.
      * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
      * @param operationData Operation data.
      * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
      * @return A Response with CreateOperationResponse object for OK status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, operationId, operationData, null, null, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+        return createOperation(operationName, operationId, operationData, null, null, params, applicationContext);
     }
 
     /**
-     * Calls the operation endpoint via POST method to create a new operation.
+     * Calls the create operation endpoint via POST method to create a new operation.
      *
      * @param operationName Operation name.
      * @param operationData Operation data.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
      * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, null, formData, params);
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, null, formData, params, applicationContext);
     }
 
     /**
-     * Calls the operation endpoint via POST method to create a new operation.
+     * Calls the create operation endpoint via POST method to create a new operation.
      *
      * @param operationName Operation name.
      * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
@@ -160,10 +163,11 @@ public class NextStepClient {
      * @param organizationId Organization ID.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
      * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String organizationId, OperationFormData formData, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String organizationId, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
@@ -175,6 +179,7 @@ public class NextStepClient {
             if (params != null) {
                 request.getParams().addAll(params);
             }
+            request.setApplicationContext(applicationContext);
             HttpEntity<ObjectRequest<CreateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateOperationResponse>>() {});
             return new ObjectResponse<>(response.getBody().getResponseObject());
@@ -187,7 +192,23 @@ public class NextStepClient {
     }
 
     /**
-     * Calls the operation endpoint via PUT method to update an existing operation.
+     * Calls the create operation endpoint via POST method to create a new operation.
+     *
+     * @param operationName Operation name.
+     * @param operationData Operation data.
+     * @param organizationId Organization ID.
+     * @param formData Operation form data, such as title, message and displayable attributes.
+     * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+        return createOperation(operationName, null, operationData, formData, organizationId, params, applicationContext);
+    }
+
+    /**
+     * Calls the update operation endpoint via PUT method to update an existing operation.
      *
      * @param operationId Operation ID.
      * @param userId User ID.
@@ -196,10 +217,11 @@ public class NextStepClient {
      * @param authStepResult Result of the last step.
      * @param authStepResultDescription Description of the result of the last step.
      * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
      * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, String organizationId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, String organizationId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             UpdateOperationRequest request = new UpdateOperationRequest();
@@ -212,6 +234,46 @@ public class NextStepClient {
             if (params != null) {
                 request.getParams().addAll(params);
             }
+            request.setApplicationContext(applicationContext);
+            HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+  
+    /**
+     * Calls the update operation endpoint via POST method to update an existing operation.
+     *
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param authMethod Authentication method.
+     * @param organizationId Organization ID.
+     * @param authStepResult Result of the last step.
+     * @param authStepResultDescription Description of the result of the last step.
+     * @param params List of generic parameters.
+     * @param applicationContext Context of application requesting the OAuth 2.0 consent.
+     * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(String operationId, String userId, String organizationId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateOperationRequest request = new UpdateOperationRequest();
+            request.setOperationId(operationId);
+            request.setUserId(userId);
+            request.setOrganizationId(organizationId);
+            request.setAuthMethod(authMethod);
+            request.setAuthStepResult(authStepResult);
+            request.setAuthStepResultDescription(authStepResultDescription);
+            if (params != null) {
+                request.getParams().addAll(params);
+            }
+            request.setApplicationContext(applicationContext);
             HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
             });

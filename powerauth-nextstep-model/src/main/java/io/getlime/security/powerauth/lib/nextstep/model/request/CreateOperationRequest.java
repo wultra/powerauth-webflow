@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 
@@ -34,6 +35,7 @@ public class CreateOperationRequest {
     private String organizationId;
     private List<KeyValueParameter> params;
     private OperationFormData formData;
+    private ApplicationContext applicationContext;
 
     /**
      * Default constructor.
@@ -130,5 +132,21 @@ public class CreateOperationRequest {
      */
     public void setFormData(OperationFormData formData) {
         this.formData = formData;
+    }
+
+    /**
+     * Get application context for OAuth 2.0 consent screen.
+     * @return Application context for OAuth 2.0 consent screen.
+     */
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    /**
+     * Set application context for OAuth 2.0 consent screen.
+     * @param applicationContext Application context for OAuth 2.0 consent screen.
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

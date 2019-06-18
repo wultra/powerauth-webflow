@@ -6,10 +6,20 @@
 
 #### Improved Data Integrity
 
-Many `NOT NULL` definitions were added to database tables to improve data integrity.
-
+Following database changes were introduced in version `0.22.0`:
+ 
+- We added `NOT NULL` definitions to database tables to improve data integrity.
+- New optional columns added in operations in table `ns_operation` for application context:
+  - `application_id` - identifier of application
+  - `application_name` - application name
+  - `application_description` - application description
+  - `application_extras` - map of extra values used in application context
+  
 DDL update script for Oracle:
-```sql
+```
+
+-- Added not null constraints 
+
 ALTER TABLE NS_AUTH_METHOD MODIFY AUTH_METHOD NOT NULL;
 ALTER TABLE NS_AUTH_METHOD MODIFY ORDER_NUMBER NOT NULL;
 ALTER TABLE NS_AUTH_METHOD MODIFY CHECK_AUTH_FAILS NOT NULL;
@@ -41,10 +51,20 @@ ALTER TABLE DA_SMS_AUTHORIZATION MODIFY OPERATION_NAME NOT NULL;
 ALTER TABLE DA_SMS_AUTHORIZATION MODIFY AUTHORIZATION_CODE NOT NULL;
 ALTER TABLE DA_SMS_AUTHORIZATION MODIFY SALT NOT NULL;
 ALTER TABLE DA_SMS_AUTHORIZATION MODIFY MESSAGE_TEXT NOT NULL;
+
+-- Columns for application context in table NS_OPERATION 
+
+ALTER TABLE NS_OPERATION ADD APPLICATION_ID VARCHAR(256);
+ALTER TABLE NS_OPERATION ADD APPLICATION_NAME VARCHAR(256);
+ALTER TABLE NS_OPERATION ADD APPLICATION_DESCRIPTION VARCHAR(256);
+ALTER TABLE NS_OPERATION ADD APPLICATION_EXTRAS CLOB;
 ```
 
 DDL update script for MySQL:
 ```sql
+
+-- Added not null constraints 
+
 ALTER TABLE `ns_auth_method` MODIFY `auth_method` VARCHAR(32) NOT NULL;
 ALTER TABLE `ns_auth_method` MODIFY `order_number` INTEGER NOT NULL;
 ALTER TABLE `ns_auth_method` MODIFY `check_auth_fails` BOOLEAN NOT NULL;
@@ -76,6 +96,13 @@ ALTER TABLE `da_sms_authorization` MODIFY `operation_name` VARCHAR(32) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `authorization_code` VARCHAR(32) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `salt` VARBINARY(16) NOT NULL;
 ALTER TABLE `da_sms_authorization` MODIFY `message_text` TEXT NOT NULL;
+
+-- Columns for application context in table NS_OPERATION
+
+ALTER TABLE `ns_operation` ADD COLUMN `application_id` VARCHAR(256);
+ALTER TABLE `ns_operation` ADD COLUMN `application_name` VARCHAR(256);
+ALTER TABLE `ns_operation` ADD COLUMN `application_description` VARCHAR(256);
+ALTER TABLE `ns_operation` ADD COLUMN `application_extras` TEXT;
 ```
 
 #### Organization Context Support

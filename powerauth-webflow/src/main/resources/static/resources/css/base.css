@@ -340,3 +340,41 @@ a:hover, a:active, a:focus {
     margin-bottom: 15px;
 }
 
+.consent-text {
+    color: #777777;
+    font-size: 12pt;
+}
+
+.consent-checkbox {
+    vertical-align: top;
+    margin-top: 6px !important;
+}
+
+.consent-option-prefix {
+    vertical-align: top;
+    margin-top: 2px;
+    display: inline-block;
+    width: 12px;
+}
+
+.consent-option-text {
+    color: #777777;
+    display: unset;
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+.consent-nopadding {
+    padding: 0;
+}
+
+.consent-error {
+    padding-top: 10px;
+    color: #C0007F;
+    font-size: 12pt;
+}
+
+.consent-option-error {
+    color: #C0007F;
+    font-size: 12pt;
+}

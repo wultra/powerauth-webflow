@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRep
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -61,8 +62,9 @@ public class OperationPersistenceService {
 
     /**
      * Service constructor.
-     * @param idGeneratorService ID generator service.
-     * @param operationRepository Operation repository.
+     *
+     * @param idGeneratorService         ID generator service.
+     * @param operationRepository        Operation repository.
      * @param operationHistoryRepository Operation history repository.
      */
     @Autowired
@@ -88,6 +90,10 @@ public class OperationPersistenceService {
         operation.setOperationId(response.getOperationId());
         operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
+        if (request.getApplicationContext() != null) {
+            // Assign operation context to entity in case it was sent in request
+            assignApplicationContext(operation, request.getApplicationContext());
+        }
         try {
             // Store form data as serialized JSON string.
             operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
@@ -128,12 +134,16 @@ public class OperationPersistenceService {
     public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new OperationNotFoundException("Operation not found, operation ID: "+response.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
         operation.setOrganizationId(request.getOrganizationId());
         operation.setResult(response.getResult());
+        if (request.getApplicationContext() != null) {
+            // Do not remove application context in case it was not sent in request
+            assignApplicationContext(operation, request.getApplicationContext());
+        }
         // operation expiration time matches current response expiration time
         operation.setTimestampExpires(response.getTimestampExpires());
         operationRepository.save(operation);
@@ -162,13 +172,14 @@ public class OperationPersistenceService {
 
     /**
      * Updates form data for given operation.
+     *
      * @param request Request to update form data.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public void updateFormData(UpdateFormDataRequest request) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new OperationNotFoundException("Operation not found, operation ID: "+request.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         try {
@@ -187,13 +198,14 @@ public class OperationPersistenceService {
 
     /**
      * Updates chosen authentication method.
+     *
      * @param request Request to update chosen authentication method.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
-            throw new OperationNotFoundException("Operation not found, operation ID: "+request.getOperationId());
+            throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
@@ -201,7 +213,7 @@ public class OperationPersistenceService {
             throw new IllegalStateException("Operation is missing history");
         }
         boolean chosenAuthMethodValid = false;
-        for (AuthStep step: getResponseAuthSteps(operation)) {
+        for (AuthStep step : getResponseAuthSteps(operation)) {
             if (step.getAuthMethod() == request.getChosenAuthMethod()) {
                 chosenAuthMethodValid = true;
                 break;
@@ -224,13 +236,14 @@ public class OperationPersistenceService {
     public OperationEntity getOperation(String operationId) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
-            throw new OperationNotFoundException("Operation not found, operation ID: "+operationId);
+            throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
         }
         return operationOptional.get();
     }
 
     /**
      * Return whether operation exists.
+     *
      * @param operationId Operation ID.
      * @return Whether operation exists.
      */
@@ -253,12 +266,28 @@ public class OperationPersistenceService {
             return entities;
         }
         List<OperationEntity> filteredList = new ArrayList<>();
-        for (OperationEntity operation: entities) {
+        for (OperationEntity operation : entities) {
             // pending operations should be filtered by authMethods which have been chosen by the user
-            for (OperationHistoryEntity history: operation.getOperationHistory()) {
+            OperationEntity operationToAdd = null;
+            for (OperationHistoryEntity history : operation.getOperationHistory()) {
                 AuthMethod chosenAuthMethod = history.getChosenAuthMethod();
                 if (chosenAuthMethod != null && chosenAuthMethod == authMethod) {
-                    filteredList.add(operation);
+                    operationToAdd = operation;
+                }
+            }
+            if (operationToAdd != null) {
+                // operation must not be added in case the authMethod was already processed (confirmed, canceled or method failed)
+                boolean alreadyProcessed = false;
+                for (OperationHistoryEntity history : operation.getOperationHistory()) {
+                    if (history.getRequestAuthMethod() == authMethod && (
+                            history.getRequestAuthStepResult() == AuthStepResult.CONFIRMED
+                            || history.getRequestAuthStepResult() == AuthStepResult.CANCELED
+                            || history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED)) {
+                        alreadyProcessed = true;
+                    }
+                }
+                if (!alreadyProcessed) {
+                    filteredList.add(operationToAdd);
                 }
             }
         }
@@ -298,6 +327,24 @@ public class OperationPersistenceService {
             );
         }
         return steps;
+    }
+
+    /**
+     * Assign application context to an operation entity.
+     *
+     * @param operationEntity    Operation entity.
+     * @param applicationContext Application context.
+     */
+    private void assignApplicationContext(OperationEntity operationEntity, ApplicationContext applicationContext) {
+        operationEntity.setApplicationId(applicationContext.getId());
+        operationEntity.setApplicationName(applicationContext.getName());
+        operationEntity.setApplicationDescription(applicationContext.getDescription());
+        // Extras are saved as JSON
+        try {
+            operationEntity.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
+        } catch (JsonProcessingException ex) {
+            logger.error("Error while serializing application extras", ex);
+        }
     }
 
 }

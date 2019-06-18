@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
@@ -45,6 +46,7 @@ public class GetOperationDetailResponse {
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
     private Integer remainingAttempts;
+    private ApplicationContext applicationContext;
 
     /**
      * Default constructor.
@@ -253,5 +255,21 @@ public class GetOperationDetailResponse {
      */
     public void setRemainingAttempts(Integer remainingAttempts) {
         this.remainingAttempts = remainingAttempts;
+    }
+
+    /**
+     * Get application context for OAuth 2.0 consent screen.
+     * @return Application context for OAuth 2.0 consent screen.
+     */
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    /**
+     * Set application context for OAuth 2.0 consent screen.
+     * @param applicationContext Application context for OAuth 2.0 consent screen.
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
     }
 }

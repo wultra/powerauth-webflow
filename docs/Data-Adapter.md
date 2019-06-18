@@ -18,3 +18,6 @@ Following functionality needs to be customized during Web Flow deployment by imp
 - generate OTP code for SMS based authorization
 - generate authorization SMS text
 - send authorization SMS 
+- create OAuth 2.0 consent form
+- validate OAuth 2.0 consent form options
+- save OAuth 2.0 consent form options

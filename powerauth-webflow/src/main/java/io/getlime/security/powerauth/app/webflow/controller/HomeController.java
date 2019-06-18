@@ -132,6 +132,7 @@ public class HomeController {
         model.put("i18n_CS", i18nService.generateMessages(new Locale("cs")));
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
+        model.put("showAndroidSecurityWarning", webFlowConfig.getShowAndroidSecurityWarning());
         logger.info("The /authenticate request succeeded");
         return "index";
     }

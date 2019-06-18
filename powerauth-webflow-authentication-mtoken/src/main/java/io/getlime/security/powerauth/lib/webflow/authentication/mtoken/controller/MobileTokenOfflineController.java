@@ -77,7 +77,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
 
     private final Logger logger = LoggerFactory.getLogger(MobileTokenOfflineController.class);
 
-    // See: https://github.com/wultra/powerauth-webflow/wiki/Off-line-Signatures-QR-Code#flags
+    // See: https://developers.wultra.com/docs/develop/powerauth-webflow/Off-line-Signatures-QR-Code#flags
     private static final String OFFLINE_MODE_ALLOW_BIOMETRY = "B";
     private static final int QR_CODE_SIZE = 250;
 
@@ -117,6 +117,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
             throw new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
         }
         final GetOperationDetailResponse operation = getOperation();
+        final String operationName = operation.getOperationName();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         // nonce is received from the UI - it was stored together with the QR code
@@ -124,7 +125,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
         String data = operation.getOperationId() + '&' + operation.getOperationData();
         String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
-        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), SignatureType.POSSESSION_KNOWLEDGE);
+        // determine whether biometry is allowed in offline mode
+        boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
+        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -346,18 +349,9 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         String title = operationTextNormalizer.normalizeText(operation.getFormData().getTitle().getMessage());
         String message = operationTextNormalizer.normalizeText(operation.getFormData().getSummary().getMessage());
 
-        // Convert mobile token mode to AllowedSignatureType object
-        GetOperationConfigDetailResponse operationConfig = getOperationConfig(operationName);
-
         String flags = "";
-        if (operationConfig != null) {
-            OperationConverter operationConverter = new OperationConverter();
-            AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
-            // Set flags based on signature type variants
-            if (allowedSignatureType != null && allowedSignatureType.getVariants() != null
-                    && allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString())) {
-                flags = OFFLINE_MODE_ALLOW_BIOMETRY;
-            }
+        if (isBiometryAllowedInOfflineMode(operationName)) {
+            flags = OFFLINE_MODE_ALLOW_BIOMETRY;
         }
 
         // Construct offline signature data payload as {OPERATION_ID}\n{TITLE}\n{MESSAGE}\n{OPERATION_DATA}\n{FLAGS}
@@ -368,4 +362,22 @@ public class MobileTokenOfflineController extends AuthMethodController<QRCodeAut
         return new OfflineSignatureQRCode(QR_CODE_SIZE, response.getOfflineData(), response.getNonce());
     }
 
+    /**
+     * Determine whether biometry is allowed in offline mode.
+     * @param operationName Operation name.
+     * @return Whether biometry is allowed in offline mode.
+     * @throws AuthStepException In case communication with Next Step service fails.
+     */
+    private boolean isBiometryAllowedInOfflineMode(String operationName) throws AuthStepException {
+        GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+        if (operationConfig != null) {
+            // Convert mobile token mode to AllowedSignatureType object
+            OperationConverter operationConverter = new OperationConverter();
+            AllowedSignatureType allowedSignatureType = operationConverter.fromMobileTokenMode(operationConfig.getMobileTokenMode());
+            // Return whether biometry is allowed in offline mode based on signature type variants
+            return allowedSignatureType != null && allowedSignatureType.getVariants() != null
+                    && allowedSignatureType.getVariants().contains(PowerAuthSignatureTypes.POSSESSION_BIOMETRY.toString());
+        }
+        return false;
+    }
 }

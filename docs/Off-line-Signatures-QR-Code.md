@@ -1,29 +1,21 @@
 # Off-line Signature QR Code
 
-## Table of contents
+## Table of Contents
 
 - [Introduction](#introduction)
-- [Operation attributes](#operation-attributes)
-- [Operation data](#operation-data)
-  - [Header](#header)
-  - [Known template types](#known-template-types)
-  - [Data types](#data-types)
-  - [Data fields](#data-fields)
+- [Operation Attributes](#operation-attributes)
+- [Operation Data](#operation-data)
 - [Flags](#flags)
-- [Signature calculation](#signature)
-- [Template details](#template-details)
-  - [`0` Generic](#0-generic)
-  - [`1` Payment](#1-payment)
-  - [`2` Login request](#2-login-request)
-- [Forward compatibility](#forward-compatibility)
-- [How to generate QR codes](#how-to-generate-qr-codes)
+- [Signature Calculation](#signature)
+- [Forward Compatibility](#forward-compatibility)
+- [Offline Signature Process Description](#offline-signature-process-description)
 
 ## Introduction
 
 This chapter describes how operation data is encoded into QR code for the purpose of off-line verification.
 
 
-## Operation attributes
+## Operation Attributes
 
 The format of QR code for offline operations is a high density string composed from several main operation attributes:
 
@@ -39,7 +31,7 @@ The format of QR code for offline operations is a high density string composed f
 4. `{OPERATION_DATA}` - content of operation data
 5. `{FLAGS}` - various flags affecting how operation is processed
 6. `{NONCE_B64}` - nonce, 16 random bytes in Base64 format. Required for pure offline signature.
-7. `{SIGNING_KEY_TYPE}{SIGNATURE_B64}` - ECDSA signature in Base64 format. The signature string has an one prefix character, containing an information about signing key type.
+7. `{SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}` - ECDSA signature in Base64 format. The signature string has an one prefix character, containing an information about signing key type.
 
 Then, the final string for QR code is simple, new-line separated list of attributes:
 
@@ -50,7 +42,7 @@ Then, the final string for QR code is simple, new-line separated list of attribu
 {OPERATION_DATA}\n
 {FLAGS}\n
 {NONCE_B64}\n
-{SIGNING_KEY_TYPE}{SIGNATURE_B64}
+{SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}
 ```
 
 For example:
@@ -64,96 +56,13 @@ AD8bOO0Df73kNaIGb3Vmpg==
 0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
 ```
 
-## Operation data
+## Operation Data
 
 Operation data is an asterisk separated list of fields, where the first field defines a version of operation data and template. Other fields are additional and contains typically significant attributes, which has to be presented to the user, before the operation is confirmed and signed.
 
-Each field has its unique type, defined by first letter. For example, following string contains header `A1` and three additional fields: "Amount", "Account" and "Date":
-```
-A1*A100CZK*ICZ2730300000001165254011*D20180425
-```
+An exact details of the operation data structure can be found in the separate documentation:
 
-### Header
-
-Header is composed from two parts:
-* `{VERSION}{TEMPLATE}`, where
-  * `{VERSION}` is an one capital letter defining version of operation data. First version is `A`, then `B`, `C`, etc...
-  * `{TEMPLATE}` is a decimal number defining a template which helps with other fields interpretation.
-
-Version `A` has following limitations:
-  * Templates from `0` up to `99` are supported
-  * Up to 5 additional fields are supported
-
-### Known template types
-
-* `0` - generic template. Each field will be displayed with "default" title.
-* `1` - payment data
-* `2` - confirm login
-
-If template defines an optional field and this field is not present in operation data, then an empty string can be used. For example, following strings defines various forms of payment:
-- `A1*A100CZK*ICZ2730300000001165254011***` - all optional parameters are empty
-- `A1*A100CZK*ICZ2730300000001165254011` - the same as above, but with omitted asterisks
-- `A1*A100CZK*ICZ2730300000001165254011***Nnote for recipient` - Last note is optional but used, so asterisks must be used to put note field at the right position
-
-Note that templates other than `0` may have an implicit `{TITLE}` and `{MESSAGE}` attributes. For example, it's not required to issue "Payment" and "Please confirm this payment" titles, when the "payment" template is used. In this case, simple empty newline is used for both data attributes. This rule unfortunately goes agains our forward compatibility principle, so it's recommended only for version `A` templates.
-
-### Data types
-
-This section defines data types available for data fields:
-
-* `{DECIMAL}` - a decimal number with dot as decimal separator. The Examples:
-  * `100.10` - number with a fractional part
-  * `1492` - number without a fractional part
-
-* `{CURRENCY}` - Currency code from [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217)
-
-* `{IBAN}` - Fully qualified IBAN with optional, comma separated BIC. For example:
-  * `CZ2730300000001165254011` - IBAN without BIC code
-  * `CZ2730300000001165254011,AIRACZPP` - IBAN with BIC code
-
-* `{TEXT}` - UTF-8 encoded text with few escaped characters:
-  * `\n` - newline
-  * `\\` - escape for backslash
-  * `\*` - escape for asterisk
-  * All characters with ASCII code < 32 are forbidden (e.g. `\t` should not be in the string)
-  * In the QR code generator, it is recommended to compress spaces. That means that two and more consequent space characters
-    should be replaced with just one space character.
-
-
-### Data fields
-
-* `A{DECIMAL}{CURRENCY}` - **Amount** with currency.
-  * `A100CZK`
-  * `A1492.50EUR`
-  * **"Amount"** is a default title, when template is not recognized.
-
-* `I{IBAN}` - **Counter account** in IBAN format, with optional BIC code:
-  * `ICZ2730300000001165254011`
-  * `ICZ2730300000001165254011,AIRACZPP`
-  * **"Account"** is a default title, when template is not recognized.
-
-* `Q{TEXT}` - **Counter account** in arbitrary format:
-  * `Q1165254011/3030` - an example for czech account
-  * **"Account"** is a default title, when template is not recognized.
-
-* `D{DATE}` - **date field** in `YYYYMMDD` format. For example:
-  * `D20180425`
-  * **"Date"** is a default title
-
-* `R{TEXT}` - **Operation's reference**. This field contains a general reference associated with the operation.
-  For example, for payment it can be a payment reference or in case of czech domestic payment, for trasmission of
-  symbols asscociated with payment:
-  * `RID3343432434` - some payment reference
-  * `R/VS123456/SS345/KS` - Czech specific, defines: VS=123456, SS=345, KS=empty
-  * **"Reference"** is a default title
-
-* `N{TEXT}` - **Note** associated with the operation. It can be for example note associated with the payment.
-  * `NZa vecerne pivo`
-  * **"Note"** is a default title
-
-* `T{TEXT}` - **Arbitrary textual** field, displayed as is, without any additional processing.
-  * `TRate 1EUR = 25,49CZK`
-  * **Attribute N**, is a default title, where N is an auto incremented number, starting with 1. For example, if you use two `T` fields in data, then the first in row will have "Attribute 1" and second "Attributer 2" title.
+- [Operation Data Structure](./Operation-Data.md)
 
 ## Flags
 
@@ -173,7 +82,7 @@ Signature attribute is composed from two separate fields:
 - `{SIGNING_KEY_TYPE}` is one character defining which key was used for signature calculation. Available options are:
    - `0` - `KEY_SERVER_MASTER_PRIVATE` was used for ECDSA signature calculation
    - `1` - `KEY_SERVER_PRIVATE` personalized key was used for ECDSA signature calculation
-- `{SIGNATURE_B64}` is ECDSA signature calculated with selected private key.
+- `{ECDSA_QRDATA_SIGNATURE_BASE64}` is ECDSA signature calculated with selected private key.
 
 Then the signed data payload is composed as:
 
@@ -187,67 +96,7 @@ Then the signed data payload is composed as:
 {SIGNING_KEY_TYPE}
 ```
 
-## Template details
-
-### `0` Generic
-
-Generic template has no predefined order of fields. You can use up to 5 fields with any type in the operation data. Note that `{TITLE}` and `{MESSAGE}` data attributes are required for this kind of template.
-
-
-### `1` Payment
-
-*Available since version `A`*
-
-| Attribute | Title                        |
-|-----------|:-----------------------------|
-| Title     | Payment                      |
-| Message   | Please confirm this payment  |
-
-Data fields
-
-| # | Type | Title                        | Required |
-|---|:------:|:-----------------------------|:--------:|
-| 1 | A      | Amount                       | yes      |
-| 2 | I or Q | Counter account              | yes      |
-| 3 | R      | Payment Reference (or parsed symbols in CZ) | |
-| 4 | D      | Due date                     |          |
-| 5 | N      | Note                         |          |
-
-Example data:
-```
-5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
-Domestic payment
-
-A1*A100CZK*ICZ2730300000001165254011*R/VS123456/SS/KS*D20180425
-
-AD8bOO0Df73kNaIGb3Vmpg==
-0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
-```
-
-
-### `2` Login request
-
-*Available since version `A`*
-
-| Attribute | Title                        |
-|-----------|:-----------------------------|
-| Title     | Login request                |
-| Message   | Please confirm login into *internet banking.* |
-
-Data fields for this type of teplate are not specified, so any available fields will be interpreted as for generic template.
-
-Example data:
-```
-5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
-
-
-A2
-B
-AD8bOO0Df73kNaIGb3Vmpg==
-0MEYCIQDby1Uq+MaxiAAGzKmE/McHzNOUrvAP2qqGBvSgcdtyjgIhAMo1sgqNa1pPZTFBhhKvCKFLGDuHuTTYexdmHFjUUIJW=
-```
-
-## Forward compatibility
+## Forward Compatibility
 
 The data format is designed with forward compatibility in mind. This means that QR codes issued in newer data format can be processed in older data parsers. This is possible due to following contract rules:
 
@@ -264,7 +113,7 @@ The data format is designed with forward compatibility in mind. This means that 
     {FLAGS}\n
     {XXX_NEW_ATTRIBUTE}\n
     {NONCE_B64}\n
-    {SIGNING_KEY_TYPE}{SIGNATURE_B64}
+    {SIGNING_KEY_TYPE}{ECDSA_QRDATA_SIGNATURE_BASE64}
     ```
     then, the signature will be calculated from following data:
     ```
@@ -279,15 +128,25 @@ The data format is designed with forward compatibility in mind. This means that 
     ```
 - Rules for data fields and templates:
   - All unsupported data fields are treated as `T{TEXT}` (e.g. arbitrary attribute with text as it is)
-  - All unsupported templates are treated as [`0` Generic](#0-generic)
+  - All unsupported templates are treated as [`0` Generic](./Operation-Data.md#0-generic)
 
-## How to generate QR codes
+## Offline Signature Process Description
 
-The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md).
+The general principles of using offline signatures in PowerAuth are documented in chapter [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md). This chapter provides an more detailed description of the step-by-step process.
 
-The concrete steps for generating offline signature QR codes using PowerAuth SOAP service for Web Flow are following:
+There are three stages of offline signature verification:
 
-### 1. Construct offline signature data payload:
+1) Generate QR code and display it to the user.
+2) User uses mobile app to scan the QR code and compute offline signature.
+3) Verify the offline signature.
+
+### 1. Generate QR Codes
+
+The first step of the process is to generate a QR code to be displayed to the user.
+
+#### 1.1. Construct offline signature data payload:
+
+First, you need to prepare a QR code data stup from the information you already should know - operation ID, operation title and description, operation data and additional flags:
 
 ```
 {OPERATION_ID}\n
@@ -298,6 +157,7 @@ The concrete steps for generating offline signature QR codes using PowerAuth SOA
 ```
 
 For example:
+
 ```
 5ff1b1ed-a3cc-45a3-8ab0-ed60950312b6
 Payment
@@ -308,28 +168,36 @@ B
 
 The meaning of individual fields is explained in chapter [Operation Attributes](#operation-attributes). Note that the field values should be normalized as discussed in the same chapter.
 
-### 2. Call PowerAuth SOAP method 'create personalized offline signature payload'
+#### 1.2. Fetch Data For Offline Signatures
 
-The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+Now, you need to prepare the data for the QR code display. Call the PowerAuth SOAP method to create a personalized offline signature payload. The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+
 - `activationId` - ID of the activation of mobile device
 - `data` - data constructed in step 1
 
-The SOAP method is documented in [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
+The SOAP method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
 
-### 3. Obtain response from 'create personalized offline signature payload' SOAP method and validate QR code data
+In the response from the SOAP method `createPersonalizedOfflineSignaturePayload`, you will receive:
 
-The response from SOAP method `createPersonalizedOfflineSignaturePayload` contains data required to display the QR code in field `offlineData`.
+- `offlineData` - The exact data to be displayed inside the QR code.
+- `nonce` - A random cryptographic nonce.
 
-The format of `offlineData` is following:
+The `nonce` field is available separately in response, so that it can be used for signature verification later, as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
+
+Note: The format of the `offlineData` is the following:
+
 ```
-{DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_SIGNATURE}
+{DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_QRDATA_SIGNATURE_BASE64}
 ```
 
-The `nonce` field is available separately in response, so that the `nonce` can be used for signature verification as documented in [Offline Signatures](https://github.com/wultra/powerauth-server/blob/develop/docs/Offline-Signatures.md#verifying-offline-signatures).
+As you can see, the `offlineData` already contain `nonce` value (in Base64 format) since the mobile app needs to scan the `nonce` value to compute the signature. However, the SOAP service still returns the value separately - since `nonce` must be used later on the back-end side, we wanted to avoid the necessity to parse the `offlineData` and hence we return `nonce` as a standalone response attribute.
 
-### 4. Generate QR code
+#### 1.3. Display Data To The User
 
-Generate the QR code from `offlineData`. Code example in Java:
+To display QR code in the web browser, generate the QR code from `offlineData` you obtained in 1.2 (no changes to the data are needed).
+
+Code example in Java:
+
 ```java
             BitMatrix matrix = new MultiFormatWriter().encode(
                     new String(offlineData.getBytes("UTF-8"), "ISO-8859-1"),
@@ -343,6 +211,71 @@ Generate the QR code from `offlineData`. Code example in Java:
             return "data:image/png;base64," + BaseEncoding.base64().encode(bytes);
 ```
 
-### 5. Verify ECDSA signature of offlineData
+The user can now scan the QR code via the mobile token app.
 
-The `ECDSA_SIGNATURE` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_SIGNATURE` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
+The value of `nonce` must be stored somewhere - for example on a browser level, either as a hidden HTML form input field or as a JavaScript variable, or alternatively, it can be stored in the user session by the specific operation. The `nonce` value is required for later offline signature validation, see step 3.
+
+### 2. Computing Signatures on Mobile Device
+
+#### 2.1. Verify ECDSA Signature of Offline Data
+
+After user scans the QR code using a mobile app, the `ECDSA_QRDATA_SIGNATURE_BASE64` should be validated on mobile device to verify authenticity of received data by taking contents of `offlineData` before the `ECDSA_QRDATA_SIGNATURE_BASE64` and computing the ECDSA signature using `KEY_SERVER_PRIVATE`. Both signatures must match before continuing with the offline data signature verification.
+
+#### 2.2. Computing the Signature
+
+Mobile device prompts the user for the PIN code or use of a biometry and computes 4x4 digit long authentication code to be rewritten manually.
+
+### 3. Validating the Signature
+
+#### 3.1. Processing The User Input
+
+After user enters 4x4 digits in the browser, the value must be converted into a standard PowerAuth signature format that uses 2x8 digits. For example, an offline signature `1234-5678-9012-3456` needs to be converted into `12345678-90123456` (removing 1st and 3rd dash).
+
+#### 3.2. Preparing Signature Base String
+
+Now, you need to prepare a normalized data package called "signature base string". This is the payload that mobile app used to compute the signature - you need to have the same signature base string in order to be able to verify the signature.
+
+To compute the signature base string, you need:
+
+- `data` - data for off-line signature verification are built from `operationId` and `operationData` attributes in a following way:
+  - format: `${operationId}&${operationData}` (values separated by `&` character)
+  - example: `9326edcd-5375-4847-abd1-5eacb6d95125&A1*A100CZK*ICZ2730300000001165254011`
+    - Payment operation with ID `9326edcd-5375-4847-abd1-5eacb6d95125`, where data is `A1*A100CZK*ICZ2730300000001165254011` (representing amount of "100 CZK" to IBAN account "CZ2730300000001165254011")
+- `nonce` value (as obtained in 1.2)
+- two static constants: `POST` and `/operation/authorize/offline`
+
+The [algorithm for signature data normalization](https://developers.wultra.com/docs/develop/powerauth-crypto/Computing-and-Validating-Signatures#normalized-data-for-http-requests) is available in the cryptography description.
+
+The Java class [PowerAuthHttpBody](https://github.com/wultra/powerauth-crypto/blob/master/powerauth-java-http/src/main/java/io/getlime/security/powerauth/http/PowerAuthHttpBody.java) already contains a ready to use method for computing the normalized signature base string:
+
+```java
+String signatureBaseString
+    = PowerAuthHttpBody.getSignatureBaseString(
+        "POST",
+        "/operation/authorize/offline",
+        BaseEncoding.base64().decode(nonce),
+        data.getBytes()
+);
+```
+
+#### 3.4. Verifying Signature
+
+To verify signature, you need to call the SOAP method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
+
+- `activationId` - identifier of the activation (to know which device is responsible for verification)
+- `data` (represented by `signatureBaseString` as obtained in 3.2.) - as data for verification
+- `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
+- `signatureType` - type of the signature (`POSSESSION_KNOWLEDGE`).
+
+The method returns information about signature verification:
+
+- `signatureValid` You can use this value to determine if the signature verification was successful or not.
+- `activationStatus` - Activation status after this attempt of the signature validation.
+- `blockedReason` - In case the activation is blocked, this attribute contains additional info about the reason.
+- `activationId` - Activation ID used for validating the signature.
+- `userId` - User ID associated with the activation who authenticated to compute the signature.
+- `applicationId` - Application ID of the application that is associated with given activation ID and was used to compute the signature.
+- `signatureType` - Signature type that was used to compute the signature value.
+- `remainingAttempts` - How many attempts are remaining for the signature validation (single, activation related counter).
+
+See the SOAP method documentation for details.
