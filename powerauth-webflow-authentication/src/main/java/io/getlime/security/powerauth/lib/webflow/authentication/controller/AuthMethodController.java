@@ -567,14 +567,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.warn("Operation was interrupted, operation ID: {}", operation.getOperationId());
                 throw new OperationInterruptedException("Operation was interrupted");
             }
-            // check steps for operations with AuthResult = CONTINUE, DONE and FAILED methods do not have steps
-            if (currentAuthMethod != AuthMethod.INIT && currentAuthMethod != AuthMethod.SHOW_OPERATION_DETAIL) {
-                // check whether AuthMethod is available in next steps, only done in real authentication methods
-                if (!isAuthMethodAvailable(operation)) {
-                    logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod.toString());
-                    throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
-                }
-            }
             // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY or POWERAUTH_TOKEN are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
                 if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN)) {
