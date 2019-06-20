@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,11 +19,21 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 
 /**
- * Request for authenticating user with user ID and password.
+ * Request for SMS OTP message and password verification.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class AuthenticationRequest {
+public class VerifySMSAndPasswordRequest {
+
+    /**
+     * SMS message ID.
+     */
+    private String messageId;
+
+    /**
+     * SMS OTP authorization code.
+     */
+    private String authorizationCode;
 
     /**
      * User ID for this authentication request.
@@ -60,25 +70,61 @@ public class AuthenticationRequest {
     /**
      * Default constructor.
      */
-    public AuthenticationRequest() {
+    public VerifySMSAndPasswordRequest() {
     }
 
     /**
-     * Constructor with all parameters for convenience.
+     * Constructor with all details.
+     * @param messageId Message ID.
+     * @param authorizationCode Authorization code from user.
      * @param userId User ID for this authentication request.
      * @param password Password for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param authenticationType Authentication type specifying optional password encryption.
+     * @param authenticationType Authentication type.
      * @param cipherTransformation Cipher transformation used in case password is encrypted.
      * @param operationContext Operation context.
      */
-    public AuthenticationRequest(String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) {
+    public VerifySMSAndPasswordRequest(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) {
+        this.messageId = messageId;
+        this.authorizationCode = authorizationCode;
         this.userId = userId;
         this.password = password;
         this.organizationId = organizationId;
         this.authenticationType = authenticationType;
         this.cipherTransformation = cipherTransformation;
         this.operationContext = operationContext;
+    }
+
+    /**
+     * Get message ID.
+     * @return Message ID.
+     */
+    public String getMessageId() {
+        return messageId;
+    }
+
+    /**
+     * Set message ID.
+     * @param messageId Message ID.
+     */
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
+    }
+
+    /**
+     * Get authorization code.
+     * @return Authorization code.
+     */
+    public String getAuthorizationCode() {
+        return authorizationCode;
+    }
+
+    /**
+     * Set authorization code.
+     * @param authorizationCode Authorization code.
+     */
+    public void setAuthorizationCode(String authorizationCode) {
+        this.authorizationCode = authorizationCode;
     }
 
     /**
@@ -98,7 +144,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Set the password. The password can be encrypted, in this case the type specifies encryption type and
+     * Set the password. The password can be encrypted, in this case the type specifies encryption method and
      * cipherTransformation specifies the algorithm, mode and padding.
      * @param password Password.
      */
@@ -107,7 +153,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Get the password. The password can be encrypted, in this case the authenticationType specifies encryption type and
+     * Get the password. The password can be encrypted, in this case the authenticationType specifies encryption method and
      * cipherTransformation specifies the algorithm, mode and padding.
      * @return Password.
      */

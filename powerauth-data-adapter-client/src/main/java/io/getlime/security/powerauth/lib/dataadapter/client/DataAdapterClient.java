@@ -28,7 +28,10 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Authentic
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -103,20 +106,47 @@ public class DataAdapterClient {
         return restTemplate;
     }
 
+
+    /**
+     * Lookup user account.
+     *
+     * @param username Username for user account which is being looked up.
+     * @param organizationId Organization ID for which the user ID is assigned to.
+     * @param operationContext Operation context.
+     * @return Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<UserDetailResponse> lookupUser(String username, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+        try {
+            // Exchange authentication request with data adapter.
+            UserLookupRequest request = new UserLookupRequest(username, organizationId, operationContext);
+            HttpEntity<ObjectRequest<UserLookupRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/lookup", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
     /**
      * Perform authentication with provided username and password.
      *
-     * @param username Username for user who is being authenticated.
+     * @param userId User ID of user who is being authenticated.
      * @param password Password as a string.
      * @param organizationId Organization ID.
+     * @param authenticationType Authentication type.
+     * @param cipherTransformation Cipher transformation used in case password is encrypted.
      * @param operationContext Operation context.
-     * @return a Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
+     * @return Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<AuthenticationResponse> authenticateUser(String username, String password, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<AuthenticationResponse> authenticateUser(String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange authentication request with data adapter.
-            AuthenticationRequest request = new AuthenticationRequest(username, password, organizationId, AuthenticationType.BASIC, operationContext);
+            AuthenticationRequest request = new AuthenticationRequest(userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
             HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<AuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
             });
@@ -191,6 +221,34 @@ public class DataAdapterClient {
             VerifySMSAuthorizationRequest request = new VerifySMSAuthorizationRequest(messageId, authorizationCode, operationContext);
             HttpEntity<ObjectRequest<VerifySMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new Response();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Verify OTP authorization code for previously generated SMS message together with user password.
+     *
+     * @param messageId Message ID.
+     * @param authorizationCode User entered authorization code.
+     * @param userId User ID for this authentication request.
+     * @param password Password for this authentication request.
+     * @param organizationId Organization ID for this authentication request.
+     * @param authenticationType Authentication type.
+     * @param cipherTransformation Cipher transformation used in case password is encrypted.
+     * @param operationContext Operation context.
+     * @return Empty response returned when action succeeds.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public Response verifyAuthorizationSMSAndPasswod(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
+        try {
+            VerifySMSAndPasswordRequest request = new VerifySMSAndPasswordRequest(messageId, authorizationCode, userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
+            HttpEntity<ObjectRequest<VerifySMSAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new Response();
         } catch (HttpStatusCodeException ex) {

@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
 /**
- * Response of the authentication using username and password.
+ * Response of the authentication using user ID and password.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -26,6 +26,10 @@ public class AuthenticationResponse {
      * Unique user ID which identifies the user.
      */
     private String userId;
+
+    /**
+     * Organization ID to which the user ID is assigned.
+     */
     private String organizationId;
 
     /**
