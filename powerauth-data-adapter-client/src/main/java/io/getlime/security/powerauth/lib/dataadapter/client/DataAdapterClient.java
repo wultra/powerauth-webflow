@@ -244,7 +244,7 @@ public class DataAdapterClient {
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public Response verifyAuthorizationSMSAndPasswod(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public Response verifyAuthorizationSMSAndPassword(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             VerifySMSAndPasswordRequest request = new VerifySMSAndPasswordRequest(messageId, authorizationCode, userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
             HttpEntity<ObjectRequest<VerifySMSAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
