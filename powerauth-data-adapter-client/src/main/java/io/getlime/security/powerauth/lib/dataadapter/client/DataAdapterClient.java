@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Authentication services provides services for communication with the Data Adapter.
+ * Data Adapter Client provides methods for communication with the Data Adapter.
  * It uses the RestTemplate class to handle REST API calls. HTTP client is used instead of default client
  * so that error responses contain full response bodies.
  *
@@ -113,8 +113,8 @@ public class DataAdapterClient {
      * @param username Username for user account which is being looked up.
      * @param organizationId Organization ID for which the user ID is assigned to.
      * @param operationContext Operation context.
-     * @return Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @return Response with user details.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserDetailResponse> lookupUser(String username, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
@@ -140,8 +140,8 @@ public class DataAdapterClient {
      * @param authenticationType Authentication type.
      * @param cipherTransformation Cipher transformation used in case password is encrypted.
      * @param operationContext Operation context.
-     * @return Response with either AuthenticationResponse or DataAdapterError given the result of the operation.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @return Authentication response is returned in case of successful authentication.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or authentication fails.
      */
     public ObjectResponse<AuthenticationResponse> authenticateUser(String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
@@ -164,7 +164,7 @@ public class DataAdapterClient {
      * @param userId User ID for the user to be obtained.
      * @param organizationId Organization ID.
      * @return A response with user details.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId, String organizationId) throws DataAdapterClientErrorException {
         try {
@@ -189,7 +189,7 @@ public class DataAdapterClient {
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
      * @return Response with generated messageId.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
     public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, String organizationId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
         try {
@@ -214,7 +214,7 @@ public class DataAdapterClient {
      * @param authorizationCode User entered authorization code.
      * @param operationContext  Operation context.
      * @return Empty response returned when action succeeds.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
     public Response verifyAuthorizationSMS(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
@@ -242,7 +242,7 @@ public class DataAdapterClient {
      * @param cipherTransformation Cipher transformation used in case password is encrypted.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
-     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
     public Response verifyAuthorizationSMSAndPasswod(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
@@ -370,7 +370,7 @@ public class DataAdapterClient {
      * @param operationContext Operation context.
      * @param lang Language of the text in the consent form.
      * @param options Consent options selected by the user.
-     * @return Consent form with text and options to select by the user.
+     * @return Consent form validation result.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<ValidateConsentFormResponse> validateConsentForm(String userId, OperationContext operationContext, String lang, List<ConsentOption> options) throws DataAdapterClientErrorException {
@@ -394,7 +394,7 @@ public class DataAdapterClient {
      * @param userId User ID.
      * @param operationContext Operation context.
      * @param options Consent options selected by the user.
-     * @return Consent form with text and options to select by the user.
+     * @return Response with indication whether consent form was successfully saved.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<SaveConsentFormResponse> saveConsentForm(String userId, OperationContext operationContext, List<ConsentOption> options) throws DataAdapterClientErrorException {
