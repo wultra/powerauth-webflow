@@ -59,6 +59,7 @@ public class SaveConsentFormRequest {
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
      * @param operationContext Operation context which provides context for creating the consent form.
+     * @param options Consent options.
      */
     public SaveConsentFormRequest(String userId, OperationContext operationContext, List<ConsentOption> options) {
         this.userId = userId;
