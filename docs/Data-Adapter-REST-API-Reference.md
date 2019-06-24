@@ -1345,8 +1345,10 @@ The list of expected status codes:
 | 401  | `AUTHENTICATION_FAILED` - password verification failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-The password can be encrypted. In this case the `authenticationType` parameter provides information about
+The password can be optionally encrypted. In this case the `authenticationType` parameter provides information about
 type of encryption and the `cipherTransformation` parameter contains information about used cipher.
+
+See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption) for additional details.
 
 ### Verify SMS and password - request
 
