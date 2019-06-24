@@ -36,6 +36,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
@@ -46,6 +47,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.form.mode
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.service.PasswordEncryptionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
@@ -72,6 +74,8 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
+    private final WebFlowServicesConfiguration configuration;
+    private final PasswordEncryptionService passwordEncryptionService;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
@@ -79,11 +83,15 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * Controller constructor.
      * @param dataAdapterClient Data Adapter client.
      * @param nextStepClient Next Step client.
+     * @param configuration Web Flow configuration.
+     * @param passwordEncryptionService Password encryption service.
      */
     @Autowired
-    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient) {
+    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, PasswordEncryptionService passwordEncryptionService) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
+        this.configuration = configuration;
+        this.passwordEncryptionService = passwordEncryptionService;
     }
 
     /**
@@ -102,8 +110,20 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
             final ObjectResponse<UserDetailResponse> lookupResponse = dataAdapterClient.lookupUser(request.getUsername(), request.getOrganizationId(), operationContext);
+
+            AuthenticationType authenticationType = configuration.getAuthenticationType();
+            String cipherTransformation = configuration.getCipherTransformation();
+            String passwordToSend;
+            if (authenticationType == AuthenticationType.BASIC) {
+                // Password is sent in plain text
+                passwordToSend = request.getPassword();
+            } else {
+                // Encrypt user password in case password encryption is configured in Web Flow
+                passwordToSend = passwordEncryptionService.encryptPassword(request.getPassword());
+            }
+
             final String userId = lookupResponse.getResponseObject().getId();
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(userId, request.getPassword(), request.getOrganizationId(), AuthenticationType.BASIC, null, operationContext);
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(userId, passwordToSend, request.getOrganizationId(), authenticationType, cipherTransformation, operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString());
             return new AuthenticationResult(responseObject.getUserId(), responseObject.getOrganizationId());

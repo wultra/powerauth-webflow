@@ -267,9 +267,6 @@ The list of expected status codes during authentication:
 | 401  | `AUTHENTICATION_FAILED` - provide reason in the message in case it is available |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-The password can be encrypted. In this case the `authenticationType` parameter provides information about
-type of encryption and the `cipherTransformation` parameter contains information about used cipher.
-
 ### Request
 
 - Headers:
@@ -365,7 +362,44 @@ type of encryption and the `cipherTransformation` parameter contains information
 }
 ```
 
-* The only currently supported authentication method is BASIC, however this field is present for future extensions of the API.
+### User Password Encryption and Decryption
+
+The `BASIC` authentication type is used for plain text password in request (sent by default). 
+
+The password can be optionally encrypted. In this case the `authenticationType` parameter provides information about
+type of password encryption and the `cipherTransformation` parameter contains information about used cipher.
+
+It is expected that the remote system which handles password verification decrypts the password and it is not required to decrypt 
+the password in the Data Adapter itself. The following code sample decrypts the encrypted password for `PASSWORD_ENCRYPTION_AES` authentication type:
+
+```java
+// Read secret key from configuration
+String secretKeyBase64 = configuration.getSecretKey();
+byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKey);
+String secretKey = SecretKeySpec(secretKeyBytes, "AES");
+
+// Extract cipher transformation and encrypted password from request
+String cipherTransformation = request.getCipherTransformation();
+String password = request.getPassword();
+
+// Extract IV and encrypted password and convert them to bytes
+String[] parts = password.split(":");
+if (parts.length != 2) {
+    throw new IllegalArgumentException("Invalid request");
+}
+String ivBase64 = parts[0];
+byte ivBytes = BaseEncoding.base64().decode(ivBase64);
+String encryptedPasswordBase64 = parts[1];
+byte encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
+
+// Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
+Cipher cipher = Cipher.getInstance(cipherTransformation);
+cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
+byte[] decryptedPasswordBytes = cipher.doFinal(encryptedPasswordBytes);
+String decryptedPassword = new String(decrypted, StandardCharsets.UTF_8);
+
+// Verify that decrypted password matches expected password
+```
 
 ### Response - authentication succeeded
 

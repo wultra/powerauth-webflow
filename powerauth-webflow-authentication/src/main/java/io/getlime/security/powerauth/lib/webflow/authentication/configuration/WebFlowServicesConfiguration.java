@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,24 @@ public class WebFlowServicesConfiguration {
      */
     @Value("${powerauth.webflow.offlineMode.available}")
     private boolean offlineModeAvailable;
+
+    /**
+     * Authentication type which configures how username and password is transferred for verification.
+     */
+    @Value("${powerauth.webflow.authentication.type:BASIC}")
+    private AuthenticationType authenticationType;
+
+    /**
+     * Encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
+     */
+    @Value("${powerauth.webflow.password.encryption.transformation}")
+    private String cipherTransformation;
+
+    /**
+     * Base64 encoded password encryption key.
+     */
+    @Value("${powerauth.webflow.password.encryption.key}")
+    private String passwordEncryptionKey;
 
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
@@ -100,4 +119,29 @@ public class WebFlowServicesConfiguration {
     public boolean isOfflineModeAvailable() {
         return offlineModeAvailable;
     }
+
+    /**
+     * Get authentication type which configures how username and password is transferred for verification.
+     * @return Authentication type.
+     */
+    public AuthenticationType getAuthenticationType() {
+        return authenticationType;
+    }
+
+    /**
+     * Get encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
+     * @return Encryption cipher transformation.
+     */
+    public String getCipherTransformation() {
+        return cipherTransformation;
+    }
+
+    /**
+     * Get Base64 encoded password encryption key.
+     * @return Base64 encoded password encryption key.
+     */
+    public String getPasswordEncryptionKey() {
+        return passwordEncryptionKey;
+    }
+
 }

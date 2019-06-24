@@ -67,7 +67,35 @@ powerauth.webflow.service.applicationEnvironment=
 
 # Configuration of Offline mode
 powerauth.webflow.offlineMode.available=true
+
+# Configuration of Android Security Warning
+powerauth.webflow.android.showSecurityWarning=true
 ```
+
+Encryption of user passwords during transport can be configured using following properties:
+```
+# Configuration of Password Encryption
+powerauth.webflow.authentication.type=PASSWORD_ENCRYPTION_AES
+powerauth.webflow.password.encryption.transformation=AES/CBC/PKCS7Padding
+powerauth.webflow.password.encryption.key=Qee4CK44d8GduTxoHU7JPM2lCs+KF63akIpKyaLk9+c=
+```
+
+The configuration specifies that user password should be encrypted using AES in CBC mode with PKCS#7 padding. 
+The key is encoded using Base64 encoding and its size influences the strength of the encryption cipher. 
+The cipher transformation can be configured using standard Java Cipher transformation definition.
+See: https://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html
+
+The random encryption key can be generated using following code:
+```java
+byte[] randomBytes = new byte[32];
+new SecureRandom().nextBytes(randomBytes);
+String encryptionKey = BaseEncoding.base64().encode(randomBytes);
+```
+
+_WARNING: Do not reuse the encryption key from sample configuration in this documentation._
+
+The symmetric key is used by both Web Flow and by the remote system which needs to decrypt the password for verification.
+For information about password decryption, see: [User Password Encryption And Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption)
 
 ## Next Step Server
 At minimum the following configuration properties should be updated based on deployment:
