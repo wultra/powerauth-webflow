@@ -41,7 +41,7 @@ public class PasswordEncryptionService {
 
     private final WebFlowServicesConfiguration configuration;
 
-    private final AESEncryptionUtils aesEncryptionUtils = new AESEncryptionUtils();
+    private final AESEncryptionUtils aes = new AESEncryptionUtils();
     private final KeyGenerator keyGenerator = new KeyGenerator();
 
     /**
@@ -93,7 +93,7 @@ public class PasswordEncryptionService {
 
                     // Encrypt password bytes using random IV, secret key and transformation
                     byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
-                    byte[] encryptedPasswordBytes = aesEncryptionUtils.encrypt(passwordBytes, ivBytes, secretKey, cipherTransformation);
+                    byte[] encryptedPasswordBytes = aes.encrypt(passwordBytes, ivBytes, secretKey, cipherTransformation);
                     String encryptedPasswordBase64 = BaseEncoding.base64().encode(encryptedPasswordBytes);
 
                     // Base64 encode the IV

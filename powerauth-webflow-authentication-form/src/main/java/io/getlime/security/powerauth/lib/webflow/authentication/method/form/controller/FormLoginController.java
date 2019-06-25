@@ -114,12 +114,20 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             AuthenticationType authenticationType = configuration.getAuthenticationType();
             String cipherTransformation = configuration.getCipherTransformation();
             String passwordToSend;
-            if (authenticationType == AuthenticationType.BASIC) {
-                // Password is sent in plain text
-                passwordToSend = request.getPassword();
-            } else {
-                // Encrypt user password in case password encryption is configured in Web Flow
-                passwordToSend = passwordEncryptionService.encryptPassword(request.getPassword());
+            switch (authenticationType) {
+                case BASIC:
+                    // Password is sent in plain text
+                    passwordToSend = request.getPassword();
+                    break;
+
+                case PASSWORD_ENCRYPTION_AES:
+                    // Encrypt user password in case password encryption is configured in Web Flow
+                    passwordToSend = passwordEncryptionService.encryptPassword(request.getPassword());
+                    break;
+
+                default:
+                    // Unsupported authentication type
+                    throw new AuthStepException("Invalid request in authenticate", "error.invalidRequest");
             }
 
             final String userId = lookupResponse.getResponseObject().getId();
