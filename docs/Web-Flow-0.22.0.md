@@ -62,7 +62,7 @@ ALTER TABLE ns_operation ADD application_extras CLOB;
 
 -- New table ns_organization for organization context and update of tables ns_operation and da_sms_authorization
 
-CREATE TABLE NS_OPERATION (
+CREATE TABLE ns_organization (
   organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
   display_name_key         VARCHAR(256),
   is_default               NUMBER(1) DEFAULT 0 NOT NULL,
