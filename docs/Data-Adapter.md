@@ -10,6 +10,7 @@ The Data Adapter needs to be customized for each deployment. You can find the do
 
 Following functionality needs to be customized during Web Flow deployment by implementing the Data Adapter interface (if applicable):
 
+- convert username to user ID in case such conversion is required
 - perform user authentication with remote backend based on provided credentials
 - retrieve user details for given user ID
 - decorate form data for given user (e.g. add user bank account list)

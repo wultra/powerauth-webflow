@@ -219,15 +219,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param userId             User ID of user who should authorize operation.
      * @param organizationId     Organization ID of organization related to the operation.
      * @param params             Custom parameters.
-     * @param applicationContext Application context.
      * @return Response with information about operation update result.
      * @throws NextStepServiceException In case communication fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException, AuthStepException {
+    protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
         // validate operation before requesting update
-        GetOperationDetailResponse operation = validateOperationState(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId);
+        ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params, applicationContext);
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
@@ -259,7 +259,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
         // validate operation before requesting update
-        GetOperationDetailResponse operation = validateOperationState(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId);
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
@@ -291,7 +291,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         // validate operation before requesting update
-        GetOperationDetailResponse operation = validateOperationState(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId);
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
@@ -441,7 +441,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 String operationId = authenticationManagementService.updateAuthenticationWithUserDetails(userId, authResult.getOrganizationId());
 
                 // response could not be derived - call authorize() method to update current operation
-                responseObject = authorize(operationId, userId, organizationId, null, null);
+                responseObject = authorize(operationId, userId, organizationId, null);
             }
             // TODO: Allow passing custom parameters
             switch (responseObject.getResult()) {
@@ -509,19 +509,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         return false;
-    }
-
-    /**
-     * Retrieve operation and validate it.
-     * @param operationId Operation ID.
-     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
-     * @throws AuthStepException Thrown when operation state is invalid.
-     */
-    private GetOperationDetailResponse validateOperationState(String operationId) throws NextStepServiceException, AuthStepException {
-        final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
-        final GetOperationDetailResponse operation = operationDetail.getResponseObject();
-        validateOperationState(operation);
-        return operation;
     }
 
     /**

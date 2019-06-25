@@ -19,11 +19,19 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * Supported authentication types.
  *
  * <ul>
- * <li>BASIC - Username and password sent via plaintext request.</li>
+ * <li>BASIC - User ID and password sent via plaintext in the request.</li>
+ * <li>SYMMETRIC_PASSWORD_ENCRYPTION - User ID is sent in plain text and password sent encrypted in the request.
+ *     The encrypted password format is following: [ivBase64]:[encryptedDataBase64], without square brackets.
+ *     <ul>
+ *         <li>ivBase64 - Base64 encoded initialization vector bytes.</li>
+ *         <li>encryptedDataBase64 - Base64 encoded encrypted data bytes.</li>
+ *     </ul>
+ * </li>
  * </ul>
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum AuthenticationType {
-    BASIC
+    BASIC,
+    SYMMETRIC_PASSWORD_ENCRYPTION,
 }
