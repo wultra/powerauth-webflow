@@ -20,11 +20,11 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  *
  * <ul>
  * <li>BASIC - User ID and password sent via plaintext in the request.</li>
- * <li>SYMMETRIC_PASSWORD_ENCRYPTION - User ID is sent in plain text and password sent encrypted in the request.
+ * <li>PASSWORD_ENCRYPTION_AES - User ID is sent in plain text and password sent encrypted by AES algorithm in the request.
  *     The encrypted password format is following: [ivBase64]:[encryptedDataBase64], without square brackets.
  *     <ul>
  *         <li>ivBase64 - Base64 encoded initialization vector bytes.</li>
- *         <li>encryptedDataBase64 - Base64 encoded encrypted data bytes.</li>
+ *         <li>encryptedDataBase64 - Base64 encoded encrypted password data bytes.</li>
  *     </ul>
  * </li>
  * </ul>
@@ -33,5 +33,5 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  */
 public enum AuthenticationType {
     BASIC,
-    SYMMETRIC_PASSWORD_ENCRYPTION,
+    PASSWORD_ENCRYPTION_AES,
 }
