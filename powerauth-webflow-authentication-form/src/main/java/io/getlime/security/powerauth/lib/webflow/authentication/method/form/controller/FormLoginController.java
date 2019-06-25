@@ -42,12 +42,14 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.converter.OrganizationConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption.AesEncryptionPasswordProtection;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption.NoPasswordProtection;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption.PasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.PrepareLoginFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.service.PasswordEncryptionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
@@ -75,7 +77,6 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final WebFlowServicesConfiguration configuration;
-    private final PasswordEncryptionService passwordEncryptionService;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
@@ -84,14 +85,12 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @param dataAdapterClient Data Adapter client.
      * @param nextStepClient Next Step client.
      * @param configuration Web Flow configuration.
-     * @param passwordEncryptionService Password encryption service.
      */
     @Autowired
-    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, PasswordEncryptionService passwordEncryptionService) {
+    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, WebFlowServicesConfiguration configuration) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.configuration = configuration;
-        this.passwordEncryptionService = passwordEncryptionService;
     }
 
     /**
@@ -113,25 +112,26 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
             AuthenticationType authenticationType = configuration.getAuthenticationType();
             String cipherTransformation = configuration.getCipherTransformation();
-            String passwordToSend;
+            PasswordProtection passwordProtection;
             switch (authenticationType) {
                 case BASIC:
                     // Password is sent in plain text
-                    passwordToSend = request.getPassword();
+                    passwordProtection = new NoPasswordProtection();
                     break;
 
                 case PASSWORD_ENCRYPTION_AES:
                     // Encrypt user password in case password encryption is configured in Web Flow
-                    passwordToSend = passwordEncryptionService.encryptPassword(request.getPassword());
+                    passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
                     break;
 
                 default:
                     // Unsupported authentication type
-                    throw new AuthStepException("Invalid request in authenticate", "error.invalidRequest");
+                    throw new AuthStepException("Invalid authentication type", "error.invalidRequest");
             }
 
+            final String protectedPassword = passwordProtection.protect(request.getPassword());
             final String userId = lookupResponse.getResponseObject().getId();
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(userId, passwordToSend, request.getOrganizationId(), authenticationType, cipherTransformation, operationContext);
+            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(userId, protectedPassword, request.getOrganizationId(), authenticationType, cipherTransformation, operationContext);
             AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
             logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString());
             return new AuthenticationResult(responseObject.getUserId(), responseObject.getOrganizationId());
