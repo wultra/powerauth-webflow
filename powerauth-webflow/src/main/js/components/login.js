@@ -108,6 +108,9 @@ export default class Login extends React.Component {
 
     singleOrganization() {
         const organizations = this.props.context.organizations;
+        if (this.props.context.chosenOrganizationId === undefined) {
+            this.setDefaultOrganization();
+        }
         return (
             <Panel>
                 {this.title()}
