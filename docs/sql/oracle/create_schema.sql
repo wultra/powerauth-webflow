@@ -91,6 +91,16 @@ CREATE TABLE ns_operation_config (
   mobile_token_mode         VARCHAR(256) NOT NULL
 );
 
+-- Table ns_organization stores definitions of organizations related to the operations.
+-- At least one default organization must be configured.
+-- Data in this table needs to be loaded before Web Flow is started.
+CREATE TABLE ns_organization (
+  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
+  display_name_key         VARCHAR(256),
+  is_default               NUMBER(1) DEFAULT 0 NOT NULL,
+  order_number             INTEGER NOT NULL
+);
+
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
@@ -106,17 +116,8 @@ CREATE TABLE ns_operation (
   organization_id           VARCHAR(256),
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
-  timestamp_expires         TIMESTAMP
-);
-
--- Table ns_organization stores definitions of organizations related to the operations.
--- At least one default organization must be configured.
--- Data in this table needs to be loaded before Web Flow is started.
-CREATE TABLE ns_organization (
-  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
-  display_name_key         VARCHAR(256),
-  is_default               NUMBER(1) DEFAULT 0 NOT NULL,
-  order_number             INTEGER NOT NULL
+  timestamp_expires         TIMESTAMP,
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
 );
 
 -- Table ns_operation_history stores all changes of operations.
