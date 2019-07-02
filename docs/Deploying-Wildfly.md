@@ -4,6 +4,8 @@ Two modules need to be configured for JBoss / Wildfly:
 - Web Flow - the main Web Flow application
 - Next Step - a backend service for Web Flow which manages operation steps and authentication methods
 
+Optionally Web Flow Client application can be also configured. 
+
 ## JBoss Deployment Descriptor 
 
 Web Flow contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
@@ -44,6 +46,7 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 ```
 
 The deployment descriptor requires configuration of the `com.wultra.powerauth.webflow.conf` and `com.wultra.powerauth.nextstep.conf` modules.
+Optionally the `com.wultra.powerauth.webflow-client.conf` module has to be configured also.
 
 ## JBoss Module for Web Flow Configuration
 
@@ -59,6 +62,16 @@ Web Flow module configuration:
 ```
 <?xml version="1.0" encoding="UTF-8"?>
 <module xmlns="urn:jboss:module:1.3" name="com.wultra.powerauth.webflow.conf">
+    <resources>
+        <resource-root path="." />
+    </resources>
+</module>
+```
+
+Web Flow Client module configuration:
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<module xmlns="urn:jboss:module:1.3" name="com.wultra.powerauth.webflow-client.conf">
     <resources>
         <resource-root path="." />
     </resources>
