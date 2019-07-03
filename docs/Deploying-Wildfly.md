@@ -45,8 +45,29 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 </jboss-deployment-structure>
 ```
 
+Optionally, Web Flow Client contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
+
+```
+<?xml version="1.0"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+	<deployment>
+		<exclude-subsystems>
+			<!-- disable the resource-adapters subsystem to prevent the application's HSQLDB driver
+			from being included in application server JDBC drivers -->
+			<subsystem name="resource-adapters" />
+			<!-- disable the logging subsystem because the application manages its own logging independently -->
+			<subsystem name="logging" />
+		</exclude-subsystems>
+		<dependencies>
+			<module name="com.wultra.powerauth.webflow-client.conf" />
+		</dependencies>
+		<local-last value="true" />
+	</deployment>
+</jboss-deployment-structure>
+```
+
 The deployment descriptor requires configuration of the `com.wultra.powerauth.webflow.conf` and `com.wultra.powerauth.nextstep.conf` modules.
-Optionally the `com.wultra.powerauth.webflow-client.conf` module has to be configured also.
+Optionally configure also the `com.wultra.powerauth.webflow-client.conf`.
 
 ## JBoss Module for Web Flow Configuration
 
