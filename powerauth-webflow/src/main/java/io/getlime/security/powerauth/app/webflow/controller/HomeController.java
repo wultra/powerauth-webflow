@@ -192,16 +192,31 @@ public class HomeController {
         }
         String redirectUri = redirectUriParameter[0];
 
+        // extract optional state parameter from original request
+        String[] stateParameter = savedRequest.getParameterMap().get("state");
+        String state = null;
+        if (stateParameter.length > 1) {
+            logger.error("Multiple state request parameters found");
+            return "redirect:/oauth/error";
+        } else if (stateParameter.length == 1) {
+            state = stateParameter[0];
+        }
+
         String clearContext = request.getParameter("clearContext");
         if (!"false".equals(clearContext)) {
             // Clear security context and invalidate session unless it is suppressed due to a new operation
             authenticationManagementService.clearContext();
         }
 
-        // append error and error_description based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
-        final String redirectWithError = UriComponentsBuilder.fromUriString(redirectUri)
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", "access_denied")
-                .queryParam("error_description", "User%20canceled%20authentication%20request")
+                .queryParam("error_description", "User%20canceled%20authentication%20request");
+        if (state != null) {
+            uriBuilder.queryParam("state", state);
+        }
+
+        // append error, error_description and state based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
+        final String redirectWithError = uriBuilder
                 .build()
                 .toUriString();
         logger.info("The /authenticate/cancel request succeeded");
