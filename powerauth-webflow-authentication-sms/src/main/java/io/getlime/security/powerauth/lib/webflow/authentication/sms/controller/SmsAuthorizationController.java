@@ -238,6 +238,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         checkOperationExpiration(operation);
+        cleanHttpSession();
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
         initResponse.setResendDelay(configuration.getSmsResendDelay());
 
