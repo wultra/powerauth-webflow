@@ -394,7 +394,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      */
     private CreateSmsAuthorizationResponse sendAuthorizationSms(GetOperationDetailResponse operation, boolean resend) throws DataAdapterClientErrorException, AuthStepException {
         Long lastMessageTimestamp = getLastMessageTimestampFromHttpSession();
-        if (lastMessageTimestamp != null && lastMessageTimestamp - System.currentTimeMillis() < configuration.getSmsResendDelay()) {
+        if (lastMessageTimestamp != null && System.currentTimeMillis() - lastMessageTimestamp < configuration.getSmsResendDelay()) {
             throw new InvalidRequestException("Attempt to send message before resend delay was reached");
         }
         String userId = operation.getUserId();
