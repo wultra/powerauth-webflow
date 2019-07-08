@@ -24,6 +24,7 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -275,7 +276,7 @@ public class NextStepClient {
             }
             request.setApplicationContext(applicationContext);
             HttpEntity<ObjectRequest<UpdateOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
+            ResponseEntity<ObjectResponse<UpdateOperationResponse>> response = restTemplate.exchange(serviceUrl + "/operation/update", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UpdateOperationResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -286,7 +287,57 @@ public class NextStepClient {
     }
 
     /**
-     * Update operation form data.
+     * Update user and organization for an operation via PUT method.
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @return Response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public Response updateOperationUser(String operationId, String userId, String organizationId) throws NextStepServiceException {
+        try {
+            // Exchange request with NextStep server.
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
+            request.setOperationId(operationId);
+            request.setUserId(userId);
+            request.setOrganizationId(organizationId);
+            HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user", HttpMethod.PUT, entity, Response.class);
+            return nsResponse.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update user and organization for an operation via POST method.
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @return Response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public Response updateOperationUserPost(String operationId, String userId, String organizationId) throws NextStepServiceException {
+        try {
+            // Exchange request with NextStep server.
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
+            request.setOperationId(operationId);
+            request.setUserId(userId);
+            request.setOrganizationId(organizationId);
+            HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user/update", HttpMethod.POST, entity, Response.class);
+            return nsResponse.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update operation form data via PUT method.
      * @param operationId Operation ID.
      * @param formData Form data.
      * @return Object response.
@@ -310,7 +361,31 @@ public class NextStepClient {
     }
 
     /**
-     * Update chosen authentication method for current operation step.
+     * Update operation form data via POST method.
+     * @param operationId Operation ID.
+     * @param formData Form data.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse updateOperationFormDataPost(String operationId, OperationFormData formData) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateFormDataRequest request = new UpdateFormDataRequest();
+            request.setOperationId(operationId);
+            request.setFormData(formData);
+            HttpEntity<ObjectRequest<UpdateFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/formData/update", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update chosen authentication method for current operation step via PUT method.
      * @param operationId Operation ID.
      * @param chosenAuthMethod Chosen authentication method.
      * @return Object response.
@@ -324,6 +399,30 @@ public class NextStepClient {
             request.setChosenAuthMethod(chosenAuthMethod);
             HttpEntity<ObjectRequest<UpdateChosenAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/chosenAuthMethod", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update chosen authentication method for current operation step via POST method.
+     * @param operationId Operation ID.
+     * @param chosenAuthMethod Chosen authentication method.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse updateChosenAuthMethodPost(String operationId, AuthMethod chosenAuthMethod) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateChosenAuthMethodRequest request = new UpdateChosenAuthMethodRequest();
+            request.setOperationId(operationId);
+            request.setChosenAuthMethod(chosenAuthMethod);
+            HttpEntity<ObjectRequest<UpdateChosenAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/chosenAuthMethod/update", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -448,22 +547,22 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId) throws NextStepServiceException {
-        return getPendingOperations(userId, null);
+        return getPendingOperations(userId, false);
     }
 
     /**
      * Get list of pending operations for given user and authentication method.
      * @param userId User ID.
-     * @param authMethod Authentication method.
+     * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      * @return A Response with list of {@link GetOperationDetailResponse} for OK status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId, AuthMethod authMethod) throws NextStepServiceException {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(String userId, boolean mobileTokenOnly) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             GetPendingOperationsRequest request = new GetPendingOperationsRequest();
             request.setUserId(userId);
-            request.setAuthMethod(authMethod);
+            request.setMobileTokenOnly(mobileTokenOnly);
             HttpEntity<ObjectRequest<GetPendingOperationsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<List<GetOperationDetailResponse>>> response = restTemplate.exchange(serviceUrl + "/user/operation/list", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {
             });
@@ -547,7 +646,7 @@ public class NextStepClient {
     }
 
     /**
-     * Disable an authentication method for given user.
+     * Disable an authentication method for given user via DELETE method.
      *
      * @param userId User ID.
      * @param authMethod Authentication method.
@@ -571,6 +670,30 @@ public class NextStepClient {
         }
     }
 
+    /**
+     * Disable an authentication method for given user via POST method.
+     *
+     * @param userId User ID.
+     * @param authMethod Authentication method.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUserPost(String userId, AuthMethod authMethod) throws NextStepServiceException {
+        try {
+            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
+            request.setUserId(userId);
+            request.setAuthMethod(authMethod);
+            HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            // Exchange next step request with NextStep server.
+            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method/delete", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
 
     /**
      * Handle resource access error (i.e. server not available).

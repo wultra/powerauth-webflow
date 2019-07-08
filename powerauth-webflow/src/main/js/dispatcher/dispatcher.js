@@ -38,6 +38,17 @@ export function dispatchAction(dispatch, response) {
                             });
                             break;
                         }
+                        case "LOGIN_2FA": {
+                            dispatch({
+                                type: "SHOW_SCREEN_LOGIN_2FA",
+                                payload: {
+                                    loading: false,
+                                    error: false,
+                                    message: ""
+                                }
+                            });
+                            break;
+                        }
                         case "CONSENT": {
                             dispatch({
                                 type: "SHOW_SCREEN_CONSENT",

@@ -23,7 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Authentic
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class VerifySMSAndPasswordRequest {
+public class VerifySmsAndPasswordRequest {
 
     /**
      * SMS message ID.
@@ -70,7 +70,7 @@ public class VerifySMSAndPasswordRequest {
     /**
      * Default constructor.
      */
-    public VerifySMSAndPasswordRequest() {
+    public VerifySmsAndPasswordRequest() {
     }
 
     /**
@@ -84,7 +84,7 @@ public class VerifySMSAndPasswordRequest {
      * @param cipherTransformation Cipher transformation used in case password is encrypted.
      * @param operationContext Operation context.
      */
-    public VerifySMSAndPasswordRequest(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) {
+    public VerifySmsAndPasswordRequest(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
         this.userId = userId;

@@ -77,7 +77,21 @@ INSERT INTO ns_organization (organization_id, display_name_key, is_default, orde
 
 ALTER TABLE da_sms_authorization ADD organization_id VARCHAR(256);
 
+ALTER TABLE ns_auth_method ADD has_mobile_token NUMBER(1) DEFAULT 0;
+
+UPDATE ns_auth_method SET has_mobile_token = 1 WHERE auth_method = 'POWERAUTH_TOKEN';
+
 COMMIT;
+```
+
+As the next step, please add new authentication methods `CONSENT` and `LOGIN_2FA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_2FA`.
+
+```sql
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 0, 'method.consent');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.login2fa');
 ```
 
 DDL update script for MySQL:
@@ -140,4 +154,19 @@ ALTER TABLE `ns_operation` ADD FOREIGN KEY `organization_fk` (`organization_id`)
 INSERT INTO `ns_organization` (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
 
 ALTER TABLE `da_sms_authorization` ADD `organization_id` VARCHAR(256);
+
+ALTER TABLE `ns_auth_method` ADD `has_mobile_token` BOOLEAN;
+
+UPDATE `ns_auth_method` SET `has_mobile_token` = TRUE WHERE `auth_method` = 'POWERAUTH_TOKEN';
 ```
+
+As the next step, please add new authentication methods `CONSENT` and `LOGIN_2FA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_2FA`.
+
+```sql
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.login2fa');
+```
+

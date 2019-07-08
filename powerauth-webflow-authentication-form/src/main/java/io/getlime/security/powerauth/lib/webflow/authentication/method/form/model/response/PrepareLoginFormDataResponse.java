@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
+
 import java.util.ArrayList;
 import java.util.List;
 

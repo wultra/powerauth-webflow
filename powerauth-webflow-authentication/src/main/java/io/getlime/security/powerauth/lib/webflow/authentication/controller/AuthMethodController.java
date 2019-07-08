@@ -178,17 +178,47 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * Get current authentication method.
      * @return Current authentication method.
      */
-    abstract protected AuthMethod getAuthMethodName();
+    protected abstract AuthMethod getAuthMethodName();
+
+    /**
+     * Get current authentication method given current operation context.
+     * @param operation Current operation.
+     * @return Current authentication method given current operation context.
+     */
+    protected AuthMethod getAuthMethodName(GetOperationDetailResponse operation) {
+        // Authentication method can be overridden to support delegation of steps to other authentication methods.
+        if (operation != null && !operation.getHistory().isEmpty()) {
+            OperationHistory currentHistory = operation.getHistory().get(operation.getHistory().size() - 1);
+            // Handle special case when LOGIN_2FA method is used, this authentication method delegates work
+            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_2FA
+            // as chosen authentication method (typically in INIT step).
+            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && operation.getChosenAuthMethod() == AuthMethod.LOGIN_2FA) {
+                return AuthMethod.LOGIN_2FA;
+            }
+            // The second case is when the current step has LOGIN_2FA as an authentication method which is not CONFIRMED
+            // or step is DONE or FAILED. This happens for instance when LOGIN_2FA step result is AUTH_FAILED after failed authentication
+            // or LOGIN_2FA is the last step of a finished operation
+            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_2FA
+                    && (currentHistory.getRequestAuthStepResult() != AuthStepResult.CONFIRMED
+                    || currentHistory.getAuthResult() == AuthResult.DONE
+                    || currentHistory.getAuthResult() == AuthResult.FAILED)) {
+                return AuthMethod.LOGIN_2FA;
+            }
+        }
+        // Use static authentication method name for all other cases.
+        return getAuthMethodName();
+    }
 
     /**
      * Get pending operations for given user.
      * @param userId User ID.
+     * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      * @return List of operations for given user.
      * @throws AuthStepException Thrown in case communication with Next Step fails.
      */
-    protected List<GetOperationDetailResponse> getOperationListForUser(String userId) throws AuthStepException {
+    protected List<GetOperationDetailResponse> getOperationListForUser(String userId, boolean mobileTokenOnly) throws AuthStepException {
         try {
-            final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, getAuthMethodName());
+            final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse response: responseObject) {
                 // translate formData messages
@@ -224,11 +254,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
+        AuthMethod authMethod = getAuthMethodName(operation);
+        logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, getAuthMethodName(), AuthStepResult.CONFIRMED, null, params, applicationContext);
+        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, authMethod, AuthStepResult.CONFIRMED, null, params, applicationContext);
         // notify Data Adapter in case operation is in DONE state now
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
@@ -242,7 +273,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // update operation result in operation to HTTP session mapping
         operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
-        logger.info("Step authorization succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
+        logger.info("Step authorization succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         return response.getResponseObject();
     }
 
@@ -257,11 +288,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
+        AuthMethod authMethod = getAuthMethodName(operation);
+        logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), getAuthMethodName(), AuthStepResult.AUTH_FAILED, null, params, applicationContext);
+        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, AuthStepResult.AUTH_FAILED, null, params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
@@ -275,7 +307,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // update operation result in operation to HTTP session mapping
         operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
-        logger.info("Fail step succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, getAuthMethodName().toString());
+        logger.info("Fail step succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         return response.getResponseObject();
     }
 
@@ -289,11 +321,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
+        AuthMethod authMethod = getAuthMethodName(operation);
+        logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), getAuthMethodName(), AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
+        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
@@ -307,19 +340,20 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // update operation result in operation to HTTP session mapping
         operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
-        logger.info("Step cancel succeeded, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
+        logger.info("Step cancel succeeded, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
         return response.getResponseObject();
     }
 
     /**
      * Initiate a new operation with given name, data and parameters.
      *
-     * @param operationName Name of the operation to be created.
-     * @param operationData Data of the operation.
-     * @param formData      Form data used for displaying the operation details.
-     * @param httpSessionId HTTP session ID.
-     * @param params        Additional parameters of the operation.
-     * @param provider      Provider that implements authentication callback.
+     * @param operationName      Name of the operation to be created.
+     * @param operationData      Data of the operation.
+     * @param formData           Form data used for displaying the operation details.
+     * @param httpSessionId      HTTP session ID.
+     * @param params             Additional parameters of the operation.
+     * @param applicationContext Application context.
+     * @param provider           Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
     protected R initiateOperationWithName(String operationName, String operationData, OperationFormData formData, String httpSessionId, List<KeyValueParameter> params, ApplicationContext applicationContext, AuthResponseProvider provider) {
@@ -492,7 +526,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @return Whether authentication method is available.
      */
     protected boolean isAuthMethodAvailable(GetOperationDetailResponse operation) {
-        final AuthMethod currentAuthMethod = getAuthMethodName();
+        final AuthMethod currentAuthMethod = getAuthMethodName(operation);
         return isAuthMethodAvailable(operation, currentAuthMethod);
     }
 
@@ -530,7 +564,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 throw new OperationAlreadyFailedException("Operation has already failed");
             }
         }
-        final AuthMethod currentAuthMethod = getAuthMethodName();
+        final AuthMethod currentAuthMethod = getAuthMethodName(operation);
         List<OperationHistory> operationHistoryList = operation.getHistory();
         if (operationHistoryList == null || operationHistoryList.isEmpty()) {
             logger.error("Operation is missing its history, operation ID: {}", operation.getOperationId());
@@ -553,9 +587,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.warn("Operation was interrupted, operation ID: {}", operation.getOperationId());
                 throw new OperationInterruptedException("Operation was interrupted");
             }
-            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY or POWERAUTH_TOKEN are present in next steps
+            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_2FA are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
-                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN)) {
+                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_2FA)) {
                     logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod.toString());
                     throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }

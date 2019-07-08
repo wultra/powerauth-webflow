@@ -26,6 +26,8 @@ public class MobileTokenInitResponse extends AuthStepResponse {
 
     private String webSocketId;
     private boolean offlineModeAvailable;
+    private boolean smsFallbackAvailable;
+    private String username;
 
     /**
      * Get Web Socket ID.
@@ -57,5 +59,37 @@ public class MobileTokenInitResponse extends AuthStepResponse {
      */
     public void setOfflineModeAvailable(boolean offlineModeAvailable) {
         this.offlineModeAvailable = offlineModeAvailable;
+    }
+
+    /**
+     * Get whether fallback to SMS authorization is enabled from mobile token.
+     * @return Whether fallback to SMS authorization is enabled from mobile token.
+     */
+    public boolean isSmsFallbackAvailable() {
+        return smsFallbackAvailable;
+    }
+
+    /**
+     * Set whether fallback to SMS authorization is enabled from mobile token.
+     * @param smsFallbackAvailable Whether fallback to SMS authorization is enabled from mobile token.
+     */
+    public void setSmsFallbackAvailable(boolean smsFallbackAvailable) {
+        this.smsFallbackAvailable = smsFallbackAvailable;
+    }
+
+    /**
+     * Get username for LOGIN_2FA authentication method.
+     * @return Username for LOGIN_2FA authentication method.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Set username for LOGIN_2FA authentication method.
+     * @param username Username for LOGIN_2FA authentication method.
+     */
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

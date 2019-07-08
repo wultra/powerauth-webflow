@@ -15,12 +15,10 @@
  */
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationExtras;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
@@ -39,7 +37,6 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.Collections;
 
 /**
@@ -61,7 +58,7 @@ public class HomeController {
     }
 
     @RequestMapping("/")
-    public String home(Principal currentUser, Model model, HttpSession session) {
+    public String home(Model model, HttpSession session) {
 
         // Fetch operation ID, if any
         String operationId;
@@ -97,7 +94,7 @@ public class HomeController {
     }
 
     @RequestMapping("/payment/create")
-    public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
+    public String payment(@ModelAttribute PaymentForm paymentForm, HttpSession session) throws NextStepServiceException {
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
         formData.addGreeting("operation.greeting");
@@ -140,13 +137,7 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
-        ApplicationContext applicationContext = new ApplicationContext();
-        applicationContext.setId("DEMO");
-        applicationContext.setName("Demo application");
-        applicationContext.setDescription("Web Flow demo application");
-        applicationContext.getExtras().put("requestedScopes", Collections.singletonList("OAUTH"));
-        applicationContext.getExtras().put("applicationOwner", "Wultra");
+        ApplicationContext applicationContext = createApplicationContext();
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (session.getServletContext()) {
@@ -157,7 +148,43 @@ public class HomeController {
         return "redirect:/";
     }
 
+    @RequestMapping("/login/2fa/create")
+    public String login2fa(HttpSession session) throws NextStepServiceException {
+        final String operationName = "login_2fa";
+        final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
+
+        String operationData = new OperationDataBuilder()
+                .templateVersion(operationConfig.getTemplateVersion())
+                .templateId(operationConfig.getTemplateId())
+                .build();
+
+        OperationFormData formData = new OperationFormData();
+        formData.addTitle("login.title");
+        formData.addGreeting("login.greeting");
+        formData.addSummary("login.summary");
+
+        ApplicationContext applicationContext = createApplicationContext();
+
+        ObjectResponse<CreateOperationResponse> objectResponse = client.createOperation(operationName, operationData, formData, null, applicationContext);
+        String operationId = objectResponse.getResponseObject().getOperationId();
+        synchronized (session.getServletContext()) {
+            session.setAttribute("operationId", operationId);
+        }
+        return "redirect:/";
+    }
+
     private ConnectionRepository getConnectionRepository() {
         return connectionRepositoryProvider.get();
+    }
+
+    private ApplicationContext createApplicationContext() {
+        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.setId("DEMO");
+        applicationContext.setName("Demo application");
+        applicationContext.setDescription("Web Flow demo application");
+        applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("OAUTH"));
+        applicationContext.getExtras().put("applicationOwner", "Wultra");
+        return applicationContext;
     }
 }

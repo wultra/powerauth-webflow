@@ -21,6 +21,7 @@ Following topics are covered in this chapter:
   - [Operation detail](#operation-detail)
   - [List pending operations](#list-pending-operations)
   - [Update operation form data](#update-operation-formdata)
+  - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
 - [Organizations](#organizations)
   - [Organization list](#list-organizations)
@@ -1441,8 +1442,61 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 
 ```json
 {
-  "status" : "OK",
-  "responseObject" : null
+  "status" : "OK"
+}
+```
+
+### Update user for an operation
+
+Updates user ID and organization ID for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>PUT</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/user</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/user/update</code></td>
+    </tr>
+</table>
+
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "0a044408-aea0-433a-80cf-6371dc2a76c0",
+    "userId": "roman",
+    "organizationId": "RETAIL"
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
 }
 ```
 
@@ -1494,8 +1548,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 
 ```json
 {
-  "status" : "OK",
-  "responseObject" : null
+  "status" : "OK"
 }
 ```
 

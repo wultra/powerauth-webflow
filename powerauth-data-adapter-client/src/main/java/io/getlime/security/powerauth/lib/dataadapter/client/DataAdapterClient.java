@@ -188,16 +188,17 @@ public class DataAdapterClient {
      * @param organizationId   Organization ID.
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
+     * @param resend           Whether SMS is being resent.
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSMSAuthorizationResponse> createAuthorizationSMS(String userId, String organizationId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         try {
-            CreateSMSAuthorizationRequest request = new CreateSMSAuthorizationRequest(userId, organizationId, lang, operationContext);
-            HttpEntity<ObjectRequest<CreateSMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<CreateSMSAuthorizationResponse>> response = restTemplate.exchange(
+            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, lang, operationContext, resend);
+            HttpEntity<ObjectRequest<CreateSmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<CreateSmsAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<CreateSMSAuthorizationResponse>>() {
+                    new ParameterizedTypeReference<ObjectResponse<CreateSmsAuthorizationResponse>>() {
                     });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -216,10 +217,10 @@ public class DataAdapterClient {
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
-    public Response verifyAuthorizationSMS(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public Response verifyAuthorizationSms(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySMSAuthorizationRequest request = new VerifySMSAuthorizationRequest(messageId, authorizationCode, operationContext);
-            HttpEntity<ObjectRequest<VerifySMSAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, operationContext);
+            HttpEntity<ObjectRequest<VerifySmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new Response();
@@ -244,10 +245,10 @@ public class DataAdapterClient {
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public Response verifyAuthorizationSMSAndPassword(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public Response verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySMSAndPasswordRequest request = new VerifySMSAndPasswordRequest(messageId, authorizationCode, userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
-            HttpEntity<ObjectRequest<VerifySMSAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
+            HttpEntity<ObjectRequest<VerifySmsAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
             });
             return new Response();

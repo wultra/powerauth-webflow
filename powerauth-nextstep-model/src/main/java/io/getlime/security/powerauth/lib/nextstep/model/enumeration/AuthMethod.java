@@ -55,6 +55,11 @@ public enum AuthMethod {
     /**
      * Confirm user consent.
      */
-    CONSENT
+    CONSENT,
+
+    /**
+     * 2FA login.
+     */
+    LOGIN_2FA
 
 }

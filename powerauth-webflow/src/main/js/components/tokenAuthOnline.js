@@ -34,6 +34,19 @@ export default class TokenOnline extends React.Component {
     constructor() {
         super();
         this.handleSwitchToOfflineMode = this.handleSwitchToOfflineMode.bind(this);
+        this.handleSwitchToSmsAuthorization = this.handleSwitchToSmsAuthorization.bind(this);
+    }
+
+    handleSwitchToSmsAuthorization(event) {
+        event.preventDefault();
+        const smsFallbackCallback = this.props.smsFallbackCallback;
+        // set the SMS fallback userInput
+        this.props.context.formData.userInput["smsFallback.enabled"] = true;
+        // save updated form data in the backend
+        this.props.dispatch(updateFormData(this.props.context.formData, function () {
+            // update Token component state - switch to SMS fallback immediately
+            smsFallbackCallback(true);
+        }));
     }
 
     handleSwitchToOfflineMode(event) {
@@ -51,6 +64,22 @@ export default class TokenOnline extends React.Component {
     render() {
         return (
             <div className="auth-actions">
+                {(this.props.username) ? (
+                    <div>
+                        <div className="attribute row">
+                            <div className="message-information">
+                                <FormattedMessage id="login.loginNumber"/>
+                            </div>
+                        </div>
+                        <div className="attribute row">
+                            <div className="col-xs-12">
+                                <input className="form-control" type="text" value={this.props.username} disabled="true"/>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    undefined
+                )}
                 <div className="font-small message-information">
                     <FormattedMessage id="message.token.confirm"/><br/>
                     <div className="image mtoken"/>
@@ -60,6 +89,15 @@ export default class TokenOnline extends React.Component {
                         <FormattedMessage id="message.token.offline"/><br/>
                         <a href="#" onClick={this.handleSwitchToOfflineMode}>
                             <FormattedMessage id="message.token.offline.link"/>
+                        </a>
+                    </div>
+                ) : (
+                    undefined
+                )}
+                {(this.props.smsFallbackAvailable) ? (
+                    <div className="font-small message-information">
+                        <a href="#" onClick={this.handleSwitchToSmsAuthorization}>
+                            <FormattedMessage id="smsAuthorization.fallback.link"/>
                         </a>
                     </div>
                 ) : (

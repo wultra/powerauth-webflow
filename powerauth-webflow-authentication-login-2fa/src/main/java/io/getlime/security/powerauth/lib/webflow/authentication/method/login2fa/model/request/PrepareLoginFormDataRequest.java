@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.request;
 
 /**
- * A no-op password protection for plain-text transfer of passwords.
+ * Request object used for preparing login form data.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class NoPasswordProtection implements PasswordProtection {
+public class PrepareLoginFormDataRequest {
 
-    @Override
-    public String protect(String password) {
-        return password;
-    }
 }

@@ -22,7 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class VerifySMSAuthorizationRequest {
+public class VerifySmsAuthorizationRequest {
 
     /**
      * SMS message ID.
@@ -42,7 +42,7 @@ public class VerifySMSAuthorizationRequest {
     /**
      * Default constructor.
      */
-    public VerifySMSAuthorizationRequest() {
+    public VerifySmsAuthorizationRequest() {
     }
 
     /**
@@ -51,7 +51,7 @@ public class VerifySMSAuthorizationRequest {
      * @param authorizationCode Authorization code from user.
      * @param operationContext Operation context.
      */
-    public VerifySMSAuthorizationRequest(String messageId, String authorizationCode, OperationContext operationContext) {
+    public VerifySmsAuthorizationRequest(String messageId, String authorizationCode, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
         this.operationContext = operationContext;

@@ -45,7 +45,7 @@ New form data structure:
 Following messages are required in resources for all locales:
 
 ```
-login.greeting=Dobrý den,\n přihlašte se, prosím.
+login.greeting=Dobrý den,\n přihlaste se, prosím.
 login.summary=Potvrďte prosím přihlášení uživatele.
 operation.greeting=Hello,\n please confirm following payment:
 operation.summary=Hello, please confirm payment {operation.amount} {operation.currency} to account {operation.account}.

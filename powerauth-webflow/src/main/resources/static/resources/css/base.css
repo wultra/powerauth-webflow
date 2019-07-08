@@ -142,6 +142,7 @@ a:hover, a:active, a:focus {
 
 #operation .panel-body {
     padding: 30px;
+    min-height: 400px;
 }
 
 #operation .operation-approve {
@@ -377,4 +378,16 @@ a:hover, a:active, a:focus {
 .consent-option-error {
     color: #C0007F;
     font-size: 12pt;
+}
+
+.sms-resend-active {
+    color: #7FC000;
+}
+
+.sms-resend-active:hover {
+    cursor: pointer;
+}
+
+.sms-resend-disabled {
+    color: #777777;
 }
