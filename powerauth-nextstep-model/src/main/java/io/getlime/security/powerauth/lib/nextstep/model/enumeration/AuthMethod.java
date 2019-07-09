@@ -58,8 +58,13 @@ public enum AuthMethod {
     CONSENT,
 
     /**
-     * 2FA login.
+     * SCA login.
      */
-    LOGIN_2FA
+    LOGIN_SCA,
+
+    /**
+     * SCA approval.
+     */
+    APPROVAL_SCA
 
 }

@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.request;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
- * Model for an init request for 2FA login.
+ * Model for an init request for SCA login.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class Login2FaInitRequest extends AuthStepRequest {
+public class LoginScaInitRequest extends AuthStepRequest {
 
     private String username;
     private String organizationId;

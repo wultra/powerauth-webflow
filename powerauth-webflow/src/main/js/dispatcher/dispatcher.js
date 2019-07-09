@@ -38,9 +38,9 @@ export function dispatchAction(dispatch, response) {
                             });
                             break;
                         }
-                        case "LOGIN_2FA": {
+                        case "LOGIN_SCA": {
                             dispatch({
-                                type: "SHOW_SCREEN_LOGIN_2FA",
+                                type: "SHOW_SCREEN_LOGIN_SCA",
                                 payload: {
                                     loading: false,
                                     error: false,

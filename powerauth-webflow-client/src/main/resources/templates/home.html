@@ -65,7 +65,7 @@
                                 <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
                             </li>
                             <li role="presentation">
-                                <a href="#login2fa" aria-controls="login2fa" role="tab" data-toggle="tab">Login (2FA)</a>
+                                <a href="#loginsca" aria-controls="loginsca" role="tab" data-toggle="tab">Login (SCA)</a>
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -80,14 +80,14 @@
                                     </form>
                                 </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="login2fa">
+                            <div role="tabpanel" class="tab-pane" id="loginsca">
                                 <div class="padding">
                                     <p>
-                                        Authenticate as a user using 2FA login.
+                                        Authenticate as a user using SCA login.
                                     </p>
-                                    <form th:action="@{/login/2fa/create}" method="POST">
+                                    <form th:action="@{/login/sca/create}" method="POST">
                                         <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                                        <button type="submit" class="btn btn-lg btn-success">Log in (2FA)</button>
+                                        <button type="submit" class="btn btn-lg btn-success">Log in (SCA)</button>
                                     </form>
                                 </div>
                             </div>

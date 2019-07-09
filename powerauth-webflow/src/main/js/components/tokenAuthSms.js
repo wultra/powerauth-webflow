@@ -48,7 +48,7 @@ export default class TokenAuthSms extends React.Component {
         if (props.context.init) {
             // Store information whether password is enabled
             this.setState({passwordEnabled: props.context.passwordEnabled});
-            // Store username for LOGIN_2FA step
+            // Store username for LOGIN_SCA step
             this.setState({username: props.context.username})
         } else {
             // store message and error into component state because online mode reloads context frequently due to polling

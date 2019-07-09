@@ -99,7 +99,7 @@ export default class SmsComponent extends React.Component {
                         <div>
                             <div className="attribute row">
                                 <div className="message-information">
-                                    <FormattedMessage id="login2fa.password"/>
+                                    <FormattedMessage id="loginSca.password"/>
                                 </div>
                             </div>
                             <div className="attribute row">
@@ -127,7 +127,7 @@ export default class SmsComponent extends React.Component {
                             <div className="col-xs-12">
                                 <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
                                     {(this.props.username && this.props.passwordEnabled) ? (
-                                        <FormattedMessage id="login2fa.confirm"/>
+                                        <FormattedMessage id="loginSca.confirm"/>
                                     ) : (
                                         <FormattedMessage id="operation.confirm"/>
                                     )}

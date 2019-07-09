@@ -23,7 +23,7 @@ import {
     init,
     organizationConfigurationError,
     selectOrganization
-} from '../actions/login2FaActions'
+} from '../actions/loginScaActions'
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
 import Spinner from 'react-tiny-spin';
@@ -39,7 +39,7 @@ import OrganizationSelect from "./organizationSelect";
         context: store.dispatching.context
     }
 })
-export default class Login2FA extends React.Component {
+export default class LoginSca extends React.Component {
 
     constructor() {
         super();
@@ -227,7 +227,7 @@ export default class Login2FA extends React.Component {
                         </div>
                         <div className="col-xs-6">
                             <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                <FormattedMessage id="login2fa.continue"/>
+                                <FormattedMessage id="loginSca.continue"/>
                             </Button>
                         </div>
                     </div>

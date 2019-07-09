@@ -4,7 +4,7 @@ import {isAndroid} from 'react-device-detect';
 
 import StartHandshake from "./startHandshake";
 import Login from "./login";
-import Login2FA from "./login2fa";
+import LoginSca from "./loginSca";
 import Success from "./success";
 import Error from "./error";
 import OperationReview from "./operationReview";
@@ -60,8 +60,8 @@ export class App extends React.Component {
                     Component = Login;
                     break;
                 }
-                case "SCREEN_LOGIN_2FA": {
-                    Component = Login2FA;
+                case "SCREEN_LOGIN_SCA": {
+                    Component = LoginSca;
                     break;
                 }
                 case "SCREEN_SUCCESS": {

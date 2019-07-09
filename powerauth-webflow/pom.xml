@@ -107,7 +107,7 @@
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-webflow-authentication-login-2fa</artifactId>
+            <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
             <version>0.22.0</version>
         </dependency>
         <dependency>

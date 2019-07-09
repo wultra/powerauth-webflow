@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.response;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response;
 
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 

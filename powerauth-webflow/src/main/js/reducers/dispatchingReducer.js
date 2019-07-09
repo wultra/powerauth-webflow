@@ -13,10 +13,10 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
-        case "SHOW_SCREEN_LOGIN_2FA": {
+        case "SHOW_SCREEN_LOGIN_SCA": {
             return {
                 ...state,
-                currentScreen: "SCREEN_LOGIN_2FA",
+                currentScreen: "SCREEN_LOGIN_SCA",
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
@@ -72,7 +72,7 @@ function mergeContext(actionType, oldContext, newContext) {
     }
     switch (actionType) {
         case "SHOW_SCREEN_LOGIN":
-        case "SHOW_SCREEN_LOGIN_2FA":
+        case "SHOW_SCREEN_LOGIN_SCA":
             mergeOrganizations(oldContext, newContext);
             break;
         case "SHOW_SCREEN_OPERATION_REVIEW":

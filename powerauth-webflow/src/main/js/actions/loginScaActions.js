@@ -25,14 +25,14 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 export function init(username, organizationId) {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_LOGIN_2FA",
+            type: "SHOW_SCREEN_LOGIN_SCA",
             payload: {
                 loading: true,
                 error: false,
                 message: ""
             }
         });
-        axios.post("./api/auth/login-2fa/init/start", {
+        axios.post("./api/auth/login-sca/init/start", {
             username: username,
             organizationId: organizationId
         }, {
@@ -87,7 +87,7 @@ export function init(username, organizationId) {
                         break;
                     }
                     dispatch({
-                        type: "SHOW_SCREEN_LOGIN_2FA",
+                        type: "SHOW_SCREEN_LOGIN_SCA",
                         payload: {
                             loading: false,
                             error: true,
@@ -107,7 +107,7 @@ export function init(username, organizationId) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/login-2fa/init/cancel", {}, {
+        axios.post("./api/auth/login-sca/init/cancel", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
@@ -128,14 +128,14 @@ export function cancel() {
 export function getOrganizationList() {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_LOGIN_2FA",
+            type: "SHOW_SCREEN_LOGIN_SCA",
             payload: {
                 loading: true,
                 error: false,
                 message: ""
             }
         });
-        axios.post("./api/auth/login-2fa/init/setup", {}).then((response) => {
+        axios.post("./api/auth/login-sca/init/setup", {}).then((response) => {
             // Handling of page refresh
             if (response.data.userAlreadyKnown) {
                 if (response.data.mobileTokenEnabled) {
@@ -161,7 +161,7 @@ export function getOrganizationList() {
                 return null;
             }
             dispatch({
-                type: "SHOW_SCREEN_LOGIN_2FA",
+                type: "SHOW_SCREEN_LOGIN_SCA",
                 payload: response.data
             });
             return null;
@@ -174,7 +174,7 @@ export function getOrganizationList() {
 export function selectOrganization(organizationId) {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_LOGIN_2FA",
+            type: "SHOW_SCREEN_LOGIN_SCA",
             payload: {
                 chosenOrganizationId: organizationId
             }

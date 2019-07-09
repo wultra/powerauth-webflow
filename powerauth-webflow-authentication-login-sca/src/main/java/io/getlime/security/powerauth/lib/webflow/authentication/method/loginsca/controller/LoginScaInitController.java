@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.controller;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
@@ -35,10 +35,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.request.Login2FaInitRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.request.PrepareLoginFormDataRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.response.Login2FaInitResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.response.PrepareLoginFormDataResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.PrepareLoginFormDataRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.LoginScaInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
@@ -58,15 +58,15 @@ import java.util.List;
 
 
 /**
- * Controller for initialization of 2FA login.
+ * Controller for initialization of SCA login.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @RestController
-@RequestMapping(value = "/api/auth/login-2fa/init")
-public class Login2FaInitController extends AuthMethodController<Login2FaInitRequest, Login2FaInitResponse, AuthStepException> {
+@RequestMapping(value = "/api/auth/login-sca/init")
+public class LoginScaInitController extends AuthMethodController<io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest, LoginScaInitResponse, AuthStepException> {
 
-    private static final Logger logger = LoggerFactory.getLogger(Login2FaInitController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginScaInitController.class);
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -85,7 +85,7 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
      * @param httpSession HTTP session.
      */
     @Autowired
-    public Login2FaInitController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
+    public LoginScaInitController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
@@ -94,14 +94,14 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
     }
 
     /**
-     * Initialize 2FA login for given username.
+     * Initialize SCA login for given username.
      * @param request Initialization request.
-     * @return 2FA login initialization response.
-     * @throws AuthStepException In case 2FA login initialization fails.
+     * @return SCA login initialization response.
+     * @throws AuthStepException In case SCA login initialization fails.
      * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/start", method = RequestMethod.POST)
-    protected Login2FaInitResponse start2FaLogin(@RequestBody Login2FaInitRequest request) throws AuthStepException, NextStepServiceException {
+    protected LoginScaInitResponse startScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
@@ -124,7 +124,7 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
                 // User ID is already set, this can happen when the user refreshes the page or another authentication method set the user ID
                 userIdAlreadyAvailable = true;
             }
-            Login2FaInitResponse response = new Login2FaInitResponse();
+            LoginScaInitResponse response = new LoginScaInitResponse();
             if (userId == null) {
                 // User ID is not available, mock SMS and password fallback to avoid fishing for active accounts
                 response.setMobileTokenEnabled(false);
@@ -135,7 +135,7 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
                     authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
                     nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId);
                 }
-                nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_2FA);
+                nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
                 // Find out whether mobile token is enabled
                 boolean mobileTokenEnabled = false;
                 try {
@@ -158,7 +158,7 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
             }
         } catch (DataAdapterClientErrorException e) {
             // Send error to client
-            Login2FaInitResponse response = new Login2FaInitResponse();
+            LoginScaInitResponse response = new LoginScaInitResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setRemainingAttempts(e.getError().getRemainingAttempts());
             response.setMessage(e.getError().getMessage());
@@ -172,7 +172,7 @@ public class Login2FaInitController extends AuthMethodController<Login2FaInitReq
      */
     @Override
     protected AuthMethod getAuthMethodName() {
-        return AuthMethod.LOGIN_2FA;
+        return AuthMethod.LOGIN_SCA;
     }
 
     /**

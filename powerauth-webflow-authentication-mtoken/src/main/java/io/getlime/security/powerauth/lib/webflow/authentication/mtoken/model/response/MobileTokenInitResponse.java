@@ -78,16 +78,16 @@ public class MobileTokenInitResponse extends AuthStepResponse {
     }
 
     /**
-     * Get username for LOGIN_2FA authentication method.
-     * @return Username for LOGIN_2FA authentication method.
+     * Get username for LOGIN_SCA authentication method.
+     * @return Username for LOGIN_SCA authentication method.
      */
     public String getUsername() {
         return username;
     }
 
     /**
-     * Set username for LOGIN_2FA authentication method.
-     * @param username Username for LOGIN_2FA authentication method.
+     * Set username for LOGIN_SCA authentication method.
+     * @param username Username for LOGIN_SCA authentication method.
      */
     public void setUsername(String username) {
         this.username = username;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.login2fa.model.request;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request;
 
 /**
  * Request object used for preparing login form data.

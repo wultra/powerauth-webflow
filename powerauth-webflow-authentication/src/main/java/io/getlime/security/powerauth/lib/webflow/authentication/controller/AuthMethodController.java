@@ -189,20 +189,20 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // Authentication method can be overridden to support delegation of steps to other authentication methods.
         if (operation != null && !operation.getHistory().isEmpty()) {
             OperationHistory currentHistory = operation.getHistory().get(operation.getHistory().size() - 1);
-            // Handle special case when LOGIN_2FA method is used, this authentication method delegates work
-            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_2FA
+            // Handle special case when LOGIN_SCA method is used, this authentication method delegates work
+            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_SCA
             // as chosen authentication method (typically in INIT step).
-            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && operation.getChosenAuthMethod() == AuthMethod.LOGIN_2FA) {
-                return AuthMethod.LOGIN_2FA;
+            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && operation.getChosenAuthMethod() == AuthMethod.LOGIN_SCA) {
+                return AuthMethod.LOGIN_SCA;
             }
-            // The second case is when the current step has LOGIN_2FA as an authentication method which is not CONFIRMED
-            // or step is DONE or FAILED. This happens for instance when LOGIN_2FA step result is AUTH_FAILED after failed authentication
-            // or LOGIN_2FA is the last step of a finished operation
-            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_2FA
+            // The second case is when the current step has LOGIN_SCA as an authentication method which is not CONFIRMED
+            // or step is DONE or FAILED. This happens for instance when LOGIN_SCA step result is AUTH_FAILED after failed authentication
+            // or LOGIN_SCA is the last step of a finished operation
+            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_SCA
                     && (currentHistory.getRequestAuthStepResult() != AuthStepResult.CONFIRMED
                     || currentHistory.getAuthResult() == AuthResult.DONE
                     || currentHistory.getAuthResult() == AuthResult.FAILED)) {
-                return AuthMethod.LOGIN_2FA;
+                return AuthMethod.LOGIN_SCA;
             }
         }
         // Use static authentication method name for all other cases.
@@ -587,9 +587,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.warn("Operation was interrupted, operation ID: {}", operation.getOperationId());
                 throw new OperationInterruptedException("Operation was interrupted");
             }
-            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_2FA are present in next steps
+            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_SCA are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
-                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_2FA)) {
+                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_SCA)) {
                     logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod.toString());
                     throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }

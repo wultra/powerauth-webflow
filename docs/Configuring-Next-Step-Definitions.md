@@ -8,7 +8,7 @@ Following authentication methods are available:
 - `INIT` - operation initialization, executed automatically when operation is started
 - `USER_ID_ASSIGN` - resolution of user identity without requiring the user to sign in
 - `USERNAME_PASSWORD_AUTH` - user signs in using form based authentication by supplying username and password credentials
-- `LOGIN_2FA` - two factor login with either mobile token or SMS and password
+- `LOGIN_SCA` - two factor login with either mobile token or SMS and password
 - `POWERAUTH_TOKEN` - user authorizes the operation using PowerAuth mobile token
 - `SMS_KEY` - user authorizes the operation using SMS message with OTP
 - `CONSENT` - OAuth 2.0 consent form with options to approve by the user
@@ -43,7 +43,7 @@ VALUES ('SMS_KEY', 6, 0, NULL, NULL, 1, 5, 1, 0, 'method.smsKey');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 0, 'method.consent');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.login2fa');
+VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.loginsca');
 ```
 
 MySQL:
@@ -63,7 +63,7 @@ VALUES ('SMS_KEY', 6, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.smsKey');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.login2fa');
+VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginsca');
 ```
 
 ## Configuration of next steps

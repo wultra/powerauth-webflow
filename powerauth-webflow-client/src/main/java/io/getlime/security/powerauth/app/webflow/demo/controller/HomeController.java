@@ -148,9 +148,9 @@ public class HomeController {
         return "redirect:/";
     }
 
-    @RequestMapping("/login/2fa/create")
-    public String login2fa(HttpSession session) throws NextStepServiceException {
-        final String operationName = "login_2fa";
+    @RequestMapping("/login/sca/create")
+    public String loginSca(HttpSession session) throws NextStepServiceException {
+        final String operationName = "login_sca";
         final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
 
         String operationData = new OperationDataBuilder()

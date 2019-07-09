@@ -12,8 +12,8 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <name>powerauth-webflow-authentication-login-2fa</name>
-    <artifactId>powerauth-webflow-authentication-login-2fa</artifactId>
+    <name>powerauth-webflow-authentication-login-sca</name>
+    <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
     <groupId>io.getlime.security</groupId>
     <version>0.22.0</version>
 
