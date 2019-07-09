@@ -27,10 +27,7 @@ import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.Security;
+import java.security.*;
 
 /**
  * Test class for the AES password encryptor.
@@ -46,7 +43,7 @@ class AesEncryptionPasswordProtectionTest {
     }
 
     @org.junit.jupiter.api.Test
-    void protect() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException {
+    void protect() throws NoSuchPaddingException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, InvalidKeyException, BadPaddingException, IllegalBlockSizeException, NoSuchProviderException {
 
         final String secretKeyBase64 = "Qee4CK44d8GduTxoHU7JPM2lCs+KF63akIpKyaLk9+c=";
         final String cipherTransformation = "AES/CBC/PKCS7Padding";
@@ -78,7 +75,7 @@ class AesEncryptionPasswordProtectionTest {
 
     }
 
-    private String decryptPassword(String secretKeyBase64, String cipherTransformation, String encryptedPassword) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException {
+    private String decryptPassword(String secretKeyBase64, String cipherTransformation, String encryptedPassword) throws NoSuchAlgorithmException, NoSuchPaddingException, InvalidKeyException, InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, NoSuchProviderException {
         // Read secret key from configuration
         byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
         SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
@@ -94,7 +91,7 @@ class AesEncryptionPasswordProtectionTest {
         byte[] encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
 
         // Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
-        Cipher cipher = Cipher.getInstance(cipherTransformation);
+        Cipher cipher = Cipher.getInstance(cipherTransformation, "BC");
         cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
         byte[] decryptedPasswordBytes = cipher.doFinal(encryptedPasswordBytes);
         return new String(decryptedPasswordBytes, StandardCharsets.UTF_8);
