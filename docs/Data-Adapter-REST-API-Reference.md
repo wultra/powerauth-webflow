@@ -380,7 +380,7 @@ String secretKeyBase64 = configuration.getSecretKey();
 String cipherTransformation = request.getCipherTransformation();
 String encryptedPassword = request.getPassword();
 
-String originalPassword = decryptoPassword(secretKeyBase64, cipherTransformation, encryptedpassword);
+String originalPassword = decryptPassword(secretKeyBase64, cipherTransformation, encryptedpassword);
 
 // ...
 
