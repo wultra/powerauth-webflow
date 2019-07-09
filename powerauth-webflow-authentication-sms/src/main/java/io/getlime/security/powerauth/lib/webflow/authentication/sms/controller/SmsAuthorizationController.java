@@ -132,7 +132,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     throw new InvalidRequestException("Invalid request");
 
             }
-            cleanHttpSession();
+            cleanHttpSession(false);
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
         } catch (DataAdapterClientErrorException e) {
@@ -142,14 +142,14 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
                 if (response.getResult() == AuthResult.FAILED) {
                     // FAILED result instead of CONTINUE means the authentication method is failed
-                    cleanHttpSession();
+                    cleanHttpSession(false);
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");
                 }
                 GetOperationDetailResponse updatedOperation = getOperation();
                 remainingAttemptsNS = updatedOperation.getRemainingAttempts();
             } catch (NextStepServiceException e2) {
                 logger.error("Error occurred in Next Step server", e);
-                cleanHttpSession();
+                cleanHttpSession(false);
                 throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
             }
             AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
@@ -218,11 +218,13 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     /**
      * Clean HTTP session.
      */
-    private void cleanHttpSession() {
+    private void cleanHttpSession(boolean keepUsername) {
         synchronized (httpSession.getServletContext()) {
             httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
             httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
-            httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+            if (!keepUsername) {
+                httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+            }
         }
     }
 
@@ -238,7 +240,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         checkOperationExpiration(operation);
-        cleanHttpSession();
+        // Clean HTTP session, however keep the username which can be stored by another authentication method
+        cleanHttpSession(true);
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
         initResponse.setResendDelay(configuration.getSmsResendDelay());
 
@@ -368,7 +371,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         try {
             final GetOperationDetailResponse operation = getOperation();
             final AuthMethod authMethod = getAuthMethodName(operation);
-            cleanHttpSession();
+            cleanHttpSession(false);
             cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
@@ -380,7 +383,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");
-            cleanHttpSession();
+            cleanHttpSession(false);
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }
