@@ -77,7 +77,21 @@ INSERT INTO ns_organization (organization_id, display_name_key, is_default, orde
 
 ALTER TABLE da_sms_authorization ADD organization_id VARCHAR(256);
 
+ALTER TABLE ns_auth_method ADD has_mobile_token NUMBER(1) DEFAULT 0;
+
+UPDATE ns_auth_method SET has_mobile_token = 1 WHERE auth_method = 'POWERAUTH_TOKEN';
+
 COMMIT;
+```
+
+As the next step, please add new authentication methods `CONSENT` and `LOGIN_2FA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_2FA`.
+
+```sql
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 0, 'method.consent');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.login2fa');
 ```
 
 DDL update script for MySQL:
@@ -140,4 +154,40 @@ ALTER TABLE `ns_operation` ADD FOREIGN KEY `organization_fk` (`organization_id`)
 INSERT INTO `ns_organization` (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
 
 ALTER TABLE `da_sms_authorization` ADD `organization_id` VARCHAR(256);
+
+ALTER TABLE `ns_auth_method` ALTER COLUMN `user_prefs_default` SET DEFAULT FALSE;
+ALTER TABLE `ns_auth_method` ALTER COLUMN `has_user_interface` SET DEFAULT FALSE;
+ALTER TABLE `ns_auth_method` ALTER COLUMN `has_mobile_token` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_1` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_2` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_3` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_4` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_5` SET DEFAULT FALSE;
+ALTER TABLE `da_sms_authorization` ALTER COLUMN `verified` SET DEFAULT FALSE;
+
+
+UPDATE `ns_auth_method` SET `user_prefs_default` = FALSE WHERE `user_prefs_default` IS NULL;
+UPDATE `ns_auth_method` SET `has_user_interface` = FALSE WHERE `has_user_interface` IS NULL;
+UPDATE `ns_auth_method` SET `has_mobile_token` = FALSE WHERE `has_mobile_token` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_1` = FALSE WHERE `auth_method_1` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_2` = FALSE WHERE `auth_method_2` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_3` = FALSE WHERE `auth_method_3` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_4` = FALSE WHERE `auth_method_4` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_5` = FALSE WHERE `auth_method_5` IS NULL;
+UPDATE `da_sms_authorization` SET `verified` = FALSE WHERE `verified` IS NULL;
+
+ALTER TABLE `da_sms_authorization` ADD `has_mobile_token` BOOLEAN DEFAULT FALSE;
+
+UPDATE `ns_auth_method` SET `has_mobile_token` = TRUE WHERE `auth_method` = 'POWERAUTH_TOKEN';
 ```
+
+As the next step, please add new authentication methods `CONSENT` and `LOGIN_2FA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_2FA`.
+
+```sql
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.login2fa');
+```
+

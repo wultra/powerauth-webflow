@@ -34,9 +34,9 @@ import java.io.IOException;
  * Signature and data for QR code in offline mode for mobile token.
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OfflineSignatureQRCode {
+public class OfflineSignatureQrCode {
 
-    private static final Logger logger = LoggerFactory.getLogger(OfflineSignatureQRCode.class);
+    private static final Logger logger = LoggerFactory.getLogger(OfflineSignatureQrCode.class);
 
     private final int size;
     private final String data;
@@ -48,7 +48,7 @@ public class OfflineSignatureQRCode {
      * @param data QR code data.
      * @param nonce Nonce.
      */
-    public OfflineSignatureQRCode(int size, String data, String nonce) {
+    public OfflineSignatureQrCode(int size, String data, String nonce) {
         this.size = size;
         this.data = data;
         this.nonce = nonce;

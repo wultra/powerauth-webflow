@@ -15,12 +15,10 @@
  */
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationExtras;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataBuilder;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ValueFormatType;
@@ -35,11 +33,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
-import java.security.Principal;
 import java.util.Collections;
 
 /**
@@ -50,24 +46,25 @@ public class HomeController {
 
     private final Provider<ConnectionRepository> connectionRepositoryProvider;
     private final ConnectionFactoryLocator connectionFactoryLocator;
+    private final NextStepClient client;
+    private final HttpSession httpSession;
 
     @Autowired
-    private NextStepClient client;
-
-    @Inject
-    public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator) {
+    public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator, NextStepClient client, HttpSession httpSession) {
         this.connectionRepositoryProvider = connectionRepositoryProvider;
         this.connectionFactoryLocator = connectionFactoryLocator;
+        this.client = client;
+        this.httpSession = httpSession;
     }
 
     @RequestMapping("/")
-    public String home(Principal currentUser, Model model, HttpSession session) {
+    public String home(Model model) {
 
         // Fetch operation ID, if any
         String operationId;
-        synchronized (session.getServletContext()) {
-            operationId = (String) session.getAttribute("operationId");
-            session.removeAttribute("operationId");
+        synchronized (httpSession.getServletContext()) {
+            operationId = (String) httpSession.getAttribute("operationId");
+            httpSession.removeAttribute("operationId");
         }
 
         // Add attributes
@@ -76,8 +73,8 @@ public class HomeController {
         model.addAttribute("operationId", operationId);
 
         PaymentForm paymentForm;
-        synchronized (session.getServletContext()) {
-            paymentForm = (PaymentForm) session.getAttribute("paymentForm");
+        synchronized (httpSession.getServletContext()) {
+            paymentForm = (PaymentForm) httpSession.getAttribute("paymentForm");
             if (paymentForm == null) {
                 // MOCK PAYMENT
                 paymentForm = new PaymentForm();
@@ -87,7 +84,7 @@ public class HomeController {
                 paymentForm.setNote("Utility Bill Payment - 05/2017");
                 paymentForm.setDueDate("2017-06-29");
             } else {
-                session.removeAttribute("paymentForm");
+                httpSession.removeAttribute("paymentForm");
             }
         }
 
@@ -97,7 +94,7 @@ public class HomeController {
     }
 
     @RequestMapping("/payment/create")
-    public String payment(Principal currentUser, @ModelAttribute PaymentForm paymentForm, HttpSession session) throws JsonProcessingException, NextStepServiceException {
+    public String payment(@ModelAttribute PaymentForm paymentForm) throws NextStepServiceException {
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
         formData.addGreeting("operation.greeting");
@@ -140,24 +137,54 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
-        ApplicationContext applicationContext = new ApplicationContext();
-        applicationContext.setId("DEMO");
-        applicationContext.setName("Demo application");
-        applicationContext.setDescription("Web Flow demo application");
-        applicationContext.getExtras().put("requestedScopes", Collections.singletonList("OAUTH"));
-        applicationContext.getExtras().put("applicationOwner", "Wultra");
+        ApplicationContext applicationContext = createApplicationContext();
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
-        synchronized (session.getServletContext()) {
-            session.setAttribute("operationId", payment.getResponseObject().getOperationId());
-            session.setAttribute("paymentForm", paymentForm);
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute("operationId", payment.getResponseObject().getOperationId());
+            httpSession.setAttribute("paymentForm", paymentForm);
         }
 
         return "redirect:/";
     }
 
+    @RequestMapping("/login/2fa/create")
+    public String login2fa() throws NextStepServiceException {
+        final String operationName = "login_2fa";
+        final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
+
+        String operationData = new OperationDataBuilder()
+                .templateVersion(operationConfig.getTemplateVersion())
+                .templateId(operationConfig.getTemplateId())
+                .build();
+
+        OperationFormData formData = new OperationFormData();
+        formData.addTitle("login.title");
+        formData.addGreeting("login.greeting");
+        formData.addSummary("login.summary");
+
+        ApplicationContext applicationContext = createApplicationContext();
+
+        ObjectResponse<CreateOperationResponse> objectResponse = client.createOperation(operationName, operationData, formData, null, applicationContext);
+        String operationId = objectResponse.getResponseObject().getOperationId();
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute("operationId", operationId);
+        }
+        return "redirect:/";
+    }
+
     private ConnectionRepository getConnectionRepository() {
         return connectionRepositoryProvider.get();
+    }
+
+    private ApplicationContext createApplicationContext() {
+        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.setId("DEMO");
+        applicationContext.setName("Demo application");
+        applicationContext.setDescription("Web Flow demo application");
+        applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("OAUTH"));
+        applicationContext.getExtras().put("applicationOwner", "Wultra");
+        return applicationContext;
     }
 }

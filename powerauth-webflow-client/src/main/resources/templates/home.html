@@ -18,12 +18,12 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>PowerAuth 2.0 Web Flow Demo</title>
+    <title>PowerAuth Web Flow Demo</title>
     <meta http-equiv="X-UA-Compatible" content="IE=11, IE=10, IE=9, IE=edge"/>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-    <meta name="description" content="PowerAuth 2.0 Web Flow Demo"/>
+    <meta name="description" content="PowerAuth Web Flow Demo"/>
     <meta name="author" content="Wultra s.r.o."/>
 
     <!-- Bootstrap core CSS -->
@@ -32,97 +32,112 @@
 <body>
 
 <div id="content">
-    <div class="wrapper text-center">
-        <p>
-            <img class="logo" src="./images/logo.png" alt="logo"/>
-        </p>
-        <div th:each="providerId : ${providerIds}">
+    <div th:style="${operationId} ? 'visibility: hidden' : ''">
+        <div class="wrapper text-center">
+            <p>
+                <img class="logo" src="./images/logo.png" alt="logo"/>
+            </p>
+            <div th:each="providerId : ${providerIds}">
 
-            <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
-                <p>
-                    Operation authorized by <span class="black"><span
-                        th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
-                </p>
-                <form id="disconnect" th:action="@{/connect/demo}" method="post">
-                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                    <input type="hidden" name="_method" value="delete"/>
-                    <button type="submit" class="btn btn-lg btn-danger">Log out</button>
-                </form>
-            </div>
+                <div th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                    <p>
+                        Operation authorized by <span class="black"><span
+                            th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
+                    </p>
+                    <form id="disconnect" th:action="@{/connect/demo}" method="post">
+                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                        <input type="hidden" name="_method" value="delete"/>
+                        <button type="submit" class="btn btn-lg btn-danger">Log out</button>
+                    </form>
+                </div>
 
-            <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
-                <div>
-                    <ul class="nav nav-tabs" role="tablist">
-                        <li role="presentation" class="active">
-                            <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment (DEMO)</a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#authorize" aria-controls="authorize" role="tab"
-                               data-toggle="tab">Authorization</a>
-                        </li>
-                        <li role="presentation">
-                            <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane" id="login">
-                            <div class="padding">
-                                <p>
-                                    Authenticate as a user.
-                                </p>
-                                <form th:action="@{/connect/demo}" method="POST">
-                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
-                                </form>
+                <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active">
+                                <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment (DEMO)</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#authorize" aria-controls="authorize" role="tab"
+                                   data-toggle="tab">Authorization</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#login2fa" aria-controls="login2fa" role="tab" data-toggle="tab">Login (2FA)</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane" id="login">
+                                <div class="padding">
+                                    <p>
+                                        Authenticate as a user.
+                                    </p>
+                                    <form th:action="@{/connect/demo}" method="POST">
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="btn btn-lg btn-success">Log in</button>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane active" id="payment">
-                            <div class="padding">
-                                <p>
-                                    Create Payment (DEMO)
-                                </p>
-                                <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
-                                    <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
-                                    </div>
-                                    <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
-                                    </div>
-                                    <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
-                                    </div>
-                                    <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
-                                    </div>
-                                    <div class="form-group form-group-lg">
-                                        <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
-                                    </div>
-                                    <div class="form-group form-group-lg">
-                                        <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
-                                    </div>
-                                </form>
+                            <div role="tabpanel" class="tab-pane" id="login2fa">
+                                <div class="padding">
+                                    <p>
+                                        Authenticate as a user using 2FA login.
+                                    </p>
+                                    <form th:action="@{/login/2fa/create}" method="POST">
+                                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                        <button type="submit" class="btn btn-lg btn-success">Log in (2FA)</button>
+                                    </form>
+                                </div>
                             </div>
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="authorize">
-                            <div class="padding">
-                                <p>
-                                    Authorize operation with given ID.
-                                </p>
-                                <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
-                                    <div class="input-group input-group-lg">
-                                        <input type="text" class="form-control" name="operation_id"
-                                               th:value="${operationId}" placeholder="Operation ID"/>
-                                        <span class="input-group-btn">
-                                            <button type="submit" class="btn btn-success">Authorize</button>
-                                        </span>
-                                    </div>
-                                </form>
+                            <div role="tabpanel" class="tab-pane active" id="payment">
+                                <div class="padding">
+                                    <p>
+                                        Create Payment (DEMO)
+                                    </p>
+                                    <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <div role="tabpanel" class="tab-pane" id="authorize">
+                                <div class="padding">
+                                    <p>
+                                        Authorize operation with given ID.
+                                    </p>
+                                    <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
+                                        <div class="input-group input-group-lg">
+                                            <input type="text" class="form-control" name="operation_id"
+                                                   th:value="${operationId}" placeholder="Operation ID"/>
+                                            <span class="input-group-btn">
+                                                <button type="submit" class="btn btn-success">Authorize</button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -131,10 +146,14 @@
 <script src="./js/bootstrap.min.js"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        var operationId = $('#operationAuthorizeForm input[name="operation_id"]').val();
+        // Operation ID was set by server, submit the operationAuthorizeForm form
+        const operationId = $('#operationAuthorizeForm input[name="operation_id"]').val();
         if (operationId) {
             $('#operationAuthorizeForm').submit();
+            return;
         }
+        // No action from server, show the form and allow the user make some action
+        $('#content').show();
     });
 </script>
 

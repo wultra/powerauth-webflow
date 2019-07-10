@@ -20,7 +20,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.response;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class CreateSMSAuthorizationResponse {
+public class CreateSmsAuthorizationResponse {
 
     /**
      * Message ID.
@@ -30,14 +30,14 @@ public class CreateSMSAuthorizationResponse {
     /**
      * Default constructor.
      */
-    public CreateSMSAuthorizationResponse() {
+    public CreateSmsAuthorizationResponse() {
     }
 
     /**
      * Constructor with message ID.
      * @param messageId Message ID.
      */
-    public CreateSMSAuthorizationResponse(String messageId) {
+    public CreateSmsAuthorizationResponse(String messageId) {
         this.messageId = messageId;
     }
 

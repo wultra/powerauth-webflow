@@ -77,6 +77,12 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.webflow.password.encryption.key}")
     private String passwordEncryptionKey;
 
+    /**
+     * Delay for resending SMS in milliseconds
+     */
+    @Value("${powerauth.webflow.sms.resend.delayMs}")
+    private int smsResendDelay;
+
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -144,4 +150,19 @@ public class WebFlowServicesConfiguration {
         return passwordEncryptionKey;
     }
 
+    /**
+     * Get delay for resending SMS in milliseconds.
+     * @return Delay for resending SMS in milliseconds.
+     */
+    public int getSmsResendDelay() {
+        return smsResendDelay;
+    }
+
+    /**
+     * Set delay for resending SMS in milliseconds.
+     * @param smsResendDelay Delay for resending SMS in milliseconds.
+     */
+    public void setSmsResendDelay(int smsResendDelay) {
+        this.smsResendDelay = smsResendDelay;
+    }
 }

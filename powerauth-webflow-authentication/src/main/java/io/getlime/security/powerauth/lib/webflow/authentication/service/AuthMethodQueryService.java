@@ -121,7 +121,7 @@ public class AuthMethodQueryService {
      * @return Whether Mobile Token authentication method is available.
      * @throws NextStepServiceException Thrown when Next Step request fails.
      */
-    private boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) throws NextStepServiceException {
+    public boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) throws NextStepServiceException {
         String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
         if (configuredActivationId == null) {
             return false;

@@ -7,7 +7,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class QRCodeAuthenticationRequest extends AuthStepRequest {
+public class QrCodeAuthenticationRequest extends AuthStepRequest {
 
     private String activationId;
     private String authCode;

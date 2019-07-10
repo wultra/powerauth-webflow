@@ -145,7 +145,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             List<GetOperationDetailResponse> operationList;
             Map<String, GetOperationConfigDetailResponse> operationConfigs;
             try {
-                operationList = getOperationListForUser(userId);
+                operationList = getOperationListForUser(userId, true);
                 operationConfigs = getOperationConfigs(operationList);
             } catch (AuthStepException e) {
                 // Next step operation list failed, return empty operation list

@@ -197,7 +197,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * Create a continue operation response.
      * @param operationId Operation ID.
      * @param steps Operation authentication steps.
-     * @return Continue operation reponse.
+     * @return Continue operation response.
      */
     private InitOperationResponse continueOperationResponse(String operationId, List<AuthStep> steps) {
         String operationHash = operationSessionService.generateOperationHash(operationId);

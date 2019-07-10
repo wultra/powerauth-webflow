@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.converter;
+package io.getlime.security.powerauth.lib.webflow.authentication.model.converter;
 
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.OrganizationDetail;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 
 /**
  * Converter for organizations.

@@ -22,7 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class CreateSMSAuthorizationRequest {
+public class CreateSmsAuthorizationRequest {
 
 
     /**
@@ -46,9 +46,14 @@ public class CreateSMSAuthorizationRequest {
     private String lang;
 
     /**
+     * Whether SMS is being resent.
+     */
+    private boolean resend;
+
+    /**
      * Default constructor.
      */
-    public CreateSMSAuthorizationRequest() {
+    public CreateSmsAuthorizationRequest() {
     }
 
     /**
@@ -57,12 +62,14 @@ public class CreateSMSAuthorizationRequest {
      * @param organizationId Organization ID.
      * @param lang SMS language.
      * @param operationContext Operation context.
+     * @param resend Whether SMS is being resent.
      */
-    public CreateSMSAuthorizationRequest(String userId, String organizationId, String lang, OperationContext operationContext) {
+    public CreateSmsAuthorizationRequest(String userId, String organizationId, String lang, OperationContext operationContext, boolean resend) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.lang = lang;
         this.operationContext = operationContext;
+        this.resend = resend;
     }
 
     /**
@@ -127,5 +134,21 @@ public class CreateSMSAuthorizationRequest {
      */
     public void setLang(String lang) {
         this.lang = lang;
+    }
+
+    /**
+     * Get whether SMS is being resent.
+     * @return Whether SMS is being resent.
+     */
+    public boolean isResend() {
+        return resend;
+    }
+
+    /**
+     * Set whether SMS is being resent.
+     * @param resend Whether SMS is being resent.
+     */
+    public void setResend(boolean resend) {
+        this.resend = resend;
     }
 }

@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class QRCodeInitResponse extends AuthStepResponse {
+public class QrCodeInitResponse extends AuthStepResponse {
 
     private String qrCode;
     private String nonce;
@@ -36,7 +36,7 @@ public class QRCodeInitResponse extends AuthStepResponse {
      * Get QR code as string.
      * @return QR code.
      */
-    public String getQRCode() {
+    public String getQrCode() {
         return qrCode;
     }
 
@@ -44,7 +44,7 @@ public class QRCodeInitResponse extends AuthStepResponse {
      * Set QR code as string.
       * @param qrCode QR code.
      */
-    public void setQRCode(String qrCode) {
+    public void setQrCode(String qrCode) {
         this.qrCode = qrCode;
     }
 
@@ -95,4 +95,5 @@ public class QRCodeInitResponse extends AuthStepResponse {
     public void setActivations(List<ActivationEntity> activations) {
         this.activations = activations;
     }
+
 }

@@ -105,6 +105,7 @@ public class StepResolutionService {
             response.setOperationId(idGeneratorService.generateOperationId());
         }
         response.setOperationName(request.getOperationName());
+        response.setOrganizationId(request.getOrganizationId());
         // AuthStepResult and AuthMethod are not available when creating the operation, null values are used to ignore them
         List<StepDefinitionEntity> stepDefinitions = filterSteps(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
         response.getSteps().addAll(prepareAuthSteps(stepDefinitions));

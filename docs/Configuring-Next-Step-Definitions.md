@@ -8,6 +8,7 @@ Following authentication methods are available:
 - `INIT` - operation initialization, executed automatically when operation is started
 - `USER_ID_ASSIGN` - resolution of user identity without requiring the user to sign in
 - `USERNAME_PASSWORD_AUTH` - user signs in using form based authentication by supplying username and password credentials
+- `LOGIN_2FA` - two factor login with either mobile token or SMS and password
 - `POWERAUTH_TOKEN` - user authorizes the operation using PowerAuth mobile token
 - `SMS_KEY` - user authorizes the operation using SMS message with OTP
 - `CONSENT` - OAuth 2.0 consent form with options to approve by the user
@@ -25,37 +26,44 @@ The following parameters can be configured:
 
 The SQL example below shows how to configure authentication methods.
 
-MySQL:
-```sql
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('INIT', 1, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('USER_ID_ASSIGN', 2, FALSE, NULL, NULL, FALSE, NULL, FALSE, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('USERNAME_PASSWORD_AUTH', 3, FALSE, NULL, TRUE, TRUE, 5, TRUE, 'method.usernamePassword');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('POWERAUTH_TOKEN', 4, TRUE, 1, FALSE, TRUE, 5, TRUE, 'method.powerauthToken');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('SMS_KEY', 5, FALSE, NULL, NULL, TRUE, 5, TRUE, 'method.smsKey');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, 'method.consent');
-```
-
 Oracle:
 ```sql
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('INIT', 1, 0, NULL, NULL, 0, NULL, 0, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('USER_ID_ASSIGN', 2, 0, NULL, NULL, 0, NULL, 0, NULL);
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('USERNAME_PASSWORD_AUTH', 3, 0, NULL, 1, 1, 5, 1, 'method.usernamePassword');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('POWERAUTH_TOKEN', 4, 1, 1, 0, 1, 5, 1, 'method.powerauthToken');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('SMS_KEY', 5, 0, NULL, NULL, 1, 5, 1, 'method.smsKey');
-INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, display_name_key)
-VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 'method.consent');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('INIT', 1, 0, NULL, NULL, 0, NULL, 0, 0, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('USER_ID_ASSIGN', 2, 0, NULL, NULL, 0, NULL, 0, 0, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('USERNAME_PASSWORD_AUTH', 3, 0, NULL, NULL, 1, 5, 1, 0, 'method.usernamePassword');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('SHOW_OPERATION_DETAIL', 4, 0, NULL, NULL, 0, NULL, 1, 0, 'method.showOperationDetail');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('POWERAUTH_TOKEN', 5, 1, 1, 0, 1, 5, 1, 1, 'method.powerauthToken');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('SMS_KEY', 6, 0, NULL, NULL, 1, 5, 1, 0, 'method.smsKey');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 0, 'method.consent');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.login2fa');
+```
 
+MySQL:
+```sql
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('INIT', 1, FALSE, NULL, NULL, FALSE, NULL, FALSE, FALSE, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('USER_ID_ASSIGN', 2, FALSE, NULL, NULL, FALSE, NULL, FALSE, FALSE, NULL);
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('USERNAME_PASSWORD_AUTH', 3, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.usernamePassword');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('SHOW_OPERATION_DETAIL', 4, FALSE, NULL, NULL, FALSE, NULL, TRUE, FALSE, 'method.showOperationDetail');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('POWERAUTH_TOKEN', 5, TRUE, 1, FALSE, TRUE, 5, TRUE, TRUE, 'method.powerauthToken');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('SMS_KEY', 6, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.smsKey');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('LOGIN_2FA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.login2fa');
 ```
 
 ## Configuration of next steps
