@@ -126,18 +126,18 @@ export default class Login extends React.Component {
             this.setDefaultOrganization();
         } else {
             return (
-                <Panel>
-                    <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
-                        {organizations.map((org) => {
-                            return (
-                                <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
+                    {organizations.map((org) => {
+                        return (
+                            <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                                <Panel>
                                     {this.title()}
                                     {this.loginForm(org.organizationId)}
-                                </Tab>
-                            )
-                        })}
-                    </Tabs>
-                </Panel>
+                                </Panel>
+                            </Tab>
+                        )
+                    })}
+                </Tabs>
             )
         }
     }

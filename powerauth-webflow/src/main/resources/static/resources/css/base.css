@@ -338,7 +338,9 @@ a:hover, a:active, a:focus {
 }
 
 .nav-tabs {
-    margin-bottom: 15px;
+    margin-bottom: -1px;
+    margin-left: 20px;
+    width: 400px;
 }
 
 .consent-text {
