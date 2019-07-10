@@ -118,6 +118,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     break;
 
                 case LOGIN_SCA:
+                case APPROVAL_SCA:
                     AuthenticationType authenticationType = configuration.getAuthenticationType();
                     String cipherTransformation = configuration.getCipherTransformation();
                     PasswordProtection passwordProtection;
@@ -264,6 +265,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             // Add username for LOGIN_SCA method
             String username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
+        }
+        if (authMethod == AuthMethod.APPROVAL_SCA) {
             // Enable password for LOGIN_SCA method
             initResponse.setPasswordEnabled(true);
         }

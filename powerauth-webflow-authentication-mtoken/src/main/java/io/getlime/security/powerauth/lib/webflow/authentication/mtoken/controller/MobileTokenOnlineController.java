@@ -128,6 +128,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             // Allow fallback to SMS in authentication method LOGIN_SCA
             initResponse.setSmsFallbackAvailable(true);
         }
+        if (authMethod == AuthMethod.APPROVAL_SCA) {
+            // Allow fallback to SMS in authentication method LOGIN_SCA
+            initResponse.setSmsFallbackAvailable(true);
+        }
         logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         return initResponse;
     }
