@@ -27,6 +27,24 @@ public class UpdateOperationUserRequest {
     private String organizationId;
 
     /**
+     * Default constructor.
+     */
+    public UpdateOperationUserRequest() {
+    }
+
+    /**
+     * Constructor with all details.
+     * @param operationId Operation ID.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     */
+    public UpdateOperationUserRequest(String operationId, String userId, String organizationId) {
+        this.operationId = operationId;
+        this.userId = userId;
+        this.organizationId = organizationId;
+    }
+
+    /**
      * Get operation ID.
      * @return Operation ID.
      */
