@@ -373,30 +373,41 @@ It is expected that the remote system which handles password verification decryp
 the password in the Data Adapter itself. The following code sample decrypts the encrypted password for `PASSWORD_ENCRYPTION_AES` authentication type:
 
 ```java
-// Read secret key from configuration
+
+// Get encryption key from the configuration and extract cipher transformation
+// and encrypted password from the request.
 String secretKeyBase64 = configuration.getSecretKey();
-byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKey);
-String secretKey = SecretKeySpec(secretKeyBytes, "AES");
-
-// Extract cipher transformation and encrypted password from request
 String cipherTransformation = request.getCipherTransformation();
-String password = request.getPassword();
+String encryptedPassword = request.getPassword();
 
-// Extract IV and encrypted password and convert them to bytes
-String[] parts = password.split(":");
-if (parts.length != 2) {
-    throw new IllegalArgumentException("Invalid request");
+String originalPassword = decryptPassword(secretKeyBase64, cipherTransformation, encryptedpassword);
+
+// ...
+
+// Decryption method (missing the 'throws' clause).
+private String decryptPassword(String secretKeyBase64, String cipherTransformation, String encryptedPassword) {
+    // Read secret key from configuration
+    byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+    SecretKey secretKey = new SecretKeySpec(secretKeyBytes, "AES");
+
+    // Extract IV and encrypted password and convert them to bytes
+    String[] parts = encryptedPassword.split(":");
+    if (parts.length != 2) {
+        throw new IllegalArgumentException("Invalid request");
+    }
+    String ivBase64 = parts[0];
+    byte[] ivBytes = BaseEncoding.base64().decode(ivBase64);
+    String encryptedPasswordBase64 = parts[1];
+    byte[] encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
+
+    // Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
+    Cipher cipher = Cipher.getInstance(cipherTransformation);
+    cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
+    byte[] decryptedPasswordBytes = cipher.doFinal(encryptedPasswordBytes);
+    return new String(decryptedPasswordBytes, StandardCharsets.UTF_8);
 }
-String ivBase64 = parts[0];
-byte ivBytes = BaseEncoding.base64().decode(ivBase64);
-String encryptedPasswordBase64 = parts[1];
-byte encryptedPasswordBytes = BaseEncoding.base64().decode(encryptedPasswordBase64);
 
-// Decrypt password using specified cipher transformation, extracted IV and encrypted password bytes
-Cipher cipher = Cipher.getInstance(cipherTransformation);
-cipher.init(Cipher.DECRYPT_MODE, secretKey, new IvParameterSpec(ivBytes));
-byte[] decryptedPasswordBytes = cipher.doFinal(encryptedPasswordBytes);
-String decryptedPassword = new String(decrypted, StandardCharsets.UTF_8);
+// ...
 
 // Verify that decrypted password matches expected password
 ```

@@ -92,6 +92,16 @@ CREATE TABLE ns_operation_config (
   mobile_token_mode         VARCHAR(256) NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_organization stores definitions of organizations related to the operations.
+-- At least one default organization must be configured.
+-- Data in this table needs to be loaded before Web Flow is started.
+CREATE TABLE ns_organization (
+  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
+  display_name_key         VARCHAR(256),
+  is_default               BOOLEAN NOT NULL,
+  order_number             INTEGER NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
@@ -142,16 +152,6 @@ CREATE TABLE ns_step_definition (
   response_result          VARCHAR(32) NOT NULL,
   FOREIGN KEY request_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
   FOREIGN KEY response_auth_method_fk (response_auth_method) REFERENCES ns_auth_method (auth_method)
-) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- Table ns_organization stores definitions of organizations related to the operations.
--- At least one default organization must be configured.
--- Data in this table needs to be loaded before Web Flow is started.
-CREATE TABLE ns_organization (
-  organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
-  display_name_key         VARCHAR(256),
-  is_default               BOOLEAN NOT NULL,
-  order_number             INTEGER NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table wf_operation_session maps operations to HTTP sessions.
