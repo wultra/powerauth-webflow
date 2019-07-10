@@ -656,6 +656,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             formData.addTitle("login.title");
             formData.addGreeting("login.greeting");
             formData.addSummary("login.summary");
+            formData.setUserInput(operation.getFormData().getUserInput());
             operation.setFormData(formData);
         }
     }
