@@ -49,6 +49,17 @@ export function dispatchAction(dispatch, response) {
                             });
                             break;
                         }
+                        case "APPROVAL_SCA": {
+                            dispatch({
+                                type: "SHOW_SCREEN_APPROVAL_SCA",
+                                payload: {
+                                    loading: false,
+                                    error: false,
+                                    message: ""
+                                }
+                            });
+                            break;
+                        }
                         case "CONSENT": {
                             dispatch({
                                 type: "SHOW_SCREEN_CONSENT",

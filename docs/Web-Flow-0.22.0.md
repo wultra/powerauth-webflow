@@ -84,14 +84,17 @@ UPDATE ns_auth_method SET has_mobile_token = 1 WHERE auth_method = 'POWERAUTH_TO
 COMMIT;
 ```
 
-As the next step, please add new authentication methods `CONSENT` and `LOGIN_SCA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_SCA`.
+As the next step, please add new authentication methods `CONSENT`, `LOGIN_SCA` and `APPROVAL_SCA`. The `order_number` parameter should be updated to exceed maximum `order_number` in table `ns_auth_method` by 1 for `CONSENT`, by 2 for `LOGIN_SCA` and by 3 for `APPROVAL_SCA`.
 
 ```sql
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('CONSENT', 7, 0, NULL, NULL, 1, 5, 1, 0, 'method.consent');
 
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.loginsca');
+VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.loginSca');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.approvalSca');
 ```
 
 DDL update script for MySQL:
@@ -160,13 +163,17 @@ ALTER TABLE `ns_auth_method` ADD `has_mobile_token` BOOLEAN;
 UPDATE `ns_auth_method` SET `has_mobile_token` = TRUE WHERE `auth_method` = 'POWERAUTH_TOKEN';
 ```
 
-As the next step, please add new authentication methods `CONSENT` and `LOGIN_SCA`. The `order_number` parameter should be updated to exceed `order_number` in table `ns_auth_method` by 1 for `CONSENT` and 2 for `LOGIN_SCA`.
+As the next step, please add new authentication methods `CONSENT`, `LOGIN_SCA` and `APPROVAL_SCA`. The `order_number` parameter should be updated to exceed maximum `order_number` in table `ns_auth_method` by 1 for `CONSENT`, by 2 for `LOGIN_SCA` and by 3 for `APPROVAL_SCA`.
 
 ```sql
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('CONSENT', 7, FALSE, NULL, NULL, TRUE, 5, TRUE, FALSE, 'method.consent');
 
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
-VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginsca');
+VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginSca');
+
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.approvalSca');
+
 ```
 

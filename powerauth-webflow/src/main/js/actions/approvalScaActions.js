@@ -17,25 +17,20 @@ import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 
 /**
- * Initialize SCA login for given username.
- * @param username Username.
- * @param organizationId Organization ID.
+ * Initialize SCA approval.
  * @returns {Function} No return value.
  */
-export function init(username, organizationId) {
+export function init() {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_LOGIN_SCA",
+            type: "SHOW_SCREEN_APPROVAL_SCA",
             payload: {
                 loading: true,
                 error: false,
                 message: ""
             }
         });
-        axios.post("./api/auth/login-sca/init", {
-            username: username,
-            organizationId: organizationId
-        }, {
+        axios.post("./api/auth/approval-sca/init", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
@@ -87,12 +82,11 @@ export function init(username, organizationId) {
                         break;
                     }
                     dispatch({
-                        type: "SHOW_SCREEN_LOGIN_SCA",
+                        type: "SHOW_SCREEN_APPROVAL_SCA",
                         payload: {
                             loading: false,
                             error: true,
-                            message: response.data.message,
-                            remainingAttempts: response.data.remainingAttempts
+                            message: response.data.message
                         }
                     });
                     break;
@@ -107,7 +101,7 @@ export function init(username, organizationId) {
 
 export function cancel() {
     return function (dispatch) {
-        axios.post("./api/auth/login-sca/cancel", {}, {
+        axios.post("./api/auth/approval-sca/cancel", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
@@ -121,78 +115,6 @@ export function cancel() {
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
-        })
-    }
-}
-
-export function getOrganizationList() {
-    return function (dispatch) {
-        dispatch({
-            type: "SHOW_SCREEN_LOGIN_SCA",
-            payload: {
-                loading: true,
-                error: false,
-                message: ""
-            }
-        });
-        axios.post("./api/auth/login-sca/setup", {}).then((response) => {
-            // Handling of page refresh
-            if (response.data.userAlreadyKnown) {
-                if (response.data.mobileTokenEnabled) {
-                    dispatch({
-                        type: "SHOW_SCREEN_TOKEN",
-                        payload: {
-                            loading: true,
-                            error: false,
-                            message: "",
-                            smsFallbackAvailable: true
-                        }
-                    });
-                } else {
-                    dispatch({
-                        type: "SHOW_SCREEN_SMS",
-                        payload: {
-                            loading: true,
-                            error: false,
-                            message: "",
-                        }
-                    });
-                }
-                return null;
-            }
-            dispatch({
-                type: "SHOW_SCREEN_LOGIN_SCA",
-                payload: response.data
-            });
-            return null;
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
-}
-
-export function selectOrganization(organizationId) {
-    return function (dispatch) {
-        dispatch({
-            type: "SHOW_SCREEN_LOGIN_SCA",
-            payload: {
-                chosenOrganizationId: organizationId
-            }
-        });
-    }
-}
-
-/**
- * Interrupt operation and show unexpected error about missing organization configuration.
- * @returns {Function} Missing organization configuration error is dispatched.
- */
-export function organizationConfigurationError() {
-    return function (dispatch) {
-        dispatch({
-            type: "SHOW_SCREEN_ERROR",
-            payload: {
-                message: "organization.configurationError"
-            }
         })
     }
 }

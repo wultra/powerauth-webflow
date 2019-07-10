@@ -55,7 +55,7 @@
                     <div>
                         <ul class="nav nav-tabs" role="tablist">
                             <li role="presentation" class="active">
-                                <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment (DEMO)</a>
+                                <a href="#payment" aria-controls="payment" role="tab" data-toggle="tab">Payment</a>
                             </li>
                             <li role="presentation">
                                 <a href="#authorize" aria-controls="authorize" role="tab"
@@ -65,10 +65,40 @@
                                 <a href="#login" aria-controls="login" role="tab" data-toggle="tab">Login</a>
                             </li>
                             <li role="presentation">
-                                <a href="#loginsca" aria-controls="loginsca" role="tab" data-toggle="tab">Login (SCA)</a>
+                                <a href="#login_sca" aria-controls="login_sca" role="tab" data-toggle="tab">Login (SCA)</a>
+                            </li>
+                            <li role="presentation">
+                                <a href="#payment_sca" aria-controls="payment_sca" role="tab" data-toggle="tab">Payment (SCA)</a>
                             </li>
                         </ul>
                         <div class="tab-content">
+                            <div role="tabpanel" class="tab-pane active" id="payment">
+                                <div class="padding">
+                                    <p>
+                                        Create Payment
+                                    </p>
+                                    <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
+                                        </div>
+                                        <div class="form-group form-group-lg">
+                                            <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
                             <div role="tabpanel" class="tab-pane" id="login">
                                 <div class="padding">
                                     <p>
@@ -80,7 +110,7 @@
                                     </form>
                                 </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane" id="loginsca">
+                            <div role="tabpanel" class="tab-pane" id="login_sca">
                                 <div class="padding">
                                     <p>
                                         Authenticate as a user using SCA login.
@@ -91,12 +121,12 @@
                                     </form>
                                 </div>
                             </div>
-                            <div role="tabpanel" class="tab-pane active" id="payment">
+                            <div role="tabpanel" class="tab-pane" id="payment_sca">
                                 <div class="padding">
                                     <p>
-                                        Create Payment (DEMO)
+                                        Create Payment (SCA)
                                     </p>
-                                    <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
+                                    <form th:action="@{/payment/sca/create}" th:object="${paymentForm}" method="POST">
                                         <div class="form-group form-group-lg">
                                             <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
                                         </div>

@@ -11,6 +11,7 @@ import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
 import SecurityOverride from "./securityOverride";
 import SmsAuthorization from "./smsAuth";
+import ApprovalSca from "./approvalSca";
 import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
@@ -62,6 +63,10 @@ export class App extends React.Component {
                 }
                 case "SCREEN_LOGIN_SCA": {
                     Component = LoginSca;
+                    break;
+                }
+                case "SCREEN_APPROVAL_SCA": {
+                    Component = ApprovalSca;
                     break;
                 }
                 case "SCREEN_SUCCESS": {

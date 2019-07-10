@@ -138,6 +138,11 @@
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
+            <artifactId>powerauth-webflow-authentication-approval-sca</artifactId>
+            <version>0.22.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-consent</artifactId>
             <version>0.22.0</version>
         </dependency>

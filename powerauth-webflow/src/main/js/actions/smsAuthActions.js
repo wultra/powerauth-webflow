@@ -29,7 +29,7 @@ export function getOperationData(component) {
             }
         }).then((response) => {
             dispatch({
-                type: "SHOW_SCREEN_" + component,
+                type: getActionType(component),
                 payload: response.data
             });
             return null;
@@ -56,7 +56,7 @@ export function init(component) {
                 return;
             }
             dispatch({
-                type: "SHOW_SCREEN_" + component,
+                type: getActionType(component),
                 payload: {
                     loading: false,
                     error: false,
@@ -91,7 +91,7 @@ export function resend(component) {
                 return;
             }
             dispatch({
-                type: "SHOW_SCREEN_" + component,
+                type: getActionType(component),
                 payload: {
                     loading: false,
                     error: false,
@@ -118,7 +118,7 @@ export function resend(component) {
 export function authenticate(userAuthCode, userPassword, component) {
     return function (dispatch) {
         dispatch({
-            type: "SHOW_SCREEN_" + component,
+            type: getActionType(component),
             payload: {
                 loading: true,
                 error: false,
@@ -191,7 +191,7 @@ export function authenticate(userAuthCode, userPassword, component) {
                         break;
                     }
                     dispatch({
-                        type: "SHOW_SCREEN_" + component,
+                        type: getActionType(component),
                         payload: {
                             loading: false,
                             error: true,
@@ -231,5 +231,21 @@ export function cancel() {
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
+    }
+}
+
+/**
+ * Get action type to dispatch for given component.
+ * @param component Component name.
+ * @returns {string|null} Action type.
+ */
+function getActionType(component) {
+    switch (component) {
+        case "SMS":
+            return "SHOW_SCREEN_SMS";
+        case "TOKEN":
+            return "SHOW_SCREEN_TOKEN";
+        default:
+            return null;
     }
 }

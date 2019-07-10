@@ -206,20 +206,7 @@ public class OperationController {
         }
         assignFormData(response, operation);
         assignApplicationContext(response, operation);
-
-        for (OperationHistoryEntity history: operation.getOperationHistory()) {
-            OperationHistory h = new OperationHistory();
-            h.setAuthMethod(history.getRequestAuthMethod());
-            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
-            h.setAuthResult(history.getResponseResult());
-            response.getHistory().add(h);
-        }
-
-        // set chosen authentication method
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
-        if (currentHistory != null) {
-            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
-        }
+        assignOperationHistory(response, operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -303,6 +290,7 @@ public class OperationController {
             }
             assignFormData(response, operation);
             assignApplicationContext(response, operation);
+            assignOperationHistory(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
@@ -419,4 +407,24 @@ public class OperationController {
         }
     }
 
+    /**
+     * Assign operation history to operation.
+     * @param response Response to be enriched by operation history.
+     * @param operation Database entity representing operation.
+     */
+    private void assignOperationHistory(GetOperationDetailResponse response, OperationEntity operation) {
+        // add operation history
+        for (OperationHistoryEntity history: operation.getOperationHistory()) {
+            OperationHistory h = new OperationHistory();
+            h.setAuthMethod(history.getRequestAuthMethod());
+            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
+            h.setAuthResult(history.getResponseResult());
+            response.getHistory().add(h);
+        }
+        // set chosen authentication method
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory != null) {
+            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
 }

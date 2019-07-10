@@ -63,7 +63,7 @@ import java.util.List;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @RestController
-@RequestMapping(value = "/api/auth/login-sca/init")
+@RequestMapping(value = "/api/auth/login-sca")
 public class LoginScaInitController extends AuthMethodController<io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest, LoginScaInitResponse, AuthStepException> {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginScaInitController.class);
@@ -100,8 +100,8 @@ public class LoginScaInitController extends AuthMethodController<io.getlime.secu
      * @throws AuthStepException In case SCA login initialization fails.
      * @throws NextStepServiceException In case communication with Next Step service fails.
      */
-    @RequestMapping(value = "/start", method = RequestMethod.POST)
-    protected LoginScaInitResponse startScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException, NextStepServiceException {
+    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    protected LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
@@ -130,12 +130,12 @@ public class LoginScaInitController extends AuthMethodController<io.getlime.secu
                 response.setMobileTokenEnabled(false);
                 return response;
             } else {
+                nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
                 if (!userIdAlreadyAvailable) {
                     // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
                     authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
                     nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId);
                 }
-                nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
                 // Find out whether mobile token is enabled
                 boolean mobileTokenEnabled = false;
                 try {

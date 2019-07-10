@@ -20,6 +20,13 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
+        case "SHOW_SCREEN_APPROVAL_SCA": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_APPROVAL_SCA",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
         case "SHOW_SCREEN_OPERATION_REVIEW": {
             return {
                 ...state,

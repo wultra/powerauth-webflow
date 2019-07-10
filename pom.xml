@@ -76,6 +76,7 @@
         <module>powerauth-webflow-authentication-operation-review</module>
         <module>powerauth-webflow-authentication-mtoken</module>
         <module>powerauth-webflow-authentication-sms</module>
+        <module>powerauth-webflow-authentication-approval-sca</module>
         <module>powerauth-webflow-authentication-consent</module>
         <module>powerauth-webflow-i18n</module>
         <module>powerauth-webflow-resources</module>

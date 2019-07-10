@@ -173,6 +173,40 @@ public class HomeController {
         return "redirect:/";
     }
 
+    @RequestMapping("/payment/sca/create")
+    public String paymentSca(@ModelAttribute PaymentForm paymentForm, HttpSession session) throws NextStepServiceException {
+        OperationFormData formData = new OperationFormData();
+        formData.addTitle("operation.title");
+        formData.addGreeting("operation.greeting");
+        formData.addSummary("operation.summary");
+        formData.addAmount("operation.amount", paymentForm.getAmount(), "operation.currency", paymentForm.getCurrency());
+        formData.addKeyValue("operation.account", paymentForm.getAccount(), ValueFormatType.ACCOUNT);
+        formData.addKeyValue("operation.dueDate", paymentForm.getDueDate(), ValueFormatType.DATE);
+        formData.addNote("operation.note", paymentForm.getNote(), ValueFormatType.TEXT);
+
+        final String operationName = "authorize_payment_sca";
+        final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
+
+        String operationData = new OperationDataBuilder()
+                .templateVersion(operationConfig.getTemplateVersion())
+                .templateId(operationConfig.getTemplateId())
+                .attr1().amount(paymentForm.getAmount(), paymentForm.getCurrency())
+                .attr2().accountGeneric(paymentForm.getAccount())
+                .attr4().date(paymentForm.getDueDate())
+                .attr5().note(paymentForm.getNote())
+                .build();
+
+        ApplicationContext applicationContext = createApplicationContext();
+
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
+        synchronized (session.getServletContext()) {
+            session.setAttribute("operationId", payment.getResponseObject().getOperationId());
+            session.setAttribute("paymentForm", paymentForm);
+        }
+
+        return "redirect:/";
+    }
+
     private ConnectionRepository getConnectionRepository() {
         return connectionRepositoryProvider.get();
     }
