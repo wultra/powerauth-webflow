@@ -38,7 +38,7 @@ export default class SmsAuthorization extends React.Component {
         this.init = this.init.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.state = {passwordEnabled: null, username: null, resendEnabled: false};
+        this.state = {passwordEnabled: null, username: null, resendEnabled: false, initialized: false};
     }
 
     componentWillMount() {
@@ -51,6 +51,8 @@ export default class SmsAuthorization extends React.Component {
             this.setState({passwordEnabled: props.context.passwordEnabled});
             // Store username for LOGIN_SCA step
             this.setState({username: props.context.username});
+            // Set the component to initialized state
+            this.setState({initialized: true});
         }
         if (props.context.init || props.context.resend) {
             // Disable resend link for configured delay in ms
@@ -75,7 +77,7 @@ export default class SmsAuthorization extends React.Component {
 
     handleCancel(event) {
         event.preventDefault();
-        this.props.dispatch(cancel());
+        this.props.dispatch(cancel("SMS"));
     }
 
     render() {
@@ -85,7 +87,8 @@ export default class SmsAuthorization extends React.Component {
                     <OperationDetail/>
                     <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
                                   smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"
-                                  message={this.props.context.message} error={this.props.context.error} remainingAttempts={this.props.context.remainingAttempts}/>
+                                  message={this.props.context.message} error={this.props.context.error} remainingAttempts={this.props.context.remainingAttempts}
+                                  initialized={this.state.initialized}/>
                 </Panel>
                 {this.props.context.loading ? <Spinner/> : undefined}
             </div>

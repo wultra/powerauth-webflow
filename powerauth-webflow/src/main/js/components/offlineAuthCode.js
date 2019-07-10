@@ -93,6 +93,7 @@ class OfflineAuthCode extends React.Component {
                 <input
                     type="text"
                     autoComplete="off"
+                    autoFocus="true"
                     size="21"
                     onChange={(e) => this.handleChange(e)}
                     onKeyDown={(e) => this.handleKeyDown(e)}

@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 // Actions
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
-import {FormGroup} from "react-bootstrap";
+import {Button, FormGroup} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
@@ -250,9 +250,9 @@ export default class TokenOffline extends React.Component {
                                 <div className="buttons">
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
                                                 <FormattedMessage id="operation.confirm"/>
-                                            </a>
+                                            </Button>
                                         </div>
                                     </div>
                                     <div className="attribute row">

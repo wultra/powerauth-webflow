@@ -266,7 +266,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
         }
-        if (authMethod == AuthMethod.APPROVAL_SCA) {
+        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
             // Enable password for LOGIN_SCA method
             initResponse.setPasswordEnabled(true);
         }

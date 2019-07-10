@@ -125,10 +125,8 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             // Add username for LOGIN_SCA method
             String username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
-            // Allow fallback to SMS in authentication method LOGIN_SCA
-            initResponse.setSmsFallbackAvailable(true);
         }
-        if (authMethod == AuthMethod.APPROVAL_SCA) {
+        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
             // Allow fallback to SMS in authentication method LOGIN_SCA
             initResponse.setSmsFallbackAvailable(true);
         }
