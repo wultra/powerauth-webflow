@@ -22,7 +22,7 @@ public class HttpSessionAttributeNames {
 
     public static final String MESSAGE_ID = "MESSAGE_ID";
     public static final String LAST_MESSAGE_TIMESTAMP = "LAST_MESSAGE_TIMESTAMP";
-    public static final String USERNAME = "USERNAME";
     public static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
+    public static final String USERNAME = "USERNAME";
 
 }

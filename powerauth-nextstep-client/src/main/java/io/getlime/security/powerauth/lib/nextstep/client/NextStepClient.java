@@ -297,10 +297,7 @@ public class NextStepClient {
     public Response updateOperationUser(String operationId, String userId, String organizationId) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
-            request.setOperationId(operationId);
-            request.setUserId(userId);
-            request.setOrganizationId(organizationId);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user", HttpMethod.PUT, entity, Response.class);
             return nsResponse.getBody();
@@ -322,10 +319,7 @@ public class NextStepClient {
     public Response updateOperationUserPost(String operationId, String userId, String organizationId) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
-            request.setOperationId(operationId);
-            request.setUserId(userId);
-            request.setOrganizationId(organizationId);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user/update", HttpMethod.POST, entity, Response.class);
             return nsResponse.getBody();

@@ -295,7 +295,7 @@ definitions:
         $ref: '#/definitions/AllowedSignatureType'
       data:
         type: string
-        description: Operation data format, see https://developers.wultra.com/docs/current/powerauth-webflow/Off-line-Signatures-QR-Code#operation-data
+        description: Operation data format, see https://developers.wultra.com/docs/develop/powerauth-webflow/Off-line-Signatures-QR-Code#operation-data
       formData:
         $ref: '#/definitions/FormData'
       id:
