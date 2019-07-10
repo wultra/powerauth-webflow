@@ -64,7 +64,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/api/auth/login-sca")
-public class LoginScaInitController extends AuthMethodController<io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest, LoginScaInitResponse, AuthStepException> {
+public class LoginScaInitController extends AuthMethodController<LoginScaInitRequest, LoginScaInitResponse, AuthStepException> {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginScaInitController.class);
 
