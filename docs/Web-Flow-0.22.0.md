@@ -155,7 +155,28 @@ INSERT INTO `ns_organization` (organization_id, display_name_key, is_default, or
 
 ALTER TABLE `da_sms_authorization` ADD `organization_id` VARCHAR(256);
 
-ALTER TABLE `ns_auth_method` ADD `has_mobile_token` BOOLEAN;
+ALTER TABLE `ns_auth_method` ALTER COLUMN `user_prefs_default` SET DEFAULT FALSE;
+ALTER TABLE `ns_auth_method` ALTER COLUMN `has_user_interface` SET DEFAULT FALSE;
+ALTER TABLE `ns_auth_method` ALTER COLUMN `has_mobile_token` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_1` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_2` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_3` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_4` SET DEFAULT FALSE;
+ALTER TABLE `ns_user_prefs` ALTER COLUMN `auth_method_5` SET DEFAULT FALSE;
+ALTER TABLE `da_sms_authorization` ALTER COLUMN `verified` SET DEFAULT FALSE;
+
+
+UPDATE `ns_auth_method` SET `user_prefs_default` = FALSE WHERE `user_prefs_default` IS NULL;
+UPDATE `ns_auth_method` SET `has_user_interface` = FALSE WHERE `has_user_interface` IS NULL;
+UPDATE `ns_auth_method` SET `has_mobile_token` = FALSE WHERE `has_mobile_token` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_1` = FALSE WHERE `auth_method_1` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_2` = FALSE WHERE `auth_method_2` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_3` = FALSE WHERE `auth_method_3` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_4` = FALSE WHERE `auth_method_4` IS NULL;
+UPDATE `ns_user_prefs` SET `auth_method_5` = FALSE WHERE `auth_method_5` IS NULL;
+UPDATE `da_sms_authorization` SET `verified` = FALSE WHERE `verified` IS NULL;
+
+ALTER TABLE `da_sms_authorization` ADD `has_mobile_token` BOOLEAN DEFAULT FALSE;
 
 UPDATE `ns_auth_method` SET `has_mobile_token` = TRUE WHERE `auth_method` = 'POWERAUTH_TOKEN';
 ```

@@ -33,7 +33,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
@@ -47,24 +46,25 @@ public class HomeController {
 
     private final Provider<ConnectionRepository> connectionRepositoryProvider;
     private final ConnectionFactoryLocator connectionFactoryLocator;
+    private final NextStepClient client;
+    private final HttpSession httpSession;
 
     @Autowired
-    private NextStepClient client;
-
-    @Inject
-    public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator) {
+    public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator, NextStepClient client, HttpSession httpSession) {
         this.connectionRepositoryProvider = connectionRepositoryProvider;
         this.connectionFactoryLocator = connectionFactoryLocator;
+        this.client = client;
+        this.httpSession = httpSession;
     }
 
     @RequestMapping("/")
-    public String home(Model model, HttpSession session) {
+    public String home(Model model) {
 
         // Fetch operation ID, if any
         String operationId;
-        synchronized (session.getServletContext()) {
-            operationId = (String) session.getAttribute("operationId");
-            session.removeAttribute("operationId");
+        synchronized (httpSession.getServletContext()) {
+            operationId = (String) httpSession.getAttribute("operationId");
+            httpSession.removeAttribute("operationId");
         }
 
         // Add attributes
@@ -73,8 +73,8 @@ public class HomeController {
         model.addAttribute("operationId", operationId);
 
         PaymentForm paymentForm;
-        synchronized (session.getServletContext()) {
-            paymentForm = (PaymentForm) session.getAttribute("paymentForm");
+        synchronized (httpSession.getServletContext()) {
+            paymentForm = (PaymentForm) httpSession.getAttribute("paymentForm");
             if (paymentForm == null) {
                 // MOCK PAYMENT
                 paymentForm = new PaymentForm();
@@ -84,7 +84,7 @@ public class HomeController {
                 paymentForm.setNote("Utility Bill Payment - 05/2017");
                 paymentForm.setDueDate("2017-06-29");
             } else {
-                session.removeAttribute("paymentForm");
+                httpSession.removeAttribute("paymentForm");
             }
         }
 
@@ -94,7 +94,7 @@ public class HomeController {
     }
 
     @RequestMapping("/payment/create")
-    public String payment(@ModelAttribute PaymentForm paymentForm, HttpSession session) throws NextStepServiceException {
+    public String payment(@ModelAttribute PaymentForm paymentForm) throws NextStepServiceException {
         OperationFormData formData = new OperationFormData();
         formData.addTitle("operation.title");
         formData.addGreeting("operation.greeting");
@@ -140,16 +140,16 @@ public class HomeController {
         ApplicationContext applicationContext = createApplicationContext();
 
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
-        synchronized (session.getServletContext()) {
-            session.setAttribute("operationId", payment.getResponseObject().getOperationId());
-            session.setAttribute("paymentForm", paymentForm);
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute("operationId", payment.getResponseObject().getOperationId());
+            httpSession.setAttribute("paymentForm", paymentForm);
         }
 
         return "redirect:/";
     }
 
     @RequestMapping("/login/2fa/create")
-    public String login2fa(HttpSession session) throws NextStepServiceException {
+    public String login2fa() throws NextStepServiceException {
         final String operationName = "login_2fa";
         final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
 
@@ -167,8 +167,8 @@ public class HomeController {
 
         ObjectResponse<CreateOperationResponse> objectResponse = client.createOperation(operationName, operationData, formData, null, applicationContext);
         String operationId = objectResponse.getResponseObject().getOperationId();
-        synchronized (session.getServletContext()) {
-            session.setAttribute("operationId", operationId);
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute("operationId", operationId);
         }
         return "redirect:/";
     }
