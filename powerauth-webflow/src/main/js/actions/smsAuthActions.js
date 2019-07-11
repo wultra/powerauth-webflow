@@ -137,7 +137,7 @@ export function authenticate(userAuthCode, userPassword, component) {
             switch (response.data.result) {
                 case 'CONFIRMED': {
                     // Make sure to complete token authentication in case it is still enabled - send push message
-                    // to mobile app about completed authentication step
+                    // to mobile app about completed authentication step.
                     if (component === "TOKEN") {
                         axios.post("./api/auth/token/web/authenticate", {}, {
                             headers: {
@@ -214,19 +214,39 @@ export function authenticate(userAuthCode, userPassword, component) {
  * Cancel operation.
  * @returns {Function} No return value.
  */
-export function cancel() {
+export function cancel(component) {
     return function (dispatch) {
         axios.post("./api/auth/sms/cancel", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
         }).then((response) => {
-            dispatch({
-                type: "SHOW_SCREEN_ERROR",
-                payload: {
-                    message: response.data.message
-                }
-            });
+            // Make sure to cancel token authentication in case it is still enabled - send push message
+            // to mobile app about canceled authentication step.
+            if (component === "TOKEN") {
+                axios.post("./api/auth/token/web/authenticate", {}, {
+                    headers: {
+                        'X-OPERATION-HASH': operationHash,
+                    }
+                }).then((response) => {
+                    dispatch({
+                        type: "SHOW_SCREEN_ERROR",
+                        payload: {
+                            message: response.data.message
+                        }
+                    });
+                }).catch((error) => {
+                    dispatchError(dispatch, error);
+                });
+            } else {
+                // Otherwise directly continue with error
+                dispatch({
+                    type: "SHOW_SCREEN_ERROR",
+                    payload: {
+                        message: response.data.message
+                    }
+                });
+            }
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);

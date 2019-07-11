@@ -117,7 +117,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     dataAdapterClient.verifyAuthorizationSms(messageId.toString(), request.getAuthCode(), operationContext);
                     break;
 
-                case LOGIN_2FA:
+                case LOGIN_SCA:
+                case APPROVAL_SCA:
                     AuthenticationType authenticationType = configuration.getAuthenticationType();
                     String cipherTransformation = configuration.getCipherTransformation();
                     PasswordProtection passwordProtection;
@@ -260,11 +261,13 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
         initResponse.setResendDelay(configuration.getSmsResendDelay());
 
-        if (authMethod == AuthMethod.LOGIN_2FA) {
-            // Add username for LOGIN_2FA method
+        if (authMethod == AuthMethod.LOGIN_SCA) {
+            // Add username for LOGIN_SCA method
             String username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
-            // Enable password for LOGIN_2FA method
+        }
+        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+            // Enable password for LOGIN_SCA method
             initResponse.setPasswordEnabled(true);
         }
 

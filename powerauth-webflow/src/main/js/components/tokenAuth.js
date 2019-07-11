@@ -281,38 +281,38 @@ export default class Token extends React.Component {
     render() {
         return (
             <div id="operation">
-                    <Panel>
-                        <OperationDetail/>
-                        <div>
-                            {(this.state.configurationInitialized) ? (
-                                <div>
-                                    {(this.state.smsFallbackAvailable && this.state.smsFallbackEnabled) ? (
-                                        <div>
-                                            <TokenAuthSms cancelCallback={this.handleCancel}/>
-                                        </div>
-                                    ) : (
-                                        <div>
-                                            {(this.state.offlineModeAvailable && this.state.offlineModeEnabled) ? (
-                                                <TokenOffline cancelCallback={this.handleCancel}
-                                                              smsFallbackAvailable={this.state.smsFallbackAvailable}
-                                                              smsFallbackCallback={this.setSmsFallback}
-                                                              username={this.state.username}/>
-                                            ) : (
-                                                <TokenOnline cancelCallback={this.handleCancel}
-                                                             offlineModeAvailable={this.state.offlineModeAvailable}
-                                                             offlineModeCallback={this.setOfflineMode}
-                                                             smsFallbackAvailable={this.state.smsFallbackAvailable}
-                                                             smsFallbackCallback={this.setSmsFallback}
-                                                             username={this.state.username}/>
-                                            )}
-                                        </div>
-                                    )}
-                                </div>
-                            ) : (
-                                <Spinner/>
-                            )}
-                        </div>
-                    </Panel>
+                <Panel>
+                    <OperationDetail/>
+                    <div>
+                        {(this.state.configurationInitialized) ? (
+                            <div>
+                                {(this.state.smsFallbackAvailable && this.state.smsFallbackEnabled) ? (
+                                    <div>
+                                        <TokenAuthSms cancelCallback={this.handleCancel}/>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        {(this.state.offlineModeAvailable && this.state.offlineModeEnabled) ? (
+                                            <TokenOffline cancelCallback={this.handleCancel}
+                                                          smsFallbackAvailable={this.state.smsFallbackAvailable}
+                                                          smsFallbackCallback={this.setSmsFallback}
+                                                          username={this.state.username}/>
+                                        ) : (
+                                            <TokenOnline cancelCallback={this.handleCancel}
+                                                         offlineModeAvailable={this.state.offlineModeAvailable}
+                                                         offlineModeCallback={this.setOfflineMode}
+                                                         smsFallbackAvailable={this.state.smsFallbackAvailable}
+                                                         smsFallbackCallback={this.setSmsFallback}
+                                                         username={this.state.username}/>
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <Spinner/>
+                        )}
+                    </div>
+                </Panel>
             </div>
         )
     }

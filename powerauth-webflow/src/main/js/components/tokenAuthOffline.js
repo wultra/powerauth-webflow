@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 // Actions
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
-import {FormGroup} from "react-bootstrap";
+import {Button, FormGroup} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
@@ -88,7 +88,7 @@ export default class TokenOffline extends React.Component {
         if (nonce !== undefined) {
             this.storeNonce(nonce);
         }
-        if (activations !== undefined && activations.length>0) {
+        if (activations !== undefined && activations.length > 0 && this.props.context.formData) {
             this.storeActivations(activations);
             if (props.context.formData.userInput["offlineMode.device"]) {
                 this.resolveChosenActivation(activations)
@@ -135,11 +135,13 @@ export default class TokenOffline extends React.Component {
     }
 
     handleActivationChoice(activation) {
-        this.setState({chosenActivation: activation});
-        this.props.context.formData.userInput["offlineMode.device"] = activation.activationId;
-        this.props.dispatch(updateFormData(activation), this.props.context.formData, function () {
-            this.props.dispatch(initOffline(activation.activationId));
-        });
+        if (this.props.context.formData) {
+            this.setState({chosenActivation: activation});
+            this.props.context.formData.userInput["offlineMode.device"] = activation.activationId;
+            this.props.dispatch(updateFormData(activation), this.props.context.formData, function () {
+                this.props.dispatch(initOffline(activation.activationId));
+            });
+        }
     }
 
     handleAuthCodeChange(value) {
@@ -158,14 +160,16 @@ export default class TokenOffline extends React.Component {
 
     handleSwitchToSmsAuthorization(event) {
         event.preventDefault();
-        const smsFallbackCallback = this.props.smsFallbackCallback;
-        // set the SMS fallback userInput
-        this.props.context.formData.userInput["smsFallback.enabled"] = true;
-        // save updated form data in the backend
-        this.props.dispatch(updateFormData(this.props.context.formData, function () {
-            // update Token component state - switch to SMS fallback immediately
-            smsFallbackCallback(true);
-        }));
+        if (this.props.context.formData) {
+            const smsFallbackCallback = this.props.smsFallbackCallback;
+            // set the SMS fallback userInput
+            this.props.context.formData.userInput["smsFallback.enabled"] = true;
+            // save updated form data in the backend
+            this.props.dispatch(updateFormData(this.props.context.formData, function () {
+                // update Token component state - switch to SMS fallback immediately
+                smsFallbackCallback(true);
+            }));
+        }
     }
 
     render() {
@@ -246,9 +250,9 @@ export default class TokenOffline extends React.Component {
                                 <div className="buttons">
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
                                                 <FormattedMessage id="operation.confirm"/>
-                                            </a>
+                                            </Button>
                                         </div>
                                     </div>
                                     <div className="attribute row">

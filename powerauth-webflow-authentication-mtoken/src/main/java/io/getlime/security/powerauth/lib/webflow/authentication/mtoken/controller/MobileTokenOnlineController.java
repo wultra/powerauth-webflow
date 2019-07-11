@@ -121,11 +121,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, authMethod);
         initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
         initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
-        if (authMethod == AuthMethod.LOGIN_2FA) {
-            // Add username for LOGIN_2FA method
+        if (authMethod == AuthMethod.LOGIN_SCA) {
+            // Add username for LOGIN_SCA method
             String username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
-            // Allow fallback to SMS in authentication method LOGIN_2FA
+        }
+        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+            // Allow fallback to SMS in authentication method LOGIN_SCA
             initResponse.setSmsFallbackAvailable(true);
         }
         logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -179,7 +181,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             // in case step was already confirmed, the authentication method has already succeeded
-            if ((AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() || AuthMethod.LOGIN_2FA == h.getAuthMethod()) && AuthStepResult.CONFIRMED.equals(h.getRequestAuthStepResult())) {
+            if (authMethod == h.getAuthMethod() && AuthStepResult.CONFIRMED.equals(h.getRequestAuthStepResult())) {
                 // remove WebSocket session, authorization is confirmed
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
@@ -192,7 +194,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 return response;
             }
             // in case previous authentication lead to an authentication method failure, the authentication method has already failed
-            if ((AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() || AuthMethod.LOGIN_2FA == h.getAuthMethod()) && AuthStepResult.AUTH_METHOD_FAILED.equals(h.getRequestAuthStepResult())) {
+            if (authMethod == h.getAuthMethod() && AuthStepResult.AUTH_METHOD_FAILED.equals(h.getRequestAuthStepResult())) {
                 // remove WebSocket session, authentication method is failed
                 clearCurrentBrowserSession();
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());
@@ -206,7 +208,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 return response;
             }
             // in case the authentication has been canceled, the authentication method is canceled
-            if ((AuthMethod.POWERAUTH_TOKEN == h.getAuthMethod() || AuthMethod.LOGIN_2FA == h.getAuthMethod()) && AuthResult.FAILED.equals(h.getAuthResult()) && AuthStepResult.CANCELED.equals(h.getRequestAuthStepResult())) {
+            if (authMethod == h.getAuthMethod() && AuthResult.FAILED.equals(h.getAuthResult()) && AuthStepResult.CANCELED.equals(h.getRequestAuthStepResult())) {
                 // remove WebSocket session, operation is canceled
                 clearCurrentBrowserSession();
                 webSocketMessageService.removeWebSocketSession(operation.getOperationId());

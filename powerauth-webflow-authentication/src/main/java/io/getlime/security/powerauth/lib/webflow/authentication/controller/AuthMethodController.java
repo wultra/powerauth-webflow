@@ -119,7 +119,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final GetOperationDetailResponse operation = operationDetail.getResponseObject();
             validateOperationState(operation);
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
-            // translate formData messages
+            // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
+            // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
+            updateOperationForScaLogin(operation);
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
         } catch (NextStepServiceException e) {
@@ -189,20 +191,17 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // Authentication method can be overridden to support delegation of steps to other authentication methods.
         if (operation != null && !operation.getHistory().isEmpty()) {
             OperationHistory currentHistory = operation.getHistory().get(operation.getHistory().size() - 1);
-            // Handle special case when LOGIN_2FA method is used, this authentication method delegates work
-            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_2FA
+            // Handle special case when LOGIN_SCA method is used, this authentication method delegates work
+            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_SCA
             // as chosen authentication method (typically in INIT step).
-            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && operation.getChosenAuthMethod() == AuthMethod.LOGIN_2FA) {
-                return AuthMethod.LOGIN_2FA;
+            // Same logic is valid for APPROVAL_SCA method.
+            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED &&
+                    (operation.getChosenAuthMethod() == AuthMethod.LOGIN_SCA || operation.getChosenAuthMethod() == AuthMethod.APPROVAL_SCA)) {
+                return operation.getChosenAuthMethod();
             }
-            // The second case is when the current step has LOGIN_2FA as an authentication method which is not CONFIRMED
-            // or step is DONE or FAILED. This happens for instance when LOGIN_2FA step result is AUTH_FAILED after failed authentication
-            // or LOGIN_2FA is the last step of a finished operation
-            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_2FA
-                    && (currentHistory.getRequestAuthStepResult() != AuthStepResult.CONFIRMED
-                    || currentHistory.getAuthResult() == AuthResult.DONE
-                    || currentHistory.getAuthResult() == AuthResult.FAILED)) {
-                return AuthMethod.LOGIN_2FA;
+            // The second case is when the current step has LOGIN_SCA or APPROVAL_SCA as an authentication method.
+            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_SCA || currentHistory.getAuthMethod() == AuthMethod.APPROVAL_SCA) {
+                return currentHistory.getAuthMethod();
             }
         }
         // Use static authentication method name for all other cases.
@@ -220,9 +219,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         try {
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
-            for (GetOperationDetailResponse response: responseObject) {
+            for (GetOperationDetailResponse operation: responseObject) {
+                updateOperationForScaLogin(operation);
                 // translate formData messages
-                messageTranslationService.translateFormData(response.getFormData());
+                messageTranslationService.translateFormData(operation.getFormData());
             }
             return operations.getResponseObject();
         } catch (NextStepServiceException e) {
@@ -587,9 +587,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.warn("Operation was interrupted, operation ID: {}", operation.getOperationId());
                 throw new OperationInterruptedException("Operation was interrupted");
             }
-            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_2FA are present in next steps
+            // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_SCA are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
-                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_2FA)) {
+                if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_SCA)) {
                     logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod.toString());
                     throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }
@@ -637,6 +637,28 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         authSteps.removeAll(authStepsToRemove);
+    }
+
+    /**
+     * Update operation for SCA login in case of an approval operation.
+     * @param operation Operation to update.
+     */
+    private void updateOperationForScaLogin(GetOperationDetailResponse operation) {
+        // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
+        // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
+        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA) {
+            // Make sure Mobile Token and Data Adapter recognize the operation name
+            operation.setOperationName("login");
+            // Update operation data for login
+            operation.setOperationData("A2");
+            // Update operation form data
+            OperationFormData formData = new OperationFormData();
+            formData.addTitle("login.title");
+            formData.addGreeting("login.greeting");
+            formData.addSummary("login.summary");
+            formData.setUserInput(operation.getFormData().getUserInput());
+            operation.setFormData(formData);
+        }
     }
 
     /**

@@ -37,7 +37,7 @@ export default class TokenAuthSms extends React.Component {
         this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
-        this.state = {username: null, error: null, message: null, remainingAttempts: null, resendEnabled: false};
+        this.state = {username: null, error: null, message: null, remainingAttempts: null, resendEnabled: false, initialized: false};
     }
 
     componentWillMount() {
@@ -48,8 +48,10 @@ export default class TokenAuthSms extends React.Component {
         if (props.context.init) {
             // Store information whether password is enabled
             this.setState({passwordEnabled: props.context.passwordEnabled});
-            // Store username for LOGIN_2FA step
+            // Store username for LOGIN_SCA step
             this.setState({username: props.context.username})
+            // Set the component to initialized state
+            this.setState({initialized: true});
         } else {
             // store message and error into component state because online mode reloads context frequently due to polling
             if (props.context.error !== undefined) {
@@ -90,7 +92,7 @@ export default class TokenAuthSms extends React.Component {
 
     handleCancel(event) {
         event.preventDefault();
-        this.props.dispatch(cancel());
+        this.props.dispatch(cancel("TOKEN"));
     }
 
     handleSmsResend(event) {
@@ -103,7 +105,8 @@ export default class TokenAuthSms extends React.Component {
         return (
             <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
                           smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="TOKEN"
-                          message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}/>
+                          message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
+                          initialized={this.state.initialized}/>
         )
     }
 }

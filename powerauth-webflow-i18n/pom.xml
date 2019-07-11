@@ -28,6 +28,10 @@
             <artifactId>spring-context</artifactId>
             <version>4.3.21.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>javax.annotation</groupId>
+            <artifactId>javax.annotation-api</artifactId>
+        </dependency>
     </dependencies>
 
     <profiles>
