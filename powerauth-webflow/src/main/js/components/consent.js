@@ -224,9 +224,9 @@ export default class Consent extends React.Component {
                                 <div className="buttons">
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
                                                 <FormattedMessage id="operation.confirm"/>
-                                            </a>
+                                            </Button>
                                         </div>
                                     </div>
                                     <div className="attribute row">
