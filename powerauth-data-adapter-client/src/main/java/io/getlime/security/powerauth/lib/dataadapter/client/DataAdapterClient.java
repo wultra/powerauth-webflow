@@ -134,7 +134,7 @@ public class DataAdapterClient {
      *
      * @param userId User ID of user who is being authenticated.
      * @param organizationId Organization ID.
-     * @param password Password as a string.
+     * @param password Password for this authentication request, optionally encrypted.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Authentication response is returned in case of successful authentication.
@@ -237,7 +237,7 @@ public class DataAdapterClient {
      * @param authorizationCode User entered authorization code.
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param password Password for this authentication request.
+     * @param password Password for this authentication request, optionally encrypted.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.

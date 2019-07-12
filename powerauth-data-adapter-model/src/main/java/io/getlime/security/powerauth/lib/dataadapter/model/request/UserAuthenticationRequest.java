@@ -60,7 +60,7 @@ public class UserAuthenticationRequest {
      * Constructor with all parameters for convenience.
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param password Password for this authentication request.
+     * @param password Password for this authentication request, optionally encrypted.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      */
