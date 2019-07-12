@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 // Actions
 import {authenticate, cancel, init} from "../actions/consentActions";
 // Components
-import {FormGroup, Panel} from "react-bootstrap";
+import {Button, FormGroup, Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
