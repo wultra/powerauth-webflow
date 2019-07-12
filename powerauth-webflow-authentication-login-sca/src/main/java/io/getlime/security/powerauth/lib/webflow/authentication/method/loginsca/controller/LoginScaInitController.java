@@ -127,7 +127,9 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
             LoginScaInitResponse response = new LoginScaInitResponse();
             if (userId == null) {
                 // User ID is not available, mock SMS and password fallback to avoid fishing for active accounts
+                response.setResult(AuthStepResult.CONFIRMED);
                 response.setMobileTokenEnabled(false);
+                logger.debug("Step initialization succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             } else {
                 nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
