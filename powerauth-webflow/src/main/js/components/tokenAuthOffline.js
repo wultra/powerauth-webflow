@@ -156,6 +156,7 @@ export default class TokenOffline extends React.Component {
         // prevent regular form submission
         event.preventDefault();
         this.props.dispatch(authenticateOffline(this.state.chosenActivation.activationId, this.state.authCode, this.state.nonce));
+        this.setState({authCode: ''});
     }
 
     handleSwitchToSmsAuthorization(event) {

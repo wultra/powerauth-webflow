@@ -48,6 +48,7 @@ export default class SmsComponent extends React.Component {
     handleSubmit(event) {
         event.preventDefault();
         this.props.dispatch(authenticate(this.state.authCode, this.state.password, this.props.parentComponent));
+        this.setState({authCode: '', password: ''});
     }
 
     render() {
