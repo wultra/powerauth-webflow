@@ -62,7 +62,7 @@ public class WebFlowServicesConfiguration {
     /**
      * Authentication type which configures how username and password is transferred for verification.
      */
-    @Value("${powerauth.webflow.password.encryption.type:NO_PROTECTION}")
+    @Value("${powerauth.webflow.password.protection.type:NO_PROTECTION}")
     private PasswordProtectionType passwordProtection;
 
     /**

@@ -104,7 +104,7 @@ public class AuthenticationContext {
     }
 
     /**
-     * Get SMS verification result.
+     * Get SMS verification result (used optionally in case of SMS authorization verification with password).
      * @return SMS verification result.
      */
     public SmsAuthorizationResult getSmsAuthorizationResult() {
@@ -112,7 +112,7 @@ public class AuthenticationContext {
     }
 
     /**
-     * Set SMS verification result.
+     * Set SMS verification result (used optionally in case of SMS authorization verification with password).
      * @param smsAuthorizationResult SMS verification result.
      */
     public void setSmsAuthorizationResult(SmsAuthorizationResult smsAuthorizationResult) {
