@@ -22,9 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -135,20 +133,19 @@ public class DataAdapterClient {
      * Perform authentication with provided username and password.
      *
      * @param userId User ID of user who is being authenticated.
-     * @param password Password as a string.
      * @param organizationId Organization ID.
-     * @param authenticationType Authentication type.
-     * @param cipherTransformation Cipher transformation used in case password is encrypted.
+     * @param password Password as a string.
+     * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Authentication response is returned in case of successful authentication.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication fails.
      */
-    public ObjectResponse<AuthenticationResponse> authenticateUser(String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<UserAuthenticationResponse> authenticateUser(String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange authentication request with data adapter.
-            AuthenticationRequest request = new AuthenticationRequest(userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
-            HttpEntity<ObjectRequest<AuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<AuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<AuthenticationResponse>>() {
+            UserAuthenticationRequest request = new UserAuthenticationRequest(userId, organizationId, password, authenticationContext, operationContext);
+            HttpEntity<ObjectRequest<UserAuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<UserAuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserAuthenticationResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
@@ -213,17 +210,19 @@ public class DataAdapterClient {
      *
      * @param messageId         Message ID.
      * @param authorizationCode User entered authorization code.
+     * @param userId            User ID.
+     * @param organizationId    Organization ID.
      * @param operationContext  Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
-    public Response verifyAuthorizationSms(String messageId, String authorizationCode, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, operationContext);
+            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse<VerifySmsAuthorizationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAuthorizationResponse>>() {
             });
-            return new Response();
+            return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -237,21 +236,20 @@ public class DataAdapterClient {
      * @param messageId Message ID.
      * @param authorizationCode User entered authorization code.
      * @param userId User ID for this authentication request.
-     * @param password Password for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param authenticationType Authentication type.
-     * @param cipherTransformation Cipher transformation used in case password is encrypted.
+     * @param password Password for this authentication request.
+     * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public Response verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, password, organizationId, authenticationType, cipherTransformation, operationContext);
+            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, password, authenticationContext, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            ResponseEntity<ObjectResponse<VerifySmsAndPasswordResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAndPasswordResponse>>() {
             });
-            return new Response();
+            return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -342,16 +340,41 @@ public class DataAdapterClient {
     }
 
     /**
+     * Initialize OAuth 2.0 consent form.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @param operationContext Operation context.
+     * @return Response with information whether consent form should be displayed
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<InitConsentFormResponse> initConsentForm(String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+        try {
+            InitConsentFormRequest request = new InitConsentFormRequest(userId, organizationId, operationContext);
+            HttpEntity<ObjectRequest<InitConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<InitConsentFormResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/auth/consent/init", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<InitConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
      * Create OAuth 2.0 consent form.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @param lang Language of the text in the consent form.
      * @return Consent form with text and options to select by the user.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<CreateConsentFormResponse> createConsentForm(String userId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateConsentFormResponse> createConsentForm(String userId, String organizationId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
         try {
-            CreateConsentFormRequest request = new CreateConsentFormRequest(userId, lang, operationContext);
+            CreateConsentFormRequest request = new CreateConsentFormRequest(userId, organizationId, lang, operationContext);
             HttpEntity<ObjectRequest<CreateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateConsentFormResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/consent/create", HttpMethod.POST, entity,
@@ -368,15 +391,16 @@ public class DataAdapterClient {
     /**
      * Validate options selected by the user in the OAuth 2.0 consent form.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @param lang Language of the text in the consent form.
      * @param options Consent options selected by the user.
      * @return Consent form validation result.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<ValidateConsentFormResponse> validateConsentForm(String userId, OperationContext operationContext, String lang, List<ConsentOption> options) throws DataAdapterClientErrorException {
+    public ObjectResponse<ValidateConsentFormResponse> validateConsentForm(String userId, String organizationId, OperationContext operationContext, String lang, List<ConsentOption> options) throws DataAdapterClientErrorException {
         try {
-            ValidateConsentFormRequest request = new ValidateConsentFormRequest(userId, operationContext, lang, options);
+            ValidateConsentFormRequest request = new ValidateConsentFormRequest(userId, organizationId, operationContext, lang, options);
             HttpEntity<ObjectRequest<ValidateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<ValidateConsentFormResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/consent/validate", HttpMethod.POST, entity,
@@ -393,14 +417,15 @@ public class DataAdapterClient {
     /**
      * Save options selected by the user in the OAuth 2.0 consent form.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @param options Consent options selected by the user.
      * @return Response with indication whether consent form was successfully saved.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<SaveConsentFormResponse> saveConsentForm(String userId, OperationContext operationContext, List<ConsentOption> options) throws DataAdapterClientErrorException {
+    public ObjectResponse<SaveConsentFormResponse> saveConsentForm(String userId, String organizationId, OperationContext operationContext, List<ConsentOption> options) throws DataAdapterClientErrorException {
         try {
-            SaveConsentFormRequest request = new SaveConsentFormRequest(userId, operationContext, options);
+            SaveConsentFormRequest request = new SaveConsentFormRequest(userId, organizationId, operationContext, options);
             HttpEntity<ObjectRequest<SaveConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<SaveConsentFormResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/consent/save", HttpMethod.POST, entity,

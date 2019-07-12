@@ -18,10 +18,15 @@ package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSmsAuthorizationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAndPasswordResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -35,7 +40,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.configuration.We
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
-import io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
@@ -110,20 +114,37 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String operationId = operation.getOperationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
+            String userId = operation.getUserId();
+            String organizationId = operation.getOrganizationId();
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            SmsAuthorizationResult smsAuthorizationResult;
+            Integer remainingAttemptsDA;
+            boolean showRemainingAttempts;
+            String errorMessage;
             switch (authMethod) {
-                case SMS_KEY:
-                    dataAdapterClient.verifyAuthorizationSms(messageId.toString(), request.getAuthCode(), operationContext);
+                case SMS_KEY: {
+                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId.toString(), request.getAuthCode(), userId, organizationId, operationContext);
+                    VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
+                    smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
+                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED) {
+                        cleanHttpSession(false);
+                        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                        return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                    }
+                    remainingAttemptsDA = smsResponse.getRemainingAttempts();
+                    showRemainingAttempts = smsResponse.getShowRemainingAttempts();
+                    errorMessage = smsResponse.getErrorMessage();
                     break;
+                }
 
                 case LOGIN_SCA:
-                case APPROVAL_SCA:
-                    AuthenticationType authenticationType = configuration.getAuthenticationType();
+                case APPROVAL_SCA: {
+                    PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
                     String cipherTransformation = configuration.getCipherTransformation();
-                    PasswordProtection passwordProtection;
-                    switch (authenticationType) {
-                        case BASIC:
+                    io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection passwordProtection;
+                    switch (passwordProtectionType) {
+                        case NO_PROTECTION:
                             // Password is sent in plain text
                             passwordProtection = new NoPasswordProtection();
                             break;
@@ -138,41 +159,49 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                             throw new InvalidRequestException("Invalid authentication type");
                     }
 
-                    final String protectedPassword = passwordProtection.protect(request.getPassword());
-                    final String authCode = request.getAuthCode();
-                    final String organizationId = operation.getOrganizationId();
-                    dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId.toString(), authCode, operation.getUserId(), protectedPassword, organizationId, authenticationType, cipherTransformation, operationContext);
+                    String protectedPassword = passwordProtection.protect(request.getPassword());
+                    String authCode = request.getAuthCode();
+                    AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
+                    ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId.toString(), authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
+                    VerifySmsAndPasswordResponse smsResponse = objectResponse.getResponseObject();
+                    smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
+                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED && smsResponse.getUserAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
+                        cleanHttpSession(false);
+                        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                        return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                    }
+                    remainingAttemptsDA = smsResponse.getRemainingAttempts();
+                    showRemainingAttempts = smsResponse.getShowRemainingAttempts();
+                    errorMessage = smsResponse.getErrorMessage();
                     break;
+                }
 
                 default:
                     throw new InvalidRequestException("Invalid request");
 
             }
-            cleanHttpSession(false);
-            logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
-        } catch (DataAdapterClientErrorException e) {
-            // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
-            Integer remainingAttemptsNS;
             try {
-                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
+                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
                 if (response.getResult() == AuthResult.FAILED) {
                     // FAILED result instead of CONTINUE means the authentication method is failed
-                    cleanHttpSession(false);
-                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }
-                GetOperationDetailResponse updatedOperation = getOperation();
-                remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            } catch (NextStepServiceException e2) {
+                if (showRemainingAttempts) {
+                    GetOperationDetailResponse updatedOperation = getOperation();
+                    Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+                    AuthStepException authEx = new AuthStepException("SMS authorization failed", errorMessage);
+                    Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+                    authEx.setRemainingAttempts(remainingAttempts);
+                    throw authEx;
+                } else {
+                    throw new AuthStepException("SMS authorization failed", errorMessage);
+                }
+            } catch (NextStepServiceException e) {
                 logger.error("Error occurred in Next Step server", e);
-                cleanHttpSession(false);
-                throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
+                throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
             }
-            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
-            Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
-            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
-            authEx.setRemainingAttempts(remainingAttempts);
-            throw authEx;
+        } catch (DataAdapterClientErrorException e) {
+            throw new AuthStepException(e.getError().getMessage(), e);
         }
     }
 

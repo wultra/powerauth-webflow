@@ -28,6 +28,7 @@ import java.util.List;
  */
 public class ConsentInitResponse extends AuthStepResponse {
 
+    private boolean shouldDisplayConsent;
     private String consentHtml;
     private List<ConsentOption> options;
 
@@ -40,12 +41,30 @@ public class ConsentInitResponse extends AuthStepResponse {
 
     /**
      * Constructor with consent form details.
+     * @param shouldDisplayConsent Whether consent form should be displayed
      * @param consentHtml Consent text in HTML.
      * @param options Consent options.
      */
-    public ConsentInitResponse(String consentHtml, List<ConsentOption> options) {
+    public ConsentInitResponse(boolean shouldDisplayConsent, String consentHtml, List<ConsentOption> options) {
+        this.shouldDisplayConsent = shouldDisplayConsent;
         this.consentHtml = consentHtml;
         this.options = options;
+    }
+
+    /**
+     * Get whether consent form should be displayed.
+     * @return Whether consent form should be displayed.
+     */
+    public boolean getShouldDisplayConsent() {
+        return shouldDisplayConsent;
+    }
+
+    /**
+     * Set whether consent form should be displayed.
+     * @param shouldDisplayConsent Whether consent form should be displayed.
+     */
+    public void setShouldDisplayConsent(boolean shouldDisplayConsent) {
+        this.shouldDisplayConsent = shouldDisplayConsent;
     }
 
     /**

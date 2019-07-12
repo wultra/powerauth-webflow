@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Request for SMS OTP message verification.
+ * Request for SMS authorization code verification.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -35,6 +35,16 @@ public class VerifySmsAuthorizationRequest {
     private String authorizationCode;
 
     /**
+     * User ID for this authentication request.
+     */
+    private String userId;
+
+    /**
+     * Organization ID for this authentication request.
+     */
+    private String organizationId;
+
+    /**
      * Operation context.
      */
     private OperationContext operationContext;
@@ -49,11 +59,15 @@ public class VerifySmsAuthorizationRequest {
      * Constructor with message ID, authorization code and operation context.
      * @param messageId Message ID.
      * @param authorizationCode Authorization code from user.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context.
      */
-    public VerifySmsAuthorizationRequest(String messageId, String authorizationCode, OperationContext operationContext) {
+    public VerifySmsAuthorizationRequest(String messageId, String authorizationCode, String userId, String organizationId, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
+        this.userId = userId;
+        this.organizationId = organizationId;
         this.operationContext = operationContext;
     }
 
@@ -87,6 +101,38 @@ public class VerifySmsAuthorizationRequest {
      */
     public void setAuthorizationCode(String authorizationCode) {
         this.authorizationCode = authorizationCode;
+    }
+
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Set user ID.
+     * @param userId User ID.
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**

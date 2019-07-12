@@ -278,7 +278,7 @@ The list of expected status codes during authentication:
     "userId": "12345678",
     "password": "s3cret",
     "organizationId": "RETAIL",
-    "authenticationType": "BASIC",
+    "passwordProtection": "NO_PROTECTION",
     "cipherTransformation": null,
     "operationContext": {
       "id": "447fbd89-6f46-46da-a573-ade4f3409c94",
@@ -364,9 +364,9 @@ The list of expected status codes during authentication:
 
 ### User Password Encryption and Decryption
 
-The `BASIC` authentication type is used for plain text password in request (sent by default). 
+The `NO_PROTECTION` password protection type is used for plain text password in request (sent by default). 
 
-The password can be optionally encrypted. In this case the `authenticationType` parameter provides information about
+The password can be optionally encrypted. In this case the `passwordProtection` parameter provides information about
 type of password encryption and the `cipherTransformation` parameter contains information about used cipher.
 
 It is expected that the remote system which handles password verification decrypts the password and it is not required to decrypt 
@@ -1356,7 +1356,7 @@ The list of expected status codes:
 | 401  | `AUTHENTICATION_FAILED` - password verification failed |
 | 500  | Server errors - provide error details in the message, this is only for unexpected errors |
 
-The password can be optionally encrypted. In this case the `authenticationType` parameter provides information about
+The password can be optionally encrypted. In this case the `passwordProtection` parameter provides information about
 type of encryption and the `cipherTransformation` parameter contains information about used cipher.
 
 See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption) for additional details.
@@ -1372,7 +1372,7 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
     "userId": "12345678",
     "password": "s3cret",
     "organizationId": "RETAIL",
-    "authenticationType": "BASIC",
+    "passwordProtection": "NO_PROTECTION",
     "cipherTransformation": null,  
     "messageId": "617178ab-f315-4223-a602-9d4893b4f99f",
     "authorizationCode": "77038183",

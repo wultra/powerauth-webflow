@@ -15,15 +15,15 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
 
 /**
  * Request for authenticating user with user ID and password.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class AuthenticationRequest {
+public class UserAuthenticationRequest {
 
     /**
      * User ID for this authentication request.
@@ -31,26 +31,19 @@ public class AuthenticationRequest {
     private String userId;
 
     /**
-     * Password for this authentication request.
-     */
-    private String password;
-
-    /**
      * Organization ID for this authentication request.
      */
     private String organizationId;
 
     /**
-     * Authentication type which defines how username and password fields are used.
+     * Password for this authentication request.
      */
-    private AuthenticationType authenticationType;
+    private String password;
 
     /**
-     * Encryption cipher transformation in case password is encrypted.
-     *
-     * See: https://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html
+     * Authentication context.
      */
-    private String cipherTransformation;
+    private AuthenticationContext authenticationContext;
 
     /**
      * Operation context.
@@ -60,24 +53,22 @@ public class AuthenticationRequest {
     /**
      * Default constructor.
      */
-    public AuthenticationRequest() {
+    public UserAuthenticationRequest() {
     }
 
     /**
      * Constructor with all parameters for convenience.
      * @param userId User ID for this authentication request.
-     * @param password Password for this authentication request.
      * @param organizationId Organization ID for this authentication request.
-     * @param authenticationType Authentication type specifying optional password encryption.
-     * @param cipherTransformation Cipher transformation used in case password is encrypted.
+     * @param password Password for this authentication request.
+     * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      */
-    public AuthenticationRequest(String userId, String password, String organizationId, AuthenticationType authenticationType, String cipherTransformation, OperationContext operationContext) {
+    public UserAuthenticationRequest(String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) {
         this.userId = userId;
-        this.password = password;
         this.organizationId = organizationId;
-        this.authenticationType = authenticationType;
-        this.cipherTransformation = cipherTransformation;
+        this.password = password;
+        this.authenticationContext = authenticationContext;
         this.operationContext = operationContext;
     }
 
@@ -107,7 +98,7 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Get the password. The password can be encrypted, in this case the authenticationType specifies encryption type and
+     * Get the password. The password can be encrypted, in this case the passwordProtection specifies encryption type and
      * cipherTransformation specifies the algorithm, mode and padding.
      * @return Password.
      */
@@ -132,35 +123,19 @@ public class AuthenticationRequest {
     }
 
     /**
-     * Set the authentication type.
-     * @param authenticationType Authentication type.
+     * Get authentication context.
+     * @return Authentication context.
      */
-    public void setAuthenticationType(AuthenticationType authenticationType) {
-        this.authenticationType = authenticationType;
+    public AuthenticationContext getAuthenticationContext() {
+        return authenticationContext;
     }
 
     /**
-     * Get the authentication type.
-     * @return Authentication type.
+     * Set authentication context.
+     * @param authenticationContext Authentication context.
      */
-    public AuthenticationType getAuthenticationType() {
-        return authenticationType;
-    }
-
-    /**
-     * Get encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
-     * @return Encryption cipher transformation.
-     */
-    public String getCipherTransformation() {
-        return cipherTransformation;
-    }
-
-    /**
-     * Set encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
-     * @param cipherTransformation Encryption cipher transformation.
-     */
-    public void setCipherTransformation(String cipherTransformation) {
-        this.cipherTransformation = cipherTransformation;
+    public void setAuthenticationContext(AuthenticationContext authenticationContext) {
+        this.authenticationContext = authenticationContext;
     }
 
     /**

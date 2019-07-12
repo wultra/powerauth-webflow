@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,18 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * Supported authentication types.
+ * Result of SMS authorization code verification.
  *
  * <ul>
- * <li>BASIC - User ID and password sent via plaintext in the request.</li>
- * <li>PASSWORD_ENCRYPTION_AES - User ID is sent in plain text and password sent encrypted by AES algorithm in the request.
- *     The encrypted password format is following: [ivBase64]:[encryptedDataBase64], without square brackets.
- *     <ul>
- *         <li>ivBase64 - Base64 encoded initialization vector bytes.</li>
- *         <li>encryptedDataBase64 - Base64 encoded encrypted password data bytes.</li>
- *     </ul>
- * </li>
+ * <li>NOT_VERIFIED - SMS authorization code has not been verified at all.</li>
+ * <li>VERIFIED_SUCCEEDED - SMS authorization code has been verified and verification succeeded.</li>
+ * <li>VERIFIED_FAILED - SMS authorization code has been verified and verification failed.</li>
  * </ul>
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum AuthenticationType {
-    BASIC,
-    PASSWORD_ENCRYPTION_AES,
+public enum SmsAuthorizationResult {
+    NOT_VERIFIED,
+    VERIFIED_SUCCEEDED,
+    VERIFIED_FAILED
 }
