@@ -22,6 +22,7 @@ Following topics are covered in this chapter:
   - [List pending operations](#list-pending-operations)
   - [Update operation form data](#update-operation-formdata)
   - [Update application context for an operation](#update-application-context-for-an-operation)  
+  - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
 - [Organizations](#organizations)
   - [Organization list](#list-organizations)
@@ -1309,70 +1310,6 @@ Lists pending operation for given user and authentication method.
 }
 ```
 
-### Update application context for an operation
-
-Updates application context for an operation.
-
-<table>
-    <tr>
-        <td>Method</td>
-        <td><code>PUT</code></td>
-    </tr>
-    <tr>
-        <td>Resource URI</td>
-        <td><code>/operation/application</code></td>
-    </tr>
-</table>
-
-Alternative with `POST` method for environments which do not allow `PUT` methods:
-<table>
-    <tr>
-        <td>Method</td>
-        <td><code>POST</code></td>
-    </tr>
-    <tr>
-        <td>Resource URI</td>
-        <td><code>/operation/application/update</code></td>
-    </tr>
-</table>
-
-#### Request
-
-- Headers:
-    - `Content-Type: application/json`
-
-```json
-{
-  "requestObject": {
-    "operationId": "3e87f071-2f08-4341-9034-47cb5f8a3fb4",
-    "applicationContext": {
-      "id": "BANK_ABC_PROD",
-      "name": "Bank ABC",
-      "description": "Authorization for Bank ABC",
-      "extras": {
-        "_requestedScopes": [
-          "SCOPE_1",
-          "SCOPE_2",
-          "SCOPE_3"
-        ],
-        "applicationOwner": "BANK_ABC"
-      }
-    }
-  }
-}
-```
-
-#### Response
-- Status Code: `200`
-- Headers:
-    - `Content-Type: application/json`
-
-```json
-{
-  "status" : "OK"
-}
-```
-
 ### Update operation formData
 
 Updates operation formData for given operation. Only the userInput part of formData can be currently updated by the clients.
@@ -1499,6 +1436,124 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
     "userInput": {
       "operation.bankAccountChoice": "CZ4012340000000012345678"
     }
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
+### Update application context for an operation
+
+Updates application context for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>PUT</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/application</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/application/update</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "3e87f071-2f08-4341-9034-47cb5f8a3fb4",
+    "applicationContext": {
+      "id": "BANK_ABC_PROD",
+      "name": "Bank ABC",
+      "description": "Authorization for Bank ABC",
+      "extras": {
+        "_requestedScopes": [
+          "SCOPE_1",
+          "SCOPE_2",
+          "SCOPE_3"
+        ],
+        "applicationOwner": "BANK_ABC"
+      }
+    }
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
+### Update user for an operation
+
+Updates user ID and organization ID for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>PUT</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/user</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/user/update</code></td>
+    </tr>
+</table>
+
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "0a044408-aea0-433a-80cf-6371dc2a76c0",
+    "userId": "roman",
+    "organizationId": "RETAIL"
   }
 }
 ```

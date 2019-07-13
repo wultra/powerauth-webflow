@@ -206,6 +206,7 @@ public class AuthMethodService {
         authMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
         authMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         authMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
+        authMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());
         return authMethodDetail;
     }
 
@@ -225,6 +226,7 @@ public class AuthMethodService {
         userAuthMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
         userAuthMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         userAuthMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
+        userAuthMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());
         userAuthMethodDetail.setConfig(config);
         return userAuthMethodDetail;
     }

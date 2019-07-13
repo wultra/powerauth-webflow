@@ -24,9 +24,16 @@
             <version>0.22.0</version>
         </dependency>
         <dependency>
-            <groupId>io.getlime.security</groupId>
-            <artifactId>powerauth-java-crypto</artifactId>
-            <version>0.22.0</version>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.61</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

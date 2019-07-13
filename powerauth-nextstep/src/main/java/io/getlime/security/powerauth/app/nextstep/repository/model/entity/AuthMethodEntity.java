@@ -60,6 +60,9 @@ public class AuthMethodEntity implements Serializable {
     @Column(name = "display_name_key")
     private String displayNameKey;
 
+    @Column(name = "has_mobile_token")
+    private Boolean hasMobileToken;
+
     public AuthMethod getAuthMethod() {
         return authMethod;
     }
@@ -130,6 +133,14 @@ public class AuthMethodEntity implements Serializable {
 
     public void setDisplayNameKey(String displayNameKey) {
         this.displayNameKey = displayNameKey;
+    }
+
+    public Boolean getHasMobileToken() {
+        return hasMobileToken;
+    }
+
+    public void setHasMobileToken(Boolean hasMobileToken) {
+        this.hasMobileToken = hasMobileToken;
     }
 
     @Override

@@ -15,8 +15,6 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-
 /**
  * Request object used for querying of pending operations.
  *
@@ -25,7 +23,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 public class GetPendingOperationsRequest {
 
     private String userId;
-    private AuthMethod authMethod;
+    private boolean mobileTokenOnly;
 
     /**
      * Get the user id.
@@ -46,20 +44,18 @@ public class GetPendingOperationsRequest {
     }
 
     /**
-     * Get the @{link AuthMethod}.
-     *
-     * @return authentication method
+     * Get whether pending operation list should be filtered for only next step with mobile token support.
+     * @return Whether pending operation list should be filtered for only next step with mobile token support.
      */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
+    public boolean isMobileTokenOnly() {
+        return mobileTokenOnly;
     }
 
     /**
-     * Set the @{link AuthMethod}.
-     *
-     * @param authMethod authentication method
+     * Set whether pending operation list should be filtered for only next step with mobile token support.
+     * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
+    public void setMobileTokenOnly(boolean mobileTokenOnly) {
+        this.mobileTokenOnly = mobileTokenOnly;
     }
 }

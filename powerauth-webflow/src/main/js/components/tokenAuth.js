@@ -23,6 +23,7 @@ import TokenOffline from "./tokenAuthOffline";
 import TokenOnline from "./tokenAuthOnline";
 import Spinner from 'react-tiny-spin';
 import {Panel} from "react-bootstrap";
+import TokenAuthSms from "./tokenAuthSms";
 
 const stompClient = require('../websocket-client');
 
@@ -54,6 +55,7 @@ export default class Token extends React.Component {
         this.getUpdateTimeout = this.getUpdateTimeout.bind(this);
         this.disconnect = this.disconnect.bind(this);
         this.setOfflineMode = this.setOfflineMode.bind(this);
+        this.setSmsFallback = this.setSmsFallback.bind(this);
         this.state = {
             initialized: false,
             configurationInitialized: false,
@@ -63,7 +65,10 @@ export default class Token extends React.Component {
             updateTimeout: null,
             disconnected: false,
             offlineModeAvailable: null,
-            offlineModeEnabled: null
+            offlineModeEnabled: null,
+            smsFallbackAvailable: null,
+            smsFallbackEnabled: null,
+            username: null
         };
     }
 
@@ -233,16 +238,24 @@ export default class Token extends React.Component {
         this.setState({offlineModeEnabled: enabled});
     }
 
+    setSmsFallback(enabled) {
+        this.setState({smsFallbackEnabled: enabled});
+    }
+
     componentWillReceiveProps(props) {
         if (!this.state.configurationInitialized) {
             const webSocketId = props.context.webSocketId;
             const offlineModeAvailable = props.context.offlineModeAvailable;
+            const smsFallbackAvailable = props.context.smsFallbackAvailable;
+            const username = props.context.username;
             if (webSocketId !== undefined && offlineModeAvailable !== undefined) {
                 stompClient.register([
                     {route: '/user/topic/registration', callback: this.onRegister},
                     {route: '/user/topic/authorization', callback: this.onAuthorize}
                 ], webSocketId);
                 this.setState({offlineModeAvailable: offlineModeAvailable});
+                this.setState({smsFallbackAvailable: smsFallbackAvailable});
+                this.setState({username: username});
                 // Configuration needs to be initialized only once
                 this.setState({configurationInitialized: true});
             }
@@ -256,26 +269,50 @@ export default class Token extends React.Component {
             } else {
                 this.setOfflineMode(false);
             }
+            // Same logic as for offline mode is used for SMS fallback.
+            if (props.context.formData.userInput["smsFallback.enabled"]) {
+                this.setSmsFallback(true);
+            } else {
+                this.setSmsFallback(false);
+            }
         }
     }
 
     render() {
         return (
             <div id="operation">
-                    <Panel>
-                        <OperationDetail/>
-                        {(this.state.offlineModeAvailable !== null && this.state.offlineModeEnabled !== null) ? (
+                <Panel>
+                    <OperationDetail/>
+                    <div>
+                        {(this.state.configurationInitialized) ? (
                             <div>
-                                {(this.state.offlineModeAvailable && this.state.offlineModeEnabled) ? (
-                                    <TokenOffline cancelCallback={this.handleCancel}/>
+                                {(this.state.smsFallbackAvailable && this.state.smsFallbackEnabled) ? (
+                                    <div>
+                                        <TokenAuthSms cancelCallback={this.handleCancel}/>
+                                    </div>
                                 ) : (
-                                    <TokenOnline cancelCallback={this.handleCancel} offlineModeAvailable={this.state.offlineModeAvailable} offlineModeCallback={this.setOfflineMode}/>
+                                    <div>
+                                        {(this.state.offlineModeAvailable && this.state.offlineModeEnabled) ? (
+                                            <TokenOffline cancelCallback={this.handleCancel}
+                                                          smsFallbackAvailable={this.state.smsFallbackAvailable}
+                                                          smsFallbackCallback={this.setSmsFallback}
+                                                          username={this.state.username}/>
+                                        ) : (
+                                            <TokenOnline cancelCallback={this.handleCancel}
+                                                         offlineModeAvailable={this.state.offlineModeAvailable}
+                                                         offlineModeCallback={this.setOfflineMode}
+                                                         smsFallbackAvailable={this.state.smsFallbackAvailable}
+                                                         smsFallbackCallback={this.setSmsFallback}
+                                                         username={this.state.username}/>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         ) : (
                             <Spinner/>
                         )}
-                    </Panel>
+                    </div>
+                </Panel>
             </div>
         )
     }

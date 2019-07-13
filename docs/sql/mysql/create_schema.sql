@@ -59,10 +59,11 @@ CREATE TABLE ns_auth_method (
   order_number       INTEGER NOT NULL,
   check_user_prefs   BOOLEAN NOT NULL,
   user_prefs_column  INTEGER,
-  user_prefs_default BOOLEAN,
+  user_prefs_default BOOLEAN DEFAULT FALSE,
   check_auth_fails   BOOLEAN NOT NULL,
   max_auth_fails     INTEGER,
-  has_user_interface BOOLEAN,
+  has_user_interface BOOLEAN DEFAULT FALSE,
+  has_mobile_token   BOOLEAN DEFAULT FALSE,
   display_name_key   VARCHAR(32)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -70,11 +71,11 @@ CREATE TABLE ns_auth_method (
 -- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY NOT NULL,
-  auth_method_1 BOOLEAN,
-  auth_method_2 BOOLEAN,
-  auth_method_3 BOOLEAN,
-  auth_method_4 BOOLEAN,
-  auth_method_5 BOOLEAN,
+  auth_method_1 BOOLEAN DEFAULT FALSE,
+  auth_method_2 BOOLEAN DEFAULT FALSE,
+  auth_method_3 BOOLEAN DEFAULT FALSE,
+  auth_method_4 BOOLEAN DEFAULT FALSE,
+  auth_method_5 BOOLEAN DEFAULT FALSE,
   auth_method_1_config VARCHAR(256),
   auth_method_2_config VARCHAR(256),
   auth_method_3_config VARCHAR(256),
@@ -173,7 +174,7 @@ CREATE TABLE da_sms_authorization (
   salt                 VARBINARY(16) NOT NULL,
   message_text         TEXT NOT NULL,
   verify_request_count INTEGER,
-  verified             BOOLEAN,
+  verified             BOOLEAN DEFAULT FALSE,
   timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP

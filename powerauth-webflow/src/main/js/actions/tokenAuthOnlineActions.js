@@ -57,7 +57,16 @@ export function initOnline(callback) {
             }
             dispatch({
                 type: "SHOW_SCREEN_TOKEN",
-                payload: response.data
+                payload: {
+                    loading: true,
+                    error: false,
+                    init: true,
+                    message: "",
+                    webSocketId: response.data.webSocketId,
+                    offlineModeAvailable: response.data.offlineModeAvailable,
+                    smsFallbackAvailable: response.data.smsFallbackAvailable,
+                    username: response.data.username
+                }
             });
             // initialization complete - mobile token authorization can start
             callback(true);
@@ -116,7 +125,8 @@ export function authenticateOnline(callback) {
                     dispatch({
                         type: "SHOW_SCREEN_TOKEN",
                         payload: {
-                            info: "reload"
+                            info: "reload",
+                            init: false
                         }
                     });
                     break;

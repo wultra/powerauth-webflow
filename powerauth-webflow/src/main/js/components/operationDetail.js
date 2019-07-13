@@ -74,7 +74,7 @@ export default class OperationDetail extends React.Component {
                         this.updateChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
                         // freeze choice for item
                         this.setBankAccountChoiceDisabled(true);
-                    } else if (this.props.context.formData.userInput["operation.bankAccountChoice"]) {
+                    } else if (props.context.formData.userInput["operation.bankAccountChoice"]) {
                         // bank account has already been chosen, set the chosen value
                         this.updateChosenBankAccount(item.bankAccounts, props.context.formData.userInput["operation.bankAccountChoice"]);
                     } else {
@@ -120,8 +120,10 @@ export default class OperationDetail extends React.Component {
 
     handleBankAccountChoice(bankAccount) {
         this.setState({chosenBankAccount: bankAccount});
-        this.props.context.formData.userInput["operation.bankAccountChoice"] = bankAccount.accountId;
-        this.props.dispatch(updateFormData(this.props.context.formData));
+        if (this.props.context.formData) {
+            this.props.context.formData.userInput["operation.bankAccountChoice"] = bankAccount.accountId;
+            this.props.dispatch(updateFormData(this.props.context.formData));
+        }
     }
 
     setBankAccountChoiceDisabled(disabled) {

@@ -63,6 +63,7 @@ CREATE TABLE ns_auth_method (
   check_auth_fails   NUMBER(1) DEFAULT 0 NOT NULL,
   max_auth_fails     INTEGER,
   has_user_interface NUMBER(1) DEFAULT 0,
+  has_mobile_token   NUMBER(1) DEFAULT 0,
   display_name_key   VARCHAR(32)
 );
 

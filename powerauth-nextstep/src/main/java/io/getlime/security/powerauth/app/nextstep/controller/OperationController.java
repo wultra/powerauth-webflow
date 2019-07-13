@@ -127,7 +127,7 @@ public class OperationController {
         return updateOperationImpl(request);
     }
 
-    private @ResponseBody ObjectResponse<UpdateOperationResponse> updateOperationImpl(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+    private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
         // resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
@@ -140,6 +140,43 @@ public class OperationController {
             logger.info("Next authentication method for operation ID: {}, authentication method: {}", response.getOperationId(), step.getAuthMethod().toString());
         }
         return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Assign user ID and organization ID to and operation.
+     *
+     * @param request Update operation user request.
+     * @return Response.
+     * @throws NextStepServiceException Thrown when update fails in Next Step.
+     */
+    @RequestMapping(value = "/operation/user", method = RequestMethod.PUT)
+    public @ResponseBody Response updateOperationUser(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+        return updateOperationUserImpl(request);
+    }
+
+    /**
+     * Assign user ID and organization ID to and operation (POST alternative).
+     *
+     * @param request Update operation user request.
+     * @return Response.
+     * @throws NextStepServiceException Thrown when update fails in Next Step.
+     */
+    @RequestMapping(value = "/operation/user/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateOperationUserPost(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+        return updateOperationUserImpl(request);
+    }
+
+    private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+        String operationId = request.getRequestObject().getOperationId();
+        String userId = request.getRequestObject().getUserId();
+        String organizationId = request.getRequestObject().getOrganizationId();
+        logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+
+        // persist operation user update
+        operationPersistenceService.updateOperationUser(request.getRequestObject());
+
+        logger.info("The updateOperationUser request succeeded, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+        return new Response();
     }
 
     /**
@@ -169,20 +206,7 @@ public class OperationController {
         }
         assignFormData(response, operation);
         assignApplicationContext(response, operation);
-
-        for (OperationHistoryEntity history: operation.getOperationHistory()) {
-            OperationHistory h = new OperationHistory();
-            h.setAuthMethod(history.getRequestAuthMethod());
-            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
-            h.setAuthResult(history.getResponseResult());
-            response.getHistory().add(h);
-        }
-
-        // set chosen authentication method
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
-        if (currentHistory != null) {
-            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
-        }
+        assignOperationHistory(response, operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -243,18 +267,16 @@ public class OperationController {
     @RequestMapping(value = "/user/operation/list", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getPendingOperations request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
+        logger.debug("Received getPendingOperations request, user ID: {}", request.getRequestObject().getUserId());
 
         GetPendingOperationsRequest requestObject = request.getRequestObject();
 
         List<GetOperationDetailResponse> responseList = new ArrayList<>();
 
-        List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.getAuthMethod());
+        List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.isMobileTokenOnly());
         if (operations == null) {
-            logger.error("Invalid query for pending operations, userId: " + requestObject.getUserId()
-                    + ", authMethod: " + requestObject.getAuthMethod());
-            throw new IllegalArgumentException("Invalid query for pending operations, userId: " + requestObject.getUserId()
-                    + ", authMethod: " + requestObject.getAuthMethod());
+            logger.error("Invalid query for pending operations, user ID: " + requestObject.getUserId());
+            throw new IllegalArgumentException("Invalid query for pending operations, user ID: " + requestObject.getUserId());
         }
         for (OperationEntity operation : operations) {
             GetOperationDetailResponse response = new GetOperationDetailResponse();
@@ -268,12 +290,13 @@ public class OperationController {
             }
             assignFormData(response, operation);
             assignApplicationContext(response, operation);
+            assignOperationHistory(response, operation);
             response.setTimestampCreated(operation.getTimestampCreated());
             response.setTimestampExpires(operation.getTimestampExpires());
             responseList.add(response);
         }
 
-        logger.debug("The getPendingOperations request succeeded, operation list size: ", responseList.size());
+        logger.debug("The getPendingOperations request succeeded, operation list size: {}", responseList.size());
         return new ObjectResponse<>(responseList);
     }
 
@@ -414,4 +437,24 @@ public class OperationController {
         }
     }
 
+    /**
+     * Assign operation history to operation.
+     * @param response Response to be enriched by operation history.
+     * @param operation Database entity representing operation.
+     */
+    private void assignOperationHistory(GetOperationDetailResponse response, OperationEntity operation) {
+        // add operation history
+        for (OperationHistoryEntity history: operation.getOperationHistory()) {
+            OperationHistory h = new OperationHistory();
+            h.setAuthMethod(history.getRequestAuthMethod());
+            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
+            h.setAuthResult(history.getResponseResult());
+            response.getHistory().add(h);
+        }
+        // set chosen authentication method
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory != null) {
+            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
 }

@@ -126,18 +126,18 @@ export default class Login extends React.Component {
             this.setDefaultOrganization();
         } else {
             return (
-                <Panel>
-                    {this.title()}
-                    <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
-                        {organizations.map((org) => {
-                            return (
-                                <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
+                    {organizations.map((org) => {
+                        return (
+                            <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                                <Panel>
+                                    {this.title()}
                                     {this.loginForm(org.organizationId)}
-                                </Tab>
-                            )
-                        })}
-                    </Tabs>
-                </Panel>
+                                </Panel>
+                            </Tab>
+                        )
+                    })}
+                </Tabs>
             )
         }
     }
@@ -159,17 +159,13 @@ export default class Login extends React.Component {
             });
             return (
                 <Panel>
+                    <OrganizationSelect
+                        organizations={organizations}
+                        chosenOrganization={chosenOrganization}
+                        intl={this.props.intl}
+                        callback={organization => this.organizationChanged(organization.organizationId)}
+                    />
                     {this.title()}
-                    <div className="row">
-                        <div className="col-xs-12">
-                            <OrganizationSelect
-                                organizations={organizations}
-                                chosenOrganization={chosenOrganization}
-                                intl={this.props.intl}
-                                callback={organization => this.organizationChanged(organization.organizationId)}
-                            />
-                        </div>
-                    </div>
                     {this.loginForm(chosenOrganizationId)}
                 </Panel>
             )

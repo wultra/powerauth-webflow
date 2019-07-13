@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,6 @@ public class AuthenticationManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationManagementService.class);
 
-    private static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
-
     /**
      * Get current HTTP request.
      * @return Current HTTP request.
@@ -60,7 +59,7 @@ public class AuthenticationManagementService {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         synchronized (session.getServletContext()) {
-            session.setAttribute(PENDING_AUTH_OBJECT, auth);
+            session.setAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT, auth);
         }
         logger.info("PENDING_AUTH_OBJECT was added into HTTP session");
     }
@@ -73,7 +72,7 @@ public class AuthenticationManagementService {
     public UserOperationAuthentication getPendingUserAuthentication() {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
-        return (UserOperationAuthentication) session.getAttribute(PENDING_AUTH_OBJECT);
+        return (UserOperationAuthentication) session.getAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT);
     }
 
     /**
@@ -85,7 +84,7 @@ public class AuthenticationManagementService {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         synchronized (session.getServletContext()) {
-            session.removeAttribute(PENDING_AUTH_OBJECT);
+            session.removeAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT);
         }
         logger.info("PENDING_AUTH_OBJECT was removed from HTTP session");
 

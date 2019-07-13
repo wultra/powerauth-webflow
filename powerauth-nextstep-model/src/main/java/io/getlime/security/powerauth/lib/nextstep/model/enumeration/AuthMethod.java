@@ -55,6 +55,16 @@ public enum AuthMethod {
     /**
      * Confirm user consent.
      */
-    CONSENT
+    CONSENT,
+
+    /**
+     * SCA login.
+     */
+    LOGIN_SCA,
+
+    /**
+     * SCA approval.
+     */
+    APPROVAL_SCA
 
 }
