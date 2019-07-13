@@ -22,8 +22,13 @@ Next Step Server implements following functionality:
   - update an operation based on next step decision
   - retrieve operation detail
   - list pending operations for user
+  - retrieve operation configuration
   - update operation form data
+  - update application context for an operation
   - set chosen authentication method
+- management of organizations
+  - list organizations
+  - retrieve organization detail
 - REST services are available for authentication methods and operations
 
 The Next Step Server functionality is described in details in [Next Step Server REST API Reference](./Next-Step-Server-REST-API-Reference.md).
