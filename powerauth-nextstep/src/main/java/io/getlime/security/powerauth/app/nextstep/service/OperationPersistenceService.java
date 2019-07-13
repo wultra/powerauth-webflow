@@ -77,7 +77,7 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Converts a CreateOperationRequest and CreateOperationResponse into OperationEntity and OperationHistoryEntity.
+     * Convert a CreateOperationRequest and CreateOperationResponse into OperationEntity and OperationHistoryEntity.
      * Both entities are persisted to store both the operation and its history in the database.
      *
      * @param request  create request received from the client
@@ -124,7 +124,7 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Converts an UpdateOperationRequest and UpdateOperationResponse into OperationEntity and OperationHistoryEntity.
+     * Convert an UpdateOperationRequest and UpdateOperationResponse into OperationEntity and OperationHistoryEntity.
      * Both entities are persisted to update the status of processed operation as well as update its history.
      *
      * @param request  create request received from the client
@@ -212,7 +212,7 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Updates chosen authentication method.
+     * Update chosen authentication method.
      *
      * @param request Request to update chosen authentication method.
      * @throws OperationNotFoundException Thrown when operation does not exist.
@@ -239,6 +239,37 @@ public class OperationPersistenceService {
         }
         currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
         operationHistoryRepository.save(currentHistory);
+    }
+
+    /**
+     * Update application context.
+     *
+     * @param request Request to update application context.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
+     */
+    public void updateApplicationContext(UpdateApplicationContextRequest request) throws OperationNotFoundException {
+        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
+        }
+        OperationEntity operation = operationOptional.get();
+        ApplicationContext applicationContext = request.getApplicationContext();
+        try {
+            if (applicationContext == null) {
+                operation.setApplicationId(null);
+                operation.setApplicationName(null);
+                operation.setApplicationDescription(null);
+                operation.setApplicationExtras(objectMapper.writeValueAsString(Collections.emptyMap()));
+            } else {
+                operation.setApplicationId(applicationContext.getId());
+                operation.setApplicationName(applicationContext.getName());
+                operation.setApplicationDescription(applicationContext.getDescription());
+                operation.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
+            }
+        } catch (IOException e) {
+            logger.error("Error occurred while serializing application context for an operation", e);
+        }
+        operationRepository.save(operation);
     }
 
     /**

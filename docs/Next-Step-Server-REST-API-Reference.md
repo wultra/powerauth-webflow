@@ -21,6 +21,7 @@ Following topics are covered in this chapter:
   - [Operation detail](#operation-detail)
   - [List pending operations](#list-pending-operations)
   - [Update operation form data](#update-operation-formdata)
+  - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
 - [Organizations](#organizations)
@@ -192,7 +193,7 @@ Lists all authentication methods enabled for given user.
 ```json
 {
   "requestObject": {
-    "userId": "roman"
+    "userId": "12345678"
   }
 }
 ```
@@ -208,35 +209,35 @@ Lists all authentication methods enabled for given user.
   "responseObject": {
     "userAuthMethods": [
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "POWERAUTH_TOKEN",
         "hasUserInterface": true,
         "displayNameKey": "method.powerauthToken",
@@ -245,7 +246,7 @@ Lists all authentication methods enabled for given user.
         }
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
@@ -286,7 +287,7 @@ Currently the only supported configuration is in the POWERAUTH_TOKEN method and 
 ```json
 {
   "requestObject": {
-    "userId": "roman",
+    "userId": "12345678",
     "authMethod": "POWERAUTH_TOKEN",
     "config": {
       "activationId": "26c94bf8-f594-4bd8-9c51-93449926b644"
@@ -299,7 +300,7 @@ For other authentication methods use the following configuration:
 ```
 {
   "requestObject": {
-    "userId": "roman",
+    "userId": "12345678",
     "authMethod": "SMS_KEY",
     "config": null
   }
@@ -317,35 +318,35 @@ For other authentication methods use the following configuration:
   "responseObject": {
     "userAuthMethods": [
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "POWERAUTH_TOKEN",
         "hasUserInterface": true,
         "displayNameKey": "method.powerauthToken",
@@ -354,7 +355,7 @@ For other authentication methods use the following configuration:
         }
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
@@ -401,7 +402,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 ```json
 {
   "requestObject": {
-    "userId": "roman",
+    "userId": "12345678",
     "authMethod": "POWERAUTH_TOKEN"
   }
 }
@@ -418,35 +419,35 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
   "responseObject": {
     "userAuthMethods": [
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
         "config": null
       },
       {
-        "userId": "roman",
+        "userId": "12345678",
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
@@ -483,6 +484,7 @@ Example of complete operation detail:
     "operationId": "3b1ec892-5267-4afe-9554-0707cad66854",
     "operationName": "authorize_payment",
     "userId": null,
+    "organizationId": null,    
     "result": "CONTINUE",
     "timestampCreated": "2018-06-28T12:04:00+0000",
     "timestampExpires": "2018-06-28T12:04:15+0000",
@@ -1038,7 +1040,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 {
   "requestObject": {
     "operationId": "4e02b39b-1ecb-440a-a942-cc27bc07d203",
-    "userId": "roman",
+    "userId": "12345678",
     "authMethod": "USERNAME_PASSWORD_AUTH",
     "authStepResult": "CONFIRMED",
     "authStepResultDescription": null,
@@ -1058,7 +1060,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
   "responseObject": {
     "operationId": "4e02b39b-1ecb-440a-a942-cc27bc07d203",
     "operationName": "authorize_payment",
-    "userId": "roman",
+    "userId": "12345678",
+    "organizationId": "RETAIL",
     "result": "CONTINUE",
     "resultDescription": null,
     "timestampCreated": "2018-06-28T12:20:28+0000",
@@ -1113,7 +1116,8 @@ Retrieves detail of an operation in the Next Step server.
   "responseObject": {
     "operationId": "4e02b39b-1ecb-440a-a942-cc27bc07d203",
     "operationName": "authorize_payment",
-    "userId": "roman",
+    "userId": "12345678",
+    "organizationId": "RETAIL",
     "result": "CONTINUE",
     "timestampCreated": "2018-06-28T12:20:26+0000",
     "timestampExpires": "2018-06-28T12:20:43+0000",
@@ -1223,7 +1227,7 @@ Lists pending operation for given user and authentication method.
 ```json
 {
   "requestObject" : {
-    "userId" : "roman",
+    "userId" : "12345678",
     "authMethod" : "POWERAUTH_TOKEN"
   }
 }
@@ -1240,7 +1244,8 @@ Lists pending operation for given user and authentication method.
   "responseObject" : [ {
     "operationId" : "07fc3e10-24ed-4938-b172-9c88fb47d6ec",
     "operationName" : "authorize_payment",
-    "userId" : "roman",
+    "userId" : "12345678",
+    "organizationId": "RETAIL",
     "result" : "CONTINUE",
     "timestampCreated" : "2018-03-19T10:10:38Z",
     "timestampExpires" : "2018-03-19T10:15:40Z",
@@ -1430,6 +1435,70 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
     "dynamicDataLoaded": true,
     "userInput": {
       "operation.bankAccountChoice": "CZ4012340000000012345678"
+    }
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
+### Update application context for an operation
+
+Updates application context for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>PUT</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/application</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/application/update</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "3e87f071-2f08-4341-9034-47cb5f8a3fb4",
+    "applicationContext": {
+      "id": "BANK_ABC_PROD",
+      "name": "Bank ABC",
+      "description": "Authorization for Bank ABC",
+      "extras": {
+        "_requestedScopes": [
+          "SCOPE_1",
+          "SCOPE_2",
+          "SCOPE_3"
+        ],
+        "applicationOwner": "BANK_ABC"
+      }
     }
   }
 }

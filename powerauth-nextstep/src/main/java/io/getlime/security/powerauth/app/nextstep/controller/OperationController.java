@@ -354,11 +354,41 @@ public class OperationController {
         return updateChosenAuthMethodImpl(request);
     }
 
-    public Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+    private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist operation form data update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         logger.debug("The updateChosenAuthMethod request succeeded");
+        return new Response();
+    }
+
+    /**
+     * Update application context for an operation (PUT method).
+     * @param request Update application context request.
+     * @return Response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/application", method = RequestMethod.PUT)
+    public @ResponseBody Response updateApplicationContext(@RequestBody ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
+        return updateApplicationContextImpl(request);
+    }
+
+    /**
+     * Update application context for an operation (POST method alternative).
+     * @param request Update application context request.
+     * @return Response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/application/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateApplicationContextPost(@RequestBody ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
+        return updateApplicationContextImpl(request);
+    }
+
+    private Response updateApplicationContextImpl(ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
+        logger.info("Received updateApplicationContext request, operation ID: {}", request.getRequestObject().getOperationId());
+        // persist application context update
+        operationPersistenceService.updateApplicationContext(request.getRequestObject());
+        logger.debug("The updateApplicationContext request succeeded");
         return new Response();
     }
 
