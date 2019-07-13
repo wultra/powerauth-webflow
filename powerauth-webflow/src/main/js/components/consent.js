@@ -18,7 +18,7 @@ import {connect} from "react-redux";
 // Actions
 import {authenticate, cancel, init} from "../actions/consentActions";
 // Components
-import {FormGroup, Panel} from "react-bootstrap";
+import {Button, FormGroup, Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
 // i18n
 import {FormattedMessage} from "react-intl";
@@ -138,7 +138,14 @@ export default class Consent extends React.Component {
     }
 
     createHtml(html) {
-        return {__html: sanitizeHTML(html)};
+        let updatedAttributes = sanitizeHTML.defaults.allowedAttributes;
+        updatedAttributes.img.concat(['alt']);
+        return {
+            __html: sanitizeHTML(html, {
+                allowedTags: sanitizeHTML.defaults.allowedTags.concat(['img']),
+                allowedAttributes: updatedAttributes
+            })
+        };
     }
 
     render() {
@@ -217,9 +224,9 @@ export default class Consent extends React.Component {
                                 <div className="buttons">
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
+                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
                                                 <FormattedMessage id="operation.confirm"/>
-                                            </a>
+                                            </Button>
                                         </div>
                                     </div>
                                     <div className="attribute row">

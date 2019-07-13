@@ -63,11 +63,12 @@ public class ValidateConsentFormRequest {
     /**
      * Constructor with all details.
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @param lang Language used for generating contest text.
      * @param operationContext Operation context which provides context for creating the consent form.
      * @param options Consent form options selected by the user.
      */
-    public ValidateConsentFormRequest(String userId, OperationContext operationContext, String lang, List<ConsentOption> options) {
+    public ValidateConsentFormRequest(String userId, String organizationId, OperationContext operationContext, String lang, List<ConsentOption> options) {
         this.userId = userId;
         this.operationContext = operationContext;
         this.lang = lang;

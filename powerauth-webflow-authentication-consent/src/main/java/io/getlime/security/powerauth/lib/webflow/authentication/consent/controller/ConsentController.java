@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOptionV
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateConsentFormResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.InitConsentFormResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.SaveConsentFormResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.ValidateConsentFormResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -36,20 +37,25 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.exception.ConsentValidationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.request.ConsentAuthRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentAuthResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.service.HtmlSanitizationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 /**
@@ -65,16 +71,19 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
 
     private final DataAdapterClient dataAdapterClient;
     private final HtmlSanitizationService htmlSanitizationService;
+    private final HttpSession httpSession;
 
     /**
      * Controller constructor.
      * @param dataAdapterClient Data adapter client.
      * @param htmlSanitizationService Html sanitization service.
+     * @param httpSession HTTP session.
      */
     @Autowired
-    public ConsentController(DataAdapterClient dataAdapterClient, HtmlSanitizationService htmlSanitizationService) {
+    public ConsentController(DataAdapterClient dataAdapterClient, HtmlSanitizationService htmlSanitizationService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.htmlSanitizationService = htmlSanitizationService;
+        this.httpSession = httpSession;
     }
 
     /**
@@ -89,7 +98,13 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
+        if (getConsentSkippedFromHttpSession()) {
+            // Consent form is skipped, step authentication is complete
+            logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+        }
         final String userId = operation.getUserId();
+        final String organizationId = operation.getOrganizationId();
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             String operationId = operation.getOperationId();
@@ -98,10 +113,10 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
             List<ConsentOption> options = request.getOptions();
-            ObjectResponse<ValidateConsentFormResponse> daResponse = dataAdapterClient.validateConsentForm(userId, operationContext, LocaleContextHolder.getLocale().getLanguage(), options);
+            ObjectResponse<ValidateConsentFormResponse> daResponse = dataAdapterClient.validateConsentForm(userId, organizationId, operationContext, LocaleContextHolder.getLocale().getLanguage(), options);
             ValidateConsentFormResponse validateResponse = daResponse.getResponseObject();
             if (validateResponse.getConsentValidationPassed()) {
-                ObjectResponse<SaveConsentFormResponse> daResponse2 = dataAdapterClient.saveConsentForm(userId, operationContext, request.getOptions());
+                ObjectResponse<SaveConsentFormResponse> daResponse2 = dataAdapterClient.saveConsentForm(userId, organizationId, operationContext, request.getOptions());
                 SaveConsentFormResponse saveResponse = daResponse2.getResponseObject();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -172,11 +187,20 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
             String operationId = operation.getOperationId();
+            String organizationId = operation.getOrganizationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
-            ObjectResponse<CreateConsentFormResponse> daResponse = dataAdapterClient.createConsentForm(userId, operationContext,
-                    LocaleContextHolder.getLocale().getLanguage());
+            // Check whether consent form should be shown at all
+            ObjectResponse<InitConsentFormResponse> formInitResponse = dataAdapterClient.initConsentForm(userId, organizationId, operationContext);
+            if (!formInitResponse.getResponseObject().getShouldDisplayConsentForm()) {
+                // Skip consent approval
+                initResponse.setShouldDisplayConsent(false);
+                updateConsentSkippedInHttpSession(true);
+                return initResponse;
+            }
+            initResponse.setShouldDisplayConsent(true);
+            ObjectResponse<CreateConsentFormResponse> daResponse = dataAdapterClient.createConsentForm(userId, organizationId, operationContext, LocaleContextHolder.getLocale().getLanguage());
             CreateConsentFormResponse createResponse = daResponse.getResponseObject();
             initResponse.setResult(AuthStepResult.CONFIRMED);
             // Sanitize consent HTML text and individual option description
@@ -197,6 +221,38 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     }
 
     /**
+     * Set whether consent is skipped in HTTP session.
+     * @param consentSkipped Whether consent is skipped.
+     */
+    private void updateConsentSkippedInHttpSession(boolean consentSkipped) {
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED, consentSkipped);
+        }
+    }
+
+    /**
+     * Get message ID from HTTP session.
+     */
+    private boolean getConsentSkippedFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            Object consentSkipped = httpSession.getAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
+            if (consentSkipped == null) {
+                return false;
+            }
+            return (boolean) consentSkipped;
+        }
+    }
+
+    /**
+     * Clean HTTP session.
+     */
+    private void cleanHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
+        }
+    }
+
+    /**
      * Performs the authorization and resolves the next step.
      *
      * @param request Authorization request which includes the authorization code.
@@ -213,6 +269,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                     final ConsentAuthResponse response = new ConsentAuthResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
+                    cleanHttpSession();
                     logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
                     return response;
                 }
@@ -233,6 +290,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
                     response.getNext().addAll(steps);
+                    cleanHttpSession();
                     logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
                     return response;
                 }
@@ -275,6 +333,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             final ConsentAuthResponse cancelResponse = new ConsentAuthResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
+            cleanHttpSession();
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return cancelResponse;
         } catch (NextStepServiceException e) {
@@ -282,6 +341,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             final ConsentAuthResponse cancelResponse = new ConsentAuthResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");
+            cleanHttpSession();
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }

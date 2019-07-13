@@ -13,17 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.model;
+package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * Constants for storing attributes in HTTP session by individual steps.
+ * Result of username and password verification.
+ *
+ * <ul>
+ * <li>NOT_VERIFIED - user ID and password have not been verified at all.</li>
+ * <li>VERIFIED_SUCCEEDED - user ID and password have been verified and verification succeeded.</li>
+ * <li>VERIFIED_FAILED - user ID and password have has been verified and verification failed.</li>
+ * </ul>
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class HttpSessionAttributeNames {
-
-    public static final String MESSAGE_ID = "MESSAGE_ID";
-    public static final String LAST_MESSAGE_TIMESTAMP = "LAST_MESSAGE_TIMESTAMP";
-    public static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
-    public static final String CONSENT_SKIPPED = "CONSENT_SKIPPED";
-    public static final String USERNAME = "USERNAME";
-
+public enum UserAuthenticationResult {
+    NOT_VERIFIED,
+    VERIFIED_SUCCEEDED,
+    VERIFIED_FAILED
 }

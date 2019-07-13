@@ -125,12 +125,14 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 userIdAlreadyAvailable = true;
             }
             LoginScaInitResponse response = new LoginScaInitResponse();
+            nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
             if (userId == null) {
                 // User ID is not available, mock SMS and password fallback to avoid fishing for active accounts
+                response.setResult(AuthStepResult.CONFIRMED);
                 response.setMobileTokenEnabled(false);
+                logger.debug("Step initialization succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             } else {
-                nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
                 if (!userIdAlreadyAvailable) {
                     // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
                     authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);

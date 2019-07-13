@@ -37,12 +37,14 @@ public class HtmlSanitizationService {
             return htmlText;
         }
         // The sanitization policy corresponds with https://www.npmjs.com/package/sanitize-html#what-are-the-default-options
+        // plus the 'img' tag with 'src' and 'alt' attributes.
         PolicyFactory policy = new HtmlPolicyBuilder()
                 .allowAttributes("href", "name", "target").onElements("a")
+                .allowAttributes("src", "alt").onElements("img")
                 .allowStandardUrlProtocols()
                 .allowElements("h3", "h4", "h5", "h6", "blockquote", "p", "a", "ul", "ol",
                         "nl", "li", "b", "i", "strong", "em", "strike", "code", "hr", "br", "div",
-                        "table", "thead", "caption", "tbody", "tr", "th", "td", "pre", "iframe"
+                        "table", "thead", "caption", "tbody", "tr", "th", "td", "pre", "iframe", "img"
                 ).toFactory();
         return policy.sanitize(htmlText);
     }

@@ -37,7 +37,12 @@ export function init() {
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
                 dispatchAction(dispatch, response);
-                return;
+                return null;
+            }
+            if (!response.data.shouldDisplayConsent) {
+                // Skip showing of consent form and go directly to authentication
+                dispatch(authenticate([]));
+                return null;
             }
             dispatch({
                 type: "SHOW_SCREEN_CONSENT",

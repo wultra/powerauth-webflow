@@ -18,11 +18,11 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 
 /**
- * Request for creating the OAuth 2.0 consent form.
+ * Request for initializing the OAuth 2.0 consent form.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class CreateConsentFormRequest {
+public class InitConsentFormRequest {
 
     /**
      * User ID for this request.
@@ -40,27 +40,19 @@ public class CreateConsentFormRequest {
     private OperationContext operationContext;
 
     /**
-     * Language used for generating the consent text.
-     */
-    private String lang;
-
-    /**
      * Default constructor.
      */
-    public CreateConsentFormRequest() {
+    public InitConsentFormRequest() {
     }
 
     /**
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
-     * @param organizationId Organization ID.
      * @param lang Language used for generating contest text.
      * @param operationContext Operation context which provides context for creating the consent form.
      */
-    public CreateConsentFormRequest(String userId, String organizationId, String lang, OperationContext operationContext) {
+    public InitConsentFormRequest(String userId, String lang, OperationContext operationContext) {
         this.userId = userId;
-        this.organizationId = organizationId;
-        this.lang = lang;
         this.operationContext = operationContext;
     }
 
@@ -112,19 +104,4 @@ public class CreateConsentFormRequest {
         this.operationContext = operationContext;
     }
 
-    /**
-     * Get language used for generating contest text.
-     * @return Language used for generating contest text.
-     */
-    public String getLang() {
-        return lang;
-    }
-
-    /**
-     * Set language used for generating contest text.
-     * @param lang Language used for generating contest text.
-     */
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
 }

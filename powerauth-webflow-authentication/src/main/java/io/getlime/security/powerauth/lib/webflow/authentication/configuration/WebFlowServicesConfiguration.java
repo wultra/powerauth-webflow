@@ -17,7 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthenticationType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,8 +62,8 @@ public class WebFlowServicesConfiguration {
     /**
      * Authentication type which configures how username and password is transferred for verification.
      */
-    @Value("${powerauth.webflow.password.encryption.type:BASIC}")
-    private AuthenticationType authenticationType;
+    @Value("${powerauth.webflow.password.protection.type:NO_PROTECTION}")
+    private PasswordProtectionType passwordProtection;
 
     /**
      * Encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
@@ -130,8 +130,8 @@ public class WebFlowServicesConfiguration {
      * Get authentication type which configures how username and password is transferred for verification.
      * @return Authentication type.
      */
-    public AuthenticationType getAuthenticationType() {
-        return authenticationType;
+    public PasswordProtectionType getPasswordProtection() {
+        return passwordProtection;
     }
 
     /**
