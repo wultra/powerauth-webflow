@@ -21,7 +21,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * <ul>
  * <li>NOT_VERIFIED - user ID and password have not been verified at all.</li>
  * <li>VERIFIED_SUCCEEDED - user ID and password have been verified and verification succeeded.</li>
- * <li>VERIFIED_FAILED - user ID and password have has been verified and verification failed.</li>
+ * <li>VERIFIED_FAILED - user ID and password have been verified and verification failed.</li>
  * </ul>
  *
  * @author Roman Strobl, roman.strobl@wultra.com
