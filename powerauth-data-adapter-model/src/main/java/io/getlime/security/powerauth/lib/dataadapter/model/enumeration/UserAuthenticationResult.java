@@ -19,7 +19,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * Result of username and password verification.
  *
  * <ul>
- * <li>NOT_VERIFIED - user ID and password have not been verified at all.</li>
+ * <li>NOT_VERIFIED - user ID and password verification has not been performed at all.</li>
  * <li>VERIFIED_SUCCEEDED - user ID and password have been verified and verification succeeded.</li>
  * <li>VERIFIED_FAILED - user ID and password have been verified and verification failed.</li>
  * </ul>

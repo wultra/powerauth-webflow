@@ -19,7 +19,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * Result of SMS authorization code verification.
  *
  * <ul>
- * <li>NOT_VERIFIED - SMS authorization code has not been verified at all.</li>
+ * <li>NOT_VERIFIED - SMS authorization code verification has not been performed at all.</li>
  * <li>VERIFIED_SUCCEEDED - SMS authorization code has been verified and verification succeeded.</li>
  * <li>VERIFIED_FAILED - SMS authorization code has been verified and verification failed.</li>
  * </ul>
