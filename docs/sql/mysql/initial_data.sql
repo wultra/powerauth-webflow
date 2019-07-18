@@ -30,7 +30,8 @@ INSERT INTO ns_operation_config (operation_name, template_version, template_id, 
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
 -- organization configuration
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.retail', FALSE, 2);
 
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
