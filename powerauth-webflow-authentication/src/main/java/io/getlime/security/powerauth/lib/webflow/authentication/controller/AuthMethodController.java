@@ -199,8 +199,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     (operation.getChosenAuthMethod() == AuthMethod.LOGIN_SCA || operation.getChosenAuthMethod() == AuthMethod.APPROVAL_SCA)) {
                 return operation.getChosenAuthMethod();
             }
-            // The second case is when the current step has LOGIN_SCA or APPROVAL_SCA as an authentication method.
-            if (currentHistory.getAuthMethod() == AuthMethod.LOGIN_SCA || currentHistory.getAuthMethod() == AuthMethod.APPROVAL_SCA) {
+            // The second case is when the current step has LOGIN_SCA or APPROVAL_SCA as an authentication method and next
+            // authentication method has not been chosen yet.
+            if (operation.getChosenAuthMethod() == null &&
+                    (currentHistory.getAuthMethod() == AuthMethod.LOGIN_SCA || currentHistory.getAuthMethod() == AuthMethod.APPROVAL_SCA)) {
                 return currentHistory.getAuthMethod();
             }
         }
