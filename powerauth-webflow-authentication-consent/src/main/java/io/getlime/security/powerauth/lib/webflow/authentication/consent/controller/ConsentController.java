@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateConsen
 import io.getlime.security.powerauth.lib.dataadapter.model.response.InitConsentFormResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.SaveConsentFormResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.ValidateConsentFormResponse;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -70,18 +71,21 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     private static final Logger logger = LoggerFactory.getLogger(ConsentController.class);
 
     private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
     private final HtmlSanitizationService htmlSanitizationService;
     private final HttpSession httpSession;
 
     /**
      * Controller constructor.
      * @param dataAdapterClient Data adapter client.
+     * @param nextStepClient Next step client.
      * @param htmlSanitizationService Html sanitization service.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public ConsentController(DataAdapterClient dataAdapterClient, HtmlSanitizationService htmlSanitizationService, HttpSession httpSession) {
+    public ConsentController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, HtmlSanitizationService htmlSanitizationService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
+        this.nextStepClient = nextStepClient;
         this.htmlSanitizationService = htmlSanitizationService;
         this.httpSession = httpSession;
     }
@@ -180,10 +184,14 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
+
         ConsentInitResponse initResponse = new ConsentInitResponse();
 
         final String userId = operation.getUserId();
         try {
+            // Update current authentication method in Next Step by marking it as chosen before it is used
+            nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.CONSENT);
+
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
             String operationId = operation.getOperationId();
@@ -211,7 +219,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             initResponse.getOptions().addAll(createResponse.getOptions());
             logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return initResponse;
-        } catch (DataAdapterClientErrorException e) {
+        } catch (DataAdapterClientErrorException | NextStepServiceException e) {
             logger.error("Error when creating consent form.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
