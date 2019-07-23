@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
@@ -50,6 +51,11 @@ public class MobileApiExceptionResolver {
     private ErrorResponse error(String code, Throwable t) {
         logger.warn("Error occurred in Mobile Token API component", t);
         return new ErrorResponse(new Error(code, t.getMessage()));
+    }
+
+    private ErrorResponse error(String code, AuthStepException e) {
+        logger.warn("Error occurred", e);
+        return new ErrorResponse(new Error(code, e.getMessageId()));
     }
 
     /**
@@ -156,13 +162,13 @@ public class MobileApiExceptionResolver {
 
     /**
      * Exception handler for operation timeout exception.
-     * @param t Throwable.
+     * @param e Authentication step exception.
      * @return Response with error details.
      */
     @ExceptionHandler(OperationTimeoutException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleOperationTimeoutException(Throwable t) {
-        return error(ErrorCode.OPERATION_EXPIRED, t);
+    public @ResponseBody ErrorResponse handleOperationTimeoutException(AuthStepException e) {
+        return error(ErrorCode.OPERATION_EXPIRED, e);
     }
 
 }
