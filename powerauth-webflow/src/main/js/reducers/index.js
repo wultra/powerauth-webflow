@@ -3,6 +3,7 @@ import {combineReducers} from 'redux';
 import dispatching from './dispatchingReducer'
 import locale from './localeReducer'
 import security from './securityReducer'
+import timeout from './timeoutReducer'
 
 /**
  * Combining reducer.
@@ -10,5 +11,6 @@ import security from './securityReducer'
 export default combineReducers({
     dispatching,
     intl: locale,
-    security: security
+    security: security,
+    timeout: timeout
 })

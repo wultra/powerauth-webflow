@@ -78,10 +78,16 @@ public class WebFlowServicesConfiguration {
     private String passwordEncryptionKey;
 
     /**
-     * Delay for resending SMS in milliseconds
+     * Delay for resending SMS in milliseconds.
      */
-    @Value("${powerauth.webflow.sms.resend.delayMs}")
+    @Value("${powerauth.webflow.sms.resend.delayMs:60000}")
     private int smsResendDelay;
+
+    /**
+     * Delay for displaying timeout warning in milliseconds.
+     */
+    @Value("${powerauth.webflow.timeout.warning.delayMs:60000}")
+    private int timeoutWarningDelay;
 
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
@@ -164,5 +170,21 @@ public class WebFlowServicesConfiguration {
      */
     public void setSmsResendDelay(int smsResendDelay) {
         this.smsResendDelay = smsResendDelay;
+    }
+
+    /**
+     * Get delay for showing timeout warning in milliseconds.
+     * @return Delay for showing timeout warning in milliseconds.
+     */
+    public int getTimeoutWarningDelay() {
+        return timeoutWarningDelay;
+    }
+
+    /**
+     * Set delay for showing timeout warning in milliseconds.
+     * @param timeoutWarningDelay Delay for showing timeout warning in milliseconds.
+     */
+    public void setTimeoutWarningDelay(int timeoutWarningDelay) {
+        this.timeoutWarningDelay = timeoutWarningDelay;
     }
 }

@@ -27,6 +27,7 @@ import {
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
 import Spinner from 'react-tiny-spin';
+import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from 'react-intl';
 import OrganizationSelect from "./organizationSelect";
@@ -46,6 +47,7 @@ export default class Login extends React.Component {
         this.handleLogin = this.handleLogin.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.organizationChanged = this.organizationChanged.bind(this);
+        this.banners = this.banners.bind(this);
     }
 
     componentWillMount() {
@@ -113,6 +115,7 @@ export default class Login extends React.Component {
         }
         return (
             <Panel>
+                {this.banners()}
                 {this.title()}
                 {this.loginForm(organizations[0].organizationId)}
             </Panel>
@@ -131,6 +134,7 @@ export default class Login extends React.Component {
                         return (
                             <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
                                 <Panel>
+                                    {this.banners()}
                                     {this.title()}
                                     {this.loginForm(org.organizationId)}
                                 </Panel>
@@ -165,6 +169,7 @@ export default class Login extends React.Component {
                         intl={this.props.intl}
                         callback={organization => this.organizationChanged(organization.organizationId)}
                     />
+                    {this.banners()}
                     {this.title()}
                     {this.loginForm(chosenOrganizationId)}
                 </Panel>
@@ -185,6 +190,12 @@ export default class Login extends React.Component {
 
     organizationChanged(organizationId) {
         this.props.dispatch(selectOrganization(organizationId));
+    }
+
+    banners() {
+        return (
+            <OperationTimeout/>
+        )
     }
 
     title() {

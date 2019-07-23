@@ -20,6 +20,7 @@ import {authenticate, cancel, init} from "../actions/consentActions";
 // Components
 import {Button, FormGroup, Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
+import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from "react-intl";
 import sanitizeHTML from 'sanitize-html';
@@ -156,6 +157,7 @@ export default class Consent extends React.Component {
                 ) : (
                     <form onSubmit={this.handleSubmit}>
                         <Panel>
+                            <OperationTimeout/>
                             <div className="auth-actions">
                                 {(this.state.consentHtml) ? (
                                     <div dangerouslySetInnerHTML={this.createHtml(this.state.consentHtml)} className="consent-text"/>

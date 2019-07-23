@@ -24,6 +24,7 @@ import TokenOnline from "./tokenAuthOnline";
 import Spinner from 'react-tiny-spin';
 import {Panel} from "react-bootstrap";
 import TokenAuthSms from "./tokenAuthSms";
+import OperationTimeout from "./operationTimeout";
 
 const stompClient = require('../websocket-client');
 
@@ -282,6 +283,7 @@ export default class Token extends React.Component {
         return (
             <div id="operation">
                 <Panel>
+                    <OperationTimeout/>
                     <OperationDetail/>
                     <div>
                         {(this.state.configurationInitialized) ? (
