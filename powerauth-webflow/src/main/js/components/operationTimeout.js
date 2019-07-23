@@ -56,12 +56,6 @@ export default class OperationTimeout extends React.Component {
                         this.setState({timeoutCheckScheduled: false});
                     }
                 }.bind(this), nextVerificationMs);
-                if (props.timeout.timeoutWarningDelayMs === 0) {
-                    // Exact match on zero is required to enable the warning message
-                    this.setState({warningEnabled: true})
-                } else {
-                    this.setState({warningEnabled: false})
-                }
             } else if (props.timeout.timeoutDelayMs === 0) {
                 // This state is already handled on server, however if it occurs, it is clearly an error
                 props.dispatch({
@@ -70,6 +64,12 @@ export default class OperationTimeout extends React.Component {
                         message: "error.sessionExpired"
                     }
                 })
+            }
+            if (props.timeout.timeoutWarningDelayMs === 0) {
+                // Exact match on zero is required to enable the warning message
+                this.setState({warningEnabled: true})
+            } else {
+                this.setState({warningEnabled: false})
             }
         }
     }
