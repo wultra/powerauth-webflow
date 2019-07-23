@@ -43,6 +43,7 @@ export default class OperationTimeout extends React.Component {
         if (props.timeout) {
             this.setState({timeoutCheckEnabled: props.timeout.timeoutCheckEnabled});
             if (this.state.timeoutCheckEnabled && !this.state.timeoutCheckScheduled && props.timeout.timeoutDelayMs > 0) {
+                this.setState({timeoutCheckScheduled: true});
                 let nextVerificationMs = props.timeout.timeoutDelayMs;
                 if (props.timeout.timeoutWarningDelayMs > 0 && props.timeout.timeoutWarningDelayMs < props.timeout.timeoutDelayMs) {
                     nextVerificationMs = props.timeout.timeoutWarningDelayMs;
@@ -55,7 +56,6 @@ export default class OperationTimeout extends React.Component {
                         this.setState({timeoutCheckScheduled: false});
                     }
                 }.bind(this), nextVerificationMs);
-                this.setState({timeoutCheckScheduled: true});
                 if (props.timeout.timeoutWarningDelayMs === 0) {
                     // Exact match on zero is required to enable the warning message
                     this.setState({warningEnabled: true})
