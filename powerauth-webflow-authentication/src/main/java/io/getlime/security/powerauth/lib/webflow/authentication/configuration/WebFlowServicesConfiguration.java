@@ -86,7 +86,7 @@ public class WebFlowServicesConfiguration {
     /**
      * Delay for displaying timeout warning in milliseconds.
      */
-    @Value("${powerauth.webflow.sms.resend.delayMs:60000}")
+    @Value("${powerauth.webflow.timeout.warning.delayMs:60000}")
     private int timeoutWarningDelay;
 
     @Autowired
