@@ -259,25 +259,20 @@ export default class OperationDetail extends React.Component {
         } else {
             bannerClass+= " alert-form";
         }
-        let glyphIconClass = "";
         switch (banner.bannerType) {
             case "BANNER_INFO":
                 bannerClass += " alert-info";
-                glyphIconClass = "glyphicon glyphicon-info-sign";
                 break;
             case "BANNER_WARNING":
                 bannerClass += " alert-warning";
-                glyphIconClass = "glyphicon glyphicon-warning-sign";
                 break;
             case "BANNER_ERROR":
                 bannerClass += " alert-danger";
-                glyphIconClass = "glyphicon glyphicon-exclamation-sign";
                 break;
         }
+        bannerClass += " font-small";
         return (
             <div className={bannerClass} key={banner.id}>
-                <span className={glyphIconClass}/>
-                &nbsp;&nbsp;
                 {banner.message}
             </div>
         );

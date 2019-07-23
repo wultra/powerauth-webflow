@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,22 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-// i18n
-import {FormattedMessage} from 'react-intl';
+package io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request;
+
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
- * Terminate component handles session termination and redirects.
+ * Request for operation timeout verification.
  *
- * Some of the component's functionality will need to be implemented by the Message component, too.
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
-class Terminate extends React.Component {
-
-
-    render() {
-        return (
-            <div><FormattedMessage id="message.sessionTerminated"/></div>
-        )
-    }
-
+public class VerifyTimeoutRequest extends AuthStepRequest {
 }

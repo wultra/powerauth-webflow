@@ -22,6 +22,7 @@ import OperationDetail from "./operationDetail";
 import {Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
 import SmsComponent from "./smsComponent";
+import OperationTimeout from "./operationTimeout";
 
 /**
  * Authorization of operation using SMS OTP key.
@@ -84,6 +85,7 @@ export default class SmsAuthorization extends React.Component {
         return (
             <div id="operation">
                 <Panel>
+                    <OperationTimeout/>
                     <OperationDetail/>
                     <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
                                   smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"

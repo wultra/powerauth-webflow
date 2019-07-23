@@ -80,23 +80,13 @@ export default class SmsComponent extends React.Component {
                                 </div>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <input className="form-control" type="text" value={this.props.username} disabled="true"/>
+                                        <input autoFocus className="form-control" type="text" value={this.props.username} disabled="true"/>
                                     </div>
                                 </div>
                             </div>
                         ) : (
                             undefined
                         )}
-                        <div className="attribute row">
-                            <div className="message-information">
-                                <FormattedMessage id="smsAuthorization.authCodeText"/>
-                            </div>
-                        </div>
-                        <div className="attribute row">
-                            <div className="col-xs-12">
-                                <input autoFocus className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                            </div>
-                        </div>
                         {(this.props.passwordEnabled) ? (
                             <div>
                                 <div className="attribute row">
@@ -113,6 +103,16 @@ export default class SmsComponent extends React.Component {
                         ) : (
                             undefined
                         )}
+                        <div className="attribute row">
+                            <div className="message-information">
+                                <FormattedMessage id="smsAuthorization.authCodeText"/>
+                            </div>
+                        </div>
+                        <div className="attribute row">
+                            <div className="col-xs-12">
+                                <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
+                            </div>
+                        </div>
                         <div className="font-small message-information">
                             {(this.props.resendEnabled) ? (
                                 <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
