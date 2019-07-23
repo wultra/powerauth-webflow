@@ -14,10 +14,35 @@
  * limitations under the License.
  */
 
+html {
+    background-image: url(../images/background.png);
+    background-position: center center;
+    background-size: cover;
+    height: 100%;
+}
+
 body {
-    font-family: "Source Sans Pro", "Helvetica Neue", "Helvetica", sans-serif;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
     color: #777777;
     font-size: 13pt;
+    font-weight: 400;
+    background-color: rgba(5, 55, 81, 0.8);
+    height: 100%;
+}
+
+p {
+    font-weight: 300;
+    font-size: 21px;
+    margin-bottom: 10px;
+    color: gray;
+}
+
+#content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
 }
 
 a {
@@ -30,13 +55,18 @@ a {
 }
 
 .logo {
-    height: 60px;
+    width: 140px;
     margin-bottom: 20px;
 }
 
 .wrapper {
-    margin: 120px auto 120px auto;
-    width: 600px;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translateY(-50%) translateX(-50%);
+    transform: translateY(-50%) translateX(-50%);
+    width: 700px;
 }
 
 .wrapper h1 {
@@ -44,11 +74,12 @@ a {
 }
 
 .padding {
-    margin: 40px;
+    margin: 20px 30px 40px;
 }
 
 .btn {
     width: 120px;
+    transition: .3s;
 }
 
 .btn-success {
@@ -69,4 +100,80 @@ a {
 .btn-danger:hover, .btn-danger:active, .btn-danger:focus {
     background-color: #74004c;
     border: none;
+}
+
+.btn-lg, .btn-group-lg > .btn {
+    padding: 7px 5px;
+}
+
+.form-control:focus {
+    box-shadow: inset 0 0 10px #439fe677 !important;
+}
+
+.form-control {
+    background: #e2e2e2;
+    color: #000000;
+    border: 0;
+}
+
+.form-inputs {
+    margin-bottom: 10px;
+}
+
+.form-group {
+    margin: 0;
+}
+
+.form-group-lg .form-control {
+    height: 44px;
+    padding: 14px 16px;
+    font-size: 21px;
+    line-height: 1.2;
+    border-radius: 0;
+    font-weight: 300;
+    overflow: auto;
+}
+
+.form-group-lg:first-child .form-control {
+    border-radius: 6px 6px 0 0;
+}
+
+.form-group-lg:last-child .form-control {
+    border-radius: 0 0 6px 6px;
+}
+
+.operations {
+    background: #000000;
+    border-radius: 8px;
+}
+
+.operations-table {
+    width: 100%;
+    height: 400px;
+    background: transparent;
+}
+
+.operations-table td:nth-child(1) {
+    width: 180px;
+    border-right: 1px dotted #222222;
+}
+
+.nav-stacked>li+li {
+    margin-top: 1px;
+    margin-left: 0;
+}
+
+.nav-pills > li > a {
+    color: #dddddd;
+    background-color: transparent;
+    border-radius: 0;
+    text-decoration: none;
+    border-right: 2px solid transparent;
+    transition: .3s;
+    text-align: right;
+}
+
+.nav-pills > li > a:hover, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover, .nav-pills > li.active > a {
+    background-color: #1a1a1a;
+    border-right: 2px solid #439fe6;
 }

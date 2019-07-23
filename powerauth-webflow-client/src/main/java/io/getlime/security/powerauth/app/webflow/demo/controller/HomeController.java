@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -36,7 +37,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.inject.Provider;
 import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Optional;
 
 /**
  * Default demo controller class.
@@ -58,7 +61,7 @@ public class HomeController {
     }
 
     @RequestMapping("/")
-    public String home(Model model) {
+    public String home(Model model) throws NextStepServiceException {
 
         // Fetch operation ID, if any
         String operationId;
@@ -89,6 +92,42 @@ public class HomeController {
         }
 
         model.addAttribute("paymentForm", paymentForm);
+
+        ArrayList<AvailableOperation> operations = new ArrayList<>();
+
+        for (GetOperationConfigDetailResponse config : client.getOperationConfigList().getResponseObject().getOperationConfigs()) {
+            String name;
+            AvailableOperation.Type type;
+            switch (config.getOperationName()) {
+                case "login_sca":
+                    name = "Login SCA";
+                    type = AvailableOperation.Type.LOGIN_SCA;
+                    break;
+                case "authorize_payment_sca":
+                    name = "Payment SCA";
+                    type = AvailableOperation.Type.PAYMENT_SCA;
+                    break;
+                case "login":
+                    name = "Login";
+                    type = AvailableOperation.Type.LOGIN;
+                    break;
+                case "authorize_payment":
+                    name = "Payment";
+                    type = AvailableOperation.Type.PAYMENT;
+                    break;
+                default:
+                    throw new NextStepServiceException("Unknown operation config");
+            }
+            operations.add(new AvailableOperation(type, name));
+        }
+
+        operations.add(new AvailableOperation(AvailableOperation.Type.AUTHORIZATION, "Authorization"));
+
+        if (!operations.isEmpty()) {
+            operations.stream().filter(x -> x.getType() == AvailableOperation.Type.PAYMENT_SCA).findFirst().orElse(operations.get(0)).setDefault(true);
+        }
+
+        model.addAttribute("availableOperations", operations);
 
         return "home";
     }
