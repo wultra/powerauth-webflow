@@ -49,20 +49,19 @@ export default class TokenAuthSms extends React.Component {
             // Store information whether password is enabled
             this.setState({passwordEnabled: props.context.passwordEnabled});
             // Store username for LOGIN_SCA step
-            this.setState({username: props.context.username})
+            this.setState({username: props.context.username});
             // Set the component to initialized state
             this.setState({initialized: true});
-        } else {
-            // store message and error into component state because online mode reloads context frequently due to polling
-            if (props.context.error !== undefined) {
-                this.storeError(props.context.error);
-            }
-            if (props.context.message !== undefined) {
-                this.storeMessage(props.context.message);
-            }
-            if (props.context.remainingAttempts !== undefined) {
-                this.storeRemainingAttempts(props.context.remainingAttempts);
-            }
+        }
+        // store message and error into component state because online mode reloads context frequently due to polling
+        if (props.context.error !== undefined) {
+            this.storeError(props.context.error);
+        }
+        if (props.context.message !== undefined) {
+            this.storeMessage(props.context.message);
+        }
+        if (props.context.remainingAttempts !== undefined) {
+            this.storeRemainingAttempts(props.context.remainingAttempts);
         }
         if (props.context.init || props.context.resend) {
             // Disable resend link for configured delay in ms

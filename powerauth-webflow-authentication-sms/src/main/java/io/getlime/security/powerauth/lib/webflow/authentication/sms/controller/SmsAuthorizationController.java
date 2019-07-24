@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsDeliveryResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAndPasswordResponse;
@@ -104,11 +105,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         checkOperationExpiration(operation);
-        final Object messageId = getMessageIdFromHttpSession();
-        if (messageId == null) {
-            // verify called before create or other error occurred, request is rejected
-            throw new InvalidRequestException("Message ID is missing");
-        }
+        final String messageId = getMessageIdFromHttpSession();
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             String operationId = operation.getOperationId();
@@ -124,11 +121,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String errorMessage;
             switch (authMethod) {
                 case SMS_KEY: {
-                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId.toString(), request.getAuthCode(), userId, organizationId, operationContext);
+                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, request.getAuthCode(), userId, organizationId, operationContext);
                     VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
                     if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED) {
-                        cleanHttpSession(false);
+                        cleanHttpSession();
                         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                     }
@@ -162,11 +159,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     String protectedPassword = passwordProtection.protect(request.getPassword());
                     String authCode = request.getAuthCode();
                     AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
-                    ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId.toString(), authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
+                    ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
                     VerifySmsAndPasswordResponse smsResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
                     if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED && smsResponse.getUserAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
-                        cleanHttpSession(false);
+                        cleanHttpSession();
                         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                     }
@@ -263,13 +260,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     /**
      * Clean HTTP session.
      */
-    private void cleanHttpSession(boolean keepUsername) {
+    private void cleanHttpSession() {
         synchronized (httpSession.getServletContext()) {
             httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
             httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
-            if (!keepUsername) {
-                httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
-            }
+            httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
         }
     }
 
@@ -285,8 +280,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         checkOperationExpiration(operation);
-        // Clean HTTP session, however keep the username which can be stored by another authentication method
-        cleanHttpSession(true);
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
         initResponse.setResendDelay(configuration.getSmsResendDelay());
 
@@ -303,15 +296,23 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         try {
             CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, false);
             String messageId = response.getMessageId();
-            updateMessageIdInHttpSession(messageId);
-            initResponse.setResult(AuthStepResult.CONFIRMED);
-            logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            if (messageId != null) {
+                updateMessageIdInHttpSession(messageId);
+            }
+            if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
+                initResponse.setResult(AuthStepResult.CONFIRMED);
+                logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            } else {
+                initResponse.setResult(AuthStepResult.AUTH_FAILED);
+                initResponse.setMessage(response.getErrorMessage());
+                logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            }
             return initResponse;
         } catch (DataAdapterClientErrorException e) {
             logger.error("Error when sending SMS message.", e);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            initResponse.setMessage("error.communication");
+            initResponse.setMessage(e.getError().getMessage());
             return initResponse;
         }
     }
@@ -333,15 +334,23 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         try {
             CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, true);
             String messageId = response.getMessageId();
-            updateMessageIdInHttpSession(messageId);
-            resendResponse.setResult(AuthStepResult.CONFIRMED);
-            logger.info("Resend step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            if (messageId != null) {
+                updateMessageIdInHttpSession(messageId);
+            }
+            if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
+                resendResponse.setResult(AuthStepResult.CONFIRMED);
+                logger.info("Resend step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            } else {
+                resendResponse.setResult(AuthStepResult.AUTH_FAILED);
+                resendResponse.setMessage(response.getErrorMessage());
+                logger.info("Resend step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            }
             return resendResponse;
         } catch (DataAdapterClientErrorException e) {
             logger.error("Error when sending SMS message.", e);
             resendResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Resend step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            resendResponse.setMessage("error.communication");
+            resendResponse.setMessage(e.getError().getMessage());
             return resendResponse;
         }
     }
@@ -418,7 +427,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         try {
             final GetOperationDetailResponse operation = getOperation();
             final AuthMethod authMethod = getAuthMethodName(operation);
-            cleanHttpSession(false);
+            cleanHttpSession();
             cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
@@ -430,7 +439,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");
-            cleanHttpSession(false);
+            cleanHttpSession();
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return cancelResponse;
         }
@@ -446,7 +455,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private CreateSmsAuthorizationResponse sendAuthorizationSms(GetOperationDetailResponse operation, boolean resend) throws DataAdapterClientErrorException, AuthStepException {
         Long lastMessageTimestamp = getLastMessageTimestampFromHttpSession();
         if (lastMessageTimestamp != null && System.currentTimeMillis() - lastMessageTimestamp < configuration.getSmsResendDelay()) {
-            throw new InvalidRequestException("Attempt to send message before resend delay was reached");
+            CreateSmsAuthorizationResponse response = new CreateSmsAuthorizationResponse();
+            response.setSmsDeliveryResult(SmsDeliveryResult.FAILED);
+            response.setErrorMessage("smsAuthorization.deliveryFailed");
+            return response;
         }
         String userId = operation.getUserId();
         String organizationId = operation.getOrganizationId();
