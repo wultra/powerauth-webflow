@@ -39,7 +39,6 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Optional;
 
 /**
  * Default demo controller class.
@@ -116,7 +115,9 @@ public class HomeController {
                     type = AvailableOperation.Type.PAYMENT;
                     break;
                 default:
-                    throw new NextStepServiceException("Unknown operation config");
+                    // Allow other operation names, client can have additional operations in Next Step which are
+                    // not supported by Web Flow.
+                    continue;
             }
             operations.add(new AvailableOperation(type, name));
         }
