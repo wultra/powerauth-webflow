@@ -87,10 +87,14 @@ export default class Token extends React.Component {
         const update = this.update;
         dispatch(initOnline(function(initSucceeded) {
             if (initSucceeded) {
-                setInitialized(true);
                 // continue only when init() succeeds - when push message is delivered
-                dispatch(getOperationData());
-                update();
+                dispatch(getOperationData(function(dataSucceeded) {
+                    // continue only when getOperationData() succeeds - chosen authentication instrument is loaded
+                    if (dataSucceeded) {
+                        update();
+                        setInitialized(true);
+                    }
+                }));
             }
         }));
     }
@@ -286,7 +290,7 @@ export default class Token extends React.Component {
                     <OperationTimeout/>
                     <OperationDetail/>
                     <div>
-                        {(this.state.configurationInitialized) ? (
+                        {(this.state.initialized && this.state.configurationInitialized) ? (
                             <div>
                                 {(this.state.smsFallbackAvailable && this.state.smsFallbackEnabled) ? (
                                     <div>
