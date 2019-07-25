@@ -231,6 +231,15 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
+     * Set initial message sent flag in HTTP session.
+     */
+    private void updateInitialMessageSentInHttpSession(Boolean initialMessageSent) {
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT, initialMessageSent);
+        }
+    }
+
+    /**
      * Get message ID from HTTP session.
      */
     private String getMessageIdFromHttpSession() {
@@ -258,12 +267,21 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
+     * Get initial message sent flag from HTTP session.
+     */
+    private Boolean getInitialMessageSentFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            return (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+        }
+    }
+    /**
      * Clean HTTP session.
      */
     private void cleanHttpSession() {
         synchronized (httpSession.getServletContext()) {
             httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
             httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
+            httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
             httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
         }
     }
@@ -293,11 +311,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             initResponse.setPasswordEnabled(true);
         }
 
+        Boolean initialMessageSent = getInitialMessageSentFromHttpSession();
+        if (initialMessageSent != null && initialMessageSent) {
+            initResponse.setResult(AuthStepResult.CONFIRMED);
+            return initResponse;
+        }
+
         try {
             CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, false);
             String messageId = response.getMessageId();
             if (messageId != null) {
                 updateMessageIdInHttpSession(messageId);
+                updateInitialMessageSentInHttpSession(true);
             }
             if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
