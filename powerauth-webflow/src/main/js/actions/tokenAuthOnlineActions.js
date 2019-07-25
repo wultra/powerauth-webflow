@@ -20,7 +20,7 @@ import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
  * Get operation detail.
  * @returns {Function} Operation detail.
  */
-export function getOperationData() {
+export function getOperationData(callback) {
     return function (dispatch) {
         axios.post("./api/auth/operation/detail", {}, {
             headers: {
@@ -31,6 +31,8 @@ export function getOperationData() {
                 type: "SHOW_SCREEN_TOKEN",
                 payload: response.data
             });
+            // data loading complete - mobile token authorization can start
+            callback(true);
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
@@ -68,7 +70,7 @@ export function initOnline(callback) {
                     username: response.data.username
                 }
             });
-            // initialization complete - mobile token authorization can start
+            // initialization complete - data loading can start
             callback(true);
             return null;
         }).catch((error) => {
