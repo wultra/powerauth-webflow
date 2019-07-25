@@ -119,11 +119,13 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 case NO_PROTECTION:
                     // Password is sent in plain text
                     passwordProtection = new NoPasswordProtection();
+                    logger.info("No protection is used for protecting user password");
                     break;
 
                 case PASSWORD_ENCRYPTION_AES:
                     // Encrypt user password in case password encryption is configured in Web Flow
                     passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
+                    logger.info("User password is protected using transformation: {}", cipherTransformation);
                     break;
 
                 default:
