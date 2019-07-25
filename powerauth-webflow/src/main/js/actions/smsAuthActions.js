@@ -52,8 +52,20 @@ export function init(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                dispatchAction(dispatch, response);
-                return;
+                // Handle  error when message delivery fails, another SMS message can be sent later.
+                dispatch({
+                    type: getActionType(component),
+                    payload: {
+                        loading: false,
+                        error: true,
+                        init: true,
+                        message: response.data.message,
+                        passwordEnabled: response.data.passwordEnabled,
+                        username: response.data.username,
+                        resendDelay: response.data.resendDelay
+                    }
+                });
+                return null;
             }
             dispatch({
                 type: getActionType(component),
@@ -87,8 +99,19 @@ export function resend(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                dispatchAction(dispatch, response);
-                return;
+                // Handle  error when message delivery fails, another SMS message can be sent later.
+                dispatch({
+                    type: getActionType(component),
+                    payload: {
+                        loading: false,
+                        error: true,
+                        init: false,
+                        resend: true,
+                        message: response.data.message,
+                        resendDelay: response.data.resendDelay
+                    }
+                });
+                return null;
             }
             dispatch({
                 type: getActionType(component),
