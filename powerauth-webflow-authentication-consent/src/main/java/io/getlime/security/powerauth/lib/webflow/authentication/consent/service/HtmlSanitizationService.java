@@ -37,10 +37,12 @@ public class HtmlSanitizationService {
             return htmlText;
         }
         // The sanitization policy corresponds with https://www.npmjs.com/package/sanitize-html#what-are-the-default-options
-        // plus the 'img' tag with 'src' and 'alt' attributes.
+        // plus the 'img' tag with 'src' and 'alt' attributes and class attributes for various tags.
         PolicyFactory policy = new HtmlPolicyBuilder()
-                .allowAttributes("href", "name", "target").onElements("a")
-                .allowAttributes("src", "alt").onElements("img")
+                .allowAttributes("href", "name", "target", "class").onElements("a")
+                .allowAttributes("src", "alt", "class").onElements("img")
+                .allowAttributes("class").onElements("div")
+                .allowAttributes("class").onElements("p")
                 .allowStandardUrlProtocols()
                 .allowElements("h3", "h4", "h5", "h6", "blockquote", "p", "a", "ul", "ol",
                         "nl", "li", "b", "i", "strong", "em", "strike", "code", "hr", "br", "div",

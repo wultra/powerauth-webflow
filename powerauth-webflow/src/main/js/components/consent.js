@@ -144,12 +144,15 @@ export default class Consent extends React.Component {
     }
 
     createHtml(html) {
-        let updatedAttributes = sanitizeHTML.defaults.allowedAttributes;
-        updatedAttributes.img.concat(['alt']);
         return {
             __html: sanitizeHTML(html, {
                 allowedTags: sanitizeHTML.defaults.allowedTags.concat(['img']),
-                allowedAttributes: updatedAttributes
+                allowedAttributes: {
+                    a: ['href', 'name', 'target', 'class'],
+                    img: ['src', 'alt', 'class'],
+                    div: ['class'],
+                    p: ['class']
+                }
             })
         };
     }
