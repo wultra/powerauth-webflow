@@ -77,6 +77,9 @@ export default class Consent extends React.Component {
                     if (option.defaultValue === 'CHECKED') {
                         option.value = 'CHECKED';
                         props.context.consent.checkedOptions.set(option.id, true);
+                    } else {
+                        option.value = 'NOT_CHECKED';
+                        props.context.consent.checkedOptions.set(option.id, false);
                     }
                 });
             } else if (props.context.consent && props.context.consent.checkedOptions) {
@@ -84,6 +87,8 @@ export default class Consent extends React.Component {
                 props.context.options.map(option => {
                     if (props.context.consent.checkedOptions.get(option.id)) {
                         option.value = 'CHECKED';
+                    } else {
+                        option.value = 'NOT_CHECKED';
                     }
                 });
             }
