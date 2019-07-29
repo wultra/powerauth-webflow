@@ -68,7 +68,13 @@ a:hover, a:active, a:focus {
     box-shadow: 0px 0px 24px -1px rgba(150, 150, 150, 1);
 }
 
-.message-error {
+.message-error.title:not(.operation-cancel) { /* If the error is title (but not cancel title, that's not an error) , just color it. */
+    color: white;
+    background: #630f0f;
+    border-radius: 6px;
+}
+
+.message-error:not(.title) {
     background: #940404;
     color: #ffffff;
     word-wrap: break-word;
@@ -80,7 +86,7 @@ a:hover, a:active, a:focus {
     border: 1px solid rgb(226, 0, 0);
 }
 
-.text-center >.message-error:first-child, .text-center > .message-error:last-child, .Select .message-error {
+.text-center >.message-error:first-child:not(.title), .text-center > .message-error:last-child:not(.title), .Select .message-error {
     color: red;
     border: 0;
     background: transparent;
@@ -331,7 +337,7 @@ a:hover, a:active, a:focus {
 .title {
     font-size: 21px;
     font-weight: 300;
-    margin: 10px;
+    padding: 10px;
 }
 
 .alert {

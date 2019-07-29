@@ -68,7 +68,7 @@ export default class Error extends React.Component {
                 ) : (
                     <div className="panel panel-body text-center">
                         <div>
-                            <div className="message-error title">
+                            <div className={"message-error title" + (this.props.context.message == 'operation.canceled' ? ' operation-cancel' : '')}>
                                 {(this.props.context.message) ? (
                                     <FormattedMessage id={this.props.context.message}/>
                                 ) : (
