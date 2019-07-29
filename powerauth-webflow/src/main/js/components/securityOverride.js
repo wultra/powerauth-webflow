@@ -46,7 +46,7 @@ export default class SecurityOverride extends React.Component {
 
     render() {
         return (
-            <div className="jumbotron text-center">
+            <div className="panel-body">
                 <h3><FormattedMessage id="security.warning.android.title"/></h3>
                 <hr className="my-4"/>
                 <div className="lead"><FormattedMessage id="security.warning.android.text"/></div>
