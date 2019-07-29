@@ -12,6 +12,7 @@ public class PaymentForm {
     private String account;
     private String note;
     private String dueDate;
+    private String appContext;
 
     public BigDecimal getAmount() {
         return amount;
@@ -52,4 +53,8 @@ public class PaymentForm {
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
+
+    public String getAppContext() { return appContext; }
+
+    public void setAppContext(String appContext) { this.appContext = appContext; }
 }

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.webflow.demo.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
@@ -26,6 +27,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Value
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -39,6 +42,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 
 /**
  * Default demo controller class.
@@ -50,6 +54,8 @@ public class HomeController {
     private final ConnectionFactoryLocator connectionFactoryLocator;
     private final NextStepClient client;
     private final HttpSession httpSession;
+
+    private final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @Autowired
     public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator, NextStepClient client, HttpSession httpSession) {
@@ -85,6 +91,19 @@ public class HomeController {
                 paymentForm.setAccount("238400856/0300");
                 paymentForm.setNote("Utility Bill Payment - 05/2017");
                 paymentForm.setDueDate("2017-06-29");
+
+                ApplicationContext ac = new ApplicationContext();
+                ac.setId("Demo");
+                ac.setName("Demo application");
+                ac.setDescription("Web Flow demo application");
+                ac.getExtras().put("_requestedScopes", Collections.singletonList("OAUTH"));
+                ac.getExtras().put("applicationOwner", "Wultra");
+                try {
+                    String acString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(ac);
+                    paymentForm.setAppContext(acString);
+                } catch (Exception e) {
+                    throw new NextStepServiceException("Cannot serialize Application Context");
+                }
             } else {
                 httpSession.removeAttribute("paymentForm");
             }
@@ -177,9 +196,7 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        ApplicationContext applicationContext = createApplicationContext();
-
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, getApplicationContext(paymentForm));
         synchronized (httpSession.getServletContext()) {
             httpSession.setAttribute("operationId", payment.getResponseObject().getOperationId());
             httpSession.setAttribute("paymentForm", paymentForm);
@@ -203,7 +220,7 @@ public class HomeController {
         formData.addGreeting("login.greeting");
         formData.addSummary("login.summary");
 
-        ApplicationContext applicationContext = createApplicationContext();
+        ApplicationContext applicationContext = null;
 
         ObjectResponse<CreateOperationResponse> objectResponse = client.createOperation(operationName, operationData, formData, null, applicationContext);
         String operationId = objectResponse.getResponseObject().getOperationId();
@@ -236,8 +253,7 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        ApplicationContext applicationContext = createApplicationContext();
-
+        ApplicationContext applicationContext = getApplicationContext(paymentForm);
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (session.getServletContext()) {
             session.setAttribute("operationId", payment.getResponseObject().getOperationId());
@@ -251,14 +267,11 @@ public class HomeController {
         return connectionRepositoryProvider.get();
     }
 
-    private ApplicationContext createApplicationContext() {
-        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
-        ApplicationContext applicationContext = new ApplicationContext();
-        applicationContext.setId("DEMO");
-        applicationContext.setName("Demo application");
-        applicationContext.setDescription("Web Flow demo application");
-        applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("OAUTH"));
-        applicationContext.getExtras().put("applicationOwner", "Wultra");
-        return applicationContext;
+    private ApplicationContext getApplicationContext(PaymentForm paymentForm) throws NextStepServiceException {
+        try {
+            return new ObjectMapper().readValue(paymentForm.getAppContext(), ApplicationContext.class);
+        } catch (Exception e) {
+            throw new NextStepServiceException("Cannot deserialize ApplicationContext");
+        }
     }
 }
