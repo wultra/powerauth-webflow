@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsDeliveryResult;
+
 /**
  * Response after creating SMS OTP authorization message.
  *
@@ -26,6 +28,16 @@ public class CreateSmsAuthorizationResponse {
      * Message ID.
      */
     private String messageId;
+
+    /**
+     * Result of SMS delivery.
+     */
+    private SmsDeliveryResult smsDeliveryResult;
+
+    /**
+     * Error message key.
+     */
+    private String errorMessage;
 
     /**
      * Default constructor.
@@ -55,5 +67,37 @@ public class CreateSmsAuthorizationResponse {
      */
     public void setMessageId(String messageId) {
         this.messageId = messageId;
+    }
+
+    /**
+     * Get result of SMS message delivery.
+     * @return Result of SMS message delivery.
+     */
+    public SmsDeliveryResult getSmsDeliveryResult() {
+        return smsDeliveryResult;
+    }
+
+    /**
+     * Set result of SMS message delivery.
+     * @param smsDeliveryResult Result of SMS message delivery.
+     */
+    public void setSmsDeliveryResult(SmsDeliveryResult smsDeliveryResult) {
+        this.smsDeliveryResult = smsDeliveryResult;
+    }
+
+    /**
+     * Get error message key used in case SMS message could not be delivered.
+     * @return Error message key.
+     */
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    /**
+     * Set error message key used in case SMS message could not be delivered.
+     * @param errorMessage Error message key.
+     */
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

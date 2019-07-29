@@ -37,9 +37,12 @@ export default class SmsAuthorization extends React.Component {
     constructor() {
         super();
         this.init = this.init.bind(this);
+        this.storeError = this.storeError.bind(this);
+        this.storeMessage = this.storeMessage.bind(this);
+        this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.state = {passwordEnabled: null, username: null, resendEnabled: false, initialized: false};
+        this.state = {passwordEnabled: null, username: null, resendEnabled: false, initialized: false, error: null, message: null, remainingAttempts: null};
     }
 
     componentWillMount() {
@@ -55,6 +58,16 @@ export default class SmsAuthorization extends React.Component {
             // Set the component to initialized state
             this.setState({initialized: true});
         }
+        // store message and error into component state because context can change
+        if (props.context.error !== undefined) {
+            this.storeError(props.context.error);
+        }
+        if (props.context.message !== undefined) {
+            this.storeMessage(props.context.message);
+        }
+        if (props.context.remainingAttempts !== undefined) {
+            this.storeRemainingAttempts(props.context.remainingAttempts);
+        }
         if (props.context.init || props.context.resend) {
             // Disable resend link for configured delay in ms
             this.setState({resendEnabled: false});
@@ -68,6 +81,18 @@ export default class SmsAuthorization extends React.Component {
     init() {
         this.props.dispatch(init("SMS"));
         this.props.dispatch(getOperationData("SMS"));
+    }
+
+    storeError(errorReceived) {
+        this.setState({error: errorReceived});
+    }
+
+    storeMessage(messageReceived) {
+        this.setState({message: messageReceived});
+    }
+
+    storeRemainingAttempts(remainingAttemptsReceived) {
+        this.setState({remainingAttempts: remainingAttemptsReceived});
     }
 
     handleSmsResend(event) {
@@ -89,7 +114,7 @@ export default class SmsAuthorization extends React.Component {
                     <OperationDetail/>
                     <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
                                   smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"
-                                  message={this.props.context.message} error={this.props.context.error} remainingAttempts={this.props.context.remainingAttempts}
+                                  message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
                                   initialized={this.state.initialized}/>
                 </Panel>
                 {this.props.context.loading ? <Spinner/> : undefined}

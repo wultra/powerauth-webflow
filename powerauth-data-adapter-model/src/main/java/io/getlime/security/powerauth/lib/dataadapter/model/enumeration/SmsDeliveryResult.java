@@ -13,18 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.model;
+package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * Constants for storing attributes in HTTP session by individual steps.
+ * Result of SMS authorization code delivery.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class HttpSessionAttributeNames {
+public enum SmsDeliveryResult {
 
-    public static final String MESSAGE_ID = "MESSAGE_ID";
-    public static final String LAST_MESSAGE_TIMESTAMP = "LAST_MESSAGE_TIMESTAMP";
-    public static final String INITIAL_MESSAGE_SENT = "INITIAL_MESSAGE_SENT";
-    public static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
-    public static final String CONSENT_SKIPPED = "CONSENT_SKIPPED";
-    public static final String USERNAME = "USERNAME";
+    /**
+     * Authorization SMS was successfully delivered.
+     */
+    SUCCEEDED,
+
+    /**
+     * Authorization SMS could not be delivered.
+     */
+    FAILED
 
 }
