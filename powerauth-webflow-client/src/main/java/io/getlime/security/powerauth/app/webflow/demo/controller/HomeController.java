@@ -83,7 +83,7 @@ public class HomeController {
                 paymentForm.setAmount(BigDecimal.valueOf(100));
                 paymentForm.setCurrency("CZK");
                 paymentForm.setAccount("238400856/0300");
-                paymentForm.setNote("Utility Bill Payment - 05/2017");
+                paymentForm.setNote("Utility Bill Payment - 05/2019");
                 paymentForm.setDueDate("2017-06-29");
             } else {
                 httpSession.removeAttribute("paymentForm");

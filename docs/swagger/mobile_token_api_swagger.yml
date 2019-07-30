@@ -41,7 +41,7 @@ paths:
                 {
                   "id": "7e0ba60f-bf22-4ff5-b999-2733784e5eaa",
                   "name": "authorize_payment",
-                  "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+                  "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2019",
                   "operationCreated": "2018-07-02T14:43:13+0000",
                   "operationExpires": "2018-07-02T14:48:17+0000",
                   "allowedSignatureType": {
@@ -85,7 +85,7 @@ paths:
                       "type": "NOTE",
                       "id": "operation.note",
                       "label": "Note",
-                      "note": "Utility Bill Payment - 05/2017"
+                      "note": "Utility Bill Payment - 05/2019"
                     },
                     {
                       "type": "PARTY_INFO",

@@ -125,7 +125,7 @@ Arbitrary data which is stored together with the operation. Web Flow does not tr
 _For example a payment operation contains following data (as string value):_
 
 ```pre
-"{\"amount\":100,\"currency\":\"CZK\",\"account\":\"238400856/0300\",\"note\":\"Utility Bill Payment - 05/2017\",\"dueDate\":\"2017-06-29\"}"
+"{\"amount\":100,\"currency\":\"CZK\",\"account\":\"238400856/0300\",\"note\":\"Utility Bill Payment - 05/2019\",\"dueDate\":\"2019-06-29\"}"
 ```
 
 Since Web Flow version 0.20.0 the [suggested format of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) to allow interpretation of data by Mobile token.
@@ -141,8 +141,8 @@ _For example a payment operation contains following form data:_
 - _summary: Hello, please confirm payment 100 CZK to account 238400856/0300._
 - _amount: 100 CZK_
 - _account: 238400856/0300_
-- _due date: 2017-06-29_
-- _note: Utility Bill Payment - 05/2017_
+- _due date: 2019-06-29_
+- _note: Utility Bill Payment - 05/2019_
 
 ### Operation form field attribute
 

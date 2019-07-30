@@ -78,8 +78,8 @@ See example below:
 String account = "238400856/0300";
 BigDecimal amount = BigDecimal.valueOf(100);
 String currency = "CZK";
-String note = "Utility Bill Payment - 05/2017";
-String dueDate = "2017-06-29";
+String note = "Utility Bill Payment - 05/2019";
+String dueDate = "2019-06-29";
 
 // operation form data initialization
 OperationFormData formData = new OperationFormData();
@@ -285,7 +285,7 @@ Remarks:
           "label": null,
           "valueFormatType": "TEXT",
           "formattedValues": {},
-          "note": "Utility Bill Payment - 05/2017"
+          "note": "Utility Bill Payment - 05/2019"
         }
 ```
 
