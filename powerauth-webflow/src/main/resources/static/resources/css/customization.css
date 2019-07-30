@@ -228,7 +228,7 @@ a:hover, a:active, a:focus {
     color: #b3b3b3;
 }
 
-form-control:focus {
+.form-control:focus {
     box-shadow: inset 0 0 10px #439fe677 !important;
 }
 
