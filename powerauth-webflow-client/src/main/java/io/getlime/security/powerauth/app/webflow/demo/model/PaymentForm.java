@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 /**
  * @author Petr Dvorak, petr@wultra.com
  */
-public class PaymentForm {
+public class PaymentForm extends OperationForm {
 
     private BigDecimal amount;
     private String currency;
