@@ -70,14 +70,25 @@ powerauth.webflow.offlineMode.available=true
 
 # Configuration of Android Security Warning
 powerauth.webflow.android.showSecurityWarning=true
+
+# Configuration of Optional User Password Encryption
+powerauth.webflow.password.protection.type=NO_PROTECTION
+powerauth.webflow.password.encryption.transformation=
+powerauth.webflow.password.encryption.key=
+
+# Configuration of Delay for Resending SMS in Milliseconds
+powerauth.webflow.sms.resend.delayMs=60000
+
+# Configuration of Delay for Showing Operation Timeout Warning in Milliseconds
+powerauth.webflow.timeout.warning.delayMs=60000
 ```
 
 Encryption of user passwords during transport can be configured using following properties:
 ```
 # Configuration of Password Encryption
-powerauth.webflow.authentication.type=PASSWORD_ENCRYPTION_AES
+powerauth.webflow.password.protection.type=PASSWORD_ENCRYPTION_AES
 powerauth.webflow.password.encryption.transformation=AES/CBC/PKCS7Padding
-powerauth.webflow.password.encryption.key=Qee4CK44d8GduTxoHU7JPM2lCs+KF63akIpKyaLk9+c=
+powerauth.webflow.password.encryption.key=[Secret Base 64 encoded 32-bit key, you generate it using code below and keep it secure]
 ```
 
 The configuration specifies that user password should be encrypted using AES in CBC mode with PKCS#7 padding. 
@@ -91,8 +102,6 @@ byte[] randomBytes = new byte[32];
 new SecureRandom().nextBytes(randomBytes);
 String encryptionKey = BaseEncoding.base64().encode(randomBytes);
 ```
-
-_WARNING: Do not reuse the encryption key from sample configuration in this documentation._
 
 The symmetric key is used by both Web Flow and by the remote system which needs to decrypt the password for verification.
 For information about password decryption, see: [User Password Encryption And Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption)
