@@ -28,8 +28,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Value
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.ConnectionRepository;
@@ -55,8 +53,6 @@ public class HomeController {
     private final ConnectionFactoryLocator connectionFactoryLocator;
     private final NextStepClient client;
     private final HttpSession httpSession;
-
-    private final Logger logger = LoggerFactory.getLogger(HomeController.class);
 
     @Autowired
     public HomeController(Provider<ConnectionRepository> connectionRepositoryProvider, ConnectionFactoryLocator connectionFactoryLocator, NextStepClient client, HttpSession httpSession) {
