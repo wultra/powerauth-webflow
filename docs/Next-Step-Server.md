@@ -26,6 +26,7 @@ Next Step Server implements following functionality:
   - update operation form data
   - update application context for an operation
   - set chosen authentication method
+  - retrieve operation configuration
 - management of organizations
   - list organizations
   - retrieve organization detail

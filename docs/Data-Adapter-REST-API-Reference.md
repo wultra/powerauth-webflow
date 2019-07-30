@@ -14,6 +14,7 @@ Following topics are covered in this chapter:
 - [Generate authorization SMS](#generate-sms-authorization-code)
 - [Verify authorization SMS code](#verify-authorization-sms-code)
 - [Verify authorization SMS code and password](#verify-authorization-sms-code-and-password)
+- [Initialize OAuth 2.0 consent form](#initialize-oauth-20-consent-form)
 - [Create OAuth 2.0 consent form](#create-oauth-20-consent-form)
 - [Validate OAuth 2.0 consent form](#validate-oauth-20-consent-form)
 - [Save OAuth 2.0 consent form](#save-oauth-20-consent-form)
@@ -115,7 +116,7 @@ The list of expected status codes during authentication:
     "operationContext": {
       "id": "7662c638-9dc9-484c-a119-145b3685e623",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -161,9 +162,9 @@ The list of expected status codes during authentication:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -171,9 +172,9 @@ The list of expected status codes during authentication:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {}
@@ -184,8 +185,8 @@ The list of expected status codes during authentication:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -222,6 +223,9 @@ The list of expected status codes during authentication:
 }
 ```
 
+Note that in SCA steps the implementations should hide this error, because the error could reveal which usernames are valid 
+and which are not.
+
 ### Response - invalid input
 
 ```json
@@ -244,7 +248,7 @@ The list of expected status codes during authentication:
 
 ## User Authentication
 
-Performs an authentication operation with user ID and password.
+Performs an authentication operation with user ID and password. This method is not SCA compliant.
 
 <table>
 	<tr>
@@ -276,14 +280,17 @@ The list of expected status codes during authentication:
 {
   "requestObject": {
     "userId": "12345678",
-    "password": "s3cret",
     "organizationId": "RETAIL",
-    "passwordProtection": "NO_PROTECTION",
-    "cipherTransformation": null,
+    "password": "s3cret",
+    "authenticationContext": {
+      "passwordProtection": "NO_PROTECTION",
+      "cipherTransformation": "",
+      "smsAuthorizationResult": null
+    },
     "operationContext": {
       "id": "447fbd89-6f46-46da-a573-ade4f3409c94",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -329,9 +336,9 @@ The list of expected status codes during authentication:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -339,9 +346,9 @@ The list of expected status codes during authentication:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {}
@@ -352,8 +359,8 @@ The list of expected status codes during authentication:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -422,30 +429,37 @@ private String decryptPassword(String secretKeyBase64, String cipherTransformati
 {
   "status": "OK",
   "responseObject": {
-    "userId": "12345678",
-    "organizationId": "RETAIL"
+    "authenticationResult": "VERIFIED_SUCCEEDED",
+    "userDetail": {
+      "id": "12345678",
+      "givenName": "John",
+      "familyName": "Doe",
+      "organizationId": "RETAIL"
+    },
+    "errorMessage": null,
+    "remainingAttempts": null,
+    "showRemainingAttempts": false
   }
 }
 ```
-
-The userId value is a system-wide unique identifier identifying the user who was just authenticated.
 
 ### Response - authentication failed
 
 This message should be sent when the Data Adapter receives a correct message, however the username and password combination is invalid.
 
-- Status Code: `401`
+- Status Code: `200`
 - Headers:
 	- `Content-Type: application/json`
 
 ```json
 {
-  "status": "ERROR",
+  "status": "OK",
   "responseObject": {
-    "code": "AUTHENTICATION_FAILED",
-    "message": "login.authenticationFailed",
-    "validationErrors": null,
-    "remainingAttempts": 2
+    "authenticationResult": "VERIFIED_FAILED",
+    "userDetail": null,
+    "errorMessage": "login.authenticationFailed",
+    "remainingAttempts": null,
+    "showRemainingAttempts": false
   }
 }
 ```
@@ -453,6 +467,8 @@ This message should be sent when the Data Adapter receives a correct message, ho
 ### Response - input validation errors
 
 This error should be returned when username or password format is invalid - either it contains unsupported characters or it is empty or too long. This error is also used when authentication type is not supported.
+
+The sample response below is returned when password is empty. 
 
 - Status Code: `400`
 - Headers:
@@ -463,20 +479,15 @@ This error should be returned when username or password format is invalid - eith
   "status": "ERROR",
   "responseObject": {
     "code": "INPUT_INVALID",
-    "message": "login.username.empty login.password.empty",
+    "message": "login.password.empty",
     "validationErrors": [
-      "login.username.empty.objectRequest.requestObject.username",
-      "login.username.empty.requestObject.username",
-      "login.username.empty.username",
-      "login.username.empty.java.lang.String",
-      "login.username.empty",
       "login.password.empty.objectRequest.requestObject.password",
       "login.password.empty.requestObject.password",
       "login.password.empty.password",
       "login.password.empty.java.lang.String",
       "login.password.empty"
     ],
-    "remainingAttempts": 3
+    "remainingAttempts": null
   }
 }
 ```
@@ -498,7 +509,7 @@ This error should be used for all unexpected errors.
     "code": "ERROR_GENERIC",
     "message": "Exception occurred at ...",
     "validationErrors": null,
-    "remainingAttempts": 3
+    "remainingAttempts": null
   }
 }
 ```
@@ -600,7 +611,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -646,9 +657,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -656,9 +667,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -670,8 +681,8 @@ The list of expected status codes:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -735,9 +746,9 @@ The list of expected status codes:
           "label": "Due Date",
           "valueFormatType": "DATE",
           "formattedValues": {
-            "value": "Jun 29, 2017"
+            "value": "Jun 29, 2019"
           },
-          "value": "2017-06-29"
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
@@ -745,9 +756,9 @@ The list of expected status codes:
           "label": "Note",
           "valueFormatType": "TEXT",
           "formattedValues": {
-            "value": "Utility Bill Payment - 05/2017"
+            "value": "Utility Bill Payment - 05/2019"
           },
-          "note": "Utility Bill Payment - 05/2017"
+          "note": "Utility Bill Payment - 05/2019"
         },
         {
           "type": "BANK_ACCOUNT_CHOICE",
@@ -832,7 +843,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -878,9 +889,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -888,9 +899,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -903,8 +914,8 @@ The list of expected status codes:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -970,7 +981,7 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
     "operationContext": {
       "id": "c02c5ea8-d4da-4499-9a27-aa4ded70921b",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1016,9 +1027,9 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1026,9 +1037,9 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1042,8 +1053,8 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -1102,7 +1113,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1148,9 +1159,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1158,9 +1169,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1174,8 +1185,8 @@ The list of expected status codes:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -1185,7 +1196,7 @@ The list of expected status codes:
 }
 ```
 
-### Response - SMS has been successfully created
+### Success response - SMS has been successfully created
 
 - Status Code: `200`
 - Headers:
@@ -1195,7 +1206,26 @@ The list of expected status codes:
 {
   "status": "OK",
   "responseObject": {
-    "messageId": "884de880-925d-47a9-8ff9-1954bf990de1"
+    "messageId": "d056ec42-2349-43a1-9af4-cc502d924f76",
+    "smsDeliveryResult": "SUCCEEDED",
+    "errorMessage": null
+  }
+}
+```
+
+### Error response - SMS could not be sent
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+	
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "messageId": "d056ec42-2349-43a1-9af4-cc502d924f76",
+    "smsDeliveryResult": "FAILED",
+    "errorMessage": null
   }
 }
 ```
@@ -1237,7 +1267,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1283,9 +1313,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1293,9 +1323,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1309,8 +1339,8 @@ The list of expected status codes:
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -1319,7 +1349,7 @@ The list of expected status codes:
 }
 ```
 
-### Response - SMS authorization code has been successfully verified
+### Success response - SMS authorization code has been successfully verified
 
 - Status Code: `200`
 - Headers:
@@ -1327,7 +1357,27 @@ The list of expected status codes:
 
 ```json
 {
-  "status": "OK"
+  "status": "OK",
+  "responseObject": {
+    "smsAuthorizationResult": "VERIFIED_SUCCEEDED",
+    "errorMessage": null,
+    "remainingAttempts": null,
+    "showRemainingAttempts": false
+  }
+}
+```
+
+### Error response - SMS authorization code verification failed
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "smsAuthorizationResult": "VERIFIED_FAILED",
+    "errorMessage": "smsAuthorization.failed",
+    "remainingAttempts": 4,
+    "showRemainingAttempts": false
+  }
 }
 ```
 
@@ -1372,14 +1422,17 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
     "userId": "12345678",
     "password": "s3cret",
     "organizationId": "RETAIL",
-    "passwordProtection": "NO_PROTECTION",
-    "cipherTransformation": null,  
+    "authenticationContext": {
+      "passwordProtection": "NO_PROTECTION",
+      "cipherTransformation": "",
+      "smsAuthorizationResult": null
+    },
     "messageId": "617178ab-f315-4223-a602-9d4893b4f99f",
     "authorizationCode": "77038183",
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1425,9 +1478,9 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1435,9 +1488,9 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1451,8 +1504,8 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
         "description": "Web Flow demo application",
         "extras": {
           "applicationOwner": "Wultra",
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ]
         }
       }
@@ -1461,7 +1514,7 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 }
 ```
 
-### Response - SMS authorization code and password have been successfully verified
+### Success response - SMS authorization code and password have been successfully verified
 
 - Status Code: `200`
 - Headers:
@@ -1469,7 +1522,184 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 
 ```json
 {
-  "status": "OK"
+  "status": "OK",
+  "responseObject": {
+    "smsAuthorizationResult": "VERIFIED_SUCCEEDED",
+    "userAuthenticationResult": "VERIFIED_SUCCEEDED",
+    "errorMessage": null,
+    "remainingAttempts": null,
+    "showRemainingAttempts": false
+  }
+}
+```
+
+### Error response - SMS authorization code and/or password verification failed
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+	
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "smsAuthorizationResult": "VERIFIED_FAILED",
+    "userAuthenticationResult": "VERIFIED_FAILED",
+    "errorMessage": "login.authenticationFailed",
+    "remainingAttempts": null,
+    "showRemainingAttempts": false
+  }
+}
+```
+
+## Initialize OAuth 2.0 Consent Form
+
+### Initialize consent form - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/auth/consent/init</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - consent form has been successfully initalized |
+| 400  | `INPUT_INVALID` - request validation errors |
+| 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
+| 400  | `REMOTE_ERROR` - communication with remote system failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Create consent form - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "12345678",
+    "organizationId": "RETAIL",
+    "operationContext": {
+      "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2019"
+            },
+            "value": "2019-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2019"
+            },
+            "note": "Utility Bill Payment - 05/2019"
+          }
+        ],
+        "userInput": {
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "_requestedScopes": [
+            "PISP"
+          ],
+          "applicationOwner": "Wultra"
+        }
+      }
+    }
+  }
+}
+```
+
+### Response - consent form has been successfully created
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "consentHtml": "I consent that I have initiated this payment request and give consent to complete the operation.",
+    "options": [
+      {
+        "id": "CONSENT_INIT",
+        "descriptionHtml": "I consent that I have initiated this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      },
+      {
+        "id": "CONSENT_PAYMENT",
+        "descriptionHtml": "I give consent to complete this payment operation.",
+        "required": true,
+        "defaultValue": "NOT_CHECKED",
+        "value": null
+      }
+    ]
+  }
 }
 ```
 
@@ -1510,7 +1740,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1556,9 +1786,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1566,9 +1796,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1581,8 +1811,8 @@ The list of expected status codes:
         "name": "Demo application",
         "description": "Web Flow demo application",
         "extras": {
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ],
           "applicationOwner": "Wultra"
         }
@@ -1662,7 +1892,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1708,9 +1938,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1718,9 +1948,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1733,8 +1963,8 @@ The list of expected status codes:
         "name": "Demo application",
         "description": "Web Flow demo application",
         "extras": {
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ],
           "applicationOwner": "Wultra"
         }
@@ -1844,7 +2074,7 @@ The list of expected status codes:
     "operationContext": {
       "id": "4a04667b-8a1a-46af-813c-cf71ffcde478",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "formData": {
         "title": {
           "id": "operation.title",
@@ -1890,9 +2120,9 @@ The list of expected status codes:
             "label": "Due Date",
             "valueFormatType": "DATE",
             "formattedValues": {
-              "value": "Jun 29, 2017"
+              "value": "Jun 29, 2019"
             },
-            "value": "2017-06-29"
+            "value": "2019-06-29"
           },
           {
             "type": "NOTE",
@@ -1900,9 +2130,9 @@ The list of expected status codes:
             "label": "Note",
             "valueFormatType": "TEXT",
             "formattedValues": {
-              "value": "Utility Bill Payment - 05/2017"
+              "value": "Utility Bill Payment - 05/2019"
             },
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           }
         ],
         "userInput": {
@@ -1915,8 +2145,8 @@ The list of expected status codes:
         "name": "Demo application",
         "description": "Web Flow demo application",
         "extras": {
-          "requestedScopes": [
-            "OAUTH"
+          "_requestedScopes": [
+            "PISP"
           ],
           "applicationOwner": "Wultra"
         }

@@ -26,7 +26,7 @@ public class VerifySmsAuthorizationResponse {
 
     private SmsAuthorizationResult smsAuthorizationResult;
     private String errorMessage;
-    private int remainingAttempts;
+    private Integer remainingAttempts;
     private boolean showRemainingAttempts;
 
     /**

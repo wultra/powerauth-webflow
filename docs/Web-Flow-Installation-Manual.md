@@ -6,6 +6,13 @@ This manual describes the installation of Web Flow including setting up the envi
 
 If you prefer a faster setup, consider trying our [Docker images](https://github.com/wultra/powerauth-docker).
 
+### Dependencies
+
+The Web Flow application has following dependencies which should be deployed before deploying Web Flow:
+- [PowerAuth Server](https://developers.wultra.com/docs/develop/powerauth-server/Deploying-PowerAuth-Server)
+- [PowerAuth Push Server](https://developers.wultra.com/docs/2019.05/powerauth-push-server/Deploying-Push-Server)
+- [PowerAuth Admin](https://developers.wultra.com/docs/2019.05/powerauth-admin/Deploying-PowerAuth-Admin)
+
 ### Create required user and group
 
 Create group "tomcat" and user "tomcat":
@@ -54,13 +61,19 @@ Copy all resources which you want to modify into this folder. See resources in t
 #### Oracle:
 Copy "ojdbc6.jar" to "/opt/tomcat/lib" folder, so that the Oracle DB connector is on classpath. You can get the required JAR here:
 
-https://mvnrepository.com/artifact/oracle/ojdbc6/11.2.0.3
+https://mvnrepository.com/artifact/oracle/ojdbc6
+
+Note that the JDBC driver version needs to be supported by installed database.
+Additional application properties may be required to be configured based on database version.
 
 #### MySQL:
 
-Copy "mysql-connector-java-6.0.6.jar" to "/opt/tomtact/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
+Copy "mysql-connector-java-[version].jar" to "/opt/tomcat/lib" folder, so that the MySQL DB connector is on classpath. You can get the required JAR here:
 
-http://central.maven.org/maven2/mysql/mysql-connector-java/6.0.6
+http://central.maven.org/maven2/mysql/mysql-connector-java
+
+Note that the JDBC driver version needs to be supported by installed database. 
+Additional application properties may be required to be configured based on database version.
 
 #### Other databases
 
@@ -95,6 +108,8 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 `<Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>`
 
 `<Parameter name="powerauth.nextstep.service.url" value="http://10.x.x.x:8080/powerauth-nextstep"/>`
+
+Note that the JDBC settings differ based on used database vendor and JDBC driver requirements.
 
 #### powerauth-webflow.xml
 
@@ -218,6 +233,23 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 </Context>
 ```
 
+#### powerauth-data-adapter.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+​
+    <!-- Database Configuration - JDBC -->
+    <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
+    <Parameter name="spring.datasource.username" value="powerauth"/>
+    <Parameter name="spring.datasource.password" value="********"/>
+    <Parameter name="spring.datasource.driver-class-name" value="oracle.jdbc.OracleDriver"/>
+    <Parameter name="spring.jpa.hibernate.ddl-auto" value="none"/>
+    <Parameter name="spring.jpa.properties.hibernate.default_schema" value="powerauth"/>
+​
+</Context>
+```
+
 #### powerauth-webflow-client.xml
 
 ```xml
@@ -248,6 +280,18 @@ Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, u
 ### Copy applications
 
 Create war artifacts using steps described in [Compilation, Packaging and Deployment](./Compilation,-Packaging-and-Deployment.md) and copy them into /opt/tomcat/webapps.
+
+Note that the Data Adapter project is available in a separate repository [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization).
+
+The following war files are required for complete functionality including PowerAuth:
+
+- powerauth-admin.war
+- powerauth-data-adapter.war
+- powerauth-java-server.war
+- powerauth-nextstep.war
+- powerauth-push-server.war
+- powerauth-webflow-client.war
+- powerauth-webflow.war
 
 ### Configure Web Flow
 

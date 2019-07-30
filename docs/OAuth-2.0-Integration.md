@@ -29,3 +29,9 @@ Web Flow Resource Serverr provides following endpoints:
 A sample OAuth 2.0 client is implemented in the [powerauth-webflow-client project](../powerauth-webflow-client). It is expected that during Web Flow deployment a similar client will be created for preparing data and form data related to the operation.
 
 The sample code for creating an operation and customizing operation form data is available in the [Customizing Operation Form Data chapter](./Customizing-Operation-Form-Data.md).
+
+## OAuth 2.0 Consent Screen
+
+The [Data Adapter project](https://github.com/wultra/powerauth-webflow-customization) can be used to customize the OAuth 2.0 screen with custom form and options.
+The consent form is shown in Web Flow when the `CONSENT` method is included in operation steps.
+ 

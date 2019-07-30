@@ -78,8 +78,8 @@ See example below:
 String account = "238400856/0300";
 BigDecimal amount = BigDecimal.valueOf(100);
 String currency = "CZK";
-String note = "Utility Bill Payment - 05/2017";
-String dueDate = "2017-06-29";
+String note = "Utility Bill Payment - 05/2019";
+String dueDate = "2019-06-29";
 
 // operation form data initialization
 OperationFormData formData = new OperationFormData();
@@ -99,7 +99,7 @@ bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
 formData.getConfig().add(bankAccountConfig);
 
 // operation initialization
-final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
+final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null, applicationContext);
 session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 ```
 
@@ -214,13 +214,28 @@ formData.addPartyInfo("operation.partyInfo", partyInfo);
 
 In order to add party information before an existing field instead of appending it after last field, use the `addPartyInfoBeforeField()` method.
 
+### Adding application context
+
+The example below specifies application context for an operation. The application context is used in `CONSENT` step to generate the consent form. 
+```java
+ApplicationContext applicationContext = new ApplicationContext();
+applicationContext.setId("DEMO");
+applicationContext.setName("Demo application");
+applicationContext.setDescription("Web Flow demo application");
+applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("AISP"));
+applicationContext.getExtras().put("applicationOwner", "Wultra");
+```
+
+Note that the `extras` is a Map which can be used for adding other key-value items required for the consent form. Use the create `ApplicationContext`
+instance when creating the operation.
+
 ### Operation Form Data JSON
 
 When creating operations using Next Step API, you can specify operation form data using JSON instead of using the Java API.
 
 Note: `label` and `formattedValue` fields in examples below are always null, because these values are used internally:
 - `label` is localized by taking the `id` and localizing it into current language
-- `formattedValue` is constructed using logic based on `valueFormatType` and field value
+- `formattedValues` is constructed using logic based on `valueFormatType` and field value
 
 `AMOUNT`:
 ```json
@@ -229,7 +244,7 @@ Note: `label` and `formattedValue` fields in examples below are always null, bec
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -249,7 +264,7 @@ Remarks:
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         }
 ```
@@ -269,8 +284,8 @@ Remarks:
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
         }
 ```
 
@@ -284,7 +299,7 @@ Remarks:
           "id": "operation.heading1",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "Heading"
         }
 ```

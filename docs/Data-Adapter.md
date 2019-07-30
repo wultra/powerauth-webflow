@@ -16,9 +16,10 @@ Following functionality needs to be customized during Web Flow deployment by imp
 - decorate form data for given user (e.g. add user bank account list)
 - form data change notification
 - operation status change notification
-- generate OTP code for SMS based authorization
-- generate authorization SMS text
-- send authorization SMS 
+- send authorization SMS with generate text and authorization code 
+- verify authorization code from SMS
+- initialize OAuth 2.0 consent form
 - create OAuth 2.0 consent form
 - validate OAuth 2.0 consent form options
 - save OAuth 2.0 consent form options
+- authenticate user using user ID, password and SMS authorization code

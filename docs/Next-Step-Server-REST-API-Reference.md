@@ -24,6 +24,8 @@ Following topics are covered in this chapter:
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
+  - [List operation configurations](#list-operation-configurations)
+  - [Get operation configuration detail](#get-operation-configuration-detail)
 - [Organizations](#organizations)
   - [Organization list](#list-organizations)
   - [Organization detail](#organization-detail)
@@ -81,9 +83,9 @@ Get a system status response, with basic information about the running applicati
         "applicationName" : "powerauth-nextstep",
         "applicationDisplayName" : "PowerAuth Next Step Server",
         "applicationEnvironment" : "",
-        "version" : "0.20.0",
-        "buildTime" : "2017-03-11T09:34:52Z",
-        "timestamp" : "2017-03-14T14:54:14Z"
+        "version" : "0.22.0",
+        "buildTime" : "2019-06-11T09:34:52Z",
+        "timestamp" : "2019-06-14T14:54:14Z"
     }  
 }
 ```
@@ -137,32 +139,56 @@ Lists all authentication methods supported by the server.
       {
         "authMethod": "INIT",
         "hasUserInterface": false,
-        "displayNameKey": null
+        "displayNameKey": null,
+        "hasMobileToken": false
       },
       {
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
-        "displayNameKey": null
+        "displayNameKey": null,
+        "hasMobileToken": false
       },
       {
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
-        "displayNameKey": "method.usernamePassword"
+        "displayNameKey": "method.usernamePassword",
+        "hasMobileToken": false
       },
       {
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
-        "displayNameKey": "method.showOperationDetail"
+        "displayNameKey": "method.showOperationDetail",
+        "hasMobileToken": false
       },
       {
         "authMethod": "POWERAUTH_TOKEN",
         "hasUserInterface": true,
-        "displayNameKey": "method.powerauthToken"
+        "displayNameKey": "method.powerauthToken",
+        "hasMobileToken": true
       },
       {
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
-        "displayNameKey": "method.smsKey"
+        "displayNameKey": "method.smsKey",
+        "hasMobileToken": false
+      },
+      {
+        "authMethod": "CONSENT",
+        "hasUserInterface": true,
+        "displayNameKey": "method.consent",
+        "hasMobileToken": false
+      },
+      {
+        "authMethod": "LOGIN_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.loginSca",
+        "hasMobileToken": true
+      },
+      {
+        "authMethod": "APPROVAL_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.approvalSca",
+        "hasMobileToken": true
       }
     ]
   }
@@ -213,6 +239,7 @@ Lists all authentication methods enabled for given user.
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -220,6 +247,7 @@ Lists all authentication methods enabled for given user.
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -227,6 +255,7 @@ Lists all authentication methods enabled for given user.
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -234,6 +263,7 @@ Lists all authentication methods enabled for given user.
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -241,8 +271,9 @@ Lists all authentication methods enabled for given user.
         "authMethod": "POWERAUTH_TOKEN",
         "hasUserInterface": true,
         "displayNameKey": "method.powerauthToken",
+        "hasMobileToken": true,
         "config": {
-          "activationId": "26c94bf8-f594-4bd8-9c51-93449926b644"
+          "activationId": "1629d4c7-6b17-41e3-bce1-e184e94921d2"
         }
       },
       {
@@ -250,6 +281,31 @@ Lists all authentication methods enabled for given user.
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "CONSENT",
+        "hasUserInterface": true,
+        "displayNameKey": "method.consent",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "LOGIN_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.loginSca",
+        "hasMobileToken": true,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "APPROVAL_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.approvalSca",
+        "hasMobileToken": true,
         "config": null
       }
     ]
@@ -322,6 +378,7 @@ For other authentication methods use the following configuration:
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -329,6 +386,7 @@ For other authentication methods use the following configuration:
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -336,6 +394,7 @@ For other authentication methods use the following configuration:
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -343,6 +402,7 @@ For other authentication methods use the following configuration:
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -350,6 +410,7 @@ For other authentication methods use the following configuration:
         "authMethod": "POWERAUTH_TOKEN",
         "hasUserInterface": true,
         "displayNameKey": "method.powerauthToken",
+        "hasMobileToken": true,
         "config": {
           "activationId": "26c94bf8-f594-4bd8-9c51-93449926b644"
         }
@@ -359,6 +420,31 @@ For other authentication methods use the following configuration:
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "CONSENT",
+        "hasUserInterface": true,
+        "displayNameKey": "method.consent",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "LOGIN_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.loginSca",
+        "hasMobileToken": true,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "APPROVAL_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.approvalSca",
+        "hasMobileToken": true,
         "config": null
       }
     ]
@@ -423,6 +509,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
         "authMethod": "INIT",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -430,6 +517,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
         "authMethod": "USER_ID_ASSIGN",
         "hasUserInterface": false,
         "displayNameKey": null,
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -437,6 +525,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
         "authMethod": "USERNAME_PASSWORD_AUTH",
         "hasUserInterface": true,
         "displayNameKey": "method.usernamePassword",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -444,6 +533,7 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
         "authMethod": "SHOW_OPERATION_DETAIL",
         "hasUserInterface": true,
         "displayNameKey": "method.showOperationDetail",
+        "hasMobileToken": false,
         "config": null
       },
       {
@@ -451,6 +541,31 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
         "authMethod": "SMS_KEY",
         "hasUserInterface": true,
         "displayNameKey": "method.smsKey",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "CONSENT",
+        "hasUserInterface": true,
+        "displayNameKey": "method.consent",
+        "hasMobileToken": false,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "LOGIN_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.loginSca",
+        "hasMobileToken": true,
+        "config": null
+      },
+      {
+        "userId": "12345678",
+        "authMethod": "APPROVAL_SCA",
+        "hasUserInterface": true,
+        "displayNameKey": "method.approvalSca",
+        "hasMobileToken": true,
         "config": null
       }
     ]
@@ -464,6 +579,7 @@ Operation detail contains following data:
 * **operationId** - unique ID of the operation, it is either set while creating an operation or it is generated (field is required, value is optional, for generated operation use null as value)
 * **operationName** - name of the operations based on the purpose of the operation - different steps are defined for each operation name (required)
 * **userId** - ID of user in case the user has been already authorized (optional)
+* **organizationId** - ID of organization in case the user has been already authorized (optional)
 * **result** - result of the last authentication step: CONTINUE, FAILED or DONE (required)
 * **timestampCreated** - timestamp when operation was created (required)
 * **timestampExpires** - timestamp when operation expires (required)
@@ -473,6 +589,7 @@ Operation detail contains following data:
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
 * **chosenAuthMethod** - authentication method chosen in current authentication step (optional)
 * **remainingAttempts** - remaining attempts for current authentication step (optional)
+* **applicationContext** - application context with information about application which triggered the operation, used when generating the consent form (optional)
 * **expired** - whether operation was expired at the time of generating response (optional)
 
 Example of complete operation detail:
@@ -481,21 +598,17 @@ Example of complete operation detail:
 {
   "status": "OK",
   "responseObject": {
-    "operationId": "3b1ec892-5267-4afe-9554-0707cad66854",
-    "operationName": "authorize_payment",
-    "userId": null,
-    "organizationId": null,    
+    "operationId": "0861a423-ac06-4bcb-a426-2052872163d3",
+    "operationName": "authorize_payment_sca",
+    "userId": "12345678",
+    "organizationId": "RETAIL",
     "result": "CONTINUE",
-    "timestampCreated": "2018-06-28T12:04:00+0000",
-    "timestampExpires": "2018-06-28T12:04:15+0000",
-    "operationData": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+    "timestampCreated": "2019-07-30T12:36:19+0000",
+    "timestampExpires": "2019-07-30T12:41:40+0000",
+    "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "steps": [
       {
-        "authMethod": "USER_ID_ASSIGN",
-        "params": []
-      },
-      {
-        "authMethod": "USERNAME_PASSWORD_AUTH",
+        "authMethod": "LOGIN_SCA",
         "params": []
       }
     ],
@@ -527,7 +640,7 @@ Example of complete operation detail:
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -537,7 +650,7 @@ Example of complete operation detail:
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         },
         {
@@ -545,23 +658,36 @@ Example of complete operation detail:
           "id": "operation.dueDate",
           "label": null,
           "valueFormatType": "DATE",
-          "formattedValue": null,
-          "value": "2017-06-29"
+          "formattedValues": {},
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
         }
       ],
       "dynamicDataLoaded": false,
-      "userInput": {}
+      "userInput": {
+        "smsFallback.enabled": "true"
+      }
     },
     "chosenAuthMethod": null,
-    "remainingAttempts": null,
+    "remainingAttempts": 3,
+    "applicationContext": {
+      "id": "DEMO",
+      "name": "Demo application",
+      "description": "Web Flow demo application",
+      "extras": {
+        "applicationOwner": "Wultra",
+        "_requestedScopes": [
+          "PISP"
+        ]
+      }
+    },
     "expired": false
   }
 }
@@ -601,7 +727,10 @@ The **static part of formData** contains data related to the operation known whe
           "id": "operation.amount",
           "label": "Amount",
           "valueFormatType": "AMOUNT",
-          "formattedValue": "100.00 CZK",
+          "formattedValues": {
+            "amount": "100.00",
+            "currency": "CZK"
+          },
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -611,31 +740,38 @@ The **static part of formData** contains data related to the operation known whe
           "id": "operation.account",
           "label": "To Account",
           "valueFormatType": "ACCOUNT",
-          "formattedValue": "238400856/0300",
-          "value": "238400856/0300"
+          "formattedValues": {
+            "value": "238400856/0300"
+          }
         },
         {
           "type": "KEY_VALUE",
           "id": "operation.dueDate",
           "label": "Due Date",
           "valueFormatType": "DATE",
-          "formattedValue": "Jun 29, 2017",
-          "value": "2017-06-29"
+          "formattedValues": {
+            "value": "Jun 29, 2019"
+          },
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": "Note",
           "valueFormatType": "TEXT",
-          "formattedValue": "Utility Bill Payment - 05/2017",
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {
+            "value": "Utility Bill Payment - 05/2019"
+          },          
+          "note": "Utility Bill Payment - 05/2019"
         },
         {
           "type": "HEADING",
           "id": "operation.heading",
           "label": null,
           "valueFormatType": "LOCALIZED_TEXT",
-          "formattedValue": "Confirm Payment",
+          "formattedValues": {
+            "value": "Confirm Payment"
+          },            
           "value": "operation.title"
         }
       ],
@@ -839,6 +975,8 @@ Null value is used when authentication method has not been chosen for current st
 
 Creates an operation in Next Step server.
 
+Documentation for operation data is available [in a separate document](https://developers.wultra.com/docs/2019.05/powerauth-webflow/Operation-Data).
+
 <table>
     <tr>
         <td>Method</td>
@@ -850,7 +988,43 @@ Creates an operation in Next Step server.
     </tr>
 </table>
 
-#### Request
+#### Request - AISP
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationName": "login",
+    "operationData": "A2",
+    "formData": {
+      "title": {
+        "id": "login.title"
+      },
+      "greeting": {
+        "id": "login.greeting"
+      },
+      "summary": {
+        "id": "login.summary"
+      }
+    },
+    "applicationContext": {
+      "id": "DEMO",
+      "name": "Demo application",
+      "description": "Web Flow demo application",
+      "extras": {
+        "applicationOwner": "Wultra",
+        "_requestedScopes": [
+          "PISP"
+        ]
+      }
+    }
+  }
+}
+```
+
+#### Request - PISP
 
 - Headers:
     - `Content-Type: application/json`
@@ -860,7 +1034,8 @@ Creates an operation in Next Step server.
   "requestObject": {
     "operationName": "authorize_payment",
     "operationId": null,
-    "operationData": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+    "organizationId": null,
+    "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "params": [],
     "formData": {
       "title": {
@@ -882,7 +1057,7 @@ Creates an operation in Next Step server.
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -892,7 +1067,7 @@ Creates an operation in Next Step server.
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         },
         {
@@ -900,20 +1075,29 @@ Creates an operation in Next Step server.
           "id": "operation.dueDate",
           "label": null,
           "valueFormatType": "DATE",
-          "formattedValue": null,
-          "value": "2017-06-29"
+          "formattedValues": {},
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
         }
       ],
-      "dynamicDataLoaded": false,
-      "userInput": {}
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "applicationOwner": "Wultra",
+          "_requestedScopes": [
+            "PISP"
+          ]
+        }
+      }
     }
   }
 }
@@ -923,17 +1107,68 @@ Creates an operation in Next Step server.
 - Status Code: `200`
 - Headers:
     - `Content-Type: application/json`
+    
+AISP:
 
 ```json
 {
   "status": "OK",
   "responseObject": {
-    "operationId": "51045c7d-1d6b-4de8-9313-cd4af7316c0b",
-    "operationName": "authorize_payment",
+    "operationId": "ec039314-7560-470a-b226-116c712e8fb3",
+    "operationName": "login",
+    "organizationId": null,
     "result": "CONTINUE",
     "resultDescription": null,
-    "timestampCreated": "2018-06-20T10:17:31+0000",
-    "timestampExpires": "2018-06-20T10:22:31+0000",
+    "timestampCreated": "2019-07-30T12:51:28+0000",
+    "timestampExpires": "2019-07-30T12:56:28+0000",
+    "operationData": null,
+    "steps": [
+      {
+        "authMethod": "USER_ID_ASSIGN",
+        "params": []
+      },
+      {
+        "authMethod": "USERNAME_PASSWORD_AUTH",
+        "params": []
+      }
+    ],
+    "formData": {
+      "title": {
+        "id": "login.title",
+        "message": null
+      },
+      "greeting": {
+        "id": "login.greeting",
+        "message": null
+      },
+      "summary": {
+        "id": "login.summary",
+        "message": null
+      },
+      "config": [],
+      "banners": [],
+      "parameters": [],
+      "dynamicDataLoaded": false,
+      "userInput": {}
+    },
+    "expired": false
+  }
+}
+```
+
+PISP:
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "operationId": "f415a617-f7c0-4800-8436-f85eb075eb6f",
+    "operationName": "authorize_payment",
+    "organizationId": null,
+    "result": "CONTINUE",
+    "resultDescription": null,
+    "timestampCreated": "2019-07-30T12:52:35+0000",
+    "timestampExpires": "2019-07-30T12:57:35+0000",
     "operationData": null,
     "steps": [
       {
@@ -966,7 +1201,7 @@ Creates an operation in Next Step server.
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -976,7 +1211,7 @@ Creates an operation in Next Step server.
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         },
         {
@@ -984,16 +1219,16 @@ Creates an operation in Next Step server.
           "id": "operation.dueDate",
           "label": null,
           "valueFormatType": "DATE",
-          "formattedValue": null,
-          "value": "2017-06-29"
+          "formattedValues": {},
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
         }
       ],
       "dynamicDataLoaded": false,
@@ -1041,6 +1276,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
   "requestObject": {
     "operationId": "4e02b39b-1ecb-440a-a942-cc27bc07d203",
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "authMethod": "USERNAME_PASSWORD_AUTH",
     "authStepResult": "CONFIRMED",
     "authStepResultDescription": null,
@@ -1100,7 +1336,7 @@ Retrieves detail of an operation in the Next Step server.
 ```json
 {
   "requestObject" : {
-    "operationId" : "4e02b39b-1ecb-440a-a942-cc27bc07d203"
+    "operationId" : "0861a423-ac06-4bcb-a426-2052872163d3"
   }
 }
 ```
@@ -1114,28 +1350,23 @@ Retrieves detail of an operation in the Next Step server.
 {
   "status": "OK",
   "responseObject": {
-    "operationId": "4e02b39b-1ecb-440a-a942-cc27bc07d203",
-    "operationName": "authorize_payment",
+    "operationId": "0861a423-ac06-4bcb-a426-2052872163d3",
+    "operationName": "authorize_payment_sca",
     "userId": "12345678",
     "organizationId": "RETAIL",
     "result": "CONTINUE",
-    "timestampCreated": "2018-06-28T12:20:26+0000",
-    "timestampExpires": "2018-06-28T12:20:43+0000",
-    "operationData": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+    "timestampCreated": "2019-07-30T12:36:19+0000",
+    "timestampExpires": "2019-07-30T12:41:40+0000",
+    "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "steps": [
       {
-        "authMethod": "SMS_KEY",
+        "authMethod": "LOGIN_SCA",
         "params": []
       }
     ],
     "history": [
       {
         "authMethod": "INIT",
-        "authResult": "CONTINUE",
-        "requestAuthStepResult": "CONFIRMED"
-      },
-      {
-        "authMethod": "USERNAME_PASSWORD_AUTH",
         "authResult": "CONTINUE",
         "requestAuthStepResult": "CONFIRMED"
       }
@@ -1161,7 +1392,7 @@ Retrieves detail of an operation in the Next Step server.
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -1171,7 +1402,7 @@ Retrieves detail of an operation in the Next Step server.
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         },
         {
@@ -1179,27 +1410,37 @@ Retrieves detail of an operation in the Next Step server.
           "id": "operation.dueDate",
           "label": null,
           "valueFormatType": "DATE",
-          "formattedValue": null,
-          "value": "2017-06-29"
+          "formattedValues": {},
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
-          "note": "Utility Bill Payment - 05/2017"
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
         }
       ],
       "dynamicDataLoaded": false,
       "userInput": {
-        "operation.bankAccountChoice": "CZ4012340000000012345678",
-        "operation.bankAccountChoice.disabled": "true"
+        "smsFallback.enabled": "true"
       }
     },
-    "chosenAuthMethod": "SMS_KEY",
+    "chosenAuthMethod": null,
     "remainingAttempts": 3,
-    "expired": true
+    "applicationContext": {
+      "id": "DEMO",
+      "name": "Demo application",
+      "description": "Web Flow demo application",
+      "extras": {
+        "applicationOwner": "Wultra",
+        "_requestedScopes": [
+          "PISP"
+        ]
+      }
+    },
+    "expired": false
   }
 }
 ```
@@ -1240,73 +1481,95 @@ Lists pending operation for given user and authentication method.
 
 ```json
 {
-  "status" : "OK",
-  "responseObject" : [ {
-    "operationId" : "07fc3e10-24ed-4938-b172-9c88fb47d6ec",
-    "operationName" : "authorize_payment",
-    "userId" : "12345678",
-    "organizationId": "RETAIL",
-    "result" : "CONTINUE",
-    "timestampCreated" : "2018-03-19T10:10:38Z",
-    "timestampExpires" : "2018-03-19T10:15:40Z",
-    "operationData" : "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
-    "steps" : [ ],
-    "history" : [ ],
-    "formData" : {
-      "title" : {
-        "id" : "operation.title",
-        "value" : null
+  "status": "OK",
+  "responseObject": [
+    {
+      "operationId": "d7d9910e-b047-4352-b2b3-f1fa30d03f3a",
+      "operationName": "authorize_payment_sca",
+      "userId": "12345678",
+      "organizationId": "RETAIL",
+      "result": "CONTINUE",
+      "timestampCreated": "2019-07-30T12:57:28+0000",
+      "timestampExpires": "2019-07-30T13:02:28+0000",
+      "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
+      "steps": [],
+      "history": [
+        {
+          "authMethod": "INIT",
+          "authResult": "CONTINUE",
+          "requestAuthStepResult": "CONFIRMED"
+        }
+      ],
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": null
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": null
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": null
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": null,
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {},
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": null,
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {},
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": null,
+            "valueFormatType": "DATE",
+            "formattedValues": {},
+            "value": "2019-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": null,
+            "valueFormatType": "TEXT",
+            "formattedValues": {},
+            "note": "Utility Bill Payment - 05/2019"
+          }
+        ],
+        "dynamicDataLoaded": false,
+        "userInput": {}
       },
-      "greeting" : {
-        "id" : "operation.greeting",
-        "value" : null
+      "chosenAuthMethod": "LOGIN_SCA",
+      "remainingAttempts": null,
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "extras": {
+          "applicationOwner": "Wultra",
+          "_requestedScopes": [
+            "PISP"
+          ]
+        }
       },
-      "summary" : {
-        "id" : "operation.summary",
-        "value" : null
-      },
-      "config" : [ ],
-      "parameters" : [ {
-        "type" : "AMOUNT",
-        "id" : "operation.amount",
-        "label" : null,
-        "valueFormatType" : "AMOUNT",
-        "formattedValue" : null,
-        "amount" : 100,
-        "currency" : "CZK",
-        "currencyId" : "operation.currency"
-      }, {
-        "type" : "KEY_VALUE",
-        "id" : "operation.account",
-        "label" : null,
-        "valueFormatType" : "ACCOUNT",
-        "formattedValue" : null,
-        "value" : "238400856/0300"
-      }, {
-        "type" : "KEY_VALUE",
-        "id" : "operation.dueDate",
-        "label" : null,
-        "valueFormatType" : "DATE",
-        "formattedValue" : null,
-        "value" : "2017-06-29"
-      }, {
-        "type" : "NOTE",
-        "id" : "operation.note",
-        "label" : null,
-        "valueFormatType" : "TEXT",
-        "formattedValue" : null,
-        "note" : "Utility Bill Payment - 05/2017"
-      } ],
-      "dynamicDataLoaded" : false,
-      "userInput" : {
-        "operation.bankAccountChoice" : "CZ4012340000000012345678",
-        "operation.bankAccountChoice.disabled" : "true"
-      }
-    },
-    "chosenAuthMethod" : null,
-    "remainingAttempts" : null,
-    "expired" : false
-  } ]
+      "expired": false
+    }
+  ]
 }
 ```
 
@@ -1384,16 +1647,16 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         "id": "operation.dueDate",
         "label": "Due Date",
         "valueFormatType": "DATE",
-        "formattedValue": "Jun 29, 2017",
-        "value": "2017-06-29"
+        "formattedValue": "Jun 29, 2019",
+        "value": "2019-06-29"
       },
       {
         "type": "NOTE",
         "id": "operation.note",
         "label": "Note",
         "valueFormatType": "TEXT",
-        "formattedValue": "Utility Bill Payment - 05/2017",
-        "note": "Utility Bill Payment - 05/2017"
+        "formattedValue": "Utility Bill Payment - 05/2019",
+        "note": "Utility Bill Payment - 05/2019"
       },
       {
         "type": "BANK_ACCOUNT_CHOICE",
@@ -1552,7 +1815,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 {
   "requestObject": {
     "operationId": "0a044408-aea0-433a-80cf-6371dc2a76c0",
-    "userId": "roman",
+    "userId": "12345678",
     "organizationId": "RETAIL"
   }
 }
@@ -1618,6 +1881,117 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 ```json
 {
   "status" : "OK"
+}
+```
+
+### List operation configurations
+
+Retrieves list of operation configurations.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/config/list</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "operationConfigs": [
+      {
+        "operationName": "authorize_payment",
+        "templateVersion": "A",
+        "templateId": 1,
+        "mobileTokenMode": "{\"type\":\"2FA\",\"variants\":[\"possession_knowledge\",\"possession_biometry\"]}"
+      },
+      {
+        "operationName": "authorize_payment_sca",
+        "templateVersion": "A",
+        "templateId": 1,
+        "mobileTokenMode": "{\"type\":\"2FA\",\"variants\":[\"possession_knowledge\",\"possession_biometry\"]}"
+      },
+      {
+        "operationName": "login",
+        "templateVersion": "A",
+        "templateId": 2,
+        "mobileTokenMode": "{\"type\":\"2FA\",\"variants\":[\"possession_knowledge\",\"possession_biometry\"]}"
+      },
+      {
+        "operationName": "login_sca",
+        "templateVersion": "A",
+        "templateId": 2,
+        "mobileTokenMode": "{\"type\":\"2FA\",\"variants\":[\"possession_knowledge\",\"possession_biometry\"]}"
+      }
+    ]
+  }
+}
+```
+
+### Get operation configuration detail
+
+Get operation configuration detail.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/config/detail</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationName": "login"
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "operationName": "login",
+    "templateVersion": "A",
+    "templateId": 2,
+    "mobileTokenMode": "{\"type\":\"2FA\",\"variants\":[\"possession_knowledge\",\"possession_biometry\"]}"
+  }
 }
 ```
 
