@@ -50,8 +50,8 @@ a {
     text-decoration: none;
 }
 
-.black {
-    color: #000;
+.tint {
+    color: #439fe6;
 }
 
 .logo {
@@ -195,4 +195,8 @@ a {
 
 .app-context-enabler:not(.login) span {
     float: left;
+}
+
+.auhtorized {
+    padding: 50px 0;
 }
