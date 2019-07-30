@@ -589,6 +589,7 @@ Operation detail contains following data:
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
 * **chosenAuthMethod** - authentication method chosen in current authentication step (optional)
 * **remainingAttempts** - remaining attempts for current authentication step (optional)
+* **applicationContext** - application context with information about application which triggered the operation, used when generating the consent form (optional)
 * **expired** - whether operation was expired at the time of generating response (optional)
 
 Example of complete operation detail:
