@@ -48,11 +48,12 @@ public class InitConsentFormRequest {
     /**
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
-     * @param lang Language used for generating contest text.
+     * @param organizationId Organization ID.
      * @param operationContext Operation context which provides context for creating the consent form.
      */
-    public InitConsentFormRequest(String userId, String lang, OperationContext operationContext) {
+    public InitConsentFormRequest(String userId, String organizationId, OperationContext operationContext) {
         this.userId = userId;
+        this.organizationId = organizationId;
         this.operationContext = operationContext;
     }
 
