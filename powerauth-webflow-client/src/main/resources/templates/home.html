@@ -86,8 +86,12 @@
                                                             <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
                                                         </div>
                                                     </div>
-                                                    <div class="form-group form-group-lg">
-                                                        <button type="submit" class="btn btn-lg btn-success pull-right">Send</button>
+                                                    <div class="form-group form-group-lg app-context-enabler">
+                                                        <span onclick="$(this).siblings().first().toggle();$(this).toggle()">App Context Setup</span>
+                                                        <textarea style="display: none;" class="form-control" th:field="*{appContext}" placeholder="Application Context" />
+                                                    </div>
+                                                    <div class="form-group form-group-lg" style="text-align: right;">
+                                                        <button type="submit" class="btn btn-lg btn-success">Send</button>
                                                     </div>
                                                 </form>
                                             </div>
@@ -104,8 +108,12 @@
                                                 <p>
                                                     Authenticate as a user using SCA login.
                                                 </p>
-                                                <form th:action="@{/login/sca/create}" method="POST">
+                                                <form th:action="@{/login/sca/create}" th:object="${loginFormSca}" method="POST">
                                                     <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                                    <div class="form-group form-group-lg app-context-enabler login">
+                                                        <span onclick="$(this).siblings().first().toggle();$(this).toggle()">App Context Setup</span>
+                                                        <textarea style="display: none;" class="form-control" th:field="*{appContext}" placeholder="Application Context" />
+                                                    </div>
                                                     <button type="submit" class="btn btn-lg btn-success">Log in</button>
                                                 </form>
                                             </div>
@@ -113,7 +121,7 @@
                                                 <p>
                                                     Create Payment (SCA)
                                                 </p>
-                                                <form th:action="@{/payment/sca/create}" th:object="${paymentForm}" method="POST">
+                                                <form th:action="@{/payment/sca/create}" th:object="${paymentFormSca}" method="POST">
                                                     <div class="form-inputs">
                                                         <div class="form-group form-group-lg">
                                                             <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>

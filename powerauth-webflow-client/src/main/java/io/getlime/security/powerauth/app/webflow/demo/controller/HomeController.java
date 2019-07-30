@@ -19,6 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
+import io.getlime.security.powerauth.app.webflow.demo.model.ScaForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -42,7 +43,7 @@ import javax.servlet.http.HttpSession;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.List;
 
 /**
  * Default demo controller class.
@@ -80,36 +81,33 @@ public class HomeController {
         model.addAttribute("providerIds", connectionFactoryLocator.registeredProviderIds());
         model.addAttribute("operationId", operationId);
 
-        PaymentForm paymentForm;
+        PaymentForm paymentForm, paymentFormSca;
+        ScaForm loginFormSca;
         synchronized (httpSession.getServletContext()) {
             paymentForm = (PaymentForm) httpSession.getAttribute("paymentForm");
             if (paymentForm == null) {
-                // MOCK PAYMENT
-                paymentForm = new PaymentForm();
-                paymentForm.setAmount(BigDecimal.valueOf(100));
-                paymentForm.setCurrency("CZK");
-                paymentForm.setAccount("238400856/0300");
-                paymentForm.setNote("Utility Bill Payment - 05/2017");
-                paymentForm.setDueDate("2017-06-29");
-
-                ApplicationContext ac = new ApplicationContext();
-                ac.setId("Demo");
-                ac.setName("Demo application");
-                ac.setDescription("Web Flow demo application");
-                ac.getExtras().put("_requestedScopes", Collections.singletonList("OAUTH"));
-                ac.getExtras().put("applicationOwner", "Wultra");
-                try {
-                    String acString = new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(ac);
-                    paymentForm.setAppContext(acString);
-                } catch (Exception e) {
-                    throw new NextStepServiceException("Cannot serialize Application Context");
-                }
+                paymentForm = createDemoPaymentForm(false);
             } else {
                 httpSession.removeAttribute("paymentForm");
+            }
+            paymentFormSca = (PaymentForm) httpSession.getAttribute("paymentFormSca");
+            if (paymentFormSca == null) {
+                paymentFormSca = createDemoPaymentForm(true);
+            } else {
+                httpSession.removeAttribute("paymentFormSca");
+            }
+            loginFormSca = (ScaForm) httpSession.getAttribute("loginFormSca");
+            if (loginFormSca == null) {
+                loginFormSca = new ScaForm();
+                loginFormSca.setAppContext(createApplicationContext(Collections.singletonList("AISP")));
+            } else {
+                httpSession.removeAttribute("loginFormSca");
             }
         }
 
         model.addAttribute("paymentForm", paymentForm);
+        model.addAttribute("paymentFormSca", paymentFormSca);
+        model.addAttribute("loginFormSca", loginFormSca);
 
         ArrayList<AvailableOperation> operations = new ArrayList<>();
 
@@ -196,7 +194,8 @@ public class HomeController {
                 .attr5().note(paymentForm.getNote())
                 .build();
 
-        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, getApplicationContext(paymentForm));
+        ApplicationContext applicationContext = getApplicationContext(paymentForm);
+        final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (httpSession.getServletContext()) {
             httpSession.setAttribute("operationId", payment.getResponseObject().getOperationId());
             httpSession.setAttribute("paymentForm", paymentForm);
@@ -206,7 +205,7 @@ public class HomeController {
     }
 
     @RequestMapping("/login/sca/create")
-    public String loginSca() throws NextStepServiceException {
+    public String loginSca(ScaForm form) throws NextStepServiceException {
         final String operationName = "login_sca";
         final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
 
@@ -220,12 +219,12 @@ public class HomeController {
         formData.addGreeting("login.greeting");
         formData.addSummary("login.summary");
 
-        ApplicationContext applicationContext = null;
-
+        ApplicationContext applicationContext = getApplicationContext(form);
         ObjectResponse<CreateOperationResponse> objectResponse = client.createOperation(operationName, operationData, formData, null, applicationContext);
         String operationId = objectResponse.getResponseObject().getOperationId();
         synchronized (httpSession.getServletContext()) {
             httpSession.setAttribute("operationId", operationId);
+            httpSession.setAttribute("loginFormSca", form);
         }
         return "redirect:/";
     }
@@ -257,7 +256,7 @@ public class HomeController {
         final ObjectResponse<CreateOperationResponse> payment = client.createOperation(operationName, operationData, formData, null, applicationContext);
         synchronized (session.getServletContext()) {
             session.setAttribute("operationId", payment.getResponseObject().getOperationId());
-            session.setAttribute("paymentForm", paymentForm);
+            session.setAttribute("paymentFormSca", paymentForm);
         }
 
         return "redirect:/";
@@ -267,11 +266,38 @@ public class HomeController {
         return connectionRepositoryProvider.get();
     }
 
-    private ApplicationContext getApplicationContext(PaymentForm paymentForm) throws NextStepServiceException {
+    private ApplicationContext getApplicationContext(ScaForm form) throws NextStepServiceException {
         try {
-            return new ObjectMapper().readValue(paymentForm.getAppContext(), ApplicationContext.class);
+            return new ObjectMapper().readValue(form.getAppContext(), ApplicationContext.class);
         } catch (Exception e) {
             throw new NextStepServiceException("Cannot deserialize ApplicationContext");
         }
+    }
+
+    private String createApplicationContext(List<String> requestedScopes) throws NextStepServiceException {
+        // Sample specification of ApplicationContext for OAuth 2.0 consent screen
+        ApplicationContext applicationContext = new ApplicationContext();
+        applicationContext.setId("DEMO");
+        applicationContext.setName("Demo application");
+        applicationContext.setDescription("Web Flow demo application");
+        applicationContext.getExtras().put("_requestedScopes", requestedScopes);
+        applicationContext.getExtras().put("applicationOwner", "Wultra");
+
+        try {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(applicationContext);
+        } catch (Exception e) {
+            throw new NextStepServiceException("Cannot serialize Application Context");
+        }
+    }
+
+    private PaymentForm createDemoPaymentForm(boolean isSca) throws NextStepServiceException {
+        PaymentForm paymentForm = new PaymentForm();
+        paymentForm.setAmount(BigDecimal.valueOf(100));
+        paymentForm.setCurrency("CZK");
+        paymentForm.setAccount("238400856/0300");
+        paymentForm.setNote("Utility Bill Payment - 05/2019");
+        paymentForm.setDueDate("2019-06-29");
+        paymentForm.setAppContext(createApplicationContext(Collections.singletonList(isSca ? "PISP" : "OAUTH")));
+        return paymentForm;
     }
 }

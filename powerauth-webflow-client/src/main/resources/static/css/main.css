@@ -189,5 +189,10 @@ a {
 .app-context-enabler span {
     font-size: 11px;
     cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.app-context-enabler:not(.login) span {
     float: left;
 }

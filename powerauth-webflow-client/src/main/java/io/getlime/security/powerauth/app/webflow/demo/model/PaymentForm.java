@@ -5,14 +5,13 @@ import java.math.BigDecimal;
 /**
  * @author Petr Dvorak, petr@wultra.com
  */
-public class PaymentForm {
+public class PaymentForm extends ScaForm {
 
     private BigDecimal amount;
     private String currency;
     private String account;
     private String note;
     private String dueDate;
-    private String appContext;
 
     public BigDecimal getAmount() {
         return amount;
@@ -53,8 +52,4 @@ public class PaymentForm {
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
-
-    public String getAppContext() { return appContext; }
-
-    public void setAppContext(String appContext) { this.appContext = appContext; }
 }
