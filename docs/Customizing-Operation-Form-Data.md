@@ -235,7 +235,7 @@ When creating operations using Next Step API, you can specify operation form dat
 
 Note: `label` and `formattedValue` fields in examples below are always null, because these values are used internally:
 - `label` is localized by taking the `id` and localizing it into current language
-- `formattedValue` is constructed using logic based on `valueFormatType` and field value
+- `formattedValues` is constructed using logic based on `valueFormatType` and field value
 
 `AMOUNT`:
 ```json
@@ -244,7 +244,7 @@ Note: `label` and `formattedValue` fields in examples below are always null, bec
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -264,7 +264,7 @@ Remarks:
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         }
 ```
@@ -284,7 +284,7 @@ Remarks:
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
+          "formattedValues": {},
           "note": "Utility Bill Payment - 05/2017"
         }
 ```
@@ -299,7 +299,7 @@ Remarks:
           "id": "operation.heading1",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "Heading"
         }
 ```

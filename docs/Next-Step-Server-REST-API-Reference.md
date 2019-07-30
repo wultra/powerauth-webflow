@@ -726,7 +726,10 @@ The **static part of formData** contains data related to the operation known whe
           "id": "operation.amount",
           "label": "Amount",
           "valueFormatType": "AMOUNT",
-          "formattedValue": "100.00 CZK",
+          "formattedValues": {
+            "amount": "100.00",
+            "currency": "CZK"
+          },
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -736,23 +739,28 @@ The **static part of formData** contains data related to the operation known whe
           "id": "operation.account",
           "label": "To Account",
           "valueFormatType": "ACCOUNT",
-          "formattedValue": "238400856/0300",
-          "value": "238400856/0300"
+          "formattedValues": {
+            "value": "238400856/0300"
+          }
         },
         {
           "type": "KEY_VALUE",
           "id": "operation.dueDate",
           "label": "Due Date",
           "valueFormatType": "DATE",
-          "formattedValue": "Jun 29, 2017",
-          "value": "2017-06-29"
+          "formattedValues": {
+            "value": "Jun 29, 2019"
+          },
+          "value": "2019-06-29"
         },
         {
           "type": "NOTE",
           "id": "operation.note",
           "label": "Note",
           "valueFormatType": "TEXT",
-          "formattedValue": "Utility Bill Payment - 05/2017",
+          "formattedValues": {
+            "value": "Utility Bill Payment - 05/2017"
+          },          
           "note": "Utility Bill Payment - 05/2017"
         },
         {
@@ -760,7 +768,9 @@ The **static part of formData** contains data related to the operation known whe
           "id": "operation.heading",
           "label": null,
           "valueFormatType": "LOCALIZED_TEXT",
-          "formattedValue": "Confirm Payment",
+          "formattedValues": {
+            "value": "Confirm Payment"
+          },            
           "value": "operation.title"
         }
       ],
@@ -1046,7 +1056,7 @@ Documentation for operation data is available [in a separate document](https://d
           "id": "operation.amount",
           "label": null,
           "valueFormatType": "AMOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "amount": 100,
           "currency": "CZK",
           "currencyId": "operation.currency"
@@ -1056,7 +1066,7 @@ Documentation for operation data is available [in a separate document](https://d
           "id": "operation.account",
           "label": null,
           "valueFormatType": "ACCOUNT",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "238400856/0300"
         },
         {
@@ -1064,7 +1074,7 @@ Documentation for operation data is available [in a separate document](https://d
           "id": "operation.dueDate",
           "label": null,
           "valueFormatType": "DATE",
-          "formattedValue": null,
+          "formattedValues": {},
           "value": "2017-06-29"
         },
         {
@@ -1072,7 +1082,7 @@ Documentation for operation data is available [in a separate document](https://d
           "id": "operation.note",
           "label": null,
           "valueFormatType": "TEXT",
-          "formattedValue": null,
+          "formattedValues": {},
           "note": "Utility Bill Payment - 05/2017"
         }
       ],
