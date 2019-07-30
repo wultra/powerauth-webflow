@@ -1,1 +1,253 @@
-/* Add customized CSS styles into this file. This CSS file is loaded after all other CSS files. */
+/*
+    Add customized CSS styles into this file. This CSS file is loaded after all other CSS files.
+*/
+
+html {
+    background-image: url(../images/background-wultra.png);
+    background-position: center center;
+    background-size: cover;
+    height: 100%;
+}
+
+body {
+    color: #b3b3b3;
+    font-size: 13pt;
+    font-weight: 400;
+    background: transparent;
+}
+
+#logo + div {
+    background: #000000;
+    border-radius: 8px;
+}
+
+a {
+    color: #439fe6;
+}
+
+p {
+    font-weight: 300;
+}
+
+a:hover, a:active, a:focus {
+    color: #195380 !important;
+}
+
+.message-information {
+    color: #b3b3b3;
+}
+
+.message-error.title:not(.operation-cancel) { /* If the error is title (but not cancel title, that's not an error) , just color it. */
+    color: white;
+    background: #630f0f;
+    border-radius: 6px;
+}
+
+.message-error:not(.title) {
+    background: #940404;
+    color: #ffffff;
+    padding: 5px;
+    margin: 0 0 3px;
+    border-radius: 6px;
+    font-size: 15px !important;
+    font-weight: 300;
+    border: 1px solid rgb(226, 0, 0);
+}
+
+.text-center >.message-error:first-child:not(.title), .text-center > .message-error:last-child:not(.title), .Select .message-error {
+    color: red;
+    border: 0;
+    background: transparent;
+}
+
+.Select .message-error {
+    font-weight: 400;
+}
+
+#logo {
+    margin-bottom: 30px;
+    height: 30px;
+}
+
+#page-wrap {
+    margin: 120px auto 40px auto;
+}
+
+.btn-default {
+    background-color: #333333;
+    color: #ffffff;
+    border: none;
+}
+
+.btn-default:hover, .btn-default:active, .btn-default:focus {
+    background-color: #222222 !important;
+    color: white !important;
+    border: none;
+}
+
+.image-result {
+    margin: 30px auto;
+}
+
+#lang a {
+    color: white;
+    text-decoration: underline;
+}
+
+#lang a:hover {
+    color: white !important;
+    text-decoration: none;
+}
+
+#operation .operation-approve h3 {
+    color: #439fe6;
+    font-size: 21pt;
+}
+
+#operation .operation-approve p {
+    color: #ffffff;
+    font-size: 18px;
+}
+
+#operation .key {
+    color: #b3b3b3;
+}
+
+#operation .value {
+    color: white;
+}
+
+#operation .currency {
+    color: #439fe6;
+}
+
+#operation .heading {
+    color: #439fe6;
+}
+
+.tint {
+    color: #439fe6;
+}
+
+#login .panel-body .title {
+    color: gray;
+}
+
+.tab-content {
+    margin-top: -10px;
+    border-radius: 8px;
+}
+
+.panel {
+    background: transparent;
+    border: 0;
+    border-radius: 0 0 8px 8px;
+    transition: 0ms;
+    box-shadow: none;
+}
+
+.title {
+    font-size: 21px;
+    font-weight: 300;
+    padding: 10px;
+    margin: 0;
+}
+
+.alert {
+    padding: 5px;
+    font-weight: 300;
+    text-align: center;
+}
+
+.alert-form {
+    padding: 10px 5px;
+}
+
+.nav-tabs {
+    background: transparent;
+    border-radius: 0;
+    border: 0;
+    border-bottom: 1px dotted #222222;
+    text-align: center;
+}
+
+.nav-tabs > li {
+    float: none;
+    display: inline-block;
+    margin-bottom: 0px;
+}
+
+.nav-tabs > li > a {
+    color: #999999;
+    background-color: black;
+    text-decoration: none;
+    border: 0 !important;
+    border-bottom: 2px solid transparent !important;
+    border-radius: 0;
+    transition: .3s;
+    text-align: center;
+    margin-right: 1px;
+}
+
+.nav-tabs > li > a:hover, .nav-tabs > li.active > a:focus, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a {
+    background-color: #1a1a1a;
+    border: 0;
+    border-radius: 0;
+    border-bottom: 2px solid #439fe6 !important;
+    color: #dddddd !important;
+    width: auto;
+    margin: 0;
+}
+
+.consent-text {
+    color: #b3b3b3;
+}
+
+.consent-option-text {
+    color: #b3b3b3;
+}
+
+.consent-error {
+    background: #940404;
+    color: #ffffff;
+    word-wrap: break-word;
+    padding: 5px;
+    margin: 10px 0;
+    border-radius: 6px;
+    font-size: 15px !important;
+    font-weight: 300;
+    border: 1px solid rgb(226, 0, 0);
+}
+
+.consent-option-error {
+    color: rgb(226, 0, 0);
+    font-size: 10pt;
+}
+
+.sms-resend-disabled {
+    color: #b3b3b3;
+}
+
+.form-control:focus {
+    box-shadow: inset 0 0 10px #439fe677 !important;
+}
+
+.form-control {
+    background: #e2e2e2;
+    color: #000000;
+    border: 0;
+}
+
+.form-group .form-control {
+    height: 44px;
+    padding: 14px 16px;
+    font-size: 21px;
+    line-height: 1.2;
+    border-radius: 0;
+    font-weight: 300;
+    overflow: auto;
+}
+
+#login .form-group .form-control {
+    border-radius: 6px;
+}
