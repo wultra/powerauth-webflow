@@ -120,7 +120,10 @@ Lists all authentication methods supported by the server.
     - `Content-Type: application/json`
 
 ```json
-{}
+{
+  "requestObject": {
+  }
+}
 ```
 
 #### Response
@@ -1891,7 +1894,10 @@ Retrieves list of operation configurations.
     - `Content-Type: application/json`
 
 ```json
-{}
+{
+  "requestObject": {
+  }
+}
 ```
 
 #### Response
