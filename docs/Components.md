@@ -53,6 +53,15 @@ Data Adapter handles following use cases:
 * Notify backend about form data changes, e.g. when user fills in some data in Web Flow frontend.
 * Notify backend about operation status changes: finished operation, failed operation and canceled operation.
 * Send authorization SMS messages with OTP code -- message text is prepared and localized, however SMS message needs to be sent by the remote backend.
+* Verify authorization SMS code specified by the user.
+* Decide whether consent step should be displayed for given operation context.
+* Prepare consent form text and options. 
+* Verify consent form options selected by the user.
+* Save consent form options selected by the user.
+* Lookup username for given user ID.
+* Verify authorization SMS code and user password.
+
+For more information see the [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization)
 
 ## Mobile Token
 

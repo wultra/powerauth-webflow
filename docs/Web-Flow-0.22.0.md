@@ -73,8 +73,6 @@ ALTER TABLE ns_operation ADD organization_id VARCHAR(256);
 
 ALTER TABLE ns_operation ADD CONSTRAINT organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id);
 
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
-
 ALTER TABLE da_sms_authorization ADD organization_id VARCHAR(256);
 
 ALTER TABLE ns_auth_method ADD has_mobile_token NUMBER(1) DEFAULT 0;
@@ -95,6 +93,19 @@ VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.loginSca');
 
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, 1, 5, 1, 1, 'method.approvalSca');
+```
+
+Finally, define organizations using sample below. At least one organization needs to be present. The UI shows organization choice when more than one organization is defined.
+
+Default organization configuration:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+```
+
+Multiple organization configuration:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.retail', 0, 2);
 ```
 
 DDL update script for MySQL:
@@ -195,6 +206,18 @@ VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginSca
 
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.approvalSca');
+```
 
+Finally, define organizations using sample below. At least one organization needs to be present. The UI shows organization choice when more than one organization is defined.
+
+Default organization configuration:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+```
+
+Multiple organization configuration:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
 ```
 

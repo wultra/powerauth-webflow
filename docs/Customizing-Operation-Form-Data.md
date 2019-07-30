@@ -99,7 +99,7 @@ bankAccountConfig.setDefaultValue("CZ4043210000000087654321");
 formData.getConfig().add(bankAccountConfig);
 
 // operation initialization
-final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null);
+final ObjectResponse<CreateOperationResponse> payment = client.createOperation("authorize_payment", data, formData, null, applicationContext);
 session.setAttribute("operationId", payment.getResponseObject().getOperationId());
 ```
 
@@ -213,6 +213,21 @@ formData.addPartyInfo("operation.partyInfo", partyInfo);
 ```
 
 In order to add party information before an existing field instead of appending it after last field, use the `addPartyInfoBeforeField()` method.
+
+### Adding application context
+
+The example below specifies application context for an operation. The application context is used in `CONSENT` step to generate the consent form. 
+```java
+ApplicationContext applicationContext = new ApplicationContext();
+applicationContext.setId("DEMO");
+applicationContext.setName("Demo application");
+applicationContext.setDescription("Web Flow demo application");
+applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("AISP"));
+applicationContext.getExtras().put("applicationOwner", "Wultra");
+```
+
+Note that the `extras` is a Map which can be used for adding other key-value items required for the consent form. Use the create `ApplicationContext`
+instance when creating the operation.
 
 ### Operation Form Data JSON
 
