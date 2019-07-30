@@ -19,7 +19,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.demo.model.AvailableOperation;
 import io.getlime.security.powerauth.app.webflow.demo.model.PaymentForm;
-import io.getlime.security.powerauth.app.webflow.demo.model.ScaForm;
+import io.getlime.security.powerauth.app.webflow.demo.model.OperationForm;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -78,7 +78,7 @@ public class HomeController {
         model.addAttribute("operationId", operationId);
 
         PaymentForm paymentForm, paymentFormSca;
-        ScaForm loginFormSca;
+        OperationForm loginFormSca;
         synchronized (httpSession.getServletContext()) {
             paymentForm = (PaymentForm) httpSession.getAttribute("paymentForm");
             if (paymentForm == null) {
@@ -92,9 +92,9 @@ public class HomeController {
             } else {
                 httpSession.removeAttribute("paymentFormSca");
             }
-            loginFormSca = (ScaForm) httpSession.getAttribute("loginFormSca");
+            loginFormSca = (OperationForm) httpSession.getAttribute("loginFormSca");
             if (loginFormSca == null) {
-                loginFormSca = new ScaForm();
+                loginFormSca = new OperationForm();
                 loginFormSca.setAppContext(createApplicationContext(Collections.singletonList("AISP")));
             } else {
                 httpSession.removeAttribute("loginFormSca");
@@ -201,7 +201,7 @@ public class HomeController {
     }
 
     @RequestMapping("/login/sca/create")
-    public String loginSca(ScaForm form) throws NextStepServiceException {
+    public String loginSca(OperationForm form) throws NextStepServiceException {
         final String operationName = "login_sca";
         final GetOperationConfigDetailResponse operationConfig = client.getOperationConfigDetail(operationName).getResponseObject();
 
@@ -262,7 +262,7 @@ public class HomeController {
         return connectionRepositoryProvider.get();
     }
 
-    private ApplicationContext getApplicationContext(ScaForm form) throws NextStepServiceException {
+    private ApplicationContext getApplicationContext(OperationForm form) throws NextStepServiceException {
         try {
             return new ObjectMapper().readValue(form.getAppContext(), ApplicationContext.class);
         } catch (Exception e) {

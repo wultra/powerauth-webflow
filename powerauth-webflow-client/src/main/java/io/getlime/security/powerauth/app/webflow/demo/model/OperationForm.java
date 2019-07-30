@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.app.webflow.demo.model;
 /**
  * @author Jan Kobersky, kober@wultra.com
  */
-public class ScaForm {
+public class OperationForm {
 
     private String appContext;
 
