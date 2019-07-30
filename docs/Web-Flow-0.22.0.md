@@ -105,7 +105,7 @@ INSERT INTO ns_organization (organization_id, display_name_key, is_default, orde
 Multiple organization configuration:
 ```sql
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.retail', 0, 2);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
 ```
 
 DDL update script for MySQL:
