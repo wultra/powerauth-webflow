@@ -1744,7 +1744,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
       "name": "Bank ABC",
       "description": "Authorization for Bank ABC",
       "extras": {
-        "__requestedScopes": [
+        "_requestedScopes": [
           "SCOPE_1",
           "SCOPE_2",
           "SCOPE_3"
