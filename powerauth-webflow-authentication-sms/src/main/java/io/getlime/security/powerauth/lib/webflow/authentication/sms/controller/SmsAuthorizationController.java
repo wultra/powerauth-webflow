@@ -182,6 +182,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             try {
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
                 if (response.getResult() == AuthResult.FAILED) {
+                    cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }

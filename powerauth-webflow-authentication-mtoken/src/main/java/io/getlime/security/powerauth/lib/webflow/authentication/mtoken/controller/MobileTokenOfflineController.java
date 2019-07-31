@@ -140,6 +140,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
+                cleanHttpSession();
                 logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                 return new AuthenticationResult(userId, operation.getOrganizationId());
             }

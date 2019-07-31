@@ -105,6 +105,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
         if (getConsentSkippedFromHttpSession()) {
             // Consent form is skipped, step authentication is complete
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            cleanHttpSession();
             return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
         }
         final String userId = operation.getUserId();
@@ -122,6 +123,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             if (validateResponse.getConsentValidationPassed()) {
                 ObjectResponse<SaveConsentFormResponse> daResponse2 = dataAdapterClient.saveConsentForm(userId, organizationId, operationContext, request.getOptions());
                 SaveConsentFormResponse saveResponse = daResponse2.getResponseObject();
+                cleanHttpSession();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                     return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
@@ -147,6 +149,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             try {
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
                 if (response.getResult() == AuthResult.FAILED) {
+                    cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");
                 }
