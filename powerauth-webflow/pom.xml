@@ -7,14 +7,14 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.22.0</version>
+        <version>0.22.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow</artifactId>
     <name>powerauth-webflow</name>
     <description>Federated Authentication and Authorization Server for Web</description>
-    <version>0.22.0</version>
+    <version>0.22.1</version>
     <packaging>war</packaging>
 
     <properties>
@@ -103,27 +103,27 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-form</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-init</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-operation-review</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcprov-jdk15on</artifactId>
@@ -134,27 +134,27 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-sms</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-approval-sca</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-consent</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-resources</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-i18n</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
 
         <!-- JAXB dependency for Java 11 -->

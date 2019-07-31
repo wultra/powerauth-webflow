@@ -7,13 +7,13 @@
     <artifactId>powerauth-nextstep</artifactId>
     <groupId>io.getlime.security</groupId>
     <description>PowerAuth 2.0 Next Step Server</description>
-    <version>0.22.0</version>
+    <version>0.22.1</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.22.0</version>
+        <version>0.22.1</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>0.22.0</version>
+            <version>0.22.1</version>
         </dependency>
 
         <!-- Other Dependencies -->
