@@ -166,7 +166,7 @@ Operation review is a special authentication step which handles review of operat
 
 ### Organization
 
-Organizations separate users into different segments, such as RETAIL, SME and so on. The organization ID is an identifier used to specify organization selected by the user in the first step of user authentication.
+Organizations separate users into different segments, such as `RETAIL`, `SME` and so on. The organization ID is an identifier used to specify organization selected by the user in the first step of user authentication.
 Each organization may use different user identifiers and authenticate against different systems. Such functionality is handled in the Data Adapter implementation.
 
 ### Authentication method

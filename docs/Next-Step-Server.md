@@ -22,11 +22,11 @@ Next Step Server implements following functionality:
   - update an operation based on next step decision
   - retrieve operation detail
   - list pending operations for user
-  - retrieve operation configuration
+  - retrieve operation configuration for an operation or all defined operations
   - update operation form data
+  - update user and organization for an operation
   - update application context for an operation
   - set chosen authentication method
-  - retrieve operation configuration
 - management of organizations
   - list organizations
   - retrieve organization detail
