@@ -11,7 +11,7 @@ Web Flow can handle various types of authentication and authorization steps duri
 * User ID assignment (user identification is resolved using backend systems)
 * SMS OTP authorization (user receives a SMS with one time code which is used for authorization)
 * Mobile token authorization (user confirms operation on mobile device, PowerAuth signature is used for authorization)
-* SCA login (user specifies username in first step, the second step uses password and SMS code verification)
+* SCA login (user specifies username in the first screen, the second screen uses password and SMS code verification)
 * SCA approval (SCA login followed by approval using password and SMS code verification)
 
 Web Flow can also display OAuth 2.0 consent page with options required to be selected for completing the operation.
