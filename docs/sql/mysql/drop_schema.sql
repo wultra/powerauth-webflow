@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS ns_operation;
 DROP TABLE IF EXISTS ns_operation_config;
 DROP TABLE IF EXISTS ns_user_prefs;
 DROP TABLE IF EXISTS ns_auth_method;
+DROP TABLE IF EXISTS ns_organization;
 DROP TABLE IF EXISTS oauth_code;
 DROP TABLE IF EXISTS oauth_refresh_token;
 DROP TABLE IF EXISTS oauth_access_token;

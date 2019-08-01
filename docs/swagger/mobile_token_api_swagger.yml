@@ -67,7 +67,7 @@ paths:
                       "amount": 100,
                       "currency": "CZK",
                       "amountFormatted": "100,00",
-                      "currencyFormatted": "KÄ"
+                      "currencyFormatted": "Kč"
                     },
                     {
                       "type": "KEY_VALUE",
