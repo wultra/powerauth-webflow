@@ -67,7 +67,44 @@ powerauth.webflow.service.applicationEnvironment=
 
 # Configuration of Offline mode
 powerauth.webflow.offlineMode.available=true
+
+# Configuration of Android Security Warning
+powerauth.webflow.android.showSecurityWarning=true
+
+# Configuration of Optional User Password Encryption
+powerauth.webflow.password.protection.type=NO_PROTECTION
+powerauth.webflow.password.encryption.transformation=
+powerauth.webflow.password.encryption.key=
+
+# Configuration of Delay for Resending SMS in Milliseconds
+powerauth.webflow.sms.resend.delayMs=60000
+
+# Configuration of Delay for Showing Operation Timeout Warning in Milliseconds
+powerauth.webflow.timeout.warning.delayMs=60000
 ```
+
+Encryption of user passwords during transport can be configured using following properties:
+```
+# Configuration of Password Encryption
+powerauth.webflow.password.protection.type=PASSWORD_ENCRYPTION_AES
+powerauth.webflow.password.encryption.transformation=AES/CBC/PKCS7Padding
+powerauth.webflow.password.encryption.key=[Secret Base 64 encoded 32-bit key, you generate it using code below and keep it secure]
+```
+
+The configuration specifies that user password should be encrypted using AES in CBC mode with PKCS#7 padding. 
+The key is encoded using Base64 encoding and its size influences the strength of the encryption cipher. 
+The cipher transformation can be configured using standard Java Cipher transformation definition.
+See: https://docs.oracle.com/javase/8/docs/api/javax/crypto/Cipher.html
+
+The random encryption key can be generated using following code:
+```java
+byte[] randomBytes = new byte[32];
+new SecureRandom().nextBytes(randomBytes);
+String encryptionKey = BaseEncoding.base64().encode(randomBytes);
+```
+
+The symmetric key is used by both Web Flow and by the remote system which needs to decrypt the password for verification.
+For information about password decryption, see: [User Password Encryption And Decryption](./Data-Adapter-REST-API-Reference.md#user-password-encryption-and-decryption)
 
 ## Next Step Server
 At minimum the following configuration properties should be updated based on deployment:
@@ -195,6 +232,43 @@ VALUES ('democlient', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJge
 Note: bcrypt('changeme', 12) => '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.'
 
 You can use [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) from Apache HTTP server to generate bcrypt hashes.
+
+
+## Organization configuration
+
+Web Flow requires at least one organization configured. The default configuration is following:
+
+Oracle:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
+```
+
+MySQL:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
+```
+
+The default configuration assigns the `DEFAULT` organization to all operations. You can define multiple organizations to support
+authentication for multiple segments which can have overlapping user IDs, e.g.:
+
+Oracle:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
+```
+
+MySQL:
+```sql
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
+```
+
+Such configuration defines two organizations `RETAIL` and `SME`. The user sees two tabs when authenticating with localized labels 
+based on keys `organization.retail` and `organization.sme`. The user can switch the organization against which the authentication is performed. 
+The `RETAIL` organization is the default one (it is preselected in the UI). The order of displayed organizations is defined as 
+`RETAIL`, `SME` using the last parameter. 
+
+_Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
 
 ## Authentication methods and next step definitions
 

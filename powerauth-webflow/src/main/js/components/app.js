@@ -1,13 +1,18 @@
 import React from "react";
 import {connect} from "react-redux";
+import {isAndroid} from 'react-device-detect';
 
 import StartHandshake from "./startHandshake";
 import Login from "./login";
+import LoginSca from "./loginSca";
 import Success from "./success";
 import Error from "./error";
 import OperationReview from "./operationReview";
 import Token from "./tokenAuth";
-import SMSAuthorization from "./smsAuth";
+import SecurityOverride from "./securityOverride";
+import SmsAuthorization from "./smsAuth";
+import ApprovalSca from "./approvalSca";
+import Consent from "./consent";
 // i18n
 import {injectIntl} from "react-intl";
 
@@ -18,7 +23,8 @@ import {injectIntl} from "react-intl";
  */
 @connect((store) => {
     return {
-        screen: store.dispatching.currentScreen
+        screen: store.dispatching.currentScreen,
+        security: store.security
     }
 })
 export class App extends React.Component {
@@ -47,34 +53,50 @@ export class App extends React.Component {
 
     render() {
         let Component;
-        switch (this.props.screen) {
-            case "SCREEN_LOGIN": {
-                Component = Login;
-                break;
-            }
-            case "SCREEN_SUCCESS": {
-                Component = Success;
-                break;
-            }
-            case "SCREEN_ERROR": {
-                Component = Error;
-                break;
-            }
-            case "SCREEN_OPERATION_REVIEW": {
-                Component = OperationReview;
-                break;
-            }
-            case "SCREEN_TOKEN": {
-                Component = Token;
-                break;
-            }
-            case "SCREEN_SMS": {
-                Component = SMSAuthorization;
-                break;
-            }
-            default: {
-                Component = StartHandshake;
-                break;
+        if (showAndroidSecurityWarning && isAndroid && !this.props.security.warningOverride) {
+            Component = SecurityOverride;
+        } else {
+            switch (this.props.screen) {
+                case "SCREEN_LOGIN": {
+                    Component = Login;
+                    break;
+                }
+                case "SCREEN_LOGIN_SCA": {
+                    Component = LoginSca;
+                    break;
+                }
+                case "SCREEN_APPROVAL_SCA": {
+                    Component = ApprovalSca;
+                    break;
+                }
+                case "SCREEN_SUCCESS": {
+                    Component = Success;
+                    break;
+                }
+                case "SCREEN_ERROR": {
+                    Component = Error;
+                    break;
+                }
+                case "SCREEN_OPERATION_REVIEW": {
+                    Component = OperationReview;
+                    break;
+                }
+                case "SCREEN_TOKEN": {
+                    Component = Token;
+                    break;
+                }
+                case "SCREEN_SMS": {
+                    Component = SmsAuthorization;
+                    break;
+                }
+                case "SCREEN_CONSENT": {
+                    Component = Consent;
+                    break;
+                }                
+                default: {
+                    Component = StartHandshake;
+                    break;
+                }
             }
         }
         return (

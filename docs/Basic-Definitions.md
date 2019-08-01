@@ -46,6 +46,21 @@ In the example above, the authentication and authorization process is completed 
 
 We also refer to this process as **authentication flow**, hence the name **Web Flow**.
 
+### PSD2
+
+On October 8, 2015, the European Parliament adopted the European Commission proposal to create safer and more innovative European payments (PSD2, Directive (EU) 2015/2366). 
+The new rules aim to better protect consumers when they pay online, promote the development and use of innovative online and mobile payments such as through open banking, 
+and make cross-border European payment services safer.
+
+An important element of PSD2 is the requirement for strong customer authentication on the majority of electronic payments.
+
+### Strong Customer Authentication (SCA)
+
+Strong customer authentication (SCA) is a requirement of the EU Revised Directive on Payment Services (PSD2) on payment service providers within the European Economic Area. 
+The SCA requirement comes into force from 14 September 2019. The requirement ensures that electronic payments are performed with multi-factor authentication, 
+to increase the security of electronic payments. Physical card transactions already commonly have what could be termed strong customer authentication in the EU (Chip and PIN), 
+but this has not generally been true for Internet transactions across the EU prior to the implementation of the requirement.
+
 ## Web Flow Terminology
 
 ### Operation
@@ -75,6 +90,8 @@ When deploying Web Flow you can define various operation names, which identify t
 Examples:
 - `login`
 - `authorize_payment`
+- `login_sca`
+- `authorize_payment_sca`
 
 There need to be different authentication/authorization steps defined for each operation name.
 
@@ -108,7 +125,7 @@ Arbitrary data which is stored together with the operation. Web Flow does not tr
 _For example a payment operation contains following data (as string value):_
 
 ```pre
-"{\"amount\":100,\"currency\":\"CZK\",\"account\":\"238400856/0300\",\"note\":\"Utility Bill Payment - 05/2017\",\"dueDate\":\"2017-06-29\"}"
+"{\"amount\":100,\"currency\":\"CZK\",\"account\":\"238400856/0300\",\"note\":\"Utility Bill Payment - 05/2019\",\"dueDate\":\"2019-06-29\"}"
 ```
 
 Since Web Flow version 0.20.0 the [suggested format of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) to allow interpretation of data by Mobile token.
@@ -124,8 +141,8 @@ _For example a payment operation contains following form data:_
 - _summary: Hello, please confirm payment 100 CZK to account 238400856/0300._
 - _amount: 100 CZK_
 - _account: 238400856/0300_
-- _due date: 2017-06-29_
-- _note: Utility Bill Payment - 05/2017_
+- _due date: 2019-06-29_
+- _note: Utility Bill Payment - 05/2019_
 
 ### Operation form field attribute
 
@@ -146,6 +163,11 @@ Whenever operation progresses to the next step, previous status of operation is 
 ### Operation review
 
 Operation review is a special authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
+
+### Organization
+
+Organizations separate users into different segments, such as `RETAIL`, `SME` and so on. The organization ID is an identifier used to specify organization selected by the user in the first step of user authentication.
+Each organization may use different user identifiers and authenticate against different systems. Such functionality is handled in the Data Adapter implementation.
 
 ### Authentication method
 
@@ -196,6 +218,8 @@ The HTTP session is used in Web Flow in following ways:
 - During the authentication process, the `PENDING_AUTH_OBJECT` attribute stored in HTTP session is updated with OAuth 2.0 `UserOperationAuthentication` token which contains the most current state of authentication.
 - When the authentication process is succcessfully completed, the HTTP session becomes authenticated with the OAuth 2.0 `UserOperationAuthentication` token.
 - When the authentication process fails, the `PENDING_AUTH_OBJECT` attribute is removed from HTTP session. The HTTP session does not become authenticated.
+
+The HTTP session is also used for storing temporary data during operation.
 
 ### Web Flow operation to session mapping
 

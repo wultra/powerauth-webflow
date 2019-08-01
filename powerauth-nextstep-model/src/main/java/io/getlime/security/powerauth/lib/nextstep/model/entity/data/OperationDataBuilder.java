@@ -123,8 +123,9 @@ public class OperationDataBuilder {
          * @param amount Amount.
          * @param currency Currency.
          * @return Operation data builder.
+         * @throws InvalidOperationDataException Thrown in case amount is invalid.
          */
-        public OperationDataBuilder amount(BigDecimal amount, String currency) {
+        public OperationDataBuilder amount(BigDecimal amount, String currency) throws InvalidOperationDataException {
             OperationAmountAttribute amountField = new OperationAmountAttribute(amount, currency);
             attributes.put(attributeId, amountField);
             return OperationDataBuilder.this;

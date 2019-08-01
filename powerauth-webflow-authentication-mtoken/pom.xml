@@ -24,14 +24,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.21.0</version>
+        <version>0.22.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
     <name>powerauth-webflow-authentication-mtoken</name>
     <groupId>io.getlime.security</groupId>
-    <version>0.21.0</version>
+    <version>0.22.0</version>
 
     <dependencies>
 
@@ -50,22 +50,22 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>0.21.0</version>
+            <version>0.22.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
-            <version>0.21.0</version>
+            <version>0.22.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
-            <version>0.21.0</version>
+            <version>0.22.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-mtoken-model</artifactId>
-            <version>0.21.0</version>
+            <version>0.22.0</version>
         </dependency>
 
         <!-- Other Dependencies -->
@@ -79,6 +79,35 @@
             <artifactId>javase</artifactId>
             <version>3.3.3</version>
         </dependency>
+
+        <!-- Dependencies for Java 11 -->
+        <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+            <version>2.3.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.istack</groupId>
+            <artifactId>istack-commons-runtime</artifactId>
+            <version>3.0.8</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.xml.soap</groupId>
+            <artifactId>javax.xml.soap-api</artifactId>
+            <version>1.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.messaging.saaj</groupId>
+            <artifactId>saaj-impl</artifactId>
+            <version>1.5.1</version>
+        </dependency>
+
+
     </dependencies>
 
     <profiles>

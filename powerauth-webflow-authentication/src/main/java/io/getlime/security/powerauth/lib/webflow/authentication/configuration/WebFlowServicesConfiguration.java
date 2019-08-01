@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,36 @@ public class WebFlowServicesConfiguration {
      */
     @Value("${powerauth.webflow.offlineMode.available}")
     private boolean offlineModeAvailable;
+
+    /**
+     * Authentication type which configures how username and password is transferred for verification.
+     */
+    @Value("${powerauth.webflow.password.protection.type:NO_PROTECTION}")
+    private PasswordProtectionType passwordProtection;
+
+    /**
+     * Encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
+     */
+    @Value("${powerauth.webflow.password.encryption.transformation}")
+    private String cipherTransformation;
+
+    /**
+     * Base64 encoded password encryption key.
+     */
+    @Value("${powerauth.webflow.password.encryption.key}")
+    private String passwordEncryptionKey;
+
+    /**
+     * Delay for resending SMS in milliseconds.
+     */
+    @Value("${powerauth.webflow.sms.resend.delayMs:60000}")
+    private int smsResendDelay;
+
+    /**
+     * Delay for displaying timeout warning in milliseconds.
+     */
+    @Value("${powerauth.webflow.timeout.warning.delayMs:60000}")
+    private int timeoutWarningDelay;
 
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
@@ -99,5 +130,61 @@ public class WebFlowServicesConfiguration {
      */
     public boolean isOfflineModeAvailable() {
         return offlineModeAvailable;
+    }
+
+    /**
+     * Get authentication type which configures how username and password is transferred for verification.
+     * @return Authentication type.
+     */
+    public PasswordProtectionType getPasswordProtection() {
+        return passwordProtection;
+    }
+
+    /**
+     * Get encryption cipher transformation for encrypted requests (e.g. AES/CBC/PKCS7Padding).
+     * @return Encryption cipher transformation.
+     */
+    public String getCipherTransformation() {
+        return cipherTransformation;
+    }
+
+    /**
+     * Get Base64 encoded password encryption key.
+     * @return Base64 encoded password encryption key.
+     */
+    public String getPasswordEncryptionKey() {
+        return passwordEncryptionKey;
+    }
+
+    /**
+     * Get delay for resending SMS in milliseconds.
+     * @return Delay for resending SMS in milliseconds.
+     */
+    public int getSmsResendDelay() {
+        return smsResendDelay;
+    }
+
+    /**
+     * Set delay for resending SMS in milliseconds.
+     * @param smsResendDelay Delay for resending SMS in milliseconds.
+     */
+    public void setSmsResendDelay(int smsResendDelay) {
+        this.smsResendDelay = smsResendDelay;
+    }
+
+    /**
+     * Get delay for showing timeout warning in milliseconds.
+     * @return Delay for showing timeout warning in milliseconds.
+     */
+    public int getTimeoutWarningDelay() {
+        return timeoutWarningDelay;
+    }
+
+    /**
+     * Set delay for showing timeout warning in milliseconds.
+     * @param timeoutWarningDelay Delay for showing timeout warning in milliseconds.
+     */
+    public void setTimeoutWarningDelay(int timeoutWarningDelay) {
+        this.timeoutWarningDelay = timeoutWarningDelay;
     }
 }

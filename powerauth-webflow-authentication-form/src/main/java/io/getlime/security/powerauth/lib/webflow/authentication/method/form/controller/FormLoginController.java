@@ -19,9 +19,15 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.form.con
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthenticationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -29,13 +35,25 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
+import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
+import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
+import io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.PrepareLoginFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthenticationRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthenticationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,57 +77,99 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     private static final Logger logger = LoggerFactory.getLogger(FormLoginController.class);
 
     private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
+    private final WebFlowServicesConfiguration configuration;
+
+    private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
     /**
      * Controller constructor.
-     * @param dataAdapterClient Data adapter client.
+     * @param dataAdapterClient Data Adapter client.
+     * @param nextStepClient Next Step client.
+     * @param configuration Web Flow configuration.
      */
     @Autowired
-    public FormLoginController(DataAdapterClient dataAdapterClient) {
+    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, WebFlowServicesConfiguration configuration) {
         this.dataAdapterClient = dataAdapterClient;
+        this.nextStepClient = nextStepClient;
+        this.configuration = configuration;
     }
 
     /**
      * Authenticate using username / password authentication.
      * @param request Authentication request.
-     * @return Authenticated user ID.
+     * @return Authentication result with user ID and organization ID.
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected String authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(UsernamePasswordAuthenticationRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData);
-            final ObjectResponse<AuthenticationResponse> authenticateResponse = dataAdapterClient.authenticateUser(request.getUsername(), request.getPassword(), operationContext);
-            AuthenticationResponse responseObject = authenticateResponse.getResponseObject();
-            logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), responseObject.getUserId(), getAuthMethodName().toString());
-            return responseObject.getUserId();
-        } catch (DataAdapterClientErrorException e) {
-            Integer remainingAttemptsNS;
-            try {
-                // User was not authenticated by Data Adapter - fail authorization to count the number of failures and make it possible
-                // to switch to an alternate authentication method in case it is available.
-                // Fix #72: Do not include incomplete login attempts when counting number of failed authentication requests
-                if ("login.authenticationFailed".equals(e.getError().getMessage())) {
-                    UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
-                    if (response.getResult() == AuthResult.FAILED) {
-                        // FAILED result instead of CONTINUE means the authentication method is failed
-                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
-                    }
-                }
-                GetOperationDetailResponse updatedOperation = getOperation();
-                remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            } catch (NextStepServiceException e2) {
-                throw new AuthStepException(e2.getError().getMessage(), e2);
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+            ObjectResponse<UserDetailResponse> lookupResponse = dataAdapterClient.lookupUser(request.getUsername(), request.getOrganizationId(), operationContext);
+
+            PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
+            String cipherTransformation = configuration.getCipherTransformation();
+            PasswordProtection passwordProtection;
+            switch (passwordProtectionType) {
+                case NO_PROTECTION:
+                    // Password is sent in plain text
+                    passwordProtection = new NoPasswordProtection();
+                    logger.info("No protection is used for protecting user password");
+                    break;
+
+                case PASSWORD_ENCRYPTION_AES:
+                    // Encrypt user password in case password encryption is configured in Web Flow
+                    passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
+                    logger.info("User password is protected using transformation: {}", cipherTransformation);
+                    break;
+
+                default:
+                    // Unsupported authentication type
+                    throw new AuthStepException("Invalid authentication type", "error.invalidRequest");
             }
-            AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
-            Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
-            Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
-            authEx.setRemainingAttempts(remainingAttempts);
-            throw authEx;
+
+            String protectedPassword = passwordProtection.protect(request.getPassword());
+            String userId = lookupResponse.getResponseObject().getId();
+            String organizationId = lookupResponse.getResponseObject().getOrganizationId();
+            AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
+
+            ObjectResponse<UserAuthenticationResponse> objectResponse = dataAdapterClient.authenticateUser(userId, organizationId, protectedPassword, authenticationContext, operationContext);
+            UserAuthenticationResponse authResponse = objectResponse.getResponseObject();
+            if (authResponse.getAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
+                logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserDetail().getId(), getAuthMethodName().toString());
+                return new AuthenticationResult(authResponse.getUserDetail().getId(), authResponse.getUserDetail().getOrganizationId());
+            } else {
+                try {
+                    if ("login.authenticationFailed".equals(authResponse.getErrorMessage())) {
+                        UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
+                        if (response.getResult() == AuthResult.FAILED) {
+                            // FAILED result instead of CONTINUE means the authentication method is failed
+                            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                        }
+                    }
+                    if (authResponse.getShowRemainingAttempts()) {
+                        GetOperationDetailResponse updatedOperation = getOperation();
+                        Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+                        AuthStepException authEx = new AuthStepException("User authentication failed", authResponse.getErrorMessage());
+                        Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
+                        Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+                        authEx.setRemainingAttempts(remainingAttempts);
+                        throw authEx;
+                    } else {
+                        throw new AuthStepException("User authentication failed", authResponse.getErrorMessage());
+                    }
+                } catch (NextStepServiceException e) {
+                    logger.error("Error occurred in Next Step server", e);
+                    throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
+                }
+            }
+        } catch (DataAdapterClientErrorException e) {
+            throw new AuthStepException(e.getError().getMessage(), e);
         }
     }
 
@@ -196,11 +256,39 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
             final UsernamePasswordAuthenticationResponse response = new UsernamePasswordAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setMessage(e.getMessage());
+            response.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
             return response;
         }
+    }
+
+    /**
+     * Prepare login form data.
+     * @param request Prepare login form data request.
+     * @return Prepare login form response.
+     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
+     */
+    @RequestMapping(value = "/setup", method = RequestMethod.POST)
+    public @ResponseBody PrepareLoginFormDataResponse prepareLoginForm(@RequestBody PrepareLoginFormDataRequest request) throws AuthStepException {
+        if (request == null) {
+            throw new AuthStepException("Invalid request in prepareLoginForm", "error.invalidRequest");
+        }
+        logger.info("Prepare login form data started");
+        final PrepareLoginFormDataResponse response = new PrepareLoginFormDataResponse();
+        try {
+            ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
+            List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
+            for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
+                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
+                response.addOrganization(organization);
+            }
+        } catch (NextStepServiceException e) {
+            throw new CommunicationFailedException("Organization is not available");
+        }
+        logger.info("Prepare login form data succeeded");
+        return response;
     }
 }

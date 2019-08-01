@@ -32,6 +32,10 @@ import java.util.Map;
  */
 public class WebFlowTokenEnhancer implements TokenEnhancer {
 
+    private static final String LANGUAGE = "language";
+    private static final String SCA = "sca";
+    private static final String ORGANIZATION_ID = "organizationId";
+
     /**
      * Enhance access tokens with additional information.
      *
@@ -44,8 +48,9 @@ public class WebFlowTokenEnhancer implements TokenEnhancer {
         DefaultOAuth2AccessToken token = ((DefaultOAuth2AccessToken) accessToken);
         UserOperationAuthentication auth = (UserOperationAuthentication) authentication.getUserAuthentication();
         Map<String, Object> extras = new HashMap<>();
-        extras.put("language", auth.getLanguage());
-        extras.put("sca", auth.isStrongAuthentication());
+        extras.put(LANGUAGE, auth.getLanguage());
+        extras.put(SCA, auth.isStrongAuthentication());
+        extras.put(ORGANIZATION_ID, auth.getOrganizationId());
         token.setAdditionalInformation(extras);
         return token;
     }

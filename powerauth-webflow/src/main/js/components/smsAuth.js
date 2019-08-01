@@ -16,13 +16,13 @@
 import React from "react";
 import {connect} from "react-redux";
 // Actions
-import {authenticate, cancel, getOperationData, init} from "../actions/smsAuthActions";
+import {cancel, getOperationData, init, resend} from "../actions/smsAuthActions";
 // Components
 import OperationDetail from "./operationDetail";
-import {FormGroup, Panel} from "react-bootstrap";
+import {Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
-// i18n
-import {FormattedMessage} from "react-intl";
+import SmsComponent from "./smsComponent";
+import OperationTimeout from "./operationTimeout";
 
 /**
  * Authorization of operation using SMS OTP key.
@@ -32,91 +32,91 @@ import {FormattedMessage} from "react-intl";
         context: store.dispatching.context
     }
 })
-export default class SMSAuthorization extends React.Component {
+export default class SmsAuthorization extends React.Component {
 
     constructor() {
         super();
         this.init = this.init.bind(this);
-        this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.storeError = this.storeError.bind(this);
+        this.storeMessage = this.storeMessage.bind(this);
+        this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
+        this.handleSmsResend = this.handleSmsResend.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
-        this.state = {authCode: ''};
+        this.state = {passwordEnabled: null, username: null, resendEnabled: false, initialized: false, error: null, message: null, remainingAttempts: null};
     }
 
     componentWillMount() {
         this.init();
     }
 
+    componentWillReceiveProps(props) {
+        if (props.context.init) {
+            // Store information whether password is enabled
+            this.setState({passwordEnabled: props.context.passwordEnabled});
+            // Store username for LOGIN_SCA step
+            this.setState({username: props.context.username});
+            // Set the component to initialized state
+            this.setState({initialized: true});
+        }
+        // store message and error into component state because context can change
+        if (props.context.error !== undefined) {
+            this.storeError(props.context.error);
+        }
+        if (props.context.message !== undefined) {
+            this.storeMessage(props.context.message);
+        }
+        if (props.context.remainingAttempts !== undefined) {
+            this.storeRemainingAttempts(props.context.remainingAttempts);
+        }
+        if (props.context.init || props.context.resend) {
+            // Disable resend link for configured delay in ms
+            this.setState({resendEnabled: false});
+            const resendDelay = props.context.resendDelay;
+            setTimeout(function() {
+                this.setState({resendEnabled: true})
+            }.bind(this), resendDelay);
+        }
+    }
+
     init() {
-        this.props.dispatch(init());
-        this.props.dispatch(getOperationData());
+        this.props.dispatch(init("SMS"));
+        this.props.dispatch(getOperationData("SMS"));
     }
 
-    handleAuthCodeChange(event) {
-        this.setState({authCode: event.target.value});
+    storeError(errorReceived) {
+        this.setState({error: errorReceived});
     }
 
-    handleSubmit(event) {
+    storeMessage(messageReceived) {
+        this.setState({message: messageReceived});
+    }
+
+    storeRemainingAttempts(remainingAttemptsReceived) {
+        this.setState({remainingAttempts: remainingAttemptsReceived});
+    }
+
+    handleSmsResend(event) {
         event.preventDefault();
-        this.props.dispatch(authenticate(this.state.authCode));
+        this.setState({resendEnabled: false});
+        this.props.dispatch(resend("SMS"));
     }
 
     handleCancel(event) {
         event.preventDefault();
-        this.props.dispatch(cancel());
+        this.props.dispatch(cancel("SMS"));
     }
 
     render() {
         return (
             <div id="operation">
-                <form onSubmit={this.handleSubmit}>
-                    <Panel>
-                        <OperationDetail/>
-                        <div className="auth-actions">
-                            {(this.props.context.message) ? (
-                                <FormGroup
-                                    className={(this.props.context.error ? "message-error" : "message-information" )}>
-                                    <FormattedMessage id={this.props.context.message}/>
-                                    {(this.props.context.remainingAttempts > 0) ? (
-                                        <div>
-                                            <FormattedMessage id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
-                                        </div>
-                                    ) : (
-                                        undefined
-                                    )}
-                                </FormGroup>
-                            ) : (
-                                undefined
-                            )}
-                            <div className="attribute row">
-                                <div className="message-information">
-                                    <FormattedMessage id="smsAuthorization.authCodeText"/>
-                                </div>
-                            </div>
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <input autoFocus className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                                </div>
-                            </div>
-                            <div className="buttons">
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <a href="#" onClick={this.handleSubmit} className="btn btn-lg btn-success">
-                                            <FormattedMessage id="operation.confirm"/>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                            <FormattedMessage id="operation.cancel"/>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </Panel>
-                </form>
+                <Panel>
+                    <OperationTimeout/>
+                    <OperationDetail/>
+                    <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
+                                  smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="SMS"
+                                  message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
+                                  initialized={this.state.initialized}/>
+                </Panel>
                 {this.props.context.loading ? <Spinner/> : undefined}
             </div>
         )

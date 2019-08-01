@@ -20,6 +20,7 @@ import {cancel, getOperationData, updateOperation} from "../actions/operationRev
 // Components
 import {Panel} from "react-bootstrap";
 import Spinner from 'react-tiny-spin';
+import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from "react-intl";
 import OperationDetail from "./operationDetail";
@@ -107,6 +108,7 @@ export default class OperationReview extends React.Component {
                 <div id="operation">
                     <form>
                         <Panel>
+                            <OperationTimeout/>
                             <OperationDetail/>
                             {(this.props.context.authMethods.length > 0) ? (
                                 <div className="auth-actions">

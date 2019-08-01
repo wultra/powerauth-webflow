@@ -7,7 +7,25 @@
 export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE", context: null}, action) {
     switch (action.type) {
         case "SHOW_SCREEN_LOGIN": {
-            return {...state, currentScreen: "SCREEN_LOGIN", context: action.payload};
+            return {
+                ...state,
+                currentScreen: "SCREEN_LOGIN",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
+        case "SHOW_SCREEN_LOGIN_SCA": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_LOGIN_SCA",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
+        case "SHOW_SCREEN_APPROVAL_SCA": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_APPROVAL_SCA",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
         }
         case "SHOW_SCREEN_OPERATION_REVIEW": {
             return {
@@ -27,6 +45,13 @@ export default function reducer(state = {currentScreen: "SCREEN_START_HANDSHAKE"
             return {
                 ...state,
                 currentScreen: "SCREEN_SMS",
+                context: mergeContext(action.type, state.context, action.payload)
+            };
+        }
+        case "SHOW_SCREEN_CONSENT": {
+            return {
+                ...state,
+                currentScreen: "SCREEN_CONSENT",
                 context: mergeContext(action.type, state.context, action.payload)
             };
         }
@@ -53,18 +78,34 @@ function mergeContext(actionType, oldContext, newContext) {
         return newContext;
     }
     switch (actionType) {
+        case "SHOW_SCREEN_LOGIN":
+        case "SHOW_SCREEN_LOGIN_SCA":
+            mergeOrganizations(oldContext, newContext);
+            break;
         case "SHOW_SCREEN_OPERATION_REVIEW":
             mergeAuthMethods(oldContext, newContext);
             mergeData(oldContext, newContext);
             break;
         case "SHOW_SCREEN_TOKEN":
-            mergeData(oldContext, newContext);
-            break;
         case "SHOW_SCREEN_SMS":
             mergeData(oldContext, newContext);
             break;
+        case "SHOW_SCREEN_CONSENT":
+            mergeConsent(oldContext, newContext);
+            break;
     }
     return newContext;
+}
+
+function mergeOrganizations(oldContext, newContext) {
+    // organizations need to remain in context
+    if (oldContext.organizations !== undefined && newContext.organizations === undefined) {
+        newContext.organizations = oldContext.organizations;
+    }
+    // chosenOrganizationId need to remain in context
+    if (oldContext.chosenOrganizationId !== undefined && newContext.chosenOrganizationId === undefined) {
+        newContext.chosenOrganizationId = oldContext.chosenOrganizationId;
+    }
 }
 
 function mergeData(oldContext, newContext) {
@@ -82,5 +123,12 @@ function mergeAuthMethods(oldContext, newContext) {
     // authMethods need to remain in context
     if (oldContext.authMethods !== undefined && newContext.authMethods === undefined) {
         newContext.authMethods = oldContext.authMethods;
+    }
+}
+
+function mergeConsent(oldContext, newContext) {
+    // consent need to remain in context
+    if (oldContext.consent !== undefined && newContext.consent === undefined) {
+        newContext.consent = oldContext.consent;
     }
 }

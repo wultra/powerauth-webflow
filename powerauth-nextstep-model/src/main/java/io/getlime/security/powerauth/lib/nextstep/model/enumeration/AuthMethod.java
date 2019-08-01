@@ -50,5 +50,21 @@ public enum AuthMethod {
     /**
      * Authenticate user using an SMS key.
      */
-    SMS_KEY;
+    SMS_KEY,
+
+    /**
+     * Confirm user consent.
+     */
+    CONSENT,
+
+    /**
+     * SCA login.
+     */
+    LOGIN_SCA,
+
+    /**
+     * SCA approval.
+     */
+    APPROVAL_SCA
+
 }

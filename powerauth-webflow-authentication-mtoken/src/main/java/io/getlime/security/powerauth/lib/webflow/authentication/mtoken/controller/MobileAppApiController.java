@@ -26,11 +26,13 @@ import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResp
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
@@ -140,12 +142,16 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             // Get the list of operations for given user
-            final List<GetOperationDetailResponse> operationList = getOperationListForUser(userId);
-            if (operationList == null) {
-                // Next step operation failed, return empty operation list
+            List<GetOperationDetailResponse> operationList;
+            Map<String, GetOperationConfigDetailResponse> operationConfigs;
+            try {
+                operationList = getOperationListForUser(userId, true);
+                operationConfigs = getOperationConfigs(operationList);
+            } catch (AuthStepException e) {
+                // Next step operation list failed, return empty operation list
                 return new ObjectResponse<>(new OperationListResponse());
             }
-            final Map<String, GetOperationConfigResponse> operationConfigs = getOperationConfigs(operationList);
+
 
             // Prepare converter
             final OperationConverter converter = new OperationConverter();
@@ -153,7 +159,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             // Prepare converted result with operations
             OperationListResponse result = new OperationListResponse();
             for (GetOperationDetailResponse operation: operationList) {
-                final GetOperationConfigResponse operationConfig = operationConfigs.get(operation.getOperationName());
+                final GetOperationConfigDetailResponse operationConfig = operationConfigs.get(operation.getOperationName());
                 result.add(converter.fromOperationDetailResponse(operation, operationConfig.getMobileTokenMode()));
             }
 
@@ -165,16 +171,28 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     }
 
     /**
-     * Get map of operation configurations (operation name -> operation configuration).
+     * Get map of all operation configurations (operation name -> operation configuration).
      * @param operations Operation list.
      * @return Map of operation configurations.
+     * @throws AuthStepException Thrown in case operation configuration query fails.
      */
-    private Map<String, GetOperationConfigResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) {
-        Map<String, GetOperationConfigResponse> operationConfigs = new HashMap<>();
+    private Map<String, GetOperationConfigDetailResponse> getOperationConfigs(List<GetOperationDetailResponse> operations) throws AuthStepException {
+        final Map<String, GetOperationConfigDetailResponse> operationConfigs = new HashMap<>();
+        final GetOperationConfigListResponse allConfigsResponse = getOperationConfigs();
+        // Construct Map for all configured operations on server (operation name -> operation configuration)
+        final Map<String, GetOperationConfigDetailResponse> allOperationConfigs = new HashMap<>();
+        for (GetOperationConfigDetailResponse config: allConfigsResponse.getOperationConfigs()) {
+            allOperationConfigs.put(config.getOperationName(), config);
+        }
+        // Go through operations for which a configuration was requested and construct response map
         for (GetOperationDetailResponse operation: operations) {
             String operationName = operation.getOperationName();
             if (!operationConfigs.containsKey(operationName)) {
-                final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
+                final GetOperationConfigDetailResponse operationConfig = allOperationConfigs.get(operationName);
+                // In case the operation configuration is not found, throw an OperationNotConfiguredException to alert about misconfigured server
+                if (operationConfig == null) {
+                    throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
+                }
                 operationConfigs.put(operationName, operationConfig);
             }
         }
@@ -226,7 +244,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             if (operation.getOperationData().equals(request.getRequestObject().getData())
                     && operation.getUserId() != null
                     && operation.getUserId().equals(apiAuthentication.getUserId())) {
-                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId);
+                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), null);
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new Response();
             } else {
@@ -300,9 +318,10 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     private boolean isSignatureTypeAllowedForOperation(String operationName, PowerAuthSignatureTypes signatureTypes)  {
 
         // Get configuration for operation with given name
-        final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
-
-        if (operationConfig == null) {
+        GetOperationConfigDetailResponse operationConfig;
+        try {
+            operationConfig = getOperationConfig(operationName);
+        } catch (AuthStepException e) {
             // Next step request failed, cannot decide
             return false;
         }

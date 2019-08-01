@@ -1,5 +1,8 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.data;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.validator.AmountValidator;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
+
 import java.math.BigDecimal;
 
 /**
@@ -23,9 +26,11 @@ public class OperationAmountAttribute extends OperationDataAttribute {
      * Constructor with amount and currency.
      * @param amount Amount.
      * @param currency Currency.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
-    public OperationAmountAttribute(BigDecimal amount, String currency) {
+    public OperationAmountAttribute(BigDecimal amount, String currency) throws InvalidOperationDataException {
         this.type = Type.AMOUNT;
+        AmountValidator.validateAmount(amount);
         this.amount = amount;
         this.currency = currency;
     }
@@ -41,8 +46,10 @@ public class OperationAmountAttribute extends OperationDataAttribute {
     /**
      * Set amount.
      * @param amount Amount.
+     * @throws InvalidOperationDataException Thrown in case amount is invalid.
      */
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(BigDecimal amount) throws InvalidOperationDataException {
+        AmountValidator.validateAmount(amount);
         this.amount = amount;
     }
 

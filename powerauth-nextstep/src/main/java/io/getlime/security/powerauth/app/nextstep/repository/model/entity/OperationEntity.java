@@ -49,6 +49,21 @@ public class OperationEntity implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
+    @Column(name = "organization_id")
+    private String organizationId;
+
+    @Column(name = "application_id")
+    private String applicationId;
+
+    @Column(name = "application_name")
+    private String applicationName;
+
+    @Column(name = "application_description")
+    private String applicationDescription;
+
+    @Column(name = "application_extras")
+    private String applicationExtras;
+
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
     private AuthResult result;
@@ -101,6 +116,46 @@ public class OperationEntity implements Serializable {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    public String getApplicationId() {
+        return applicationId;
+    }
+
+    public void setApplicationId(String applicationId) {
+        this.applicationId = applicationId;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public String getApplicationDescription() {
+        return applicationDescription;
+    }
+
+    public void setApplicationDescription(String applicationDescription) {
+        this.applicationDescription = applicationDescription;
+    }
+
+    public String getApplicationExtras() {
+        return applicationExtras;
+    }
+
+    public void setApplicationExtras(String applicationExtras) {
+        this.applicationExtras = applicationExtras;
     }
 
     public AuthResult getResult() {

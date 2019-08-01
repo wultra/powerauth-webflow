@@ -34,6 +34,15 @@ export default class Error extends React.Component {
     }
 
     componentWillMount() {
+        // Disable checking of timeout to avoid sending additional requests to server
+        this.props.dispatch({
+            type: "UPDATE_TIMEOUT",
+            payload: {
+                timeoutWarningDelayMs: null,
+                timeoutDelayMs: null,
+                timeoutCheckEnabled: false
+            }
+        });
         if (this.props.context.message === "message.networkError") {
             // do not redirect user in case of network errors - just display the error
             this.setState({networkError: true});
@@ -59,7 +68,7 @@ export default class Error extends React.Component {
                 ) : (
                     <div className="panel panel-body text-center">
                         <div>
-                            <div className="message-error title">
+                            <div className={"message-error title" + (this.props.context.message == 'operation.canceled' ? ' operation-cancel' : '')}>
                                 {(this.props.context.message) ? (
                                     <FormattedMessage id={this.props.context.message}/>
                                 ) : (

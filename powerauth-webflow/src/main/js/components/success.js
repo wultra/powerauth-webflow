@@ -29,6 +29,15 @@ import {FormattedMessage} from "react-intl";
 export default class Success extends React.Component {
 
     componentWillMount() {
+        // Disable checking of timeout to avoid sending additional requests to server
+        this.props.dispatch({
+            type: "UPDATE_TIMEOUT",
+            payload: {
+                timeoutWarningDelayMs: null,
+                timeoutDelayMs: null,
+                timeoutCheckEnabled: false
+            }
+        });
         setTimeout(() => {
             window.location = './authenticate/continue';
         }, 3000);

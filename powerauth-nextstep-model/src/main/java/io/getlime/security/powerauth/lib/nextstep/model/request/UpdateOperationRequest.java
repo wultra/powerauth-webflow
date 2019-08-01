@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -31,10 +32,12 @@ public class UpdateOperationRequest {
 
     private String operationId;
     private String userId;
+    private String organizationId;
     private AuthMethod authMethod;
     private AuthStepResult authStepResult;
     private String authStepResultDescription;
     private List<KeyValueParameter> params;
+    private ApplicationContext applicationContext;
 
     /**
      * Default constructor.
@@ -73,6 +76,22 @@ public class UpdateOperationRequest {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
     }
 
     /**
@@ -132,4 +151,19 @@ public class UpdateOperationRequest {
         return params;
     }
 
+    /**
+     * Get application context for OAuth 2.0 consent screen.
+     * @return Application context for OAuth 2.0 consent screen.
+     */
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    /**
+     * Set application context for OAuth 2.0 consent screen.
+     * @param applicationContext Application context for OAuth 2.0 consent screen.
+     */
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 }

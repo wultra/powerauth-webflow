@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,8 +41,6 @@ public class AuthenticationManagementService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationManagementService.class);
 
-    private static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
-
     /**
      * Get current HTTP request.
      * @return Current HTTP request.
@@ -60,7 +59,7 @@ public class AuthenticationManagementService {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         synchronized (session.getServletContext()) {
-            session.setAttribute(PENDING_AUTH_OBJECT, auth);
+            session.setAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT, auth);
         }
         logger.info("PENDING_AUTH_OBJECT was added into HTTP session");
     }
@@ -73,7 +72,7 @@ public class AuthenticationManagementService {
     public UserOperationAuthentication getPendingUserAuthentication() {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
-        return (UserOperationAuthentication) session.getAttribute(PENDING_AUTH_OBJECT);
+        return (UserOperationAuthentication) session.getAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT);
     }
 
     /**
@@ -85,7 +84,7 @@ public class AuthenticationManagementService {
         HttpServletRequest request = currentRequest();
         HttpSession session = request.getSession();
         synchronized (session.getServletContext()) {
-            session.removeAttribute(PENDING_AUTH_OBJECT);
+            session.removeAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT);
         }
         logger.info("PENDING_AUTH_OBJECT was removed from HTTP session");
 
@@ -95,35 +94,51 @@ public class AuthenticationManagementService {
      * Create a new authentication object with assigned operation ID.
      *
      * @param operationId Operation ID.
+     * @param organizationId Organization ID.
      */
-    public void createAuthenticationWithOperationId(String operationId) {
+    public void createAuthenticationWithOperationId(String operationId, String organizationId) {
         logger.info("Authentication object created for operation ID: {}", operationId);
         UserOperationAuthentication auth = new UserOperationAuthentication();
         auth.setOperationId(operationId);
         auth.setAuthenticated(false);
+        auth.setOrganizationId(organizationId);
         setPendingUserAuthentication(auth);
     }
 
     /**
-     * Update the current operation with provided user ID. This step assigns authenticated
+     * Update the current operation with provided user ID and organization ID. This step assigns authenticated
      * user to given operation.
      *
      * @param userId User ID.
+     * @param organizationId Organization ID.
      * @return Operation ID.
      */
-    public String updateAuthenticationWithUserId(String userId) {
+    public String updateAuthenticationWithUserDetails(String userId, String organizationId) {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         if (auth.getUserId() != null && !userId.equals(auth.getUserId())) {
-            logger.error("Failed updateAuthenticationWithUserId due to missing or invalid user ID");
+            logger.error("Failed updateAuthenticationWithUserDetails due to missing or invalid user ID");
             return null;
         }
         if (auth.getOperationId() == null) {
-            logger.error("Failed updateAuthenticationWithUserId due to missing operation ID");
+            logger.error("Failed updateAuthenticationWithUserDetails due to missing operation ID");
             return null;
         }
         auth.setUserId(userId);
+        auth.setOrganizationId(organizationId);
         setPendingUserAuthentication(auth);
         return auth.getOperationId();
+    }
+
+    /**
+     * Return whether pending session is authenticated.
+     * @return Whether pending session is authenticated.
+     */
+    public boolean isPendingSessionAuthenticated() {
+        UserOperationAuthentication auth = getPendingUserAuthentication();
+        if (auth == null) {
+            return false;
+        }
+        return auth.getUserId() != null;
     }
 
     /**

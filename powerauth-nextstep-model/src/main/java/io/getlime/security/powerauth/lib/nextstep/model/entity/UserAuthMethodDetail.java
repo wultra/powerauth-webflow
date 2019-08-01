@@ -15,6 +15,7 @@ public class UserAuthMethodDetail {
     private AuthMethod authMethod;
     private Boolean hasUserInterface;
     private String displayNameKey;
+    private Boolean hasMobileToken;
     private Map<String, String> config;
 
     public String getUserId() {
@@ -47,6 +48,14 @@ public class UserAuthMethodDetail {
 
     public void setDisplayNameKey(String displayNameKey) {
         this.displayNameKey = displayNameKey;
+    }
+
+    public Boolean getHasMobileToken() {
+        return hasMobileToken;
+    }
+
+    public void setHasMobileToken(Boolean hasMobileToken) {
+        this.hasMobileToken = hasMobileToken;
     }
 
     public Map<String, String> getConfig() {

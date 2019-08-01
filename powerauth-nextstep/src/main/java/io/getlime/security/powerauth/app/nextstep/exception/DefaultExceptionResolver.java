@@ -90,7 +90,7 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for invalid operation not found error.
+     * Exception handler for operation not found error.
      * @param ex Exception.
      * @return Response with error details.
      */
@@ -103,7 +103,7 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for invalid operation not confiured error.
+     * Exception handler for operation not configured error.
      * @param ex Exception.
      * @return Response with error details.
      */
@@ -112,6 +112,19 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleOperationNotConfiguredException(OperationNotConfiguredException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         Error error = new Error(OperationNotFoundException.CODE, "Operation is not configured.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for organization not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OrganizationNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOrganizationNotFoundException(OrganizationNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OrganizationNotFoundException.CODE, "Organization not found.");
         return new ErrorResponse(error);
     }
 

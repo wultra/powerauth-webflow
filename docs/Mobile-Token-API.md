@@ -66,7 +66,7 @@ Get the list with all operations that are pending confirmation.
     {
       "id": "7e0ba60f-bf22-4ff5-b999-2733784e5eaa",
       "name": "authorize_payment",
-      "data": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
       "operationCreated": "2018-07-02T14:43:13+0000",
       "operationExpires": "2018-07-02T14:48:17+0000",
       "allowedSignatureType": {
@@ -104,13 +104,13 @@ Get the list with all operations that are pending confirmation.
             "type": "KEY_VALUE",
             "id": "operation.dueDate",
             "label": "Due Date",
-            "value": "Jun 29, 2017"
+            "value": "Jun 29, 2019"
           },
           {
             "type": "NOTE",
             "id": "operation.note",
             "label": "Note",
-            "note": "Utility Bill Payment - 05/2017"
+            "note": "Utility Bill Payment - 05/2019"
           },
           {
             "type": "PARTY_INFO",
@@ -155,7 +155,7 @@ Confirms an operation with given ID and data. This endpoint requires a signature
 {
   "requestObject": {
     "id": "3699a9c0-45f0-458d-84bc-5bde7ec384f7",
-    "data": "A1*A100CZK*Q238400856\/0300**D20170629*NUtility Bill Payment - 05\/2017"
+    "data": "A1*A100CZK*Q238400856\/0300**D20190629*NUtility Bill Payment - 05\/2019"
   }
 }
 ```

@@ -4,3 +4,20 @@ jdk:
 branches:
   only:
     - master
+    - coverity_scan
+env:
+  global:
+    - secure: "VP4tgKnWZ3NoaXeaL2PfCCVvltddXrUl9BygxdPncmoFIYiTtb+cjpCwg7HdFYE0yRlM1lASQATUcAVOF988ow0wK4phLbma+fzKXWl3nQOMsESRkxo78dmRDSJrbiTe8PU2ocKOUkiGOt/pLWirUUHL5OUgRCT8C4gXnGsfOsiOgDCj7+YOMq4J3GUw+TVgP3Mvgoe7eVIFJcW1fQeI2I2GOPcRo4J6vgWYk2odxslaSloXMbHS7WMgdGIeM3Eo+MrDDATUMfEr39jlGtDSFuP+HnVNgScnt+pyeJn38kE9jqoX16sV3uGpNQV3SDiABJOFVrJOa3O9b3xUUU+F1Gq3TWPVT6sgGcjDXXWfdWBm25RP5GAfCDgeBKHtIFpTeZBWHEJqzTzWhoM0DmKPnaHzhD+atCHYC7ABqohQV7O70CzEjQxFS1x9qKm9T1Kx8F3XyK+s2hJRvNfHL6U0x4KnuZgKyt/1WG12j5ouFmW4JFipRAizUr4gtmXtf+Bza8Yt22LQwUH4xOmpI1htK5X8vZkxjUnldG7BBMljKymjeCkCdqQ/WPsWtA1zPFPEE8R5VmH3osqs1gS9HFO9R1BW10Z7S/SkijZZzy+WhV2Eg38A6m70XQnk9yAOS4YvF9W8AkxvLo3DwDFFP6aCuHmOVrvUOIIX2cKIExfI1k8="
+
+before_install:
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | sudo tee -a /etc/ssl/certs/ca-
+
+addons:
+  coverity_scan:
+    project:
+      name: "wultra/powerauth-webflow"
+      description: "Build submitted via Travis CI"
+    notification_email: roman.strobl@wultra.com
+    build_command_prepend: "mvn clean"
+    build_command: "mvn -DskipTests=true compile"
+    branch_pattern: coverity_scan

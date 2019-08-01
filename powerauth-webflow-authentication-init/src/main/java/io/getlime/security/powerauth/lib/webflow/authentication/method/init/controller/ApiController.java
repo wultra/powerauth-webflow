@@ -22,7 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDat
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
@@ -101,8 +101,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         if (operation == null) {
             final String operationName = "login";
-            final GetOperationConfigResponse operationConfig = getOperationConfig(operationName);
-            if (operationConfig == null) {
+            GetOperationConfigDetailResponse operationConfig;
+            try {
+                operationConfig = getOperationConfig(operationName);
+            } catch (AuthStepException e) {
                 logger.error("Operation configuration is missing, operation name: {}", operationName);
                 return failedOperationResponse(null, "operationConfig.missing");
             }
@@ -122,7 +124,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             }
             List<KeyValueParameter> params = new ArrayList<>();
             logger.info("Initialized default login operation");
-            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, new AuthResponseProvider() {
+            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, null, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
@@ -195,7 +197,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      * Create a continue operation response.
      * @param operationId Operation ID.
      * @param steps Operation authentication steps.
-     * @return Continue operation reponse.
+     * @return Continue operation response.
      */
     private InitOperationResponse continueOperationResponse(String operationId, List<AuthStep> steps) {
         String operationHash = operationSessionService.generateOperationHash(operationId);

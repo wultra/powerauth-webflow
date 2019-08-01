@@ -142,6 +142,7 @@ a:hover, a:active, a:focus {
 
 #operation .panel-body {
     padding: 30px;
+    min-height: 400px;
 }
 
 #operation .operation-approve {
@@ -151,7 +152,7 @@ a:hover, a:active, a:focus {
 #operation .operation-approve h3 {
     color: #7FC000;
     font-size: 18pt;
-    margin-top: 0;
+    margin-top: 10px;
     margin-bottom: 10px;
 }
 
@@ -266,7 +267,7 @@ a:hover, a:active, a:focus {
 
 .title {
     font-size: 16pt;
-    margin: 10px 10px 20px 10px;
+    margin: 20px 10px 20px 10px;
 }
 
 .alert {
@@ -314,4 +315,81 @@ a:hover, a:active, a:focus {
 
 .party-info-link {
     font-size: 12pt;
+}
+
+.organization .Select-control {
+    margin-bottom: 15px;
+}
+
+.organization .Select-input {
+    height: 34px;
+}
+
+.organization .Select-value-label {
+    font-size: 14px;
+    text-align: left;
+    padding-left: 2px;
+}
+
+.organization .Select-option {
+    font-size: 14px;
+    text-align: left;
+    padding-left: 12px;
+}
+
+.nav-tabs {
+    margin-bottom: -1px;
+    margin-left: 20px;
+    width: 400px;
+}
+
+.consent-text {
+    color: #777777;
+    font-size: 12pt;
+}
+
+.consent-checkbox {
+    vertical-align: top;
+    margin-top: 6px !important;
+}
+
+.consent-option-prefix {
+    vertical-align: top;
+    margin-top: 2px;
+    display: inline-block;
+    width: 12px;
+}
+
+.consent-option-text {
+    color: #777777;
+    display: unset;
+    font-size: 12pt;
+    font-weight: normal;
+}
+
+.consent-nopadding {
+    padding: 0;
+}
+
+.consent-error {
+    padding-top: 10px;
+    color: #C0007F;
+    font-size: 12pt;
+}
+
+.consent-option-error {
+    color: #C0007F;
+    font-size: 12pt;
+}
+
+.sms-resend-active {
+    color: #7FC000;
+}
+
+.sms-resend-active:hover {
+    cursor: pointer;
+}
+
+.sms-resend-disabled {
+    color: #777777;
 }

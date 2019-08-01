@@ -50,7 +50,7 @@ export function initOffline(activationId) {
                     error: false,
                     init: true,
                     message: "",
-                    qrCode: response.data.qrcode,
+                    qrCode: response.data.qrCode,
                     nonce: response.data.nonce,
                     chosenActivation: response.data.chosenActivation,
                     activations: response.data.activations
