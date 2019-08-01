@@ -47,6 +47,7 @@ Data Adapter connects Web Flow to other backends and serves as an integration co
 
 Data Adapter handles following use cases:
 
+* Lookup user ID for given username.
 * User authentication with remote backend based on provided credentials for form based authentication step.
 * Retrieve user details for given user ID such as firstname and surname.
 * Retrieve data for given user and decorate operation data (e.g. bank account names, balances, currencies, etc.).
@@ -58,14 +59,13 @@ Data Adapter handles following use cases:
 * Prepare consent form text and options. 
 * Verify consent form options selected by the user.
 * Save consent form options selected by the user.
-* Lookup username for given user ID.
 * Verify authorization SMS code and user password.
 
 For more information see the [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization)
 
 ## Mobile Token
 
-Mobile Token is a standalone mobile application which allows user to confirm authentication, or authorization operations, created by Web Flow Server. 
+Mobile Token is a standalone mobile application which allows user to confirm authentication, or authorization operations, created on Next Step Server. Operations are typically accessed via REST API published by Web Flow Server.
 
 For more information see our [Mobile Token product page](https://www.wultra.com/product/powerauth-mobile-token).
 

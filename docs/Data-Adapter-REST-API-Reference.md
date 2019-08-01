@@ -83,7 +83,8 @@ Get a system status response, with basic information about the running applicati
 
 ## User Lookup
 
-Performs a lookup of user account.
+Performs a lookup of user account. The specified username is converted into a user ID. The username and user ID values 
+may be identical, however in typical deployments they are different.
 
 <table>
 	<tr>
