@@ -92,6 +92,12 @@ public class UserProfileController {
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
             userResponse.getConnection().setLanguage(language);
             userResponse.getConnection().setSca(sca);
+
+            // In case Data Adapter translated organization ID, use the translated value,
+            // otherwise use the organization ID that is assigned to the access token.
+            if (userDetail.getOrganizationId() != null && !userDetail.getOrganizationId().isEmpty()) {
+                organizationId = userDetail.getOrganizationId();
+            }
             userResponse.getConnection().setOrganizationId(organizationId);
         } catch (DataAdapterClientErrorException e) {
             // Return dummy user
