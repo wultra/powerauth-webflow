@@ -117,7 +117,7 @@ public class OperationConfigEntity implements Serializable {
      * Get whether anti-fraud system is enabled.
      * @return Whether anti-fraud system is enabled.
      */
-    public boolean getAfsEnabled() {
+    public boolean isAfsEnabled() {
         return afsEnabled;
     }
 
