@@ -16,12 +16,10 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * Enumeration with banner types.
+ * Product used for anti-fraud service integration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum BannerType {
-    BANNER_INFO,
-    BANNER_WARNING,
-    BANNER_ERROR
+public enum AfsType {
+    THREAT_MARK
 }

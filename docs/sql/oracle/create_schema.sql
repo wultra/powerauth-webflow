@@ -89,7 +89,8 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
-  mobile_token_mode         VARCHAR(256) NOT NULL
+  mobile_token_mode         VARCHAR(256) NOT NULL,
+  afs_enabled               NUMBER(1) DEFAULT 0 NOT NULL
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.

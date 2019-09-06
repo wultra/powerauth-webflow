@@ -46,6 +46,9 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "mobile_token_mode")
     private String mobileTokenMode;
 
+    @Column(name = "afs_enabled")
+    private boolean afsEnabled;
+
     /**
      * Get operation name.
      * @return Operation name.
@@ -108,6 +111,22 @@ public class OperationConfigEntity implements Serializable {
      */
     public void setMobileTokenMode(String mobileTokenMode) {
         this.mobileTokenMode = mobileTokenMode;
+    }
+
+    /**
+     * Get whether anti-fraud system is enabled.
+     * @return Whether anti-fraud system is enabled.
+     */
+    public boolean getAfsEnabled() {
+        return afsEnabled;
+    }
+
+    /**
+     * Set whether anti-fraud system is enabled.
+     * @param afsEnabled Whether anti-fraud system is enabled.
+     */
+    public void setAfsEnabled(boolean afsEnabled) {
+        this.afsEnabled = afsEnabled;
     }
 
     @Override
