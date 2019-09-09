@@ -26,6 +26,7 @@ public class GetOperationConfigDetailResponse {
     private String templateVersion;
     private Integer templateId;
     private String mobileTokenMode;
+    private boolean afsEnabled;
 
     /**
      * Get operation name.
@@ -89,5 +90,21 @@ public class GetOperationConfigDetailResponse {
      */
     public void setMobileTokenMode(String mobileTokenMode) {
         this.mobileTokenMode = mobileTokenMode;
+    }
+
+    /**
+     * Get whether anti-fraud system is enabled.
+     * @return Whether anti-fraud system is enabled.
+     */
+    public boolean isAfsEnabled() {
+        return afsEnabled;
+    }
+
+    /**
+     * Set whether anti-fraud system is enabled.
+     * @param afsEnabled Whether anti-fraud system is enabled.
+     */
+    public void setAfsEnabled(boolean afsEnabled) {
+        this.afsEnabled = afsEnabled;
     }
 }

@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
@@ -88,6 +89,18 @@ public class WebFlowServicesConfiguration {
      */
     @Value("${powerauth.webflow.timeout.warning.delayMs:60000}")
     private int timeoutWarningDelay;
+
+    /**
+     * Whether anti-fraud system integration is enabled.
+     */
+    @Value("${powerauth.webflow.afs.enabled:false}")
+    private boolean afsEnabled;
+
+    /**
+     * Type of product used for anti-fraud system integration.
+     */
+    @Value("${powerauth.webflow.afs.type:THREAT_MARK}")
+    private AfsType afsType;
 
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
@@ -186,5 +199,21 @@ public class WebFlowServicesConfiguration {
      */
     public void setTimeoutWarningDelay(int timeoutWarningDelay) {
         this.timeoutWarningDelay = timeoutWarningDelay;
+    }
+
+    /**
+     * Get whether anti-fraud system integration is enabled.
+     * @return Whether anti-fraud system integration is enabled.
+     */
+    public boolean isAfsEnabled() {
+        return afsEnabled;
+    }
+
+    /**
+     * Get anti-fraud system type.
+     * @return Anti-fraud system type.
+     */
+    public AfsType getAfsType() {
+        return afsType;
     }
 }
