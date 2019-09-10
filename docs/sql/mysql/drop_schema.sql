@@ -13,5 +13,3 @@ DROP TABLE IF EXISTS oauth_access_token;
 DROP TABLE IF EXISTS oauth_client_token;
 DROP TABLE IF EXISTS oauth_client_details;
 
--- This table is only required for demo client application
--- DROP TABLE IF EXISTS UserConnection;

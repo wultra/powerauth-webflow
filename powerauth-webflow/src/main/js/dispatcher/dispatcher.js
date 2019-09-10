@@ -23,6 +23,14 @@ export function dispatchAction(dispatch, response) {
     if (response.data.next.length > 0) {
         if (response.data.result === "CONFIRMED") {
             const next = response.data.next;
+            if (next.length === 0) {
+                dispatch({
+                    type: "SHOW_SCREEN_ERROR",
+                    payload: {
+                        message: "error.noAuthMethod"
+                    }
+                })
+            }
             let authMethods = [];
             for (let key in next) {
                 if (next.hasOwnProperty(key)) {

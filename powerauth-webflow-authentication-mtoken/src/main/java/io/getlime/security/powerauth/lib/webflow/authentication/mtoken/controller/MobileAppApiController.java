@@ -39,8 +39,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhand
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;

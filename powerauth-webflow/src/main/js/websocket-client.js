@@ -16,13 +16,13 @@
 'use strict';
 
 const SockJS = require('sockjs-client');
-let stompClient;
+let client;
 require('stompjs');
 
 /**
  * Registration for WebSocket routes with callback functions called on incoming messages.
- * @param registrations routes and callback functions
- * @param webSocketId Web Socket ID
+ * @param registrations Registration routes and callback functions.
+ * @param webSocketId Web Socket ID.
  */
 function register(registrations, webSocketId) {
     var msie = document.documentMode;
@@ -34,39 +34,59 @@ function register(registrations, webSocketId) {
     let headers = {};
     headers[csrf.headerName] = csrf.token;
     const socket = SockJS('./websocket');
-    stompClient = Stomp.over(socket);
-    stompClient.debug = () => {};
-    stompClient.connect(headers, function (frame) {
+    client = Stomp.over(socket);
+    client.debug = () => {};
+    client.connect(headers, function (frame) {
         registrations.forEach(function (registration) {
-            stompClient.subscribe(registration.route, registration.callback);
+            client.subscribe(registration.route, registration.callback);
         });
         // registration of the client with given webSocketId to link WebSocket session and operation
         const msg = {"webSocketId": webSocketId};
-        stompClient.send("/app/registration", {}, JSON.stringify(msg));
+        client.send("/app/registration", {}, JSON.stringify(msg));
     });
 }
 
+
 /**
- * Sends a WebSocket message
- * @param destination message destination
- * @param params parameters, use {} for empty
- * @param message text of the message as JSON
+ * Subscribe to a Web Socket route with a callback function.
+ * @param route Web Socket route.
+ * @param callback Callback function to call on an event.
+ */
+function subscribe(route, callback) {
+    client.subscribe(route, callback);
+}
+
+/**
+ * Unsubscribe from a route.
+ * @param route Web Socket route.
+ */
+function unsubscribe(route) {
+    client.unsubscribe(route);
+}
+
+/**
+ * Send a WebSocket message.
+ * @param destination Message destination.
+ * @param params Parameters, use {} for empty.
+ * @param message Text of the message as JSON.
  */
 function send(destination, params, message) {
-    if (stompClient !== undefined) {
-        stompClient.send(destination, params, message);
+    if (client !== undefined) {
+        client.send(destination, params, message);
     }
 }
 
 /**
- * Disconnects the WebSocket.
+ * Disconnect the WebSocket.
  */
 function disconnect() {
-    if (stompClient !== undefined) {
-        stompClient.disconnect();
+    if (client !== undefined) {
+        client.disconnect();
     }
 }
 
 module.exports.register = register;
+module.exports.subscribe = subscribe;
+module.exports.unsubscribe = unsubscribe;
 module.exports.disconnect = disconnect;
 module.exports.send = send;
