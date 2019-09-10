@@ -90,7 +90,7 @@ CREATE TABLE ns_operation_config (
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
+  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
