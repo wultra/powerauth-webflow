@@ -1,6 +1,6 @@
 -- Table oauth_client_details stores details about OAuth2 client applications.
 -- Every Web Flow client application should have a record in this table.
--- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java
+-- See: https://github.com/spring-projects/spring-security-oauth/BYTEA/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java
 CREATE TABLE oauth_client_details (
   client_id               VARCHAR(256) PRIMARY KEY,
   resource_ids            VARCHAR(256),
@@ -19,37 +19,37 @@ CREATE TABLE oauth_client_details (
 -- See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html
 CREATE TABLE oauth_client_token (
   token_id          VARCHAR(256),
-  token             BLOB,
+  token             BYTEA,
   authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 );
 
 -- Table oauth_access_token stores OAuth2 access tokens.
--- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
+-- See: https://github.com/spring-projects/spring-security-oauth/BYTEA/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_access_token (
   token_id          VARCHAR(256),
-  token             BLOB,
+  token             BYTEA,
   authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
-  authentication    BLOB,
+  authentication    BYTEA,
   refresh_token     VARCHAR(256)
 );
 
 -- Table oauth_access_token stores OAuth2 refresh tokens.
--- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
+-- See: https://github.com/spring-projects/spring-security-oauth/BYTEA/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_refresh_token (
   token_id       VARCHAR(256),
-  token          BLOB,
-  authentication BLOB
+  token          BYTEA,
+  authentication BYTEA
 );
 
 -- Table oauth_code stores data for the OAuth2 authorization code grant.
--- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java
+-- See: https://github.com/spring-projects/spring-security-oauth/BYTEA/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/code/JdbcAuthorizationCodeServices.java
 CREATE TABLE oauth_code (
   code           VARCHAR(255),
-  authentication BLOB
+  authentication BYTEA
 );
 
 -- Table ns_auth_method stores configuration of authentication methods.
@@ -57,13 +57,13 @@ CREATE TABLE oauth_code (
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY NOT NULL,
   order_number       INTEGER NOT NULL,
-  check_user_prefs   NUMBER(1) DEFAULT 0 NOT NULL,
+  check_user_prefs   BOOLEAN DEFAULT FALSE NOT NULL,
   user_prefs_column  INTEGER,
-  user_prefs_default NUMBER(1) DEFAULT 0,
-  check_auth_fails   NUMBER(1) DEFAULT 0 NOT NULL,
+  user_prefs_default BOOLEAN DEFAULT FALSE,
+  check_auth_fails   BOOLEAN DEFAULT FALSE NOT NULL,
   max_auth_fails     INTEGER,
-  has_user_interface NUMBER(1) DEFAULT 0,
-  has_mobile_token   NUMBER(1) DEFAULT 0,
+  has_user_interface BOOLEAN DEFAULT FALSE,
+  has_mobile_token   BOOLEAN DEFAULT FALSE,
   display_name_key   VARCHAR(32)
 );
 
@@ -71,11 +71,11 @@ CREATE TABLE ns_auth_method (
 -- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
   user_id       VARCHAR(256) PRIMARY KEY NOT NULL,
-  auth_method_1 NUMBER(1) DEFAULT 0,
-  auth_method_2 NUMBER(1) DEFAULT 0,
-  auth_method_3 NUMBER(1) DEFAULT 0,
-  auth_method_4 NUMBER(1) DEFAULT 0,
-  auth_method_5 NUMBER(1) DEFAULT 0,
+  auth_method_1 BOOLEAN DEFAULT FALSE,
+  auth_method_2 BOOLEAN DEFAULT FALSE,
+  auth_method_3 BOOLEAN DEFAULT FALSE,
+  auth_method_4 BOOLEAN DEFAULT FALSE,
+  auth_method_5 BOOLEAN DEFAULT FALSE,
   auth_method_1_config VARCHAR(256),
   auth_method_2_config VARCHAR(256),
   auth_method_3_config VARCHAR(256),
@@ -90,7 +90,7 @@ CREATE TABLE ns_operation_config (
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               NUMBER(1) DEFAULT 0 NOT NULL
+  afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -99,7 +99,7 @@ CREATE TABLE ns_operation_config (
 CREATE TABLE ns_organization (
   organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,
   display_name_key         VARCHAR(256),
-  is_default               NUMBER(1) DEFAULT 0 NOT NULL,
+  is_default               BOOLEAN DEFAULT FALSE NOT NULL,
   order_number             INTEGER NOT NULL
 );
 
@@ -108,12 +108,12 @@ CREATE TABLE ns_organization (
 CREATE TABLE ns_operation (
   operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
   operation_name            VARCHAR(32) NOT NULL,
-  operation_data            CLOB NOT NULL,
-  operation_form_data       CLOB,
+  operation_data            TEXT NOT NULL,
+  operation_form_data       TEXT,
   application_id            VARCHAR(256),
   application_name          VARCHAR(256),
   application_description   VARCHAR(256),
-  application_extras        CLOB,
+  application_extras        TEXT,
   user_id                   VARCHAR(256),
   organization_id           VARCHAR(256),
   result                    VARCHAR(32),
@@ -173,30 +173,11 @@ CREATE TABLE da_sms_authorization (
   organization_id      VARCHAR(256),
   operation_name       VARCHAR(32) NOT NULL,
   authorization_code   VARCHAR(32) NOT NULL,
-  salt                 BLOB NOT NULL,
-  message_text         CLOB NOT NULL,
+  salt                 BYTEA NOT NULL,
+  message_text         TEXT NOT NULL,
   verify_request_count INTEGER,
-  verified             NUMBER(1) DEFAULT 0,
+  verified             BOOLEAN DEFAULT FALSE,
   timestamp_created    TIMESTAMP,
   timestamp_verified   TIMESTAMP,
   timestamp_expires    TIMESTAMP
 );
-
--- Table UserConnection is required only for the demo client application which is based on Spring Social.
--- See: https://github.com/spring-projects/spring-social
-/*
-CREATE TABLE UserConnection (
-  userId VARCHAR(255) NOT NULL,
-  providerId VARCHAR(255) NOT NULL,
-  providerUserId VARCHAR(255),
-  rank INTEGER NOT NULL,
-  displayName VARCHAR(255),
-  profileUrl VARCHAR(512),
-  imageUrl VARCHAR(512),
-  accessToken VARCHAR(512) NOT NULL,
-  secret VARCHAR(512),
-  refreshToken VARCHAR(512),
-  expireTime NUMBER(19),
-PRIMARY KEY (userId, providerId, providerUserId));
-CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
-*/

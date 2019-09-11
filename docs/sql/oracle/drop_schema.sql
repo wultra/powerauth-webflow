@@ -96,13 +96,4 @@ EXCEPTION
 END;
 /
 
-/* This table is required only for the demo client application
-BEGIN
-  EXECUTE IMMEDIATE 'DROP TABLE UserConnection';
-EXCEPTION
-  WHEN OTHERS THEN NULL;
-END;
-/
-*/
-
 
