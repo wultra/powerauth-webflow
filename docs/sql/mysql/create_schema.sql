@@ -90,7 +90,7 @@ CREATE TABLE ns_operation_config (
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
+  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -179,6 +179,38 @@ CREATE TABLE da_sms_authorization (
   timestamp_created    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_verified   TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_consent
+(
+	`consent_id` VARCHAR(64) PRIMARY KEY NOT NULL,
+	`consent_name` VARCHAR(128) NOT NULL,
+	`consent_text` TEXT NOT NULL,
+	`version` INT NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_user_consent
+(
+    `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `user_id` VARCHAR(256) NOT NULL,
+    `client_id` VARCHAR(256) NOT NULL,
+    `consent_id` VARCHAR(64) NOT NULL,
+    `external_id` VARCHAR(256) NOT NULL,
+    `consent_parameters` TEXT NOT NULL,
+    `timestamp_created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    `timestamp_updated` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_user_consent_history
+(
+    `id` INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+    `user_id` VARCHAR(256) NOT NULL,
+    `client_id` VARCHAR(256) NOT NULL,
+    `consent_id` VARCHAR(64) NOT NULL,
+    `consent_change` VARCHAR(16) NOT NULL,
+    `external_id` VARCHAR(256) NOT NULL,
+    `consent_parameters` TEXT NOT NULL,
+    `timestamp_created` TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table UserConnection is required only for the demo client application which is based on Spring Social.

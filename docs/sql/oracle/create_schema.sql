@@ -1,3 +1,9 @@
+--
+--  Create sequences.
+--
+CREATE SEQUENCE "TPP_USER_CONSENT_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "TPP_USER_CONSENT_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+
 -- Table oauth_client_details stores details about OAuth2 client applications.
 -- Every Web Flow client application should have a record in this table.
 -- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java
@@ -119,7 +125,7 @@ CREATE TABLE ns_operation (
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
   timestamp_expires         TIMESTAMP,
-  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
 -- Table ns_operation_history stores all changes of operations.
@@ -180,6 +186,38 @@ CREATE TABLE da_sms_authorization (
   timestamp_created    TIMESTAMP,
   timestamp_verified   TIMESTAMP,
   timestamp_expires    TIMESTAMP
+);
+
+CREATE TABLE tpp_consent
+(
+	consent_id VARCHAR(64) PRIMARY KEY NOT NULL,
+	consent_name VARCHAR(128) NOT NULL,
+	consent_text CLOB NOT NULL,
+	version INT NOT NULL
+);
+
+CREATE TABLE tpp_user_consent
+(
+    id INTEGER PRIMARY KEY NOT NULL,
+    user_id VARCHAR(256) NOT NULL,
+    client_id VARCHAR(256) NOT NULL,
+    consent_id VARCHAR(64) NOT NULL,
+    external_id VARCHAR(256) NOT NULL,
+    consent_parameters CLOB NOT NULL,
+    timestamp_created TIMESTAMP,
+    timestamp_updated TIMESTAMP
+);
+
+CREATE TABLE tpp_user_consent_history
+(
+    id INTEGER PRIMARY KEY NOT NULL,
+    user_id VARCHAR(256) NOT NULL,
+    client_id VARCHAR(256) NOT NULL,
+    consent_id VARCHAR(64) NOT NULL,
+    consent_change VARCHAR(16) NOT NULL,
+    external_id VARCHAR(256) NOT NULL,
+    consent_parameters CLOB NOT NULL,
+    timestamp_created TIMESTAMP
 );
 
 -- Table UserConnection is required only for the demo client application which is based on Spring Social.
