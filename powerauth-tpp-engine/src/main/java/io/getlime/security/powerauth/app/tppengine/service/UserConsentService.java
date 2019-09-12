@@ -128,7 +128,10 @@ public class UserConsentService {
 
             return response;
         } else {
-            return null;
+            UserConsentDetailResponse response = new UserConsentDetailResponse();
+            response.setUserId(userId);
+            response.setConsent(null); // no consent given
+            return response;
         }
     }
 
