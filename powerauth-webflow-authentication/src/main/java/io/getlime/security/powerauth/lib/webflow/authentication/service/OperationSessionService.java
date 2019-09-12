@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.xml.bind.DatatypeConverter;
-import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -63,6 +63,8 @@ public class OperationSessionService {
      */
     public void persistOperationToSessionMapping(String operationId, String httpSessionId, AuthResult result) {
         OperationSessionEntity operationSessionEntity = new OperationSessionEntity(operationId, httpSessionId, result);
+        String operationHash = generateOperationHash(operationId);
+        operationSessionEntity.setOperationHash(operationHash);
         operationSessionRepository.save(operationSessionEntity);
     }
 
@@ -104,9 +106,48 @@ public class OperationSessionService {
             return null;
         }
         try {
-            return DatatypeConverter.printHexBinary(MessageDigest.getInstance("SHA-512").digest(operationId.getBytes("UTF-8")));
-        } catch (NoSuchAlgorithmException | UnsupportedEncodingException e) {
+            return DatatypeConverter.printHexBinary(MessageDigest.getInstance("SHA-512").digest(operationId.getBytes(StandardCharsets.UTF_8)));
+        } catch (NoSuchAlgorithmException e) {
             return null;
+        }
+    }
+
+    /**
+     * Lookup Web Socket Session ID based on operation hash.
+     * @param operationHash Operation hash.
+     * @return Web Socket Session ID or null if session was not found.
+     */
+    public String lookupWebSocketSessionIdByOperationHash(String operationHash) {
+        OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
+        if (operationSessionEntity != null) {
+            return operationSessionEntity.getWebSocketSessionId();
+        }
+        return null;
+    }
+
+    /**
+     * Lookup Operation ID based on Web Socket session ID.
+     * @param webSocketSessionId Web Socket session ID.
+     * @return Operation ID or null if session was not found.
+     */
+    public String lookupOperationIdByWebSocketSessionId(String webSocketSessionId) {
+        OperationSessionEntity operationSessionEntity = operationSessionRepository.findByWebSocketSessionId(webSocketSessionId);
+        if (operationSessionEntity != null) {
+            return operationSessionEntity.getOperationId();
+        }
+        return null;
+    }
+
+    /**
+     * Lookup an operation by operation hash and store Web Socket session ID.
+     * @param operationHash Operation hash.
+     * @param webSocketSessionId Web Socket session ID.
+     */
+    public void storeWebSocketSessionId(String operationHash, String webSocketSessionId) {
+        OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
+        if (operationSessionEntity != null) {
+            operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
+            operationSessionRepository.save(operationSessionEntity);
         }
     }
 

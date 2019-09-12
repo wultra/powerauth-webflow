@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 import axios from "axios";
-import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
+import {dispatchError} from "../dispatcher/dispatcher";
+import {handleAuthFailedError} from "./errorHandling";
 
 /**
  * Initialize SCA approval.
@@ -60,35 +61,16 @@ export function init() {
                     break;
                 }
                 case 'AUTH_FAILED': {
-                    // handle timeout - login action can not succeed anymore, do not show login screen, show error instead
-                    if (response.data.message === "operation.timeout") {
-                        dispatchAction(dispatch, response);
-                        break;
+                    if (!handleAuthFailedError(dispatch, response)) {
+                        dispatch({
+                            type: "SHOW_SCREEN_APPROVAL_SCA",
+                            payload: {
+                                loading: false,
+                                error: true,
+                                message: response.data.message
+                            }
+                        });
                     }
-                    // if the operation has been interrupted by new operation, show an error
-                    if (response.data.message === "operation.interrupted") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
-                    if (response.data.message === "authentication.maxAttemptsExceeded") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if there is no supported auth method, show error, there is no point in continuing
-                    // TODO - handle fallback - see issue #32
-                    if (response.data.message === "error.noAuthMethod") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    dispatch({
-                        type: "SHOW_SCREEN_APPROVAL_SCA",
-                        payload: {
-                            loading: false,
-                            error: true,
-                            message: response.data.message
-                        }
-                    });
                     break;
                 }
             }

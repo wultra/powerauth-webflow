@@ -43,7 +43,6 @@ export default class Token extends React.Component {
         super();
         this.update = this.update.bind(this);
         this.init = this.init.bind(this);
-        this.onRegister = this.onRegister.bind(this);
         this.onAuthorize = this.onAuthorize.bind(this);
         this.setAuthorizationInProgress = this.setAuthorizationInProgress.bind(this);
         this.isAuthorizationInProgress = this.isAuthorizationInProgress.bind(this);
@@ -180,11 +179,6 @@ export default class Token extends React.Component {
         return this.state.updateTimeout;
     }
 
-    onRegister() {
-        // disabled debug logging
-        // console.log('WebSocket has been registered.');
-    }
-
     onAuthorize() {
         // disabled debug logging
         // console.log('Authorization request received from WebSocket.');
@@ -211,6 +205,10 @@ export default class Token extends React.Component {
             if (!b) {
                 // Authorization was completed successfully.
                 setAuthorized(true);
+                // Unsubscribe from authorization events.
+                if (operationHash !== undefined) {
+                    stompClient.unsubscribe('/user/topic/authorization');
+                }
             }
             // End of attempt to authorize by WebSockets - 3s polling can be resumed in case authorization is not done yet.
             setAuthorizationInProgress(false);
@@ -234,8 +232,6 @@ export default class Token extends React.Component {
         if (updateTimeout !== null) {
             clearTimeout(updateTimeout);
         }
-        // disconnect Web Socket connection
-        stompClient.disconnect();
         this.setState({disconnected: true});
     }
 
@@ -249,15 +245,13 @@ export default class Token extends React.Component {
 
     componentWillReceiveProps(props) {
         if (!this.state.configurationInitialized) {
-            const webSocketId = props.context.webSocketId;
             const offlineModeAvailable = props.context.offlineModeAvailable;
             const smsFallbackAvailable = props.context.smsFallbackAvailable;
             const username = props.context.username;
-            if (webSocketId !== undefined && offlineModeAvailable !== undefined) {
-                stompClient.register([
-                    {route: '/user/topic/registration', callback: this.onRegister},
-                    {route: '/user/topic/authorization', callback: this.onAuthorize}
-                ], webSocketId);
+            if (offlineModeAvailable !== undefined && smsFallbackAvailable !== undefined && username !== undefined) {
+                if (operationHash !== undefined) {
+                    stompClient.subscribe('/user/topic/authorization', this.onAuthorize);
+                }
                 this.setState({offlineModeAvailable: offlineModeAvailable});
                 this.setState({smsFallbackAvailable: smsFallbackAvailable});
                 this.setState({username: username});

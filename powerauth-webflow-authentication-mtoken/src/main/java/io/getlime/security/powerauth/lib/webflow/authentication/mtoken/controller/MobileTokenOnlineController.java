@@ -32,7 +32,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.req
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,21 +55,18 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
     private static final Logger logger = LoggerFactory.getLogger(MobileTokenOnlineController.class);
 
-    private final WebSocketMessageService webSocketMessageService;
     private final WebFlowServicesConfiguration webFlowServicesConfiguration;
     private final PushMessageService pushMessageService;
     private final HttpSession httpSession;
 
     /**
      * Controller constructor.
-     * @param webSocketMessageService Web Socket message service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public MobileTokenOnlineController(WebSocketMessageService webSocketMessageService, WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
-        this.webSocketMessageService = webSocketMessageService;
+    public MobileTokenOnlineController(WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
         this.webFlowServicesConfiguration = webFlowServicesConfiguration;
         this.pushMessageService = pushMessageService;
         this.httpSession = httpSession;
@@ -119,7 +115,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         checkOperationExpiration(operation);
 
         MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, authMethod);
-        initResponse.setWebSocketId(webSocketMessageService.generateWebSocketId(operation.getOperationId()));
         initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
         if (authMethod == AuthMethod.LOGIN_SCA) {
             // Add username for LOGIN_SCA method
@@ -153,9 +148,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         if (operation.isExpired()) {
             logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
             // handle operation expiration
-            // remove WebSocket session, it is expired
             clearCurrentBrowserSession();
-            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("operation.timeout");
@@ -167,7 +160,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
         if (AuthResult.DONE.equals(operation.getResult())) {
             authenticateCurrentBrowserSession();
-            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CONFIRMED);
             response.getNext().addAll(operation.getSteps());
@@ -182,8 +174,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         for (OperationHistory h : history) {
             // in case step was already confirmed, the authentication method has already succeeded
             if (authMethod == h.getAuthMethod() && AuthStepResult.CONFIRMED.equals(h.getRequestAuthStepResult())) {
-                // remove WebSocket session, authorization is confirmed
-                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.getNext().addAll(operation.getSteps());
@@ -195,9 +185,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             }
             // in case previous authentication lead to an authentication method failure, the authentication method has already failed
             if (authMethod == h.getAuthMethod() && AuthStepResult.AUTH_METHOD_FAILED.equals(h.getRequestAuthStepResult())) {
-                // remove WebSocket session, authentication method is failed
                 clearCurrentBrowserSession();
-                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.AUTH_METHOD_FAILED);
                 response.getNext().addAll(operation.getSteps());
@@ -209,9 +197,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             }
             // in case the authentication has been canceled, the authentication method is canceled
             if (authMethod == h.getAuthMethod() && AuthResult.FAILED.equals(h.getAuthResult()) && AuthStepResult.CANCELED.equals(h.getRequestAuthStepResult())) {
-                // remove WebSocket session, operation is canceled
                 clearCurrentBrowserSession();
-                webSocketMessageService.removeWebSocketSession(operation.getOperationId());
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CANCELED);
                 response.setMessage("operation.canceled");
@@ -233,7 +219,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 logger.error("Cancel operation request failed, reason: "+ex.getMessage());
             }
             clearCurrentBrowserSession();
-            webSocketMessageService.removeWebSocketSession(operation.getOperationId());
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("operation.methodNotAvailable");

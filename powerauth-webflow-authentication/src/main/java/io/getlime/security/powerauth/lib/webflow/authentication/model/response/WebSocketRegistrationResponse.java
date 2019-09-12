@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response;
+package io.getlime.security.powerauth.lib.webflow.authentication.model.response;
 
 /**
  * Response to registration of a new WebSocket session.

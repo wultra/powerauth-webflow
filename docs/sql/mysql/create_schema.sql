@@ -18,9 +18,9 @@ CREATE TABLE oauth_client_details (
 -- Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.
 -- See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html
 CREATE TABLE oauth_client_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -28,9 +28,9 @@ CREATE TABLE oauth_client_token (
 -- Table oauth_access_token stores OAuth2 access tokens.
 -- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_access_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
   authentication    LONG VARBINARY,
@@ -160,6 +160,8 @@ CREATE TABLE ns_step_definition (
 CREATE TABLE wf_operation_session (
   operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
   http_session_id           VARCHAR(256) NOT NULL,
+  operation_hash            VARCHAR(256),
+  websocket_session_id      VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -231,3 +233,6 @@ CREATE TABLE UserConnection (
 PRIMARY KEY (userId, providerId, providerUserId));
 CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
 */
+
+CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
+CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
