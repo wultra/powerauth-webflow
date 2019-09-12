@@ -84,6 +84,7 @@
         <module>powerauth-mtoken-model</module>
         <module>powerauth-tpp-engine</module>
         <module>powerauth-tpp-engine-model</module>
+        <module>powerauth-tpp-engine-client</module>
     </modules>
 
     <properties>

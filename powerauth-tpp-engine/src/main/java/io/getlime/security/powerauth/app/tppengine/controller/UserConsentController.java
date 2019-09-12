@@ -120,7 +120,7 @@ public class UserConsentController {
      * @return List of consents that are currently active.
      */
     @RequestMapping(value = "consent", method = RequestMethod.GET)
-    public ObjectResponse<ConsentListResponse> listConsent(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
+    public ObjectResponse<ConsentListResponse> consentList(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
         final ConsentListResponse response = userConsentService.consentListForUser(userId, clientId);
         return new ObjectResponse<>(response);
     }
@@ -134,7 +134,7 @@ public class UserConsentController {
      * @return Check
      */
     @RequestMapping(value = "consent/status", method = RequestMethod.GET)
-    public ObjectResponse<UserConsentDetailResponse> listConsent(@RequestParam("userId") String userId, @RequestParam("clientId") String clientId, @RequestParam("consentId") String consentId) throws ConsentNotFoundException {
+    public ObjectResponse<UserConsentDetailResponse> consentStatus(@RequestParam("userId") String userId, @RequestParam("clientId") String clientId, @RequestParam("consentId") String consentId) throws ConsentNotFoundException {
         UserConsentDetailResponse response = userConsentService.consentStatus(userId, consentId, clientId);
         return new ObjectResponse<>(response);
     }
@@ -148,7 +148,7 @@ public class UserConsentController {
      * @return List of history items.
      */
     @RequestMapping(value = "consent/history", method = RequestMethod.GET)
-    public ObjectResponse<ConsentHistoryListResponse> historyConsent(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
+    public ObjectResponse<ConsentHistoryListResponse> consentHistory(@RequestParam("userId") String userId, @RequestParam(value = "clientId", required = false) String clientId) throws ConsentNotFoundException {
         ConsentHistoryListResponse response = userConsentService.consentHistoryForUser(userId, clientId);
         return new ObjectResponse<>(response);
     }
