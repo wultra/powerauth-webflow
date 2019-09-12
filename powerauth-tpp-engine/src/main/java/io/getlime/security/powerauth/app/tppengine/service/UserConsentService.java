@@ -137,6 +137,7 @@ public class UserConsentService {
      *
      * @param ro Request object with details of the consent.
      * @return Response related to consent approval.
+     * @throws ConsentNotFoundException In case some approved consent is not found due to database inconsistency.
      */
     @Transactional
     public GiveConsentResponse giveConsent(GiveConsentRequest ro) throws ConsentNotFoundException {
@@ -235,6 +236,7 @@ public class UserConsentService {
      * operation is a no-op.
      *
      * @param id User consent ID to be removed.
+     * @throws ConsentNotFoundException In case some approved consent is not found due to database inconsistency.
      */
     @Transactional
     public void removeConsent(Long id) throws ConsentNotFoundException {
