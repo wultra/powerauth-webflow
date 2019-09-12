@@ -8,13 +8,13 @@
     <name>powerauth-data-adapter-model</name>
     <artifactId>powerauth-data-adapter-model</artifactId>
     <groupId>io.getlime.security</groupId>
-    <version>0.22.0</version>
+    <version>0.23.0_SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.22.0</version>
+        <version>0.23.0_SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -27,7 +27,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0_SNAPSHOT</version>
         </dependency>
     </dependencies>
 

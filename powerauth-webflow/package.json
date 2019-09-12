@@ -1,6 +1,6 @@
 {
   "name": "powerauth-webflow",
-  "version": "0.22.0",
+  "version": "0.23.0_SNAPSHOT",
   "description": "Federated Authentication and Authorization Server for Web",
   "repository": {
     "type": "git",

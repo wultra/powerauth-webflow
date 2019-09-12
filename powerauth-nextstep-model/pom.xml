@@ -8,13 +8,13 @@
     <artifactId>powerauth-nextstep-model</artifactId>
     <name>powerauth-nextstep-model</name>
     <groupId>io.getlime.security</groupId>
-    <version>0.22.0</version>
+    <version>0.23.0_SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.22.0</version>
+        <version>0.23.0_SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
