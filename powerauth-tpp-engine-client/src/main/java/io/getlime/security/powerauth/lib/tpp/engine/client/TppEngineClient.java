@@ -125,7 +125,7 @@ public class TppEngineClient {
             final Map<String, String> params = new HashMap<>();
             params.put("id", id);
             ResponseEntity<ObjectResponse<ConsentDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/consent",
+                    serviceUrl + "/consent?id={id}",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<ObjectResponse<ConsentDetailResponse>>() {},
@@ -156,7 +156,7 @@ public class TppEngineClient {
             params.put("consentId", consentId);
             params.put("clientId", clientId);
             ResponseEntity<ObjectResponse<UserConsentDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/user/consent",
+                    serviceUrl + "/user/consent?userId={userId}&consentId={consentId}&clientId={clientId}",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<ObjectResponse<UserConsentDetailResponse>>() {},
