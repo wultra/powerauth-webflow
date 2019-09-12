@@ -156,7 +156,7 @@ public class TppEngineClient {
             params.put("consentId", consentId);
             params.put("clientId", clientId);
             ResponseEntity<ObjectResponse<UserConsentDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/user/consent?userId={userId}&consentId={consentId}&clientId={clientId}",
+                    serviceUrl + "/user/consent/status?userId={userId}&consentId={consentId}&clientId={clientId}",
                     HttpMethod.GET,
                     null,
                     new ParameterizedTypeReference<ObjectResponse<UserConsentDetailResponse>>() {},
