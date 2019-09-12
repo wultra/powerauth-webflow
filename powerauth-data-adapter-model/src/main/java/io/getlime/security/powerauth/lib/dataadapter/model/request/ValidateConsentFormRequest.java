@@ -70,6 +70,7 @@ public class ValidateConsentFormRequest {
      */
     public ValidateConsentFormRequest(String userId, String organizationId, OperationContext operationContext, String lang, List<ConsentOption> options) {
         this.userId = userId;
+        this.organizationId = organizationId;
         this.operationContext = operationContext;
         this.lang = lang;
         this.options = options;
