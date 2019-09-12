@@ -10,7 +10,7 @@ Following database changes were introduced in version `0.23.0`:
 - We added `operation_hash` and `websocket_session_id` columns to table `wf_operation_session`
   
 DDL update script for Oracle:
-```
+```sql
 ALTER TABLE ns_operation_config ADD afs_enabled NUMBER(1) DEFAULT 0 NOT NULL;
 
 ALTER TABLE wf_operation_session ADD operation_hash VARCHAR(256) DEFAULT 0 NOT NULL;
