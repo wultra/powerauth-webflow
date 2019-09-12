@@ -18,9 +18,9 @@ CREATE TABLE oauth_client_details (
 -- Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.
 -- See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html
 CREATE TABLE oauth_client_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             BLOB,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 );
@@ -28,9 +28,9 @@ CREATE TABLE oauth_client_token (
 -- Table oauth_access_token stores OAuth2 access tokens.
 -- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_access_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             BLOB,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
   authentication    BLOB,
@@ -119,7 +119,7 @@ CREATE TABLE ns_operation (
   result                    VARCHAR(32),
   timestamp_created         TIMESTAMP,
   timestamp_expires         TIMESTAMP,
-  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
 -- Table ns_operation_history stores all changes of operations.
