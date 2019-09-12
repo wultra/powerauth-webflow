@@ -160,6 +160,8 @@ CREATE TABLE ns_step_definition (
 CREATE TABLE wf_operation_session (
   operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
   http_session_id           VARCHAR(256) NOT NULL,
+  operation_hash            VARCHAR(256),
+  websocket_session_id      VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -181,21 +183,5 @@ CREATE TABLE da_sms_authorization (
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
--- Table UserConnection is required only for the demo client application which is based on Spring Social.
--- See: https://github.com/spring-projects/spring-social
-/*
-CREATE TABLE UserConnection (
-  userId VARCHAR(255) NOT NULL,
-  providerId VARCHAR(255) NOT NULL,
-  providerUserId VARCHAR(255),
-  rank INTEGER NOT NULL,
-  displayName VARCHAR(255),
-  profileUrl VARCHAR(512),
-  imageUrl VARCHAR(512),
-  accessToken VARCHAR(512) NOT NULL,
-  secret VARCHAR(512),
-  refreshToken VARCHAR(512),
-  expireTime BIGINT,
-PRIMARY KEY (userId, providerId, providerUserId));
-CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
-*/
+CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
+CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);

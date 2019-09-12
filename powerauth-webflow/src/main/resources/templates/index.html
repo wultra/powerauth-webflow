@@ -24,6 +24,18 @@
 
     var operationHash = [[${operationHash}]];
     var showAndroidSecurityWarning = [[${showAndroidSecurityWarning}]];
+    window.onbeforeunload = function() {
+        // Modern browsers do not allow custom messages, so text will be only shown in old browsers.
+        // Note that the onbeforeunload dialog does not appear in case user does no action, see:
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=707007
+        if (lang === 'en') {
+            return I18N_EN.messages['browser.close.warning'];
+        }
+        if (lang === 'cs') {
+            return I18N_CS.messages['browser.close.warning'];
+        }
+        return I18N_EN.messages['browser.close.warning'];
+    };
     /*]]>*/
 </script>
 

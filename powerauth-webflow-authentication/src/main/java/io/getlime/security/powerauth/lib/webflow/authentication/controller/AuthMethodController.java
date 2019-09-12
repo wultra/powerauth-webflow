@@ -37,10 +37,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.Authentica
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.OperationSessionEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +84,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     @Autowired
     private HttpServletRequest request;
+
+    @Autowired
+    private AuthMethodResolutionService authMethodResolutionService;
 
     /**
      * Get operation detail.
@@ -188,25 +188,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @return Current authentication method given current operation context.
      */
     protected AuthMethod getAuthMethodName(GetOperationDetailResponse operation) {
-        // Authentication method can be overridden to support delegation of steps to other authentication methods.
-        if (operation != null && !operation.getHistory().isEmpty()) {
-            OperationHistory currentHistory = operation.getHistory().get(operation.getHistory().size() - 1);
-            // Handle special case when LOGIN_SCA method is used, this authentication method delegates work
-            // to other authentication methods. The first case is when current step is confirmed and contains LOGIN_SCA
-            // as chosen authentication method (typically in INIT step).
-            // Same logic is valid for APPROVAL_SCA method.
-            if (currentHistory.getRequestAuthStepResult() == AuthStepResult.CONFIRMED &&
-                    (operation.getChosenAuthMethod() == AuthMethod.LOGIN_SCA || operation.getChosenAuthMethod() == AuthMethod.APPROVAL_SCA)) {
-                return operation.getChosenAuthMethod();
-            }
-            // The second case is when the current step has LOGIN_SCA or APPROVAL_SCA as an authentication method and next
-            // authentication method has not been chosen yet.
-            if (operation.getChosenAuthMethod() == null &&
-                    (currentHistory.getAuthMethod() == AuthMethod.LOGIN_SCA || currentHistory.getAuthMethod() == AuthMethod.APPROVAL_SCA)) {
-                return currentHistory.getAuthMethod();
-            }
+        // Check for authentication method override for SCA methods.
+        AuthMethod overriddenAuthMethod = authMethodResolutionService.resolveAuthMethodOverride(operation);
+        if (overriddenAuthMethod != null) {
+            return overriddenAuthMethod;
         }
-        // Use static authentication method name for all other cases.
+        // Regular authentication method resolution.
         return getAuthMethodName();
     }
 
@@ -414,6 +401,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 R done = provider.doneAuthentication(userId);
                 logger.info("Operation continue succeeded, result is DONE, operation ID: {}", operationId);
                 return done;
+            } else if (AuthResult.FAILED.equals(operation.getResult())) {
+                R failed = provider.failedAuthentication(userId, "operation.notAvailable");
+                logger.info("Operation continue succeeded, result is FAILED, operation ID: {}", operationId);
+                return failed;
             } else {
                 R cont = provider.continueAuthentication(operationId, userId, operation.getSteps());
                 logger.info("Operation continue succeeded, result is CONTINUE, operation ID: {}", operationId);

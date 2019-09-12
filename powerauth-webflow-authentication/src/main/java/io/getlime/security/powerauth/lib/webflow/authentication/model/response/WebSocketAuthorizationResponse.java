@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request;
+package io.getlime.security.powerauth.lib.webflow.authentication.model.response;
+
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 /**
- * Request for registration of a WebSocket session.
+ * Authorization response object for sending result of an authorization via WebSockets.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class WebSocketRegistrationRequest {
+public class WebSocketAuthorizationResponse {
 
     private String webSocketId;
+    private AuthResult authResult;
 
     public String getWebSocketId() {
         return webSocketId;
@@ -31,4 +34,13 @@ public class WebSocketRegistrationRequest {
     public void setWebSocketId(String webSocketId) {
         this.webSocketId = webSocketId;
     }
+
+    public AuthResult getAuthResult() {
+        return authResult;
+    }
+
+    public void setAuthResult(AuthResult authResult) {
+        this.authResult = authResult;
+    }
+
 }

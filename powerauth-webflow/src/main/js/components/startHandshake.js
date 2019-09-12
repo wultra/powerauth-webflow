@@ -19,7 +19,8 @@ import {connect} from 'react-redux';
 import {authenticate} from '../actions/startHandshakeActions'
 // Components
 import Spinner from 'react-tiny-spin';
-
+// Web Socket support
+const stompClient = require('../websocket-client');
 /**
  * Component for dispatching the initial web flow state.
  */
@@ -29,8 +30,27 @@ import Spinner from 'react-tiny-spin';
 })
 export default class StartHandshake extends React.Component {
 
+    constructor() {
+        super();
+        this.onRegister = this.onRegister.bind(this);
+    }
+
     componentWillMount() {
-        this.props.dispatch(authenticate());
+        const onRegister = this.onRegister;
+        this.props.dispatch(authenticate(function() {
+            // Register Web Socket client as soon as handshake has been completed.
+            // The Web Socket ID is identical to operation SHA-512 hash.
+            if (operationHash !== undefined) {
+                stompClient.register([
+                    {route: '/user/topic/registration', callback: onRegister}
+                ], operationHash);
+            }
+        }));
+    }
+
+    onRegister() {
+        // Debug logging is disabled.
+        // console.log('WebSocket has been registered.');
     }
 
     render() {
