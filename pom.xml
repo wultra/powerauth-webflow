@@ -82,6 +82,9 @@
         <module>powerauth-webflow-resources</module>
         <module>powerauth-webflow-client</module>
         <module>powerauth-mtoken-model</module>
+        <module>powerauth-tpp-engine</module>
+        <module>powerauth-tpp-engine-model</module>
+        <module>powerauth-tpp-engine-client</module>
     </modules>
 
     <properties>
@@ -192,7 +195,7 @@
                     <plugin>
                         <groupId>org.zeroturnaround</groupId>
                         <artifactId>jrebel-maven-plugin</artifactId>
-                        <version>1.1.8</version>
+                        <version>1.1.9</version>
                         <executions>
                             <execution>
                                 <id>generate-rebel-xml</id>
