@@ -34,6 +34,8 @@ import io.getlime.security.powerauth.app.tppengine.repository.UserConsentReposit
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.ConsentEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.UserConsentEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.UserConsentHistoryEntity;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,6 +53,8 @@ public class UserConsentService {
     private final ConsentRepository consentRepository;
     private final UserConsentRepository userConsentRepository;
     private final UserConsentHistoryRepository userConsentHistoryRepository;
+
+    private final static Logger logger = LoggerFactory.getLogger(UserConsentService.class);
 
     @Autowired
     public UserConsentService(ConsentRepository consentRepository, UserConsentRepository userConsentRepository, UserConsentHistoryRepository userConsentHistoryRepository) {
@@ -395,6 +399,7 @@ public class UserConsentService {
         try {
             return new ObjectMapper().writeValueAsString(parameters);
         } catch (JsonProcessingException e) {
+            logger.warn("Unable to serialize JSON string from object.", e);
             return null;
         }
     }

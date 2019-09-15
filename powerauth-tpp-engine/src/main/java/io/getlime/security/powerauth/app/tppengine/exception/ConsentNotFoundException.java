@@ -24,9 +24,10 @@ package io.getlime.security.powerauth.app.tppengine.exception;
 public class ConsentNotFoundException extends Exception {
 
     private final String id;
+    private static final String DEFAULT_MESSAGE = "Consent with given ID not found.";
 
     public ConsentNotFoundException(String id) {
-        super();
+        super(DEFAULT_MESSAGE);
         this.id = id;
     }
 
