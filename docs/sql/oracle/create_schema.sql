@@ -190,33 +190,44 @@ CREATE TABLE da_sms_authorization (
   timestamp_expires    TIMESTAMP
 );
 
+-- Table da_user_credentials stores built-in users for the data adapter
+CREATE TABLE da_user_credentials (
+    user_id             VARCHAR(128) PRIMARY KEY NOT NULL,
+    username            VARCHAR(255) NOT NULL,
+    password_hash       VARCHAR(255) NOT NULL,
+    phone_number        VARCHAR(255) NOT NULL
+);
+
+-- Table for the list of consent templates
 CREATE TABLE tpp_consent (
-	consent_id VARCHAR(64) PRIMARY KEY NOT NULL,
-	consent_name VARCHAR(128) NOT NULL,
-	consent_text CLOB NOT NULL,
-	version INT NOT NULL
+	consent_id          VARCHAR(64) PRIMARY KEY NOT NULL,
+	consent_name        VARCHAR(128) NOT NULL,
+	consent_text        CLOB NOT NULL,
+	version             INT NOT NULL
 );
 
+-- Table for the list of consent currently given by a user
 CREATE TABLE tpp_user_consent (
-    id INTEGER PRIMARY KEY NOT NULL,
-    user_id VARCHAR(256) NOT NULL,
-    client_id VARCHAR(256) NOT NULL,
-    consent_id VARCHAR(64) NOT NULL,
-    external_id VARCHAR(256) NOT NULL,
-    consent_parameters CLOB NOT NULL,
-    timestamp_created TIMESTAMP,
-    timestamp_updated TIMESTAMP
+    id                  INTEGER PRIMARY KEY NOT NULL,
+    user_id             VARCHAR(256) NOT NULL,
+    client_id           VARCHAR(256) NOT NULL,
+    consent_id          VARCHAR(64) NOT NULL,
+    external_id         VARCHAR(256) NOT NULL,
+    consent_parameters  CLOB NOT NULL,
+    timestamp_created   TIMESTAMP,
+    timestamp_updated   TIMESTAMP
 );
 
+-- Table for the list of changes in consent history by given user
 CREATE TABLE tpp_user_consent_history (
-    id INTEGER PRIMARY KEY NOT NULL,
-    user_id VARCHAR(256) NOT NULL,
-    client_id VARCHAR(256) NOT NULL,
-    consent_id VARCHAR(64) NOT NULL,
-    consent_change VARCHAR(16) NOT NULL,
-    external_id VARCHAR(256) NOT NULL,
-    consent_parameters CLOB NOT NULL,
-    timestamp_created TIMESTAMP
+    id                  INTEGER PRIMARY KEY NOT NULL,
+    user_id             VARCHAR(256) NOT NULL,
+    client_id           VARCHAR(256) NOT NULL,
+    consent_id          VARCHAR(64) NOT NULL,
+    consent_change      VARCHAR(16) NOT NULL,
+    external_id         VARCHAR(256) NOT NULL,
+    consent_parameters  CLOB NOT NULL,
+    timestamp_created   TIMESTAMP
 );
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
