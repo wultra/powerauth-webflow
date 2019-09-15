@@ -195,6 +195,9 @@ CREATE TABLE da_user_credentials (
     user_id             VARCHAR(128) PRIMARY KEY NOT NULL,
     username            VARCHAR(255) NOT NULL,
     password_hash       VARCHAR(255) NOT NULL,
+    family_name         VARCHAR(255) NOT NULL,
+    given_name          VARCHAR(255) NOT NULL,
+    organization_id     VARCHAR(64)  NOT NULL,
     phone_number        VARCHAR(255) NOT NULL
 );
 
