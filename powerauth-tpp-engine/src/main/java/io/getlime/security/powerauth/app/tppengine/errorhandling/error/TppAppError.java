@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.tppengine.exception;
+package io.getlime.security.powerauth.app.tppengine.errorhandling.error;
 
 import io.getlime.core.rest.model.base.entity.Error;
 
@@ -23,16 +23,16 @@ import io.getlime.core.rest.model.base.entity.Error;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class ConsentError extends Error {
+public class TppAppError extends Error {
 
-    private static final String code = "CONSENT_ERROR";
+    private static final String code = "TPP_APP_ERROR";
 
-    public ConsentError() {
+    public TppAppError() {
         super();
         this.setCode(code);
     }
 
-    public ConsentError(String message) {
+    public TppAppError(String message) {
         super(code, message);
     }
 }

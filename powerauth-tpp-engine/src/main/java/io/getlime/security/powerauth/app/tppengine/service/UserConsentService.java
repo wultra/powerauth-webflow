@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.app.tppengine.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getlime.security.powerauth.app.tppengine.exception.ConsentNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.model.entity.GivenConsent;
 import io.getlime.security.powerauth.app.tppengine.model.entity.GivenConsentHistory;
 import io.getlime.security.powerauth.app.tppengine.model.enumeration.ConsentChange;

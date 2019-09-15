@@ -225,5 +225,26 @@ CREATE TABLE tpp_user_consent_history (
   timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+CREATE TABLE tpp_detail (
+  tpp_id                INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  tpp_name              VARCHAR(256) NOT NULL,
+  tpp_info              TEXT NULL,
+  tpp_address           TEXT NULL,
+  tpp_website           TEXT NULL,
+  tpp_phone             VARCHAR(256) NULL,
+  tpp_email             VARCHAR(256) NULL,
+  tpp_logo              BLOB NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_app_detail (
+  tpp_id                INTEGER NOT NULL,
+  app_client_id         VARCHAR(256) NOT NULL,
+  app_name              VARCHAR(256) NOT NULL,
+  app_info              TEXT NULL,
+  PRIMARY KEY (tpp_id, app_client_id),
+  FOREIGN KEY tpp_detail_fk (tpp_id) REFERENCES tpp_detail (tpp_id),
+  FOREIGN KEY tpp_client_secret_fk (app_client_id) REFERENCES oauth_client_details (client_id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);

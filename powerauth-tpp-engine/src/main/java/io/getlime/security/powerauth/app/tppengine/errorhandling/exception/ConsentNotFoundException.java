@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.tppengine.exception;
+package io.getlime.security.powerauth.app.tppengine.errorhandling.exception;
 
 /**
  * Exception thrown on missing consent.
@@ -24,7 +24,7 @@ package io.getlime.security.powerauth.app.tppengine.exception;
 public class ConsentNotFoundException extends Exception {
 
     private final String id;
-    private static final String DEFAULT_MESSAGE = "Consent with given ID not found.";
+    private static final String DEFAULT_MESSAGE = "Consent with given ID was not found.";
 
     public ConsentNotFoundException(String id) {
         super(DEFAULT_MESSAGE);
