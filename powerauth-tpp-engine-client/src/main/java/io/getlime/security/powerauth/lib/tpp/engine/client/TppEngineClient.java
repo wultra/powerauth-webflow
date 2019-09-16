@@ -28,6 +28,7 @@ import io.getlime.security.powerauth.app.tppengine.model.request.GiveConsentRequ
 import io.getlime.security.powerauth.app.tppengine.model.request.RemoveConsentRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.ConsentDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.model.response.GiveConsentResponse;
+import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.model.response.UserConsentDetailResponse;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -121,7 +122,6 @@ public class TppEngineClient {
      */
     public ObjectResponse<ConsentDetailResponse> consentDetail(String id) throws TppEngineClientException {
         try {
-            // Exchange authentication request with data adapter.
             final Map<String, String> params = new HashMap<>();
             params.put("id", id);
             ResponseEntity<ObjectResponse<ConsentDetailResponse>> response = restTemplate.exchange(
@@ -150,7 +150,6 @@ public class TppEngineClient {
      */
     public ObjectResponse<UserConsentDetailResponse> consentStatus(String userId, String consentId, String clientId) throws TppEngineClientException {
         try {
-            // Exchange authentication request with data adapter.
             final Map<String, String> params = new HashMap<>();
             params.put("userId", userId);
             params.put("consentId", consentId);
@@ -209,6 +208,32 @@ public class TppEngineClient {
                     entity,
                     new ParameterizedTypeReference<Response>() {});
             return new Response();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Lookup information about a provided app.
+     *
+     * @param clientId Identifier of a TPP app.
+     * @return Response with details TPP app with given client ID.
+     * @throws TppEngineClientException Thrown when client request fails or app does not exist.
+     */
+    public ObjectResponse<TppAppDetailResponse> fetchAppInfo(String clientId) throws TppEngineClientException {
+        try {
+            final Map<String, String> params = new HashMap<>();
+            params.put("clientId", clientId);
+            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app?clientId={clientId}",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
+                    params
+            );
+            return new ObjectResponse<>(Objects.requireNonNull(response.getBody()).getResponseObject());
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
