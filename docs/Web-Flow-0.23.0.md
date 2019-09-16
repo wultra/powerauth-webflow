@@ -17,6 +17,8 @@ ALTER TABLE wf_operation_session ADD operation_hash VARCHAR(256);
 ALTER TABLE wf_operation_session ADD websocket_session_id VARCHAR(32);
 ALTER TABLE wf_operation_session ADD client_ip VARCHAR(32);
 
+ALTER TABLE ns_operation ADD application_original_scopes VARCHAR(256);
+
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 ```
@@ -28,6 +30,8 @@ ALTER TABLE `ns_operation_config` ADD `afs_enabled` BOOLEAN NOT NULL DEFAULT FAL
 ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256),  
 ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32),
 ALTER TABLE `wf_operation_session` ADD `client_ip` VARCHAR(32),
+
+ALTER TABLE `ns_operation` ADD `application_original_scopes` VARCHAR(256);
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
