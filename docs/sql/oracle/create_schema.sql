@@ -192,21 +192,21 @@ CREATE TABLE da_sms_authorization (
 
 -- Table da_user_credentials stores built-in users for the data adapter
 CREATE TABLE da_user_credentials (
-    user_id             VARCHAR(128) PRIMARY KEY NOT NULL,
-    username            VARCHAR(255) NOT NULL,
-    password_hash       VARCHAR(255) NOT NULL,
-    family_name         VARCHAR(255) NOT NULL,
-    given_name          VARCHAR(255) NOT NULL,
-    organization_id     VARCHAR(64)  NOT NULL,
-    phone_number        VARCHAR(255) NOT NULL
+  user_id               VARCHAR(128) PRIMARY KEY NOT NULL,
+  username              VARCHAR(255) NOT NULL,
+  password_hash         VARCHAR(255) NOT NULL,
+  family_name           VARCHAR(255) NOT NULL,
+  given_name            VARCHAR(255) NOT NULL,
+  organization_id       VARCHAR(64)  NOT NULL,
+  phone_number          VARCHAR(255) NOT NULL
 );
 
 -- Table for the list of consent templates
 CREATE TABLE tpp_consent (
-	consent_id          VARCHAR(64) PRIMARY KEY NOT NULL,
-	consent_name        VARCHAR(128) NOT NULL,
-	consent_text        CLOB NOT NULL,
-	version             INT NOT NULL
+  consent_id            VARCHAR(64) PRIMARY KEY NOT NULL,
+  consent_name          VARCHAR(128) NOT NULL,
+  consent_text          CLOB NOT NULL,
+  version               INT NOT NULL
 );
 
 -- Table for the list of consent currently given by a user
