@@ -49,7 +49,8 @@ public class MessageController {
     public void register(SimpMessageHeaderAccessor headerAccessor, WebSocketRegistrationRequest registrationRequest) {
         String sessionId = headerAccessor.getSessionId();
         String webSocketId = registrationRequest.getWebSocketId();
-        webSocketMessageService.storeWebSocketSession(webSocketId, sessionId);
+        String clientIp = (String) headerAccessor.getSessionAttributes().get("client_ip");
+        webSocketMessageService.storeWebSocketSession(webSocketId, sessionId, clientIp);
         webSocketMessageService.sendRegistrationMessage(webSocketId, sessionId);
     }
 

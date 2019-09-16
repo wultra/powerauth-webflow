@@ -13,8 +13,9 @@ DDL update script for Oracle:
 ```sql
 ALTER TABLE ns_operation_config ADD afs_enabled NUMBER(1) DEFAULT 0 NOT NULL;
 
-ALTER TABLE wf_operation_session ADD operation_hash VARCHAR(256) DEFAULT 0 NOT NULL;
-ALTER TABLE wf_operation_session ADD websocket_session_id VARCHAR(32) DEFAULT 0 NOT NULL;
+ALTER TABLE wf_operation_session ADD operation_hash VARCHAR(256);
+ALTER TABLE wf_operation_session ADD websocket_session_id VARCHAR(32);
+ALTER TABLE wf_operation_session ADD client_ip VARCHAR(32);
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
@@ -26,8 +27,8 @@ ALTER TABLE `ns_operation_config` ADD `afs_enabled` BOOLEAN NOT NULL DEFAULT FAL
 
 ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256),  
 ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32),
+ALTER TABLE `wf_operation_session` ADD `client_ip` VARCHAR(32),
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 ```
-
