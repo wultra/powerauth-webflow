@@ -412,31 +412,30 @@ public class StepResolutionService {
             throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
-        if (currentOperationHistory != null && currentOperationHistory.getResponseResult() == AuthResult.CONTINUE) {
-            // do not check operation continuity for cancellation requests from INIT authentication method (done when new operation superseeds previous one)
-            if (!(request.getAuthMethod() == AuthMethod.INIT && request.getAuthStepResult() == AuthStepResult.CANCELED)) {
-                boolean stepAuthMethodValid = false;
-                // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
-                if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
-                    // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
-                    for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                        if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                            stepAuthMethodValid = true;
-                            break;
-                        }
-                    }
-                } else {
-                    // verification of operation continuity for all other authentication methods
-                    for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
-                        if (step.getAuthMethod() == request.getAuthMethod()) {
-                            stepAuthMethodValid = true;
-                            break;
-                        }
+        // operation can be canceled anytime (e.g. by closed Web Socket) - do not check for step continuation
+        if (currentOperationHistory != null && currentOperationHistory.getResponseResult() == AuthResult.CONTINUE
+                && request.getAuthStepResult() != AuthStepResult.CANCELED ) {
+            boolean stepAuthMethodValid = false;
+            // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
+            if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
+                // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
+                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                    if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                        stepAuthMethodValid = true;
+                        break;
                     }
                 }
-                if (!stepAuthMethodValid) {
-                    throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
+            } else {
+                // verification of operation continuity for all other authentication methods
+                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                    if (step.getAuthMethod() == request.getAuthMethod()) {
+                        stepAuthMethodValid = true;
+                        break;
+                    }
                 }
+            }
+            if (!stepAuthMethodValid) {
+                throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
             }
         }
         for (OperationHistoryEntity historyItem : operationHistory) {
