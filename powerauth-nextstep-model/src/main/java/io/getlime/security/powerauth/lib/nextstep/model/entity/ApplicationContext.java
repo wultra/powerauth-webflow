@@ -45,10 +45,9 @@ public class ApplicationContext {
      * Constructor with all details.
      * @param id Application identifier.
      * @param name Application name.
-     * @param description Application description.
-     * @param extras Extra information for OAuth 2.0 consent screen.
+     * @param description Application description
      */
-    public ApplicationContext(String id, String name, String description, ApplicationExtras extras) {
+    public ApplicationContext(String id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

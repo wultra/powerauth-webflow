@@ -259,15 +259,17 @@ public class OperationPersistenceService {
                 operation.setApplicationId(null);
                 operation.setApplicationName(null);
                 operation.setApplicationDescription(null);
+                operation.setApplicationOriginalScopes(null);
                 operation.setApplicationExtras(objectMapper.writeValueAsString(Collections.emptyMap()));
             } else {
                 operation.setApplicationId(applicationContext.getId());
                 operation.setApplicationName(applicationContext.getName());
                 operation.setApplicationDescription(applicationContext.getDescription());
+                operation.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
                 operation.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
             }
         } catch (IOException e) {
-            logger.error("Error occurred while serializing application context for an operation", e);
+            logger.error("Error occurred while serializing application attributes for an operation", e);
         }
         operationRepository.save(operation);
     }
@@ -383,11 +385,12 @@ public class OperationPersistenceService {
         operationEntity.setApplicationId(applicationContext.getId());
         operationEntity.setApplicationName(applicationContext.getName());
         operationEntity.setApplicationDescription(applicationContext.getDescription());
-        // Extras are saved as JSON
+        // Extras and original scopes are saved as JSON
         try {
             operationEntity.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
+            operationEntity.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
         } catch (JsonProcessingException ex) {
-            logger.error("Error while serializing application extras", ex);
+            logger.error("Error while serializing application attributes.", ex);
         }
     }
 

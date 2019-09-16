@@ -61,6 +61,9 @@ public class OperationEntity implements Serializable {
     @Column(name = "application_description")
     private String applicationDescription;
 
+    @Column(name = "application_original_scopes")
+    private String applicationOriginalScopes;
+
     @Column(name = "application_extras")
     private String applicationExtras;
 
@@ -148,6 +151,14 @@ public class OperationEntity implements Serializable {
 
     public void setApplicationDescription(String applicationDescription) {
         this.applicationDescription = applicationDescription;
+    }
+
+    public String getApplicationOriginalScopes() {
+        return applicationOriginalScopes;
+    }
+
+    public void setApplicationOriginalScopes(String applicationOriginalScopes) {
+        this.applicationOriginalScopes = applicationOriginalScopes;
     }
 
     public String getApplicationExtras() {

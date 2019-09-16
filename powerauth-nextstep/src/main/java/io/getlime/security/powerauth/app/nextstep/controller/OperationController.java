@@ -423,14 +423,22 @@ public class OperationController {
             applicationContext.setId(operation.getApplicationId());
             applicationContext.setName(operation.getApplicationName());
             applicationContext.setDescription(operation.getApplicationDescription());
+            if (operation.getApplicationOriginalScopes() != null) {
+                try {
+                    JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
+                    List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
+                    applicationContext.getOriginalScopes().addAll(originalScopes);
+                } catch (IOException ex) {
+                    logger.error("Error while deserializing application scopes.", ex);
+                }
+            }
             if (operation.getApplicationExtras() != null) {
-                Map<String, Object> extras;
                 try {
                     JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
-                    extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
                     applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
-                    logger.error("Error while deserializing application extras", ex);
+                    logger.error("Error while deserializing application extras.", ex);
                 }
             }
             response.setApplicationContext(applicationContext);
