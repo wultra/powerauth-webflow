@@ -14,10 +14,14 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.tppengine.exception;
+package io.getlime.security.powerauth.app.tppengine.errorhandling;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.error.ConsentError;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.error.TppAppError;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -59,6 +63,18 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleConsentNotFoundException(ConsentNotFoundException t) {
         logger.error("Consent with ID {} was not found", t.getId(), t);
         return new ErrorResponse(new ConsentError("consent.missing"));
+    }
+
+    /**
+     * Exception thrown in case TPP app was not found.
+     * @param t Exception thrown when TPP app is not found.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(TppAppNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public @ResponseBody ErrorResponse handleTppAppNotFoundException(TppAppNotFoundException t) {
+        logger.error("App with client ID {} was not found", t.getId(), t);
+        return new ErrorResponse(new TppAppError("tpp.app.notFound"));
     }
 
 }

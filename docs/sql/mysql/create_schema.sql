@@ -183,33 +183,67 @@ CREATE TABLE da_sms_authorization (
   timestamp_expires    TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-CREATE TABLE tpp_consent (
-	consent_id VARCHAR(64) PRIMARY KEY NOT NULL,
-	consent_name VARCHAR(128) NOT NULL,
-	consent_text TEXT NOT NULL,
-	version INT NOT NULL
+-- Table da_user_credentials stores built-in users for the data adapter
+CREATE TABLE da_user_credentials (
+  user_id               VARCHAR(128) PRIMARY KEY NOT NULL,
+  username              VARCHAR(255) NOT NULL,
+  password_hash         VARCHAR(255) NOT NULL,
+  family_name           VARCHAR(255) NOT NULL,
+  given_name            VARCHAR(255) NOT NULL,
+  organization_id       VARCHAR(64)  NOT NULL,
+  phone_number          VARCHAR(255) NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table for the list of consent currently given by a user
+CREATE TABLE tpp_consent (
+  consent_id            VARCHAR(64) PRIMARY KEY NOT NULL,
+  consent_name          VARCHAR(128) NOT NULL,
+  consent_text          TEXT NOT NULL,
+  version               INT NOT NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table for the list of changes in consent history by given user
 CREATE TABLE tpp_user_consent (
-    id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    user_id VARCHAR(256) NOT NULL,
-    client_id VARCHAR(256) NOT NULL,
-    consent_id VARCHAR(64) NOT NULL,
-    external_id VARCHAR(256) NOT NULL,
-    consent_parameters TEXT NOT NULL,
-    timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    timestamp_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id               VARCHAR(256) NOT NULL,
+  client_id             VARCHAR(256) NOT NULL,
+  consent_id            VARCHAR(64) NOT NULL,
+  external_id           VARCHAR(256) NOT NULL,
+  consent_parameters    TEXT NOT NULL,
+  timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  timestamp_updated     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE tpp_user_consent_history (
-    id INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
-    user_id VARCHAR(256) NOT NULL,
-    client_id VARCHAR(256) NOT NULL,
-    consent_id VARCHAR(64) NOT NULL,
-    consent_change VARCHAR(16) NOT NULL,
-    external_id VARCHAR(256) NOT NULL,
-    consent_parameters TEXT NOT NULL,
-    timestamp_created TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id                    INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  user_id               VARCHAR(256) NOT NULL,
+  client_id             VARCHAR(256) NOT NULL,
+  consent_id            VARCHAR(64) NOT NULL,
+  consent_change        VARCHAR(16) NOT NULL,
+  external_id           VARCHAR(256) NOT NULL,
+  consent_parameters    TEXT NOT NULL,
+  timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_detail (
+  tpp_id                INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  tpp_name              VARCHAR(256) NOT NULL,
+  tpp_info              TEXT NULL,
+  tpp_address           TEXT NULL,
+  tpp_website           TEXT NULL,
+  tpp_phone             VARCHAR(256) NULL,
+  tpp_email             VARCHAR(256) NULL,
+  tpp_logo              BLOB NULL
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+CREATE TABLE tpp_app_detail (
+  tpp_id                INTEGER NOT NULL,
+  app_client_id         VARCHAR(256) NOT NULL,
+  app_name              VARCHAR(256) NOT NULL,
+  app_info              TEXT NULL,
+  PRIMARY KEY (tpp_id, app_client_id),
+  FOREIGN KEY tpp_detail_fk (tpp_id) REFERENCES tpp_detail (tpp_id),
+  FOREIGN KEY tpp_client_secret_fk (app_client_id) REFERENCES oauth_client_details (client_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);

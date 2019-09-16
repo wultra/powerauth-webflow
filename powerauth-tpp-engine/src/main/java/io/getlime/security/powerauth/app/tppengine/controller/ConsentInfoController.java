@@ -17,7 +17,7 @@
 package io.getlime.security.powerauth.app.tppengine.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.tppengine.exception.ConsentNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.model.response.ConsentDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.service.ConsentService;
 import org.springframework.beans.factory.annotation.Autowired;
