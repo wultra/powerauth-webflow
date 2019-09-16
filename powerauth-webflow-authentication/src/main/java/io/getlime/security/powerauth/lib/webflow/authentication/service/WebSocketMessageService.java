@@ -90,9 +90,10 @@ public class WebSocketMessageService {
      *
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket Session ID.
+     * @param clientIp Remote client IP address.
      */
-    public void storeWebSocketSession(String operationHash, String webSocketSessionId) {
-        operationSessionService.storeWebSocketSessionId(operationHash, webSocketSessionId);
+    public void storeWebSocketSession(String operationHash, String webSocketSessionId, String clientIp) {
+        operationSessionService.storeWebSocketSessionId(operationHash, webSocketSessionId, clientIp);
     }
 
 }

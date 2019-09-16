@@ -167,6 +167,9 @@ CREATE TABLE ns_step_definition (
 CREATE TABLE wf_operation_session (
   operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
   http_session_id           VARCHAR(256) NOT NULL,
+  operation_hash            VARCHAR(256),
+  websocket_session_id      VARCHAR(32),
+  client_ip                 VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP
 );
