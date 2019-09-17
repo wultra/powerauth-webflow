@@ -27,7 +27,19 @@ ALTER TABLE `ns_operation_config` ADD `afs_enabled` BOOLEAN NOT NULL DEFAULT FAL
 ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256),  
 ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32),
 
-CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
-CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE INDEX `wf_operation_hash` ON `wf_operation_session` (`operation_hash`);
+CREATE INDEX `wf_websocket_session` ON `wf_operation_session` (`websocket_session_id`);
 ```
 
+### Configuration of OAuth 2.0 Client
+
+Due to changes in Spring OAuth 2.0 configuration, the redirect URI needs to be specified in the client configuration in database.
+For demo application, you can use this SQL query:
+
+```sql
+UPDATE oauth_client_details SET web_server_redirect_uri = 'http://localhost:8080/powerauth-webflow-client/connect/demo' WHERE client_id='democlient';
+COMMIT;
+```
+
+Note that the URI needs to be updated for each client in each environment. There is typically a different redirect URI 
+for development, testing and production environments.
