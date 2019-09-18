@@ -103,7 +103,7 @@ public class WebFlowServicesConfiguration {
     private AfsType afsType;
 
     /**
-     * Whether anti-fraud system requires IPv4 IP addresses.
+     * Whether anti-fraud system requires IPv4 addresses.
      */
     @Value("${powerauth.webflow.afs.forceIpv4:true}")
     private boolean afsForceIpv4;
