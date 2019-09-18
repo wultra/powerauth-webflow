@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.interceptor.WebSocketHandshakeInterceptor;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -38,7 +39,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").setAllowedOrigins("*").withSockJS();
+        registry.addEndpoint("/websocket").addInterceptors(new WebSocketHandshakeInterceptor()).setAllowedOrigins("*").withSockJS();
     }
 
     /**
