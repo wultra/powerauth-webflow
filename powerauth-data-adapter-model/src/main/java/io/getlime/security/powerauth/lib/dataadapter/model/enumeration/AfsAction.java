@@ -16,16 +16,21 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * AFS action type.
+ * AFS action type enumeration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum AfsAction {
 
     /**
-     * Triggered anytime user performs authentication, both successful and failed.
+     * Triggered before the login form is created.
      */
-    LOGIN,
+    LOGIN_INIT,
+
+    /**
+     * Triggered when user performs authentication, both successful and failed.
+     */
+    LOGIN_AUTH,
 
     /**
      * Triggered when user completes an operation or the operation is terminated for any reason.
@@ -33,13 +38,13 @@ public enum AfsAction {
     LOGOUT,
 
     /**
-     * Triggered before an approval form is created.
+     * Triggered before the approval form is created.
      */
-    APPROVAL_CREATE,
+    APPROVAL_INIT,
 
     /**
-     * Triggered anytime the approval form is authenticated.
+     * Triggered when the approval form is authorized.
      */
-    APPROVAL_SIGN
+    APPROVAL_AUTH
 
 }

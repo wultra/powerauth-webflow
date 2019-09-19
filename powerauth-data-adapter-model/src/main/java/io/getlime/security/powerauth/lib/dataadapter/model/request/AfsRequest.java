@@ -16,14 +16,10 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,11 +29,6 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class AfsRequest {
-
-    /**
-     * AFS product type.
-     */
-    private AfsType afsType;
 
     /**
      * User ID for this request, use null value before user is authenticated.
@@ -55,29 +46,9 @@ public class AfsRequest {
     private OperationContext operationContext;
 
     /**
-     * AFS action.
+     * Request parameters for anti-fraud system.
      */
-    private AfsAction afsAction;
-
-    /**
-     * Client IP address.
-     */
-    private String clientIp;
-
-    /**
-     * Index counter for this authentication step.
-     */
-    private int stepIndex;
-
-    /**
-     * Authentication step result.
-     */
-    private AuthStepResult authStepResult;
-
-    /**
-     * Reason why operation was terminated.
-     */
-    private OperationTerminationReason operationTerminationReason;
+    private AfsRequestParameters afsRequestParameters;
 
     /**
      * Authentication instruments used during this authentication step.
@@ -87,7 +58,7 @@ public class AfsRequest {
     /**
      * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark, logout reason, etc.
      */
-    private final Map<String, String> extras = new HashMap<>();
+    private final Map<String, String> extras = new LinkedHashMap<>();
 
     /**
      * Default constructor.
@@ -96,51 +67,21 @@ public class AfsRequest {
     }
 
     /**
-     * Constructor all details.
-     * @param afsType AFS product type.
-     * @param afsAction AFS action.
+     * Constructor with all details.
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param operationContext Operation context which provides context for creating the consent form.
+     * @param afsRequestParameters Request parameters for AFS.
+     * @param authInstruments Authentication instruments used during this authentication step.
+     * @param extras Extra parameters for AFS.
      */
-    public AfsRequest(AfsType afsType, AfsAction afsAction, String userId, String organizationId, OperationContext operationContext) {
-        this.afsType = afsType;
-        this.afsAction = afsAction;
+    public AfsRequest(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, String> extras) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.operationContext = operationContext;
-    }
-
-    /**
-     * Get the AFS product type.
-     * @return AFS product type.
-     */
-    public AfsType getAfsType() {
-        return afsType;
-    }
-
-    /**
-     * Set the AFS product type.
-     * @param afsType AFS product type.
-     */
-    public void setAfsType(AfsType afsType) {
-        this.afsType = afsType;
-    }
-
-    /**
-     * Get the AFS action.
-     * @return AFS action.
-     */
-    public AfsAction getAfsAction() {
-        return afsAction;
-    }
-
-    /**
-     * Set the AFS action.
-     * @param afsAction AFS action.
-     */
-    public void setAfsAction(AfsAction afsAction) {
-        this.afsAction = afsAction;
+        this.afsRequestParameters = afsRequestParameters;
+        this.authInstruments.addAll(authInstruments);
+        this.extras.putAll(extras);
     }
 
     /**
@@ -192,67 +133,19 @@ public class AfsRequest {
     }
 
     /**
-     * Get client IP address.
-     * @return Client IP address.
+     * Get request parameters for anti-fraud system.
+     * @return Request parameters for anti-fraud system.
      */
-    public String getClientIp() {
-        return clientIp;
+    public AfsRequestParameters getAfsRequestParameters() {
+        return afsRequestParameters;
     }
 
     /**
-     * Set client IP address.
-     * @param clientIp IP address.
+     * Set request parameters for anti-fraud system.
+     * @param afsRequestParameters Request parameters for anti-fraud system.
      */
-    public void setClientIp(String clientIp) {
-        this.clientIp = clientIp;
-    }
-
-    /**
-     * Get index counter for this authentication step.
-     * @return Index counter for this authentication step.
-     */
-    public int getStepIndex() {
-        return stepIndex;
-    }
-
-    /**
-     * Set index counter for this authentication step.
-     * @param stepIndex Index counter for this authentication step.
-     */
-    public void setStepIndex(int stepIndex) {
-        this.stepIndex = stepIndex;
-    }
-
-    /**
-     * Get authentication step result.
-     * @return Authentication step result.
-     */
-    public AuthStepResult getAuthStepResult() {
-        return authStepResult;
-    }
-
-    /**
-     * Set authentication step result.
-     * @param authStepResult Authentication step result.
-     */
-    public void setAuthStepResult(AuthStepResult authStepResult) {
-        this.authStepResult = authStepResult;
-    }
-
-    /**
-     * Get reason why operation was terminated, use null for active operations.
-     * @return Reason why operation was terminated.
-     */
-    public OperationTerminationReason getOperationTerminationReason() {
-        return operationTerminationReason;
-    }
-
-    /**
-     * Set reason why operation was terminated, use null for active operations.
-     * @param operationTerminationReason Reason why operation was terminated.
-     */
-    public void setOperationTerminationReason(OperationTerminationReason operationTerminationReason) {
-        this.operationTerminationReason = operationTerminationReason;
+    public void setAfsRequestParameters(AfsRequestParameters afsRequestParameters) {
+        this.afsRequestParameters = afsRequestParameters;
     }
 
     /**

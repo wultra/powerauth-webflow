@@ -310,6 +310,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             initResponse.setUsername(username);
         }
         if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+
+            if (configuration.isAfsEnabled()) {
+                // TODO
+            }
+
             // Enable password for LOGIN_SCA method
             initResponse.setPasswordEnabled(true);
         }
