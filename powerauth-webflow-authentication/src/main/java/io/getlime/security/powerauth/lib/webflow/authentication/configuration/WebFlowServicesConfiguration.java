@@ -102,6 +102,12 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.webflow.afs.type:THREAT_MARK}")
     private AfsType afsType;
 
+    /**
+     * Whether anti-fraud system requires IPv4 addresses.
+     */
+    @Value("${powerauth.webflow.afs.forceIpv4:true}")
+    private boolean afsForceIpv4;
+
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -215,5 +221,13 @@ public class WebFlowServicesConfiguration {
      */
     public AfsType getAfsType() {
         return afsType;
+    }
+
+    /**
+     * Get whether anti-fraud system requires IPv4 addresses.
+     * @return Whether anti-fraud system requires IPv4 addresses.
+     */
+    public boolean getAfsForceIpv4() {
+        return afsForceIpv4;
     }
 }
