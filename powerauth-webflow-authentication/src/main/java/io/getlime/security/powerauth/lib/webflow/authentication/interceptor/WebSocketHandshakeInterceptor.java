@@ -36,8 +36,8 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
                 if (ipAddress == null || !isIpv4Address(ipAddress)) {
                     ipAddress = servletRequest.getServletRequest().getRemoteAddr();
                     if (!isIpv4Address(ipAddress)) {
-                        // Fallback to 127.0.0.1 in case IPv4 address could not be determined
-                        ipAddress = "127.0.0.1";
+                        // IP address is null in case IPv4 address could not be determined, it should not be sent to AFS
+                        ipAddress = null;
                     }
                 }
             } else if (ipAddress == null) {
