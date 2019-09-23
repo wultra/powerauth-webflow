@@ -27,6 +27,7 @@ public class GetOperationConfigDetailResponse {
     private Integer templateId;
     private String mobileTokenMode;
     private boolean afsEnabled;
+    private String afsConfigId;
 
     /**
      * Get operation name.
@@ -106,5 +107,21 @@ public class GetOperationConfigDetailResponse {
      */
     public void setAfsEnabled(boolean afsEnabled) {
         this.afsEnabled = afsEnabled;
+    }
+
+    /**
+     * Get AFS configuration ID.
+     * @return AFS configuration ID.
+     */
+    public String getAfsConfigId() {
+        return afsConfigId;
+    }
+
+    /**
+     * Set AFS configuration ID.
+     * @param afsConfigId AFS configuration ID.
+     */
+    public void setAfsConfigId(String afsConfigId) {
+        this.afsConfigId = afsConfigId;
     }
 }

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data Adapter Client provides methods for communication with the Data Adapter.
@@ -430,6 +432,34 @@ public class DataAdapterClient {
             ResponseEntity<ObjectResponse<SaveConsentFormResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/consent/save", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<SaveConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Execute an anti-fraud system action with information about current step and retrieve response which can override
+     * authentication instruments used in current authentication step.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @param operationContext Operation context.
+     * @param afsRequestParameters Request parameters for AFS.
+     * @param authInstruments Authentication instruments used during this authentication step.
+     * @param extras Extra parameters for AFS.
+     * @return Response with indication whether consent form was successfully saved.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, String> extras) throws DataAdapterClientErrorException {
+        try {
+            AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
+            HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<AfsResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/afs/action", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<AfsResponse>>() {
                     });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

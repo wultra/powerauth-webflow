@@ -15,11 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
-
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -30,14 +26,19 @@ import java.util.Map;
 public class AfsResponse {
 
     /**
+     * Whether AFS response should be applied in current authentication step.
+     */
+    private boolean applyAfsResponse = false;
+
+    /**
      * AFS label specifying factors to be used during this authentication step.
      */
     private String afsLabel;
 
     /**
-     * Authentication instruments to be used during this authentication step.
+     * Configuration of authentication options available for the user.
      */
-    private final List<AuthInstrument> authInstruments = new ArrayList<>();
+    private AuthStepOptions authStepOptions;
 
     /**
      * Extra parameters sent with the response which should be persisted together with the operation.
@@ -53,10 +54,27 @@ public class AfsResponse {
     /**
      * Constructor with all details.
      */
-    public AfsResponse(String afsLabel, List<AuthInstrument> authInstruments, Map<String, String> extras) {
+    public AfsResponse(boolean applyAfsLabel, String afsLabel, AuthStepOptions authStepOptions, Map<String, String> extras) {
+        this.applyAfsResponse = applyAfsLabel;
         this.afsLabel = afsLabel;
-        this.authInstruments.addAll(authInstruments);
+        this.authStepOptions = authStepOptions;
         this.extras.putAll(extras);
+    }
+
+    /**
+     * Get whether AFS response should be applied in current authentication step.
+     * @return Whether AFS response should be applied in current authentication step.
+     */
+    public boolean getApplyAfsResponse() {
+        return applyAfsResponse;
+    }
+
+    /**
+     * Set whether AFS response should be applied in current authentication step.
+     * @param applyAfsResponse Whether AFS response should be applied in current authentication step.
+     */
+    public void setApplyAfsResponse(boolean applyAfsResponse) {
+        this.applyAfsResponse = applyAfsResponse;
     }
 
     /**
@@ -76,11 +94,19 @@ public class AfsResponse {
     }
 
     /**
-     * Get authentication instruments to be used during this authentication step.
-     * @return Authentication instruments.
+     * Get authentication step options available for the user.
+     * @return Authentication step options available for the user.
      */
-    public List<AuthInstrument> getAuthInstruments() {
-        return authInstruments;
+    public AuthStepOptions getAuthStepOptions() {
+        return authStepOptions;
+    }
+
+    /**
+     * Set authentication step options available for the user.
+     * @param authStepOptions Authentication step options available for the user.
+     */
+    public void setAuthStepOptions(AuthStepOptions authStepOptions) {
+        this.authStepOptions = authStepOptions;
     }
 
     /**

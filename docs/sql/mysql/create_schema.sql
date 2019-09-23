@@ -90,7 +90,8 @@ CREATE TABLE ns_operation_config (
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE
+  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
+  afs_config_id             VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -165,6 +166,13 @@ CREATE TABLE wf_operation_session (
   client_ip                 VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table wf_afs_config is used to configure anti-fraud system parameters.
+CREATE TABLE wf_afs_config (
+  config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
+  js_snippet                VARCHAR(256) NOT NULL,
+  parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.

@@ -96,7 +96,8 @@ CREATE TABLE ns_operation_config (
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL
+  afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL,
+  afs_config_id             VARCHAR(256)
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -173,6 +174,13 @@ CREATE TABLE wf_operation_session (
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP
 );
+
+-- Table wf_afs_config is used to configure anti-fraud system parameters.
+CREATE TABLE wf_afs_config (
+  config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
+  js_snippet                VARCHAR(256) NOT NULL,
+  parameters                TEXT
+)
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.
 CREATE TABLE da_sms_authorization (
