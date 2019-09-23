@@ -1,5 +1,8 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.interceptor;
 
+import com.google.common.net.InetAddresses;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -7,6 +10,8 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
 
+import javax.servlet.http.HttpServletRequest;
+import java.net.Inet4Address;
 import java.util.Map;
 
 /**
@@ -17,6 +22,7 @@ import java.util.Map;
  */
 public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
     private final boolean forceIpv4;
 
     public WebSocketHandshakeInterceptor(boolean forceIpv4) {
@@ -29,20 +35,21 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
         // Set client_ip attribute in WebSocket session, either from the X-FORWARDED-FOR HTTP header, if it is not
         // available, use servlet request remote IP address.
         if (request instanceof ServletServerHttpRequest) {
-            ServletServerHttpRequest servletRequest = (ServletServerHttpRequest) request;
-            String ipAddress = servletRequest.getServletRequest().getHeader("X-FORWARDED-FOR");
+            HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
+            String ipAddress = servletRequest.getHeader("X-FORWARDED-FOR");
             if (forceIpv4) {
                 // IPv4 logic
                 if (ipAddress == null || !isIpv4Address(ipAddress)) {
-                    ipAddress = servletRequest.getServletRequest().getRemoteAddr();
+                    ipAddress = servletRequest.getRemoteAddr();
                     if (!isIpv4Address(ipAddress)) {
                         // IP address is null in case IPv4 address could not be determined, it should not be sent to AFS
+                        logger.warn("IPv4 address could not be detected.");
                         ipAddress = null;
                     }
                 }
             } else if (ipAddress == null) {
                 // IPv4 or IPv6 logic
-                ipAddress = servletRequest.getServletRequest().getRemoteAddr();
+                ipAddress = servletRequest.getRemoteAddr();
             }
 
             attributes.put("client_ip", ipAddress);
@@ -61,8 +68,10 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
      * @return Whether IP address is an IPv4 address.
      */
     private boolean isIpv4Address(String address) {
-        // Source: https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch08s16.html
-        return address.matches("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}↵\n" +
-                "(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$");
+        try {
+            return InetAddresses.forString(address) instanceof Inet4Address;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
