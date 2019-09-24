@@ -281,6 +281,7 @@ public class HomeController {
         httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
         httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
         httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+        httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
         httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
         httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
     }
