@@ -149,7 +149,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                             logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                             return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                         } else if (!authStepOptions.isPasswordRequired()) {
-                            // Only SMS authorization is required, skip password veriication
+                            // Only SMS authorization is required, skip password verification
                             ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, operationContext);
                             VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                             smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
@@ -500,8 +500,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         } else {
             afsAction = null;
         }
-
-        logger.debug("AFS action: {}", afsAction);
 
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {

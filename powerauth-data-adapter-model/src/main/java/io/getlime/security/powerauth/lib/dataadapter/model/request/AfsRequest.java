@@ -56,7 +56,7 @@ public class AfsRequest {
     private final List<AuthInstrument> authInstruments = new ArrayList<>();
 
     /**
-     * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark, logout reason, etc.
+     * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark.
      */
     private final Map<String, Object> extras = new LinkedHashMap<>();
 

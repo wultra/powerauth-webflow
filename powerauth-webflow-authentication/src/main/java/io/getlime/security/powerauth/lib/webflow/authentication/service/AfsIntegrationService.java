@@ -38,6 +38,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +63,6 @@ public class AfsIntegrationService {
     private final NextStepClient nextStepClient;
     private final DataAdapterClient dataAdapterClient;
     private final OperationSessionService operationSessionService;
-    private final HttpServletRequest httpServletRequest;
 
     /**
      * Service constructor.
@@ -68,7 +70,6 @@ public class AfsIntegrationService {
      * @param nextStepClient Next Step client.
      * @param dataAdapterClient Data Adapter client.
      * @param operationSessionService Operation session service.
-     * @param httpServletRequest HTTP servlet request.
      */
     @Autowired
     public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService, HttpServletRequest httpServletRequest) {
@@ -76,7 +77,6 @@ public class AfsIntegrationService {
         this.nextStepClient = nextStepClient;
         this.dataAdapterClient = dataAdapterClient;
         this.operationSessionService = operationSessionService;
-        this.httpServletRequest = httpServletRequest;
     }
 
 
@@ -149,9 +149,8 @@ public class AfsIntegrationService {
                     Map<String, Object> extras = prepareExtrasForAfs();
                     // AuthStepResult is null due to init action
                     AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIp, stepIndex, authStepResult, operationTerminationReason);
-                    logger.info("Sending AFS action request, operation ID: {}", operation.getOperationId());
+                    logger.info("AFS action: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
                     ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
-                    logger.info("AFS response received, operation ID: {}", operation.getOperationId());
                     // TODO - save AFS response in Next Step
                     return afsObjectResponse.getResponseObject();
                 } else {
@@ -180,15 +179,21 @@ public class AfsIntegrationService {
         Map<String, Object> extras = new LinkedHashMap<>();
         AfsType afsType = configuration.getAfsType();
         if (afsType == AfsType.THREAT_MARK) {
-            Cookie[] cookies = httpServletRequest.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie: cookies) {
-                    // TODO - use configuration
-                    if (cookie.getName().equals("CoBNX2ZROo")) {
-                        extras.put("tm_device_tag", cookie.getValue());
-                    }
-                    if (cookie.getName().equals("DV7mCBByG2")) {
-                        extras.put("tm_session_sid", cookie.getValue());
+            // RequestContextHolder is used instead of autowiring because of WebSocketDisconnectListener code which
+            // runs outside of DispatcherServlet.
+            RequestAttributes attr = RequestContextHolder.getRequestAttributes();
+            if (attr instanceof NativeWebRequest) {
+                HttpServletRequest request = (HttpServletRequest) ((NativeWebRequest) attr).getNativeRequest();
+                Cookie[] cookies = request.getCookies();
+                if (cookies != null) {
+                    for (Cookie cookie: cookies) {
+                        // TODO - use configuration
+                        if (cookie.getName().equals("CoBNX2ZROo")) {
+                            extras.put("tm_device_tag", cookie.getValue());
+                        }
+                        if (cookie.getName().equals("DV7mCBByG2")) {
+                            extras.put("tm_session_sid", cookie.getValue());
+                        }
                     }
                 }
             }

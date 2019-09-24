@@ -53,9 +53,13 @@ public class AfsResponse {
 
     /**
      * Constructor with all details.
+     * @param applyAfsResponse Whether AFS response should be applied in Web Flow.
+     * @param afsLabel AFS label to be stored with the operation.
+     * @param authStepOptions Authentication step options for current step. Use null value case applyAfsResponse = false.
+     * @param extras AFS extras.
      */
-    public AfsResponse(boolean applyAfsLabel, String afsLabel, AuthStepOptions authStepOptions, Map<String, Object> extras) {
-        this.applyAfsResponse = applyAfsLabel;
+    public AfsResponse(boolean applyAfsResponse, String afsLabel, AuthStepOptions authStepOptions, Map<String, Object> extras) {
+        this.applyAfsResponse = applyAfsResponse;
         this.afsLabel = afsLabel;
         this.authStepOptions = authStepOptions;
         this.extras.putAll(extras);

@@ -45,7 +45,12 @@ public enum OperationCancelReason {
     /**
      * Operation has been interrupted by another new operation.
      */
-    INTERRUPTED_OPERATION;
+    INTERRUPTED_OPERATION,
+
+    /**
+     * Operation has timed out.
+     */
+    OPERATION_TIMED_OUT;
 
     /**
      * Convert String value to OperationCancelReason enum value.

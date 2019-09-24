@@ -35,7 +35,7 @@ public class AfsRequestParameters {
     /**
      * Client IP address.
      */
-    private String clientIp;
+    private String clientIpAddress;
 
     /**
      * Index counter for this authentication step.
@@ -62,15 +62,15 @@ public class AfsRequestParameters {
      * Constuctor with all details.
      * @param afsType AFS product type.
      * @param afsAction AFS action.
-     * @param clientIp Client IP address.
+     * @param clientIpAddress Client IP address.
      * @param stepIndex Index counter for this authentication step.
      * @param authStepResult Authentication step result.
      * @param operationTerminationReason Reason why operation was terminated.
      */
-    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIp, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         this.afsType = afsType;
         this.afsAction = afsAction;
-        this.clientIp = clientIp;
+        this.clientIpAddress = clientIpAddress;
         this.stepIndex = stepIndex;
         this.authStepResult = authStepResult;
         this.operationTerminationReason = operationTerminationReason;
@@ -111,16 +111,16 @@ public class AfsRequestParameters {
      * Get client IP address.
      * @return Client IP address.
      */
-    public String getClientIp() {
-        return clientIp;
+    public String getClientIpAddress() {
+        return clientIpAddress;
     }
 
     /**
      * Set client IP address.
-     * @param clientIp IP address.
+     * @param clientIpAddress IP address.
      */
-    public void setClientIp(String clientIp) {
-        this.clientIp = clientIp;
+    public void setClientIpAddress(String clientIpAddress) {
+        this.clientIpAddress = clientIpAddress;
     }
 
     /**
