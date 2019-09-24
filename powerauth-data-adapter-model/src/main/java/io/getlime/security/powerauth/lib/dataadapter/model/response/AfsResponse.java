@@ -38,12 +38,12 @@ public class AfsResponse {
     /**
      * Configuration of authentication options available for the user.
      */
-    private AuthStepOptions authStepOptions;
+    private AuthStepOptions authStepOptions = new AuthStepOptions();
 
     /**
      * Extra parameters sent with the response which should be persisted together with the operation.
      */
-    private final Map<String, String> extras = new LinkedHashMap<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**
      * Default constructor.
@@ -54,7 +54,7 @@ public class AfsResponse {
     /**
      * Constructor with all details.
      */
-    public AfsResponse(boolean applyAfsLabel, String afsLabel, AuthStepOptions authStepOptions, Map<String, String> extras) {
+    public AfsResponse(boolean applyAfsLabel, String afsLabel, AuthStepOptions authStepOptions, Map<String, Object> extras) {
         this.applyAfsResponse = applyAfsLabel;
         this.afsLabel = afsLabel;
         this.authStepOptions = authStepOptions;
@@ -113,7 +113,7 @@ public class AfsResponse {
      * Get extra parameters sent with the response which should be persisted together with the operation.
      * @return Extra parameters.
      */
-    public Map<String, String> getExtras() {
+    public Map<String, Object> getExtras() {
         return extras;
     }
 }

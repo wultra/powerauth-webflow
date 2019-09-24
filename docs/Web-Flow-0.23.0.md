@@ -24,7 +24,7 @@ CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id)
 
 CREATE TABLE wf_afs_config (
   config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
-  js_snippet                VARCHAR(256) NOT NULL,
+  js_snippet_url            VARCHAR(256) NOT NULL,
   parameters                CLOB
 );
 ```
@@ -43,7 +43,7 @@ CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id)
 
 CREATE TABLE wf_afs_config (
   config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
-  js_snippet                VARCHAR(256) NOT NULL,
+  js_snippet_url            VARCHAR(256) NOT NULL,
   parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```

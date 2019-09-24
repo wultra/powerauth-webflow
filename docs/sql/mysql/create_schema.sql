@@ -171,7 +171,7 @@ CREATE TABLE wf_operation_session (
 -- Table wf_afs_config is used to configure anti-fraud system parameters.
 CREATE TABLE wf_afs_config (
   config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
-  js_snippet                VARCHAR(256) NOT NULL,
+  js_snippet_url            VARCHAR(256) NOT NULL,
   parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

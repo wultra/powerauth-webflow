@@ -453,7 +453,7 @@ public class DataAdapterClient {
      * @return Response with indication whether consent form was successfully saved.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, String> extras) throws DataAdapterClientErrorException {
+    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, Object> extras) throws DataAdapterClientErrorException {
         try {
             AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
             HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));

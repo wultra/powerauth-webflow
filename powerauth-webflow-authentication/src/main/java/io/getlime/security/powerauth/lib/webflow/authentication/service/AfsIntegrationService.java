@@ -39,6 +39,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -58,6 +60,7 @@ public class AfsIntegrationService {
     private final NextStepClient nextStepClient;
     private final DataAdapterClient dataAdapterClient;
     private final OperationSessionService operationSessionService;
+    private final HttpServletRequest httpServletRequest;
 
     /**
      * Service constructor.
@@ -65,13 +68,15 @@ public class AfsIntegrationService {
      * @param nextStepClient Next Step client.
      * @param dataAdapterClient Data Adapter client.
      * @param operationSessionService Operation session service.
+     * @param httpServletRequest HTTP servlet request.
      */
     @Autowired
-    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService) {
+    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService, HttpServletRequest httpServletRequest) {
         this.configuration = configuration;
         this.nextStepClient = nextStepClient;
         this.dataAdapterClient = dataAdapterClient;
         this.operationSessionService = operationSessionService;
+        this.httpServletRequest = httpServletRequest;
     }
 
 
@@ -79,43 +84,43 @@ public class AfsIntegrationService {
      * Execute an anti-fraud system action. This method variant is used during step initialization.
      * The response from AFS is applied in Web Flow.
      *
-     * @param operation Current operation.
+     * @param operationId Operation ID.
      * @param afsAction AFS action to be executed.
      * @return Response from anti-fraud system.
      */
-    public AfsResponse executeInitAction(GetOperationDetailResponse operation, AfsAction afsAction) {
-        return executeAfsAction(operation, afsAction, Collections.emptyList(), 1, null, null);
+    public AfsResponse executeInitAction(String operationId, AfsAction afsAction) {
+        return executeAfsAction(operationId, afsAction, Collections.emptyList(), 1, null, null);
     }
 
     /**
      * Execute an anti-fraud system action. This method variant is used during step authentication.
      * The response from AFS has no impact on Web Flow.
      *
-     * @param operation Current operation.
+     * @param operationId Operation ID.
      * @param afsAction AFS action to be executed.
      * @param authInstruments Authentication instruments used in this step.
      * @param stepIndex Index in current authentication step.
      * @param authStepResult Authentication step result.
      */
-    public void executeAuthAction(GetOperationDetailResponse operation, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
-        executeAfsAction(operation, afsAction, authInstruments, stepIndex, authStepResult, null);
+    public void executeAuthAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
+        executeAfsAction(operationId, afsAction, authInstruments, stepIndex, authStepResult, null);
     }
 
     /**
      * Execute an anti-fraud system action. This method variant is used during logout.
      * The response from AFS has no impact on Web Flow.
      *
-     * @param operation Current operation.
+     * @param operationId Operation ID.
      * @param operationTerminationReason Reason why operation was terminated.
      */
-    public void executeLogoutAction(GetOperationDetailResponse operation, OperationTerminationReason operationTerminationReason) {
-        executeAfsAction(operation, AfsAction.LOGOUT, Collections.emptyList(), 1, null, operationTerminationReason);
+    public void executeLogoutAction(String operationId, OperationTerminationReason operationTerminationReason) {
+        executeAfsAction(operationId, AfsAction.LOGOUT, Collections.emptyList(), 1, null, operationTerminationReason);
     }
 
     /**
      * Execute a generic anti-fraud system action and return response.
      *
-     * @param operation Current operation.
+     * @param operationId Operation ID.
      * @param afsAction AFS action to be executed.
      * @param authInstruments Authentication instruments used in this step.
      * @param stepIndex Index in current authentication step.
@@ -123,9 +128,13 @@ public class AfsIntegrationService {
      * @param operationTerminationReason Reason why operation was terminated.
      * @return Response from anti-fraud system.
      */
-    private AfsResponse executeAfsAction(GetOperationDetailResponse operation, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         if (configuration.isAfsEnabled()) {
+            logger.debug("AFS integration is enabled");
             try {
+                // Retrieve operation
+                ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
+                GetOperationDetailResponse operation = operationDetail.getResponseObject();
                 ObjectResponse<GetOperationConfigDetailResponse> objectResponse = nextStepClient.getOperationConfigDetail(operation.getOperationName());
                 GetOperationConfigDetailResponse config = objectResponse.getResponseObject();
                 if (config.isAfsEnabled()) {
@@ -137,24 +146,54 @@ public class AfsIntegrationService {
                     OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                     AfsType afsType = configuration.getAfsType();
                     String clientIp = operationSessionService.getOperationToSessionMapping(operation.getOperationId()).getClientIp();
-                    // TODO - extract TM cookies and send their values
-                    Map<String, String> extras = new LinkedHashMap<>();
+                    Map<String, Object> extras = prepareExtrasForAfs();
                     // AuthStepResult is null due to init action
                     AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIp, stepIndex, authStepResult, operationTerminationReason);
-                    ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, Collections.emptyList(), extras);
+                    logger.info("Sending AFS action request, operation ID: {}", operation.getOperationId());
+                    ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
+                    logger.info("AFS response received, operation ID: {}", operation.getOperationId());
                     // TODO - save AFS response in Next Step
                     return afsObjectResponse.getResponseObject();
+                } else {
+                    logger.debug("AFS integration is disabled for operation name: {}", operation.getOperationName());
                 }
 
             // AFS errors are not critical, Web Flow falls back to 2FA
             } catch (NextStepServiceException e) {
-                // Next step errors are critical
-                logger.error("Error when obtaining operation configuration.", e);
+                logger.error("Error when obtaining operation configuration", e);
             } catch (DataAdapterClientErrorException e) {
-                logger.error("Error when calling anti-fraud service.", e);
+                logger.error("Error when calling anti-fraud service", e);
+            }
+        } else {
+            logger.debug("AFS integration is disabled");
+        }
+        // The default response is not applied
+        return new AfsResponse();
+    }
+
+    /**
+     * Prepare extras which are sent with request to AFS. These values are AFS type dependent.
+     *
+     * @return AFS extras.
+     */
+    private Map<String, Object> prepareExtrasForAfs() {
+        Map<String, Object> extras = new LinkedHashMap<>();
+        AfsType afsType = configuration.getAfsType();
+        if (afsType == AfsType.THREAT_MARK) {
+            Cookie[] cookies = httpServletRequest.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie: cookies) {
+                    // TODO - use configuration
+                    if (cookie.getName().equals("CoBNX2ZROo")) {
+                        extras.put("tm_device_tag", cookie.getValue());
+                    }
+                    if (cookie.getName().equals("DV7mCBByG2")) {
+                        extras.put("tm_session_sid", cookie.getValue());
+                    }
+                }
             }
         }
-        return new AfsResponse();
+        return extras;
     }
 
 }

@@ -20,8 +20,11 @@ import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConf
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.AfsConfigRepository;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.AfsConfigEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.slf4j.Logger;
@@ -40,6 +43,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Simple controller, redirects to the main HTML page with JavaScript content.
@@ -56,24 +60,27 @@ public class HomeController {
     private final I18NService i18nService;
     private final OperationSessionService operationSessionService;
     private final NextStepClient nextStepClient;
+    private final AfsConfigRepository afsConfigRepository;
     private final HttpSession httpSession;
 
     /**
-     * Initialization of the HomeController with application webflowServicesConfiguration.
+     * Initialization of the HomeController with application configuration.
      * @param authenticationManagementService Authentication management service.
      * @param webFlowConfig WebFlowServicesConfiguration of the application.
      * @param i18nService I18n service.
      * @param operationSessionService Operation to session mapping service.
      * @param nextStepClient Next step client.
+     * @param afsConfigRepository Anti-fraud system configuration repository.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, HttpSession httpSession) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
         this.operationSessionService = operationSessionService;
         this.nextStepClient = nextStepClient;
+        this.afsConfigRepository = afsConfigRepository;
         this.httpSession = httpSession;
     }
 
@@ -124,6 +131,27 @@ public class HomeController {
             try {
                 ObjectResponse<GetOperationDetailResponse> objectResponse = nextStepClient.getOperationDetail(operationId);
                 organizationId = objectResponse.getResponseObject().getOrganizationId();
+
+                // AFS is enabled only for non-default operations which are deprecated
+                if (webFlowConfig.isAfsEnabled()) {
+                    String operationName = objectResponse.getResponseObject().getOperationName();
+                    ObjectResponse<GetOperationConfigDetailResponse> objectResponseConfig = nextStepClient.getOperationConfigDetail(operationName);
+                    GetOperationConfigDetailResponse config = objectResponseConfig.getResponseObject();
+                    if (config.isAfsEnabled() && config.getAfsConfigId() != null) {
+                        Optional<AfsConfigEntity> afsConfig = afsConfigRepository.findById(config.getAfsConfigId());
+                        if (afsConfig.isPresent()) {
+                            String afsJsSnippet = afsConfig.get().getJsSnippetUrl();
+                            if (afsJsSnippet != null) {
+                                model.put("afs_js_snippet_url", afsJsSnippet);
+                            }
+                        } else {
+                            logger.error("AFS configuration is not available in Web Flow: {}", config.getAfsConfigId());
+                        }
+                    } else if (config.getAfsConfigId() == null) {
+                        logger.error("AFS configuration is invalid for operation name: {}", config.getOperationName());
+                    }
+                }
+
             } catch (NextStepServiceException e) {
                 logger.error("Error occurred while retrieving operation with ID: " + operationId, e);
                 return "redirect:/oauth/error";
@@ -131,6 +159,8 @@ public class HomeController {
 
             authenticationManagementService.createAuthenticationWithOperationId(operationId, organizationId);
         }
+
+        model.putIfAbsent("afs_js_snippet_url", "");
 
         model.put("title", webFlowConfig.getPageTitle());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());

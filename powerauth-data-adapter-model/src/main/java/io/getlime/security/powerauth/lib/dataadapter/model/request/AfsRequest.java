@@ -58,7 +58,7 @@ public class AfsRequest {
     /**
      * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark, logout reason, etc.
      */
-    private final Map<String, String> extras = new LinkedHashMap<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**
      * Default constructor.
@@ -75,7 +75,7 @@ public class AfsRequest {
      * @param authInstruments Authentication instruments used during this authentication step.
      * @param extras Extra parameters for AFS.
      */
-    public AfsRequest(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, String> extras) {
+    public AfsRequest(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, Object> extras) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.operationContext = operationContext;
@@ -160,7 +160,7 @@ public class AfsRequest {
      * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark.
      * @return Get extra parameters for AFS.
      */
-    public Map<String, String> getExtras() {
+    public Map<String, Object> getExtras() {
         return extras;
     }
 }

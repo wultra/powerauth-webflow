@@ -34,21 +34,30 @@ public class AfsConfigEntity implements Serializable {
     private static final long serialVersionUID = -3077689235187445743L;
 
     @Id
-    @Column(name = "afs_config_id")
+    @Column(name = "config_id")
     private String afsConfigId;
 
-    @Column(name = "js_snippet")
-    private String jsSnippet;
+    @Column(name = "js_snippet_url")
+    private String jsSnippetUrl;
 
     @Column(name = "parameters")
     private String parameters;
 
+    /**
+     * Default constructor.
+     */
     public AfsConfigEntity() {
     }
 
-    public AfsConfigEntity(String afsConfigId, String jsSnippet, String parameters) {
+    /**
+     * Entity constructor.
+     * @param afsConfigId AFS configuration ID.
+     * @param jsSnippetUrl JavaScript snipped for integration of AFS into Web Flow.
+     * @param parameters Parameters which should be sent together with the AFS request.
+     */
+    public AfsConfigEntity(String afsConfigId, String jsSnippetUrl, String parameters) {
         this.afsConfigId = afsConfigId;
-        this.jsSnippet = jsSnippet;
+        this.jsSnippetUrl = jsSnippetUrl;
         this.parameters = parameters;
     }
 
@@ -60,12 +69,12 @@ public class AfsConfigEntity implements Serializable {
         this.afsConfigId = afsConfigId;
     }
 
-    public String getJsSnippet() {
-        return jsSnippet;
+    public String getJsSnippetUrl() {
+        return jsSnippetUrl;
     }
 
-    public void setJsSnippet(String jsSnippet) {
-        this.jsSnippet = jsSnippet;
+    public void setJsSnippetUrl(String jsSnippetUrl) {
+        this.jsSnippetUrl = jsSnippetUrl;
     }
 
     public String getParameters() {
@@ -82,12 +91,12 @@ public class AfsConfigEntity implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         AfsConfigEntity that = (AfsConfigEntity) o;
         return afsConfigId.equals(that.afsConfigId) &&
-                jsSnippet.equals(that.jsSnippet) &&
+                jsSnippetUrl.equals(that.jsSnippetUrl) &&
                 Objects.equals(parameters, that.parameters);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(afsConfigId, jsSnippet, parameters);
+        return Objects.hash(afsConfigId, jsSnippetUrl, parameters);
     }
 }

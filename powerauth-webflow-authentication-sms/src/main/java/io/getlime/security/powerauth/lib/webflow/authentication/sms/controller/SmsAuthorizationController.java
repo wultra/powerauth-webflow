@@ -316,7 +316,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             initResponse.setUsername(username);
         }
 
-        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+        if (configuration.isAfsEnabled()
+                && (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA)) {
 
             // Choose current AFS action
             AfsAction afsAction;
@@ -327,7 +328,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             }
 
             // Execute an AFS action
-            AfsResponse afsResponse = afsIntegrationService.executeInitAction(operation, afsAction);
+            AfsResponse afsResponse = afsIntegrationService.executeInitAction(operation.getOperationId(), afsAction);
+
+            // TODO - save AFS response into HTTP session and use it during authentication to switch to 1FA or NO_FA
 
             // Process AFS response
             if (afsResponse.getApplyAfsResponse()) {
@@ -432,21 +435,27 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         // Choose current AFS action
         final AfsAction afsAction;
         final List<AuthInstrument> authInstruments = new ArrayList<>();
-        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
-            if (authMethod == AuthMethod.LOGIN_SCA) {
-                afsAction = AfsAction.LOGIN_AUTH;
+        if (configuration.isAfsEnabled()) {
+            if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+                if (authMethod == AuthMethod.LOGIN_SCA) {
+                    afsAction = AfsAction.LOGIN_AUTH;
+                } else {
+                    afsAction = AfsAction.APPROVAL_AUTH;
+                }
+                if (request.getPassword() != null) {
+                    authInstruments.add(AuthInstrument.PASSWORD);
+                }
+                if (request.getAuthCode() != null) {
+                    authInstruments.add(AuthInstrument.SMS_KEY);
+                }
             } else {
-                afsAction = AfsAction.APPROVAL_AUTH;
-            }
-            if (request.getPassword() != null) {
-                authInstruments.add(AuthInstrument.PASSWORD);
-            }
-            if (request.getAuthCode() != null) {
-                authInstruments.add(AuthInstrument.SMS_KEY);
+                afsAction = null;
             }
         } else {
             afsAction = null;
         }
+
+        logger.debug("AFS action: {}", afsAction);
 
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
@@ -454,7 +463,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 @Override
                 public SmsAuthorizationResponse doneAuthentication(String userId) {
                     if (afsAction != null) {
-                        afsIntegrationService.executeAuthAction(operation, afsAction, authInstruments, 1, AuthStepResult.CONFIRMED);
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, authInstruments, 1, AuthStepResult.CONFIRMED);
                     }
                     authenticateCurrentBrowserSession();
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
@@ -467,7 +476,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 @Override
                 public SmsAuthorizationResponse failedAuthentication(String userId, String failedReason) {
                     if (afsAction != null) {
-                        afsIntegrationService.executeAuthAction(operation, afsAction, authInstruments, 1, AuthStepResult.AUTH_FAILED);
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, authInstruments, 1, AuthStepResult.AUTH_FAILED);
                     }
                     clearCurrentBrowserSession();
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
@@ -480,7 +489,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 @Override
                 public SmsAuthorizationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
                     if (afsAction != null) {
-                        afsIntegrationService.executeAuthAction(operation, afsAction, authInstruments, 1, AuthStepResult.CONFIRMED);
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, authInstruments, 1, AuthStepResult.CONFIRMED);
                     }
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
@@ -492,6 +501,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             });
         } catch (AuthStepException e) {
             logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
+            if (afsAction != null) {
+                afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, authInstruments, 1, AuthStepResult.AUTH_FAILED);
+            }
             final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());
