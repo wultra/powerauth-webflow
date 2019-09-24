@@ -48,7 +48,7 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        WebSocketHandshakeInterceptor interceptor = new WebSocketHandshakeInterceptor(configuration.getAfsForceIpv4());
+        WebSocketHandshakeInterceptor interceptor = new WebSocketHandshakeInterceptor(configuration.getAfsDetectIpAddress(), configuration.getAfsForceIpv4());
         registry.addEndpoint("/websocket").addInterceptors(interceptor).setAllowedOrigins("*").withSockJS();
     }
 

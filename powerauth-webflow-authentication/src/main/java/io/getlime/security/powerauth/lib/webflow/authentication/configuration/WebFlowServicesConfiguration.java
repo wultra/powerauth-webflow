@@ -103,6 +103,12 @@ public class WebFlowServicesConfiguration {
     private AfsType afsType;
 
     /**
+     * Whether client IP address is detected in anti-fraud system integration.
+     */
+    @Value("${powerauth.webflow.afs.detectIpAddress:false}")
+    private boolean afsDetectIpAddress;
+
+    /**
      * Whether anti-fraud system requires IPv4 addresses.
      */
     @Value("${powerauth.webflow.afs.forceIpv4:true}")
@@ -221,6 +227,14 @@ public class WebFlowServicesConfiguration {
      */
     public AfsType getAfsType() {
         return afsType;
+    }
+
+    /**
+     * Get whether client IP address is detected in anti-fraud system integration.
+     * @return Whether client IP address is detected in anti-fraud system integration.
+     */
+    public boolean getAfsDetectIpAddress() {
+        return afsDetectIpAddress;
     }
 
     /**
