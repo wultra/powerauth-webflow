@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -27,6 +29,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Operation
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AfsRequestParameters;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AfsResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -38,9 +41,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +66,8 @@ public class AfsIntegrationService {
     private final NextStepClient nextStepClient;
     private final DataAdapterClient dataAdapterClient;
     private final OperationSessionService operationSessionService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Service constructor.
@@ -89,7 +94,7 @@ public class AfsIntegrationService {
      * @return Response from anti-fraud system.
      */
     public AfsResponse executeInitAction(String operationId, AfsAction afsAction) {
-        return executeAfsAction(operationId, afsAction, Collections.emptyList(), 1, null, null);
+        return executeAfsAction(operationId, afsAction, Collections.emptyList(), null, null);
     }
 
     /**
@@ -103,7 +108,7 @@ public class AfsIntegrationService {
      * @param authStepResult Authentication step result.
      */
     public void executeAuthAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
-        executeAfsAction(operationId, afsAction, authInstruments, stepIndex, authStepResult, null);
+        executeAfsAction(operationId, afsAction, authInstruments, authStepResult, null);
     }
 
     /**
@@ -114,7 +119,7 @@ public class AfsIntegrationService {
      * @param operationTerminationReason Reason why operation was terminated.
      */
     public void executeLogoutAction(String operationId, OperationTerminationReason operationTerminationReason) {
-        executeAfsAction(operationId, AfsAction.LOGOUT, Collections.emptyList(), 1, null, operationTerminationReason);
+        executeAfsAction(operationId, AfsAction.LOGOUT, Collections.emptyList(), null, operationTerminationReason);
     }
 
     /**
@@ -123,12 +128,11 @@ public class AfsIntegrationService {
      * @param operationId Operation ID.
      * @param afsAction AFS action to be executed.
      * @param authInstruments Authentication instruments used in this step.
-     * @param stepIndex Index in current authentication step.
      * @param authStepResult Authentication step result.
      * @param operationTerminationReason Reason why operation was terminated.
      * @return Response from anti-fraud system.
      */
-    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         if (configuration.isAfsEnabled()) {
             logger.debug("AFS integration is enabled");
             try {
@@ -138,6 +142,12 @@ public class AfsIntegrationService {
                 ObjectResponse<GetOperationConfigDetailResponse> objectResponse = nextStepClient.getOperationConfigDetail(operation.getOperationName());
                 GetOperationConfigDetailResponse config = objectResponse.getResponseObject();
                 if (config.isAfsEnabled()) {
+                    logger.debug("AFS integration is enabled for operation name: {}", operation.getOperationName());
+                    // Check that at least one previous AFS operation was triggered before executing LOGOUT action
+                    if (afsAction == AfsAction.LOGOUT && operation.getAfsActions().isEmpty()) {
+                        logger.info("AFS action for logout event is not executed because no previous action is available for operation: {}", operationId);
+                        return new AfsResponse();
+                    }
                     // Prepare all AFS request parameters
                     String userId = operation.getUserId();
                     String organizationId = operation.getOrganizationId();
@@ -146,13 +156,19 @@ public class AfsIntegrationService {
                     OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                     AfsType afsType = configuration.getAfsType();
                     String clientIp = operationSessionService.getOperationToSessionMapping(operation.getOperationId()).getClientIp();
-                    Map<String, Object> extras = prepareExtrasForAfs();
+                    int stepIndex = deriveStepIndex(operation, afsAction);
+                    Map<String, Object> requestAfsExtras = prepareExtrasForAfs(operation);
                     // AuthStepResult is null due to init action
                     AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIp, stepIndex, authStepResult, operationTerminationReason);
-                    logger.info("AFS action: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
-                    ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
-                    // TODO - save AFS response in Next Step
-                    return afsObjectResponse.getResponseObject();
+                    logger.info("Executing AFS action: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
+                    ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, authInstruments, requestAfsExtras);
+                    AfsResponse response = afsObjectResponse.getResponseObject();
+                    // Save ASF request and response in Next Step
+                    String requestExtras = convertExtrasToString(requestAfsExtras);
+                    String responseExtras = convertExtrasToString(response.getExtras());
+                    nextStepClient.createAfsAction(operationId, afsAction.toString(), stepIndex, requestExtras, response.getAfsLabel(), response.isAfsResponseApplied(), responseExtras);
+                    logger.debug("AFS action succeeded: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
+                    return response;
                 } else {
                     logger.debug("AFS integration is disabled for operation name: {}", operation.getOperationName());
                 }
@@ -171,22 +187,48 @@ public class AfsIntegrationService {
     }
 
     /**
+     * Derive step index for current AFS action.
+     * @param operation Operation.
+     * @param afsAction AFS action.
+     * @return Step index of this AFS action.
+     */
+    private int deriveStepIndex(GetOperationDetailResponse operation, AfsAction afsAction) {
+        int stepIndex = 1;
+        if (operation.getAfsActions().isEmpty()) {
+            return stepIndex;
+        }
+        for (AfsActionDetail action: operation.getAfsActions()) {
+            if (afsAction.toString().equals(action.getName())) {
+                stepIndex++;
+            }
+        }
+        return stepIndex;
+    }
+
+    /**
      * Prepare extras which are sent with request to AFS. These values are AFS type dependent.
      *
      * @return AFS extras.
      */
-    private Map<String, Object> prepareExtrasForAfs() {
+    private Map<String, Object> prepareExtrasForAfs(GetOperationDetailResponse operation) {
         Map<String, Object> extras = new LinkedHashMap<>();
         AfsType afsType = configuration.getAfsType();
         if (afsType == AfsType.THREAT_MARK) {
-            // RequestContextHolder is used instead of autowiring because of WebSocketDisconnectListener code which
-            // runs outside of DispatcherServlet.
-            RequestAttributes attr = RequestContextHolder.getRequestAttributes();
-            if (attr instanceof NativeWebRequest) {
-                HttpServletRequest request = (HttpServletRequest) ((NativeWebRequest) attr).getNativeRequest();
-                Cookie[] cookies = request.getCookies();
+            RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            if (!(requestAttributes instanceof ServletRequestAttributes)) {
+                // The action is not dispatched using DispatcherServlet. This occurs in case of processing of the Web
+                // Socket close session event. Obtain AFS parameters from last regular request and reuse them.
+                List<AfsActionDetail> afsActions = operation.getAfsActions();
+                if (!afsActions.isEmpty()) {
+                    AfsActionDetail lastAction = afsActions.get(afsActions.size() - 1);
+                    // Reuse extras from previous request
+                    return lastAction.getRequestExtras();
+                }
+            } else {
+                HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                Cookie[] cookies = servletRequest.getCookies();
                 if (cookies != null) {
-                    for (Cookie cookie: cookies) {
+                    for (Cookie cookie : cookies) {
                         // TODO - use configuration
                         if (cookie.getName().equals("CoBNX2ZROo")) {
                             extras.put("tm_device_tag", cookie.getValue());
@@ -199,6 +241,20 @@ public class AfsIntegrationService {
             }
         }
         return extras;
+    }
+
+    /**
+     * Convert extras map to String.
+     * @param extras Extras map.
+     * @return String value of extras.
+     */
+    private String convertExtrasToString(Map<String, Object> extras) {
+        try {
+            return objectMapper.writeValueAsString(extras);
+        } catch (JsonProcessingException e) {
+            logger.error("Error occurred while serializing data", e);
+            return null;
+        }
     }
 
 }

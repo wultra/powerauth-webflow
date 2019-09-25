@@ -16,20 +16,19 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -207,6 +206,7 @@ public class OperationController {
         assignFormData(response, operation);
         assignApplicationContext(response, operation);
         assignOperationHistory(response, operation);
+        assignAfsActions(response, operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -384,6 +384,17 @@ public class OperationController {
         return updateApplicationContextImpl(request);
     }
 
+    @RequestMapping(value = "/operation/afs", method = RequestMethod.POST)
+    public @ResponseBody Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) throws OperationNotFoundException {
+        CreateAfsActionRequest afsRequest = request.getRequestObject();
+        logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());
+        // persist AFS action for operation
+        operationPersistenceService.createAfsAction(afsRequest);
+        logger.debug("The createAfsAction request succeeded");
+        return new Response();
+
+    }
+
     private Response updateApplicationContextImpl(ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
         logger.info("Received updateApplicationContext request, operation ID: {}", request.getRequestObject().getOperationId());
         // persist application context update
@@ -455,6 +466,42 @@ public class OperationController {
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
+
+
+    /**
+     * Assign AFS actions to operation.
+     * @param response Response to be enriched by AFS actions.
+     * @param operation Database entity representing operation.
+     */
+    private void assignAfsActions(GetOperationDetailResponse response, OperationEntity operation) {
+        // add AFS actions
+        for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
+            AfsActionDetail action = new AfsActionDetail();
+            action.setName(afsAction.getAfsAction());
+            action.setStepIndex(afsAction.getStepIndex());
+            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
+            action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
+            action.setAfsLabel(afsAction.getAfsLabel());
+            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
+            response.getAfsActions().add(action);
+        }
+    }
+
+    /**
+     * Convert extras String to map.
+     * @param extras String with extras.
+     * @return Extras map.
+     */
+    private Map<String, Object> convertExtrasToMap(String extras) {
+        try {
+            TypeReference<Map<String, Object>> typeRef
+                    = new TypeReference<Map<String, Object>>() {};
+            return objectMapper.readValue(extras, typeRef);
+        } catch (IOException e) {
+            logger.error("Error occurred while deserializing data", e);
+            return null;
         }
     }
 }

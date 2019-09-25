@@ -118,6 +118,7 @@ CREATE TABLE ns_operation (
   user_id                   VARCHAR(256),
   organization_id           VARCHAR(256),
   result                    VARCHAR(32),
+  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY organization_fk (organization_id) REFERENCES ns_organization (organization_id)
@@ -139,6 +140,20 @@ CREATE TABLE ns_operation_history (
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY operation_fk (operation_id) REFERENCES ns_operation (operation_id),
   FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table ns_operation_afs stores AFS requests and responses.
+CREATE TABLE ns_operation_afs (
+  afs_action_id               INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  operation_id                VARCHAR(256) NOT NULL,
+  request_afs_action          VARCHAR(256) NOT NULL,
+  request_step_index          INTEGER NOT NULL,
+  request_afs_extras          VARCHAR(256),
+  response_afs_apply          BOOLEAN NOT NULL DEFAULT FALSE,
+  response_afs_label          VARCHAR(256),
+  response_afs_extras         VARCHAR(256),
+  timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY operation_afs_fk (operation_id) REFERENCES ns_operation (operation_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
@@ -257,3 +272,4 @@ CREATE TABLE tpp_app_detail (
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);

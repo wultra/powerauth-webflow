@@ -19,9 +19,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationAfsActionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -57,18 +59,21 @@ public class OperationPersistenceService {
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
+    private final OperationAfsActionRepository operationAfsActionRepository;
     private final AuthMethodRepository authMethodRepository;
 
     /**
      * Service constructor.
-     * @param idGeneratorService         ID generator service.
-     * @param operationRepository        Operation repository.
-     * @param operationHistoryRepository Operation history repository.
-     * @param authMethodRepository       Authentication method repository.
+     * @param idGeneratorService           ID generator service.
+     * @param operationRepository          Operation repository.
+     * @param operationHistoryRepository   Operation history repository.
+     * @param operationAfsActionRepository Operation AFS action repository.
+     * @param authMethodRepository         Authentication method repository.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository, AuthMethodRepository authMethodRepository) {
+                                       OperationHistoryRepository operationHistoryRepository, OperationAfsActionRepository operationAfsActionRepository, AuthMethodRepository authMethodRepository) {
+        this.operationAfsActionRepository = operationAfsActionRepository;
         this.authMethodRepository = authMethodRepository;
         this.objectMapper = new ObjectMapper();
         this.idGeneratorService = idGeneratorService;
@@ -371,6 +376,29 @@ public class OperationPersistenceService {
             );
         }
         return steps;
+    }
+
+    /**
+     * Create an AFS action.
+     * @param request Request to crete an AFS action.
+     */
+    public void createAfsAction(CreateAfsActionRequest request) {
+        try {
+            OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
+            OperationEntity operation = getOperation(request.getOperationId());
+            afsEntity.setOperation(operation);
+            afsEntity.setAfsAction(request.getAfsAction());
+            afsEntity.setStepIndex(request.getStepIndex());
+            afsEntity.setRequestAfsExtras(request.getRequestAfsExtras());
+            afsEntity.setAfsLabel(request.getAfsLabel());
+            afsEntity.setAfsResponseApplied(request.isAfsResponseApplied());
+            afsEntity.setResponseAfsExtras(request.getResponseAfsExtras());
+            afsEntity.setTimestampCreated(request.getTimestampCreated());
+            operation.getAfsActions().add(afsEntity);
+            operationRepository.save(operation);
+        } catch (OperationNotFoundException e) {
+            logger.error("AFS action could not be saved because operation does not exist: {}", request.getOperationId());
+        }
     }
 
     /**

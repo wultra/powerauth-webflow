@@ -379,7 +379,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             updateAuthStepOptionsInHttpSession(afsResponse.getAuthStepOptions());
 
             // Process AFS response
-            if (afsResponse.getApplyAfsResponse()) {
+            if (afsResponse.isAfsResponseApplied()) {
                 if (afsResponse.getAuthStepOptions() != null) {
                     if (!afsResponse.getAuthStepOptions().isPasswordRequired()) {
                         logger.debug("Disabling password verification based on AFS response in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());

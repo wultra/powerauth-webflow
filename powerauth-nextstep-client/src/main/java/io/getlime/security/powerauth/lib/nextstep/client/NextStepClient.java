@@ -47,6 +47,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -682,6 +683,41 @@ public class NextStepClient {
             ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method/delete", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Create an AFS action in Next Step and log its request and response parameters.
+     * @param operationId Operation ID.
+     * @param afsAction AFS action.
+     * @param stepIndex Step index.
+     * @param requestAfsExtras AFS request extras.
+     * @param afsLabel AFS label.
+     * @param afsResponseApplied Whether AFS response was applied.
+     * @param responseAfsExtras AFS response extras.
+     * @return
+     * @throws NextStepServiceException
+     */
+    public Response createAfsAction(String operationId, String afsAction, int stepIndex, String requestAfsExtras, String afsLabel,
+                                    boolean afsResponseApplied, String responseAfsExtras) throws NextStepServiceException {
+        try {
+            CreateAfsActionRequest request = new CreateAfsActionRequest();
+            request.setOperationId(operationId);
+            request.setAfsAction(afsAction);
+            request.setStepIndex(stepIndex);
+            request.setRequestAfsExtras(requestAfsExtras);
+            request.setAfsLabel(afsLabel);
+            request.setAfsResponseApplied(afsResponseApplied);
+            request.setResponseAfsExtras(responseAfsExtras);
+            request.setTimestampCreated(new Date());
+            HttpEntity<ObjectRequest<CreateAfsActionRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            // Exchange next step request with NextStep server.
+            ResponseEntity<Response> response = restTemplate.exchange(serviceUrl + "/operation/afs", HttpMethod.POST, entity, Response.class);
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);
         } catch (ResourceAccessException ex) {

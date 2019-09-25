@@ -28,7 +28,7 @@ public class AfsResponse {
     /**
      * Whether AFS response should be applied in current authentication step.
      */
-    private boolean applyAfsResponse = false;
+    private boolean afsResponseApplied = false;
 
     /**
      * AFS label specifying factors to be used during this authentication step.
@@ -53,13 +53,13 @@ public class AfsResponse {
 
     /**
      * Constructor with all details.
-     * @param applyAfsResponse Whether AFS response should be applied in Web Flow.
+     * @param afsResponseApplied Whether AFS response should be applied in Web Flow.
      * @param afsLabel AFS label to be stored with the operation.
-     * @param authStepOptions Authentication step options for current step. Use null value case applyAfsResponse = false.
+     * @param authStepOptions Authentication step options for current step. Use null value case afsResponseApplied = false.
      * @param extras AFS extras.
      */
-    public AfsResponse(boolean applyAfsResponse, String afsLabel, AuthStepOptions authStepOptions, Map<String, Object> extras) {
-        this.applyAfsResponse = applyAfsResponse;
+    public AfsResponse(boolean afsResponseApplied, String afsLabel, AuthStepOptions authStepOptions, Map<String, Object> extras) {
+        this.afsResponseApplied = afsResponseApplied;
         this.afsLabel = afsLabel;
         this.authStepOptions = authStepOptions;
         this.extras.putAll(extras);
@@ -69,16 +69,16 @@ public class AfsResponse {
      * Get whether AFS response should be applied in current authentication step.
      * @return Whether AFS response should be applied in current authentication step.
      */
-    public boolean getApplyAfsResponse() {
-        return applyAfsResponse;
+    public boolean isAfsResponseApplied() {
+        return afsResponseApplied;
     }
 
     /**
      * Set whether AFS response should be applied in current authentication step.
-     * @param applyAfsResponse Whether AFS response should be applied in current authentication step.
+     * @param afsResponseApplied Whether AFS response should be applied in current authentication step.
      */
-    public void setApplyAfsResponse(boolean applyAfsResponse) {
-        this.applyAfsResponse = applyAfsResponse;
+    public void setAfsResponseApplied(boolean afsResponseApplied) {
+        this.afsResponseApplied = afsResponseApplied;
     }
 
     /**

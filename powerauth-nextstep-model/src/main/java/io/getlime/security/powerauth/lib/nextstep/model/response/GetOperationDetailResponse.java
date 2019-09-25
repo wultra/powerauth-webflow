@@ -15,10 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
@@ -43,6 +40,7 @@ public class GetOperationDetailResponse {
     private String operationData;
     private List<AuthStep> steps;
     private List<OperationHistory> history;
+    private List<AfsActionDetail> afsActions;
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
     private Integer remainingAttempts;
@@ -54,6 +52,7 @@ public class GetOperationDetailResponse {
     public GetOperationDetailResponse() {
         steps = new ArrayList<>();
         history = new ArrayList<>();
+        afsActions = new ArrayList<>();
     }
 
     /**
@@ -207,6 +206,14 @@ public class GetOperationDetailResponse {
      */
     public List<OperationHistory> getHistory() {
         return history;
+    }
+
+    /**
+     * Get the list with AFS action records.
+     * @return List with AFS action records.
+     */
+    public List<AfsActionDetail> getAfsActions() {
+        return afsActions;
     }
 
     /**
