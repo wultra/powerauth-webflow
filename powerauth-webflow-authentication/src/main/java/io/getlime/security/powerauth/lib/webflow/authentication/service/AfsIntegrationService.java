@@ -227,13 +227,14 @@ public class AfsIntegrationService {
             } else {
                 HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
                 Cookie[] cookies = servletRequest.getCookies();
-                if (cookies != null) {
+                String deviceTagCookie = configuration.getTmDeviceTagCookie();
+                String sessionSidCookie = configuration.getTmSessionSidCookie();
+                if (cookies != null && deviceTagCookie != null && sessionSidCookie != null) {
                     for (Cookie cookie : cookies) {
-                        // TODO - use configuration
-                        if (cookie.getName().equals("CoBNX2ZROo")) {
+                        if (cookie.getName().equals(deviceTagCookie)) {
                             extras.put("tm_device_tag", cookie.getValue());
                         }
-                        if (cookie.getName().equals("DV7mCBByG2")) {
+                        if (cookie.getName().equals(sessionSidCookie)) {
                             extras.put("tm_session_sid", cookie.getValue());
                         }
                     }
