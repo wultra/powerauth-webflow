@@ -479,7 +479,7 @@ public class OperationController {
         // add AFS actions
         for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
             AfsActionDetail action = new AfsActionDetail();
-            action.setName(afsAction.getAfsAction());
+            action.setAction(afsAction.getAfsAction());
             action.setStepIndex(afsAction.getStepIndex());
             action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
             action.setAfsResponseApplied(afsAction.isAfsResponseApplied());

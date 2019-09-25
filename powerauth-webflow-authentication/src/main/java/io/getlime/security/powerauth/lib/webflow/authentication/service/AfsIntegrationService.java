@@ -197,8 +197,8 @@ public class AfsIntegrationService {
         if (operation.getAfsActions().isEmpty()) {
             return stepIndex;
         }
-        for (AfsActionDetail action: operation.getAfsActions()) {
-            if (afsAction.toString().equals(action.getName())) {
+        for (AfsActionDetail detail: operation.getAfsActions()) {
+            if (afsAction.toString().equals(detail.getAction())) {
                 stepIndex++;
             }
         }

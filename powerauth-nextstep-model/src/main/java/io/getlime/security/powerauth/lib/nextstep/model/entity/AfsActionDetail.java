@@ -24,19 +24,19 @@ import java.util.Map;
  */
 public class AfsActionDetail {
 
-    private String name;
+    private String action;
     private int stepIndex;
     private String afsLabel;
     private boolean afsResponseApplied;
     private Map<String, Object> requestExtras;
     private Map<String, Object> responseExtras;
 
-    public String getName() {
-        return name;
+    public String getAction() {
+        return action;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public int getStepIndex() {
