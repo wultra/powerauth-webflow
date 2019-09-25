@@ -35,12 +35,12 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
                                    @NonNull WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) {
-        // Set client_ip attribute in WebSocket session, either from the X-FORWARDED-FOR HTTP header, if it is not
+        // Set client_ip_address attribute in WebSocket session, either from the X-FORWARDED-FOR HTTP header, if it is not
         // available, use servlet request remote IP address.
         if (request instanceof ServletServerHttpRequest) {
             if (!detectIpAddress) {
                 // IP address detection is skipped, use empty String for AFS (null value is not usable in ConcurrentHashMap)
-                attributes.put("client_ip", "");
+                attributes.put("client_ip_address", "");
                 return true;
             }
             HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
@@ -60,7 +60,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
                 ipAddress = servletRequest.getRemoteAddr();
             }
 
-            attributes.put("client_ip", ipAddress);
+            attributes.put("client_ip_address", ipAddress);
         }
         return true;
     }

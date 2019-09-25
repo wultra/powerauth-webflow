@@ -155,11 +155,11 @@ public class AfsIntegrationService {
                     ApplicationContext applicationContext = operation.getApplicationContext();
                     OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                     AfsType afsType = configuration.getAfsType();
-                    String clientIp = operationSessionService.getOperationToSessionMapping(operation.getOperationId()).getClientIp();
+                    String clientIpAddress = operationSessionService.getOperationToSessionMapping(operation.getOperationId()).getClientIp();
                     int stepIndex = deriveStepIndex(operation, afsAction);
                     Map<String, Object> requestAfsExtras = prepareExtrasForAfs(operation);
                     // AuthStepResult is null due to init action
-                    AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIp, stepIndex, authStepResult, operationTerminationReason);
+                    AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIpAddress, stepIndex, authStepResult, operationTerminationReason);
                     logger.info("Executing AFS action: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
                     ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, authInstruments, requestAfsExtras);
                     AfsResponse response = afsObjectResponse.getResponseObject();

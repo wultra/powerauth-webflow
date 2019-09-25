@@ -142,13 +142,13 @@ public class OperationSessionService {
      * Lookup an operation by operation hash and store Web Socket session ID.
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket session ID.
-     * @param clientIp Remote client IP address.
+     * @param clientIpAddress Remote client IP address.
      */
-    public void storeWebSocketSessionId(String operationHash, String webSocketSessionId, String clientIp) {
+    public void storeWebSocketSessionId(String operationHash, String webSocketSessionId, String clientIpAddress) {
         OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
         if (operationSessionEntity != null) {
             operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
-            operationSessionEntity.setClientIp(clientIp);
+            operationSessionEntity.setClientIp(clientIpAddress);
             operationSessionRepository.save(operationSessionEntity);
         }
     }
