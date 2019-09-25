@@ -23,9 +23,12 @@ import java.util.Map;
 public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketHandshakeInterceptor.class);
+
+    private final boolean detectIpAddress;
     private final boolean forceIpv4;
 
-    public WebSocketHandshakeInterceptor(boolean forceIpv4) {
+    public WebSocketHandshakeInterceptor(boolean detectIpAddress, boolean forceIpv4) {
+        this.detectIpAddress = detectIpAddress;
         this.forceIpv4 = forceIpv4;
     }
 
@@ -35,6 +38,11 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
         // Set client_ip attribute in WebSocket session, either from the X-FORWARDED-FOR HTTP header, if it is not
         // available, use servlet request remote IP address.
         if (request instanceof ServletServerHttpRequest) {
+            if (!detectIpAddress) {
+                // IP address detection is skipped, use empty String for AFS (null value is not usable in ConcurrentHashMap)
+                attributes.put("client_ip", "");
+                return true;
+            }
             HttpServletRequest servletRequest = ((ServletServerHttpRequest) request).getServletRequest();
             String ipAddress = servletRequest.getHeader("X-FORWARDED-FOR");
             if (forceIpv4) {
