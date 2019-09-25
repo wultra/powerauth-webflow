@@ -118,7 +118,6 @@ CREATE TABLE ns_operation (
   user_id                   VARCHAR(256),
   organization_id           VARCHAR(256),
   result                    VARCHAR(32),
-  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_expires         TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY organization_fk (organization_id) REFERENCES ns_organization (organization_id)
