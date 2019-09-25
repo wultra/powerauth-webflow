@@ -30,7 +30,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /**
-     * Configurate http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
+     * Configure http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
      * @param http HTTP security.
      * @throws Exception Thrown when configuration fails.
      */
@@ -40,7 +40,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .httpBasic().disable()
                 .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**").and()
                 .antMatcher("/**").authorizeRequests()
-                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/FDS/**").permitAll()
+                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
