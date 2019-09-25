@@ -41,7 +41,7 @@ public class AfsRequest {
     private String organizationId;
 
     /**
-     * Operation context which provides context for creating the consent form.
+     * Operation context.
      */
     private OperationContext operationContext;
 
@@ -70,7 +70,7 @@ public class AfsRequest {
      * Constructor with all details.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * @param operationContext Operation context.
      * @param afsRequestParameters Request parameters for AFS.
      * @param authInstruments Authentication instruments used during this authentication step.
      * @param extras Extra parameters for AFS.
@@ -117,16 +117,16 @@ public class AfsRequest {
     }
 
     /**
-     * Get operation context which provides context for creating the consent form.
-     * @return Operation context which provides context for creating the consent form.
+     * Get operation context.
+     * @return Operation context.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context which provides context for creating the consent form.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * Set operation context.
+     * @param operationContext Operation context.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;
