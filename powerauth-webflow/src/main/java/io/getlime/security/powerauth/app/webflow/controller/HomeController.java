@@ -137,18 +137,20 @@ public class HomeController {
                     String operationName = objectResponse.getResponseObject().getOperationName();
                     ObjectResponse<GetOperationConfigDetailResponse> objectResponseConfig = nextStepClient.getOperationConfigDetail(operationName);
                     GetOperationConfigDetailResponse config = objectResponseConfig.getResponseObject();
-                    if (config.isAfsEnabled() && config.getAfsConfigId() != null) {
-                        Optional<AfsConfigEntity> afsConfig = afsConfigRepository.findById(config.getAfsConfigId());
-                        if (afsConfig.isPresent()) {
-                            String afsJsSnippet = afsConfig.get().getJsSnippetUrl();
-                            if (afsJsSnippet != null) {
-                                model.put("afs_js_snippet_url", afsJsSnippet);
+                    if (config.isAfsEnabled()) {
+                        if (config.getAfsConfigId() != null) {
+                            Optional<AfsConfigEntity> afsConfig = afsConfigRepository.findById(config.getAfsConfigId());
+                            if (afsConfig.isPresent()) {
+                                String afsJsSnippet = afsConfig.get().getJsSnippetUrl();
+                                if (afsJsSnippet != null) {
+                                    model.put("afs_js_snippet_url", afsJsSnippet);
+                                }
+                            } else {
+                                logger.error("AFS configuration is not available in Web Flow: {}", config.getAfsConfigId());
                             }
                         } else {
-                            logger.error("AFS configuration is not available in Web Flow: {}", config.getAfsConfigId());
+                            logger.error("AFS configuration is invalid for operation name: {}", config.getOperationName());
                         }
-                    } else if (config.getAfsConfigId() == null) {
-                        logger.error("AFS configuration is invalid for operation name: {}", config.getOperationName());
                     }
                 }
 
