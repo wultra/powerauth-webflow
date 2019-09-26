@@ -144,8 +144,8 @@ public class AfsIntegrationService {
                 if (config.isAfsEnabled()) {
                     logger.debug("AFS integration is enabled for operation name: {}", operation.getOperationName());
                     // Check that at least one previous AFS operation was triggered before executing LOGOUT action
-                    if (afsAction == AfsAction.LOGOUT && operation.getAfsActions().isEmpty()) {
-                        logger.info("AFS action for logout event is not executed because no previous action is available for operation: {}", operationId);
+                    if (afsAction == AfsAction.LOGOUT && !canExecuteLogout(operation)) {
+                        logger.debug("AFS action for LOGOUT event is not executed because previous LOGIN_AUTH action is not available for operation: {}", operationId);
                         return new AfsResponse();
                     }
                     // Prepare all AFS request parameters
@@ -184,6 +184,23 @@ public class AfsIntegrationService {
         }
         // The default response is not applied
         return new AfsResponse();
+    }
+
+    /**
+     * Determine whether LOGOUT AFS action is meaningful, a LOGIN_AUTH AFS action within same operation must be already present.
+     * @param operation Operation.
+     * @return Whether LOGOUT AFS action can be executed.
+     */
+    private boolean canExecuteLogout(GetOperationDetailResponse operation) {
+        if (operation.getAfsActions().isEmpty()) {
+            return false;
+        }
+        for (AfsActionDetail detail: operation.getAfsActions()) {
+            if (AfsAction.LOGIN_AUTH.toString().equals(detail.getAction())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
