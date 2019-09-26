@@ -23,7 +23,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -448,14 +447,13 @@ public class DataAdapterClient {
      * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @param afsRequestParameters Request parameters for AFS.
-     * @param authInstruments Authentication instruments used during this authentication step.
      * @param extras Extra parameters for AFS.
      * @return Response with indication whether consent form was successfully saved.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, Object> extras) throws DataAdapterClientErrorException {
+    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, Map<String, Object> extras) throws DataAdapterClientErrorException {
         try {
-            AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, authInstruments, extras);
+            AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, extras);
             HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<AfsResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/afs/action", HttpMethod.POST, entity,

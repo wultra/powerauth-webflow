@@ -16,11 +16,8 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -51,11 +48,6 @@ public class AfsRequest {
     private AfsRequestParameters afsRequestParameters;
 
     /**
-     * Authentication instruments used during this authentication step.
-     */
-    private final List<AuthInstrument> authInstruments = new ArrayList<>();
-
-    /**
      * Extra parameters sent with the request depending on AFS type, e.g. cookies for Threat Mark.
      */
     private final Map<String, Object> extras = new LinkedHashMap<>();
@@ -72,15 +64,13 @@ public class AfsRequest {
      * @param organizationId Organization ID.
      * @param operationContext Operation context.
      * @param afsRequestParameters Request parameters for AFS.
-     * @param authInstruments Authentication instruments used during this authentication step.
      * @param extras Extra parameters for AFS.
      */
-    public AfsRequest(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, List<AuthInstrument> authInstruments, Map<String, Object> extras) {
+    public AfsRequest(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, Map<String, Object> extras) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.operationContext = operationContext;
         this.afsRequestParameters = afsRequestParameters;
-        this.authInstruments.addAll(authInstruments);
         this.extras.putAll(extras);
     }
 
@@ -146,14 +136,6 @@ public class AfsRequest {
      */
     public void setAfsRequestParameters(AfsRequestParameters afsRequestParameters) {
         this.afsRequestParameters = afsRequestParameters;
-    }
-
-    /**
-     * Get authentication authentication instruments used during this step.
-     * @return Authentication authentication instruments used during this step.
-     */
-    public List<AuthInstrument> getAuthInstruments() {
-        return authInstruments;
     }
 
     /**

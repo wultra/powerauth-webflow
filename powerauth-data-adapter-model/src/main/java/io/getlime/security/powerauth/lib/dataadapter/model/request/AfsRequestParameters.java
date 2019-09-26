@@ -17,8 +17,12 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class AfsRequestParameters {
 
@@ -43,6 +47,11 @@ public class AfsRequestParameters {
     private int stepIndex;
 
     /**
+     * Authentication instruments used during this authentication step.
+     */
+    private final List<AuthInstrument> authInstruments = new ArrayList<>();
+
+    /**
      * Authentication step result.
      */
     private AuthStepResult authStepResult;
@@ -64,14 +73,16 @@ public class AfsRequestParameters {
      * @param afsAction AFS action.
      * @param clientIpAddress Client IP address.
      * @param stepIndex Index counter for this authentication step.
+     * @param authInstruments Authentication instruments used during this authentication step.
      * @param authStepResult Authentication step result.
      * @param operationTerminationReason Reason why operation was terminated.
      */
-    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         this.afsType = afsType;
         this.afsAction = afsAction;
         this.clientIpAddress = clientIpAddress;
         this.stepIndex = stepIndex;
+        this.authInstruments.addAll(authInstruments);
         this.authStepResult = authStepResult;
         this.operationTerminationReason = operationTerminationReason;
     }
@@ -137,6 +148,14 @@ public class AfsRequestParameters {
      */
     public void setStepIndex(int stepIndex) {
         this.stepIndex = stepIndex;
+    }
+
+    /**
+     * Get authentication authentication instruments used during this step.
+     * @return Authentication authentication instruments used during this step.
+     */
+    public List<AuthInstrument> getAuthInstruments() {
+        return authInstruments;
     }
 
     /**
