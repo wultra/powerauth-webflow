@@ -47,6 +47,11 @@ public class AfsRequestParameters {
     private int stepIndex;
 
     /**
+     * Username filled in by the user. This value is used for user identification before user is authenticated.
+     */
+    private String username;
+
+    /**
      * Authentication instruments used during this authentication step.
      */
     private final List<AuthInstrument> authInstruments = new ArrayList<>();
@@ -62,26 +67,28 @@ public class AfsRequestParameters {
     private OperationTerminationReason operationTerminationReason;
 
     /**
-     * Default constuctor.
+     * Default constructor.
      */
     public AfsRequestParameters() {
     }
 
     /**
-     * Constuctor with all details.
+     * Constructor with all details.
      * @param afsType AFS product type.
      * @param afsAction AFS action.
      * @param clientIpAddress Client IP address.
      * @param stepIndex Index counter for this authentication step.
+     * @param username Username filled in by the user, which is used before user is authenticated.
      * @param authInstruments Authentication instruments used during this authentication step.
      * @param authStepResult Authentication step result.
      * @param operationTerminationReason Reason why operation was terminated.
      */
-    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, String username, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         this.afsType = afsType;
         this.afsAction = afsAction;
         this.clientIpAddress = clientIpAddress;
         this.stepIndex = stepIndex;
+        this.username = username;
         this.authInstruments.addAll(authInstruments);
         this.authStepResult = authStepResult;
         this.operationTerminationReason = operationTerminationReason;

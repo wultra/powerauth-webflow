@@ -90,11 +90,12 @@ public class AfsIntegrationService {
      * The response from AFS is applied in Web Flow.
      *
      * @param operationId Operation ID.
+     * @param username Username filled in by the user. Use null in case user is already authenticated.
      * @param afsAction AFS action to be executed.
      * @return Response from anti-fraud system.
      */
-    public AfsResponse executeInitAction(String operationId, AfsAction afsAction) {
-        return executeAfsAction(operationId, afsAction, Collections.emptyList(), null, null);
+    public AfsResponse executeInitAction(String operationId, String username, AfsAction afsAction) {
+        return executeAfsAction(operationId, afsAction, Collections.emptyList(), null, username, null);
     }
 
     /**
@@ -103,12 +104,13 @@ public class AfsIntegrationService {
      *
      * @param operationId Operation ID.
      * @param afsAction AFS action to be executed.
+     * @param username Username filled in by the user. Use null in case user is already authenticated.
      * @param authInstruments Authentication instruments used in this step.
      * @param stepIndex Index in current authentication step.
      * @param authStepResult Authentication step result.
      */
-    public void executeAuthAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
-        executeAfsAction(operationId, afsAction, authInstruments, authStepResult, null);
+    public void executeAuthAction(String operationId, AfsAction afsAction, String username, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
+        executeAfsAction(operationId, afsAction, authInstruments, authStepResult, username, null);
     }
 
     /**
@@ -119,7 +121,7 @@ public class AfsIntegrationService {
      * @param operationTerminationReason Reason why operation was terminated.
      */
     public void executeLogoutAction(String operationId, OperationTerminationReason operationTerminationReason) {
-        executeAfsAction(operationId, AfsAction.LOGOUT, Collections.emptyList(), null, operationTerminationReason);
+        executeAfsAction(operationId, AfsAction.LOGOUT, Collections.emptyList(), null, null, operationTerminationReason);
     }
 
     /**
@@ -132,7 +134,7 @@ public class AfsIntegrationService {
      * @param operationTerminationReason Reason why operation was terminated.
      * @return Response from anti-fraud system.
      */
-    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, String username, OperationTerminationReason operationTerminationReason) {
         if (configuration.isAfsEnabled()) {
             logger.debug("AFS integration is enabled");
             try {
@@ -159,7 +161,7 @@ public class AfsIntegrationService {
                     int stepIndex = deriveStepIndex(operation, afsAction);
                     Map<String, Object> requestAfsExtras = prepareExtrasForAfs(operation);
                     // AuthStepResult is null due to init action
-                    AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIpAddress, stepIndex,authInstruments, authStepResult, operationTerminationReason);
+                    AfsRequestParameters afsRequestParameters = new AfsRequestParameters(afsType, afsAction, clientIpAddress, stepIndex, username, authInstruments, authStepResult, operationTerminationReason);
                     logger.info("Executing AFS action: {}, user ID: {}, operation ID: {}", afsAction, operation.getUserId(), operation.getOperationId());
                     ObjectResponse<AfsResponse> afsObjectResponse = dataAdapterClient.executeAfsAction(userId, organizationId, operationContext, afsRequestParameters, requestAfsExtras);
                     AfsResponse response = afsObjectResponse.getResponseObject();
