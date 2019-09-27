@@ -50,7 +50,7 @@ public enum OperationCancelReason {
     /**
      * Operation has timed out.
      */
-    OPERATION_TIMED_OUT;
+    TIMED_OUT_OPERATION;
 
     /**
      * Convert String value to OperationCancelReason enum value.

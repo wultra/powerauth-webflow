@@ -146,7 +146,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (operation.isExpired()) {
             logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
             try {
-                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.OPERATION_TIMED_OUT, null);
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -336,7 +336,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operation.getOrganizationId(), operationContext);
                 // notify AFS about logout
-                if (cancelReason == OperationCancelReason.OPERATION_TIMED_OUT) {
+                if (cancelReason == OperationCancelReason.TIMED_OUT_OPERATION) {
                     afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.TIMED_OUT);
                 } else {
                     afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
