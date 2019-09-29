@@ -77,7 +77,7 @@ public class AfsIntegrationService {
      * @param operationSessionService Operation session service.
      */
     @Autowired
-    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService, HttpServletRequest httpServletRequest) {
+    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService) {
         this.configuration = configuration;
         this.nextStepClient = nextStepClient;
         this.dataAdapterClient = dataAdapterClient;
@@ -106,10 +106,9 @@ public class AfsIntegrationService {
      * @param afsAction AFS action to be executed.
      * @param username Username filled in by the user. Use null in case user is already authenticated.
      * @param authInstruments Authentication instruments used in this step.
-     * @param stepIndex Index in current authentication step.
      * @param authStepResult Authentication step result.
      */
-    public void executeAuthAction(String operationId, AfsAction afsAction, String username, List<AuthInstrument> authInstruments, int stepIndex, AuthStepResult authStepResult) {
+    public void executeAuthAction(String operationId, AfsAction afsAction, String username, List<AuthInstrument> authInstruments, AuthStepResult authStepResult) {
         executeAfsAction(operationId, afsAction, authInstruments, authStepResult, username, null);
     }
 

@@ -699,8 +699,8 @@ public class NextStepClient {
      * @param afsLabel AFS label.
      * @param afsResponseApplied Whether AFS response was applied.
      * @param responseAfsExtras AFS response extras.
-     * @return
-     * @throws NextStepServiceException
+     * @return Response.
+     * @throws NextStepServiceException In case communication with Next Step fails.
      */
     public Response createAfsAction(String operationId, String afsAction, int stepIndex, String requestAfsExtras, String afsLabel,
                                     boolean afsResponseApplied, String responseAfsExtras) throws NextStepServiceException {
