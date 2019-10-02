@@ -19,6 +19,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.powerauth.soap.v3.ActivationStatus;
 import io.getlime.powerauth.soap.v3.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -129,18 +130,32 @@ public class AuthMethodQueryService {
      * @throws NextStepServiceException Thrown when Next Step request fails.
      */
     public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepServiceException {
-        // Retrieve pending mobile token operations for given user and check that operation with given operation ID is among them
-        ObjectResponse<List<GetOperationDetailResponse>> objectResponseOperations = nextStepClient.getPendingOperations(userId, true);
-        List<GetOperationDetailResponse> operationsForMobileToken = objectResponseOperations.getResponseObject();
-        boolean operationSupportsMobileToken = false;
-        for (GetOperationDetailResponse operation: operationsForMobileToken) {
-            if (operation.getOperationId().equals(operationId)) {
-                operationSupportsMobileToken = true;
+        // Non-SCA usage: check whether POWERAUTH_TOKEN method is available as next step for operation (used in operation review step)
+        ObjectResponse<GetOperationDetailResponse> objectResponseOperation = nextStepClient.getOperationDetail(operationId);
+        GetOperationDetailResponse operationDetail = objectResponseOperation.getResponseObject();
+        boolean mobileTokenAvailableAsNextStep = false;
+        for (AuthStep step: operationDetail.getSteps()) {
+            if (step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                mobileTokenAvailableAsNextStep = true;
                 break;
             }
         }
-        if (!operationSupportsMobileToken) {
-            return false;
+
+        // SCA usage: check whether an authentication method supporting mobile token is currently available (authentication method is already chosen)
+        if (!mobileTokenAvailableAsNextStep) {
+            // Retrieve pending mobile token operations for given user and check that operation with given operation ID is among them
+            ObjectResponse<List<GetOperationDetailResponse>> objectResponseOperations = nextStepClient.getPendingOperations(userId, true);
+            List<GetOperationDetailResponse> operationsForMobileToken = objectResponseOperations.getResponseObject();
+            boolean operationSupportsMobileToken = false;
+            for (GetOperationDetailResponse operation : operationsForMobileToken) {
+                if (operation.getOperationId().equals(operationId)) {
+                    operationSupportsMobileToken = true;
+                    break;
+                }
+            }
+            if (!operationSupportsMobileToken) {
+                return false;
+            }
         }
 
         // Retrieve activation ID configured for mobile token
