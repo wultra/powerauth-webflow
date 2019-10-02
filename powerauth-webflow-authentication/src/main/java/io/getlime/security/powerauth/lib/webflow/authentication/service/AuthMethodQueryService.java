@@ -126,7 +126,7 @@ public class AuthMethodQueryService {
      *
      * @param userId User ID.
      * @param operationId Operation ID.
-     * @return Whether Mobile Token authentication method is currently available for given user ID and operation name.
+     * @return Whether Mobile Token authentication method is currently available for given user ID and operation ID.
      * @throws NextStepServiceException Thrown when Next Step request fails.
      */
     public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepServiceException {
