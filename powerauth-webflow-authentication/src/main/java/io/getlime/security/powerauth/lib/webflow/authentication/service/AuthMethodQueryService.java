@@ -165,7 +165,7 @@ public class AuthMethodQueryService {
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
         for (GetActivationListForUserResponse.Activations activation : allActivations) {
             if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                // User has an active activation and it is the configured activation - method can be used
+                // User has an active activation and it is the configured activation - mobile token is available
                 return true;
             }
         }
