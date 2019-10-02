@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.slf4j.Logger;
@@ -78,7 +79,7 @@ public class AuthMethodQueryService {
                     if (authMethod != AuthMethod.POWERAUTH_TOKEN) {
                         return true;
                     } else {
-                        return isMobileTokenAuthMethodAvailable(userId, operationId);
+                        return isMobileTokenAvailable(userId, operationId);
                     }
                 }
             }
@@ -115,22 +116,41 @@ public class AuthMethodQueryService {
     }
 
     /**
-     * Returns whether Mobile Token authentication method is currently available by querying the PowerAuth backend for ACTIVE activations.
+     * Get information whether mobile token is available. Following checks are performed:
+     * <ul>
+     * <li>Operation is among pending operations for mobile token.</li>
+     * <li>Activation ID is configured for POWERAUTH_TOKEN method configuration for given user.</li>
+     * <li>User has an ACTIVE activation and it matches configured activation ID.</li>
+     * </ul>
+     *
      * @param userId User ID.
      * @param operationId Operation ID.
-     * @return Whether Mobile Token authentication method is available.
+     * @return Whether Mobile Token authentication method is currently available for given user ID and operation name.
      * @throws NextStepServiceException Thrown when Next Step request fails.
      */
-    public boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) throws NextStepServiceException {
-        String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
-        if (configuredActivationId == null) {
+    public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepServiceException {
+        // Retrieve pending mobile token operations for given user and check that operation with given operation ID is among them
+        ObjectResponse<List<GetOperationDetailResponse>> objectResponseOperations = nextStepClient.getPendingOperations(userId, true);
+        List<GetOperationDetailResponse> operationsForMobileToken = objectResponseOperations.getResponseObject();
+        boolean operationSupportsMobileToken = false;
+        for (GetOperationDetailResponse operation: operationsForMobileToken) {
+            if (operation.getOperationId().equals(operationId)) {
+                operationSupportsMobileToken = true;
+                break;
+            }
+        }
+        if (!operationSupportsMobileToken) {
             return false;
         }
-        // check whether user has an ACTIVE activation and it matches configured activation
+
+        // Retrieve activation ID configured for mobile token
+        String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
+
+        // Check whether user has an ACTIVE activation and it matches configured activation
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
-        for (GetActivationListForUserResponse.Activations activation: allActivations) {
+        for (GetActivationListForUserResponse.Activations activation : allActivations) {
             if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                // user has an active activation and it is the configured activation - method can be used
+                // User has an active activation and it is the configured activation - method can be used
                 return true;
             }
         }

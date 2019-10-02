@@ -79,6 +79,8 @@ ALTER TABLE ns_auth_method ADD has_mobile_token NUMBER(1) DEFAULT 0;
 
 UPDATE ns_auth_method SET has_mobile_token = 1 WHERE auth_method = 'POWERAUTH_TOKEN';
 
+ALTER TABLE ns_operation_config ADD mobile_token_enabled NUMBER(1) DEFAULT 0 NOT NULL;
+
 COMMIT;
 ```
 
@@ -193,6 +195,9 @@ UPDATE `da_sms_authorization` SET `verified` = FALSE WHERE `verified` IS NULL;
 ALTER TABLE `da_sms_authorization` ADD `has_mobile_token` BOOLEAN DEFAULT FALSE;
 
 UPDATE `ns_auth_method` SET `has_mobile_token` = TRUE WHERE `auth_method` = 'POWERAUTH_TOKEN';
+
+ALTER TABLE `ns_operation_config` ADD `mobile_token_enabled` BOOLEAN DEFAULT FALSE NOT NULL;
+
 ```
 
 As the next step, please add new authentication methods `CONSENT`, `LOGIN_SCA` and `APPROVAL_SCA`. The `order_number` parameter should be updated to exceed maximum `order_number` in table `ns_auth_method` by 1 for `CONSENT`, by 2 for `LOGIN_SCA` and by 3 for `APPROVAL_SCA`.

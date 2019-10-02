@@ -25,6 +25,7 @@ public class GetOperationConfigDetailResponse {
     private String operationName;
     private String templateVersion;
     private Integer templateId;
+    private boolean mobileTokenEnabled;
     private String mobileTokenMode;
 
     /**
@@ -73,6 +74,22 @@ public class GetOperationConfigDetailResponse {
      */
     public void setTemplateId(Integer templateId) {
         this.templateId = templateId;
+    }
+
+    /**
+     * Get whether mobile token is enabled for this operation.
+     * @return Whether mobile token is enabled.
+     */
+    public boolean isMobileTokenEnabled() {
+        return mobileTokenEnabled;
+    }
+
+    /**
+     * Set whether mobile token is enabled for this operation.
+     * @param mobileTokenEnabled Whether mobile token is enabled.
+     */
+    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
+        this.mobileTokenEnabled = mobileTokenEnabled;
     }
 
     /**

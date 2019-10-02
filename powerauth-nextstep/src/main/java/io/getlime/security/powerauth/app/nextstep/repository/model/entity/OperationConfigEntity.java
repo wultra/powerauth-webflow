@@ -43,6 +43,9 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "template_id")
     private Integer templateId;
 
+    @Column(name = "mobile_token_enabled")
+    private boolean mobileTokenEnabled;
+
     @Column(name = "mobile_token_mode")
     private String mobileTokenMode;
 
@@ -92,6 +95,22 @@ public class OperationConfigEntity implements Serializable {
      */
     public void setTemplateId(Integer templateId) {
         this.templateId = templateId;
+    }
+
+    /**
+     * Get whether mobile token is enabled for this operation.
+     * @return Whether mobile token is enabled.
+     */
+    public boolean isMobileTokenEnabled() {
+        return mobileTokenEnabled;
+    }
+
+    /**
+     * Set whether mobile token is enabled for this operation.
+     * @param mobileTokenEnabled Whether mobile token is enabled.
+     */
+    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
+        this.mobileTokenEnabled = mobileTokenEnabled;
     }
 
     /**
