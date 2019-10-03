@@ -119,9 +119,9 @@ public class AuthMethodQueryService {
     /**
      * Get information whether mobile token is available. Following checks are performed:
      * <ul>
-     * <li>Operation is among pending operations for mobile token.</li>
-     * <li>Activation ID is configured for POWERAUTH_TOKEN method configuration for given user.</li>
-     * <li>User has an ACTIVE activation and it matches configured activation ID.</li>
+     * <li>Non-SCA operations: POWERAUTH_TOKEN method is available as a next step for the operation.</li>
+     * <li>SCA operations: Operation is among pending operations for mobile token.</li>
+     * <li>User has an ACTIVE activation in PowerAuth server and it matches configured activation ID in Next Step.</li>
      * </ul>
      *
      * @param userId User ID.
