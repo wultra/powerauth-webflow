@@ -25,15 +25,12 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +38,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This service handles conversion of operation request/response objects into operation entities.
@@ -55,29 +55,27 @@ public class OperationPersistenceService {
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
     private final ObjectMapper objectMapper;
+
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
-    private final OperationConfigurationService operationConfigurationService;
-    private final AuthMethodService authMethodService;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     /**
      * Service constructor.
-     * @param idGeneratorService            ID generator service.
-     * @param operationRepository           Operation repository.
-     * @param operationHistoryRepository    Operation history repository.
-     * @param operationConfigurationService Operation configuration service.
-     * @param authMethodService             Authentication method service.
+     * @param idGeneratorService              ID generator service.
+     * @param operationRepository             Operation repository.
+     * @param operationHistoryRepository      Operation history repository.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository, OperationConfigurationService operationConfigurationService, AuthMethodService authMethodService) {
-        this.operationConfigurationService = operationConfigurationService;
-        this.authMethodService = authMethodService;
+                                       OperationHistoryRepository operationHistoryRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.objectMapper = new ObjectMapper();
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -322,49 +320,10 @@ public class OperationPersistenceService {
             if (currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE
                     && currentHistoryEntity.getChosenAuthMethod() != null) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
-                // Check whether mobile token is enabled for operation by operation name
-                try {
-                    GetOperationConfigDetailResponse config = operationConfigurationService.getOperationConfig(operation.getOperationName());
-                    if (!config.isMobileTokenEnabled()) {
-                        // Mobile token is not enabled for this operation, skip it
-                        continue;
-                    }
-                } catch (OperationNotConfiguredException e) {
-                    // Operation is not configured, skip it
-                    logger.error(e.getMessage(), e);
-                    continue;
-                }
-
-                // Consider only authentication methods which are enabled for user
-                List<UserAuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-                boolean activationConfiguredForMobileToken = false;
-                for (UserAuthMethodDetail authMethod : authMethods) {
-                    // Check whether activation ID is configured for mobile token, this configuration is set using
-                    // POWERAUTH_TOKEN authentication method.
-                    if (authMethod.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                        Map<String, String> config = authMethod.getConfig();
-                        if (config != null) {
-                            String activationId = config.get("activationId");
-                            if (activationId != null && !activationId.isEmpty()) {
-                                activationConfiguredForMobileToken = true;
-                            }
-                        }
-                    }
-                }
-                if (!activationConfiguredForMobileToken) {
-                    // Activation ID is not configured for mobile token, so mobile token cannot be used
-                    continue;
-                }
-
-                for (UserAuthMethodDetail authMethod : authMethods) {
-                    // In case the chosen auth method is enabled for user and it supports mobile token,
-                    // this operation should be added into pending operation list.
-                    if (authMethod.getAuthMethod() == chosenAuthMethod && authMethod.getHasMobileToken()) {
-                        filteredList.add(operation);
-                    }
+                if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
+                    filteredList.add(operation);
                 }
             }
-
         }
         return filteredList;
     }
