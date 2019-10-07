@@ -89,6 +89,7 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
+  mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -141,7 +141,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 // Find out whether mobile token is enabled
                 boolean mobileTokenEnabled = false;
                 try {
-                    if (authMethodQueryService.isMobileTokenAuthMethodAvailable(userId, operation.getOperationId())) {
+                    if (authMethodQueryService.isMobileTokenAvailable(userId, operation.getOperationId())) {
                         mobileTokenEnabled = true;
                     }
                 } catch (NextStepServiceException e) {
@@ -232,7 +232,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
             // Find out whether mobile token is enabled
             boolean mobileTokenEnabled = false;
             try {
-                if (authMethodQueryService.isMobileTokenAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+                if (authMethodQueryService.isMobileTokenAvailable(operation.getUserId(), operation.getOperationId())) {
                     mobileTokenEnabled = true;
                 }
             } catch (NextStepServiceException e) {
