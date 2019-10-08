@@ -62,6 +62,7 @@ export function init(component) {
                         init: true,
                         message: response.data.message,
                         passwordEnabled: response.data.passwordEnabled,
+                        smsOtpEnabled: response.data.smsOtpEnabled,
                         username: response.data.username,
                         resendDelay: response.data.resendDelay
                     }
@@ -76,6 +77,7 @@ export function init(component) {
                     init: true,
                     message: response.data.message,
                     passwordEnabled: response.data.passwordEnabled,
+                    smsOtpEnabled: response.data.smsOtpEnabled,
                     username: response.data.username,
                     resendDelay: response.data.resendDelay
                 }

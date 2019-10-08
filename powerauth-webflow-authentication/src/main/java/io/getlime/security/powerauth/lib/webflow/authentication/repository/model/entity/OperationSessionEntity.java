@@ -46,8 +46,8 @@ public class OperationSessionEntity implements Serializable {
     @Column(name = "websocket_session_id")
     private String webSocketSessionId;
 
-    @Column(name = "client_ip")
-    private String clientIp;
+    @Column(name = "client_ip_address")
+    private String clientIpAddress;
 
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
@@ -100,11 +100,11 @@ public class OperationSessionEntity implements Serializable {
     }
 
     public String getClientIp() {
-        return clientIp;
+        return clientIpAddress;
     }
 
-    public void setClientIp(String clientIp) {
-        this.clientIp = clientIp;
+    public void setClientIp(String clientIpAddress) {
+        this.clientIpAddress = clientIpAddress;
     }
 
     public AuthResult getResult() {

@@ -10,6 +10,10 @@
     <link rel="stylesheet" href="./ext-resources/css/base.css"/>
     <link rel="stylesheet" th:if="${stylesheet != null}" th:href="${stylesheet}"/>
     <link rel="stylesheet" href="./ext-resources/css/customization.css"/>
+    <th:block th:if="${afs_js_snippet_url}">
+        <!-- AFS integration -->
+        <script th:src='${afs_js_snippet_url}' async></script>
+    </th:block>
 </head>
 <body>
 

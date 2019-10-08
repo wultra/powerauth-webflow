@@ -114,6 +114,18 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.webflow.afs.forceIpv4:true}")
     private boolean afsIpv4Forced;
 
+    /**
+     * Configuration of tm_device_tag cookie for Threat Mark AFS integration.
+     */
+    @Value("${powerauth.webflow.afs.tm.cookies.deviceTag}")
+    private String tmDeviceTagCookie;
+
+    /**
+     * Configuration of tm_session_sid cookie for Threat Mark AFS integration.
+     */
+    @Value("${powerauth.webflow.afs.tm.cookies.sessionSid}")
+    private String tmSessionSidCookie;
+
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -244,4 +256,21 @@ public class WebFlowServicesConfiguration {
     public boolean isAfsIpv4Forced() {
         return afsIpv4Forced;
     }
+
+    /**
+     * Get name of tm_device_tag cookie for Threat Mark AFS integration.
+     * @return Name of tm_device_tag cookie for Threat Mark AFS integration.
+     */
+    public String getTmDeviceTagCookie() {
+        return tmDeviceTagCookie;
+    }
+
+    /**
+     * Get name of tm_session_sid cookie for Threat Mark AFS integration.
+     * @return Name of tm_session_sid cookie for Threat Mark AFS integration.
+     */
+    public String getTmSessionSidCookie() {
+        return tmSessionSidCookie;
+    }
+
 }

@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -88,6 +89,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private AuthMethodResolutionService authMethodResolutionService;
 
+    @Autowired
+    private AfsIntegrationService afsIntegrationService;
+
     /**
      * Get operation detail.
      * @return Operation detail.
@@ -141,6 +145,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         }
         if (operation.isExpired()) {
             logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
+            try {
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
+            } catch (Exception e) {
+                logger.error(e.getMessage(), e);
+            }
             throw new OperationTimeoutException("Operation has timed out");
         }
     }
@@ -255,6 +264,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, organizationId, operationContext);
+                // notify AFS about logout
+                afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
             }
@@ -289,6 +300,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
+                // notify AFS about logout
+                afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
             }
@@ -317,15 +330,22 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
-        if (response.getResponseObject().getResult()==AuthResult.FAILED) {
+        if (response.getResponseObject().getResult() == AuthResult.FAILED) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operation.getOrganizationId(), operationContext);
+                // notify AFS about logout
+                if (cancelReason == OperationCancelReason.TIMED_OUT_OPERATION) {
+                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.TIMED_OUT);
+                } else {
+                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
+                }
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
             }
         }
+
         // update operation result in operation to HTTP session mapping
         operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
         filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
@@ -435,6 +455,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getResponseObject().getFormData());
                 OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
+                // notify AFS about logout
+                afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), OperationTerminationReason.INTERRUPTED);
             } catch (NextStepServiceException | DataAdapterClientErrorException e) {
                 // errors occurring when canceling previous operations are not critical
                 logger.error("Error while canceling previous operation", e);

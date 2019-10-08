@@ -21,13 +21,8 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsDeliveryResult;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSmsAuthorizationResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAndPasswordResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifySmsAuthorizationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -47,6 +42,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAtt
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SmsAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.ResendSmsAuthorizationResponse;
@@ -62,6 +58,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -77,18 +74,21 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
     private final DataAdapterClient dataAdapterClient;
     private final WebFlowServicesConfiguration configuration;
+    private final AfsIntegrationService afsIntegrationService;
     private final HttpSession httpSession;
 
     /**
      * Controller constructor.
-     * @param dataAdapterClient Data adapter client.
+     * @param dataAdapterClient Data Adapter client.
      * @param configuration Web Flow configuration.
+     * @param afsIntegrationService Anti-fraud system integration service.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, HttpSession httpSession) {
+    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.configuration = configuration;
+        this.afsIntegrationService = afsIntegrationService;
         this.httpSession = httpSession;
     }
 
@@ -137,6 +137,35 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
                 case LOGIN_SCA:
                 case APPROVAL_SCA: {
+
+                    String authCode = request.getAuthCode();
+                    AuthStepOptions authStepOptions = getAuthStepOptionsFromHttpSession();
+                    if (authStepOptions != null) {
+                        // Authentication step options have been derived from AFS response
+
+                        if (!authStepOptions.isSmsOtpRequired() && !authStepOptions.isPasswordRequired()) {
+                            // No authentication is required, approve step
+                            cleanHttpSession();
+                            logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                        } else if (!authStepOptions.isPasswordRequired()) {
+                            // Only SMS authorization is required, skip password verification
+                            ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, operationContext);
+                            VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
+                            smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
+                            if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED) {
+                                cleanHttpSession();
+                                logger.info("Step authentication succeeded (1FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                                return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                            }
+                            remainingAttemptsDA = smsResponse.getRemainingAttempts();
+                            showRemainingAttempts = smsResponse.getShowRemainingAttempts();
+                            errorMessage = smsResponse.getErrorMessage();
+                            break;
+
+                        }
+                        // Otherwise 2FA authentication is performed
+                    }
                     PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
                     String cipherTransformation = configuration.getCipherTransformation();
                     io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection passwordProtection;
@@ -159,19 +188,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     }
 
                     String protectedPassword = passwordProtection.protect(request.getPassword());
-                    String authCode = request.getAuthCode();
                     AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
                     ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
-                    VerifySmsAndPasswordResponse smsResponse = objectResponse.getResponseObject();
-                    smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
-                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED && smsResponse.getUserAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
+                    VerifySmsAndPasswordResponse smsAndPasswordResponse = objectResponse.getResponseObject();
+                    smsAuthorizationResult = smsAndPasswordResponse.getSmsAuthorizationResult();
+                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED && smsAndPasswordResponse.getUserAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
                         cleanHttpSession();
-                        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                        logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                     }
-                    remainingAttemptsDA = smsResponse.getRemainingAttempts();
-                    showRemainingAttempts = smsResponse.getShowRemainingAttempts();
-                    errorMessage = smsResponse.getErrorMessage();
+                    remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
+                    showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
+                    errorMessage = smsAndPasswordResponse.getErrorMessage();
                     break;
                 }
 
@@ -243,6 +271,15 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
+     * Set authentication step options in HTTP session.
+     */
+    private void updateAuthStepOptionsInHttpSession(AuthStepOptions authStepOptions) {
+        synchronized (httpSession.getServletContext()) {
+            httpSession.setAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS, authStepOptions);
+        }
+    }
+
+    /**
      * Get message ID from HTTP session.
      */
     private String getMessageIdFromHttpSession() {
@@ -277,6 +314,16 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return (Boolean) httpSession.getAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
         }
     }
+
+    /**
+     * Get authentication step options from HTTP session.
+     */
+    private AuthStepOptions getAuthStepOptionsFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            return (AuthStepOptions) httpSession.getAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
+        }
+    }
+
     /**
      * Clean HTTP session.
      */
@@ -285,6 +332,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
             httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
             httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
+            httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
             httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
         }
     }
@@ -302,39 +350,76 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         checkOperationExpiration(operation);
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
-        initResponse.setResendDelay(configuration.getSmsResendDelay());
 
+        // By default enable both SMS authorization and password verification (2FA)
+        initResponse.setSmsOtpEnabled(true);
+        initResponse.setPasswordEnabled(true);
+
+        String username = null;
         if (authMethod == AuthMethod.LOGIN_SCA) {
             // Add username for LOGIN_SCA method
-            String username = getUsernameFromHttpSession();
+            username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
         }
-        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
-            // Enable password for LOGIN_SCA method
-            initResponse.setPasswordEnabled(true);
-        }
 
-        Boolean initialMessageSent = getInitialMessageSentFromHttpSession();
-        if (initialMessageSent != null && initialMessageSent) {
-            initResponse.setResult(AuthStepResult.CONFIRMED);
-            return initResponse;
+        if (configuration.isAfsEnabled()
+                && (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA)) {
+
+            // Choose current AFS action
+            AfsAction afsAction;
+            if (authMethod == AuthMethod.LOGIN_SCA) {
+                afsAction = AfsAction.LOGIN_INIT;
+            } else {
+                afsAction = AfsAction.APPROVAL_INIT;
+            }
+
+            // Execute an AFS action
+            AfsResponse afsResponse = afsIntegrationService.executeInitAction(operation.getOperationId(), username, afsAction);
+
+            // Save authentication step options derived from AFS response for authenticate step
+            updateAuthStepOptionsInHttpSession(afsResponse.getAuthStepOptions());
+
+            // Process AFS response
+            if (afsResponse.isAfsResponseApplied()) {
+                if (afsResponse.getAuthStepOptions() != null) {
+                    if (!afsResponse.getAuthStepOptions().isPasswordRequired()) {
+                        logger.debug("Disabling password verification based on AFS response in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());
+                        // Step-down for password verification
+                        initResponse.setPasswordEnabled(false);
+                    }
+                    if (!afsResponse.getAuthStepOptions().isSmsOtpRequired()) {
+                        logger.debug("Disabling SMS authorization due based on AFS response in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());
+                        // Step-down for SMS authorization
+                        initResponse.setSmsOtpEnabled(false);
+                    }
+                }
+            }
         }
 
         try {
-            CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, false);
-            String messageId = response.getMessageId();
-            if (messageId != null) {
-                updateMessageIdInHttpSession(messageId);
-                updateInitialMessageSentInHttpSession(true);
+            if (initResponse.isSmsOtpEnabled()) {
+                initResponse.setResendDelay(configuration.getSmsResendDelay());
+                Boolean initialMessageSent = getInitialMessageSentFromHttpSession();
+                if (initialMessageSent != null && initialMessageSent) {
+                    initResponse.setResult(AuthStepResult.CONFIRMED);
+                    return initResponse;
+                }
+                CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, false);
+                String messageId = response.getMessageId();
+                if (messageId != null) {
+                    updateMessageIdInHttpSession(messageId);
+                    updateInitialMessageSentInHttpSession(true);
+                }
+                if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
+                    initResponse.setResult(AuthStepResult.CONFIRMED);
+                    logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                } else {
+                    initResponse.setResult(AuthStepResult.AUTH_FAILED);
+                    initResponse.setMessage(response.getErrorMessage());
+                    logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                }
             }
-            if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
-                initResponse.setResult(AuthStepResult.CONFIRMED);
-                logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            } else {
-                initResponse.setResult(AuthStepResult.AUTH_FAILED);
-                initResponse.setMessage(response.getErrorMessage());
-                logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            }
+
             return initResponse;
         } catch (DataAdapterClientErrorException e) {
             logger.error("Error when sending SMS message.", e);
@@ -394,11 +479,45 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     public @ResponseBody SmsAuthorizationResponse authenticateHandler(@RequestBody SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
+        // Extract username for LOGIN_SCA
+        final String username;
+        if (authMethod == AuthMethod.LOGIN_SCA) {
+            username = getUsernameFromHttpSession();
+        } else {
+            // In other methods user ID is already available
+            username = null;
+        }
+        // Choose current AFS action
+        final AfsAction afsAction;
+        final List<AuthInstrument> authInstruments = new ArrayList<>();
+        if (configuration.isAfsEnabled()) {
+            if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+                if (authMethod == AuthMethod.LOGIN_SCA) {
+                    afsAction = AfsAction.LOGIN_AUTH;
+                } else {
+                    afsAction = AfsAction.APPROVAL_AUTH;
+                }
+                if (request.getPassword() != null) {
+                    authInstruments.add(AuthInstrument.PASSWORD);
+                }
+                if (request.getAuthCode() != null) {
+                    authInstruments.add(AuthInstrument.SMS_KEY);
+                }
+            } else {
+                afsAction = null;
+            }
+        } else {
+            afsAction = null;
+        }
+
         try {
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
                 public SmsAuthorizationResponse doneAuthentication(String userId) {
+                    if (afsAction != null) {
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments,  AuthStepResult.CONFIRMED);
+                    }
                     authenticateCurrentBrowserSession();
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
@@ -409,6 +528,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
                 @Override
                 public SmsAuthorizationResponse failedAuthentication(String userId, String failedReason) {
+                    if (afsAction != null) {
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
+                    }
                     clearCurrentBrowserSession();
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
@@ -419,6 +541,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
                 @Override
                 public SmsAuthorizationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
+                    if (afsAction != null) {
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.CONFIRMED);
+                    }
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
                     response.setResult(AuthStepResult.CONFIRMED);
                     response.setMessage("authentication.success");
@@ -429,6 +554,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             });
         } catch (AuthStepException e) {
             logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
+            if (afsAction != null) {
+                afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
+            }
             final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());

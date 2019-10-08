@@ -103,27 +103,33 @@ export default class SmsComponent extends React.Component {
                         ) : (
                             undefined
                         )}
-                        <div className="attribute row">
-                            <div className="message-information">
-                                <FormattedMessage id="smsAuthorization.authCodeText"/>
-                            </div>
-                        </div>
-                        <div className="attribute row">
-                            <div className="col-xs-12">
-                                <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                            </div>
-                        </div>
-                        <div className="font-small message-information">
-                            {(this.props.resendEnabled) ? (
-                                <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
-                                    <FormattedMessage id="smsAuthorization.resendActive"/>
+                        {(this.props.smsOtpEnabled) ? (
+                            <div>
+                                <div className="attribute row">
+                                    <div className="message-information">
+                                        <FormattedMessage id="smsAuthorization.authCodeText"/>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div id="resend-disabled" className="sms-resend-disabled">
-                                    <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
+                                <div className="font-small message-information">
+                                    {(this.props.resendEnabled) ? (
+                                        <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
+                                            <FormattedMessage id="smsAuthorization.resendActive"/>
+                                        </div>
+                                    ) : (
+                                        <div id="resend-disabled" className="sms-resend-disabled">
+                                            <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                         ) : (
+                             undefined
+                         )}
                         <div className="buttons">
                             <div className="attribute row">
                                 <div className="col-xs-12">

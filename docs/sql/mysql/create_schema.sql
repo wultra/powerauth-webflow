@@ -90,7 +90,8 @@ CREATE TABLE ns_operation_config (
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
-  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE
+  afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
+  afs_config_id             VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -140,6 +141,20 @@ CREATE TABLE ns_operation_history (
   FOREIGN KEY auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table ns_operation_afs stores AFS requests and responses.
+CREATE TABLE ns_operation_afs (
+  afs_action_id               INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
+  operation_id                VARCHAR(256) NOT NULL,
+  request_afs_action          VARCHAR(256) NOT NULL,
+  request_step_index          INTEGER NOT NULL,
+  request_afs_extras          VARCHAR(256),
+  response_afs_apply          BOOLEAN NOT NULL DEFAULT FALSE,
+  response_afs_label          VARCHAR(256),
+  response_afs_extras         VARCHAR(256),
+  timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY operation_afs_fk (operation_id) REFERENCES ns_operation (operation_id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
 -- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_step_definition (
@@ -162,9 +177,16 @@ CREATE TABLE wf_operation_session (
   http_session_id           VARCHAR(256) NOT NULL,
   operation_hash            VARCHAR(256),
   websocket_session_id      VARCHAR(32),
-  client_ip                 VARCHAR(32),
+  client_ip_address         VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table wf_afs_config is used to configure anti-fraud system parameters.
+CREATE TABLE wf_afs_config (
+  config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
+  js_snippet_url            VARCHAR(256) NOT NULL,
+  parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.
@@ -249,3 +271,4 @@ CREATE TABLE tpp_app_detail (
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);

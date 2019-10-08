@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -30,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCan
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.slf4j.Logger;
@@ -53,6 +55,7 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
 
     private final OperationSessionService operationSessionService;
     private final AuthMethodResolutionService authMethodResolutionService;
+    private final AfsIntegrationService afsIntegrationService;
     private final NextStepClient nextStepClient;
     private final DataAdapterClient dataAdapterClient;
 
@@ -60,13 +63,15 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
      * Constructor for Web Socket disconnect listener.
      * @param operationSessionService Operation to session mapping service.
      * @param authMethodResolutionService Authentication method resolution service.
+     * @param afsIntegrationService Anti-fraud system integration service.
      * @param nextStepClient Next Step client.
      * @param dataAdapterClient Data Adapter client.
      */
     @Autowired
-    public WebSocketDisconnectListener(OperationSessionService operationSessionService, AuthMethodResolutionService authMethodResolutionService, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient) {
+    public WebSocketDisconnectListener(OperationSessionService operationSessionService, AuthMethodResolutionService authMethodResolutionService, AfsIntegrationService afsIntegrationService, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient) {
         this.operationSessionService = operationSessionService;
         this.authMethodResolutionService = authMethodResolutionService;
+        this.afsIntegrationService = afsIntegrationService;
         this.nextStepClient = nextStepClient;
         this.dataAdapterClient = dataAdapterClient;
     }
@@ -103,6 +108,8 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
                     FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
                     OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, operationDetail.getApplicationContext());
                     dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
+                    // notify AFS about logout
+                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.INTERRUPTED);
                 } else {
                     logger.warn("Operation history is not available for operation ID {}", operationId);
                 }

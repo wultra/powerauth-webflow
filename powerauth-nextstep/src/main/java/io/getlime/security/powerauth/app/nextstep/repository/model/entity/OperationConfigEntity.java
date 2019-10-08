@@ -49,6 +49,9 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "afs_enabled")
     private boolean afsEnabled;
 
+    @Column(name = "afs_config_id")
+    private String afsConfigId;
+
     /**
      * Get operation name.
      * @return Operation name.
@@ -129,19 +132,37 @@ public class OperationConfigEntity implements Serializable {
         this.afsEnabled = afsEnabled;
     }
 
+    /**
+     * Get AFS configuration ID.
+     * @return AFS configuration ID.
+     */
+    public String getAfsConfigId() {
+        return afsConfigId;
+    }
+
+    /**
+     * Set AFS configuration ID.
+     * @param afsConfigId AFS configuration ID.
+     */
+    public void setAfsConfigId(String afsConfigId) {
+        this.afsConfigId = afsConfigId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OperationConfigEntity that = (OperationConfigEntity) o;
-        return Objects.equals(operationName, that.operationName) &&
+        return afsEnabled == that.afsEnabled &&
+                operationName.equals(that.operationName) &&
                 Objects.equals(templateVersion, that.templateVersion) &&
                 Objects.equals(templateId, that.templateId) &&
-                Objects.equals(mobileTokenMode, that.mobileTokenMode);
+                Objects.equals(mobileTokenMode, that.mobileTokenMode) &&
+                Objects.equals(afsConfigId, that.afsConfigId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(operationName, templateVersion, templateId, mobileTokenMode);
+        return Objects.hash(operationName, templateVersion, templateId, mobileTokenMode, afsEnabled, afsConfigId);
     }
 }

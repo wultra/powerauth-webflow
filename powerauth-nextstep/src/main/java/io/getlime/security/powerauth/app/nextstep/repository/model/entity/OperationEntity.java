@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -74,9 +76,14 @@ public class OperationEntity implements Serializable {
     @Column(name = "timestamp_expires")
     private Date timestampExpires;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "operation")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "operation", cascade = CascadeType.ALL)
     @OrderBy("result_id")
     private List<OperationHistoryEntity> operationHistory;
+
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "operation", cascade = CascadeType.ALL)
+    @OrderBy("timestamp_created")
+    @Fetch(value = FetchMode.SUBSELECT)
+    private List<OperationAfsActionEntity> afsActions;
 
     public String getOperationId() {
         return operationId;
@@ -197,6 +204,14 @@ public class OperationEntity implements Serializable {
 
     public void setOperationHistory(List<OperationHistoryEntity> operationHistory) {
         this.operationHistory = operationHistory;
+    }
+
+    public List<OperationAfsActionEntity> getAfsActions() {
+        return afsActions;
+    }
+
+    public void setAfsActions(List<OperationAfsActionEntity> afsActions) {
+        this.afsActions = afsActions;
     }
 
     /**
