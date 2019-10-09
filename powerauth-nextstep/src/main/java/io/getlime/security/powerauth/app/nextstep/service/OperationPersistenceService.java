@@ -42,7 +42,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This service handles conversion of operation request/response objects into operation entities.
@@ -56,11 +59,13 @@ public class OperationPersistenceService {
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
     private final ObjectMapper objectMapper;
+
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
     private final OperationAfsActionRepository operationAfsActionRepository;
     private final AuthMethodRepository authMethodRepository;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     /**
      * Service constructor.
@@ -69,16 +74,20 @@ public class OperationPersistenceService {
      * @param operationHistoryRepository   Operation history repository.
      * @param operationAfsActionRepository Operation AFS action repository.
      * @param authMethodRepository         Authentication method repository.
+     * @param idGeneratorService              ID generator service.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OperationHistoryRepository operationHistoryRepository, OperationAfsActionRepository operationAfsActionRepository, AuthMethodRepository authMethodRepository) {
         this.operationAfsActionRepository = operationAfsActionRepository;
         this.authMethodRepository = authMethodRepository;
+                                       OperationHistoryRepository operationHistoryRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.objectMapper = new ObjectMapper();
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -317,28 +326,16 @@ public class OperationPersistenceService {
             return entities;
         }
         List<OperationEntity> filteredList = new ArrayList<>();
-        List<AuthMethodEntity> authMethodEntities = authMethodRepository.findAllAuthMethods();
         for (OperationEntity operation : entities) {
-            Set<AuthMethod> authMethodsWithMobileToken = new LinkedHashSet<>();
             // Add operations whose last step is CONFIRMED with CONTINUE result and chosen authentication method supports mobile token
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
             if (currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE
                     && currentHistoryEntity.getChosenAuthMethod() != null) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
-                // Check whether chosen authentication method supports mobile token
-                for (AuthMethodEntity authMethodEntity : authMethodEntities) {
-                    if (authMethodEntity.getAuthMethod() == chosenAuthMethod && authMethodEntity.getHasMobileToken()) {
-                        authMethodsWithMobileToken.add(chosenAuthMethod);
-                        break;
-                    }
+                if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
+                    filteredList.add(operation);
                 }
             }
-
-            // There is at least one authentication method which supports mobile token, add operation into list of pending operations
-            if (!authMethodsWithMobileToken.isEmpty()) {
-                filteredList.add(operation);
-            }
-
         }
         return filteredList;
     }

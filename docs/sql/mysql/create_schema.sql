@@ -21,6 +21,7 @@ CREATE TABLE oauth_client_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -31,6 +32,7 @@ CREATE TABLE oauth_access_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
+  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
   authentication    LONG VARBINARY,
@@ -89,6 +91,7 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          CHAR NOT NULL,
   template_id               INTEGER NOT NULL,
+  mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
   afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,
   afs_config_id             VARCHAR(256)
