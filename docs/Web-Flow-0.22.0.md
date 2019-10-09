@@ -15,6 +15,9 @@ Following database changes were introduced in version `0.22.0`:
 - Table `ns_organization` has been added for organization context in Web Flow.
 - Table `ns_operation` has new column `organization_id` for organization context.
 - Table `da_sms_authorization` has new column `organization_id` for organization context.
+
+Additional column has been added in a hotfix in version `0.22.2`:
+- Table `ns_operation_config` has new column `mobile_token_enabled` for more granular mobile token configuration.
   
 DDL update script for Oracle:
 ```
