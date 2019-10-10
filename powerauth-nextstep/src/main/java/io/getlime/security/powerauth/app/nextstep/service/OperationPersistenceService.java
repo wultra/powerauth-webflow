@@ -63,26 +63,19 @@ public class OperationPersistenceService {
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
-    private final OperationAfsActionRepository operationAfsActionRepository;
-    private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     /**
      * Service constructor.
-     * @param idGeneratorService           ID generator service.
-     * @param operationRepository          Operation repository.
-     * @param operationHistoryRepository   Operation history repository.
-     * @param operationAfsActionRepository Operation AFS action repository.
-     * @param authMethodRepository         Authentication method repository.
      * @param idGeneratorService              ID generator service.
+     * @param operationRepository             Operation repository.
+     * @param operationHistoryRepository      Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository, OperationAfsActionRepository operationAfsActionRepository, AuthMethodRepository authMethodRepository) {
-        this.operationAfsActionRepository = operationAfsActionRepository;
-        this.authMethodRepository = authMethodRepository;
-                                       OperationHistoryRepository operationHistoryRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
+                                       OperationHistoryRepository operationHistoryRepository,
+                                       MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.objectMapper = new ObjectMapper();
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
