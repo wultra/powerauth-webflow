@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -65,6 +66,10 @@ public class OperationEntity implements Serializable {
 
     @Column(name = "application_extras")
     private String applicationExtras;
+
+    @Column(name = "user_account_status")
+    @Enumerated(EnumType.STRING)
+    private UserAccountStatus userAccountStatus;
 
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
@@ -163,6 +168,14 @@ public class OperationEntity implements Serializable {
 
     public void setApplicationExtras(String applicationExtras) {
         this.applicationExtras = applicationExtras;
+    }
+
+    public UserAccountStatus getUserAccountStatus() {
+        return userAccountStatus;
+    }
+
+    public void setUserAccountStatus(UserAccountStatus userAccountStatus) {
+        this.userAccountStatus = userAccountStatus;
     }
 
     public AuthResult getResult() {

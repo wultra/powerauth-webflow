@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
@@ -34,6 +35,7 @@ public class GetOperationDetailResponse {
     private String operationName;
     private String userId;
     private String organizationId;
+    private UserAccountStatus accountStatus;
     private AuthResult result;
     private Date timestampCreated;
     private Date timestampExpires;
@@ -117,6 +119,22 @@ public class GetOperationDetailResponse {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get current user account status.
+     * @return User account status.
+     */
+    public UserAccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set current user account status.
+     * @param accountStatus User account status.
+     */
+    public void setAccountStatus(UserAccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
     /**
