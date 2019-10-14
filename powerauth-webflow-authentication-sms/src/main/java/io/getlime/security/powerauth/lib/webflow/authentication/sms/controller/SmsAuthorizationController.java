@@ -501,12 +501,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         // Choose current AFS action
         final AfsAction afsAction;
         if (configuration.isAfsEnabled()) {
-            if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
-                if (authMethod == AuthMethod.LOGIN_SCA) {
-                    afsAction = AfsAction.LOGIN_AUTH;
-                } else {
-                    afsAction = AfsAction.APPROVAL_AUTH;
-                }
+            if (authMethod == AuthMethod.LOGIN_SCA) {
+                afsAction = AfsAction.LOGIN_AUTH;
+            } else if (authMethod == AuthMethod.APPROVAL_SCA) {
+                afsAction = AfsAction.APPROVAL_AUTH;
             } else {
                 afsAction = null;
             }
