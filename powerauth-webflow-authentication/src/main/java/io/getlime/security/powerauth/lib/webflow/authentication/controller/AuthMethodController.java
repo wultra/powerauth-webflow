@@ -144,7 +144,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             throw new IllegalArgumentException("Operation is null in checkOperationExpiration");
         }
         if (operation.isExpired()) {
-            logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
+            logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
             try {
                 cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
             } catch (Exception e) {

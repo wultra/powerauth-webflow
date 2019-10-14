@@ -146,7 +146,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
         // Custom handling of operation expiration, checkOperationExpiration() method is not called
         if (operation.isExpired()) {
-            logger.warn("Operation has timed out, operation ID: {}", operation.getOperationId());
+            logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
             // handle operation expiration
             try {
                 cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
