@@ -100,49 +100,9 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         String sessionId = attributes.getSessionId();
 
         if (operation == null) {
-            final String operationName = "login";
-            GetOperationConfigDetailResponse operationConfig;
-            try {
-                operationConfig = getOperationConfig(operationName);
-            } catch (AuthStepException e) {
-                logger.error("Operation configuration is missing, operation name: {}", operationName);
-                return failedOperationResponse(null, "operationConfig.missing");
-            }
-            final OperationFormData formData = new OperationFormData();
-            formData.addTitle( "login.title");
-            formData.addGreeting("login.greeting");
-            formData.addSummary("login.summary");
-            String operationData;
-            try {
-                 operationData = new OperationDataBuilder()
-                        .templateVersion(operationConfig.getTemplateVersion())
-                        .templateId(operationConfig.getTemplateId())
-                        .build();
-            } catch (InvalidOperationDataException ex) {
-                logger.error("Operation data is invalid, error: {}", ex.getMessage());
-                return failedOperationResponse(null, "operationData.invalid");
-            }
-            List<KeyValueParameter> params = new ArrayList<>();
-            logger.info("Initialized default login operation");
-            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, null, new AuthResponseProvider() {
-                @Override
-                public InitOperationResponse doneAuthentication(String userId) {
-                    logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());
-                    return completeOperationResponse();
-                }
-
-                @Override
-                public InitOperationResponse failedAuthentication(String userId, String failedReason) {
-                    logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
-                    return failedOperationResponse(null, failedReason);
-                }
-
-                @Override
-                public InitOperationResponse continueAuthentication(String operationId, String userId, List<AuthStep> steps) {
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
-                    return continueOperationResponse(operationId, steps);
-                }
-            });
+            // See https://github.com/wultra/powerauth-webflow/issues/573, default operation is no longer supported
+            logger.warn("Operation is not available and default operation is no longer supported");
+            return failedOperationResponse(null, "error.invalidRequest");
         } else {
             logger.info("Continuing operation, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
             return continueOperationWithId(operation.getOperationId(), sessionId, new AuthResponseProvider() {
