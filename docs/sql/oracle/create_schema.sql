@@ -162,7 +162,7 @@ CREATE TABLE ns_operation_afs (
   response_afs_label          VARCHAR(256),
   response_afs_extras         VARCHAR(256),
   timestamp_created           TIMESTAMP,
-  FOREIGN KEY operation_afs_fk (operation_id) REFERENCES ns_operation (operation_id)
+  CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
