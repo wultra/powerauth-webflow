@@ -17,13 +17,12 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
  * Request to update operation form data.
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UpdateOperationFormDataRequest extends AuthStepRequest {
+public class UpdateOperationFormDataRequest {
 
     private OperationFormData formData;
 

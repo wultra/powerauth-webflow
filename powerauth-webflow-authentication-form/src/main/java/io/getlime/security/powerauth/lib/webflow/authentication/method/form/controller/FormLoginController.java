@@ -146,7 +146,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             } else {
                 try {
                     if ("login.authenticationFailed".equals(authResponse.getErrorMessage())) {
-                        UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, null);
+                        UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), null);
                         if (response.getResult() == AuthResult.FAILED) {
                             // FAILED result instead of CONTINUE means the authentication method is failed
                             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");

@@ -162,8 +162,9 @@ public class OperationPersistenceService {
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
-            // Params and steps are saved as JSON for now - new entities would be required to store this data.
+            // Params, steps and auth instruments are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
+            operationHistory.setRequestAuthInstruments(objectMapper.writeValueAsString(request.getAuthInstruments()));
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {

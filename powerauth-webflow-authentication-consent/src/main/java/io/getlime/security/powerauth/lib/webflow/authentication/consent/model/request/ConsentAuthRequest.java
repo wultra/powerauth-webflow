@@ -16,8 +16,10 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.consent.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOption;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -38,5 +40,10 @@ public class ConsentAuthRequest extends AuthStepRequest {
 
     public List<ConsentOption> getOptions() {
         return options;
+    }
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.emptyList();
     }
 }

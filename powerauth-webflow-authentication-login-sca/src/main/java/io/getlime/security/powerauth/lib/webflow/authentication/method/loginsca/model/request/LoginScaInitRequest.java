@@ -15,7 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Model for an init request for SCA login.
@@ -59,5 +63,10 @@ public class LoginScaInitRequest extends AuthStepRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.emptyList();
     }
 }

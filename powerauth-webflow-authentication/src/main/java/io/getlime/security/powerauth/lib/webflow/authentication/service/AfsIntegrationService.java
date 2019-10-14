@@ -24,7 +24,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AfsRequestParameters;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AfsResponse;
@@ -108,7 +108,7 @@ public class AfsIntegrationService {
      * @param authInstruments Authentication instruments used in this step.
      * @param authStepResult Authentication step result.
      */
-    public void executeAuthAction(String operationId, AfsAction afsAction, String username, List<AuthInstrument> authInstruments, AuthStepResult authStepResult) {
+    public void executeAuthAction(String operationId, AfsAction afsAction, String username, List<AfsAuthInstrument> authInstruments, AuthStepResult authStepResult) {
         executeAfsAction(operationId, afsAction, authInstruments, authStepResult, username, null);
     }
 
@@ -133,7 +133,7 @@ public class AfsIntegrationService {
      * @param operationTerminationReason Reason why operation was terminated.
      * @return Response from anti-fraud system.
      */
-    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, String username, OperationTerminationReason operationTerminationReason) {
+    private AfsResponse executeAfsAction(String operationId, AfsAction afsAction, List<AfsAuthInstrument> authInstruments, AuthStepResult authStepResult, String username, OperationTerminationReason operationTerminationReason) {
         if (configuration.isAfsEnabled()) {
             logger.debug("AFS integration is enabled");
             try {

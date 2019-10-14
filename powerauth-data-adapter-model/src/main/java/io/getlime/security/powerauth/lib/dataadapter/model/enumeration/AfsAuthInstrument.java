@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request;
-
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
-
-import java.util.Collections;
-import java.util.List;
+package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
 
 /**
- * Model for an init request for SCA approval.
+ * Authentication instruments used for authentication / authorization during authentication steps.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class ApprovalScaInitRequest extends AuthStepRequest {
+public enum AfsAuthInstrument {
 
-    @Override
-    public List<AuthInstrument> getAuthInstruments() {
-        return Collections.emptyList();
-    }
+    /**
+     * Password is used for step authentication / authorization.
+     */
+    PASSWORD,
+
+    /**
+     * SMS authorization code is used for step authentication / authorization.
+     */
+    SMS_KEY,
+
+    /**
+     * PowerAuth mobile token application is used for step authentication / authorization.
+     */
+    POWERAUTH_TOKEN,
+
+    /**
+     * Hardware token is used for step authentication / authorization.
+     */
+    HW_TOKEN
+
 }

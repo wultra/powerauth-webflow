@@ -28,6 +28,7 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
@@ -215,6 +216,7 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param authMethod Authentication method.
+     * @param authInstruments Authentication / authorization instruments.
      * @param organizationId Organization ID.
      * @param authStepResult Result of the last step.
      * @param authStepResultDescription Description of the result of the last step.
@@ -223,7 +225,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, String organizationId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(String operationId, String userId, String organizationId, AuthMethod authMethod, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             UpdateOperationRequest request = new UpdateOperationRequest();
@@ -231,6 +233,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setOrganizationId(organizationId);
             request.setAuthMethod(authMethod);
+            request.setAuthInstruments(authInstruments);
             request.setAuthStepResult(authStepResult);
             request.setAuthStepResultDescription(authStepResultDescription);
             if (params != null) {
@@ -254,6 +257,7 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param authMethod Authentication method.
+     * @param authInstruments Used authentication / authorization instruments.
      * @param organizationId Organization ID.
      * @param authStepResult Result of the last step.
      * @param authStepResultDescription Description of the result of the last step.
@@ -262,7 +266,7 @@ public class NextStepClient {
      * @return A Response with UpdateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<UpdateOperationResponse> updateOperationPost(String operationId, String userId, String organizationId, AuthMethod authMethod, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(String operationId, String userId, String organizationId, AuthMethod authMethod, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, String authStepResultDescription, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             UpdateOperationRequest request = new UpdateOperationRequest();
@@ -270,6 +274,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setOrganizationId(organizationId);
             request.setAuthMethod(authMethod);
+            request.setAuthInstruments(authInstruments);
             request.setAuthStepResult(authStepResult);
             request.setAuthStepResultDescription(authStepResultDescription);
             if (params != null) {

@@ -41,6 +41,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -103,7 +104,7 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
                         // Authentication method is not overridden, use last known authentication method
                         authMethod = operationHistory.get(operationHistory.size() - 1).getAuthMethod();
                     }
-                    nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null, operationDetail.getApplicationContext());
+                    nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null, operationDetail.getApplicationContext());
                     // Notify Data Adapter about cancellation
                     FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
                     OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, operationDetail.getApplicationContext());
