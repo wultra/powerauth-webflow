@@ -300,8 +300,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
-                // notify AFS about logout
-                afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
             }

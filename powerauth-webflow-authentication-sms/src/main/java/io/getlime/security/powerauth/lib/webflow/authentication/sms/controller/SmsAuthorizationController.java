@@ -534,9 +534,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
                 @Override
                 public SmsAuthorizationResponse failedAuthentication(String userId, String failedReason) {
-                    if (afsAction != null) {
-                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
-                    }
                     clearCurrentBrowserSession();
                     final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
@@ -562,7 +559,14 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
             if (afsAction != null) {
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
-                afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
+                if (e instanceof MaxAttemptsExceededException) {
+                    // notify AFS about failed authentication method
+                    afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
+                    // notify AFS about logout
+                    afsIntegrationService.executeLogoutAction(operation.getOperationId(), OperationTerminationReason.FAILED);
+                } else {
+                    afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
+                }
             }
             final SmsAuthorizationResponse response = new SmsAuthorizationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);

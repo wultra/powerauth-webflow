@@ -158,6 +158,22 @@ public class AfsRequestParameters {
     }
 
     /**
+     * Get username filled in by the user.
+     * @return Username filled in by the user.
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Set username filled in by the user.
+     * @param username Username filled in by the user.
+     */
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    /**
      * Get authentication authentication instruments used during this step.
      * @return Authentication authentication instruments used during this step.
      */
