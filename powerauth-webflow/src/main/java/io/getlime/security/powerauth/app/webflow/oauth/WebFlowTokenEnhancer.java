@@ -34,7 +34,7 @@ public class WebFlowTokenEnhancer implements TokenEnhancer {
 
     private static final String LANGUAGE = "language";
     private static final String SCA = "sca";
-    private static final String ORGANIZATION_ID = "organizationId";
+    private static final String ORGANIZATION_ID = "organization_id";
 
     /**
      * Enhance access tokens with additional information.

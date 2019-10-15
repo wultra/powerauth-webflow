@@ -9,6 +9,7 @@ Following database changes were introduced in version `0.23.0`:
 - Added `afs_enabled` and `afs_config_id` columns to table `ns_operation_config`
 - Added `operation_hash`, `websocket_session_id` and `client_ip_address` columns to table `wf_operation_session`
 - Added `request_auth_instruments` column to table `ns_operation_history`
+- Added `user_account_status` column to table `ns_operation`
 - New tables `ns_operation_afs` and `wf_afs_config` for integration of anti-fraud system
 - Updated indexes and sequences
   
@@ -27,6 +28,7 @@ CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 
 ALTER TABLE ns_operation_history ADD request_auth_instruments VARCHAR(256);
+ALTER TABLE ns_operation ADD user_account_status VARCHAR(32);
 
 CREATE TABLE ns_operation_afs (
   afs_action_id               INTEGER PRIMARY KEY NOT NULL,
@@ -63,6 +65,7 @@ CREATE INDEX `wf_operation_hash` ON `wf_operation_session` (`operation_hash`);
 CREATE INDEX `wf_websocket_session` ON `wf_operation_session` (`websocket_session_id`);
 
 ALTER TABLE `ns_operation_history` ADD `request_auth_instruments` VARCHAR(256);
+ALTER TABLE `ns_operation` ADD `user_account_status` VARCHAR(32);
 
 CREATE TABLE ns_operation_afs (
   afs_action_id               INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,

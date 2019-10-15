@@ -190,6 +190,7 @@ public class OperationPersistenceService {
         OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
         operation.setOrganizationId(organizationId);
+        operation.setUserAccountStatus(request.getAccountStatus());
         operationRepository.save(operation);
     }
 

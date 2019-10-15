@@ -41,6 +41,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.Authentica
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SmsAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
@@ -78,6 +79,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private final HttpSession httpSession;
 
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
+    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -623,13 +625,14 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         }
         String userId = operation.getUserId();
         String organizationId = operation.getOrganizationId();
+        AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
         FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
         ApplicationContext applicationContext = operation.getApplicationContext();
         String operationId = operation.getOperationId();
         String operationName = operation.getOperationName();
         String operationData = operation.getOperationData();
         OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
-        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
+        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
         updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
         return daResponse.getResponseObject();
     }
