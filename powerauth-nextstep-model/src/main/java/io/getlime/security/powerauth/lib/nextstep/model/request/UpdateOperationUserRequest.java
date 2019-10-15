@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+
 /**
  * Request object used for updating a user of an operation.
  *
@@ -25,6 +27,7 @@ public class UpdateOperationUserRequest {
     private String operationId;
     private String userId;
     private String organizationId;
+    private UserAccountStatus accountStatus;
 
     /**
      * Default constructor.
@@ -37,11 +40,13 @@ public class UpdateOperationUserRequest {
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param accountStatus User account status.
      */
-    public UpdateOperationUserRequest(String operationId, String userId, String organizationId) {
+    public UpdateOperationUserRequest(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) {
         this.operationId = operationId;
         this.userId = userId;
         this.organizationId = organizationId;
+        this.accountStatus = accountStatus;
     }
 
     /**
@@ -92,4 +97,19 @@ public class UpdateOperationUserRequest {
         this.organizationId = organizationId;
     }
 
+    /**
+     * Get current user account status.
+     * @return User account status.
+     */
+    public UserAccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set current user account status.
+     * @param accountStatus User account status.
+     */
+    public void setAccountStatus(UserAccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
 }

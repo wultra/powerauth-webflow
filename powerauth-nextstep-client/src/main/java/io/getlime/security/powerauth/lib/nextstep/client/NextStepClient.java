@@ -28,6 +28,7 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
@@ -292,13 +293,14 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param accountStatus User account status.
      * @return Response.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public Response updateOperationUser(String operationId, String userId, String organizationId) throws NextStepServiceException {
+    public Response updateOperationUser(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId, accountStatus);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user", HttpMethod.PUT, entity, Response.class);
             return nsResponse.getBody();
@@ -314,13 +316,14 @@ public class NextStepClient {
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param accountStatus User account status.
      * @return Response.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public Response updateOperationUserPost(String operationId, String userId, String organizationId) throws NextStepServiceException {
+    public Response updateOperationUserPost(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId, accountStatus);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user/update", HttpMethod.POST, entity, Response.class);
             return nsResponse.getBody();

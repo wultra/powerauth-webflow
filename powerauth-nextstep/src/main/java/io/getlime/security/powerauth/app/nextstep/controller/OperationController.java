@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.app.nextstep.service.OperationConfiguration
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -169,12 +170,13 @@ public class OperationController {
         String operationId = request.getRequestObject().getOperationId();
         String userId = request.getRequestObject().getUserId();
         String organizationId = request.getRequestObject().getOrganizationId();
-        logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+        UserAccountStatus accountStatus = request.getRequestObject().getAccountStatus();
+        logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}, account status: {}", operationId, userId, organizationId, accountStatus);
 
         // persist operation user update
         operationPersistenceService.updateOperationUser(request.getRequestObject());
 
-        logger.info("The updateOperationUser request succeeded, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+        logger.info("The updateOperationUser request succeeded, operation ID: {}, user ID: {}, organization ID: {}, account status: {}", operationId, userId, organizationId, accountStatus);
         return new Response();
     }
 
@@ -199,6 +201,7 @@ public class OperationController {
         response.setOperationName(operation.getOperationName());
         response.setUserId(operation.getUserId());
         response.setOrganizationId(operation.getOrganizationId());
+        response.setAccountStatus(operation.getUserAccountStatus());
         response.setOperationData(operation.getOperationData());
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
@@ -284,6 +287,7 @@ public class OperationController {
             response.setOperationName(operation.getOperationName());
             response.setUserId(operation.getUserId());
             response.setOrganizationId(operation.getOrganizationId());
+            response.setAccountStatus(operation.getUserAccountStatus());
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());

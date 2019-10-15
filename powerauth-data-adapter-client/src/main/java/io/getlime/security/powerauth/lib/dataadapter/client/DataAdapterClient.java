@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -184,15 +185,16 @@ public class DataAdapterClient {
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
+     * @param accountStatus    User account status.
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
      * @param resend           Whether SMS is being resent.
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         try {
-            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, lang, operationContext, resend);
+            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, operationContext, resend);
             HttpEntity<ObjectRequest<CreateSmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateSmsAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,

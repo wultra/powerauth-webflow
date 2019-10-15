@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
@@ -136,6 +137,12 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             String protectedPassword = passwordProtection.protect(request.getPassword());
             String userId = lookupResponse.getResponseObject().getId();
             String organizationId = lookupResponse.getResponseObject().getOrganizationId();
+            AccountStatus accountStatus = lookupResponse.getResponseObject().getAccountStatus();
+
+            if (accountStatus != AccountStatus.ACTIVE) {
+                throw new AuthStepException("User authentication failed", "login.authenticationFailed");
+            }
+
             AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
 
             ObjectResponse<UserAuthenticationResponse> objectResponse = dataAdapterClient.authenticateUser(userId, organizationId, protectedPassword, authenticationContext, operationContext);
