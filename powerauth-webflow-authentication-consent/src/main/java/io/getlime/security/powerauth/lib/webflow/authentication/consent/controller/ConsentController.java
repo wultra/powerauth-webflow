@@ -147,7 +147,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             Integer remainingAttemptsNS;
             try {
-                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), null);
+                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
                 if (response.getResult() == AuthResult.FAILED) {
                     cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed

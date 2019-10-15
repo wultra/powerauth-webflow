@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 
@@ -54,7 +54,7 @@ public class AfsRequestParameters {
     /**
      * Authentication instruments used during this authentication step.
      */
-    private final List<AuthInstrument> authInstruments = new ArrayList<>();
+    private final List<AfsAuthInstrument> authInstruments = new ArrayList<>();
 
     /**
      * Authentication step result.
@@ -83,7 +83,7 @@ public class AfsRequestParameters {
      * @param authStepResult Authentication step result.
      * @param operationTerminationReason Reason why operation was terminated.
      */
-    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, String username, List<AuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
+    public AfsRequestParameters(AfsType afsType, AfsAction afsAction, String clientIpAddress, int stepIndex, String username, List<AfsAuthInstrument> authInstruments, AuthStepResult authStepResult, OperationTerminationReason operationTerminationReason) {
         this.afsType = afsType;
         this.afsAction = afsAction;
         this.clientIpAddress = clientIpAddress;
@@ -161,7 +161,7 @@ public class AfsRequestParameters {
      * Get authentication authentication instruments used during this step.
      * @return Authentication authentication instruments used during this step.
      */
-    public List<AuthInstrument> getAuthInstruments() {
+    public List<AfsAuthInstrument> getAuthInstruments() {
         return authInstruments;
     }
 

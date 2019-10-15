@@ -16,12 +16,11 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
-
 /**
  * Request for operation detail.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OperationDetailRequest extends AuthStepRequest {
+public class OperationDetailRequest {
+
 }

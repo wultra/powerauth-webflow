@@ -132,6 +132,7 @@ CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,
   result_id                   INTEGER NOT NULL,
   request_auth_method         VARCHAR(32) NOT NULL,
+  request_auth_instruments    VARCHAR(256),
   request_auth_step_result    VARCHAR(32) NOT NULL,
   request_params              VARCHAR(4096),
   response_result             VARCHAR(32) NOT NULL,

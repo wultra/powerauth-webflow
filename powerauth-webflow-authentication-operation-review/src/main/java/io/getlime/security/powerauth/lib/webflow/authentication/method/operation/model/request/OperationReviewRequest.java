@@ -16,7 +16,11 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Request for operation review.
@@ -24,4 +28,9 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
  * @author Petr Dvorak, petr@wultra.com
  */
 public class OperationReviewRequest extends AuthStepRequest {
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.emptyList();
+    }
 }
