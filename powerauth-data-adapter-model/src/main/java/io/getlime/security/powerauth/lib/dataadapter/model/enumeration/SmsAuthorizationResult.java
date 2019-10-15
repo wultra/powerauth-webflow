@@ -19,15 +19,15 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * Result of SMS authorization code verification.
  *
  * <ul>
- * <li>NOT_VERIFIED - SMS authorization code verification has not been performed at all.</li>
- * <li>VERIFIED_SUCCEEDED - SMS authorization code has been verified and verification succeeded.</li>
- * <li>VERIFIED_FAILED - SMS authorization code has been verified and verification failed.</li>
+ * <li>SUCCEEDED - SMS authorization code has been verified and verification succeeded.</li>
+ * <li>FAILED - SMS authorization code has been verified and verification failed.</li>
+ * <li>SKIPPED - SMS authorization code verification has not been performed at all.</li>
  * </ul>
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum SmsAuthorizationResult {
-    NOT_VERIFIED,
-    VERIFIED_SUCCEEDED,
-    VERIFIED_FAILED
+    SUCCEEDED,
+    FAILED,
+    SKIPPED
 }

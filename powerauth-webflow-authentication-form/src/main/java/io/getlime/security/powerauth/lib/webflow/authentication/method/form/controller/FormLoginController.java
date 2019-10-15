@@ -147,7 +147,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
             ObjectResponse<UserAuthenticationResponse> objectResponse = dataAdapterClient.authenticateUser(userId, organizationId, protectedPassword, authenticationContext, operationContext);
             UserAuthenticationResponse authResponse = objectResponse.getResponseObject();
-            if (authResponse.getAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
+            if (authResponse.getAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
                 logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserDetail().getId(), getAuthMethodName().toString());
                 return new AuthenticationResult(authResponse.getUserDetail().getId(), authResponse.getUserDetail().getOrganizationId());
             } else {

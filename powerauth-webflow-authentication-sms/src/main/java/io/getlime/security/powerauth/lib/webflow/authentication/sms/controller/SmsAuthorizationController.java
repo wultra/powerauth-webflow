@@ -129,7 +129,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
                     request.setAuthInstruments(Collections.singletonList(AuthInstrument.SMS_KEY));
-                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED) {
+                    if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED) {
                         cleanHttpSession();
                         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
@@ -160,7 +160,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                             VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                             smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
                             request.setAuthInstruments(Collections.singletonList(AuthInstrument.SMS_KEY));
-                            if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED) {
+                            if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED) {
                                 cleanHttpSession();
                                 logger.info("Step authentication succeeded (1FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                                 return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
@@ -205,7 +205,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
                     VerifySmsAndPasswordResponse smsAndPasswordResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsAndPasswordResponse.getSmsAuthorizationResult();
-                    if (smsAuthorizationResult == SmsAuthorizationResult.VERIFIED_SUCCEEDED && smsAndPasswordResponse.getUserAuthenticationResult() == UserAuthenticationResult.VERIFIED_SUCCEEDED) {
+                    if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED && smsAndPasswordResponse.getUserAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
                         cleanHttpSession();
                         logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
