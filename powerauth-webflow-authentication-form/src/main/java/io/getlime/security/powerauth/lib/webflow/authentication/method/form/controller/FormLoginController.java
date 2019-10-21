@@ -55,6 +55,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.Authentica
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +83,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     private final WebFlowServicesConfiguration configuration;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -148,33 +150,32 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             ObjectResponse<UserAuthenticationResponse> objectResponse = dataAdapterClient.authenticateUser(userId, organizationId, protectedPassword, authenticationContext, operationContext);
             UserAuthenticationResponse authResponse = objectResponse.getResponseObject();
             if (authResponse.getAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
+                nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, statusConverter.fromAccountStatus(accountStatus));
                 logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserDetail().getId(), getAuthMethodName().toString());
                 return new AuthenticationResult(authResponse.getUserDetail().getId(), authResponse.getUserDetail().getOrganizationId());
             } else {
-                try {
-                    if ("login.authenticationFailed".equals(authResponse.getErrorMessage())) {
-                        UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), null);
-                        if (response.getResult() == AuthResult.FAILED) {
-                            // FAILED result instead of CONTINUE means the authentication method is failed
-                            throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
-                        }
+                if ("login.authenticationFailed".equals(authResponse.getErrorMessage())) {
+                    UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), null);
+                    if (response.getResult() == AuthResult.FAILED) {
+                        // FAILED result instead of CONTINUE means the authentication method is failed
+                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                     }
-                    if (authResponse.getShowRemainingAttempts()) {
-                        GetOperationDetailResponse updatedOperation = getOperation();
-                        Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-                        AuthStepException authEx = new AuthStepException("User authentication failed", authResponse.getErrorMessage());
-                        Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
-                        Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
-                        authEx.setRemainingAttempts(remainingAttempts);
-                        throw authEx;
-                    } else {
-                        throw new AuthStepException("User authentication failed", authResponse.getErrorMessage());
-                    }
-                } catch (NextStepServiceException e) {
-                    logger.error("Error occurred in Next Step server", e);
-                    throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
+                }
+                if (authResponse.getShowRemainingAttempts()) {
+                    GetOperationDetailResponse updatedOperation = getOperation();
+                    Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
+                    AuthStepException authEx = new AuthStepException("User authentication failed", authResponse.getErrorMessage());
+                    Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
+                    Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
+                    authEx.setRemainingAttempts(remainingAttempts);
+                    throw authEx;
+                } else {
+                    throw new AuthStepException("User authentication failed", authResponse.getErrorMessage());
                 }
             }
+        } catch (NextStepServiceException e) {
+            logger.error("Error occurred in Next Step server", e);
+            throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
         } catch (DataAdapterClientErrorException e) {
             throw new AuthStepException(e.getError().getMessage(), e);
         }
