@@ -294,7 +294,7 @@ public class NextStepClient {
     }
 
     /**
-     * Update user and organization for an operation via PUT method.
+     * Update user, organization and account status for an operation via PUT method.
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
@@ -317,7 +317,7 @@ public class NextStepClient {
     }
 
     /**
-     * Update user and organization for an operation via POST method.
+     * UUpdate user, organization and account status for an operation via POST method.
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param organizationId Organization ID.
