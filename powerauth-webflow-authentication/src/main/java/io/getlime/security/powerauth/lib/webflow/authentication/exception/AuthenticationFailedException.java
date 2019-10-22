@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
 /**
- * Exception during an authentication step.
- *
- * @author Petr Dvorak, petr@wultra.com
+ * Exception thrown in case user authentication fails.
  */
-public class AuthStepException extends Exception {
+public class AuthenticationFailedException extends AuthStepException {
 
-    private Integer remainingAttempts;
-    private String messageId;
+    private boolean userAccountBlocked;
 
     /**
      * Constructor with message and message ID.
@@ -32,9 +28,8 @@ public class AuthStepException extends Exception {
      * @param message Error message.
      * @param messageId Error message localization key.
      */
-    public AuthStepException(String message, String messageId) {
-        super(message);
-        this.messageId = messageId;
+    public AuthenticationFailedException(String message, String messageId) {
+        super(message, messageId);
     }
 
     /**
@@ -43,7 +38,7 @@ public class AuthStepException extends Exception {
      * @param message Error message.
      * @param cause   Error cause (original exception, if any).
      */
-    public AuthStepException(String message, Throwable cause) {
+    public AuthenticationFailedException(String message, Throwable cause) {
         super(message, cause);
     }
 
@@ -54,32 +49,24 @@ public class AuthStepException extends Exception {
      * @param cause   Error cause (original exception, if any).
      * @param messageId Error message localization key.
      */
-    public AuthStepException(String message, Throwable cause, String messageId) {
-        super(message, cause);
-        this.messageId = messageId;
+    public AuthenticationFailedException(String message, Throwable cause, String messageId) {
+        super(message, cause, messageId);
     }
 
     /**
-     * Get number of remaining authentication attempts.
-     * @return Number of remaining attempts.
+     * Get whether user account is blocked.
+     * @return Whether user account is blocked.
      */
-    public Integer getRemainingAttempts() {
-        return remainingAttempts;
+    public boolean isUserAccountBlocked() {
+        return userAccountBlocked;
     }
 
     /**
-     * Set number of remaining authentication attempts.
-     * @param remainingAttempts Number of remaining attempts.
+     * Set whether user account is blocked.
+     * @param userAccountBlocked Whether user account is blocked.
      */
-    public void setRemainingAttempts(Integer remainingAttempts) {
-        this.remainingAttempts = remainingAttempts;
+    public void setUserAccountBlocked(boolean userAccountBlocked) {
+        this.userAccountBlocked = userAccountBlocked;
     }
 
-    /**
-     * Get error message localization key.
-     * @return Error message localization key.
-     */
-    public String getMessageId() {
-        return messageId;
-    }
 }

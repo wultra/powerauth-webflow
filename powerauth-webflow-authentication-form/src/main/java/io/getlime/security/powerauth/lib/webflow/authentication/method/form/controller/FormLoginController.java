@@ -45,6 +45,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEn
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.PrepareLoginFormDataRequest;
@@ -161,17 +162,20 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                         throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                     }
                 }
-                if (authResponse.getShowRemainingAttempts()) {
+                Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
+                boolean showRemainingAttempts = authResponse.getShowRemainingAttempts();
+                String errorMessage = authResponse.getErrorMessage();
+                boolean userAccountBlocked = authResponse.isUserAccountBlocked();
+
+                AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
+                if (showRemainingAttempts) {
                     GetOperationDetailResponse updatedOperation = getOperation();
                     Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-                    AuthStepException authEx = new AuthStepException("User authentication failed", authResponse.getErrorMessage());
-                    Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
                     Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
                     authEx.setRemainingAttempts(remainingAttempts);
-                    throw authEx;
-                } else {
-                    throw new AuthStepException("User authentication failed", authResponse.getErrorMessage());
                 }
+                authEx.setUserAccountBlocked(userAccountBlocked);
+                throw authEx;
             }
         } catch (NextStepServiceException e) {
             logger.error("Error occurred in Next Step server", e);

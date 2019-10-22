@@ -35,10 +35,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.configuration.We
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
@@ -125,9 +122,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
             SmsAuthorizationResult smsAuthorizationResult;
-            Integer remainingAttemptsDA;
-            boolean showRemainingAttempts;
-            String errorMessage;
 
             String authCode = request.getAuthCode();
             AuthStepOptions authStepOptions = getAuthStepOptionsFromHttpSession();
@@ -191,9 +185,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                 return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
             }
-            remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
-            showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
-            errorMessage = smsAndPasswordResponse.getErrorMessage();
+
+            Integer remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
+            boolean showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
+            String errorMessage = smsAndPasswordResponse.getErrorMessage();
+            boolean userAccountBlocked = smsAndPasswordResponse.isUserAccountBlocked();
 
             try {
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
@@ -202,16 +198,15 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }
+                AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
                 if (showRemainingAttempts) {
                     GetOperationDetailResponse updatedOperation = getOperation();
                     Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-                    AuthStepException authEx = new AuthStepException("SMS authorization failed", errorMessage);
                     Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
                     authEx.setRemainingAttempts(remainingAttempts);
-                    throw authEx;
-                } else {
-                    throw new AuthStepException("SMS authorization failed", errorMessage);
                 }
+                authEx.setUserAccountBlocked(userAccountBlocked);
+                throw authEx;
             } catch (NextStepServiceException e) {
                 logger.error("Error occurred in Next Step server", e);
                 throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
@@ -522,13 +517,20 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             logger.warn("Error occurred while verifying authorization code from SMS message: {}", e.getMessage());
             if (afsAction != null) {
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
-                if (e instanceof MaxAttemptsExceededException) {
-                    // notify AFS about failed authentication method
+                if (e instanceof AuthenticationFailedException) {
+                    AuthenticationFailedException authEx = (AuthenticationFailedException) e;
+                    if (authEx.isUserAccountBlocked()) {
+                        // notify AFS about failed authentication method due to the fact that user account is blocked
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
+                    } else {
+                        // notify AFS about failed authentication
+                        afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
+                    }
+                } else if (e instanceof MaxAttemptsExceededException) {
+                    // notify AFS about failed authentication method due to last attempt
                     afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
                     // notify AFS about logout
                     afsIntegrationService.executeLogoutAction(operation.getOperationId(), OperationTerminationReason.FAILED);
-                } else {
-                    afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_FAILED);
                 }
             }
             final SmsAuthorizationResponse response = new SmsAuthorizationResponse();

@@ -30,6 +30,7 @@ public class UserAuthenticationResponse {
     private String errorMessage;
     private Integer remainingAttempts;
     private boolean showRemainingAttempts;
+    private boolean userAccountBlocked;
 
     /**
      * Default constructor.
@@ -126,4 +127,21 @@ public class UserAuthenticationResponse {
     public void setShowRemainingAttempts(boolean showRemainingAttempts) {
         this.showRemainingAttempts = showRemainingAttempts;
     }
+
+    /**
+     * Get whether user account is blocked.
+     * @return Whether user account is blocked.
+     */
+    public boolean isUserAccountBlocked() {
+        return userAccountBlocked;
+    }
+
+    /**
+     * Set whether user account is blocked.
+     * @param userAccountBlocked Whether user account is blocked.
+     */
+    public void setUserAccountBlocked(boolean userAccountBlocked) {
+        this.userAccountBlocked = userAccountBlocked;
+    }
+
 }
