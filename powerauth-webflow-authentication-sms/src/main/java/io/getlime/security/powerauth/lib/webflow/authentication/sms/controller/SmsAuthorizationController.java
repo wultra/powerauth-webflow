@@ -119,6 +119,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String operationData = operation.getOperationData();
             String userId = operation.getUserId();
             String organizationId = operation.getOrganizationId();
+            AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
             SmsAuthorizationResult smsAuthorizationResult;
@@ -136,7 +137,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
-                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, operationContext);
+                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, accountStatus, operationContext);
                     VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
                     request.setAuthInstruments(Collections.singletonList(AuthInstrument.SMS_KEY));
@@ -177,7 +178,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
             String protectedPassword = passwordProtection.protect(request.getPassword());
             AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
-            ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, protectedPassword, authenticationContext, operationContext);
+            ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, accountStatus, protectedPassword, authenticationContext, operationContext);
             VerifySmsAndPasswordResponse smsAndPasswordResponse = objectResponse.getResponseObject();
             smsAuthorizationResult = smsAndPasswordResponse.getSmsAuthorizationResult();
             if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED && smsAndPasswordResponse.getUserAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {

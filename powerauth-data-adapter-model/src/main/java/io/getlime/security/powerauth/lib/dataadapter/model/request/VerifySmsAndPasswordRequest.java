@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 
 /**
  * Request for SMS authorization code and password verification.
@@ -51,6 +52,11 @@ public class VerifySmsAndPasswordRequest {
     private String organizationId;
 
     /**
+     * User account status.
+     */
+    private AccountStatus accountStatus;
+
+    /**
      * Authentication context.
      */
     private AuthenticationContext authenticationContext;
@@ -72,11 +78,13 @@ public class VerifySmsAndPasswordRequest {
      * @param authorizationCode Authorization code from user.
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
+     * @param accountStatus Current user account status.
      * @param password Password for this authentication request, optionally encrypted.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      */
-    public VerifySmsAndPasswordRequest(String messageId, String authorizationCode, String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) {
+    public VerifySmsAndPasswordRequest(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus,
+                                       String password, AuthenticationContext authenticationContext, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
         this.userId = userId;
@@ -166,6 +174,22 @@ public class VerifySmsAndPasswordRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get current user account status.
+     * @return User account status.
+     */
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set current user account status.
+     * @param accountStatus User account status.
+     */
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
     /**

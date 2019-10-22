@@ -213,6 +213,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      *
      * @param request Authentication request using username and password.
      * @return Authentication response.
+     * @throws AuthStepException Thrown in case authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody UsernamePasswordAuthResponse authenticateHandler(@RequestBody UsernamePasswordAuthRequest request) throws AuthStepException {
