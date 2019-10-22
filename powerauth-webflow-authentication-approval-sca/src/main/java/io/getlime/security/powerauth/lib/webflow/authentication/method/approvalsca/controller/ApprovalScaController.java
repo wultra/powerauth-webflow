@@ -113,6 +113,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
 
     /**
      * Initialize SCA approval.
+     * @param request SCA approval initialization request.
+     * @throws AuthStepException In case SCA approval initialization fails.
+     * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException, NextStepServiceException {
