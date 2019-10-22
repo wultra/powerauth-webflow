@@ -353,7 +353,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         if (configuration.isAfsEnabled()) {
 
             AfsAction afsAction = determineAfsActionInit(authMethod, operation.getOperationName());
-            System.out.println("AFS action: " + afsAction);
 
             if (afsAction != null) {
                 // Execute an AFS action
@@ -474,7 +473,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AfsAction afsAction;
         if (configuration.isAfsEnabled()) {
             afsAction = determineAfsActionAuth(authMethod, operation.getOperationName());
-            System.out.println("AFS action: " + afsAction);
         } else {
             afsAction = null;
         }
