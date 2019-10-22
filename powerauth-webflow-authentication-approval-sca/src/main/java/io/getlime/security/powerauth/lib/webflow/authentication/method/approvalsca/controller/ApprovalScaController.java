@@ -31,6 +31,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.approvals
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,16 +56,19 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
 
     private final NextStepClient nextStepClient;
     private final AuthMethodQueryService authMethodQueryService;
+    private final AuthenticationManagementService authenticationManagementService;
 
     /**
      * Controller constructor.
      * @param nextStepClient Next Step client.
      * @param authMethodQueryService Service for querying authentication methods.
+     * @param authenticationManagementService Authentication management service.
      */
     @Autowired
-    public ApprovalScaController(NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService) {
+    public ApprovalScaController(NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService) {
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
+        this.authenticationManagementService = authenticationManagementService;
     }
 
     /**
@@ -89,6 +93,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         // Disable bank account choice
         operation.getFormData().getUserInput().put(FIELD_BANK_ACCOUNT_CHOICE_DISABLED, "true");
         nextStepClient.updateOperationFormData(operation.getOperationId(), operation.getFormData());
+
+        // Upgrade operation to SCA
+        authenticationManagementService.upgradeToStrongCustomerAuthentication();
 
         // Find out whether mobile token is enabled
         boolean mobileTokenEnabled = false;

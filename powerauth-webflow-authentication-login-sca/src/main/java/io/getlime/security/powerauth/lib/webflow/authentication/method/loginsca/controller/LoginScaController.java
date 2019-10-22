@@ -134,6 +134,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             if (!userIdAlreadyAvailable && userId != null) {
                 // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
                 authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
+                authenticationManagementService.upgradeToStrongCustomerAuthentication();
                 nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, statusConverter.fromAccountStatus(accountStatus));
             }
             if (userId == null || accountStatus != AccountStatus.ACTIVE) {
