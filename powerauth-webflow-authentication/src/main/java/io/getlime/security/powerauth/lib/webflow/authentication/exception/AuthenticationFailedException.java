@@ -15,12 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+
 /**
  * Exception thrown in case user authentication fails.
  */
 public class AuthenticationFailedException extends AuthStepException {
 
-    private boolean userAccountBlocked;
+    private UserAccountStatus accountStatus;
 
     /**
      * Constructor with message and message ID.
@@ -54,19 +56,18 @@ public class AuthenticationFailedException extends AuthStepException {
     }
 
     /**
-     * Get whether user account is blocked.
-     * @return Whether user account is blocked.
+     * Get current user account status.
+     * @return User account status.
      */
-    public boolean isUserAccountBlocked() {
-        return userAccountBlocked;
+    public UserAccountStatus getAccountStatus() {
+        return accountStatus;
     }
 
     /**
-     * Set whether user account is blocked.
-     * @param userAccountBlocked Whether user account is blocked.
+     * Set current user account status.
+     * @param accountStatus User account status.
      */
-    public void setUserAccountBlocked(boolean userAccountBlocked) {
-        this.userAccountBlocked = userAccountBlocked;
+    public void setAccountStatus(UserAccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
-
 }

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 
@@ -30,7 +31,7 @@ public class VerifySmsAndPasswordResponse {
     private String errorMessage;
     private Integer remainingAttempts;
     private boolean showRemainingAttempts;
-    private boolean userAccountBlocked;
+    private AccountStatus accountStatus;
 
     /**
      * Default constructor.
@@ -129,19 +130,19 @@ public class VerifySmsAndPasswordResponse {
     }
 
     /**
-     * Get whether user account is blocked.
-     * @return Whether user account is blocked.
+     * Get user account status.
+     * @return User account status.
      */
-    public boolean isUserAccountBlocked() {
-        return userAccountBlocked;
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
     }
 
     /**
-     * Set whether user account is blocked.
-     * @param userAccountBlocked Whether user account is blocked.
+     * Set user account status.
+     * @param accountStatus Status.
      */
-    public void setUserAccountBlocked(boolean userAccountBlocked) {
-        this.userAccountBlocked = userAccountBlocked;
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
 }

@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -88,6 +89,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
     private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
+    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -179,7 +181,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
                 boolean showRemainingAttempts = authResponse.getShowRemainingAttempts();
                 String errorMessage = authResponse.getErrorMessage();
-                boolean userAccountBlocked = authResponse.isUserAccountBlocked();
+                UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(authResponse.getAccountStatus());
 
                 AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
                 if (showRemainingAttempts) {
@@ -188,7 +190,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
                     authEx.setRemainingAttempts(remainingAttempts);
                 }
-                authEx.setUserAccountBlocked(userAccountBlocked);
+                authEx.setAccountStatus(userAccountStatus);
                 throw authEx;
             }
         } catch (NextStepServiceException e) {
@@ -272,8 +274,8 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
                 if (e instanceof AuthenticationFailedException) {
                     AuthenticationFailedException authEx = (AuthenticationFailedException) e;
-                    if (authEx.isUserAccountBlocked()) {
-                        // notify AFS about failed authentication method due to the fact that user account is blocked
+                    if (authEx.getAccountStatus() != UserAccountStatus.ACTIVE) {
+                        // notify AFS about failed authentication method due to the fact that user account is not active
                         afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
                     } else {
                         // notify AFS about failed authentication

@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -190,7 +191,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             Integer remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
             boolean showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
             String errorMessage = smsAndPasswordResponse.getErrorMessage();
-            boolean userAccountBlocked = smsAndPasswordResponse.isUserAccountBlocked();
+            boolean userAccountBlocked = smsAndPasswordResponse.getAccountStatus() != AccountStatus.ACTIVE;
+            UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(smsAndPasswordResponse.getAccountStatus());
 
             try {
                 UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
@@ -206,7 +208,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
                     authEx.setRemainingAttempts(remainingAttempts);
                 }
-                authEx.setUserAccountBlocked(userAccountBlocked);
+                authEx.setAccountStatus(userAccountStatus);
                 throw authEx;
             } catch (NextStepServiceException e) {
                 logger.error("Error occurred in Next Step server", e);
@@ -520,8 +522,8 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 final List<AfsAuthInstrument> authInstruments = authInstrumentConverter.fromAuthInstruments(request.getAuthInstruments());
                 if (e instanceof AuthenticationFailedException) {
                     AuthenticationFailedException authEx = (AuthenticationFailedException) e;
-                    if (authEx.isUserAccountBlocked()) {
-                        // notify AFS about failed authentication method due to the fact that user account is blocked
+                    if (authEx.getAccountStatus() != UserAccountStatus.ACTIVE) {
+                        // notify AFS about failed authentication method due to the fact that user account is not active
                         afsIntegrationService.executeAuthAction(operation.getOperationId(), afsAction, username, authInstruments, AuthStepResult.AUTH_METHOD_FAILED);
                     } else {
                         // notify AFS about failed authentication
