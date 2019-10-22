@@ -36,10 +36,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.PrepareLoginFormDataRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.LoginScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.LoginScaInitResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.PrepareLoginFormDataResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
@@ -66,9 +66,9 @@ import java.util.List;
  */
 @RestController
 @RequestMapping(value = "/api/auth/login-sca")
-public class LoginScaInitController extends AuthMethodController<LoginScaInitRequest, LoginScaInitResponse, AuthStepException> {
+public class LoginScaController extends AuthMethodController<LoginScaAuthRequest, LoginScaAuthResponse, AuthStepException> {
 
-    private static final Logger logger = LoggerFactory.getLogger(LoginScaInitController.class);
+    private static final Logger logger = LoggerFactory.getLogger(LoginScaController.class);
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -88,7 +88,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
      * @param httpSession HTTP session.
      */
     @Autowired
-    public LoginScaInitController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
+    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
@@ -103,10 +103,10 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
      * @throws AuthStepException In case SCA login initialization fails.
      * @throws NextStepServiceException In case communication with Next Step service fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
-    protected LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException, NextStepServiceException {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public LoginScaAuthResponse authenticateScaLogin(@RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
-        logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
@@ -129,7 +129,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 // User ID is already set, this can happen when the user refreshes the page or another authentication method set the user ID
                 userIdAlreadyAvailable = true;
             }
-            LoginScaInitResponse response = new LoginScaInitResponse();
+            LoginScaAuthResponse response = new LoginScaAuthResponse();
             nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
             if (!userIdAlreadyAvailable && userId != null) {
                 // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
@@ -140,7 +140,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 // User ID is not available or user account is not ACTIVE, mock SMS and password fallback to avoid fishing for active accounts
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.setMobileTokenEnabled(false);
-                logger.debug("Step initialization succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                logger.debug("Step authentication succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             } else {
                 // Find out whether mobile token is enabled
@@ -155,22 +155,66 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 response.setMobileTokenEnabled(mobileTokenEnabled);
                 if (mobileTokenEnabled) {
                     response.setResult(AuthStepResult.CONFIRMED);
-                    logger.debug("Step initialization succeeded with mobile token, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                    logger.debug("Step authentication succeeded with mobile token, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                     return response;
                 } else {
                     response.setResult(AuthStepResult.CONFIRMED);
-                    logger.debug("Step initialization succeeded with SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                    logger.debug("Step authentication succeeded with SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                     return response;
                 }
             }
         } catch (DataAdapterClientErrorException e) {
             // Send error to client
-            LoginScaInitResponse response = new LoginScaInitResponse();
+            LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setRemainingAttempts(e.getError().getRemainingAttempts());
             response.setMessage(e.getError().getMessage());
             return response;
         }
+    }
+
+    /**
+     * Prepare login form data.
+     * @param request Prepare login form data request.
+     * @return Prepare login form response.
+     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
+     */
+    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    public LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException {
+        if (request == null) {
+            throw new AuthStepException("Invalid request in prepareLoginForm", "error.invalidRequest");
+        }
+        final GetOperationDetailResponse operation = getOperation();
+        logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        final LoginScaInitResponse response = new LoginScaInitResponse();
+        if (operation.getUserId() != null && operation.getOrganizationId() != null) {
+            // Username form can be skipped
+            response.setUserAlreadyKnown(true);
+            // Find out whether mobile token is enabled
+            boolean mobileTokenEnabled = false;
+            try {
+                if (authMethodQueryService.isMobileTokenAvailable(operation.getUserId(), operation.getOperationId())) {
+                    mobileTokenEnabled = true;
+                }
+            } catch (NextStepServiceException e) {
+                logger.error(e.getMessage(), e);
+            }
+            response.setMobileTokenEnabled(mobileTokenEnabled);
+            logger.info("Step init skipped, user and organization is already known, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            return response;
+        }
+        try {
+            ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
+            List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
+            for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
+                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
+                response.addOrganization(organization);
+            }
+        } catch (NextStepServiceException e) {
+            throw new CommunicationFailedException("Organization is not available");
+        }
+        logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        return response;
     }
 
     /**
@@ -217,47 +261,4 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
         }
     }
 
-    /**
-     * Prepare login form data.
-     * @param request Prepare login form data request.
-     * @return Prepare login form response.
-     * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
-     */
-    @RequestMapping(value = "/setup", method = RequestMethod.POST)
-    public PrepareLoginFormDataResponse prepareLoginForm(@RequestBody PrepareLoginFormDataRequest request) throws AuthStepException {
-        if (request == null) {
-            throw new AuthStepException("Invalid request in prepareLoginForm", "error.invalidRequest");
-        }
-        logger.info("Prepare login form data started");
-        final GetOperationDetailResponse operation = getOperation();
-        final PrepareLoginFormDataResponse response = new PrepareLoginFormDataResponse();
-        if (operation.getUserId() != null && operation.getOrganizationId() != null) {
-            // Username form can be skipped
-            response.setUserAlreadyKnown(true);
-            // Find out whether mobile token is enabled
-            boolean mobileTokenEnabled = false;
-            try {
-                if (authMethodQueryService.isMobileTokenAvailable(operation.getUserId(), operation.getOperationId())) {
-                    mobileTokenEnabled = true;
-                }
-            } catch (NextStepServiceException e) {
-                logger.error(e.getMessage(), e);
-            }
-            response.setMobileTokenEnabled(mobileTokenEnabled);
-            logger.info("Prepare login form data skipped, user and organization is already known");
-            return response;
-        }
-        try {
-            ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
-            List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
-            for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
-                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
-                response.addOrganization(organization);
-            }
-        } catch (NextStepServiceException e) {
-            throw new CommunicationFailedException("Organization is not available");
-        }
-        logger.info("Prepare login form data succeeded");
-        return response;
-    }
 }

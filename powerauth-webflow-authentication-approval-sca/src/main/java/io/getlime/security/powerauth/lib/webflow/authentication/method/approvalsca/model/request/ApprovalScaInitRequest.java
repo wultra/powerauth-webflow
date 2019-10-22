@@ -15,21 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
-
-import java.util.Collections;
-import java.util.List;
-
 /**
- * Model for an init request for SCA approval.
+ * Request object used for initializing operation approval.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class ApprovalScaInitRequest extends AuthStepRequest {
+public class ApprovalScaInitRequest {
 
-    @Override
-    public List<AuthInstrument> getAuthInstruments() {
-        return Collections.emptyList();
-    }
 }

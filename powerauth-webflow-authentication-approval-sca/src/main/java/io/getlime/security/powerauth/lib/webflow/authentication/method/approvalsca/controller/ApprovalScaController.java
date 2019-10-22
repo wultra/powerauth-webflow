@@ -26,7 +26,9 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRes
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaInitRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import org.slf4j.Logger;
@@ -45,9 +47,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(value = "/api/auth/approval-sca")
-public class ApprovalScaInitController extends AuthMethodController<ApprovalScaInitRequest, ApprovalScaInitResponse, AuthStepException> {
+public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthRequest, ApprovalScaAuthResponse, AuthStepException> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApprovalScaInitController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ApprovalScaController.class);
+
+    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
 
     private final NextStepClient nextStepClient;
     private final AuthMethodQueryService authMethodQueryService;
@@ -58,30 +62,34 @@ public class ApprovalScaInitController extends AuthMethodController<ApprovalScaI
      * @param authMethodQueryService Service for querying authentication methods.
      */
     @Autowired
-    public ApprovalScaInitController(NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService) {
+    public ApprovalScaController(NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService) {
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
     }
 
     /**
-     * Initialize SCA approval.
-     * @param request Initialization request.
-     * @return SCA approval initialization response.
-     * @throws AuthStepException In case SCA approval initialization fails.
+     * Authenticate SCA approval.
+     * @param request Authentication request.
+     * @return SCA approval authentication response.
+     * @throws AuthStepException In case SCA approval authentication fails.
      * @throws NextStepServiceException In case communication with Next Step service fails.
      */
-    @RequestMapping(value = "/init", method = RequestMethod.POST)
-    protected ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException, NextStepServiceException {
+    @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+    public ApprovalScaAuthResponse authenticateScaApproval(@RequestBody ApprovalScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
-        logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         checkOperationExpiration(operation);
         String userId = operation.getUserId();
         if (userId == null) {
             // At this point user ID must be known, method cannot continue
             throw new InvalidRequestException("User ID is missing");
         }
-        ApprovalScaInitResponse response = new ApprovalScaInitResponse();
-        nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.APPROVAL_SCA);
+        ApprovalScaAuthResponse response = new ApprovalScaAuthResponse();
+
+        // Disable bank account choice
+        operation.getFormData().getUserInput().put(FIELD_BANK_ACCOUNT_CHOICE_DISABLED, "true");
+        nextStepClient.updateOperationFormData(operation.getOperationId(), operation.getFormData());
+
         // Find out whether mobile token is enabled
         boolean mobileTokenEnabled = false;
         try {
@@ -94,13 +102,33 @@ public class ApprovalScaInitController extends AuthMethodController<ApprovalScaI
         response.setMobileTokenEnabled(mobileTokenEnabled);
         if (mobileTokenEnabled) {
             response.setResult(AuthStepResult.CONFIRMED);
-            logger.debug("Step initialization succeeded with mobile token, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            logger.debug("Step authentication succeeded with mobile token, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         } else {
             response.setResult(AuthStepResult.CONFIRMED);
-            logger.debug("Step initialization succeeded with SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+            logger.debug("Step authentication succeeded with SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
         }
+    }
+
+    /**
+     * Initialize SCA approval.
+     */
+    @RequestMapping(value = "/init", method = RequestMethod.POST)
+    public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException, NextStepServiceException {
+        GetOperationDetailResponse operation = getOperation();
+        logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        checkOperationExpiration(operation);
+        String userId = operation.getUserId();
+        if (userId == null) {
+            // At this point user ID must be known, method cannot continue
+            throw new InvalidRequestException("User ID is missing");
+        }
+        // Set chosen authentication method to APPROVAL_SCA
+        nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.APPROVAL_SCA);
+        ApprovalScaInitResponse response = new ApprovalScaInitResponse();
+        logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+        return response;
     }
 
     /**

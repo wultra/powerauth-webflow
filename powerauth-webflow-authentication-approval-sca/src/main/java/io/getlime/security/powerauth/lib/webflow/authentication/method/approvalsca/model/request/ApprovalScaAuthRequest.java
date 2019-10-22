@@ -13,13 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request;
+
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
- * Request object used for preparing login form data.
+ * Model for an init request for SCA approval.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class PrepareLoginFormDataRequest {
+public class ApprovalScaAuthRequest extends AuthStepRequest {
 
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.emptyList();
+    }
 }
