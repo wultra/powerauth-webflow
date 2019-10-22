@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response;
-
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
 
 /**
- * Model for a display login from response sent to the client.
+ * Request object used for preparing login form data.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UsernamePasswordAuthenticationResponse extends AuthStepResponse {
+public class UsernamePasswordInitRequest {
 
 }

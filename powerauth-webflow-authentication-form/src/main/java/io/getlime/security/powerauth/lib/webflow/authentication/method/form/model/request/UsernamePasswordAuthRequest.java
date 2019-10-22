@@ -26,7 +26,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
+public class UsernamePasswordAuthRequest extends AuthStepRequest {
 
     private String username;
     private String password;
