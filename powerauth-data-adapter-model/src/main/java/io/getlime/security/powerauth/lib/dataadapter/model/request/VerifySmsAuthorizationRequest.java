@@ -76,6 +76,7 @@ public class VerifySmsAuthorizationRequest {
         this.authorizationCode = authorizationCode;
         this.userId = userId;
         this.organizationId = organizationId;
+        this.accountStatus = accountStatus;
         this.operationContext = operationContext;
     }
 

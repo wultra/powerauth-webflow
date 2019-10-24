@@ -89,6 +89,7 @@ public class VerifySmsAndPasswordRequest {
         this.authorizationCode = authorizationCode;
         this.userId = userId;
         this.organizationId = organizationId;
+        this.accountStatus = accountStatus;
         this.password = password;
         this.authenticationContext = authenticationContext;
         this.operationContext = operationContext;
