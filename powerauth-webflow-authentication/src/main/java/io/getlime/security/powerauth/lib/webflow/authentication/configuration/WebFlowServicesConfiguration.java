@@ -102,6 +102,30 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.webflow.afs.type:THREAT_MARK}")
     private AfsType afsType;
 
+    /**
+     * Whether client IP address is detected in anti-fraud system integration.
+     */
+    @Value("${powerauth.webflow.afs.detectIpAddress:false}")
+    private boolean afsIpAddressDetectionEnabled;
+
+    /**
+     * Whether anti-fraud system requires IPv4 addresses.
+     */
+    @Value("${powerauth.webflow.afs.forceIpv4:true}")
+    private boolean afsIpv4Forced;
+
+    /**
+     * Configuration of tm_device_tag cookie for Threat Mark AFS integration.
+     */
+    @Value("${powerauth.webflow.afs.tm.cookies.deviceTag}")
+    private String tmDeviceTagCookie;
+
+    /**
+     * Configuration of tm_session_sid cookie for Threat Mark AFS integration.
+     */
+    @Value("${powerauth.webflow.afs.tm.cookies.sessionSid}")
+    private String tmSessionSidCookie;
+
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -216,4 +240,37 @@ public class WebFlowServicesConfiguration {
     public AfsType getAfsType() {
         return afsType;
     }
+
+    /**
+     * Get whether client IP address is detected in anti-fraud system integration.
+     * @return Whether client IP address is detected in anti-fraud system integration.
+     */
+    public boolean isAfsIpAddressDetectionEnabled() {
+        return afsIpAddressDetectionEnabled;
+    }
+
+    /**
+     * Get whether anti-fraud system requires IPv4 addresses.
+     * @return Whether anti-fraud system requires IPv4 addresses.
+     */
+    public boolean isAfsIpv4Forced() {
+        return afsIpv4Forced;
+    }
+
+    /**
+     * Get name of tm_device_tag cookie for Threat Mark AFS integration.
+     * @return Name of tm_device_tag cookie for Threat Mark AFS integration.
+     */
+    public String getTmDeviceTagCookie() {
+        return tmDeviceTagCookie;
+    }
+
+    /**
+     * Get name of tm_session_sid cookie for Threat Mark AFS integration.
+     * @return Name of tm_session_sid cookie for Threat Mark AFS integration.
+     */
+    public String getTmSessionSidCookie() {
+        return tmSessionSidCookie;
+    }
+
 }

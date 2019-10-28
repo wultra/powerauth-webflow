@@ -35,8 +35,10 @@ public class OperationConfigConverter {
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
         response.setTemplateId(operationConfig.getTemplateId());
+        response.setMobileTokenEnabled(operationConfig.isMobileTokenEnabled());
         response.setMobileTokenMode(operationConfig.getMobileTokenMode());
         response.setAfsEnabled(operationConfig.isAfsEnabled());
+        response.setAfsConfigId(operationConfig.getAfsConfigId());
         return response;
     }
 }

@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -43,6 +44,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessio
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.slf4j.Logger;
@@ -75,6 +77,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
     private final HttpSession httpSession;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -111,6 +114,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
             String userId = operation.getUserId();
             String organizationId = request.getOrganizationId();
+            AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
             boolean userIdAlreadyAvailable;
             if (userId == null) {
                 // First time invocation, user ID is not available yet
@@ -120,28 +124,29 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
                 updateUsernameInHttpSession(username);
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
                 userId = userDetailResponse.getId();
+                accountStatus = userDetailResponse.getAccountStatus();
             } else {
                 // User ID is already set, this can happen when the user refreshes the page or another authentication method set the user ID
                 userIdAlreadyAvailable = true;
             }
             LoginScaInitResponse response = new LoginScaInitResponse();
             nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
-            if (userId == null) {
-                // User ID is not available, mock SMS and password fallback to avoid fishing for active accounts
+            if (!userIdAlreadyAvailable && userId != null) {
+                // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
+                authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
+                nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, statusConverter.fromAccountStatus(accountStatus));
+            }
+            if (userId == null || accountStatus != AccountStatus.ACTIVE) {
+                // User ID is not available or user account is not ACTIVE, mock SMS and password fallback to avoid fishing for active accounts
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.setMobileTokenEnabled(false);
                 logger.debug("Step initialization succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return response;
             } else {
-                if (!userIdAlreadyAvailable) {
-                    // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
-                    authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
-                    nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId);
-                }
                 // Find out whether mobile token is enabled
                 boolean mobileTokenEnabled = false;
                 try {
-                    if (authMethodQueryService.isMobileTokenAuthMethodAvailable(userId, operation.getOperationId())) {
+                    if (authMethodQueryService.isMobileTokenAvailable(userId, operation.getOperationId())) {
                         mobileTokenEnabled = true;
                     }
                 } catch (NextStepServiceException e) {
@@ -232,7 +237,7 @@ public class LoginScaInitController extends AuthMethodController<LoginScaInitReq
             // Find out whether mobile token is enabled
             boolean mobileTokenEnabled = false;
             try {
-                if (authMethodQueryService.isMobileTokenAuthMethodAvailable(operation.getUserId(), operation.getOperationId())) {
+                if (authMethodQueryService.isMobileTokenAvailable(operation.getUserId(), operation.getOperationId())) {
                     mobileTokenEnabled = true;
                 }
             } catch (NextStepServiceException e) {

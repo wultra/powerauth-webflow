@@ -15,7 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request for SMS authorization.
@@ -26,6 +30,7 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
 
     private String authCode;
     private String password;
+    private List<AuthInstrument> authInstruments = new ArrayList<>();
 
     /**
      * Get authorization code from SMS message.
@@ -57,5 +62,18 @@ public class SmsAuthorizationRequest extends AuthStepRequest {
      */
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return authInstruments;
+    }
+
+    /**
+     * Set authorization instruments used in this request.
+     * @param authInstruments Authorization instruments used in this request.
+     */
+    public void setAuthInstruments(List<AuthInstrument> authInstruments) {
+        this.authInstruments = authInstruments;
     }
 }

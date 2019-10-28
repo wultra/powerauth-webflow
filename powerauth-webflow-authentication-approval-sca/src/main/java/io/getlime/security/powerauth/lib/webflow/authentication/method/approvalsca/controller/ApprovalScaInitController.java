@@ -85,7 +85,7 @@ public class ApprovalScaInitController extends AuthMethodController<ApprovalScaI
         // Find out whether mobile token is enabled
         boolean mobileTokenEnabled = false;
         try {
-            if (authMethodQueryService.isMobileTokenAuthMethodAvailable(userId, operation.getOperationId())) {
+            if (authMethodQueryService.isMobileTokenAvailable(userId, operation.getOperationId())) {
                 mobileTokenEnabled = true;
             }
         } catch (NextStepServiceException e) {

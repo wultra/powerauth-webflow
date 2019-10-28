@@ -75,6 +75,12 @@ public class WebFlowServerConfiguration {
     private boolean showAndroidSecurityWarning;
 
     /**
+     * Whether anti-fraud system integration is enabled.
+     */
+    @Value("${powerauth.webflow.afs.enabled:false}")
+    private boolean afsEnabled;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -131,5 +137,13 @@ public class WebFlowServerConfiguration {
      */
     public boolean getShowAndroidSecurityWarning() {
         return showAndroidSecurityWarning;
+    }
+
+    /**
+     * Get whether anti-fraud system integration is enabled.
+     * @return Whether anti-fraud system integration is enabled.
+     */
+    public boolean isAfsEnabled() {
+        return afsEnabled;
     }
 }

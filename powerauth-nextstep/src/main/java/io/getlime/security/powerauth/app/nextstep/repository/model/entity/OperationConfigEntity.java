@@ -43,11 +43,17 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "template_id")
     private Integer templateId;
 
+    @Column(name = "mobile_token_enabled")
+    private boolean mobileTokenEnabled;
+
     @Column(name = "mobile_token_mode")
     private String mobileTokenMode;
 
     @Column(name = "afs_enabled")
     private boolean afsEnabled;
+
+    @Column(name = "afs_config_id")
+    private String afsConfigId;
 
     /**
      * Get operation name.
@@ -98,6 +104,22 @@ public class OperationConfigEntity implements Serializable {
     }
 
     /**
+     * Get whether mobile token is enabled for this operation.
+     * @return Whether mobile token is enabled.
+     */
+    public boolean isMobileTokenEnabled() {
+        return mobileTokenEnabled;
+    }
+
+    /**
+     * Set whether mobile token is enabled for this operation.
+     * @param mobileTokenEnabled Whether mobile token is enabled.
+     */
+    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
+        this.mobileTokenEnabled = mobileTokenEnabled;
+    }
+
+    /**
      * Get mobile token mode configuration.
      * @return Mobile token mode configuration.
      */
@@ -129,19 +151,37 @@ public class OperationConfigEntity implements Serializable {
         this.afsEnabled = afsEnabled;
     }
 
+    /**
+     * Get AFS configuration ID.
+     * @return AFS configuration ID.
+     */
+    public String getAfsConfigId() {
+        return afsConfigId;
+    }
+
+    /**
+     * Set AFS configuration ID.
+     * @param afsConfigId AFS configuration ID.
+     */
+    public void setAfsConfigId(String afsConfigId) {
+        this.afsConfigId = afsConfigId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         OperationConfigEntity that = (OperationConfigEntity) o;
-        return Objects.equals(operationName, that.operationName) &&
+        return afsEnabled == that.afsEnabled &&
+                operationName.equals(that.operationName) &&
                 Objects.equals(templateVersion, that.templateVersion) &&
                 Objects.equals(templateId, that.templateId) &&
-                Objects.equals(mobileTokenMode, that.mobileTokenMode);
+                Objects.equals(mobileTokenMode, that.mobileTokenMode) &&
+                Objects.equals(afsConfigId, that.afsConfigId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(operationName, templateVersion, templateId, mobileTokenMode);
+        return Objects.hash(operationName, templateVersion, templateId, mobileTokenMode, afsEnabled, afsConfigId);
     }
 }

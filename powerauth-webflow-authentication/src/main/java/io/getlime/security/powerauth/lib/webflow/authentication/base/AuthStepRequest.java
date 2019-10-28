@@ -16,10 +16,20 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.base;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
+
+import java.util.List;
+
 /**
  * Base class for any authentication step requests.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class AuthStepRequest {
+public abstract class AuthStepRequest {
+
+    /**
+     * Get authentication / authorization instruments used in this step.
+     * @return Authentication / authorization instuments used in this step.
+     */
+    public abstract List<AuthInstrument> getAuthInstruments();
 }

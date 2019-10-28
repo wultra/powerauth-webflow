@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 
@@ -34,6 +35,7 @@ public class UpdateOperationRequest {
     private String userId;
     private String organizationId;
     private AuthMethod authMethod;
+    private List<AuthInstrument> authInstruments;
     private AuthStepResult authStepResult;
     private String authStepResultDescription;
     private List<KeyValueParameter> params;
@@ -108,6 +110,22 @@ public class UpdateOperationRequest {
      */
     public void setAuthMethod(AuthMethod authMethod) {
         this.authMethod = authMethod;
+    }
+
+    /**
+     * Get used authentication / authorization instruments.
+     * @return Used authentication / authorization instruments.
+     */
+    public List<AuthInstrument> getAuthInstruments() {
+        return authInstruments;
+    }
+
+    /**
+     * Set used authentication / authorization instruments.
+     * @param authInstruments Used authentication / authorization instruments.
+     */
+    public void setAuthInstruments(List<AuthInstrument> authInstruments) {
+        this.authInstruments = authInstruments;
     }
 
     /**

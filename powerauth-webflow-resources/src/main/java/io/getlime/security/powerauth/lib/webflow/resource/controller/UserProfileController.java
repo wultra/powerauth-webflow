@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.lib.webflow.resource.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.resource.configuration.WebFlowResourcesServerConfiguration;
 import io.getlime.security.powerauth.lib.webflow.resource.model.UserInfoResponse;
@@ -52,7 +53,9 @@ public class UserProfileController {
 
     private static final String LANGUAGE = "language";
     private static final String SCA = "sca";
-    private static final String ORGANIZATION_ID = "organizationId";
+    private static final String ORGANIZATION_ID = "organization_id";
+
+    private static final String ANONYMOUS_USER = "anonymousUser";
 
     private static final Logger logger = LoggerFactory.getLogger(UserProfileController.class);
 
@@ -86,6 +89,11 @@ public class UserProfileController {
 
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName(), organizationId);
 
+            if (userDetailResponse.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
+                // Return dummy user in case user account is not ACTIVE
+                return anonymousUser();
+            }
+
             UserDetailResponse userDetail = userDetailResponse.getResponseObject();
             userResponse.getUser().setId(userDetail.getId());
             userResponse.getUser().setGivenName(userDetail.getGivenName());
@@ -100,13 +108,7 @@ public class UserProfileController {
             }
             userResponse.getConnection().setOrganizationId(organizationId);
         } catch (DataAdapterClientErrorException e) {
-            // Return dummy user
-            userResponse.getUser().setId("anonymousUser");
-            userResponse.getUser().setGivenName(null);
-            userResponse.getUser().setFamilyName(null);
-            userResponse.getConnection().setLanguage("en");
-            userResponse.getConnection().setSca(false);
-            userResponse.getConnection().setOrganizationId(null);
+            return anonymousUser();
         }
         // Save service information
         userResponse.getService().setApplicationName(webFlowResourcesServerConfiguration.getApplicationName());
@@ -135,6 +137,9 @@ public class UserProfileController {
             final String organizationId = (String) additionalInfo.get(ORGANIZATION_ID);
             logger.info("Fetching user details for user with ID: {}, organization ID: {}", usedId, organizationId);
             final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId, organizationId);
+            if (userDetail.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
+                return new UserInfoResponse(ANONYMOUS_USER, null, null, null);
+            }
             final UserDetailResponse user = userDetail.getResponseObject();
             final String id = user.getId();
             final String givenName = user.getGivenName();
@@ -144,6 +149,21 @@ public class UserProfileController {
         } catch (DataAdapterClientErrorException e) {
             throw new UnauthorizedUserException("Unable to fetch user details from data adapter");
         }
+    }
+
+    /**
+     * Create dummy user for case when user does not exist or user account is not active.
+     * @return Dummy user response.
+     */
+    private UserResponse anonymousUser() {
+        UserResponse userResponse = new UserResponse();
+        userResponse.getUser().setId(ANONYMOUS_USER);
+        userResponse.getUser().setGivenName(null);
+        userResponse.getUser().setFamilyName(null);
+        userResponse.getConnection().setLanguage("en");
+        userResponse.getConnection().setSca(false);
+        userResponse.getConnection().setOrganizationId(null);
+        return userResponse;
     }
 
 }
