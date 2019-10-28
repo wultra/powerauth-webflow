@@ -40,6 +40,7 @@ public class TppAppConverter {
         }
         TppInfo tpp = new TppInfo();
         tpp.setName(tppEntity.getTppName());
+        tpp.setLicense(tppEntity.getTppLicense());
         tpp.setInfo(tppEntity.getTppInfo());
         tpp.setAddress(tppEntity.getTppAddress());
         tpp.setWebsite(tppEntity.getTppWebsite());

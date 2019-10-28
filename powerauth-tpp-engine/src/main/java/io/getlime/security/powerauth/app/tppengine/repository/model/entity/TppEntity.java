@@ -38,6 +38,9 @@ public class TppEntity implements Serializable {
     @Column(name = "tpp_name")
     private String tppName;
 
+    @Column(name = "tpp_license")
+    private String tppLicense;
+
     @Column(name = "tpp_info")
     private String tppInfo;
 
@@ -78,6 +81,14 @@ public class TppEntity implements Serializable {
 
     public void setTppName(String tppName) {
         this.tppName = tppName;
+    }
+
+    public String getTppLicense() {
+        return tppLicense;
+    }
+
+    public void setTppLicense(String tppLicense) {
+        this.tppLicense = tppLicense;
     }
 
     public String getTppInfo() {

@@ -210,7 +210,7 @@ CREATE TABLE tpp_user_consent (
   user_id               VARCHAR(256) NOT NULL,
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_updated     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -222,7 +222,7 @@ CREATE TABLE tpp_user_consent_history (
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
   consent_change        VARCHAR(16) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -230,6 +230,7 @@ CREATE TABLE tpp_user_consent_history (
 CREATE TABLE tpp_detail (
   tpp_id                INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   tpp_name              VARCHAR(256) NOT NULL,
+  tpp_license           VARCHAR(256) NOT NULL,
   tpp_info              TEXT NULL,
   tpp_address           TEXT NULL,
   tpp_website           TEXT NULL,

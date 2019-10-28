@@ -1,6 +1,7 @@
 --
 --  Create sequences.
 --
+CREATE SEQUENCE "TPP_DETAIL_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 CREATE SEQUENCE "TPP_USER_CONSENT_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 CREATE SEQUENCE "TPP_USER_CONSENT_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 
@@ -233,6 +234,28 @@ CREATE TABLE tpp_user_consent_history (
     external_id         VARCHAR(256) NOT NULL,
     consent_parameters  CLOB NOT NULL,
     timestamp_created   TIMESTAMP
+);
+
+CREATE TABLE tpp_detail (
+  tpp_id                INTEGER PRIMARY KEY NOT NULL,
+  tpp_name              VARCHAR(256) NOT NULL,
+  tpp_license           VARCHAR(256) NOT NULL,
+  tpp_info              CLOB NULL,
+  tpp_address           CLOB NULL,
+  tpp_website           CLOB NULL,
+  tpp_phone             VARCHAR(256) NULL,
+  tpp_email             VARCHAR(256) NULL,
+  tpp_logo              BLOB NULL
+);
+
+CREATE TABLE tpp_app_detail (
+  tpp_id                INTEGER NOT NULL,
+  app_client_id         VARCHAR(256) NOT NULL,
+  app_name              VARCHAR(256) NOT NULL,
+  app_info              CLOB NULL,
+  CONSTRAINT tpp_detail_pk PRIMARY KEY (tpp_id, app_client_id),
+  CONSTRAINT tpp_detail_fk FOREIGN KEY (tpp_id) REFERENCES tpp_detail (tpp_id),
+  CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth_client_details (client_id)
 );
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);

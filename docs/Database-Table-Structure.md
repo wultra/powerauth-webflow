@@ -48,7 +48,16 @@ Web Flow can coexist with PowerAuth in the same database schema or it can use a 
 ### Database Tables for the Data Adapter
 
 - **da_sms_authorization** - the table stores data for SMS OTP authorization.
+- **da_user_credentials** - the table stores information about users in case there is no external identity store available.
 
 ### Database Tables for the Web Flow Server
 
 - **wf_operation_session** - the table stores mapping of operations to HTTP sessions.
+
+### Database Tables for the TPP (Third Party Provider) Engine 
+
+- **tpp_consent** - the table stores consents templates for various consent types.
+- **tpp_user_consent** - the table stores consents given by a user to the third-party provider apps.
+- **tpp_user_consent_history** - the table stores a consent history for a given user.
+- **tpp_detail** - the table stores the details of the third party.
+- **tpp_app_detail** - the table stores the details of the third-party provider apps.
