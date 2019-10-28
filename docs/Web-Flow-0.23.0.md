@@ -24,6 +24,8 @@ ALTER TABLE wf_operation_session ADD operation_hash VARCHAR(256);
 ALTER TABLE wf_operation_session ADD websocket_session_id VARCHAR(32);
 ALTER TABLE wf_operation_session ADD client_ip_address VARCHAR(32);
 
+ALTER TABLE ns_operation ADD application_original_scopes VARCHAR(256);
+
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 
@@ -60,6 +62,8 @@ ALTER TABLE `ns_operation_config` ADD `afs_config_id` VARCHAR(256);
 ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256),  
 ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32),
 ALTER TABLE `wf_operation_session` ADD `client_ip_address` VARCHAR(32),
+
+ALTER TABLE `ns_operation` ADD `application_original_scopes` VARCHAR(256);
 
 CREATE INDEX `wf_operation_hash` ON `wf_operation_session` (`operation_hash`);
 CREATE INDEX `wf_websocket_session` ON `wf_operation_session` (`websocket_session_id`);
@@ -103,3 +107,28 @@ COMMIT;
 Note that the URI needs to be updated for each client in each environment. There is typically a different redirect URI 
 for development, testing and production environments.
 
+### Other Changes
+
+#### Storing Original OAuth 2.0 Scopes
+
+When assigning the application context to the operation, it is now possible to pass OAuth 2.0 scopes as a strongly typed attribute via the `originalScopes` attribute, like so:
+
+```json
+{
+  "requestObject": {
+    "operationId": "12341234-1234-1234-1234-123412341234",
+    "applicationContext": {
+      "id" : "democlient",
+      "name" : "Demo application",
+      "description" : "Demo application",
+      "originalScopes" : [ "aisp", "pisp" ],
+      "extras" : {
+        "applicationOwner" : "Wultra",
+        "_requestedScopes" : [ "aisp", "pisp" ]
+      }
+    }
+  }
+}
+```
+
+This is helpful when working with the operation later, especially when fetching the correct consent for the operation.

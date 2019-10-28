@@ -95,7 +95,7 @@ public class HomeController {
             loginFormSca = (OperationForm) httpSession.getAttribute("loginFormSca");
             if (loginFormSca == null) {
                 loginFormSca = new OperationForm();
-                loginFormSca.setAppContext(createApplicationContext(Collections.singletonList("AISP")));
+                loginFormSca.setAppContext(createApplicationContext(Collections.singletonList("aisp")));
             } else {
                 httpSession.removeAttribute("loginFormSca");
             }
@@ -273,9 +273,10 @@ public class HomeController {
     private String createApplicationContext(List<String> requestedScopes) throws NextStepServiceException {
         // Sample specification of ApplicationContext for OAuth 2.0 consent screen
         ApplicationContext applicationContext = new ApplicationContext();
-        applicationContext.setId("DEMO");
+        applicationContext.setId("democlient");
         applicationContext.setName("Demo application");
         applicationContext.setDescription("Web Flow demo application");
+        applicationContext.getOriginalScopes().addAll(requestedScopes);
         applicationContext.getExtras().put("_requestedScopes", requestedScopes);
         applicationContext.getExtras().put("applicationOwner", "Wultra");
 
@@ -293,7 +294,7 @@ public class HomeController {
         paymentForm.setAccount("238400856/0300");
         paymentForm.setNote("Utility Bill Payment - 05/2019");
         paymentForm.setDueDate("2019-06-29");
-        paymentForm.setAppContext(createApplicationContext(Collections.singletonList(isSca ? "PISP" : "OAUTH")));
+        paymentForm.setAppContext(createApplicationContext(Collections.singletonList(isSca ? "pisp" : "oauth")));
         return paymentForm;
     }
 }

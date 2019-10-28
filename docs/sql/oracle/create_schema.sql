@@ -116,20 +116,21 @@ CREATE TABLE ns_organization (
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
-  operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
-  operation_name            VARCHAR(32) NOT NULL,
-  operation_data            CLOB NOT NULL,
-  operation_form_data       CLOB,
-  application_id            VARCHAR(256),
-  application_name          VARCHAR(256),
-  application_description   VARCHAR(256),
-  application_extras        CLOB,
-  user_id                   VARCHAR(256),
-  organization_id           VARCHAR(256),
-  user_account_status       VARCHAR(32),
-  result                    VARCHAR(32),
-  timestamp_created         TIMESTAMP,
-  timestamp_expires         TIMESTAMP,
+  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,
+  operation_name                VARCHAR(32) NOT NULL,
+  operation_data                CLOB NOT NULL,
+  operation_form_data           CLOB,
+  application_id                VARCHAR(256),
+  application_name              VARCHAR(256),
+  application_description       VARCHAR(256),
+  application_original_scopes   VARCHAR(256),
+  application_extras            CLOB,
+  user_id                       VARCHAR(256),
+  organization_id               VARCHAR(256),
+  user_account_status           VARCHAR(32),
+  result                        VARCHAR(32),
+  timestamp_created             TIMESTAMP,
+  timestamp_expires             TIMESTAMP,
   CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
