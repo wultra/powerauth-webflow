@@ -18,9 +18,9 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 // Actions
 import {
-    cancel,
-    getOrganizationList,
     init,
+    authenticate,
+    cancel,
     organizationConfigurationError,
     selectOrganization
 } from '../actions/loginScaActions'
@@ -50,7 +50,7 @@ export default class LoginSca extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(getOrganizationList());
+        this.props.dispatch(init());
     }
 
     handleLogin(event) {
@@ -58,7 +58,7 @@ export default class LoginSca extends React.Component {
         const organizationId = this.props.context.chosenOrganizationId;
         const usernameField = "username" + "_" + organizationId;
         const username = ReactDOM.findDOMNode(this.refs[usernameField]);
-        this.props.dispatch(init(username.value, organizationId));
+        this.props.dispatch(authenticate(username.value, organizationId));
     }
 
     handleCancel(event) {

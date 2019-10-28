@@ -18,12 +18,12 @@ import {dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
- * Initialize SCA login for given username.
+ * Authenticate SCA login for given username.
  * @param username Username.
  * @param organizationId Organization ID.
  * @returns {Function} No return value.
  */
-export function init(username, organizationId) {
+export function authenticate(username, organizationId) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN_SCA",
@@ -33,7 +33,7 @@ export function init(username, organizationId) {
                 message: ""
             }
         });
-        axios.post("./api/auth/login-sca/init", {
+        axios.post("./api/auth/login-sca/authenticate", {
             username: username,
             organizationId: organizationId
         }, {
@@ -87,27 +87,11 @@ export function init(username, organizationId) {
     }
 }
 
-export function cancel() {
-    return function (dispatch) {
-        axios.post("./api/auth/login-sca/cancel", {}, {
-            headers: {
-                'X-OPERATION-HASH': operationHash,
-            }
-        }).then((response) => {
-            dispatch({
-                type: "SHOW_SCREEN_ERROR",
-                payload: {
-                    message: response.data.message
-                }
-            });
-            return null;
-        }).catch((error) => {
-            dispatchError(dispatch, error);
-        })
-    }
-}
-
-export function getOrganizationList() {
+/**
+ * Initialize SCA login.
+ * @returns {Function} No return value.
+ */
+export function init() {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN_SCA",
@@ -117,7 +101,7 @@ export function getOrganizationList() {
                 message: ""
             }
         });
-        axios.post("./api/auth/login-sca/setup", {}).then((response) => {
+        axios.post("./api/auth/login-sca/init", {}).then((response) => {
             // Handling of page refresh
             if (response.data.userAlreadyKnown) {
                 if (response.data.mobileTokenEnabled) {
@@ -153,6 +137,35 @@ export function getOrganizationList() {
     }
 }
 
+/**
+ * Cancel SCA login.
+ * @returns {Function} No return value.
+ */
+export function cancel() {
+    return function (dispatch) {
+        axios.post("./api/auth/login-sca/cancel", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_ERROR",
+                payload: {
+                    message: response.data.message
+                }
+            });
+            return null;
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+/**
+ * Select an organization.
+ * @param organizationId Organization ID.
+ * @returns {Function} No return value.
+ */
 export function selectOrganization(organizationId) {
     return function (dispatch) {
         dispatch({

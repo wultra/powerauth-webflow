@@ -142,9 +142,9 @@ public class AuthenticationManagementService {
     }
 
     /**
-     * Mark the current pending authentication authenticated.
+     * Upgrade authentication to SCA.
      */
-    public void upgradeToStrongClientAuthentication() {
+    public void upgradeToStrongCustomerAuthentication() {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         auth.setStrongAuthentication(true);
         setPendingUserAuthentication(auth);

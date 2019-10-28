@@ -20,6 +20,6 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.form.mod
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class PrepareLoginFormDataRequest {
+public class UsernamePasswordInitRequest {
 
 }

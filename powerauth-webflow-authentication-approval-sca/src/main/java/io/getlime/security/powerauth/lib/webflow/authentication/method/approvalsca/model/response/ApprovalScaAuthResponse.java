@@ -15,11 +15,31 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+
 /**
- * Response object used for initializing operation approval.
+ * Model for an init response for SCA approval.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class ApprovalScaInitResponse {
+public class ApprovalScaAuthResponse extends AuthStepResponse {
+
+    private boolean mobileTokenEnabled;
+
+    /**
+     * Get whether mobile token is enabled for this step.
+     * @return Whether mobile token is enabled for this step.
+     */
+    public boolean isMobileTokenEnabled() {
+        return mobileTokenEnabled;
+    }
+
+    /**
+     * Set whether mobile token is enabled for this step.
+     * @param mobileTokenEnabled Whether mobile token is enabled for this step.
+     */
+    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
+        this.mobileTokenEnabled = mobileTokenEnabled;
+    }
 
 }

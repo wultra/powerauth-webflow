@@ -23,6 +23,34 @@ import {handleAuthFailedError} from "./errorHandling";
  */
 export function init() {
     return function (dispatch) {
+        axios.post("./api/auth/approval-sca/init", {}).then((response) => {
+            axios.post("./api/auth/operation/detail", {}, {
+                headers: {
+                    'X-OPERATION-HASH': operationHash,
+                }
+            }).then((response) => {
+                dispatch({
+                    type: "SHOW_SCREEN_APPROVAL_SCA",
+                    loading: false,
+                    error: false,
+                    payload: response.data
+                });
+                return null;
+            }).catch((error) => {
+                dispatchError(dispatch, error);
+            })
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+/**
+ * Confirm SCA approval.
+ * @returns {Function} No return value.
+ */
+export function confirm() {
+    return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_APPROVAL_SCA",
             payload: {
@@ -31,7 +59,7 @@ export function init() {
                 message: ""
             }
         });
-        axios.post("./api/auth/approval-sca/init", {}, {
+        axios.post("./api/auth/approval-sca/authenticate", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
@@ -81,6 +109,10 @@ export function init() {
     }
 }
 
+/**
+ * Cancel SCA approval.
+ * @returns {Function} No return value.
+ */
 export function cancel() {
     return function (dispatch) {
         axios.post("./api/auth/approval-sca/cancel", {}, {

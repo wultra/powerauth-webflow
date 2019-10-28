@@ -215,13 +215,14 @@ public class DataAdapterClient {
      * @param authorizationCode User entered authorization code.
      * @param userId            User ID.
      * @param organizationId    Organization ID.
+     * @param accountStatus     User account status.
      * @param operationContext  Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
-    public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, operationContext);
+            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, accountStatus, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<VerifySmsAuthorizationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAuthorizationResponse>>() {
             });
@@ -241,14 +242,15 @@ public class DataAdapterClient {
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
      * @param password Password for this authentication request, optionally encrypted.
+     * @param accountStatus Current user account status.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, password, authenticationContext, operationContext);
+            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, accountStatus, password, authenticationContext, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<VerifySmsAndPasswordResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAndPasswordResponse>>() {
             });
