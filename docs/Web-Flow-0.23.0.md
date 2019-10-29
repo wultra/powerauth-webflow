@@ -30,6 +30,7 @@ CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 
 ALTER TABLE ns_operation_history ADD request_auth_instruments VARCHAR(256);
+ALTER TABLE ns_operation_history ADD mobile_token_active NUMBER(1) DEFAULT 0 NOT NULL;
 ALTER TABLE ns_operation ADD user_account_status VARCHAR(32);
 
 CREATE TABLE ns_operation_afs (
@@ -69,6 +70,7 @@ CREATE INDEX `wf_operation_hash` ON `wf_operation_session` (`operation_hash`);
 CREATE INDEX `wf_websocket_session` ON `wf_operation_session` (`websocket_session_id`);
 
 ALTER TABLE `ns_operation_history` ADD `request_auth_instruments` VARCHAR(256);
+ALTER TABLE `ns_operation_history` ADD `mobile_token_active` BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE `ns_operation` ADD `user_account_status` VARCHAR(32);
 
 CREATE TABLE ns_operation_afs (

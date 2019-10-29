@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
@@ -57,18 +58,21 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
 
     private final WebFlowServicesConfiguration webFlowServicesConfiguration;
     private final PushMessageService pushMessageService;
+    private final NextStepClient nextStepClient;
     private final HttpSession httpSession;
 
     /**
      * Controller constructor.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
+     * @param nextStepClient Next Step client.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public MobileTokenOnlineController(WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
+    public MobileTokenOnlineController(WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, NextStepClient nextStepClient, HttpSession httpSession) {
         this.webFlowServicesConfiguration = webFlowServicesConfiguration;
         this.pushMessageService = pushMessageService;
+        this.nextStepClient = nextStepClient;
         this.httpSession = httpSession;
     }
 
@@ -124,6 +128,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
             // Allow fallback to SMS in authentication method LOGIN_SCA
             initResponse.setSmsFallbackAvailable(true);
+        }
+        if (authMethod == AuthMethod.POWERAUTH_TOKEN) {
+            // User selected POWERAUTH_TOKEN in a non-SCA step, set mobile token as active
+            nextStepClient.updateMobileToken(operation.getOperationId(), true);
         }
         logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         return initResponse;
