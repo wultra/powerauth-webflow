@@ -1086,7 +1086,8 @@ Documentation for operation data is available [in a separate document](https://d
           "formattedValues": {},
           "note": "Utility Bill Payment - 05/2019"
         }
-      ],
+      ]
+    },
       "applicationContext": {
         "id": "DEMO",
         "name": "Demo application",
@@ -1097,7 +1098,6 @@ Documentation for operation data is available [in a separate document](https://d
             "PISP"
           ]
         }
-      }
     }
   }
 }

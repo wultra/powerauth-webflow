@@ -45,6 +45,9 @@ public class OperationHistoryEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthMethod requestAuthMethod;
 
+    @Column(name = "request_auth_instruments")
+    private String requestAuthInstruments;
+
     @Column(name = "request_params")
     private String requestParams;
 
@@ -101,6 +104,14 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setRequestAuthMethod(AuthMethod requestAuthMethod) {
         this.requestAuthMethod = requestAuthMethod;
+    }
+
+    public String getRequestAuthInstruments() {
+        return requestAuthInstruments;
+    }
+
+    public void setRequestAuthInstruments(String requestAuthInstruments) {
+        this.requestAuthInstruments = requestAuthInstruments;
     }
 
     public String getRequestParams() {

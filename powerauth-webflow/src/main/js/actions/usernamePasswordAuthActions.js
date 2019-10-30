@@ -108,7 +108,7 @@ export function cancel() {
     }
 }
 
-export function getOrganizationList() {
+export function init() {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN",
@@ -118,7 +118,7 @@ export function getOrganizationList() {
                 message: ""
             }
         });
-        axios.post("./api/auth/form/setup", {}).then((response) => {
+        axios.post("./api/auth/form/init", {}).then((response) => {
             dispatch({
                 type: "SHOW_SCREEN_LOGIN",
                 payload: response.data

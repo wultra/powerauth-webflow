@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import org.springframework.core.ParameterizedTypeReference;
@@ -40,6 +41,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Data Adapter Client provides methods for communication with the Data Adapter.
@@ -183,15 +185,16 @@ public class DataAdapterClient {
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
+     * @param accountStatus    User account status.
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
      * @param resend           Whether SMS is being resent.
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         try {
-            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, lang, operationContext, resend);
+            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, operationContext, resend);
             HttpEntity<ObjectRequest<CreateSmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateSmsAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
@@ -212,13 +215,14 @@ public class DataAdapterClient {
      * @param authorizationCode User entered authorization code.
      * @param userId            User ID.
      * @param organizationId    Organization ID.
+     * @param accountStatus     User account status.
      * @param operationContext  Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
-    public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, operationContext);
+            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, accountStatus, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<VerifySmsAuthorizationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAuthorizationResponse>>() {
             });
@@ -238,14 +242,15 @@ public class DataAdapterClient {
      * @param userId User ID for this authentication request.
      * @param organizationId Organization ID for this authentication request.
      * @param password Password for this authentication request, optionally encrypted.
+     * @param accountStatus Current user account status.
      * @param authenticationContext Authentication context.
      * @param operationContext Operation context.
      * @return Empty response returned when action succeeds.
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
-    public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
-            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, password, authenticationContext, operationContext);
+            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, accountStatus, password, authenticationContext, operationContext);
             HttpEntity<ObjectRequest<VerifySmsAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<VerifySmsAndPasswordResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAndPasswordResponse>>() {
             });
@@ -430,6 +435,33 @@ public class DataAdapterClient {
             ResponseEntity<ObjectResponse<SaveConsentFormResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/consent/save", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<SaveConsentFormResponse>>() {
+                    });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Execute an anti-fraud system action with information about current step and retrieve response which can override
+     * authentication instruments used in current authentication step.
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @param operationContext Operation context.
+     * @param afsRequestParameters Request parameters for AFS.
+     * @param extras Extra parameters for AFS.
+     * @return Response with indication whether consent form was successfully saved.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, Map<String, Object> extras) throws DataAdapterClientErrorException {
+        try {
+            AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, extras);
+            HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<AfsResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/api/afs/action", HttpMethod.POST, entity,
+                    new ParameterizedTypeReference<ObjectResponse<AfsResponse>>() {
                     });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

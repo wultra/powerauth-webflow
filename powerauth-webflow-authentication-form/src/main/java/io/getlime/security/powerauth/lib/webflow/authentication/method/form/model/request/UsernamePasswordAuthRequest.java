@@ -15,14 +15,18 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Model for a username / password authentication request from client.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
+public class UsernamePasswordAuthRequest extends AuthStepRequest {
 
     private String username;
     private String password;
@@ -78,5 +82,10 @@ public class UsernamePasswordAuthenticationRequest extends AuthStepRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.singletonList(AuthInstrument.PASSWORD);
     }
 }

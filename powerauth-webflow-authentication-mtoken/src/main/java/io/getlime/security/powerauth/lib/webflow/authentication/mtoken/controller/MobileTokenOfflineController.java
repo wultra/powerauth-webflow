@@ -153,7 +153,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), null);
+            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
             if (response.getResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
                 cleanHttpSession();

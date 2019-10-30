@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class PrepareLoginFormDataResponse {
+public class UsernamePasswordInitResponse {
 
     private List<OrganizationDetail> organizations = new ArrayList<>();
 

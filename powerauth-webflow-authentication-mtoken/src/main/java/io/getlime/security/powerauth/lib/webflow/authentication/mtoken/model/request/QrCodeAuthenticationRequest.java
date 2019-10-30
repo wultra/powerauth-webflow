@@ -1,6 +1,10 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Request for QR code based authentication in offline mode for mobile token.
@@ -61,4 +65,8 @@ public class QrCodeAuthenticationRequest extends AuthStepRequest {
         this.nonce = nonce;
     }
 
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
+    }
 }

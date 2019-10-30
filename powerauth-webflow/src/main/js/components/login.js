@@ -18,9 +18,9 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 // Actions
 import {
+    init,
     authenticate,
     cancel,
-    getOrganizationList,
     organizationConfigurationError,
     selectOrganization
 } from '../actions/usernamePasswordAuthActions'
@@ -51,7 +51,7 @@ export default class Login extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(getOrganizationList());
+        this.props.dispatch(init());
     }
 
     handleLogin(event) {

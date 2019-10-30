@@ -30,7 +30,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     /**
-     * Configurate http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
+     * Configure http security for OAuth 2.0 authentication, URL exceptions, CSRF tokens, etc.
      * @param http HTTP security.
      * @throws Exception Thrown when configuration fails.
      */

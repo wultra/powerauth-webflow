@@ -15,7 +15,9 @@
  */
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.interceptor.WebSocketHandshakeInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -33,13 +35,21 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     public static final String MESSAGE_PREFIX = "/topic";
 
+    private final WebFlowServicesConfiguration configuration;
+
+    @Autowired
+    public WebSocketConfiguration(WebFlowServicesConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
     /**
      * Stomp endpoint registration for Web Sockets.
      * @param registry Stomp endpoint registry.
      */
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/websocket").addInterceptors(new WebSocketHandshakeInterceptor()).setAllowedOrigins("*").withSockJS();
+        WebSocketHandshakeInterceptor interceptor = new WebSocketHandshakeInterceptor(configuration.isAfsIpAddressDetectionEnabled(), configuration.isAfsIpv4Forced());
+        registry.addEndpoint("/websocket").addInterceptors(interceptor).setAllowedOrigins("*").withSockJS();
     }
 
     /**

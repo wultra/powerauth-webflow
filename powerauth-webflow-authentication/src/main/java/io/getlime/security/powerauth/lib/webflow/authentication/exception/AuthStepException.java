@@ -58,6 +58,7 @@ public class AuthStepException extends Exception {
         super(message, cause);
         this.messageId = messageId;
     }
+
     /**
      * Get number of remaining authentication attempts.
      * @return Number of remaining attempts.

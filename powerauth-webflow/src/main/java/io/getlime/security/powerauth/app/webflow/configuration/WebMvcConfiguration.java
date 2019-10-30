@@ -152,6 +152,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         objectMapper.registerModule(new JodaModule());
         // replacement for ISO8601DateFormat which is deprecated
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         return objectMapper;
     }
 

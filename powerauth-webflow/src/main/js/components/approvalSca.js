@@ -16,9 +16,13 @@
 import React from 'react';
 import {connect} from 'react-redux';
 // Actions
-import {init} from '../actions/approvalScaActions'
+import {init, confirm, cancel} from "../actions/approvalScaActions";
 // Components
 import Spinner from 'react-tiny-spin';
+import {Button, Panel} from "react-bootstrap";
+import OperationTimeout from "./operationTimeout";
+import OperationDetail from "./operationDetail";
+import {FormattedMessage} from "react-intl";
 
 /**
  * SCA approval component.
@@ -30,13 +34,60 @@ import Spinner from 'react-tiny-spin';
 })
 export default class ApprovalSca extends React.Component {
 
+    constructor() {
+        super();
+        this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+    }
+
     componentWillMount() {
         this.props.dispatch(init());
     }
 
+    handleSubmit(event) {
+        event.preventDefault();
+        this.props.dispatch(confirm());
+    }
+
+    handleCancel(event) {
+        event.preventDefault();
+        this.props.dispatch(cancel());
+    }
+
     render() {
-        return (
-            <Spinner/>
-        )
+        if (this.props.context.formData || this.props.context.data) {
+            return (
+                <div id="operation">
+                    <form onSubmit={this.handleSubmit}>
+                        <Panel>
+                            <OperationTimeout/>
+                            <OperationDetail/>
+                            <div className="auth-actions">
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                            <FormattedMessage id="operation.cancel"/>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </Panel>
+                    </form>
+                </div>
+            )
+        } else {
+            return (
+                <div id="operation">
+                    <Spinner/>
+                </div>
+            )
+        }
     }
 }

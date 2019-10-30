@@ -13,13 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 
 /**
- * Request object used for preparing login form data.
+ * Authentication instruments used for authentication / authorization during authentication steps.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class PrepareLoginFormDataRequest {
+public enum AuthInstrument {
+
+    /**
+     * Password is used for step authentication / authorization.
+     */
+    PASSWORD,
+
+    /**
+     * SMS authorization code is used for step authentication / authorization.
+     */
+    SMS_KEY,
+
+    /**
+     * PowerAuth mobile token application is used for step authentication / authorization.
+     */
+    POWERAUTH_TOKEN,
+
+    /**
+     * Hardware token is used for step authentication / authorization.
+     */
+    HW_TOKEN
 
 }
