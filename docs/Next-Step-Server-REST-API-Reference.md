@@ -24,6 +24,7 @@ Following topics are covered in this chapter:
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
+  - [Store result of an AFS action] TODO
   - [List operation configurations](#list-operation-configurations)
   - [Get operation configuration detail](#get-operation-configuration-detail)
 - [Organizations](#organizations)
@@ -681,11 +682,9 @@ Example of complete operation detail:
       "id": "DEMO",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": ["pisp"],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     },
     "expired": false
@@ -1013,11 +1012,9 @@ Documentation for operation data is available [in a separate document](https://d
       "id": "DEMO",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": ["pisp"],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     }
   }
@@ -1092,11 +1089,9 @@ Documentation for operation data is available [in a separate document](https://d
         "id": "DEMO",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"],
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
     }
   }
@@ -1433,11 +1428,9 @@ Retrieves detail of an operation in the Next Step server.
       "id": "DEMO",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": ["pisp"],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     },
     "expired": false
@@ -1560,11 +1553,9 @@ Lists pending operation for given user and authentication method.
         "id": "DEMO",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"],
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       },
       "expired": false
@@ -1754,12 +1745,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
       "id": "BANK_ABC_PROD",
       "name": "Bank ABC",
       "description": "Authorization for Bank ABC",
+      "originalScopes": ["SCOPE_1", "SCOPE_2", "SCOPE_3"],
       "extras": {
-        "_requestedScopes": [
-          "SCOPE_1",
-          "SCOPE_2",
-          "SCOPE_3"
-        ],
         "applicationOwner": "BANK_ABC"
       }
     }

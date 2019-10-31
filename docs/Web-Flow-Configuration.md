@@ -270,8 +270,22 @@ The `RETAIL` organization is the default one (it is preselected in the UI). The 
 
 _Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
 
+## Operation configuration
+
+TODO
+
+## AFS configuration
+
+TODO
+
 ## Authentication methods and next step definitions
 
 Authentication methods and next step definitions need to be configured during Web Flow deployment.
 
 See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for details.
+
+## Mobile token configuration
+
+Mobile token needs to be enabled and configured in case it should be available for Web Flow. 
+
+See chapter [Mobile Token Configuration](./Mobile-Token-Configuration.md) for details.

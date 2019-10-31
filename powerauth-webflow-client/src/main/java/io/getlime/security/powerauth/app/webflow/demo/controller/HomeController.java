@@ -277,7 +277,6 @@ public class HomeController {
         applicationContext.setName("Demo application");
         applicationContext.setDescription("Web Flow demo application");
         applicationContext.getOriginalScopes().addAll(requestedScopes);
-        applicationContext.getExtras().put("_requestedScopes", requestedScopes);
         applicationContext.getExtras().put("applicationOwner", "Wultra");
 
         try {

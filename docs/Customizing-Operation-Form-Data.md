@@ -222,7 +222,7 @@ ApplicationContext applicationContext = new ApplicationContext();
 applicationContext.setId("DEMO");
 applicationContext.setName("Demo application");
 applicationContext.setDescription("Web Flow demo application");
-applicationContext.getExtras().put("_requestedScopes", Collections.singletonList("AISP"));
+applicationContext.getOriginalScopes().add("aisp");
 applicationContext.getExtras().put("applicationOwner", "Wultra");
 ```
 
