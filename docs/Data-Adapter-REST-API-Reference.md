@@ -18,7 +18,7 @@ Following topics are covered in this chapter:
 - [Create OAuth 2.0 consent form](#create-oauth-20-consent-form)
 - [Validate OAuth 2.0 consent form](#validate-oauth-20-consent-form)
 - [Save OAuth 2.0 consent form](#save-oauth-20-consent-form)
-- [Execute an AFS action] TODO
+- [Execute an AFS action](#execute-an-afs-action)
 
 You can access the generated REST API documentation in deployed Data Adapter:
 
@@ -1744,6 +1744,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
@@ -1894,6 +1895,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
@@ -2074,6 +2076,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "4a04667b-8a1a-46af-813c-cf71ffcde478",
       "name": "authorize_payment",
@@ -2199,6 +2202,161 @@ The list of expected status codes:
   "status": "OK",
   "responseObject": {
     "saveSucceeded": false
+  }
+}
+```
+
+## Execute an AFS action
+
+### Execute an AFS action - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/afs/action</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - AFS action was successfully executed |
+| 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
+| 400  | `REMOTE_ERROR` - communication with remote system failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Execute an AFS action - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "12345678",
+    "organizationId": "RETAIL",
+    "operationContext": {
+      "id": "47a74437-83f9-4567-8c9e-270bea98d9de",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2019"
+            },
+            "value": "2019-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2019"
+            },
+            "note": "Utility Bill Payment - 05/2019"
+          }
+        ],
+        "userInput": {
+          "smsFallback.enabled": "true",
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "DEMO",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "originalScopes": [
+          "pisp"
+        ],
+        "extras": {
+          "applicationOwner": "Wultra"
+        }
+      }
+    },
+`    "afsRequestParameters": {
+      "afsType": "THREAT_MARK",
+      "afsAction": "APPROVAL_INIT",
+      "clientIpAddress": "",
+      "stepIndex": 1,
+      "username": null,
+      "authInstruments": [],
+      "authStepResult": null,
+      "operationTerminationReason": null
+    },
+    "extras": {
+      "cookie1": "123xyz",
+      "cookie2": "abc67890"
+    }
+  }
+}
+```
+
+### Response - AFS action was successfully executed
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "afsResponseApplied": true,
+    "afsLabel": "1FA",
+    "authStepOptions": {
+      "smsOtpRequired": true,
+      "passwordRequired": false
+    },
+    "extras": {}
   }
 }
 ```
