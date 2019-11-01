@@ -210,7 +210,7 @@ The list of expected status codes during authentication:
 }
 ```
 
-### Response - user account exists, however the account is not active (e.g. blockeds)
+### Response - user account exists, however the account is not active (e.g. blocked)
 
 ```json
 {
