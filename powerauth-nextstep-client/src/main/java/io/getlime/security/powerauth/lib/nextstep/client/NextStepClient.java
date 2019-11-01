@@ -724,7 +724,7 @@ public class NextStepClient {
             request.setTimestampCreated(new Date());
             HttpEntity<ObjectRequest<CreateAfsActionRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response> response = restTemplate.exchange(serviceUrl + "/operation/afs", HttpMethod.POST, entity, Response.class);
+            ResponseEntity<Response> response = restTemplate.exchange(serviceUrl + "/operation/afs/action/create", HttpMethod.POST, entity, Response.class);
             return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);

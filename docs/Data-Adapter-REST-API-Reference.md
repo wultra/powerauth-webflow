@@ -2217,7 +2217,7 @@ The list of expected status codes:
 	</tr>
 	<tr>
 		<td>Resource URI</td>
-		<td><code>/api/afs/action</code></td>
+		<td><code>/api/afs/action/execute</code></td>
 	</tr>
 </table>
 

@@ -24,7 +24,7 @@ Following topics are covered in this chapter:
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
-  - [Store result of an AFS action] TODO
+  - [Store result of an AFS action](#store-result-of-an-afs-action)
   - [List operation configurations](#list-operation-configurations)
   - [Get operation configuration detail](#get-operation-configuration-detail)
 - [Organizations](#organizations)
@@ -1870,6 +1870,53 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
   "status" : "OK"
 }
 ```
+
+### Store result of an AFS action
+
+Store result of an AFS action for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/afs/action/create</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "47a74437-83f9-4567-8c9e-270bea98d9de",
+    "afsAction": "APPROVAL_INIT",
+    "stepIndex": 1,
+    "requestAfsExtras": "{}",
+    "afsResponseApplied": true,
+    "afsLabel": "1FA",
+    "responseAfsExtras": "{}",
+    "timestampCreated": 1572618429867
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
 
 ### List operation configurations
 
