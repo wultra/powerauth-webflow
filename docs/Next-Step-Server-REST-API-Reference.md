@@ -644,7 +644,7 @@ Example of complete operation detail:
       {
         "action": "LOGIN_AUTH",
         "stepIndex": 1,
-        "afsLabel": null,
+        "afsLabel": "2FA",
         "afsResponseApplied": false,
         "requestExtras": {},
         "responseExtras": {}
