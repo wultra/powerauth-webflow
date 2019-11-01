@@ -279,8 +279,8 @@ Following parameters are configured for each operation:
 - `template_version` - template version, see documentation for [Operation Data](./Operation-Data.md)
   - currently used template version is `A`
 - `template_id` - template identifier, see documentation for [Operation Data](./Operation-Data.md)
-  - for approval (payment) use `A`
-  - for login use `B`
+  - for approval (payment) use `1`
+  - for login use `2`
 - `mobile_token_enabled` - whether mobile token is enabled for this operation
 - `mobile_token_mode` - configuration of mobile token factors, use only when `mobile_token_enabled` value is true
   - for 1FA use: `{"type":"1FA"}`
