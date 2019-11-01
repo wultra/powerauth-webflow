@@ -2322,7 +2322,7 @@ The list of expected status codes:
         }
       }
     },
-`    "afsRequestParameters": {
+    "afsRequestParameters": {
       "afsType": "THREAT_MARK",
       "afsAction": "APPROVAL_INIT",
       "clientIpAddress": "",
