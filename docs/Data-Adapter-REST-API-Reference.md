@@ -182,7 +182,7 @@ The list of expected status codes during authentication:
         "userInput": {}
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -370,7 +370,7 @@ The list of expected status codes during authentication:
         "userInput": {}
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -692,7 +692,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -923,7 +923,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"],
@@ -1060,7 +1060,7 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1191,7 +1191,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1346,7 +1346,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1510,7 +1510,7 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1666,7 +1666,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1815,7 +1815,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -1966,7 +1966,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -2147,7 +2147,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"], 
@@ -2311,7 +2311,7 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": [

@@ -587,6 +587,7 @@ Operation detail contains following data:
 * **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) for easier interpretation of data in Mobile token.
 * **steps** - next steps for the operation (required)
 * **history** - operation history with completed authentication steps (required)
+* **afsActions** - AFS actions executed for the operation (optional)
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
 * **chosenAuthMethod** - authentication method chosen in current authentication step (optional)
 * **remainingAttempts** - remaining attempts for current authentication step (optional)
@@ -599,17 +600,18 @@ Example of complete operation detail:
 {
   "status": "OK",
   "responseObject": {
-    "operationId": "0861a423-ac06-4bcb-a426-2052872163d3",
+    "operationId": "b7ecf869-2ebb-44bf-ae0e-0963e9d6d46f",
     "operationName": "authorize_payment_sca",
     "userId": "12345678",
     "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE",
     "result": "CONTINUE",
-    "timestampCreated": "2019-07-30T12:36:19+0000",
-    "timestampExpires": "2019-07-30T12:41:40+0000",
+    "timestampCreated": "2019-11-01T15:35:37+0000",
+    "timestampExpires": "2019-11-01T15:41:16+0000",
     "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "steps": [
       {
-        "authMethod": "LOGIN_SCA",
+        "authMethod": "CONSENT",
         "params": []
       }
     ],
@@ -618,6 +620,50 @@ Example of complete operation detail:
         "authMethod": "INIT",
         "authResult": "CONTINUE",
         "requestAuthStepResult": "CONFIRMED"
+      },
+      {
+        "authMethod": "LOGIN_SCA",
+        "authResult": "CONTINUE",
+        "requestAuthStepResult": "CONFIRMED"
+      },
+      {
+        "authMethod": "APPROVAL_SCA",
+        "authResult": "CONTINUE",
+        "requestAuthStepResult": "CONFIRMED"
+      }
+    ],
+    "afsActions": [
+      {
+        "action": "LOGIN_INIT",
+        "stepIndex": 1,
+        "afsLabel": "2FA",
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "LOGIN_AUTH",
+        "stepIndex": 1,
+        "afsLabel": null,
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "APPROVAL_INIT",
+        "stepIndex": 1,
+        "afsLabel": "1FA",
+        "afsResponseApplied": true,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "APPROVAL_AUTH",
+        "stepIndex": 1,
+        "afsLabel": "2FA",
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
       }
     ],
     "formData": {
@@ -673,16 +719,20 @@ Example of complete operation detail:
       ],
       "dynamicDataLoaded": false,
       "userInput": {
-        "smsFallback.enabled": "true"
+        "smsFallback.enabled": "true",
+        "operation.bankAccountChoice": "CZ4012340000000012345678",
+        "operation.bankAccountChoice.disabled": "true"
       }
     },
-    "chosenAuthMethod": null,
-    "remainingAttempts": 3,
+    "chosenAuthMethod": "CONSENT",
+    "remainingAttempts": 5,
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
-      "originalScopes": ["pisp"],
+      "originalScopes": [
+        "pisp"
+      ],
       "extras": {
         "applicationOwner": "Wultra"
       }
@@ -1009,7 +1059,7 @@ Documentation for operation data is available [in a separate document](https://d
       }
     },
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
       "originalScopes": ["pisp"],
@@ -1086,7 +1136,7 @@ Documentation for operation data is available [in a separate document](https://d
       ]
     },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"],
@@ -1425,7 +1475,7 @@ Retrieves detail of an operation in the Next Step server.
     "chosenAuthMethod": null,
     "remainingAttempts": 3,
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
       "originalScopes": ["pisp"],
@@ -1550,7 +1600,7 @@ Lists pending operation for given user and authentication method.
       "chosenAuthMethod": "LOGIN_SCA",
       "remainingAttempts": null,
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
         "originalScopes": ["pisp"],
