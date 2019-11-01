@@ -123,8 +123,7 @@ When assigning the application context to the operation, it is now possible to p
       "description" : "Demo application",
       "originalScopes" : [ "aisp", "pisp" ],
       "extras" : {
-        "applicationOwner" : "Wultra",
-        "_requestedScopes" : [ "aisp", "pisp" ]
+        "applicationOwner" : "Wultra"
       }
     }
   }

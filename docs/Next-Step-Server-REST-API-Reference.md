@@ -24,6 +24,7 @@ Following topics are covered in this chapter:
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
+  - [Store result of an AFS action](#store-result-of-an-afs-action)
   - [List operation configurations](#list-operation-configurations)
   - [Get operation configuration detail](#get-operation-configuration-detail)
 - [Organizations](#organizations)
@@ -586,6 +587,7 @@ Operation detail contains following data:
 * **operationData** - arbitrary string which contains data related to this operation, this data is not used during authorization and authentication (required). Since Web Flow version 0.20.0 the [structure of operation data is specified](./Off-line-Signatures-QR-Code.md#operation-data) for easier interpretation of data in Mobile token.
 * **steps** - next steps for the operation (required)
 * **history** - operation history with completed authentication steps (required)
+* **afsActions** - AFS actions executed for the operation (optional)
 * **formData** - data displayed by the UI as well as data gathered from the user responses (required, discussed in details below)
 * **chosenAuthMethod** - authentication method chosen in current authentication step (optional)
 * **remainingAttempts** - remaining attempts for current authentication step (optional)
@@ -598,17 +600,18 @@ Example of complete operation detail:
 {
   "status": "OK",
   "responseObject": {
-    "operationId": "0861a423-ac06-4bcb-a426-2052872163d3",
+    "operationId": "b7ecf869-2ebb-44bf-ae0e-0963e9d6d46f",
     "operationName": "authorize_payment_sca",
     "userId": "12345678",
     "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE",
     "result": "CONTINUE",
-    "timestampCreated": "2019-07-30T12:36:19+0000",
-    "timestampExpires": "2019-07-30T12:41:40+0000",
+    "timestampCreated": "2019-11-01T15:35:37+0000",
+    "timestampExpires": "2019-11-01T15:41:16+0000",
     "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "steps": [
       {
-        "authMethod": "LOGIN_SCA",
+        "authMethod": "CONSENT",
         "params": []
       }
     ],
@@ -617,6 +620,50 @@ Example of complete operation detail:
         "authMethod": "INIT",
         "authResult": "CONTINUE",
         "requestAuthStepResult": "CONFIRMED"
+      },
+      {
+        "authMethod": "LOGIN_SCA",
+        "authResult": "CONTINUE",
+        "requestAuthStepResult": "CONFIRMED"
+      },
+      {
+        "authMethod": "APPROVAL_SCA",
+        "authResult": "CONTINUE",
+        "requestAuthStepResult": "CONFIRMED"
+      }
+    ],
+    "afsActions": [
+      {
+        "action": "LOGIN_INIT",
+        "stepIndex": 1,
+        "afsLabel": "2FA",
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "LOGIN_AUTH",
+        "stepIndex": 1,
+        "afsLabel": "2FA",
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "APPROVAL_INIT",
+        "stepIndex": 1,
+        "afsLabel": "1FA",
+        "afsResponseApplied": true,
+        "requestExtras": {},
+        "responseExtras": {}
+      },
+      {
+        "action": "APPROVAL_AUTH",
+        "stepIndex": 1,
+        "afsLabel": "2FA",
+        "afsResponseApplied": false,
+        "requestExtras": {},
+        "responseExtras": {}
       }
     ],
     "formData": {
@@ -672,20 +719,22 @@ Example of complete operation detail:
       ],
       "dynamicDataLoaded": false,
       "userInput": {
-        "smsFallback.enabled": "true"
+        "smsFallback.enabled": "true",
+        "operation.bankAccountChoice": "CZ4012340000000012345678",
+        "operation.bankAccountChoice.disabled": "true"
       }
     },
-    "chosenAuthMethod": null,
-    "remainingAttempts": 3,
+    "chosenAuthMethod": "CONSENT",
+    "remainingAttempts": 5,
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": [
+        "pisp"
+      ],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     },
     "expired": false
@@ -1010,14 +1059,12 @@ Documentation for operation data is available [in a separate document](https://d
       }
     },
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": ["pisp"],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     }
   }
@@ -1089,14 +1136,12 @@ Documentation for operation data is available [in a separate document](https://d
       ]
     },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"],
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
     }
   }
@@ -1430,14 +1475,12 @@ Retrieves detail of an operation in the Next Step server.
     "chosenAuthMethod": null,
     "remainingAttempts": 3,
     "applicationContext": {
-      "id": "DEMO",
+      "id": "democlient",
       "name": "Demo application",
       "description": "Web Flow demo application",
+      "originalScopes": ["pisp"],
       "extras": {
-        "applicationOwner": "Wultra",
-        "_requestedScopes": [
-          "PISP"
-        ]
+        "applicationOwner": "Wultra"
       }
     },
     "expired": false
@@ -1557,14 +1600,12 @@ Lists pending operation for given user and authentication method.
       "chosenAuthMethod": "LOGIN_SCA",
       "remainingAttempts": null,
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"],
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       },
       "expired": false
@@ -1754,12 +1795,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
       "id": "BANK_ABC_PROD",
       "name": "Bank ABC",
       "description": "Authorization for Bank ABC",
+      "originalScopes": ["SCOPE_1", "SCOPE_2", "SCOPE_3"],
       "extras": {
-        "_requestedScopes": [
-          "SCOPE_1",
-          "SCOPE_2",
-          "SCOPE_3"
-        ],
         "applicationOwner": "BANK_ABC"
       }
     }
@@ -1883,6 +1920,53 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
   "status" : "OK"
 }
 ```
+
+### Store result of an AFS action
+
+Store result of an AFS action for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/afs/action/create</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "47a74437-83f9-4567-8c9e-270bea98d9de",
+    "afsAction": "APPROVAL_INIT",
+    "stepIndex": 1,
+    "requestAfsExtras": "{}",
+    "afsResponseApplied": true,
+    "afsLabel": "1FA",
+    "responseAfsExtras": "{}",
+    "timestampCreated": 1572618429867
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
 
 ### List operation configurations
 

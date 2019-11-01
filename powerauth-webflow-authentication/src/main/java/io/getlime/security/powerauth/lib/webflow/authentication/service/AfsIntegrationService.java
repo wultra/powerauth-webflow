@@ -66,6 +66,7 @@ public class AfsIntegrationService {
     private final NextStepClient nextStepClient;
     private final DataAdapterClient dataAdapterClient;
     private final OperationSessionService operationSessionService;
+    private final MessageTranslationService messageTranslationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -75,13 +76,15 @@ public class AfsIntegrationService {
      * @param nextStepClient Next Step client.
      * @param dataAdapterClient Data Adapter client.
      * @param operationSessionService Operation session service.
+     * @param messageTranslationService Message translation service.
      */
     @Autowired
-    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService) {
+    public AfsIntegrationService(WebFlowServicesConfiguration configuration, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, OperationSessionService operationSessionService, MessageTranslationService messageTranslationService) {
         this.configuration = configuration;
         this.nextStepClient = nextStepClient;
         this.dataAdapterClient = dataAdapterClient;
         this.operationSessionService = operationSessionService;
+        this.messageTranslationService = messageTranslationService;
     }
 
 
@@ -140,6 +143,7 @@ public class AfsIntegrationService {
                 // Retrieve operation
                 ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
                 GetOperationDetailResponse operation = operationDetail.getResponseObject();
+                messageTranslationService.translateFormData(operation.getFormData());
                 ObjectResponse<GetOperationConfigDetailResponse> objectResponse = nextStepClient.getOperationConfigDetail(operation.getOperationName());
                 GetOperationConfigDetailResponse config = objectResponse.getResponseObject();
                 if (config.isAfsEnabled()) {

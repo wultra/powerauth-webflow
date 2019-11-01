@@ -460,7 +460,7 @@ public class DataAdapterClient {
             AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, extras);
             HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<AfsResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/afs/action", HttpMethod.POST, entity,
+                    serviceUrl + "/api/afs/action/execute", HttpMethod.POST, entity,
                     new ParameterizedTypeReference<ObjectResponse<AfsResponse>>() {
                     });
             return new ObjectResponse<>(response.getBody().getResponseObject());

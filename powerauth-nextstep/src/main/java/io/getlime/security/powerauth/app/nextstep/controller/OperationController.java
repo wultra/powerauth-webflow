@@ -388,7 +388,7 @@ public class OperationController {
         return updateApplicationContextImpl(request);
     }
 
-    @RequestMapping(value = "/operation/afs", method = RequestMethod.POST)
+    @RequestMapping(value = "/operation/afs/action/create", method = RequestMethod.POST)
     public @ResponseBody Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) throws OperationNotFoundException {
         CreateAfsActionRequest afsRequest = request.getRequestObject();
         logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());

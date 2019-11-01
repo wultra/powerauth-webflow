@@ -270,8 +270,41 @@ The `RETAIL` organization is the default one (it is preselected in the UI). The 
 
 _Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
 
+## Operation configuration
+
+Operations need to be configured in table `ns_operation_config`.
+
+Following parameters are configured for each operation:
+- `operation_name` - unique operation name which identifies the operation
+- `template_version` - template version, see documentation for [Operation Data](./Operation-Data.md)
+  - currently used template version is `A`
+- `template_id` - template identifier, see documentation for [Operation Data](./Operation-Data.md)
+  - for approval (payment) use `1`
+  - for login use `2`
+- `mobile_token_enabled` - whether mobile token is enabled for this operation
+- `mobile_token_mode` - configuration of mobile token factors, use only when `mobile_token_enabled` value is true
+  - for 1FA use: `{"type":"1FA"}`
+  - for 2FA use e.g.: `{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}`
+- `afs_enabled` - whether anti-fraud service integration is enabled for this operation
+- `afs_config_id` - identifier of AFS configuration, use only when `afs_enabled` value is true
+
+## AFS configuration
+
+Anti-fraud system integration needs to be configured in table `ns_operation_config`.
+
+Following parameters are configured for each AFS configuration:
+- `afs_config_id` - unique identifier of AFS configuration which is configured in `ns_operation_config` table to link operation with AFS configuration
+- `js_snippet_url` - URL which should be used for executing JavaScript code from anti-fraud system
+- `parameters` - reserved for future use, specify value `{}`
+
 ## Authentication methods and next step definitions
 
 Authentication methods and next step definitions need to be configured during Web Flow deployment.
 
 See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for details.
+
+## Mobile token configuration
+
+Mobile token needs to be enabled and configured in case it should be available for Web Flow. 
+
+See chapter [Mobile Token Configuration](./Mobile-Token-Configuration.md) for details.
