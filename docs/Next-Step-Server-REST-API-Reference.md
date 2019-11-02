@@ -1512,7 +1512,7 @@ Lists pending operation for given user and authentication method.
 {
   "requestObject" : {
     "userId" : "12345678",
-    "authMethod" : "POWERAUTH_TOKEN"
+    "mobileTokenOnly" : true
   }
 }
 ```
@@ -1531,6 +1531,7 @@ Lists pending operation for given user and authentication method.
       "operationName": "authorize_payment_sca",
       "userId": "12345678",
       "organizationId": "RETAIL",
+      "accountStatus": "ACTIVE",
       "result": "CONTINUE",
       "timestampCreated": "2019-07-30T12:57:28+0000",
       "timestampExpires": "2019-07-30T13:02:28+0000",
