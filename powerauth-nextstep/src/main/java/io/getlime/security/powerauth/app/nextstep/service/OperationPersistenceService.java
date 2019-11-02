@@ -248,6 +248,26 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Update mobile token status.
+     *
+     * @param request Request to update mobile token status.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
+     */
+    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException {
+        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
+        }
+        OperationEntity operation = operationOptional.get();
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            throw new IllegalStateException("Operation is missing history");
+        }
+        currentHistory.setMobileTokenActive(request.isMobileTokenActive());
+        operationHistoryRepository.save(currentHistory);
+    }
+
+    /**
      * Update application context.
      *
      * @param request Request to update application context.
@@ -324,7 +344,7 @@ public class OperationPersistenceService {
             // Add operations whose last step is CONFIRMED with CONTINUE result and chosen authentication method supports mobile token
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
             if (currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE
-                    && currentHistoryEntity.getChosenAuthMethod() != null) {
+                    && currentHistoryEntity.isMobileTokenActive()) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
                 if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
                     filteredList.add(operation);
