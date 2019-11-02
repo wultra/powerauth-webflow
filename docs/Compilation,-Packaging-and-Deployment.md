@@ -8,6 +8,7 @@ Web Flow can be deployed to any Java web container (such as Tomcat) using war ar
 
 In order to build Web Flow using Maven, following PowerAuth dependencies need to be satisfied:
 
+* [powerauth-server](https://github.com/wultra/powerauth-server) - dependency **powerauth-java-client-spring**
 * [powerauth-push-server](https://github.com/wultra/powerauth-push-server) - dependency **powerauth-push-client**
 * [powerauth-restful-integration](https://github.com/wultra/powerauth-restful-integration) - dependency **powerauth-restful-security-spring**
 * [powerauth-crypto](https://github.com/wultra/powerauth-crypto) - dependency **powerauth-java-crypto**

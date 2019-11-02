@@ -62,7 +62,11 @@ Web Flow can coexist with PowerAuth in the same database schema or it can use a 
 ### Database Tables for the Third Party Provider
 
 - **tpp_consent** - the table stores definitions of consents.
+
 - **tpp_user_consent** - the table stores consents given by the user.
+
 - **tpp_user_consent_history** - the table stores changes of consents given by the user.
+
 - **tpp_detail** - the table stores information about third parties.
+
 - **tpp_app_detail** - the table store information about third party applications.

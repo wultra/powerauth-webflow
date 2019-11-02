@@ -78,6 +78,7 @@ The operation may fail due to different reasons, such as:
 - Maximum number of attempts is reached causing authentication method to fail.
 - Operation times out.
 - User cancels the operation.
+- User refreshes the browser, navigates to another URL or closes the browser window. 
 
 ### Operation ID
 
@@ -162,7 +163,7 @@ Whenever operation progresses to the next step, previous status of operation is 
 
 ### Operation review
 
-Operation review is a special authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
+Operation review is a special non-SCA authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
 
 ### Organization
 
@@ -177,7 +178,11 @@ See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definiti
 
 ### Authentication method choice
 
-The user becomes authenticated and there are multiple choices available for the next authentication method (which is usually performing authorization, not authentication). The next authentication method is executed based on user choice.
+The user becomes authenticated and there are multiple choices available for the next authentication method (which is usually performing authorization, not authentication). The next authentication method is executed based on user choice. This approach is used in non-SCA authentication methods.
+
+### Authentication instrument
+
+The user has a choice of using different authentication instruments (SMS, mobile token, hardware token, etc.). The chosen authentication instrument influences how authentication / authorization is done. This approach is used in SCA authentication methods.
 
 ### Next step of an operation
 
@@ -195,7 +200,7 @@ See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definiti
 
 ### Next step user preferences
 
-Next step user preferences store configuration for different authentication methods.
+Next step user preferences store configuration for different authentication methods, for instance activation configured for mobile token.
 
 ### Authorization failure count
 
