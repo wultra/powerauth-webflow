@@ -38,7 +38,7 @@ The whole installation process is described in the [Web Flow Installation Manual
 
 You can test the web flow demo application by navigating to: http://localhost:8080/powerauth-webflow-client
 
-* Use the "Login" action to test the user authentication. The Credential Server Sample project uses "test" as password for any username.
+* Use the "Login" action to test the user authentication. The Data Adapter sample project uses "test" as password for any username.
 * Use the "Payment (DEMO)" action to test payment authorization. You will need to enable POWERAUTH_TOKEN authentication method for the user who will authorize the payment (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#enable-an-authentication-method-for-given-user)).
 * Use the "Authorization" action to test operation authorization. In order to test this action you will need to create an operation and obtain its operationId (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#create-an-operation)).
 
