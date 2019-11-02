@@ -1817,7 +1817,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 
 ### Update user for an operation
 
-Updates user ID and organization ID for an operation.
+Updates user ID, organization ID and account status for an operation.
 
 <table>
     <tr>
@@ -1853,7 +1853,8 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
   "requestObject": {
     "operationId": "0a044408-aea0-433a-80cf-6371dc2a76c0",
     "userId": "12345678",
-    "organizationId": "RETAIL"
+    "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE"
   }
 }
 ```
