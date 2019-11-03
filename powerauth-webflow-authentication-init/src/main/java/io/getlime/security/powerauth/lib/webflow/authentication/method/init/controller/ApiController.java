@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
+import io.getlime.security.powerauth.app.webflow.oauth.OAuthBasicContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -33,6 +34,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.Operatio
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.web.savedrequest.DefaultSavedRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -100,7 +102,18 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         String sessionId = attributes.getSessionId();
 
         if (operation == null) {
-            final String operationName = "login";
+            final DefaultSavedRequest savedRequest = (DefaultSavedRequest) attributes.getAttribute("SPRING_SECURITY_SAVED_REQUEST", RequestAttributes.SCOPE_SESSION);
+            OAuthBasicContext oAuthBasicContext = extractOAuthBasicContext(savedRequest);
+
+            String operationName;
+            if (oAuthBasicContext == null) {
+                logger.error("OAuth 2.0 operation context was not extracted correctly and hence the process cannot continue.");
+                return failedOperationResponse(null, "operationConfig.missing");
+            }
+
+            //TODO: Call data adapter to obtain correct operation name
+            operationName = "login";
+
             GetOperationConfigDetailResponse operationConfig;
             try {
                 operationConfig = getOperationConfig(operationName);
@@ -207,6 +220,40 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         // transfer operation hash to client for operation created in this step (required for default operation)
         registrationResponse.setOperationHash(operationHash);
         return registrationResponse;
+    }
+
+    /**
+     * Extract OAuth 2.0 context from the saved request. Namely, fetch client_id value and
+     * array with requested scopes.
+     *
+     * @param savedRequest Saved request with OAuth 2.0 attributes.
+     * @return OAuth 2.0 context information, or null in case context cannot be extracted.
+     */
+    private OAuthBasicContext extractOAuthBasicContext(DefaultSavedRequest savedRequest) {
+
+        // Check saved request for null
+        if (savedRequest == null) { // OAuth 2.0 context missing
+            logger.debug("OAuth 2.0 context was not found.");
+            return null;
+        }
+
+        // Get OAuth 2.0 Client ID
+        final String[] client_ids = savedRequest.getParameterValues("client_id");
+        if (client_ids.length != 1) { // no client ID is present, or worse - more are present
+            logger.debug("OAuth 2.0 Client ID must be present and unique.");
+            return null;
+        }
+        final String client_id = client_ids[0];
+
+        // Get OAuth 2.0 Scopes
+        final String[] scopes = savedRequest.getParameterValues("scope");
+
+        // Return the result
+        OAuthBasicContext result = new OAuthBasicContext();
+        result.setClientId(client_id);
+        result.setScopes(scopes);
+
+        return result;
     }
 
     /**
