@@ -25,11 +25,13 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.service.MobileTokenConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -63,6 +65,7 @@ public class OperationController {
     private final OperationPersistenceService operationPersistenceService;
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,13 +74,15 @@ public class OperationController {
      * @param operationPersistenceService Operation persistence service.
      * @param operationConfigurationService Operation configuration service.
      * @param stepResolutionService Step resolution service.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService, OperationConfigurationService operationConfigurationService,
-                               StepResolutionService stepResolutionService) {
+                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.operationPersistenceService = operationPersistenceService;
         this.operationConfigurationService = operationConfigurationService;
         this.stepResolutionService = stepResolutionService;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -360,10 +365,59 @@ public class OperationController {
 
     private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
-        // persist operation form data update
+        // persist chosen auth method update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         logger.debug("The updateChosenAuthMethod request succeeded");
         return new Response();
+    }
+
+    /**
+     * Update mobile token status for an operation (PUT method).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/status", method = RequestMethod.PUT)
+    public @ResponseBody Response updateMobileToken(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        return updateMobileTokenImpl(request);
+    }
+
+    /**
+     * Update operation with chosen authentication method (POST method alternative).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/status/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateMobileTokenPost(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        return updateMobileTokenImpl(request);
+    }
+
+    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        logger.info("Received updateMobileToken request, operation ID: {}, mobile token active: {}", request.getRequestObject().getOperationId(), request.getRequestObject().isMobileTokenActive());
+        // persist mobile token update
+        operationPersistenceService.updateMobileToken(request.getRequestObject());
+        logger.debug("The updateMobileToken request succeeded");
+        return new Response();
+    }
+
+    /**
+     * Get mobile token configuration.
+     * @param request Get mobile token configuration request.
+     * @return Get mobile token configuration response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/config/detail", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws OperationNotFoundException {
+        String userId = request.getRequestObject().getUserId();
+        String operationName = request.getRequestObject().getOperationName();
+        AuthMethod authMethod = request.getRequestObject().getAuthMethod();
+        logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
+        boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, authMethod);
+        GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
+        response.setMobileTokenEnabled(isMobileTokenEnabled);
+        logger.debug("The getMobileTokenConfig request succeeded");
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -388,7 +442,7 @@ public class OperationController {
         return updateApplicationContextImpl(request);
     }
 
-    @RequestMapping(value = "/operation/afs", method = RequestMethod.POST)
+    @RequestMapping(value = "/operation/afs/action/create", method = RequestMethod.POST)
     public @ResponseBody Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) throws OperationNotFoundException {
         CreateAfsActionRequest afsRequest = request.getRequestObject();
         logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());

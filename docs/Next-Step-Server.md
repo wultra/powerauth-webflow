@@ -27,6 +27,7 @@ Next Step Server implements following functionality:
   - update user and organization for an operation
   - update application context for an operation
   - set chosen authentication method
+  - execute an AFS action
 - management of organizations
   - list organizations
   - retrieve organization detail

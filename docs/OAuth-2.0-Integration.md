@@ -21,8 +21,9 @@ Web Flow only uses OAuth 2.0 access tokens and does not issue refresh tokens.
 
 Web Flow implements a basis Resource Server which provides access to the user profile. The Resource Server is provided by the [powerauth-webflow-resources project](../powerauth-webflow-resources).
 
-Web Flow Resource Serverr provides following endpoints:
+Web Flow Resource Server provides following endpoints:
 - `/api/secure/profile/me` - provides information about authenticated user (user ID, firstName, familyName), connection (language, SCA) and service (application name, environment, timestamp)
+- `/api/secure/profile/me/info` - provides user information for OpenID Connect (OIDC)
 
 ## OAuth 2.0 Client
 

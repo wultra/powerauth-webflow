@@ -101,6 +101,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         boolean mobileTokenEnabled = false;
         try {
             if (authMethodQueryService.isMobileTokenAvailable(userId, operation.getOperationId())) {
+                nextStepClient.updateMobileToken(operation.getOperationId(), true);
                 mobileTokenEnabled = true;
             }
         } catch (NextStepServiceException e) {

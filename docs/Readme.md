@@ -18,6 +18,8 @@ Web Flow can also display OAuth 2.0 consent page with options required to be sel
 
 Additional authentication and authorization steps can be implemented by extending Web Flow. Each operation can be configured to require a different authentication/authorization flow based on security requirements of the operation.
 
+Web Flow can be integrated with anti-fraud systems, provide information for fraud detection as well as perform an authentication step-down based on response from anti-fraud system. 
+
 ## Overview
 
 - [Basic Definitions](./Basic-Definitions.md)

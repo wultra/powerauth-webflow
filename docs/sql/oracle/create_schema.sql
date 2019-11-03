@@ -150,6 +150,7 @@ CREATE TABLE ns_operation_history (
   response_timestamp_created  TIMESTAMP,
   response_timestamp_expires  TIMESTAMP,
   chosen_auth_method          VARCHAR(32),
+  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,
   CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
   CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method)

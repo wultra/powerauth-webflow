@@ -436,6 +436,80 @@ public class NextStepClient {
     }
 
     /**
+     * Update mobile token status for current operation step via PUT method.
+     * @param operationId Operation ID.
+     * @param mobileTokenActive Whether mobile token is active.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse updateMobileToken(String operationId, boolean mobileTokenActive) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateMobileTokenRequest request = new UpdateMobileTokenRequest();
+            request.setOperationId(operationId);
+            request.setMobileTokenActive(mobileTokenActive);
+            HttpEntity<ObjectRequest<UpdateMobileTokenRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/mobileToken/status", HttpMethod.PUT, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Update mobile token status for current operation step via POST method.
+     * @param operationId Operation ID.
+     * @param mobileTokenActive Whether mobile token is active.
+     * @return Object response.
+     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
+     */
+    public ObjectResponse updateMobileTokenPost(String operationId, boolean mobileTokenActive) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            UpdateMobileTokenRequest request = new UpdateMobileTokenRequest();
+            request.setOperationId(operationId);
+            request.setMobileTokenActive(mobileTokenActive);
+            HttpEntity<ObjectRequest<UpdateMobileTokenRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/operation/status/update", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
+     * Get mobile token configuration configuration.
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @param authMethod Authentication method.
+     * @return Mobile token configuration.
+     * @throws NextStepServiceException Thrown when operation configuration is missing.
+     */
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(String userId, String operationName, AuthMethod authMethod) throws NextStepServiceException {
+        try {
+            // Exchange next step request with NextStep server.
+            GetMobileTokenConfigRequest request = new GetMobileTokenConfigRequest();
+            request.setUserId(userId);
+            request.setOperationName(operationName);
+            request.setAuthMethod(authMethod);
+            HttpEntity<ObjectRequest<GetMobileTokenConfigRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<GetMobileTokenConfigResponse>> response = restTemplate.exchange(serviceUrl + "/operation/mobileToken/config/detail", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetMobileTokenConfigResponse>>() {});
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw handleHttpError(ex);
+        } catch (ResourceAccessException ex) {
+            // Next Step service is down
+            throw handleResourceAccessError(ex);
+        }
+    }
+
+    /**
      * Calls the operation details endpoint via POST method to get operation details.
      *
      * @param id Operation ID.
@@ -724,7 +798,7 @@ public class NextStepClient {
             request.setTimestampCreated(new Date());
             HttpEntity<ObjectRequest<CreateAfsActionRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
-            ResponseEntity<Response> response = restTemplate.exchange(serviceUrl + "/operation/afs", HttpMethod.POST, entity, Response.class);
+            ResponseEntity<Response> response = restTemplate.exchange(serviceUrl + "/operation/afs/action/create", HttpMethod.POST, entity, Response.class);
             return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw handleHttpError(ex);

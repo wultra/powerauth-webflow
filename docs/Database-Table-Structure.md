@@ -45,19 +45,28 @@ Web Flow can coexist with PowerAuth in the same database schema or it can use a 
 
 - **ns_step_definition** - the table stores definitions of authentication/authorization steps. Data in this table needs to be loaded before Web Flow is started.
 
+- **ns_operation_afs** - the table stores responses from AFS for operations.
+
 ### Database Tables for the Data Adapter
 
 - **da_sms_authorization** - the table stores data for SMS OTP authorization.
-- **da_user_credentials** - the table stores information about users in case there is no external identity store available.
+
+- **da_user_credentials** - the table stores user credentials.
 
 ### Database Tables for the Web Flow Server
 
 - **wf_operation_session** - the table stores mapping of operations to HTTP sessions.
 
-### Database Tables for the TPP (Third Party Provider) Engine 
+- **wf_afs_config** - the table stores configuration of anti-fraud system integration.
 
-- **tpp_consent** - the table stores consents templates for various consent types.
-- **tpp_user_consent** - the table stores consents given by a user to the third-party provider apps.
-- **tpp_user_consent_history** - the table stores a consent history for a given user.
-- **tpp_detail** - the table stores the details of the third party.
-- **tpp_app_detail** - the table stores the details of the third-party provider apps.
+### Database Tables for the Third Party Provider
+
+- **tpp_consent** - the table stores definitions of consents.
+
+- **tpp_user_consent** - the table stores consents given by the user.
+
+- **tpp_user_consent_history** - the table stores changes of consents given by the user.
+
+- **tpp_detail** - the table stores information about third parties.
+
+- **tpp_app_detail** - the table store information about third party applications.
