@@ -235,7 +235,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private void updateUsernameInHttpSession(String username) {
         synchronized (httpSession.getServletContext()) {
             if (username == null || !username.matches("^[0-9a-zA-Z_]+$")) {
-                logger.error("Invalid username: {}", username);
+                logger.warn("Invalid username: {}", username);
                 return;
             }
             httpSession.setAttribute(HttpSessionAttributeNames.USERNAME, username);
