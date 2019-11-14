@@ -17,19 +17,19 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
 /**
- * Operation already failed exception.
+ * Operation already canceled exception.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OperationAlreadyFailedException extends AuthStepException {
+public class OperationIsAlreadyCanceledException extends AuthStepException {
 
     /**
      * Constructor with message.
      *
      * @param message Error message.
      */
-    public OperationAlreadyFailedException(String message) {
-        super(message, "operation.alreadyFailed");
+    public OperationIsAlreadyCanceledException(String message) {
+        super(message, "operation.alreadyCanceled");
     }
 
 }

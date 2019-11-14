@@ -26,7 +26,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Operation
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -528,8 +528,18 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
-        } catch (NextStepServiceException e) {
-            logger.error("Error while building authorization response", e);
+        } catch (OperationAlreadyFinishedException ex) {
+            // Translate Next Step exception for update of a finished operation
+            throw new OperationIsAlreadyFinished(ex.getMessage());
+        } catch (OperationAlreadyCanceledException ex) {
+            // Translate Next Step exception for update of a canceled operation
+            throw new OperationIsAlreadyCanceledException(ex.getMessage());
+        } catch (OperationAlreadyFailedException ex) {
+            // Translate Next Step exception for update of a failed operation
+            throw new OperationIsAlreadyFailedException(ex.getMessage());
+        } catch (NextStepServiceException ex) {
+            // Generic Next Step error
+            logger.error("Error while building authorization response", ex);
             throw new CommunicationFailedException("Step authorization failed");
         }
     }
@@ -598,7 +608,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             if (operationHistory.size() == 0 || operationHistory.get(operationHistory.size()-1).getRequestAuthStepResult() != AuthStepResult.CANCELED) {
                 // allow displaying of canceled operations - operation may be canceled in mobile app and later displayed in web UI
                 logger.warn("Operation has already failed, operation ID: {}", operation.getOperationId());
-                throw new OperationAlreadyFailedException("Operation has already failed");
+                throw new OperationIsAlreadyFailedException("Operation has already failed");
             }
         }
         final AuthMethod currentAuthMethod = getAuthMethodName(operation);

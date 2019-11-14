@@ -18,11 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationTimeoutException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.slf4j.Logger;
@@ -132,7 +128,7 @@ public class MobileApiExceptionResolver {
      * @param t Throwable.
      * @return Response with error details.
      */
-    @ExceptionHandler(OperationAlreadyFinishedException.class)
+    @ExceptionHandler(OperationIsAlreadyFinished.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(Throwable t) {
         return error(ErrorCode.OPERATION_ALREADY_FINISHED, t);
@@ -143,7 +139,7 @@ public class MobileApiExceptionResolver {
      * @param t Throwable.
      * @return Response with error details.
      */
-    @ExceptionHandler(OperationAlreadyFailedException.class)
+    @ExceptionHandler(OperationIsAlreadyFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(Throwable t) {
         return error(ErrorCode.OPERATION_ALREADY_FAILED, t);
@@ -154,7 +150,7 @@ public class MobileApiExceptionResolver {
      * @param t Throwable.
      * @return Response with error details.
      */
-    @ExceptionHandler(OperationAlreadyCanceledException.class)
+    @ExceptionHandler(OperationIsAlreadyCanceledException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationCanceledException(Throwable t) {
         return error(ErrorCode.OPERATION_ALREADY_CANCELED, t);
