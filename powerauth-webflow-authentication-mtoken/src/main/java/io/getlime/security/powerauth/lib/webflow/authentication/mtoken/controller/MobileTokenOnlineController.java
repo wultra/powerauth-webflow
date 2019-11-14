@@ -85,7 +85,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     @Override
     protected AuthenticationResult authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        checkOperationExpiration(operation);
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
@@ -116,7 +115,6 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
 
         MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, authMethod);
         initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
@@ -147,15 +145,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
     public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
-        final GetOperationDetailResponse operation = getOperation();
+        final GetOperationDetailResponse operation = getOperation(false);
         final AuthMethod authMethod = getAuthMethodName(operation);
         // Log level is set to FINE due to large amount of requests caused by polling.
         logger.debug("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-
-        // Custom handling of operation expiration, checkOperationExpiration() method is not called
         if (operation.isExpired()) {
-            logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
-            // handle operation expiration
+            logger.info("Operation has timed out, operation ID: {}", operation);
+            // Handle operation expiration
             try {
                 cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
             } catch (Exception e) {

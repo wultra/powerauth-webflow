@@ -96,11 +96,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
     protected GetOperationDetailResponse getOperation() throws AuthStepException {
+        return getOperation(true);
+    }
+
+    /**
+     * Get operation detail.
+     * @param validateOperationState Whether operation state should be validated.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
+    protected GetOperationDetailResponse getOperation(boolean validateOperationState) throws AuthStepException {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
             String operationId = pendingUserAuthentication.getOperationId();
             if (operationId != null) {
-                return getOperation(operationId);
+                return getOperation(operationId, validateOperationState);
             } else {
                 throw new OperationNotAvailableException("Operation is not available");
             }
@@ -110,16 +120,29 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Get operation detail with given operation ID.
+     * Get operation detail.
      * @param operationId Operation ID.
      * @return Operation detail.
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
     protected GetOperationDetailResponse getOperation(String operationId) throws AuthStepException {
+        return getOperation(operationId, false);
+    }
+
+    /**
+     * Get operation detail with given operation ID.
+     * @param operationId Operation ID.
+     * @param validateOperationSate Whether operation state should be validated.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
+    protected GetOperationDetailResponse getOperation(String operationId, boolean validateOperationSate) throws AuthStepException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
             final GetOperationDetailResponse operation = operationDetail.getResponseObject();
-            validateOperationState(operation);
+            if (validateOperationSate) {
+                validateOperationState(operation);
+            }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
             // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
             // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
@@ -137,7 +160,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param operation Operation.
      * @throws OperationTimeoutException Thrown when operation is expired.
      */
-    protected void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
+    private void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
         if (operation == null) {
             throw new IllegalArgumentException("Operation is null in checkOperationExpiration");
         }
@@ -569,6 +592,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             throw new OperationNotAvailableException("Operation is not available");
         }
         logger.debug("Validate operation started, operation ID: {}", operation.getOperationId());
+        checkOperationExpiration(operation);
         if (operation.getResult() == AuthResult.FAILED) {
             List<OperationHistory> operationHistory = operation.getHistory();
             if (operationHistory.size() == 0 || operationHistory.get(operationHistory.size()-1).getRequestAuthStepResult() != AuthStepResult.CANCELED) {
