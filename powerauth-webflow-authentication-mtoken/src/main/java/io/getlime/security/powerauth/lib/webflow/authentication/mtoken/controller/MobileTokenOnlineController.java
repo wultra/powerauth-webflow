@@ -150,7 +150,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         // Log level is set to FINE due to large amount of requests caused by polling.
         logger.debug("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         if (operation.isExpired()) {
-            logger.info("Operation has timed out, operation ID: {}", operation);
+            logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
             // Handle operation expiration
             try {
                 cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
