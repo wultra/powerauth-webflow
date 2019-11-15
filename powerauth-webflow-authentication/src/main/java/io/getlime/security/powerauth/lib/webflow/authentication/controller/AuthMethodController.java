@@ -311,7 +311,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
@@ -344,7 +343,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
