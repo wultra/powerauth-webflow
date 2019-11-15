@@ -116,7 +116,6 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     protected AuthenticationResult authenticate(UsernamePasswordAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
 
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
@@ -343,7 +342,6 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
         }
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         final UsernamePasswordInitResponse response = new UsernamePasswordInitResponse();
         try {
             ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();

@@ -107,7 +107,6 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     public LoginScaAuthResponse authenticateScaLogin(@RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
