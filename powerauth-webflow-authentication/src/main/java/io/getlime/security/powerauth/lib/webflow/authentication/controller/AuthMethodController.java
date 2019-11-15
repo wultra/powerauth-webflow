@@ -126,7 +126,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
     protected GetOperationDetailResponse getOperation(String operationId) throws AuthStepException {
-        return getOperation(operationId, false);
+        return getOperation(operationId, true);
     }
 
     /**
@@ -312,7 +312,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
-        GetOperationDetailResponse operation = getOperation(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
@@ -345,7 +345,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         // validate operation before requesting update
-        GetOperationDetailResponse operation = getOperation(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
