@@ -132,15 +132,15 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     /**
      * Get operation detail with given operation ID.
      * @param operationId Operation ID.
-     * @param validateOperationSate Whether operation state should be validated.
+     * @param validateOperationState Whether operation state should be validated.
      * @return Operation detail.
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
-    protected GetOperationDetailResponse getOperation(String operationId, boolean validateOperationSate) throws AuthStepException {
+    protected GetOperationDetailResponse getOperation(String operationId, boolean validateOperationState) throws AuthStepException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
             final GetOperationDetailResponse operation = operationDetail.getResponseObject();
-            if (validateOperationSate) {
+            if (validateOperationState) {
                 validateOperationState(operation);
             }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
