@@ -120,7 +120,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
-     * Get operation detail.
+     * Get operation detail with given operation ID.
      * @param operationId Operation ID.
      * @return Operation detail.
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
