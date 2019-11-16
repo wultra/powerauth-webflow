@@ -70,6 +70,8 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
 
     private static final Logger logger = LoggerFactory.getLogger(LoginScaController.class);
 
+    private static final String USERNAME_VALIDATION_REGEXP = "^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$";
+
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final AuthMethodQueryService authMethodQueryService;
@@ -234,7 +236,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      */
     private void updateUsernameInHttpSession(String username) {
         synchronized (httpSession.getServletContext()) {
-            if (username == null || !username.matches("^[0-9a-zA-Z_]+$")) {
+            if (username == null || !username.matches(USERNAME_VALIDATION_REGEXP)) {
                 logger.warn("Invalid username: {}", username);
                 return;
             }
