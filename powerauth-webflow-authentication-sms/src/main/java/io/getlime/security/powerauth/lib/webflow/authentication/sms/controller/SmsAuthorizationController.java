@@ -111,7 +111,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
         final String messageId = getMessageIdFromHttpSession();
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
@@ -334,7 +333,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
         InitSmsAuthorizationResponse initResponse = new InitSmsAuthorizationResponse();
 
         // By default enable both SMS authorization and password verification (2FA)
@@ -422,7 +420,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Resend step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
         ResendSmsAuthorizationResponse resendResponse = new ResendSmsAuthorizationResponse();
         resendResponse.setResendDelay(configuration.getSmsResendDelay());
         try {

@@ -65,7 +65,6 @@ public class TimeoutController extends AuthMethodController<VerifyTimeoutRequest
         }
         final GetOperationDetailResponse operation = getOperation();
         logger.debug("Verify timeout started, operation: {}", operation.getOperationId());
-        checkOperationExpiration(operation);
         final VerifyTimeoutResponse response = new VerifyTimeoutResponse();
 
         response.setTimeoutDelayMs(timeoutService.getTimeoutDelay(operation));

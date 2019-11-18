@@ -232,9 +232,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             final GetOperationDetailResponse operation = getOperation(operationId);
 
-            // Check for expired operation
-            checkOperationExpiration(operation);
-
             // Check if signature type is allowed
             if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
                 throw new PowerAuthAuthenticationException();

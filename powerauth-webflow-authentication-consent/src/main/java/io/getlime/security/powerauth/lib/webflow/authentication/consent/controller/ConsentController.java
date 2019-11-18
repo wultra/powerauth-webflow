@@ -101,7 +101,6 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     protected AuthenticationResult authenticate(ConsentAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         if (getConsentSkippedFromHttpSession()) {
             // Consent form is skipped, step authentication is complete
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -186,7 +185,6 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     public ConsentInitResponse initConsentForm() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
 
         ConsentInitResponse initResponse = new ConsentInitResponse();
 
