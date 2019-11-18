@@ -122,6 +122,15 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
                 String username = request.getUsername();
+                // Verify username format
+                if (username == null || !username.matches(USERNAME_VALIDATION_REGEXP)) {
+                    logger.warn("Invalid username: {}", username);
+                    // Send error in case username format is not acceptable
+                    LoginScaAuthResponse response = new LoginScaAuthResponse();
+                    response.setResult(AuthStepResult.AUTH_FAILED);
+                    response.setMessage("login.userNotFound");
+                    return response;
+                }
                 ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, operationContext);
                 updateUsernameInHttpSession(username);
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
@@ -236,10 +245,6 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      */
     private void updateUsernameInHttpSession(String username) {
         synchronized (httpSession.getServletContext()) {
-            if (username == null || !username.matches(USERNAME_VALIDATION_REGEXP)) {
-                logger.warn("Invalid username: {}", username);
-                return;
-            }
             httpSession.setAttribute(HttpSessionAttributeNames.USERNAME, username);
         }
     }
