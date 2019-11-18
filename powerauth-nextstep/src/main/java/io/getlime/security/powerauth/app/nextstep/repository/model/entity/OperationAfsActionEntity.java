@@ -141,7 +141,6 @@ public class OperationAfsActionEntity implements Serializable {
         OperationAfsActionEntity that = (OperationAfsActionEntity) o;
         return stepIndex == that.stepIndex &&
                 afsResponseApplied == that.afsResponseApplied &&
-                afsActionId.equals(that.afsActionId) &&
                 afsAction.equals(that.afsAction) &&
                 Objects.equals(requestAfsExtras, that.requestAfsExtras) &&
                 Objects.equals(afsLabel, that.afsLabel) &&
@@ -152,6 +151,6 @@ public class OperationAfsActionEntity implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(afsActionId, afsAction, stepIndex, requestAfsExtras, afsResponseApplied, afsLabel, responseAfsExtras, timestampCreated, operation);
+        return Objects.hash(afsAction, stepIndex, requestAfsExtras, afsResponseApplied, afsLabel, responseAfsExtras, timestampCreated, operation);
     }
 }

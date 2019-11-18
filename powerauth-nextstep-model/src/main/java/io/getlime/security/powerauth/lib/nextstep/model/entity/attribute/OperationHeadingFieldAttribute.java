@@ -57,7 +57,7 @@ public class OperationHeadingFieldAttribute extends OperationKeyValueFieldAttrib
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        this.formattedValues.putAll(formattedValues);
+        addFormattedValues(formattedValues);
     }
 
 }
