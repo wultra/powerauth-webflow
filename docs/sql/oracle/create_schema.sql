@@ -28,7 +28,6 @@ CREATE TABLE oauth_client_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             BLOB,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 );
