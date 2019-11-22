@@ -93,6 +93,7 @@ public class OperationPersistenceService {
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setOrganizationId(request.getOrganizationId());
+        operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Assign operation context to entity in case it was sent in request
