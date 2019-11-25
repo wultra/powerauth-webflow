@@ -74,6 +74,9 @@ public class OperationEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserAccountStatus userAccountStatus;
 
+    @Column(name = "external_transaction_id")
+    private String externalTransactionId;
+
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
     private AuthResult result;
@@ -187,6 +190,14 @@ public class OperationEntity implements Serializable {
 
     public void setUserAccountStatus(UserAccountStatus userAccountStatus) {
         this.userAccountStatus = userAccountStatus;
+    }
+
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
     }
 
     public AuthResult getResult() {

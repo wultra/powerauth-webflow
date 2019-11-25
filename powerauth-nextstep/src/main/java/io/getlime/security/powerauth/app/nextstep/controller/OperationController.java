@@ -207,6 +207,7 @@ public class OperationController {
         response.setUserId(operation.getUserId());
         response.setOrganizationId(operation.getOrganizationId());
         response.setAccountStatus(operation.getUserAccountStatus());
+        response.setExternalTransactionId(operation.getExternalTransactionId());
         response.setOperationData(operation.getOperationData());
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
@@ -293,6 +294,7 @@ public class OperationController {
             response.setUserId(operation.getUserId());
             response.setOrganizationId(operation.getOrganizationId());
             response.setAccountStatus(operation.getUserAccountStatus());
+            response.setExternalTransactionId(operation.getExternalTransactionId());
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());

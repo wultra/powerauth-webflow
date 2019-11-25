@@ -125,7 +125,7 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, List<KeyValueParameter> params) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, null, null, params, null);
+        return createOperation(operationName, null, operationData, null, null, null, params, null);
     }
 
     /**
@@ -140,7 +140,7 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
-        return createOperation(operationName, operationId, operationData, null, null, params, applicationContext);
+        return createOperation(operationName, operationId, operationData, null, null, null, params, applicationContext);
     }
 
     /**
@@ -155,7 +155,7 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, null, formData, params, applicationContext);
+        return createOperation(operationName, null, operationData, null, null, formData, params, applicationContext);
     }
 
     /**
@@ -165,13 +165,14 @@ public class NextStepClient {
      * @param operationId Operation ID (optional - if null, unique ID is automatically generated).
      * @param operationData Operation data.
      * @param organizationId Organization ID.
+     * @param externalTransactionId External transaction ID.
      * @param formData Operation form data, such as title, message and displayable attributes.
      * @param params List of generic parameters.
      * @param applicationContext Context of application requesting the OAuth 2.0 consent.
      * @return A Response with CreateOperationResponse object for OK status or ErrorModel for ERROR status.
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String organizationId, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
+    public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationId, String operationData, String organizationId, String externalTransactionId, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
         try {
             // Exchange next step request with NextStep server.
             CreateOperationRequest request = new CreateOperationRequest();
@@ -179,6 +180,7 @@ public class NextStepClient {
             request.setOperationId(operationId);
             request.setOperationData(operationData);
             request.setOrganizationId(organizationId);
+            request.setExternalTransactionId(externalTransactionId);
             request.setFormData(formData);
             if (params != null) {
                 request.getParams().addAll(params);
@@ -208,7 +210,7 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<CreateOperationResponse> createOperation(String operationName, String operationData, OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepServiceException {
-        return createOperation(operationName, null, operationData, organizationId, formData, params, applicationContext);
+        return createOperation(operationName, null, operationData, organizationId, null, formData, params, applicationContext);
     }
 
     /**
