@@ -263,6 +263,29 @@ public class DataAdapterClient {
     }
 
     /**
+     * Create a new login operation from the OAuth 2.0 login context.
+     *
+     * @param clientId OAuth 2.0 Client ID.
+     * @param scopes OAuth 2.0 Scopes.
+     * @return Information about a new operation.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<CreateImplicitLoginOperationResponse> createImplicitLoginOperation(String clientId, String[] scopes) throws DataAdapterClientErrorException {
+        try {
+            // Exchange user details with data adapter.
+            CreateImplicitLoginOperationRequest request = new CreateImplicitLoginOperationRequest(clientId, scopes);
+            HttpEntity<ObjectRequest<CreateImplicitLoginOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<CreateImplicitLoginOperationResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/create", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateImplicitLoginOperationResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
      * Decorate operation form data.
      *
      * @param userId User ID of the user for this request.

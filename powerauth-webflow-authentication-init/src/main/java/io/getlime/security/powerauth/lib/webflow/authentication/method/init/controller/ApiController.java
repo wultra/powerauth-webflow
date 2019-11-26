@@ -15,7 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.controller;
 
-import io.getlime.security.powerauth.app.webflow.oauth.OAuthBasicContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -27,7 +29,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationCon
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotAvailableException;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.entity.OAuthBasicContext;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request.InitOperationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.response.InitOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
@@ -76,9 +80,10 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
      *
      * @param request Authentication initialization request.
      * @return Authentication initialization response.
+     * @throws CommunicationFailedException In case the network communication fails when creating an implicit login operation.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) {
+    public @ResponseBody InitOperationResponse register(@RequestBody InitOperationRequest request) throws CommunicationFailedException {
         logger.info("Operation INIT started");
 
         GetOperationDetailResponse operation = null;
@@ -105,14 +110,28 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             final DefaultSavedRequest savedRequest = (DefaultSavedRequest) attributes.getAttribute("SPRING_SECURITY_SAVED_REQUEST", RequestAttributes.SCOPE_SESSION);
             OAuthBasicContext oAuthBasicContext = extractOAuthBasicContext(savedRequest);
 
-            String operationName;
             if (oAuthBasicContext == null) {
                 logger.error("OAuth 2.0 operation context was not extracted correctly and hence the process cannot continue.");
                 return failedOperationResponse(null, "operationConfig.missing");
             }
 
-            //TODO: Call data adapter to obtain correct operation name
-            operationName = "login";
+            // Fetch and prepare operation by calling the Data Adapter.
+            final CreateImplicitLoginOperationResponse ilo = createImplicitLoginOperation(oAuthBasicContext.getClientId(), oAuthBasicContext.getScopes());
+            String operationName = (ilo.getName() != null) ? ilo.getName() : "login" ;
+            final FormData daFormData = ilo.getFormData();
+            final OperationFormData formData;
+            if (daFormData != null) {
+                formData = new OperationFormData();
+                formData.addTitle(daFormData.getTitle().getId());
+                formData.addGreeting(daFormData.getGreeting().getId());
+                formData.addSummary(daFormData.getSummary().getId());
+            } else {
+                formData = new OperationFormData();
+                formData.addTitle("login.title");
+                formData.addGreeting("login.greeting");
+                formData.addSummary("login.summary");
+            }
+            final ApplicationContext applicationContext = ilo.getApplicationContext();
 
             GetOperationConfigDetailResponse operationConfig;
             try {
@@ -121,10 +140,6 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
                 logger.error("Operation configuration is missing, operation name: {}", operationName);
                 return failedOperationResponse(null, "operationConfig.missing");
             }
-            final OperationFormData formData = new OperationFormData();
-            formData.addTitle( "login.title");
-            formData.addGreeting("login.greeting");
-            formData.addSummary("login.summary");
             String operationData;
             try {
                  operationData = new OperationDataBuilder()
@@ -137,7 +152,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
             }
             List<KeyValueParameter> params = new ArrayList<>();
             logger.info("Initialized default login operation");
-            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, null, new AuthResponseProvider() {
+            return initiateOperationWithName(operationName, operationData, formData, sessionId, params, applicationContext, new AuthResponseProvider() {
                 @Override
                 public InitOperationResponse doneAuthentication(String userId) {
                     logger.info("Step result: CONFIRMED, authentication method: {}", getAuthMethodName().toString());

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.entity;
+package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 /**
- * Object for containing the basic OAuth 2.0 dance context.
+ * Request object for creating an operation based on OAuth 2.0 context.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class OAuthBasicContext {
+public class CreateImplicitLoginOperationRequest {
 
     /**
      * OAuth 2.0 Client ID
@@ -32,6 +32,22 @@ public class OAuthBasicContext {
      * OAuth 2.0 Scopes
      */
     private String[] scopes;
+
+    /**
+     * Default constructor
+     */
+    public CreateImplicitLoginOperationRequest() {
+    }
+
+    /**
+     * Full constructor.
+     * @param clientId OAuth 2.0 Client ID.
+     * @param scopes OAuth 2.0 Scopes.
+     */
+    public CreateImplicitLoginOperationRequest(String clientId, String[] scopes) {
+        this.clientId = clientId;
+        this.scopes = scopes;
+    }
 
     public String getClientId() {
         return clientId;
