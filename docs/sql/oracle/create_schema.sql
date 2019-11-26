@@ -128,6 +128,7 @@ CREATE TABLE ns_operation (
   user_id                       VARCHAR(256),
   organization_id               VARCHAR(256),
   user_account_status           VARCHAR(32),
+  external_transaction_id       VARCHAR(256),
   result                        VARCHAR(32),
   timestamp_created             TIMESTAMP,
   timestamp_expires             TIMESTAMP,

@@ -27,7 +27,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplic
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -97,11 +97,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
     protected GetOperationDetailResponse getOperation() throws AuthStepException {
+        return getOperation(true);
+    }
+
+    /**
+     * Get operation detail.
+     * @param validateOperationState Whether operation state should be validated.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
+    protected GetOperationDetailResponse getOperation(boolean validateOperationState) throws AuthStepException {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
             String operationId = pendingUserAuthentication.getOperationId();
             if (operationId != null) {
-                return getOperation(operationId);
+                return getOperation(operationId, validateOperationState);
             } else {
                 throw new OperationNotAvailableException("Operation is not available");
             }
@@ -134,10 +144,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
      */
     protected GetOperationDetailResponse getOperation(String operationId) throws AuthStepException {
+        return getOperation(operationId, true);
+    }
+
+    /**
+     * Get operation detail with given operation ID.
+     * @param operationId Operation ID.
+     * @param validateOperationState Whether operation state should be validated.
+     * @return Operation detail.
+     * @throws AuthStepException Thrown when operation could not be retrieved or it is not available.
+     */
+    protected GetOperationDetailResponse getOperation(String operationId, boolean validateOperationState) throws AuthStepException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationDetail = nextStepClient.getOperationDetail(operationId);
             final GetOperationDetailResponse operation = operationDetail.getResponseObject();
-            validateOperationState(operation);
+            if (validateOperationState) {
+                validateOperationState(operation);
+            }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
             // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
             // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
@@ -155,7 +178,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param operation Operation.
      * @throws OperationTimeoutException Thrown when operation is expired.
      */
-    protected void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
+    private void checkOperationExpiration(GetOperationDetailResponse operation) throws OperationTimeoutException {
         if (operation == null) {
             throw new IllegalArgumentException("Operation is null in checkOperationExpiration");
         }
@@ -306,8 +329,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // validate operation before requesting update
-        GetOperationDetailResponse operation = getOperation(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
@@ -339,8 +361,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @throws AuthStepException In case authorization fails.
      */
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
-        // validate operation before requesting update
-        GetOperationDetailResponse operation = getOperation(operationId);
+        GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
         ApplicationContext applicationContext = operation.getApplicationContext();
@@ -523,8 +544,18 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
-        } catch (NextStepServiceException e) {
-            logger.error("Error while building authorization response", e);
+        } catch (OperationAlreadyFinishedException ex) {
+            // Translate Next Step exception for update of a finished operation
+            throw new OperationIsAlreadyFinished(ex.getMessage());
+        } catch (OperationAlreadyCanceledException ex) {
+            // Translate Next Step exception for update of a canceled operation
+            throw new OperationIsAlreadyCanceledException(ex.getMessage());
+        } catch (OperationAlreadyFailedException ex) {
+            // Translate Next Step exception for update of a failed operation
+            throw new OperationIsAlreadyFailedException(ex.getMessage());
+        } catch (NextStepServiceException ex) {
+            // Generic Next Step error
+            logger.error("Error while building authorization response", ex);
             throw new CommunicationFailedException("Step authorization failed");
         }
     }
@@ -587,12 +618,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             throw new OperationNotAvailableException("Operation is not available");
         }
         logger.debug("Validate operation started, operation ID: {}", operation.getOperationId());
+        checkOperationExpiration(operation);
         if (operation.getResult() == AuthResult.FAILED) {
             List<OperationHistory> operationHistory = operation.getHistory();
             if (operationHistory.size() == 0 || operationHistory.get(operationHistory.size()-1).getRequestAuthStepResult() != AuthStepResult.CANCELED) {
                 // allow displaying of canceled operations - operation may be canceled in mobile app and later displayed in web UI
                 logger.warn("Operation has already failed, operation ID: {}", operation.getOperationId());
-                throw new OperationAlreadyFailedException("Operation has already failed");
+                throw new OperationIsAlreadyFailedException("Operation has already failed");
             }
         }
         final AuthMethod currentAuthMethod = getAuthMethodName(operation);

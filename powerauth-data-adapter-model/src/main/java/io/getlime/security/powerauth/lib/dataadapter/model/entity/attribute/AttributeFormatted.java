@@ -57,4 +57,12 @@ public class AttributeFormatted extends Attribute {
         formattedValues.put(key, formattedValue);
     }
 
+    /**
+     * Add multiple formatted values.
+     * @param formattedValues Formatted values.
+     */
+    public void addFormattedValues(Map<String, String> formattedValues) {
+        addFormattedValues(formattedValues);
+    }
+
 }

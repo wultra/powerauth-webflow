@@ -263,6 +263,10 @@ public class TppEngineClient {
             TypeReference<ObjectResponse<TppEngineError>> typeReference = new TypeReference<ObjectResponse<TppEngineError>>() {
             };
             ObjectResponse<TppEngineError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
+            if (errorResponse == null) {
+                TppEngineError error = new TppEngineError(TppEngineError.Code.ERROR_GENERIC, "IO error occurred: " + ex.getMessage());
+                return new TppEngineClientException(ex, error);
+            }
             TppEngineError error = errorResponse.getResponseObject();
             if (error == null) {
                 error = new TppEngineError();

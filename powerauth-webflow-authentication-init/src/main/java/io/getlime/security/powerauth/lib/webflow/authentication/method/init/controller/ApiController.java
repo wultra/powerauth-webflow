@@ -91,7 +91,6 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         try {
             operation = getOperation();
             logger.info("Operation found, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
-            checkOperationExpiration(operation);
         } catch (OperationNotAvailableException ex) {
             logger.info("Operation not found");
             // Operation is not available - this state is valid in INIT authentication method, operation was not initialized yet

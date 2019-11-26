@@ -125,8 +125,9 @@ CREATE TABLE ns_operation (
   application_extras            TEXT,
   user_id                       VARCHAR(256),
   organization_id               VARCHAR(256),
-  result                        VARCHAR(32),
   user_account_status           VARCHAR(32),
+  external_transaction_id       VARCHAR(256),
+  result                        VARCHAR(32),
   timestamp_created             TIMESTAMP,
   timestamp_expires             TIMESTAMP,
   CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)

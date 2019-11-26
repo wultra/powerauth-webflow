@@ -82,7 +82,6 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
     public ApprovalScaAuthResponse authenticateScaApproval(@RequestBody ApprovalScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         String userId = operation.getUserId();
         if (userId == null) {
             // At this point user ID must be known, method cannot continue
@@ -130,7 +129,6 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
     public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         String userId = operation.getUserId();
         if (userId == null) {
             // At this point user ID must be known, method cannot continue

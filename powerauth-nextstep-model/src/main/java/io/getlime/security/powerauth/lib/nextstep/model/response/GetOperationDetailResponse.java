@@ -36,6 +36,7 @@ public class GetOperationDetailResponse {
     private String userId;
     private String organizationId;
     private UserAccountStatus accountStatus;
+    private String externalTransactionId;
     private AuthResult result;
     private Date timestampCreated;
     private Date timestampExpires;
@@ -135,6 +136,22 @@ public class GetOperationDetailResponse {
      */
     public void setAccountStatus(UserAccountStatus accountStatus) {
         this.accountStatus = accountStatus;
+    }
+
+    /**
+     * Get external transaction ID.
+     * @return External transaction ID.
+     */
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    /**
+     * Set external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     */
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
     }
 
     /**

@@ -70,6 +70,8 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
 
     private static final Logger logger = LoggerFactory.getLogger(LoginScaController.class);
 
+    private static final String USERNAME_VALIDATION_REGEXP = "^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$";
+
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final AuthMethodQueryService authMethodQueryService;
@@ -107,7 +109,6 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     public LoginScaAuthResponse authenticateScaLogin(@RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         try {
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
@@ -120,6 +121,15 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
                 String username = request.getUsername();
+                // Verify username format
+                if (username == null || !username.matches(USERNAME_VALIDATION_REGEXP)) {
+                    logger.warn("Invalid username: {}", username);
+                    // Send error in case username format is not acceptable
+                    LoginScaAuthResponse response = new LoginScaAuthResponse();
+                    response.setResult(AuthStepResult.AUTH_FAILED);
+                    response.setMessage("login.userNotFound");
+                    return response;
+                }
                 ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, operationContext);
                 updateUsernameInHttpSession(username);
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();

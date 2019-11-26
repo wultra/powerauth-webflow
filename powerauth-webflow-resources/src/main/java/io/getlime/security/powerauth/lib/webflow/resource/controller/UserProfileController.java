@@ -89,7 +89,8 @@ public class UserProfileController {
 
             final ObjectResponse<UserDetailResponse> userDetailResponse = client.fetchUserDetail(authentication.getUserAuthentication().getName(), organizationId);
 
-            if (userDetailResponse.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
+            if (userDetailResponse.getResponseObject().getAccountStatus() == null
+                    || userDetailResponse.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
                 // Return dummy user in case user account is not ACTIVE
                 return anonymousUser();
             }

@@ -93,6 +93,7 @@ public class OperationPersistenceService {
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setOrganizationId(request.getOrganizationId());
+        operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Assign operation context to entity in case it was sent in request
@@ -343,8 +344,8 @@ public class OperationPersistenceService {
         for (OperationEntity operation : entities) {
             // Add operations whose last step is CONFIRMED with CONTINUE result and chosen authentication method supports mobile token
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
-            if (currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE
-                    && currentHistoryEntity.isMobileTokenActive()) {
+            if (currentHistoryEntity != null && currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED
+                    && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
                 if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
                     filteredList.add(operation);
