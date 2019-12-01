@@ -21,7 +21,6 @@ CREATE TABLE oauth_client_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -32,7 +31,6 @@ CREATE TABLE oauth_access_token (
   authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             LONG VARBINARY,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
   authentication    LONG VARBINARY,

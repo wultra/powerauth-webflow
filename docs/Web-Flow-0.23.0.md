@@ -61,9 +61,9 @@ DDL update script for MySQL:
 ALTER TABLE `ns_operation_config` ADD `afs_enabled` BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE `ns_operation_config` ADD `afs_config_id` VARCHAR(256);
 
-ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256),  
-ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32),
-ALTER TABLE `wf_operation_session` ADD `client_ip_address` VARCHAR(32),
+ALTER TABLE `wf_operation_session` ADD `operation_hash` VARCHAR(256);  
+ALTER TABLE `wf_operation_session` ADD `websocket_session_id` VARCHAR(32);
+ALTER TABLE `wf_operation_session` ADD `client_ip_address` VARCHAR(32);
 
 ALTER TABLE `ns_operation` ADD `application_original_scopes` VARCHAR(256);
 ALTER TABLE `ns_operation` ADD `external_transaction_id` VARCHAR(256);
