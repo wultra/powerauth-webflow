@@ -1980,7 +1980,7 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 
 ### Get mobile token configuration
 
-Get whether mobile token is enabled for given user ID, operation ID and authentication method.
+Get whether mobile token is enabled for given user ID, operation name and authentication method.
 
 <table>
     <tr>
