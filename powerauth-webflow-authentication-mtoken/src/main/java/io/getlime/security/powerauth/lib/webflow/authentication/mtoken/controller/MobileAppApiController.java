@@ -147,6 +147,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 operationList = getOperationListForUser(userId, true);
                 operationConfigs = getOperationConfigs(operationList);
             } catch (AuthStepException e) {
+                logger.error("Could not retrieve operation list", e);
                 // Next step operation list failed, return empty operation list
                 return new ObjectResponse<>(new OperationListResponse());
             }
@@ -319,6 +320,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         try {
             operationConfig = getOperationConfig(operationName);
         } catch (AuthStepException e) {
+            logger.error("Could not retrieve operation configuration", e);
             // Next step request failed, cannot decide
             return false;
         }
