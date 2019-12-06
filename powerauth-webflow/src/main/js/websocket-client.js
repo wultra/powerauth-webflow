@@ -25,25 +25,30 @@ require('stompjs');
  * @param webSocketId Web Socket ID.
  */
 function register(registrations, webSocketId) {
-    var msie = document.documentMode;
-    if (msie && msie < 11) {
-        // Old IE versions do not support Web Sockets, see: https://caniuse.com/#feat=websockets
-        // For IE < 11 fall back to polling.
-        return;
-    }
-    let headers = {};
-    headers[csrf.headerName] = csrf.token;
-    const socket = SockJS('./websocket');
-    client = Stomp.over(socket);
-    client.debug = () => {};
-    client.connect(headers, function (frame) {
-        registrations.forEach(function (registration) {
-            client.subscribe(registration.route, registration.callback);
+    try {
+        var msie = document.documentMode;
+        if (msie && msie < 11) {
+            // Old IE versions do not support Web Sockets, see: https://caniuse.com/#feat=websockets
+            // For IE < 11 fall back to polling.
+            return;
+        }
+        let headers = {};
+        headers[csrf.headerName] = csrf.token;
+        const socket = SockJS('./websocket');
+        client = Stomp.over(socket);
+        client.debug = () => {};
+        client.connect(headers, function (frame) {
+            registrations.forEach(function (registration) {
+                client.subscribe(registration.route, registration.callback);
+            });
+            // Registration of the client with given webSocketId to link WebSocket session and operation
+            const msg = {"webSocketId": webSocketId};
+            client.send("/app/registration", {}, JSON.stringify(msg));
         });
-        // registration of the client with given webSocketId to link WebSocket session and operation
-        const msg = {"webSocketId": webSocketId};
-        client.send("/app/registration", {}, JSON.stringify(msg));
-    });
+    } catch (e) {
+        // Ignore Web Socket errors, however log the event
+        console.log("Web Socket registration failed.");
+    }
 }
 
 
@@ -53,7 +58,14 @@ function register(registrations, webSocketId) {
  * @param callback Callback function to call on an event.
  */
 function subscribe(route, callback) {
-    client.subscribe(route, callback);
+    try {
+        if (client !== undefined) {
+            client.subscribe(route, callback);
+        }
+    } catch (e) {
+        // Ignore Web Socket errors, however log the event
+        console.log("Web Socket subscribe action failed.");
+    }
 }
 
 /**
@@ -61,7 +73,14 @@ function subscribe(route, callback) {
  * @param route Web Socket route.
  */
 function unsubscribe(route) {
-    client.unsubscribe(route);
+    try {
+        if (client !== undefined) {
+            client.unsubscribe(route);
+        }
+    } catch (e) {
+        // Ignore Web Socket errors, however log the event
+        console.log("Web Socket unsubscribe action failed.");
+    }
 }
 
 /**
@@ -71,8 +90,13 @@ function unsubscribe(route) {
  * @param message Text of the message as JSON.
  */
 function send(destination, params, message) {
-    if (client !== undefined) {
-        client.send(destination, params, message);
+    try {
+        if (client !== undefined) {
+            client.send(destination, params, message);
+        }
+    } catch (e) {
+        // Ignore Web Socket errors, however log the event
+        console.log("Web Socket send action failed.");
     }
 }
 
@@ -80,8 +104,13 @@ function send(destination, params, message) {
  * Disconnect the WebSocket.
  */
 function disconnect() {
-    if (client !== undefined) {
-        client.disconnect();
+    try {
+        if (client !== undefined) {
+            client.disconnect();
+        }
+    } catch (e) {
+        // Ignore Web Socket errors, however log the event
+        console.log("Web Socket disconnect action failed.");
     }
 }
 
