@@ -61,7 +61,7 @@ public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttr
      * @param formattedValues Formatted values.
      */
     public void addFormattedValues(Map<String, String> formattedValues) {
-        addFormattedValues(formattedValues);
+        this.formattedValues.putAll(formattedValues);
     }
 
 }

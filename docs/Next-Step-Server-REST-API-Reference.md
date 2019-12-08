@@ -24,6 +24,8 @@ Following topics are covered in this chapter:
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
   - [Set chosen authentication method](#set-chosen-authentication-method)
+  - [Update mobile token status for an operation](#update-mobile-token-status-for-an-operation)
+  - [Get mobile token configuration](#get-mobile-token-configuration)
   - [Store result of an AFS action](#store-result-of-an-afs-action)
   - [List operation configurations](#list-operation-configurations)
   - [Get operation configuration detail](#get-operation-configuration-detail)
@@ -1920,6 +1922,103 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 ```json
 {
   "status" : "OK"
+}
+```
+
+### Update mobile token status for an operation
+
+Set whether mobile token is active for an operation.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>PUT</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/mobileToken/status</code></td>
+    </tr>
+</table>
+
+Alternative with `POST` method for environments which do not allow `PUT` methods:
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/mobileToken/status/update</code></td>
+    </tr>
+</table>
+
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "operationId": "1ee2d165-1926-4a77-be5f-82ec26f12b97",
+    "mobileTokenActive": true
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status" : "OK"
+}
+```
+
+### Get mobile token configuration
+
+Get whether mobile token is enabled for given user ID, operation name and authentication method.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/mobileToken/config/detail</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "12345678",
+    "operationName": "login",
+    "authMethod": "LOGIN_SCA"
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "mobileTokenEnabled": true
+  }
 }
 ```
 

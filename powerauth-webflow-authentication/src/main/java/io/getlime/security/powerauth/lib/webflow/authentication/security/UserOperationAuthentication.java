@@ -33,7 +33,7 @@ import java.util.Locale;
  */
 public class UserOperationAuthentication extends AbstractAuthenticationToken implements Serializable {
 
-    private static final long serialVersionUID = -3790516505615465445L;
+    private static final long serialVersionUID = 4514448849365459373L;
 
     private String userId;
     private String operationId;
