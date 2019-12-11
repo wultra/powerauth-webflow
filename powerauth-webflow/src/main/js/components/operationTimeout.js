@@ -36,14 +36,32 @@ export default class OperationTimeout extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(verifyOperationTimeout());
+        // Check timeout only in case the check is active to avoid concurrent requests
+        if (this.props.timeoutCheckActive) {
+            this.props.dispatch(verifyOperationTimeout());
+        }
     }
 
     componentWillReceiveProps(props) {
+        if (!this.props.timeoutCheckActive && props.timeoutCheckActive) {
+            // Timeout check has just been activated e.g. by switching active organization
+            if (this.state.timeoutCheckScheduled) {
+                // Timeout check is already scheduled, just enable it
+                this.setState({timeoutCheckEnabled: true});
+            } else {
+                // Trigger new timeout check
+                this.props.dispatch(verifyOperationTimeout());
+            }
+            return;
+        }
+        if (this.props.timeoutCheckActive && !props.timeoutCheckActive) {
+            // Timeout check has just been deactivated e.g. by switching active organization
+            this.setState({timeoutCheckEnabled: false});
+            return;
+        }
         if (props.timeout) {
-            this.setState({timeoutCheckEnabled: props.timeout.timeoutCheckEnabled});
-            if (this.state.timeoutCheckEnabled && !this.state.timeoutCheckScheduled && props.timeout.timeoutDelayMs > 0) {
-                this.setState({timeoutCheckScheduled: true});
+            if (!this.state.timeoutCheckScheduled && props.timeout.timeoutCheckEnabled && props.timeout.timeoutDelayMs > 0) {
+                this.setState({timeoutCheckEnabled: true, timeoutCheckScheduled: true});
                 let nextVerificationMs = props.timeout.timeoutDelayMs;
                 if (props.timeout.timeoutWarningDelayMs > 0 && props.timeout.timeoutWarningDelayMs < props.timeout.timeoutDelayMs) {
                     nextVerificationMs = props.timeout.timeoutWarningDelayMs;

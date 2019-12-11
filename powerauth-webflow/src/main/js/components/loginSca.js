@@ -108,7 +108,7 @@ export default class LoginSca extends React.Component {
         }
         return (
             <Panel>
-                {this.banners()}
+                {this.banners(true)}
                 {this.title()}
                 {this.loginForm(organizations[0].organizationId)}
             </Panel>
@@ -127,7 +127,7 @@ export default class LoginSca extends React.Component {
                         return (
                             <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
                                 <Panel>
-                                    {this.banners()}
+                                    {this.banners(org.organizationId === this.props.context.chosenOrganizationId)}
                                     {this.title()}
                                     {this.loginForm(org.organizationId)}
                                 </Panel>
@@ -162,7 +162,7 @@ export default class LoginSca extends React.Component {
                         intl={this.props.intl}
                         callback={organization => this.organizationChanged(organization.organizationId)}
                     />
-                    {this.banners()}
+                    {this.banners(true)}
                     {this.title()}
                     {this.loginForm(chosenOrganizationId)}
                 </Panel>
@@ -185,9 +185,9 @@ export default class LoginSca extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
-    banners() {
+    banners(timeoutCheckActive) {
         return (
-            <OperationTimeout/>
+            <OperationTimeout timeoutCheckActive={timeoutCheckActive}/>
         )
     }
 
