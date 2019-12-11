@@ -44,7 +44,7 @@ export default class OperationTimeout extends React.Component {
 
     componentWillReceiveProps(props) {
         if (!this.props.timeoutCheckActive && props.timeoutCheckActive) {
-            // Timeout check has just been activated e.g. by switching active organization
+            // Timeout check has just been activated e.g. by switching the active organization
             if (this.state.timeoutCheckScheduled) {
                 // Timeout check is already scheduled, just enable it
                 this.setState({timeoutCheckEnabled: true});
@@ -55,11 +55,11 @@ export default class OperationTimeout extends React.Component {
             return;
         }
         if (this.props.timeoutCheckActive && !props.timeoutCheckActive) {
-            // Timeout check has just been deactivated e.g. by switching active organization
+            // Timeout check has just been deactivated e.g. by switching the active organization
             this.setState({timeoutCheckEnabled: false});
             return;
         }
-        if (props.timeout) {
+        if (props.timeoutCheckActive && props.timeout) {
             if (!this.state.timeoutCheckScheduled && props.timeout.timeoutCheckEnabled && props.timeout.timeoutDelayMs > 0) {
                 this.setState({timeoutCheckEnabled: true, timeoutCheckScheduled: true});
                 let nextVerificationMs = props.timeout.timeoutDelayMs;
