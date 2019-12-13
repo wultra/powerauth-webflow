@@ -122,12 +122,20 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 userIdAlreadyAvailable = false;
                 String username = request.getUsername();
                 // Verify username format
-                if (username == null || !username.matches(USERNAME_VALIDATION_REGEXP)) {
-                    logger.warn("Invalid username: {}", username);
+                if (username == null || username.isEmpty()) {
+                    logger.debug("Empty username specified during user authentication");
+                    // Send error in case username is empty
+                    LoginScaAuthResponse response = new LoginScaAuthResponse();
+                    response.setResult(AuthStepResult.AUTH_FAILED);
+                    response.setMessage("login.username.empty");
+                    return response;
+                }
+                if (!username.matches(USERNAME_VALIDATION_REGEXP)) {
+                    logger.debug("Invalid username specified during user authentication: {}", username);
                     // Send error in case username format is not acceptable
                     LoginScaAuthResponse response = new LoginScaAuthResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
-                    response.setMessage("login.userNotFound");
+                    response.setMessage("login.username.invalidFormat");
                     return response;
                 }
                 ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, operationContext);
