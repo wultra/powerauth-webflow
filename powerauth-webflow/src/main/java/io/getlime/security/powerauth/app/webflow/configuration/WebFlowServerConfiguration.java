@@ -81,6 +81,24 @@ public class WebFlowServerConfiguration {
     private boolean afsEnabled;
 
     /**
+     * Maximum length of username.
+     */
+    @Value("${powerauth.webflow.input.username.maxLength:256}")
+    private int usernameMaxLength;
+
+    /**
+     * Maximum length of user password.
+     */
+    @Value("${powerauth.webflow.input.password.maxLength:256}")
+    private int passwordMaxLength;
+
+    /**
+     * Maximum length of SMS authorization code.
+     */
+    @Value("${powerauth.webflow.input.smsOtp.maxLength:8}")
+    private int smsOtpMaxLength;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -145,5 +163,29 @@ public class WebFlowServerConfiguration {
      */
     public boolean isAfsEnabled() {
         return afsEnabled;
+    }
+
+    /**
+     * Get maximum length of username.
+     * @return Maximum length of username.
+     */
+    public int getUsernameMaxLength() {
+        return usernameMaxLength;
+    }
+
+    /**
+     * Get maximum length of password.
+     * @return Maximum length of password.
+     */
+    public int getPasswordMaxLength() {
+        return passwordMaxLength;
+    }
+
+    /**
+     * Get maximum length of SMS authorization code.
+     * @return Maximum length of SMS authorization code.
+     */
+    public int getSmsOtpMaxLength() {
+        return smsOtpMaxLength;
     }
 }
