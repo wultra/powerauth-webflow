@@ -276,7 +276,7 @@ curl --request POST \
 }'
 ```
 
-- Either of the previous commands returns an operation ID which should be used in the authorization form:
+- Either of the previous commands returns an operation ID which should be used in the authorization form.
 - The AISP or PISP operation authorization continues with same steps as an operation triggered directly by the test client. 
 - See the documentation for [customizing operation form data](./Next-Step-Server-REST-API-Reference.md#operation-formdata) and [customizing operation data](./Operation-Data.md) in case you want to test an operation with custom data.
 
