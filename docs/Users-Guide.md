@@ -124,7 +124,7 @@ This chapter describes generic behaviour which is independent on chosen operatio
 | In case the user tries to refresh the page a confirmation dialog appears. The refresh action interrupts operation which is in progress. | ![Preview](./img/reload.png) |
 | In case the user tries to navigate away from the page or close browser window a confirmation dialog appears. The navigation action interrupts operation which is in progress. | ![Preview](./img/leave.png) |
 
-## Login SCA Testing (AISP)
+## Login Testing (AISP)
 
 - AISP contains only a user authentication step, there is no approval step. 
 - AIPS contains a consent step.
