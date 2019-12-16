@@ -165,6 +165,7 @@ public class HomeController {
         model.putIfAbsent("afs_js_snippet_url", "");
 
         model.put("title", webFlowConfig.getPageTitle());
+        model.put("limitLargeConsentPanel", webFlowConfig.getLimitLargeConsentPanel());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
         model.put("lang", LocaleContextHolder.getLocale().getLanguage());
         // JSON objects with i18n messages are inserted into the model to provide localization for the frontend

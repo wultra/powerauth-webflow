@@ -81,6 +81,12 @@ public class WebFlowServerConfiguration {
     private boolean afsEnabled;
 
     /**
+     * Configuration of limit for large consent panel in number of characters.
+     */
+    @Value("${powerauth.webflow.consent.large.limit:750}")
+    private int limitLargeConsentPanel;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -145,5 +151,13 @@ public class WebFlowServerConfiguration {
      */
     public boolean isAfsEnabled() {
         return afsEnabled;
+    }
+
+    /**
+     * Get limit of characters for displaying large consent panel.
+     * @return Limit of characters for displaying large consent panel.
+     */
+    public int getLimitLargeConsentPanel() {
+        return limitLargeConsentPanel;
     }
 }
