@@ -50,7 +50,8 @@ export default class Consent extends React.Component {
             consentHtml: null,
             options: null,
             validationErrorMessage: null,
-            optionValidationErrors: new Map()
+            optionValidationErrors: new Map(),
+            largePanelDisplayed: false
         };
     }
 
@@ -128,11 +129,14 @@ export default class Consent extends React.Component {
     enableLargePanel() {
         document.getElementById("main-panel").classList.remove("col-sm-8", "col-sm-offset-2", "col-md-6", "col-md-offset-3", "col-lg-6", "col-lg-offset-3");
         document.getElementById("main-panel").classList.add("col-sm-12", "col-md-12", "col-lg-12");
+        this.setState({largePanelDisplayed: true});
     }
 
     disableLargePanel() {
-        document.getElementById("main-panel").classList.remove("col-sm-12", "col-md-12", "col-lg-12");
-        document.getElementById("main-panel").classList.add("col-sm-8", "col-sm-offset-2", "col-md-6", "col-md-offset-3", "col-lg-6", "col-lg-offset-3");
+        if (this.state.largePanelDisplayed) {
+            document.getElementById("main-panel").classList.remove("col-sm-12", "col-md-12", "col-lg-12");
+            document.getElementById("main-panel").classList.add("col-sm-8", "col-sm-offset-2", "col-md-6", "col-md-offset-3", "col-lg-6", "col-lg-offset-3");
+        }
     }
 
     handleCheckboxChange(event) {
