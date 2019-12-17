@@ -121,7 +121,7 @@ export default class Consent extends React.Component {
     }
 
     handleLargeConsent(consentHtml) {
-        if (consentHtml && consentHtml.length > limitLargeConsentPanel) {
+        if (consentPanelLimitEnabled && consentHtml && consentHtml.length >= consentPanelLimitCharacters) {
             this.enableLargePanel();
         }
     }
