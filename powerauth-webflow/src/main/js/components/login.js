@@ -230,11 +230,11 @@ export default class Login extends React.Component {
                 )
                 }
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={usernameField} type="text"
+                    <FormControl autoComplete="new-password" ref={usernameField} type="text" maxLength={usernameMaxLength}
                                  placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
                 </FormGroup>
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={passwordField} type="password"
+                    <FormControl autoComplete="new-password" ref={passwordField} type="password" maxLength={passwordMaxLength}
                                  placeholder={formatMessage({id: 'login.password'})}/>
                 </FormGroup>
                 <FormGroup>

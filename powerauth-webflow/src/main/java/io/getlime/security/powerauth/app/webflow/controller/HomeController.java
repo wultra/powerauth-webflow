@@ -174,6 +174,9 @@ public class HomeController {
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         model.put("showAndroidSecurityWarning", webFlowConfig.getShowAndroidSecurityWarning());
+        model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());
+        model.put("passwordMaxLength", webFlowConfig.getPasswordMaxLength());
+        model.put("smsOtpMaxLength", webFlowConfig.getSmsOtpMaxLength());
         logger.info("The /authenticate request succeeded");
         return "index";
     }
