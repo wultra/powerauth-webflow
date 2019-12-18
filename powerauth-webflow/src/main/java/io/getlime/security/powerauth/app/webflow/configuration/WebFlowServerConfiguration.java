@@ -199,6 +199,7 @@ public class WebFlowServerConfiguration {
      */
     public int getSmsOtpMaxLength() {
         return smsOtpMaxLength;
+    }
 
     /**
      * Get whether limit for large consent panel is enabled.
