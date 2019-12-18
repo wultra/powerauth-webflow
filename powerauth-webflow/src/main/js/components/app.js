@@ -113,7 +113,7 @@ export class App extends React.Component {
                     )}
                 </div>
                 <div className="row">
-                    <div className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
+                    <div id="main-panel" className="col-xs-12 col-sm-8 col-sm-offset-2 col-md-6 col-md-offset-3 col-lg-6 col-lg-offset-3">
                         <div id="home" className="text-center">
                             <div id="logo"/>
                             <Component intl={this.props.intl}/>

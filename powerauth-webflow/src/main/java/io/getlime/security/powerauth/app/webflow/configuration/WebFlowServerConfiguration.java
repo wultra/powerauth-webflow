@@ -99,6 +99,18 @@ public class WebFlowServerConfiguration {
     private int smsOtpMaxLength;
 
     /**
+     * Whether limit for large consent panel is enabled.
+     */
+    @Value("${powerauth.webflow.consent.limit.enabled:false}")
+    private boolean consentPanelLimitEnabled;
+
+    /**
+     * Configuration of limit for large consent panel in number of characters.
+     */
+    @Value("${powerauth.webflow.consent.limit.characters:750}")
+    private int consentPanelLimitCharacters;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -187,5 +199,20 @@ public class WebFlowServerConfiguration {
      */
     public int getSmsOtpMaxLength() {
         return smsOtpMaxLength;
+
+    /**
+     * Get whether limit for large consent panel is enabled.
+     * @return Whether limit for large consent panel is enabled.
+     */
+    public boolean isConsentPanelLimitEnabled() {
+        return consentPanelLimitEnabled;
+    }
+
+    /**
+     * Get limit of characters for displaying large consent panel.
+     * @return Limit of characters for displaying large consent panel.
+     */
+    public int getConsentPanelLimitCharacters() {
+        return consentPanelLimitCharacters;
     }
 }
