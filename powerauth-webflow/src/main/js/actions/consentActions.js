@@ -42,7 +42,7 @@ export function init() {
             }
             if (!response.data.shouldDisplayConsent) {
                 // Skip showing of consent form and go directly to authentication
-                dispatch(authenticate([]));
+                dispatch(authenticate([], function () {}));
                 return null;
             }
             dispatch({
