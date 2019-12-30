@@ -42,7 +42,7 @@ export function init() {
             }
             if (!response.data.shouldDisplayConsent) {
                 // Skip showing of consent form and go directly to authentication
-                dispatch(authenticate([]));
+                dispatch(authenticate([], function(){}));
                 return null;
             }
             dispatch({
@@ -65,7 +65,7 @@ export function init() {
  * Perform SMS authentication.
  * @returns {Function} No return value.
  */
-export function authenticate(options) {
+export function authenticate(options, callback) {
     return function (dispatch) {
         axios.post("./api/auth/consent/authenticate", {
             options
@@ -76,10 +76,12 @@ export function authenticate(options) {
         }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
+                    callback();
                     dispatchAction(dispatch, response);
                     break;
                 }
                 case 'CANCELED': {
+                    callback();
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {
@@ -117,13 +119,14 @@ export function authenticate(options) {
  * Cancel operation.
  * @returns {Function} No return value.
  */
-export function cancel() {
+export function cancel(callback) {
     return function (dispatch) {
         axios.post("./api/auth/consent/cancel", {}, {
             headers: {
                 'X-OPERATION-HASH': operationHash,
             }
         }).then((response) => {
+            callback();
             dispatch({
                 type: "SHOW_SCREEN_ERROR",
                 payload: {

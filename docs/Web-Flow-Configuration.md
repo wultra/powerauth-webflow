@@ -86,13 +86,22 @@ powerauth.webflow.sms.resend.delayMs=60000
 # Configuration of Delay for Showing Operation Timeout Warning in Milliseconds
 powerauth.webflow.timeout.warning.delayMs=60000
 
+# Configuration of Limit for Large Consent Panel in Number of Characters
+powerauth.webflow.consent.limit.enabled=false
+powerauth.webflow.consent.limit.characters=750
+
 # Anti-fraud system configuration
-powerauth.webflow.afs.enabled=true
+powerauth.webflow.afs.enabled=false
 powerauth.webflow.afs.type=THREAT_MARK
 powerauth.webflow.afs.detectIpAddress=false
 powerauth.webflow.afs.forceIpv4=true
 powerauth.webflow.afs.tm.cookies.deviceTag=
 powerauth.webflow.afs.tm.cookies.sessionSid=
+
+# User input validation
+powerauth.webflow.input.username.maxLength=256
+powerauth.webflow.input.password.maxLength=256
+powerauth.webflow.input.smsOtp.maxLength=8
 ```
 
 Encryption of user passwords during transport can be configured using following properties:

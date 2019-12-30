@@ -5,6 +5,7 @@
 - [Components](./Components.md)
 - [Web Flow Architecture](./Web-Flow-Architecture.md)
 - [OAuth 2.0 Integration](./OAuth-2.0-Integration.md)
+- [User's Guide](./Users-Guide.md)
 
 **Applications**
 - [Web Flow Server](./Web-Flow-Server.md)

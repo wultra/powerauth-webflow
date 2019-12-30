@@ -38,6 +38,9 @@ export default class Consent extends React.Component {
     constructor() {
         super();
         this.init = this.init.bind(this);
+        this.handleLargeConsent = this.handleLargeConsent.bind(this);
+        this.enableLargePanel = this.enableLargePanel.bind(this);
+        this.disableLargePanel = this.disableLargePanel.bind(this);
         this.handleCheckboxChange = this.handleCheckboxChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
@@ -47,7 +50,8 @@ export default class Consent extends React.Component {
             consentHtml: null,
             options: null,
             validationErrorMessage: null,
-            optionValidationErrors: new Map()
+            optionValidationErrors: new Map(),
+            largePanelDisplayed: false
         };
     }
 
@@ -65,8 +69,11 @@ export default class Consent extends React.Component {
 
     initConsent(props) {
         // Store consent HTML in local state, switching language or refresh will receive new consent HTML
+        const handleLargeConsent = this.handleLargeConsent;
         if (props.context.consentHtml) {
-            this.setState({consentHtml: props.context.consentHtml});
+            this.setState({consentHtml: props.context.consentHtml}, function () {
+                handleLargeConsent(props.context.consentHtml);
+            });
         }
         if (props.context.options) {
             // Update default values in context when options are received for the first time
@@ -113,6 +120,25 @@ export default class Consent extends React.Component {
         }
     }
 
+    handleLargeConsent(consentHtml) {
+        if (consentPanelLimitEnabled && consentHtml && consentHtml.length >= consentPanelLimitCharacters) {
+            this.enableLargePanel();
+        }
+    }
+
+    enableLargePanel() {
+        document.getElementById("main-panel").classList.remove("col-sm-8", "col-sm-offset-2", "col-md-6", "col-md-offset-3", "col-lg-6", "col-lg-offset-3");
+        document.getElementById("main-panel").classList.add("col-sm-12", "col-md-12", "col-lg-12");
+        this.setState({largePanelDisplayed: true});
+    }
+
+    disableLargePanel() {
+        if (this.state.largePanelDisplayed) {
+            document.getElementById("main-panel").classList.remove("col-sm-12", "col-md-12", "col-lg-12");
+            document.getElementById("main-panel").classList.add("col-sm-8", "col-sm-offset-2", "col-md-6", "col-md-offset-3", "col-lg-6", "col-lg-offset-3");
+        }
+    }
+
     handleCheckboxChange(event) {
         // Update map of checked checkboxes in context
         const optionId = event.target.id;
@@ -134,13 +160,19 @@ export default class Consent extends React.Component {
 
     handleSubmit(event) {
         event.preventDefault();
+        const disableLargePanel = this.disableLargePanel;
         // Local state stores up-to-date consent options state
-        this.props.dispatch(authenticate(this.state.options));
+        this.props.dispatch(authenticate(this.state.options, function() {
+            disableLargePanel();
+        }));
     }
 
     handleCancel(event) {
         event.preventDefault();
-        this.props.dispatch(cancel());
+        const disableLargePanel = this.disableLargePanel;
+        this.props.dispatch(cancel(function() {
+            disableLargePanel();
+        }));
     }
 
     createHtml(html) {

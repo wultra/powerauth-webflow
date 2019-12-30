@@ -165,6 +165,8 @@ public class HomeController {
         model.putIfAbsent("afs_js_snippet_url", "");
 
         model.put("title", webFlowConfig.getPageTitle());
+        model.put("consentPanelLimitEnabled", webFlowConfig.isConsentPanelLimitEnabled());
+        model.put("consentPanelLimitCharacters", webFlowConfig.getConsentPanelLimitCharacters());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
         model.put("lang", LocaleContextHolder.getLocale().getLanguage());
         // JSON objects with i18n messages are inserted into the model to provide localization for the frontend
@@ -172,6 +174,9 @@ public class HomeController {
         model.put("i18n_EN", i18nService.generateMessages(Locale.ENGLISH));
         model.put("operationHash", operationSessionService.generateOperationHash(operationId));
         model.put("showAndroidSecurityWarning", webFlowConfig.getShowAndroidSecurityWarning());
+        model.put("usernameMaxLength", webFlowConfig.getUsernameMaxLength());
+        model.put("passwordMaxLength", webFlowConfig.getPasswordMaxLength());
+        model.put("smsOtpMaxLength", webFlowConfig.getSmsOtpMaxLength());
         logger.info("The /authenticate request succeeded");
         return "index";
     }
