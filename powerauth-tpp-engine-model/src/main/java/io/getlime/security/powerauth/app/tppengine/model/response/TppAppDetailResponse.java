@@ -41,6 +41,21 @@ public class TppAppDetailResponse {
     private String description;
 
     /**
+     * OAuth 2.0 scopes of this application.
+     */
+    private String[] scopes;
+
+    /**
+     * OAuth 2.0 redirect URLs.
+     */
+    private String[] redirectUris;
+
+    /**
+     * OAuth 2.0 client secret.
+     */
+    private String clientSecret;
+
+    /**
      * TPP information.
      */
     private TppInfo tpp;
@@ -67,6 +82,30 @@ public class TppAppDetailResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String[] getScopes() {
+        return scopes;
+    }
+
+    public void setScopes(String[] scopes) {
+        this.scopes = scopes;
+    }
+
+    public String[] getRedirectUris() {
+        return redirectUris;
+    }
+
+    public void setRedirectUris(String[] redirectUris) {
+        this.redirectUris = redirectUris;
+    }
+
+    public String getClientSecret() {
+        return clientSecret;
+    }
+
+    public void setClientSecret(String clientSecret) {
+        this.clientSecret = clientSecret;
     }
 
     public TppInfo getTpp() {

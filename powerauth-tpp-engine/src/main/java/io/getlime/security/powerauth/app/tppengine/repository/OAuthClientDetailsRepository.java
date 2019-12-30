@@ -16,26 +16,13 @@
 
 package io.getlime.security.powerauth.app.tppengine.repository;
 
-import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppAppDetailEntity;
-import org.springframework.data.jpa.repository.Query;
+import io.getlime.security.powerauth.app.tppengine.repository.model.entity.OAuthClientDetailsEntity;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
-
 /**
- * Repository for fetching details about TPP providers.
- *
  * @author Petr Dvorak, petr@wultra.com
  */
 @Repository
-public interface TppAppDetailRepository extends CrudRepository<TppAppDetailEntity, TppAppDetailEntity.TppAppDetailKey> {
-
-    @Query("SELECT app FROM TppAppDetailEntity app WHERE app.primaryKey.appClientId=:clientId")
-    Optional<TppAppDetailEntity> findByClientId(@Param("clientId") String clientId);
-
-    @Query("SELECT app FROM TppAppDetailEntity app WHERE app.primaryKey.tppId=:tppId")
-    Iterable<TppAppDetailEntity> findByTppId(@Param("tppId") Long tppId);
-
+public interface OAuthClientDetailsRepository extends CrudRepository<OAuthClientDetailsEntity, String> {
 }

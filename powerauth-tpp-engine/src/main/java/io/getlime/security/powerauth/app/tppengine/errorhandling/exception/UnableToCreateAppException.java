@@ -14,39 +14,28 @@
  * limitations under the License.
  */
 
-package io.getlime.security.powerauth.app.tppengine.errorhandling.error;
-
-import io.getlime.core.rest.model.base.entity.Error;
+package io.getlime.security.powerauth.app.tppengine.errorhandling.exception;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Error related to consent.
- *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class TppAppError extends Error {
+public class UnableToCreateAppException extends Exception {
 
-    private static final String code = "TPP_APP_ERROR";
+    private List<String> errors;
 
-    private List<String> causes;
-
-    public TppAppError() {
-        super();
-        this.setCode(code);
+    public UnableToCreateAppException(List<String> errors) {
+        this.errors = new ArrayList<>(errors);
     }
 
-    public TppAppError(String message) {
-        super(code, message);
+    public UnableToCreateAppException(String message, List<String> errors) {
+        super(message);
+        this.errors = new ArrayList<>(errors);
     }
 
-    public TppAppError(String message, List<String> causes) {
-        super(code, message);
-        this.causes = new ArrayList<>(causes);
-    }
-
-    public List<String> getCauses() {
-        return causes;
+    public List<String> getErrors() {
+        return errors;
     }
 }
