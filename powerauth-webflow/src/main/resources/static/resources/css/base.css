@@ -92,6 +92,13 @@ a:hover, a:active, a:focus {
     width: 100%;
 }
 
+.btn {
+    display: block;
+    margin-right: auto;
+    margin-left: auto;
+    max-width: 500px;
+}
+
 .btn-success {
     background-color: #7FC000;
     border: none;
