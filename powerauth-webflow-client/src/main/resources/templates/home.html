@@ -38,7 +38,7 @@
                 <img class="logo" src="./images/logo.png" alt="logo"/>
             </p>
             <div th:each="providerId : ${providerIds}" class="operations">
-                <div class="auhtorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                <div class="authorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
                     <p>
                         Operation authorized by <span class="tint"><span
                             th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
