@@ -224,7 +224,7 @@ export default class Consent extends React.Component {
                                             }
                                             return (
                                                 <div className="row attribute" key={option.id}>
-                                                    <div className="col-xs-2 text-nowrap consent-nopadding">
+                                                    <div className="col-xs-1 text-nowrap consent-nopadding">
                                                         {(required) ? (
                                                             <span className={optionPrefixClassName}>*&nbsp;</span>
                                                         ) : (
@@ -232,7 +232,7 @@ export default class Consent extends React.Component {
                                                         )}
                                                         <input id={option.id} type="checkbox" className="consent-checkbox" checked={checked} onChange={this.handleCheckboxChange}/>
                                                     </div>
-                                                    <div className="col-xs-10 text-left consent-nopadding">
+                                                    <div className="col-xs-11 text-left consent-nopadding">
                                                         <label htmlFor={option.id} className="consent-option-text" dangerouslySetInnerHTML={this.createHtml(option.descriptionHtml)}/>
                                                             {(validationError) ? (
                                                                 <div dangerouslySetInnerHTML={this.createHtml(validationError)} className="consent-option-error"/>
