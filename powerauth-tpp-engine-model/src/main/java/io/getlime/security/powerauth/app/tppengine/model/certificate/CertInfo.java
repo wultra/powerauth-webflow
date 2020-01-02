@@ -120,6 +120,20 @@ public class CertInfo {
         return country;
     }
 
+    /**
+     * Checks if the certificate info contains a correct PSD2 license information.
+     *
+     * @return True in case PSD2 license is contained, false otherwise.
+     */
+    public boolean hasPsd2License() {
+        return psd2License != null && !psd2License.isEmpty();
+    }
+
+    /**
+     * Get unstructured TPP address information.
+     * 
+     * @return Unstructured TPP address information.
+     */
     public String getAddressUnstructured() {
         List<String> addressComponents = new ArrayList<>();
         if (this.street != null) {
