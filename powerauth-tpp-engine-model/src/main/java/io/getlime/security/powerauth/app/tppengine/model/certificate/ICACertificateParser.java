@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-public class ICACertificateParser {
+public class ICACertificateParser implements ICertificateParser {
 
     /**
      * Parse certificate in PEM format and return structured information about organization.
