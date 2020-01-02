@@ -28,6 +28,11 @@ import java.util.List;
  */
 public class CertInfo {
 
+    /**
+     * Location of the forwarded certificate in HTTP header.
+     */
+    public static final String HTTP_HEADER = "X-Client_Certificate";
+
     private String serialNumber;
     private String commonName;
     private String psd2License;
@@ -131,7 +136,7 @@ public class CertInfo {
 
     /**
      * Get unstructured TPP address information.
-     * 
+     *
      * @return Unstructured TPP address information.
      */
     public String getAddressUnstructured() {
