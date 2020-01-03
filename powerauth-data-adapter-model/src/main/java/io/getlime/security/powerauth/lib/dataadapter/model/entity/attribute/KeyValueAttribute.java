@@ -58,7 +58,9 @@ public class KeyValueAttribute extends AttributeFormatted {
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        addFormattedValues(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
     /**
