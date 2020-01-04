@@ -117,38 +117,39 @@ public class ICACertificateParser implements ICertificateParser {
                 switch (oid) {
                     case "2.5.4.6": {   //    C=CZ => 2.5.4.6
                         country = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.3": {   //    CN=cnb.cz => 2.5.4.3
                         commonName = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.10": {  //    O=ČESKÁ NÁRODNÍ BANKA => 2.5.4.10
                         organization = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.9": {   //    STREET=Na příkopě 864/28 => 2.5.4.9
                         street = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.7": {   //    L=Praha 1 => 2.5.4.7
                         city = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.17": {  //    OID.2.5.4.17=11000 => 2.5.4.17
                         zipCode = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.5": {   //    SERIALNUMBER=48136450 => 2.5.4.5
                         serialNumber = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.8": {   //    ST=Hlavní město Praha => 2.5.4.8
                         region = val;
-                        continue;
+                        break;
                     }
                     case "2.5.4.97": {  //   OID.2.5.4.97=PSDCZ-CNB-48136450 => 2.5.4.97
                         psd2License = val;
+                        break;
                     }
                 }
             }
