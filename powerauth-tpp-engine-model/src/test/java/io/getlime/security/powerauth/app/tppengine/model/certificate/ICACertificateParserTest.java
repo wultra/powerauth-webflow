@@ -20,6 +20,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.security.cert.CertificateException;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Petr Dvorak, petr@wultra.com
@@ -79,6 +81,7 @@ class ICACertificateParserTest {
         ICACertificateParser parser = new ICACertificateParser();
         final CertInfo parse = parser.parse(certificate);
 
+        // Check basic certificate info
         Assertions.assertEquals("48136450", parse.getSerialNumber());
         Assertions.assertEquals("cnb.cz", parse.getCommonName());
         Assertions.assertEquals("PSDCZ-CNB-48136450", parse.getPsd2License());
@@ -89,6 +92,13 @@ class ICACertificateParserTest {
         Assertions.assertEquals("11000", parse.getZipCode());
         Assertions.assertEquals("CZ", parse.getCountry());
         Assertions.assertEquals("Na příkopě 864/28\nPraha 1\n11000\nHlavní město Praha\nCZ", parse.getAddressUnstructured());
+
+        Set<CertInfo.PSD2> expected = new HashSet<>();
+        expected.add(CertInfo.PSD2.PSP_AS);
+        expected.add(CertInfo.PSD2.PSP_AI);
+        expected.add(CertInfo.PSD2.PSP_IC);
+        expected.add(CertInfo.PSD2.PSP_PI);
+        Assertions.assertEquals(expected, parse.getPsd2Mandates());
 
     }
 

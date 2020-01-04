@@ -16,10 +16,10 @@
 
 package io.getlime.security.powerauth.app.tppengine.model.certificate;
 
-import sun.security.x509.AVA;
-
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Information about subject from the certificate.
@@ -27,6 +27,28 @@ import java.util.List;
  * @author Petr Dvorak, petr@wultra.com
  */
 public class CertInfo {
+
+    public enum PSD2 {
+        /**
+         * Account Information Service Provider
+         */
+        PSP_AI,
+
+        /**
+         * Account Servicing Payment Service Provider
+         */
+        PSP_AS,
+
+        /**
+         * Payment Service Provider Issuing Card-Based Payment Instruments
+         */
+        PSP_IC,
+
+        /**
+         *  Payment Initiation Service Provider
+         */
+        PSP_PI
+    }
 
     /**
      * Location of the forwarded certificate in HTTP header.
@@ -42,51 +64,19 @@ public class CertInfo {
     private String zipCode;
     private String region;
     private String country;
+    private Set<PSD2> psd2Mandates;
 
-    public CertInfo(List<AVA> avaList) {
-        super();
-        for (AVA ava: avaList) {
-            final String oid = ava.getObjectIdentifier().toString();
-            final String val = ava.getValueString();
-
-            switch (oid) {
-                case "2.5.4.6": {   //    C=CZ => 2.5.4.6
-                    this.country = val;
-                    continue;
-                }
-                case "2.5.4.3": {   //    CN=cnb.cz => 2.5.4.3
-                    this.commonName = val;
-                    continue;
-                }
-                case "2.5.4.10": {  //    O=ČESKÁ NÁRODNÍ BANKA => 2.5.4.10
-                    this.organization = val;
-                    continue;
-                }
-                case "2.5.4.9": {   //    STREET=Na příkopě 864/28 => 2.5.4.9
-                    this.street = val;
-                    continue;
-                }
-                case "2.5.4.7": {   //    L=Praha 1 => 2.5.4.7
-                    this.city = val;
-                    continue;
-                }
-                case "2.5.4.17": {  //    OID.2.5.4.17=11000 => 2.5.4.17
-                    this.zipCode = val;
-                    continue;
-                }
-                case "2.5.4.5": {   //    SERIALNUMBER=48136450 => 2.5.4.5
-                    this.serialNumber = val;
-                    continue;
-                }
-                case "2.5.4.8": {   //    ST=Hlavní město Praha => 2.5.4.8
-                    this.region = val;
-                    continue;
-                }
-                case "2.5.4.97": {  //   OID.2.5.4.97=PSDCZ-CNB-48136450 => 2.5.4.97
-                    this.psd2License = val;
-                }
-            }
-        }
+    public CertInfo(String serialNumber, String commonName, String psd2License, String organization, String street, String city, String zipCode, String region, String country, Set<PSD2> psd2Mandates) {
+        this.serialNumber = serialNumber;
+        this.commonName = commonName;
+        this.psd2License = psd2License;
+        this.organization = organization;
+        this.street = street;
+        this.city = city;
+        this.zipCode = zipCode;
+        this.region = region;
+        this.country = country;
+        this.psd2Mandates = new HashSet<>(psd2Mandates);
     }
 
     public String getSerialNumber() {
@@ -123,6 +113,10 @@ public class CertInfo {
 
     public String getCountry() {
         return country;
+    }
+
+    public Set<PSD2> getPsd2Mandates() {
+        return psd2Mandates;
     }
 
     /**
