@@ -390,7 +390,7 @@ public class TppEngineClient {
             params.put("tppLicense", tppLicense);
             ResponseEntity<Response> response = restTemplate.exchange(
                     serviceUrl + "/tpp/app?clientId={clientId}&tppLicense={tppLicense}",
-                    HttpMethod.POST,
+                    HttpMethod.DELETE,
                     null,
                     new ParameterizedTypeReference<Response>() {},
                     params

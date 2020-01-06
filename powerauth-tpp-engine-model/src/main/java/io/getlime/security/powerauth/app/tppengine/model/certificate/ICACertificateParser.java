@@ -55,6 +55,13 @@ public class ICACertificateParser implements ICertificateParser {
      * @throws CertificateException In case certificate cannot be parsed (or in rare case X.509 is not supported).
      */
     public CertInfo parse(String certificatePem) throws CertificateException {
+
+        // Replace spaces in Apache forwarded certificate by newlines correctly
+        certificatePem = certificatePem
+                .replaceAll(" ", "\n")
+                .replace("-----BEGIN\nCERTIFICATE-----", "-----BEGIN CERTIFICATE-----")
+                .replace("-----END\nCERTIFICATE-----", "-----END CERTIFICATE-----");
+
         final CertificateFactory cf = CertificateFactory.getInstance("X.509");
         final ByteArrayInputStream bais = new ByteArrayInputStream(certificatePem.getBytes(StandardCharsets.UTF_8));
         X509Certificate cert = (X509Certificate) cf.generateCertificate(bais);
