@@ -53,7 +53,7 @@ public class CertInfo {
     /**
      * Location of the forwarded certificate in HTTP header.
      */
-    public static final String HTTP_HEADER = "X-Client_Certificate";
+    public static final String HTTP_HEADER = "X-Client-Certificate";
 
     private String serialNumber;
     private String commonName;
