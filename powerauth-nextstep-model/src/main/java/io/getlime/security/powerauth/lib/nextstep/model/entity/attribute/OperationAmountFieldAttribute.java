@@ -56,7 +56,9 @@ public class OperationAmountFieldAttribute extends OperationFormFieldAttributeFo
         this.amount = amount;
         this.currency = currency;
         this.currencyId = currencyId;
-        addFormattedValues(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
     /**

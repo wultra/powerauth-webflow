@@ -59,7 +59,9 @@ public class OperationNoteFieldAttribute extends OperationFormFieldAttributeForm
         this.label = label;
         this.note = note;
         this.valueFormatType = valueFormatType;
-        addFormattedValues(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
     /**

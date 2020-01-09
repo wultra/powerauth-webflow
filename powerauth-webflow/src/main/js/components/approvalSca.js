@@ -63,18 +63,16 @@ export default class ApprovalSca extends React.Component {
                             <OperationTimeout/>
                             <OperationDetail/>
                             <div className="auth-actions">
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                            <FormattedMessage id="operation.confirm"/>
-                                        </Button>
-                                    </div>
-                                </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
+                                <div className="row buttons">
+                                    <div className="col-xs-6">
                                         <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                             <FormattedMessage id="operation.cancel"/>
                                         </a>
+                                    </div>
+                                    <div className="col-xs-6">
+                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

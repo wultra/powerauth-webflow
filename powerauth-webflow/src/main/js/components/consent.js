@@ -224,7 +224,7 @@ export default class Consent extends React.Component {
                                             }
                                             return (
                                                 <div className="row attribute" key={option.id}>
-                                                    <div className="col-xs-2 text-nowrap consent-nopadding">
+                                                    <div className="col-xs-1 text-nowrap">
                                                         {(required) ? (
                                                             <span className={optionPrefixClassName}>*&nbsp;</span>
                                                         ) : (
@@ -232,7 +232,7 @@ export default class Consent extends React.Component {
                                                         )}
                                                         <input id={option.id} type="checkbox" className="consent-checkbox" checked={checked} onChange={this.handleCheckboxChange}/>
                                                     </div>
-                                                    <div className="col-xs-10 text-left consent-nopadding">
+                                                    <div className="col-xs-11 text-left">
                                                         <label htmlFor={option.id} className="consent-option-text" dangerouslySetInnerHTML={this.createHtml(option.descriptionHtml)}/>
                                                             {(validationError) ? (
                                                                 <div dangerouslySetInnerHTML={this.createHtml(validationError)} className="consent-option-error"/>
@@ -263,20 +263,16 @@ export default class Consent extends React.Component {
                                 ) : (
                                     undefined
                                 )}
-                                <div className="buttons">
-                                    <div className="attribute row">
-                                        <div className="col-xs-12">
-                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                                <FormattedMessage id="operation.confirm"/>
-                                            </Button>
-                                        </div>
+                                <div className="row buttons">
+                                    <div className="col-xs-6">
+                                        <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                            <FormattedMessage id="operation.cancel"/>
+                                        </a>
                                     </div>
-                                    <div className="attribute row">
-                                        <div className="col-xs-12">
-                                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                                <FormattedMessage id="operation.cancel"/>
-                                            </a>
-                                        </div>
+                                    <div className="col-xs-6">
+                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
