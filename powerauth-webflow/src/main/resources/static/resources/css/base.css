@@ -367,10 +367,6 @@ a:hover, a:active, a:focus {
     font-weight: normal;
 }
 
-.consent-nopadding {
-    padding: 0;
-}
-
 .consent-error {
     padding-top: 10px;
     color: #C0007F;
