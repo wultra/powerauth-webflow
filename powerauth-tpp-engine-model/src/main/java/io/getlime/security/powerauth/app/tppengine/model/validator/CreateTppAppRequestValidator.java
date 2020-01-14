@@ -70,9 +70,13 @@ public class CreateTppAppRequestValidator {
         if (scopes == null || scopes.length == 0) {
             errors.add("You must provide at least one OAuth 2.0 scope.");
         } else {
-            if (permittedScopes != null) { // validate scope against the permitted scopes
-                for (final String scope : scopes) {
-                    if (!permittedScopes.contains(scope)) {
+            for (final String scope : scopes) {
+                // validate scope against the basic regexp pattern
+                if (!scope.matches("^[A-Za-z0-9]+$")) {
+                    errors.add("You provided an invalid scope: " + scope);
+                } else {
+                    // validate scope against the permitted scopes
+                    if (permittedScopes != null && !permittedScopes.contains(scope)) {
                         errors.add("You provided an invalid scope: " + scope);
                     }
                 }

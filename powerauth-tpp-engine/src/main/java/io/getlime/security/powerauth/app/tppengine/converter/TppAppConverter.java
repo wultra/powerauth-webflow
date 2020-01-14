@@ -21,6 +21,9 @@ import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailRe
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.OAuthClientDetailsEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppAppDetailEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEntity;
+import org.springframework.web.util.UriUtils;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Converter class for TPP and TPP app entity conversion.
@@ -72,7 +75,12 @@ public class TppAppConverter {
 
         // Convert OAuth 2.0 info
         if (oAuthClientDetailsEntity != null) {
-            result.setRedirectUris(oAuthClientDetailsEntity.getWebServerRedirectUri().split(","));
+            // Decode sanitized redirect URIs
+            final String[] redirectUrisEncoded = oAuthClientDetailsEntity.getWebServerRedirectUri().split(",");
+            for (int i = 0; i < redirectUrisEncoded.length; i++) {
+                redirectUrisEncoded[i] = UriUtils.decode(redirectUrisEncoded[i], StandardCharsets.UTF_8);
+            }
+            result.setRedirectUris(redirectUrisEncoded);
             result.setScopes(oAuthClientDetailsEntity.getScope().split(","));
             result.setClientSecret(clientSecret);
         }

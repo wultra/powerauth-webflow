@@ -31,8 +31,10 @@ import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEn
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.UriUtils;
 
 import javax.transaction.Transactional;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -163,6 +165,12 @@ public class TppService {
         tppAppDetailKey.setAppClientId(clientId);
         tppAppDetailEntity.setTpp(tppEntity);
         tppAppDetailEntity.setPrimaryKey(tppAppDetailKey);
+
+        // Sanitize redirect URIs by Base64 decoding them
+        final String[] redirectUris = request.getRedirectUris();
+        for (int i = 0; i < redirectUris.length; i++) {
+            redirectUris[i] = UriUtils.encode(redirectUris[i], StandardCharsets.UTF_8);
+        }
 
         // Store the new OAuth 2.0 credentials in database
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
