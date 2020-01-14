@@ -253,7 +253,7 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
 
         // Get OAuth 2.0 Client ID
         final String[] client_ids = savedRequest.getParameterValues("client_id");
-        if (client_ids.length != 1) { // no client ID is present, or worse - more are present
+        if (client_ids == null || client_ids.length != 1) { // no client ID is present, or worse - more are present
             logger.debug("OAuth 2.0 Client ID must be present and unique.");
             return null;
         }
