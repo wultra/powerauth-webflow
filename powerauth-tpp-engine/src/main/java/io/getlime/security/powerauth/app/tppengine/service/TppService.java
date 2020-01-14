@@ -168,17 +168,25 @@ public class TppService {
 
         // Sanitize redirect URIs by Base64 decoding them
         final String[] redirectUris = request.getRedirectUris();
-        for (int i = 0; i < redirectUris.length; i++) {
-            redirectUris[i] = UriUtils.encode(redirectUris[i], StandardCharsets.UTF_8);
+        final String sanitizedRedirectUris;
+        if (redirectUris != null) {
+            for (int i = 0; i < redirectUris.length; i++) {
+                redirectUris[i] = UriUtils.encode(redirectUris[i], StandardCharsets.UTF_8);
+            }
+            sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
+        } else {
+            sanitizedRedirectUris = null; // should not happen due to validation in controller
         }
+
+        final String scopes = Joiner.on(",").join(request.getScopes());
 
         // Store the new OAuth 2.0 credentials in database
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
         oAuthClientDetailsEntity.setClientId(clientId);
         oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
         oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code");
-        oAuthClientDetailsEntity.setWebServerRedirectUri(Joiner.on(",").join(request.getRedirectUris()));
-        oAuthClientDetailsEntity.setScope(Joiner.on(",").join(request.getScopes()));
+        oAuthClientDetailsEntity.setWebServerRedirectUri(sanitizedRedirectUris);
+        oAuthClientDetailsEntity.setScope(scopes);
         oAuthClientDetailsEntity.setAccessTokenValidity(OAUTH_ACCESS_TOKEN_VALIDITY);
         oAuthClientDetailsEntity.setAdditionalInformation("{}");
         oAuthClientDetailsEntity.setAutoapprove("true");
@@ -191,12 +199,14 @@ public class TppService {
 
     @Transactional
     public TppAppDetailResponse updateApp(String clientId, CreateTppAppRequest request) throws TppNotFoundException, TppAppNotFoundException {
-        // Create a TPP entity, if it does not exist
+        // Get TPP entity
         TppEntity tppEntity = getTppEntity(request.getTppLicense());
 
+        // Find application by client ID
         final Optional<TppAppDetailEntity> appDetailEntityOptional = appDetailRepository.findByClientId(clientId);
         if (appDetailEntityOptional.isPresent()) {
             TppAppDetailEntity tppAppDetailEntity = appDetailEntityOptional.get();
+
             // Check if the client ID belongs to the TPP provider
             if (!Objects.equals(tppAppDetailEntity.getPrimaryKey().getTppId(), tppEntity.getTppId())) {
                 throw new TppAppNotFoundException(clientId);
