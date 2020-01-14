@@ -38,137 +38,69 @@
                 <img class="logo" src="./images/logo.png" alt="logo"/>
             </p>
             <div th:each="providerId : ${providerIds}" class="operations">
-                <div class="authorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
-                    <p>
-                        Operation authorized by <span class="tint"><span
-                            th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
-                    </p>
-                    <form id="disconnect" th:action="@{/connect/demo}" method="post">
-                        <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                        <input type="hidden" name="_method" value="delete"/>
-                        <button type="submit" class="btn btn-lg btn-danger">Log out</button>
-                    </form>
-                </div>
 
-                <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
-                    <div>
-                        <table class="operations-table">
-                            <tr>
-                                <td>
-                                    <ul class="nav nav-pills nav-stacked" role="tablist">
-                                        <li th:each="opConfig : ${availableOperations}" role="presentation" th:classappend="${opConfig.isDefault()} ? 'active' : ''">
-                                            <a th:text="${opConfig.getName()}" th:href="'#'+${opConfig.getType().name()}" th:attr="aria-controls=${opConfig.getType().name()}" role="tab" data-toggle="tab">NAME</a>
-                                        </li>
-                                    </ul>
-                                </td>
-                                <td>
-                                    <div class="tab-content">
-                                        <div th:each="opConfig : ${availableOperations}" th:classappend="${opConfig.isDefault()} ? 'active' : ''" role="tabpanel" class="tab-pane" th:id="${opConfig.getType().name()}">
-                                            <div th:if="${opConfig.getType().name() == 'PAYMENT'}" class="padding">
+                <table class="operations-table">
+                    <tr>
+                        <td>
+                            <ul class="nav nav-pills nav-stacked" role="tablist">
+                                <li th:each="opConfig : ${availableOperations}" role="presentation" th:classappend="${opConfig.isDefault()} ? 'active' : ''">
+                                    <a th:text="${opConfig.getName()}" th:href="'#'+${opConfig.getType().name()}" th:attr="aria-controls=${opConfig.getType().name()}" role="tab" data-toggle="tab">NAME</a>
+                                </li>
+                            </ul>
+                        </td>
+                        <td>
+                            <div class="tab-content">
+                                <div th:each="opConfig : ${availableOperations}" th:classappend="${opConfig.isDefault()} ? 'active' : ''" role="tabpanel" class="tab-pane" th:id="${opConfig.getType().name()}">
+                                    <div th:if="${opConfig.getType().name() == 'LOGIN'}" class="padding text-left">
+
+                                        <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
+                                            <p>
+                                                Zvolte typ připojení třetí strany:
+                                            </p>
+                                            <form th:action="@{/connect/demo}" method="POST">
+                                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                                 <p>
-                                                    Create Payment
+                                                    <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Služba informování o platebním účtu</label>
                                                 </p>
-                                                <form th:action="@{/payment/create}" th:object="${paymentForm}" method="POST">
-                                                    <div class="form-inputs">
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group form-group-lg app-context-enabler">
-                                                        <span onclick="$(this).siblings().first().toggle();$(this).toggle()">App Context Setup</span>
-                                                        <textarea style="display: none;" class="form-control" th:field="*{appContext}" placeholder="Application Context" />
-                                                    </div>
-                                                    <div class="form-group form-group-lg" style="text-align: right;">
-                                                        <button type="submit" class="btn btn-lg btn-success">Send</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <div th:if="${opConfig.getType().name() == 'LOGIN'}" class="padding">
                                                 <p>
-                                                    Authenticate as a user.
+                                                    <label class="radio"><input id="scope_pisp" type="radio" name="scope" value="pisp"/> PIS - Služba nepřímého dání platebního příkazu</label>
                                                 </p>
-                                                <form th:action="@{/connect/demo}" method="POST">
-                                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                                                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
-                                                </form>
-                                            </div>
-                                            <div th:if="${opConfig.getType().name() == 'LOGIN_SCA'}" class="padding">
-                                                <p>
-                                                    Authenticate as a user using SCA login.
-                                                </p>
-                                                <form th:action="@{/login/sca/create}" th:object="${loginFormSca}" method="POST">
-                                                    <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
-                                                    <div class="form-group form-group-lg app-context-enabler login">
-                                                        <span onclick="$(this).siblings().first().toggle();$(this).toggle()">App Context Setup</span>
-                                                        <textarea style="display: none;" class="form-control" th:field="*{appContext}" placeholder="Application Context" />
-                                                    </div>
-                                                    <button type="submit" class="btn btn-lg btn-success">Log in</button>
-                                                </form>
-                                            </div>
-                                            <div th:if="${opConfig.getType().name() == 'PAYMENT_SCA'}" class="padding">
-                                                <p>
-                                                    Create Payment (SCA)
-                                                </p>
-                                                <form th:action="@{/payment/sca/create}" th:object="${paymentFormSca}" method="POST">
-                                                    <div class="form-inputs">
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{amount}" placeholder="Amount"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{currency}" placeholder="Currency"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{account}" placeholder="Account Number"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{note}" placeholder="Note"/>
-                                                        </div>
-                                                        <div class="form-group form-group-lg">
-                                                            <input type="text" class="form-control" th:field="*{dueDate}" placeholder="Due Date"/>
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group form-group-lg app-context-enabler">
-                                                        <span onclick="$(this).siblings().first().toggle();$(this).toggle()">App Context Setup</span>
-                                                        <textarea style="display: none;" class="form-control" th:field="*{appContext}" placeholder="Application Context" />
-                                                    </div>
-                                                    <div class="form-group form-group-lg" style="text-align: right;">
-                                                        <button type="submit" class="btn btn-lg btn-success">Send</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                            <div th:if="${opConfig.getType().name() == 'AUTHORIZATION'}" class="padding">
-                                                <p>
-                                                    Authorize operation with given ID.
-                                                </p>
-                                                <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
-                                                    <div class="input-group input-group-lg">
-                                                        <input type="text" class="form-control" name="operation_id"
-                                                               th:value="${operationId}" placeholder="Operation ID"/>
-                                                        <span class="input-group-btn">
-                                                            <button type="submit" class="btn btn-success">Authorize</button>
-                                                        </span>
-                                                    </div>
-                                                </form>
-                                            </div>
+                                                <button type="submit" class="btn btn-lg btn-success">Propojit</button>
+                                            </form>
                                         </div>
+
+                                        <div class="authorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
+                                            <p>
+                                                Připojený účet uživatele s ID: <span class="tint"><span
+                                                    th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
+                                            </p>
+                                            <form id="disconnect" th:action="@{/connect/demo}" method="post">
+                                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
+                                                <input type="hidden" name="_method" value="delete"/>
+                                                <button type="submit" class="btn btn-lg btn-danger">Odpojit</button>
+                                            </form>
+                                        </div>
+
                                     </div>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+                                    <div th:if="${opConfig.getType().name() == 'AUTHORIZATION'}" class="padding text-left">
+                                        <p>
+                                            Autorizovat platbu s ID:
+                                        </p>
+                                        <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
+                                            <div class="input-group input-group-lg">
+                                                <input type="text" class="form-control" name="operation_id"
+                                                       th:value="${operationId}" placeholder="Hodnota Sign ID"/>
+                                                <span class="input-group-btn">
+                                                    <button type="submit" class="btn btn-success">Autorizovat</button>
+                                                </span>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
             </div>
         </div>
     </div>
