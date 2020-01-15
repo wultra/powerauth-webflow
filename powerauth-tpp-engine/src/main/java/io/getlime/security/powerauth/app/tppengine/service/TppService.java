@@ -179,7 +179,7 @@ public class TppService {
         if (redirectUris != null) {
             for (int i = 0; i < redirectUris.length; i++) {
                 // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
-                redirectUris[i] = redirectUris[i].replace(",", "");
+                redirectUris[i] = redirectUris[i].replace(",", "%2C");
             }
             sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
         } else {
