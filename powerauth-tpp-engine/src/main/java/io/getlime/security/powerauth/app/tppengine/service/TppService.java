@@ -31,10 +31,8 @@ import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEn
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.util.UriUtils;
 
 import javax.transaction.Transactional;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -64,6 +62,7 @@ public class TppService {
      * @param clientId Client ID.
      * @return Application details for app with given client ID, or null
      * if no app for given client ID exists.
+     * @throws TppAppNotFoundException In case TPP app is not found.
      */
     public TppAppDetailResponse fetchAppDetailByClientId(String clientId) throws TppAppNotFoundException {
         final Optional<TppAppDetailEntity> tppAppEntityOptional = appDetailRepository.findByClientId(clientId);
@@ -87,6 +86,8 @@ public class TppService {
      * @param tppLicense TPP license info.
      * @return Application details for app with given client ID, or null
      * if no app for given client ID exists.
+     * @throws TppNotFoundException In case TPP is not found.
+     * @throws TppAppNotFoundException In case TPP app is not found.
      */
     public TppAppDetailResponse fetchAppDetailByClientId(String clientId, String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
         // Create a TPP entity, if it does not exist
@@ -116,6 +117,7 @@ public class TppService {
      *
      * @param tppLicense TPP license information.
      * @return Application list for given third party.
+     * @throws TppNotFoundException In case TPP is not found.
      */
     public List<TppAppDetailResponse> fetchAppListByTppLicense(String tppLicense) throws TppNotFoundException {
         final Optional<TppEntity> tppAppEntityOptional = tppRepository.findFirstByTppLicense(tppLicense);
@@ -132,6 +134,11 @@ public class TppService {
         }
     }
 
+    /**
+     * Create a new application with provided information.
+     * @param request Request with information about a newly created app.
+     * @return Information about a newly created app, including the OAuth 2.0 credentials (including "client secret").
+     */
     @Transactional
     public TppAppDetailResponse createApp(CreateTppAppRequest request) {
 
@@ -171,7 +178,8 @@ public class TppService {
         final String sanitizedRedirectUris;
         if (redirectUris != null) {
             for (int i = 0; i < redirectUris.length; i++) {
-                redirectUris[i] = UriUtils.encode(redirectUris[i], StandardCharsets.UTF_8);
+                // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
+                redirectUris[i] = redirectUris[i].replace(",", "");
             }
             sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
         } else {
@@ -197,6 +205,14 @@ public class TppService {
 
     }
 
+    /**
+     * Update application details for an app with provided client ID.
+     * @param clientId Client ID of TPP app to be updated.
+     * @param request Request with information about updated app.
+     * @return Information about the updated app.
+     * @throws TppNotFoundException In case TPP is not found.
+     * @throws TppAppNotFoundException In case TPP app is not found.
+     */
     @Transactional
     public TppAppDetailResponse updateApp(String clientId, CreateTppAppRequest request) throws TppNotFoundException, TppAppNotFoundException {
         // Get TPP entity
@@ -234,6 +250,13 @@ public class TppService {
 
     }
 
+    /**
+     * Delete an app based on provided client ID, with crosscheck to client license.
+     * @param clientId Client ID of an app to be deleted.
+     * @param tppLicense License info of a TPP party that owns the app.
+     * @throws TppNotFoundException In case TPP was not found.
+     * @throws TppAppNotFoundException In case TPP app was not found.
+     */
     @Transactional
     public void deleteApp(String clientId, String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
         // Create a TPP entity, if it does not exist
@@ -279,6 +302,14 @@ public class TppService {
         return tppEntity;
     }
 
+    /**
+     * Renew OAuth 2.0 secret for an app with given client ID and belonging to TPP with specific license.
+     * @param clientId Client ID for which to refresh Client Secret.
+     * @param tppLicense License information of the party that owns the app with given Client ID.
+     * @return Information about application, including new client secret.
+     * @throws TppNotFoundException In case TPP was not found.
+     * @throws TppAppNotFoundException In case TPP app was not found.
+     */
     public TppAppDetailResponse renewAppSecret(String clientId, String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
         // Create a TPP entity, if it does not exist
         TppEntity tppEntity = getTppEntity(tppLicense);

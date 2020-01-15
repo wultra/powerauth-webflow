@@ -16,10 +16,10 @@
 
 package io.getlime.security.powerauth.app.tppengine.model.validator;
 
-import com.sun.jndi.toolkit.url.Uri;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 
-import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -59,8 +59,8 @@ public class CreateTppAppRequestValidator {
         } else {
             for (final String redirectUri : redirectUris) {
                 try {
-                    new Uri(redirectUri);
-                } catch (MalformedURLException e) {
+                    new URI(redirectUri);
+                } catch (URISyntaxException e) {
                     errors.add("You provided an invalid redirect URI: " + redirectUri);
                 }
             }

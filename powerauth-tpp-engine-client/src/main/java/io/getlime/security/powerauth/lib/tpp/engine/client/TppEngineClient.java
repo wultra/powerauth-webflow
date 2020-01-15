@@ -301,7 +301,7 @@ public class TppEngineClient {
      *
      * @param request New application information.
      * @return Information about newly created application.
-     *
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> createApplication(CreateTppAppRequest request) throws TppEngineClientException {
         try {
@@ -325,7 +325,7 @@ public class TppEngineClient {
      * @param clientId Client ID of an app to be updated.
      * @param request New application information.
      * @return Information about newly created application.
-     *
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> updateApplication(String clientId, CreateTppAppRequest request) throws TppEngineClientException {
         try {
@@ -353,7 +353,7 @@ public class TppEngineClient {
      * @param clientId Client ID of an application to be refreshed.
      * @param tppLicense License information of TPP.
      * @return Information about newly created application.
-     *
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> renewClientSecret(String clientId, String tppLicense) throws TppEngineClientException {
         try {
@@ -381,7 +381,7 @@ public class TppEngineClient {
      * @param clientId Client ID of the app.
      * @param tppLicense License information of TPP.
      * @return Generic response.
-     *
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public Response deleteApplication(String clientId, String tppLicense) throws TppEngineClientException {
         try {
