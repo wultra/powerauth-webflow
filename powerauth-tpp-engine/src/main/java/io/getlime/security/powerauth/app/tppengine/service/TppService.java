@@ -177,28 +177,17 @@ public class TppService {
         tppAppDetailEntity.setPrimaryKey(tppAppDetailKey);
 
         // Sanitize redirect URIs by Base64 decoding them
-        final String[] redirectUris = request.getRedirectUris();
-        final String sanitizedRedirectUris;
-        if (redirectUris != null) {
-            for (int i = 0; i < redirectUris.length; i++) {
-                // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
-                redirectUris[i] = redirectUris[i].replace(",", "%2C");
-            }
-            sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
-        } else {
-            sanitizedRedirectUris = null; // should not happen due to validation in controller
-        }
+        final String redirectUris = sanitizeRedirectUris(request.getRedirectUris());
 
-        String[] scopesArray = request.getScopes();
-        Arrays.sort(scopesArray);
-        final String scopes = Joiner.on(",").join(scopesArray);
+        // Sort scopes and make sure a scope is unique in the collection
+        final String scopes = sanitizeScopes(request.getScopes());
 
         // Store the new OAuth 2.0 credentials in database
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
         oAuthClientDetailsEntity.setClientId(clientId);
         oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
         oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code");
-        oAuthClientDetailsEntity.setWebServerRedirectUri(sanitizedRedirectUris);
+        oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
         oAuthClientDetailsEntity.setScope(scopes);
         oAuthClientDetailsEntity.setAccessTokenValidity(OAUTH_ACCESS_TOKEN_VALIDITY);
         oAuthClientDetailsEntity.setAdditionalInformation("{}");
@@ -237,27 +226,16 @@ public class TppService {
             tppAppDetailEntity.setAppInfo(request.getAppDescription());
 
             // Sanitize redirect URIs by Base64 decoding them
-            final String[] redirectUris = request.getRedirectUris();
-            final String sanitizedRedirectUris;
-            if (redirectUris != null) {
-                for (int i = 0; i < redirectUris.length; i++) {
-                    // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
-                    redirectUris[i] = redirectUris[i].replace(",", "%2C");
-                }
-                sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
-            } else {
-                sanitizedRedirectUris = null; // should not happen due to validation in controller
-            }
+            final String redirectUris = sanitizeRedirectUris(request.getRedirectUris());
 
-            String[] scopesArray = request.getScopes();
-            Arrays.sort(scopesArray);
-            final String scopes = Joiner.on(",").join(scopesArray);
+            // Sort scopes and make sure a scope is unique in the collection
+            final String scopes = sanitizeScopes(request.getScopes());
 
             // Store the new OAuth 2.0 credentials in database
             Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
             if (oAuthClientDetailsEntityOptional.isPresent()) {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
-                oAuthClientDetailsEntity.setWebServerRedirectUri(sanitizedRedirectUris);
+                oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
                 if (!scopes.equals(oAuthClientDetailsEntity.getScope())) {
                     oAuthClientDetailsEntity.setScope(scopes);
                     accessTokenRepository.deleteAllByClientId(clientId); // changing application scopes will immediately revoke access tokens
@@ -265,6 +243,48 @@ public class TppService {
                 clientDetailsRepository.save(oAuthClientDetailsEntity);
                 tppAppDetailEntity = appDetailRepository.save(tppAppDetailEntity);
                 return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity);
+            } else {
+                throw new TppAppNotFoundException(clientId);
+            }
+
+        } else {
+            throw new TppAppNotFoundException(clientId);
+        }
+
+    }
+
+    /**
+     * Renew OAuth 2.0 secret for an app with given client ID and belonging to TPP with specific license.
+     * @param clientId Client ID for which to refresh Client Secret.
+     * @param tppLicense License information of the party that owns the app with given Client ID.
+     * @return Information about application, including new client secret.
+     * @throws TppNotFoundException In case TPP was not found.
+     * @throws TppAppNotFoundException In case TPP app was not found.
+     */
+    public TppAppDetailResponse renewAppSecret(String clientId, String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
+        // Create a TPP entity, if it does not exist
+        TppEntity tppEntity = getTppEntity(tppLicense);
+
+        final Optional<TppAppDetailEntity> appDetailEntityOptional = appDetailRepository.findByClientId(clientId);
+        if (appDetailEntityOptional.isPresent()) {
+            TppAppDetailEntity tppAppDetailEntity = appDetailEntityOptional.get();
+            // Check if the client ID belongs to the TPP provider
+            if (!Objects.equals(tppAppDetailEntity.getPrimaryKey().getTppId(), tppEntity.getTppId())) {
+                throw new TppAppNotFoundException(clientId);
+            }
+
+            // Generate app OAuth 2.0 credentials
+            final String clientSecret = UUID.randomUUID().toString();
+            BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+            final String encodedClientSecret = bcrypt.encode(clientSecret);
+
+            // Store the new OAuth 2.0 credentials in database
+            Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
+            if (oAuthClientDetailsEntityOptional.isPresent()) {
+                final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
+                oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
+                clientDetailsRepository.save(oAuthClientDetailsEntity);
+                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity, clientSecret);
             } else {
                 throw new TppAppNotFoundException(clientId);
             }
@@ -329,44 +349,42 @@ public class TppService {
     }
 
     /**
-     * Renew OAuth 2.0 secret for an app with given client ID and belonging to TPP with specific license.
-     * @param clientId Client ID for which to refresh Client Secret.
-     * @param tppLicense License information of the party that owns the app with given Client ID.
-     * @return Information about application, including new client secret.
-     * @throws TppNotFoundException In case TPP was not found.
-     * @throws TppAppNotFoundException In case TPP app was not found.
+     * Create a comma-separated string with unique values from an array, sorted.
+     * @param source Original array.
+     * @return A comma-separated string with unique values from an array, sorted.
      */
-    public TppAppDetailResponse renewAppSecret(String clientId, String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
-        // Create a TPP entity, if it does not exist
-        TppEntity tppEntity = getTppEntity(tppLicense);
-
-        final Optional<TppAppDetailEntity> appDetailEntityOptional = appDetailRepository.findByClientId(clientId);
-        if (appDetailEntityOptional.isPresent()) {
-            TppAppDetailEntity tppAppDetailEntity = appDetailEntityOptional.get();
-            // Check if the client ID belongs to the TPP provider
-            if (!Objects.equals(tppAppDetailEntity.getPrimaryKey().getTppId(), tppEntity.getTppId())) {
-                throw new TppAppNotFoundException(clientId);
-            }
-
-            // Generate app OAuth 2.0 credentials
-            final String clientSecret = UUID.randomUUID().toString();
-            BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-            final String encodedClientSecret = bcrypt.encode(clientSecret);
-
-            // Store the new OAuth 2.0 credentials in database
-            Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
-            if (oAuthClientDetailsEntityOptional.isPresent()) {
-                final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
-                oAuthClientDetailsEntity.setClientSecret(encodedClientSecret);
-                clientDetailsRepository.save(oAuthClientDetailsEntity);
-                return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity, clientSecret);
-            } else {
-                throw new TppAppNotFoundException(clientId);
-            }
-
-        } else {
-            throw new TppAppNotFoundException(clientId);
-        }
-
+    private String sortAndUniqueCommaSeparated(String[] source) {
+        TreeSet<String> set = new TreeSet<>();
+        Collections.addAll(set, source);
+        String[] result = set.toArray(new String[0]);
+        return Joiner.on(",").join(result);
     }
+
+    /**
+     * Create a comma-separated string with unique sorted redirect URIs.
+     * @param redirectUris Original redirect URIs.
+     * @return A comma separated string with unique sorted redirect URIs, or null if original array is null.
+     */
+    private String sanitizeRedirectUris(String[] redirectUris) {
+        if (redirectUris != null) {
+            String[] sanitizedUris = new String[redirectUris.length];
+            for (int i = 0; i < redirectUris.length; i++) {
+                // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
+                sanitizedUris[i] = redirectUris[i].replace(",", "%2C");
+            }
+            // Make sure that redirect URIs are unique
+            return sortAndUniqueCommaSeparated(sanitizedUris);
+        }
+        return null;
+    }
+
+    /**
+     * Create a comma-separated string with unique sorted scopes.
+     * @param scopes Original scopes.
+     * @return A comma-separated string with unique sorted scopes, or null if original array is null.
+     */
+    private String sanitizeScopes(String[] scopes) {
+        return sortAndUniqueCommaSeparated(scopes);
+    }
+
 }
