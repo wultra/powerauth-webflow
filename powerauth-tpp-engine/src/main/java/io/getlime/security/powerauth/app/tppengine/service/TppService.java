@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAp
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
+import io.getlime.security.powerauth.app.tppengine.repository.OAuthAccessTokenRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.OAuthClientDetailsRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppAppDetailRepository;
 import io.getlime.security.powerauth.app.tppengine.repository.TppRepository;
@@ -48,12 +49,14 @@ public class TppService {
     private final TppRepository tppRepository;
     private final TppAppDetailRepository appDetailRepository;
     private final OAuthClientDetailsRepository clientDetailsRepository;
+    private final OAuthAccessTokenRepository accessTokenRepository;
 
     @Autowired
-    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, OAuthClientDetailsRepository clientDetailsRepository) {
+    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, OAuthClientDetailsRepository clientDetailsRepository, OAuthAccessTokenRepository accessTokenRepository) {
         this.tppRepository = tppRepository;
         this.appDetailRepository = appDetailRepository;
         this.clientDetailsRepository = clientDetailsRepository;
+        this.accessTokenRepository = accessTokenRepository;
     }
 
     /**
@@ -186,7 +189,9 @@ public class TppService {
             sanitizedRedirectUris = null; // should not happen due to validation in controller
         }
 
-        final String scopes = Joiner.on(",").join(request.getScopes());
+        String[] scopesArray = request.getScopes();
+        Arrays.sort(scopesArray);
+        final String scopes = Joiner.on(",").join(scopesArray);
 
         // Store the new OAuth 2.0 credentials in database
         OAuthClientDetailsEntity oAuthClientDetailsEntity = new OAuthClientDetailsEntity();
@@ -231,12 +236,32 @@ public class TppService {
             tppAppDetailEntity.setAppName(request.getAppName());
             tppAppDetailEntity.setAppInfo(request.getAppDescription());
 
+            // Sanitize redirect URIs by Base64 decoding them
+            final String[] redirectUris = request.getRedirectUris();
+            final String sanitizedRedirectUris;
+            if (redirectUris != null) {
+                for (int i = 0; i < redirectUris.length; i++) {
+                    // comma is not allowed, we cannot encode the data in DB due to Spring OAuth support
+                    redirectUris[i] = redirectUris[i].replace(",", "%2C");
+                }
+                sanitizedRedirectUris = Joiner.on(",").join(redirectUris);
+            } else {
+                sanitizedRedirectUris = null; // should not happen due to validation in controller
+            }
+
+            String[] scopesArray = request.getScopes();
+            Arrays.sort(scopesArray);
+            final String scopes = Joiner.on(",").join(scopesArray);
+
             // Store the new OAuth 2.0 credentials in database
             Optional<OAuthClientDetailsEntity> oAuthClientDetailsEntityOptional = clientDetailsRepository.findById(clientId);
             if (oAuthClientDetailsEntityOptional.isPresent()) {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
-                oAuthClientDetailsEntity.setWebServerRedirectUri(Joiner.on(",").join(request.getRedirectUris()));
-                oAuthClientDetailsEntity.setScope(Joiner.on(",").join(request.getScopes()));
+                oAuthClientDetailsEntity.setWebServerRedirectUri(sanitizedRedirectUris);
+                if (!scopes.equals(oAuthClientDetailsEntity.getScope())) {
+                    oAuthClientDetailsEntity.setScope(scopes);
+                    accessTokenRepository.deleteAllByClientId(clientId); // changing application scopes will immediately revoke access tokens
+                }
                 clientDetailsRepository.save(oAuthClientDetailsEntity);
                 tppAppDetailEntity = appDetailRepository.save(tppAppDetailEntity);
                 return TppAppConverter.fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity);
@@ -276,6 +301,7 @@ public class TppService {
                 final OAuthClientDetailsEntity oAuthClientDetailsEntity = oAuthClientDetailsEntityOptional.get();
                 appDetailRepository.delete(tppAppDetailEntity);
                 clientDetailsRepository.delete(oAuthClientDetailsEntity);
+                accessTokenRepository.deleteAllByClientId(clientId);
             } else {
                 throw new TppAppNotFoundException(clientId);
             }
