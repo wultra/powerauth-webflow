@@ -20,6 +20,7 @@ import com.google.common.base.Joiner;
 import io.getlime.security.powerauth.app.tppengine.converter.TppAppConverter;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
 import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.repository.OAuthAccessTokenRepository;
@@ -143,7 +144,7 @@ public class TppService {
      * @return Information about a newly created app, including the OAuth 2.0 credentials (including "client secret").
      */
     @Transactional
-    public TppAppDetailResponse createApp(CreateTppAppRequest request) {
+    public TppAppDetailResponse createApp(CreateTppAppRequest request) throws UnableToCreateAppException {
 
         // Create a TPP entity, if it does not exist
         final Optional<TppEntity> tppEntityOptional = tppRepository.findFirstByTppLicense(request.getTppLicense());
@@ -157,6 +158,13 @@ public class TppService {
             tppEntity.setTppAddress(request.getTppAddress());
             tppEntity.setTppWebsite(request.getTppWebsite());
             tppEntity = tppRepository.save(tppEntity);
+        }
+
+        // Check if an app with given name exists
+        final Iterable<TppAppDetailEntity> appWithName = appDetailRepository.findByTppIdAndAppName(tppEntity.getTppId(), request.getAppName());
+        if (appWithName.iterator().hasNext()) { // app with given name already exists
+            List<String> errors = Collections.singletonList("Application with given name already exists. Chose different one or delete existing application.");
+            throw new UnableToCreateAppException(errors);
         }
 
         // Generate app OAuth 2.0 credentials
