@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureTyp
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -39,8 +40,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhand
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuth;
@@ -54,9 +55,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * This controller presents endpoints that are consumed by the native mobile app,
@@ -148,6 +147,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 operationList = getOperationListForUser(userId, true);
                 operationConfigs = getOperationConfigs(operationList);
             } catch (AuthStepException e) {
+                logger.error("Could not retrieve operation list", e);
                 // Next step operation list failed, return empty operation list
                 return new ObjectResponse<>(new OperationListResponse());
             }
@@ -233,9 +233,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             final GetOperationDetailResponse operation = getOperation(operationId);
 
-            // Check for expired operation
-            checkOperationExpiration(operation);
-
             // Check if signature type is allowed
             if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
                 throw new PowerAuthAuthenticationException();
@@ -244,7 +241,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             if (operation.getOperationData().equals(request.getRequestObject().getData())
                     && operation.getUserId() != null
                     && operation.getUserId().equals(apiAuthentication.getUserId())) {
-                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), null);
+                final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
+                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
                 return new Response();
             } else {
@@ -322,6 +320,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         try {
             operationConfig = getOperationConfig(operationName);
         } catch (AuthStepException e) {
+            logger.error("Could not retrieve operation configuration", e);
             // Next step request failed, cannot decide
             return false;
         }

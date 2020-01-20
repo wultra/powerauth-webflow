@@ -26,6 +26,7 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
 
     private String username;
     private boolean passwordEnabled;
+    private boolean smsOtpEnabled;
     private int resendDelay;
 
     /**
@@ -58,6 +59,22 @@ public class InitSmsAuthorizationResponse extends AuthStepResponse {
      */
     public void setPasswordEnabled(boolean passwordEnabled) {
         this.passwordEnabled = passwordEnabled;
+    }
+
+    /**
+     * Get whether authorization using SMS code is enabled.
+     * @return Whether authorization using SMS code is enabled.
+     */
+    public boolean isSmsOtpEnabled() {
+        return smsOtpEnabled;
+    }
+
+    /**
+     * Set whether authorization using SMS code is enabled.
+     * @param smsOtpEnabled Whether authorization using SMS code is enabled.
+     */
+    public void setSmsOtpEnabled(boolean smsOtpEnabled) {
+        this.smsOtpEnabled = smsOtpEnabled;
     }
 
     /**

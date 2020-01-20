@@ -15,7 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,6 +30,7 @@ public class ApplicationContext {
     private String id;
     private String name;
     private String description;
+    private List<String> originalScopes;
     private Map<String, Object> extras;
 
     /**
@@ -35,19 +38,20 @@ public class ApplicationContext {
      */
     public ApplicationContext() {
         extras = new HashMap<>();
+        originalScopes = new ArrayList<>();
     }
 
     /**
      * Constructor with all details.
      * @param id Application identifier.
      * @param name Application name.
-     * @param description Application description.
-     * @param extras Extra information for OAuth 2.0 consent screen.
+     * @param description Application description
      */
-    public ApplicationContext(String id, String name, String description, ApplicationExtras extras) {
+    public ApplicationContext(String id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;
+        this.originalScopes = new ArrayList<>();
         this.extras = new HashMap<>();
     }
 
@@ -97,6 +101,14 @@ public class ApplicationContext {
      */
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    /**
+     * Get the list with the original OAuth 2.0 scopes used when requesting the operation.
+     * @return List of originally requested scopes.
+     */
+    public List<String> getOriginalScopes() {
+        return originalScopes;
     }
 
     /**

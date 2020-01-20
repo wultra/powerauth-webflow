@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 
 /**
  * Request for creating SMS OTP authorization message.
@@ -34,6 +35,11 @@ public class CreateSmsAuthorizationRequest {
      * Organization ID for this authorization request.
      */
     private String organizationId;
+
+    /**
+     * User account status.
+     */
+    private AccountStatus accountStatus;
 
     /**
      * Operation context.
@@ -60,13 +66,15 @@ public class CreateSmsAuthorizationRequest {
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param accountStatus User account status.
      * @param lang SMS language.
      * @param operationContext Operation context.
      * @param resend Whether SMS is being resent.
      */
-    public CreateSmsAuthorizationRequest(String userId, String organizationId, String lang, OperationContext operationContext, boolean resend) {
+    public CreateSmsAuthorizationRequest(String userId, String organizationId, AccountStatus accountStatus, String lang, OperationContext operationContext, boolean resend) {
         this.userId = userId;
         this.organizationId = organizationId;
+        this.accountStatus = accountStatus;
         this.lang = lang;
         this.operationContext = operationContext;
         this.resend = resend;
@@ -102,6 +110,22 @@ public class CreateSmsAuthorizationRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get current user account status.
+     * @return User account status.
+     */
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set current user account status.
+     * @param accountStatus User account status.
+     */
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
     /**

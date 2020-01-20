@@ -117,7 +117,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
 
-    <!-- PowerAuth Credential Service URL -->
+    <!-- PowerAuth Data Adapter Service URL -->
     <Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>
 
     <!-- PowerAuth Next Step Service URL -->

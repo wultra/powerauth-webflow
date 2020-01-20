@@ -40,6 +40,15 @@ public class OperationSessionEntity implements Serializable {
     @Column(name = "http_session_id")
     private String httpSessionId;
 
+    @Column(name = "operation_hash")
+    private String operationHash;
+
+    @Column(name = "websocket_session_id")
+    private String webSocketSessionId;
+
+    @Column(name = "client_ip_address")
+    private String clientIpAddress;
+
     @Column(name = "result")
     @Enumerated(EnumType.STRING)
     private AuthResult result;
@@ -72,6 +81,30 @@ public class OperationSessionEntity implements Serializable {
 
     public void setHttpSessionId(String httpSessionId) {
         this.httpSessionId = httpSessionId;
+    }
+
+    public String getOperationHash() {
+        return operationHash;
+    }
+
+    public void setOperationHash(String operationHash) {
+        this.operationHash = operationHash;
+    }
+
+    public String getWebSocketSessionId() {
+        return webSocketSessionId;
+    }
+
+    public void setWebSocketSessionId(String webSocketSessionId) {
+        this.webSocketSessionId = webSocketSessionId;
+    }
+
+    public String getClientIp() {
+        return clientIpAddress;
+    }
+
+    public void setClientIp(String clientIpAddress) {
+        this.clientIpAddress = clientIpAddress;
     }
 
     public AuthResult getResult() {

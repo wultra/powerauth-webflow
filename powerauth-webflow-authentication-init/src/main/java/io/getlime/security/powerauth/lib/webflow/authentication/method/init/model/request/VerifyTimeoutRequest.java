@@ -15,7 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.init.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Request for operation timeout verification.
@@ -23,4 +27,9 @@ import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepReq
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class VerifyTimeoutRequest extends AuthStepRequest {
+
+    @Override
+    public List<AuthInstrument> getAuthInstruments() {
+        return Collections.emptyList();
+    }
 }

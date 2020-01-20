@@ -15,7 +15,7 @@
  */
 
 html {
-    background-image: url(../images/background.png);
+    background-image: url(../images/background-wultra.jpg);
     background-position: center center;
     background-size: cover;
     height: 100%;
@@ -197,6 +197,6 @@ a {
     float: left;
 }
 
-.auhtorized {
+.authorized {
     padding: 50px 0;
 }

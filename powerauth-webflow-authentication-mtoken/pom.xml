@@ -24,14 +24,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.22.0</version>
+        <version>0.23.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
     <name>powerauth-webflow-authentication-mtoken</name>
     <groupId>io.getlime.security</groupId>
-    <version>0.22.0</version>
+    <version>0.23.0</version>
 
     <dependencies>
 
@@ -39,6 +39,12 @@
         <dependency>
             <groupId>org.springframework.ws</groupId>
             <artifactId>spring-ws-security</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>bcprov-jdk15on</artifactId>
+                    <groupId>org.bouncycastle</groupId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -50,22 +56,22 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-mtoken-model</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
 
         <!-- Other Dependencies -->
@@ -77,7 +83,7 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.3.3</version>
+            <version>3.4.0</version>
         </dependency>
 
         <!-- Dependencies for Java 11 -->

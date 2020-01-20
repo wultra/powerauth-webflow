@@ -34,4 +34,9 @@ public interface OperationSessionRepository extends CrudRepository<OperationSess
     List<OperationSessionEntity> findActiveOperationsByHttpSessionId(String httpSessionId);
 
     OperationSessionEntity findByOperationId(String operationId);
+
+    OperationSessionEntity findByOperationHash(String operationHash);
+
+    OperationSessionEntity findByWebSocketSessionId(String operationHash);
+
 }

@@ -16,20 +16,22 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.service.MobileTokenConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
@@ -63,6 +65,7 @@ public class OperationController {
     private final OperationPersistenceService operationPersistenceService;
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,13 +74,15 @@ public class OperationController {
      * @param operationPersistenceService Operation persistence service.
      * @param operationConfigurationService Operation configuration service.
      * @param stepResolutionService Step resolution service.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService, OperationConfigurationService operationConfigurationService,
-                               StepResolutionService stepResolutionService) {
+                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.operationPersistenceService = operationPersistenceService;
         this.operationConfigurationService = operationConfigurationService;
         this.stepResolutionService = stepResolutionService;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -170,12 +175,13 @@ public class OperationController {
         String operationId = request.getRequestObject().getOperationId();
         String userId = request.getRequestObject().getUserId();
         String organizationId = request.getRequestObject().getOrganizationId();
-        logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+        UserAccountStatus accountStatus = request.getRequestObject().getAccountStatus();
+        logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}, account status: {}", operationId, userId, organizationId, accountStatus);
 
         // persist operation user update
         operationPersistenceService.updateOperationUser(request.getRequestObject());
 
-        logger.info("The updateOperationUser request succeeded, operation ID: {}, user ID: {}, organization ID: {}", operationId, userId, organizationId);
+        logger.info("The updateOperationUser request succeeded, operation ID: {}, user ID: {}, organization ID: {}, account status: {}", operationId, userId, organizationId, accountStatus);
         return new Response();
     }
 
@@ -200,6 +206,8 @@ public class OperationController {
         response.setOperationName(operation.getOperationName());
         response.setUserId(operation.getUserId());
         response.setOrganizationId(operation.getOrganizationId());
+        response.setAccountStatus(operation.getUserAccountStatus());
+        response.setExternalTransactionId(operation.getExternalTransactionId());
         response.setOperationData(operation.getOperationData());
         if (operation.getResult() != null) {
             response.setResult(operation.getResult());
@@ -207,6 +215,7 @@ public class OperationController {
         assignFormData(response, operation);
         assignApplicationContext(response, operation);
         assignOperationHistory(response, operation);
+        assignAfsActions(response, operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -284,6 +293,8 @@ public class OperationController {
             response.setOperationName(operation.getOperationName());
             response.setUserId(operation.getUserId());
             response.setOrganizationId(operation.getOrganizationId());
+            response.setAccountStatus(operation.getUserAccountStatus());
+            response.setExternalTransactionId(operation.getExternalTransactionId());
             response.setOperationData(operation.getOperationData());
             if (operation.getResult() != null) {
                 response.setResult(operation.getResult());
@@ -356,10 +367,59 @@ public class OperationController {
 
     private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
-        // persist operation form data update
+        // persist chosen auth method update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
         logger.debug("The updateChosenAuthMethod request succeeded");
         return new Response();
+    }
+
+    /**
+     * Update mobile token status for an operation (PUT method).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/status", method = RequestMethod.PUT)
+    public @ResponseBody Response updateMobileToken(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        return updateMobileTokenImpl(request);
+    }
+
+    /**
+     * Update operation with chosen authentication method (POST method alternative).
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/status/update", method = RequestMethod.POST)
+    public @ResponseBody Response updateMobileTokenPost(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        return updateMobileTokenImpl(request);
+    }
+
+    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+        logger.info("Received updateMobileToken request, operation ID: {}, mobile token active: {}", request.getRequestObject().getOperationId(), request.getRequestObject().isMobileTokenActive());
+        // persist mobile token update
+        operationPersistenceService.updateMobileToken(request.getRequestObject());
+        logger.debug("The updateMobileToken request succeeded");
+        return new Response();
+    }
+
+    /**
+     * Get mobile token configuration.
+     * @param request Get mobile token configuration request.
+     * @return Get mobile token configuration response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "/operation/mobileToken/config/detail", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws OperationNotFoundException {
+        String userId = request.getRequestObject().getUserId();
+        String operationName = request.getRequestObject().getOperationName();
+        AuthMethod authMethod = request.getRequestObject().getAuthMethod();
+        logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
+        boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, authMethod);
+        GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
+        response.setMobileTokenEnabled(isMobileTokenEnabled);
+        logger.debug("The getMobileTokenConfig request succeeded");
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -382,6 +442,17 @@ public class OperationController {
     @RequestMapping(value = "/operation/application/update", method = RequestMethod.POST)
     public @ResponseBody Response updateApplicationContextPost(@RequestBody ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
         return updateApplicationContextImpl(request);
+    }
+
+    @RequestMapping(value = "/operation/afs/action/create", method = RequestMethod.POST)
+    public @ResponseBody Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) throws OperationNotFoundException {
+        CreateAfsActionRequest afsRequest = request.getRequestObject();
+        logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());
+        // persist AFS action for operation
+        operationPersistenceService.createAfsAction(afsRequest);
+        logger.debug("The createAfsAction request succeeded");
+        return new Response();
+
     }
 
     private Response updateApplicationContextImpl(ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
@@ -423,14 +494,22 @@ public class OperationController {
             applicationContext.setId(operation.getApplicationId());
             applicationContext.setName(operation.getApplicationName());
             applicationContext.setDescription(operation.getApplicationDescription());
+            if (operation.getApplicationOriginalScopes() != null) {
+                try {
+                    JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
+                    List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
+                    applicationContext.getOriginalScopes().addAll(originalScopes);
+                } catch (IOException ex) {
+                    logger.error("Error while deserializing application scopes.", ex);
+                }
+            }
             if (operation.getApplicationExtras() != null) {
-                Map<String, Object> extras;
                 try {
                     JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
-                    extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
                     applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
-                    logger.error("Error while deserializing application extras", ex);
+                    logger.error("Error while deserializing application extras.", ex);
                 }
             }
             response.setApplicationContext(applicationContext);
@@ -455,6 +534,42 @@ public class OperationController {
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
+        }
+    }
+
+
+    /**
+     * Assign AFS actions to operation.
+     * @param response Response to be enriched by AFS actions.
+     * @param operation Database entity representing operation.
+     */
+    private void assignAfsActions(GetOperationDetailResponse response, OperationEntity operation) {
+        // add AFS actions
+        for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
+            AfsActionDetail action = new AfsActionDetail();
+            action.setAction(afsAction.getAfsAction());
+            action.setStepIndex(afsAction.getStepIndex());
+            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
+            action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
+            action.setAfsLabel(afsAction.getAfsLabel());
+            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
+            response.getAfsActions().add(action);
+        }
+    }
+
+    /**
+     * Convert extras String to map.
+     * @param extras String with extras.
+     * @return Extras map.
+     */
+    private Map<String, Object> convertExtrasToMap(String extras) {
+        try {
+            TypeReference<Map<String, Object>> typeRef
+                    = new TypeReference<Map<String, Object>>() {};
+            return objectMapper.readValue(extras, typeRef);
+        } catch (IOException e) {
+            logger.error("Error occurred while deserializing data", e);
+            return null;
         }
     }
 }

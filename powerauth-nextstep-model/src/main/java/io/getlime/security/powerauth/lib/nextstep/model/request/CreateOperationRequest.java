@@ -33,6 +33,7 @@ public class CreateOperationRequest {
     private String operationId;
     private String operationData;
     private String organizationId;
+    private String externalTransactionId;
     private List<KeyValueParameter> params;
     private OperationFormData formData;
     private ApplicationContext applicationContext;
@@ -108,6 +109,22 @@ public class CreateOperationRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get external transaction ID.
+     * @return External transaction ID.
+     */
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    /**
+     * Set external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     */
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
     }
 
     /**

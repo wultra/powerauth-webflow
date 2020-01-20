@@ -78,6 +78,7 @@ The operation may fail due to different reasons, such as:
 - Maximum number of attempts is reached causing authentication method to fail.
 - Operation times out.
 - User cancels the operation.
+- User refreshes the browser, navigates to another URL or closes the browser window. 
 
 ### Operation ID
 
@@ -162,7 +163,7 @@ Whenever operation progresses to the next step, previous status of operation is 
 
 ### Operation review
 
-Operation review is a special authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
+Operation review is a special non-SCA authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
 
 ### Organization
 
@@ -177,7 +178,11 @@ See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definiti
 
 ### Authentication method choice
 
-The user becomes authenticated and there are multiple choices available for the next authentication method (which is usually performing authorization, not authentication). The next authentication method is executed based on user choice.
+The user becomes authenticated and there are multiple choices available for the next authentication method (which is usually performing authorization, not authentication). The next authentication method is executed based on user choice. This approach is used in non-SCA authentication methods.
+
+### Authentication instrument
+
+The user has a choice of using different authentication instruments (SMS, mobile token, hardware token, etc.). The chosen authentication instrument influences how authentication / authorization is done. This approach is used in SCA authentication methods.
 
 ### Next step of an operation
 
@@ -195,7 +200,7 @@ See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definiti
 
 ### Next step user preferences
 
-Next step user preferences store configuration for different authentication methods.
+Next step user preferences store configuration for different authentication methods, for instance activation configured for mobile token.
 
 ### Authorization failure count
 
@@ -216,7 +221,7 @@ The effective number of remaining attempts is the lower of the two above mention
 The HTTP session is used in Web Flow in following ways:
 - A client may create an operation with operation data before the OAuth 2.0 authentication is started and store assigned operationId in HTTP session in the `operationId` attribute. This attribute is picked when authentication is started and Web Flow continues an already existing operation. In case the `operationId` attribute is not found, Web Flow creates a new login operation with default operation data.
 - During the authentication process, the `PENDING_AUTH_OBJECT` attribute stored in HTTP session is updated with OAuth 2.0 `UserOperationAuthentication` token which contains the most current state of authentication.
-- When the authentication process is succcessfully completed, the HTTP session becomes authenticated with the OAuth 2.0 `UserOperationAuthentication` token.
+- When the authentication process is successfully completed, the HTTP session becomes authenticated with the OAuth 2.0 `UserOperationAuthentication` token.
 - When the authentication process fails, the `PENDING_AUTH_OBJECT` attribute is removed from HTTP session. The HTTP session does not become authenticated.
 
 The HTTP session is also used for storing temporary data during operation.
@@ -238,3 +243,11 @@ Web Flow contains message resources which can be localized to different language
 ### Resource translation
 
 Web Flow supports translation of resources which contain references to values of operation form data. This process is called resource translation.
+
+### Anti-fraud system integration
+
+Anti-fraud System (AFS) integration is available for Web Flow. Web Flow triggers AFS actions during login
+and approval steps both when the step is initialized and when step authentication is performed.
+The AFS integration allows authentication step-down (e.g. using 1 factor instead of 2 factors or even no factors at all). 
+The AFS is also informed about completed, timed out and interrupted operations. 
+The communication with AFS is handled in Data Adapter. 

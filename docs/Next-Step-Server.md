@@ -27,6 +27,9 @@ Next Step Server implements following functionality:
   - update user and organization for an operation
   - update application context for an operation
   - set chosen authentication method
+  - update mobile token status for an operation
+  - retrieve mobile token configuration
+  - store result of an AFS action
 - management of organizations
   - list organizations
   - retrieve organization detail

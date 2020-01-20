@@ -18,10 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -40,7 +39,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This service handles conversion of operation request/response objects into operation entities.
@@ -54,26 +56,28 @@ public class OperationPersistenceService {
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
     private final ObjectMapper objectMapper;
+
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
-    private final AuthMethodRepository authMethodRepository;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     /**
      * Service constructor.
-     * @param idGeneratorService         ID generator service.
-     * @param operationRepository        Operation repository.
-     * @param operationHistoryRepository Operation history repository.
-     * @param authMethodRepository       Authentication method repository.
+     * @param idGeneratorService              ID generator service.
+     * @param operationRepository             Operation repository.
+     * @param operationHistoryRepository      Operation history repository.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository, AuthMethodRepository authMethodRepository) {
-        this.authMethodRepository = authMethodRepository;
+                                       OperationHistoryRepository operationHistoryRepository,
+                                       MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.objectMapper = new ObjectMapper();
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -89,6 +93,7 @@ public class OperationPersistenceService {
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setOrganizationId(request.getOrganizationId());
+        operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Assign operation context to entity in case it was sent in request
@@ -155,8 +160,9 @@ public class OperationPersistenceService {
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
-            // Params and steps are saved as JSON for now - new entities would be required to store this data.
+            // Params, steps and auth instruments are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
+            operationHistory.setRequestAuthInstruments(objectMapper.writeValueAsString(request.getAuthInstruments()));
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
@@ -182,6 +188,7 @@ public class OperationPersistenceService {
         OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
         operation.setOrganizationId(organizationId);
+        operation.setUserAccountStatus(request.getAccountStatus());
         operationRepository.save(operation);
     }
 
@@ -242,6 +249,26 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Update mobile token status.
+     *
+     * @param request Request to update mobile token status.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
+     */
+    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException {
+        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        if (!operationOptional.isPresent()) {
+            throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
+        }
+        OperationEntity operation = operationOptional.get();
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            throw new IllegalStateException("Operation is missing history");
+        }
+        currentHistory.setMobileTokenActive(request.isMobileTokenActive());
+        operationHistoryRepository.save(currentHistory);
+    }
+
+    /**
      * Update application context.
      *
      * @param request Request to update application context.
@@ -259,15 +286,17 @@ public class OperationPersistenceService {
                 operation.setApplicationId(null);
                 operation.setApplicationName(null);
                 operation.setApplicationDescription(null);
+                operation.setApplicationOriginalScopes(null);
                 operation.setApplicationExtras(objectMapper.writeValueAsString(Collections.emptyMap()));
             } else {
                 operation.setApplicationId(applicationContext.getId());
                 operation.setApplicationName(applicationContext.getName());
                 operation.setApplicationDescription(applicationContext.getDescription());
+                operation.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
                 operation.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
             }
         } catch (IOException e) {
-            logger.error("Error occurred while serializing application context for an operation", e);
+            logger.error("Error occurred while serializing application attributes for an operation", e);
         }
         operationRepository.save(operation);
     }
@@ -312,28 +341,16 @@ public class OperationPersistenceService {
             return entities;
         }
         List<OperationEntity> filteredList = new ArrayList<>();
-        List<AuthMethodEntity> authMethodEntities = authMethodRepository.findAllAuthMethods();
         for (OperationEntity operation : entities) {
-            Set<AuthMethod> authMethodsWithMobileToken = new LinkedHashSet<>();
             // Add operations whose last step is CONFIRMED with CONTINUE result and chosen authentication method supports mobile token
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
-            if (currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE
-                    && currentHistoryEntity.getChosenAuthMethod() != null) {
+            if (currentHistoryEntity != null && currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED
+                    && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
-                // Check whether chosen authentication method supports mobile token
-                for (AuthMethodEntity authMethodEntity : authMethodEntities) {
-                    if (authMethodEntity.getAuthMethod() == chosenAuthMethod && authMethodEntity.getHasMobileToken()) {
-                        authMethodsWithMobileToken.add(chosenAuthMethod);
-                        break;
-                    }
+                if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
+                    filteredList.add(operation);
                 }
             }
-
-            // There is at least one authentication method which supports mobile token, add operation into list of pending operations
-            if (!authMethodsWithMobileToken.isEmpty()) {
-                filteredList.add(operation);
-            }
-
         }
         return filteredList;
     }
@@ -374,6 +391,29 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Create an AFS action.
+     * @param request Request to crete an AFS action.
+     */
+    public void createAfsAction(CreateAfsActionRequest request) {
+        try {
+            OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
+            OperationEntity operation = getOperation(request.getOperationId());
+            afsEntity.setOperation(operation);
+            afsEntity.setAfsAction(request.getAfsAction());
+            afsEntity.setStepIndex(request.getStepIndex());
+            afsEntity.setRequestAfsExtras(request.getRequestAfsExtras());
+            afsEntity.setAfsLabel(request.getAfsLabel());
+            afsEntity.setAfsResponseApplied(request.isAfsResponseApplied());
+            afsEntity.setResponseAfsExtras(request.getResponseAfsExtras());
+            afsEntity.setTimestampCreated(request.getTimestampCreated());
+            operation.getAfsActions().add(afsEntity);
+            operationRepository.save(operation);
+        } catch (OperationNotFoundException e) {
+            logger.error("AFS action could not be saved because operation does not exist: {}", request.getOperationId());
+        }
+    }
+
+    /**
      * Assign application context to an operation entity.
      *
      * @param operationEntity    Operation entity.
@@ -383,11 +423,12 @@ public class OperationPersistenceService {
         operationEntity.setApplicationId(applicationContext.getId());
         operationEntity.setApplicationName(applicationContext.getName());
         operationEntity.setApplicationDescription(applicationContext.getDescription());
-        // Extras are saved as JSON
+        // Extras and original scopes are saved as JSON
         try {
             operationEntity.setApplicationExtras(objectMapper.writeValueAsString(applicationContext.getExtras()));
+            operationEntity.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
         } catch (JsonProcessingException ex) {
-            logger.error("Error while serializing application extras", ex);
+            logger.error("Error while serializing application attributes.", ex);
         }
     }
 

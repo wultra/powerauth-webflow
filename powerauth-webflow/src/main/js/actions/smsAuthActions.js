@@ -15,6 +15,7 @@
  */
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
+import {handleAuthFailedError} from "./errorHandling";
 
 /**
  * Get operation detail.
@@ -61,6 +62,7 @@ export function init(component) {
                         init: true,
                         message: response.data.message,
                         passwordEnabled: response.data.passwordEnabled,
+                        smsOtpEnabled: response.data.smsOtpEnabled,
                         username: response.data.username,
                         resendDelay: response.data.resendDelay
                     }
@@ -75,6 +77,7 @@ export function init(component) {
                     init: true,
                     message: response.data.message,
                     passwordEnabled: response.data.passwordEnabled,
+                    smsOtpEnabled: response.data.smsOtpEnabled,
                     username: response.data.username,
                     resendDelay: response.data.resendDelay
                 }
@@ -188,41 +191,18 @@ export function authenticate(userAuthCode, userPassword, component) {
                     break;
                 }
                 case 'AUTH_FAILED': {
-                    // handle timeout - action can not succeed anymore, show error
-                    if (response.data.message === "operation.timeout") {
-                        dispatchAction(dispatch, response);
-                        break;
+                    if (!handleAuthFailedError(dispatch, response)) {
+                        dispatch({
+                            type: getActionType(component),
+                            payload: {
+                                loading: false,
+                                error: true,
+                                init: false,
+                                message: response.data.message,
+                                remainingAttempts: response.data.remainingAttempts
+                            }
+                        });
                     }
-                    // if the operation has been interrupted by new operation, show an error
-                    if (response.data.message === "operation.interrupted") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if the maximum number of attempts has been exceeded, show an error, the method cannot continue
-                    if (response.data.message === "authentication.maxAttemptsExceeded") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if the maximum number of SMS OTP messages has been exceeded, show an error, the method cannot continue
-                    if (response.data.message === "smsAuthorization.maxAttemptsExceeded") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if there is no supported auth method, show error, there is no point in continuing
-                    if (response.data.message === "error.noAuthMethod") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    dispatch({
-                        type: getActionType(component),
-                        payload: {
-                            loading: false,
-                            error: true,
-                            init: false,
-                            message: response.data.message,
-                            remainingAttempts: response.data.remainingAttempts
-                        }
-                    });
                     break;
                 }
             }

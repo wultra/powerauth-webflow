@@ -75,6 +75,42 @@ public class WebFlowServerConfiguration {
     private boolean showAndroidSecurityWarning;
 
     /**
+     * Whether anti-fraud system integration is enabled.
+     */
+    @Value("${powerauth.webflow.afs.enabled:false}")
+    private boolean afsEnabled;
+
+    /**
+     * Maximum length of username.
+     */
+    @Value("${powerauth.webflow.input.username.maxLength:256}")
+    private int usernameMaxLength;
+
+    /**
+     * Maximum length of user password.
+     */
+    @Value("${powerauth.webflow.input.password.maxLength:256}")
+    private int passwordMaxLength;
+
+    /**
+     * Maximum length of SMS authorization code.
+     */
+    @Value("${powerauth.webflow.input.smsOtp.maxLength:8}")
+    private int smsOtpMaxLength;
+
+    /**
+     * Whether limit for large consent panel is enabled.
+     */
+    @Value("${powerauth.webflow.consent.limit.enabled:false}")
+    private boolean consentPanelLimitEnabled;
+
+    /**
+     * Configuration of limit for large consent panel in number of characters.
+     */
+    @Value("${powerauth.webflow.consent.limit.characters:750}")
+    private int consentPanelLimitCharacters;
+
+    /**
      * Get custom external stylesheet URL.
      *
      * @return External stylesheet URL.
@@ -131,5 +167,53 @@ public class WebFlowServerConfiguration {
      */
     public boolean getShowAndroidSecurityWarning() {
         return showAndroidSecurityWarning;
+    }
+
+    /**
+     * Get whether anti-fraud system integration is enabled.
+     * @return Whether anti-fraud system integration is enabled.
+     */
+    public boolean isAfsEnabled() {
+        return afsEnabled;
+    }
+
+    /**
+     * Get maximum length of username.
+     * @return Maximum length of username.
+     */
+    public int getUsernameMaxLength() {
+        return usernameMaxLength;
+    }
+
+    /**
+     * Get maximum length of password.
+     * @return Maximum length of password.
+     */
+    public int getPasswordMaxLength() {
+        return passwordMaxLength;
+    }
+
+    /**
+     * Get maximum length of SMS authorization code.
+     * @return Maximum length of SMS authorization code.
+     */
+    public int getSmsOtpMaxLength() {
+        return smsOtpMaxLength;
+    }
+
+    /**
+     * Get whether limit for large consent panel is enabled.
+     * @return Whether limit for large consent panel is enabled.
+     */
+    public boolean isConsentPanelLimitEnabled() {
+        return consentPanelLimitEnabled;
+    }
+
+    /**
+     * Get limit of characters for displaying large consent panel.
+     * @return Limit of characters for displaying large consent panel.
+     */
+    public int getConsentPanelLimitCharacters() {
+        return consentPanelLimitCharacters;
     }
 }

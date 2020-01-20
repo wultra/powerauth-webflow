@@ -33,6 +33,7 @@ public class CreateOperationResponse {
     private String operationId;
     private String operationName;
     private String organizationId;
+    private String externalTransactionId;
     private AuthResult result;
     private String resultDescription;
     private Date timestampCreated;
@@ -102,6 +103,22 @@ public class CreateOperationResponse {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get external transaction ID.
+     * @return External transaction ID.
+     */
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    /**
+     * Set external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     */
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
     }
 
     /**

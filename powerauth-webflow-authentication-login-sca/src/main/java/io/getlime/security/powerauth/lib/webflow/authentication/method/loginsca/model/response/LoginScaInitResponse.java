@@ -15,31 +15,59 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Model for an init response for SCA login.
+ * Response object used for querying login form data.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class LoginScaInitResponse extends AuthStepResponse {
+public class LoginScaInitResponse {
 
+    private List<OrganizationDetail> organizations = new ArrayList<>();
+    private boolean userAlreadyKnown;
     private boolean mobileTokenEnabled;
 
     /**
-     * Get whether mobile token is enabled for this step.
-     * @return Whether mobile token is enabled for this step.
+     * Get organizations.
+     * @return Organizations.
      */
+    public List<OrganizationDetail> getOrganizations() {
+        return organizations;
+    }
+
+    /**
+     * Set organizations.
+     * @param organizations Organizations.
+     */
+    public void setOrganizations(List<OrganizationDetail> organizations) {
+        this.organizations = organizations;
+    }
+
+    /**
+     * Add an organization.
+     * @param organization Organization.
+     */
+    public void addOrganization(OrganizationDetail organization) {
+        organizations.add(organization);
+    }
+
+    public boolean isUserAlreadyKnown() {
+        return userAlreadyKnown;
+    }
+
+    public void setUserAlreadyKnown(boolean userAlreadyKnown) {
+        this.userAlreadyKnown = userAlreadyKnown;
+    }
+
     public boolean isMobileTokenEnabled() {
         return mobileTokenEnabled;
     }
 
-    /**
-     * Set whether mobile token is enabled for this step.
-     * @param mobileTokenEnabled Whether mobile token is enabled for this step.
-     */
     public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
         this.mobileTokenEnabled = mobileTokenEnabled;
     }
-
 }

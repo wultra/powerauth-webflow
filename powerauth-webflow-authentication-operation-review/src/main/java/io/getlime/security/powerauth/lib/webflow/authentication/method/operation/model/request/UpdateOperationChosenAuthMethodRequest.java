@@ -17,13 +17,12 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
 /**
  * Request to set chosen authentication method.
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class UpdateOperationChosenAuthMethodRequest extends AuthStepRequest {
+public class UpdateOperationChosenAuthMethodRequest {
 
     private AuthMethod chosenAuthMethod;
 

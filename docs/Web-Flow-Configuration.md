@@ -16,7 +16,7 @@ At minimum the following configuration properties should be updated based on dep
 
 Complete configuration file:
 ```properties
-# Credential Server Service URL
+# Data Adapter Server Service URL
 powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
 
 # Next Step Server Service URL
@@ -37,11 +37,6 @@ powerauth.webflow.page.title=PowerAuth Web Flow
 powerauth.webflow.page.ext-resources.location=classpath:/static/resources/
 powerauth.webflow.page.custom-css.url=
 
-# Database Keep-Alive
-spring.datasource.test-while-idle=true
-spring.datasource.test-on-borrow=true
-spring.datasource.validation-query=SELECT 1
-
 # Database Configuration - MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
@@ -50,6 +45,15 @@ spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+
+# Database Configuration - PostgreSQL
+#spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
+#spring.datasource.username=powerauth
+#spring.datasource.password=powerauth
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
+#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
@@ -65,7 +69,7 @@ powerauth.webflow.service.applicationName=powerauth-webflow
 powerauth.webflow.service.applicationDisplayName=PowerAuth Web Flow Server
 powerauth.webflow.service.applicationEnvironment=
 
-# Configuration of Offline mode
+# Configuration of Offline Mode
 powerauth.webflow.offlineMode.available=true
 
 # Configuration of Android Security Warning
@@ -81,6 +85,23 @@ powerauth.webflow.sms.resend.delayMs=60000
 
 # Configuration of Delay for Showing Operation Timeout Warning in Milliseconds
 powerauth.webflow.timeout.warning.delayMs=60000
+
+# Configuration of Limit for Large Consent Panel in Number of Characters
+powerauth.webflow.consent.limit.enabled=false
+powerauth.webflow.consent.limit.characters=750
+
+# Anti-fraud system configuration
+powerauth.webflow.afs.enabled=false
+powerauth.webflow.afs.type=THREAT_MARK
+powerauth.webflow.afs.detectIpAddress=false
+powerauth.webflow.afs.forceIpv4=true
+powerauth.webflow.afs.tm.cookies.deviceTag=
+powerauth.webflow.afs.tm.cookies.sessionSid=
+
+# User input validation
+powerauth.webflow.input.username.maxLength=256
+powerauth.webflow.input.password.maxLength=256
+powerauth.webflow.input.smsOtp.maxLength=8
 ```
 
 Encryption of user passwords during transport can be configured using following properties:
@@ -113,11 +134,6 @@ At minimum the following configuration properties should be updated based on dep
 
 Complete configuration file:
 ```properties
-# Database Keep-Alive
-spring.datasource.test-while-idle=true
-spring.datasource.test-on-borrow=true
-spring.datasource.validation-query=SELECT 1
-
 # Database Configuration - MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
@@ -126,6 +142,15 @@ spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+
+# Database Configuration - PostgreSQL
+#spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
+#spring.datasource.username=powerauth
+#spring.datasource.password=
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
+#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
@@ -153,11 +178,6 @@ At minimum the following configuration properties should be updated based on dep
 
 Complete configuration file:
 ```properties
-# Database Keep-Alive
-spring.datasource.test-while-idle=true
-spring.datasource.test-on-borrow=true
-spring.datasource.validation-query=SELECT 1
-
 # Database Configuration - MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
@@ -166,6 +186,15 @@ spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+
+# Database Configuration - PostgreSQL
+#spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+#spring.datasource.username=powerauth
+#spring.datasource.password=
+#spring.datasource.driver-class-name=org.postgresql.Driver
+#spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
+#spring.jpa.properties.hibernate.connection.characterEncoding=utf8
+#spring.jpa.properties.hibernate.connection.useUnicode=true
 
 # Database Configuration - Oracle
 #spring.datasource.url=jdbc:oracle:thin:@//localhost:1521/powerauth
@@ -180,11 +209,6 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 powerauth.authorization.sms-otp.expiration-time-in-seconds=300
 # Maximum number of tries to verify a SMS OTP authorization code
 powerauth.authorization.sms-otp.max-verify-tries-per-message=5
-
-# Application Service Configuration
-powerauth.dataAdapter.service.applicationName=powerauth-data-adapter
-powerauth.dataAdapter.service.applicationDisplayName=PowerAuth Data Adapter
-powerauth.dataAdapter.service.applicationEnvironment=
 ```
 
 ## Web Flow Client
@@ -270,8 +294,49 @@ The `RETAIL` organization is the default one (it is preselected in the UI). The 
 
 _Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
 
+## Operation configuration
+
+Operations need to be configured in table `ns_operation_config`.
+
+Following parameters are configured for each operation:
+- `operation_name` - unique operation name which identifies the operation
+- `template_version` - template version, see documentation for [Operation Data](./Operation-Data.md)
+  - currently used template version is `A`
+- `template_id` - template identifier, see documentation for [Operation Data](./Operation-Data.md)
+  - for approval (payment) use `1`
+  - for login use `2`
+- `mobile_token_enabled` - whether mobile token is enabled for this operation
+- `mobile_token_mode` - configuration of mobile token factors, use only when `mobile_token_enabled` value is true
+  - for 1FA use: `{"type":"1FA"}`
+  - for 2FA use e.g.: `{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}`
+- `afs_enabled` - whether anti-fraud service integration is enabled for this operation
+- `afs_config_id` - identifier of AFS configuration, use only when `afs_enabled` value is true
+
+## AFS configuration
+
+Anti-fraud system integration needs to be configured in table `ns_operation_config`.
+
+Following parameters are configured for each AFS configuration:
+- `afs_config_id` - unique identifier of AFS configuration which is configured in `ns_operation_config` table to link operation with AFS configuration
+- `js_snippet_url` - URL which should be used for executing JavaScript code from anti-fraud system
+- `parameters` - reserved for future use, specify value `{}`
+
+AFS also needs to be configured using application properties:
+- `powerauth.webflow.afs.enabled` - enables AFS integration
+- `powerauth.webflow.afs.type` - AFS product type (e.g. `THREAT_MARK`)
+- `powerauth.webflow.afs.detectIpAddress` - whether Web Flow should attempt to detect client IP addresses
+- `powerauth.webflow.afs.forceIpv4` - whether only IPv4 addresses should be used when detecting client IP addresses
+- `powerauth.webflow.afs.tm.cookies.deviceTag` - name of Threat Mark `deviceTag` cookie 
+- `powerauth.webflow.afs.tm.cookies.sessionSid` - name of Threat Mark `sessionSid` cookie
+
 ## Authentication methods and next step definitions
 
 Authentication methods and next step definitions need to be configured during Web Flow deployment.
 
 See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for details.
+
+## Mobile token configuration
+
+Mobile token needs to be enabled and configured in case it should be available for Web Flow. 
+
+See chapter [Mobile Token Configuration](./Mobile-Token-Configuration.md) for details.

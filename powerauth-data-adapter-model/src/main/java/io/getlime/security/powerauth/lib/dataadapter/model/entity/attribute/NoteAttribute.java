@@ -59,7 +59,9 @@ public class NoteAttribute extends AttributeFormatted {
         this.label = label;
         this.note = note;
         this.valueFormatType = valueFormatType;
-        this.formattedValues.putAll(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
 

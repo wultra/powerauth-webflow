@@ -23,3 +23,4 @@ Following functionality needs to be customized during Web Flow deployment by imp
 - validate OAuth 2.0 consent form options
 - save OAuth 2.0 consent form options
 - authenticate user using user ID, password and SMS authorization code
+- execute an anti-fraud system (AFS) action and react on response from AFS

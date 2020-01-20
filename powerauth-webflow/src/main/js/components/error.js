@@ -17,6 +17,8 @@ import React from "react";
 import {connect} from "react-redux";
 // i18n
 import {FormattedMessage} from "react-intl";
+// Web Socket support
+const stompClient = require('../websocket-client');
 
 /**
  * Error component with redirect to original application.
@@ -34,6 +36,8 @@ export default class Error extends React.Component {
     }
 
     componentWillMount() {
+        // Disable onbeforeunload dialog
+        window.onbeforeunload = undefined;
         // Disable checking of timeout to avoid sending additional requests to server
         this.props.dispatch({
             type: "UPDATE_TIMEOUT",
@@ -43,6 +47,8 @@ export default class Error extends React.Component {
                 timeoutCheckEnabled: false
             }
         });
+        // Disconnect Web Socket connection
+        stompClient.disconnect();
         if (this.props.context.message === "message.networkError") {
             // do not redirect user in case of network errors - just display the error
             this.setState({networkError: true});

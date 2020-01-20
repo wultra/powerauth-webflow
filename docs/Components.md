@@ -60,6 +60,7 @@ Data Adapter handles following use cases:
 * Verify consent form options selected by the user.
 * Save consent form options selected by the user.
 * Verify authorization SMS code and user password.
+* Execute an anti-fraud system (AFS) action and react on response from AFS.
 
 For more information see the [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization)
 

@@ -1,3 +1,10 @@
+--
+--  Create sequences.
+--
+CREATE SEQUENCE "TPP_USER_CONSENT_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "TPP_USER_CONSENT_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_OPERATION_AFS_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+
 -- Table oauth_client_details stores details about OAuth2 client applications.
 -- Every Web Flow client application should have a record in this table.
 -- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/client/JdbcClientDetailsService.java
@@ -18,9 +25,9 @@ CREATE TABLE oauth_client_details (
 -- Table oauth_client_token stores OAuth2 tokens for retrieval by client applications.
 -- See: https://docs.spring.io/spring-security/oauth/apidocs/org/springframework/security/oauth2/client/token/JdbcClientTokenServices.html
 CREATE TABLE oauth_client_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             BLOB,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256)
 );
@@ -28,9 +35,9 @@ CREATE TABLE oauth_client_token (
 -- Table oauth_access_token stores OAuth2 access tokens.
 -- See: https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-oauth2/src/main/java/org/springframework/security/oauth2/provider/token/store/JdbcTokenStore.java
 CREATE TABLE oauth_access_token (
+  authentication_id VARCHAR(256) PRIMARY KEY,
   token_id          VARCHAR(256),
   token             BLOB,
-  authentication_id VARCHAR(256) PRIMARY KEY,
   user_name         VARCHAR(256),
   client_id         VARCHAR(256),
   authentication    BLOB,
@@ -89,7 +96,10 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
-  mobile_token_mode         VARCHAR(256) NOT NULL
+  mobile_token_enabled      NUMBER(1) DEFAULT 0 NOT NULL,
+  mobile_token_mode         VARCHAR(256) NOT NULL,
+  afs_enabled               NUMBER(1) DEFAULT 0 NOT NULL,
+  afs_config_id             VARCHAR(256)
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -105,20 +115,23 @@ CREATE TABLE ns_organization (
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
-  operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
-  operation_name            VARCHAR(32) NOT NULL,
-  operation_data            CLOB NOT NULL,
-  operation_form_data       CLOB,
-  application_id            VARCHAR(256),
-  application_name          VARCHAR(256),
-  application_description   VARCHAR(256),
-  application_extras        CLOB,
-  user_id                   VARCHAR(256),
-  organization_id           VARCHAR(256),
-  result                    VARCHAR(32),
-  timestamp_created         TIMESTAMP,
-  timestamp_expires         TIMESTAMP,
-  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
+  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,
+  operation_name                VARCHAR(32) NOT NULL,
+  operation_data                CLOB NOT NULL,
+  operation_form_data           CLOB,
+  application_id                VARCHAR(256),
+  application_name              VARCHAR(256),
+  application_description       VARCHAR(256),
+  application_original_scopes   VARCHAR(256),
+  application_extras            CLOB,
+  user_id                       VARCHAR(256),
+  organization_id               VARCHAR(256),
+  user_account_status           VARCHAR(32),
+  external_transaction_id       VARCHAR(256),
+  result                        VARCHAR(32),
+  timestamp_created             TIMESTAMP,
+  timestamp_expires             TIMESTAMP,
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
 -- Table ns_operation_history stores all changes of operations.
@@ -127,6 +140,7 @@ CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,
   result_id                   INTEGER NOT NULL,
   request_auth_method         VARCHAR(32) NOT NULL,
+  request_auth_instruments    VARCHAR(256),
   request_auth_step_result    VARCHAR(32) NOT NULL,
   request_params              VARCHAR(4000),
   response_result             VARCHAR(32) NOT NULL,
@@ -135,9 +149,24 @@ CREATE TABLE ns_operation_history (
   response_timestamp_created  TIMESTAMP,
   response_timestamp_expires  TIMESTAMP,
   chosen_auth_method          VARCHAR(32),
+  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,
   CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
   CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method)
+);
+
+-- Table ns_operation_afs stores AFS requests and responses.
+CREATE TABLE ns_operation_afs (
+  afs_action_id               INTEGER PRIMARY KEY NOT NULL,
+  operation_id                VARCHAR(256) NOT NULL,
+  request_afs_action          VARCHAR(256) NOT NULL,
+  request_step_index          INTEGER NOT NULL,
+  request_afs_extras          VARCHAR(256),
+  response_afs_apply          NUMBER(1) DEFAULT 0 NOT NULL,
+  response_afs_label          VARCHAR(256),
+  response_afs_extras         VARCHAR(256),
+  timestamp_created           TIMESTAMP,
+  CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
@@ -160,8 +189,18 @@ CREATE TABLE ns_step_definition (
 CREATE TABLE wf_operation_session (
   operation_id              VARCHAR(256) PRIMARY KEY NOT NULL,
   http_session_id           VARCHAR(256) NOT NULL,
+  operation_hash            VARCHAR(256),
+  websocket_session_id      VARCHAR(32),
+  client_ip_address         VARCHAR(32),
   result                    VARCHAR(32) NOT NULL,
   timestamp_created         TIMESTAMP
+);
+
+-- Table wf_afs_config is used to configure anti-fraud system parameters.
+CREATE TABLE wf_afs_config (
+  config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,
+  js_snippet_url            VARCHAR(256) NOT NULL,
+  parameters                CLOB
 );
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.
@@ -181,21 +220,50 @@ CREATE TABLE da_sms_authorization (
   timestamp_expires    TIMESTAMP
 );
 
--- Table UserConnection is required only for the demo client application which is based on Spring Social.
--- See: https://github.com/spring-projects/spring-social
-/*
-CREATE TABLE UserConnection (
-  userId VARCHAR(255) NOT NULL,
-  providerId VARCHAR(255) NOT NULL,
-  providerUserId VARCHAR(255),
-  rank INTEGER NOT NULL,
-  displayName VARCHAR(255),
-  profileUrl VARCHAR(512),
-  imageUrl VARCHAR(512),
-  accessToken VARCHAR(512) NOT NULL,
-  secret VARCHAR(512),
-  refreshToken VARCHAR(512),
-  expireTime NUMBER(19),
-PRIMARY KEY (userId, providerId, providerUserId));
-CREATE UNIQUE INDEX UserConnectionRank on UserConnection(userId, providerId, rank);
-*/
+-- Table da_user_credentials stores built-in users for the data adapter
+CREATE TABLE da_user_credentials (
+  user_id               VARCHAR(128) PRIMARY KEY NOT NULL,
+  username              VARCHAR(255) NOT NULL,
+  password_hash         VARCHAR(255) NOT NULL,
+  family_name           VARCHAR(255) NOT NULL,
+  given_name            VARCHAR(255) NOT NULL,
+  organization_id       VARCHAR(64)  NOT NULL,
+  phone_number          VARCHAR(255) NOT NULL
+);
+
+-- Table for the list of consent templates
+CREATE TABLE tpp_consent (
+  consent_id            VARCHAR(64) PRIMARY KEY NOT NULL,
+  consent_name          VARCHAR(128) NOT NULL,
+  consent_text          CLOB NOT NULL,
+  version               INT NOT NULL
+);
+
+-- Table for the list of consent currently given by a user
+CREATE TABLE tpp_user_consent (
+    id                  INTEGER PRIMARY KEY NOT NULL,
+    user_id             VARCHAR(256) NOT NULL,
+    client_id           VARCHAR(256) NOT NULL,
+    consent_id          VARCHAR(64) NOT NULL,
+    external_id         VARCHAR(256) NOT NULL,
+    consent_parameters  CLOB NOT NULL,
+    timestamp_created   TIMESTAMP,
+    timestamp_updated   TIMESTAMP
+);
+
+-- Table for the list of changes in consent history by given user
+CREATE TABLE tpp_user_consent_history (
+    id                  INTEGER PRIMARY KEY NOT NULL,
+    user_id             VARCHAR(256) NOT NULL,
+    client_id           VARCHAR(256) NOT NULL,
+    consent_id          VARCHAR(64) NOT NULL,
+    consent_change      VARCHAR(16) NOT NULL,
+    external_id         VARCHAR(256) NOT NULL,
+    consent_parameters  CLOB NOT NULL,
+    timestamp_created   TIMESTAMP
+);
+
+CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
+CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
+

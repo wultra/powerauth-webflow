@@ -98,7 +98,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     protected AuthenticationResult authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        checkOperationExpiration(operation);
         //TODO: Check pre-authenticated user here
         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
@@ -122,7 +121,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        checkOperationExpiration(operation);
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());
         response.setFormData(decorateFormData(operation));
@@ -238,7 +236,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private Response updateFormDataImpl(UpdateOperationFormDataRequest request) throws NextStepServiceException, DataAdapterClientErrorException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        checkOperationExpiration(operation);
         // update formData in Next Step server
         nextStepClient.updateOperationFormData(operation.getOperationId(), request.getFormData());
         // Send notification to Data Adapter if the bank account has changed.
@@ -281,7 +278,6 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private Response updateChosenAuthenticationMethodImpl(UpdateOperationChosenAuthMethodRequest request) throws NextStepServiceException, AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
-        checkOperationExpiration(operation);
         // update chosenAuthMethod in Next Step server
         nextStepClient.updateChosenAuthMethod(operation.getOperationId(), request.getChosenAuthMethod());
         return new Response();

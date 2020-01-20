@@ -18,6 +18,7 @@ Following topics are covered in this chapter:
 - [Create OAuth 2.0 consent form](#create-oauth-20-consent-form)
 - [Validate OAuth 2.0 consent form](#validate-oauth-20-consent-form)
 - [Save OAuth 2.0 consent form](#save-oauth-20-consent-form)
+- [Execute an AFS action](#execute-an-afs-action)
 
 You can access the generated REST API documentation in deployed Data Adapter:
 
@@ -181,14 +182,12 @@ The list of expected status codes during authentication:
         "userInput": {}
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     }
@@ -205,7 +204,23 @@ The list of expected status codes during authentication:
     "id": "12345678",
     "givenName": "John",
     "familyName": "Doe",
-    "organizationId": "RETAIL"
+    "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE"
+  }
+}
+```
+
+### Response - user account exists, however the account is not active (e.g. blocked)
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "id": "12345678",
+    "givenName": "John",
+    "familyName": "Doe",
+    "organizationId": "RETAIL",
+    "accountStatus": "NOT_ACTIVE"
   }
 }
 ```
@@ -355,14 +370,12 @@ The list of expected status codes during authentication:
         "userInput": {}
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     }
@@ -430,12 +443,13 @@ private String decryptPassword(String secretKeyBase64, String cipherTransformati
 {
   "status": "OK",
   "responseObject": {
-    "authenticationResult": "VERIFIED_SUCCEEDED",
+    "authenticationResult": "SUCCEEDED",
     "userDetail": {
       "id": "12345678",
       "givenName": "John",
       "familyName": "Doe",
-      "organizationId": "RETAIL"
+      "organizationId": "RETAIL",
+      "accountStatus": "ACTIVE"
     },
     "errorMessage": null,
     "remainingAttempts": null,
@@ -456,7 +470,7 @@ This message should be sent when the Data Adapter receives a correct message, ho
 {
   "status": "OK",
   "responseObject": {
-    "authenticationResult": "VERIFIED_FAILED",
+    "authenticationResult": "FAILED",
     "userDetail": null,
     "errorMessage": "login.authenticationFailed",
     "remainingAttempts": null,
@@ -567,7 +581,8 @@ The list of expected status codes:
     "id": "12345678",
     "givenName": "John",
     "familyName": "Doe",
-    "organizationId": "RETAIL"
+    "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE"
   }
 }
 ```
@@ -677,14 +692,12 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     }
@@ -910,14 +923,12 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"],
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     },
@@ -1049,14 +1060,12 @@ Possible operation changes are: `DONE`, `CANCELED` and `FAILED`.
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     },
@@ -1111,6 +1120,7 @@ The list of expected status codes:
   "requestObject": {
     "userId": "12345678",
     "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE",
     "operationContext": {
       "id": "371526cc-5dee-414e-8418-5ee1c5ef2d67",
       "name": "authorize_payment",
@@ -1181,14 +1191,12 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     },
@@ -1263,6 +1271,9 @@ The list of expected status codes:
 ```json
 {
   "requestObject": {
+    "userId": "12345678",
+    "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE",
     "messageId": "617178ab-f315-4223-a602-9d4893b4f99f",
     "authorizationCode": "77038183",
     "operationContext": {
@@ -1335,14 +1346,12 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     }
@@ -1360,7 +1369,7 @@ The list of expected status codes:
 {
   "status": "OK",
   "responseObject": {
-    "smsAuthorizationResult": "VERIFIED_SUCCEEDED",
+    "smsAuthorizationResult": "SUCCEEDED",
     "errorMessage": null,
     "remainingAttempts": null,
     "showRemainingAttempts": false
@@ -1374,7 +1383,7 @@ The list of expected status codes:
 {
   "status": "OK",
   "responseObject": {
-    "smsAuthorizationResult": "VERIFIED_FAILED",
+    "smsAuthorizationResult": "FAILED",
     "errorMessage": "smsAuthorization.failed",
     "remainingAttempts": 4,
     "showRemainingAttempts": false
@@ -1421,8 +1430,9 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 {
   "requestObject": {
     "userId": "12345678",
-    "password": "s3cret",
     "organizationId": "RETAIL",
+    "accountStatus": "ACTIVE",
+    "password": "s3cret",
     "authenticationContext": {
       "passwordProtection": "NO_PROTECTION",
       "cipherTransformation": "",
@@ -1500,14 +1510,12 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "applicationOwner": "Wultra",
-          "_requestedScopes": [
-            "PISP"
-          ]
+          "applicationOwner": "Wultra"
         }
       }
     }
@@ -1525,8 +1533,8 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 {
   "status": "OK",
   "responseObject": {
-    "smsAuthorizationResult": "VERIFIED_SUCCEEDED",
-    "userAuthenticationResult": "VERIFIED_SUCCEEDED",
+    "smsAuthorizationResult": "SUCCEEDED",
+    "userAuthenticationResult": "SUCCEEDED",
     "errorMessage": null,
     "remainingAttempts": null,
     "showRemainingAttempts": false
@@ -1544,8 +1552,8 @@ See chapter [User Password Encryption and Decryption](./Data-Adapter-REST-API-Re
 {
   "status": "OK",
   "responseObject": {
-    "smsAuthorizationResult": "VERIFIED_FAILED",
-    "userAuthenticationResult": "VERIFIED_FAILED",
+    "smsAuthorizationResult": "FAILED",
+    "userAuthenticationResult": "FAILED",
     "errorMessage": "login.authenticationFailed",
     "remainingAttempts": null,
     "showRemainingAttempts": false
@@ -1658,13 +1666,11 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "_requestedScopes": [
-            "PISP"
-          ],
           "applicationOwner": "Wultra"
         }
       }
@@ -1738,6 +1744,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
@@ -1808,13 +1815,11 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "_requestedScopes": [
-            "PISP"
-          ],
           "applicationOwner": "Wultra"
         }
       }
@@ -1890,6 +1895,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "7d92fce2-c1f2-4d5b-b522-61da0749fdf7",
       "name": "authorize_payment",
@@ -1960,13 +1966,11 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "_requestedScopes": [
-            "PISP"
-          ],
           "applicationOwner": "Wultra"
         }
       }
@@ -2072,6 +2076,7 @@ The list of expected status codes:
 {
   "requestObject": {
     "userId": "12345678",
+    "organizationId": "RETAIL",
     "operationContext": {
       "id": "4a04667b-8a1a-46af-813c-cf71ffcde478",
       "name": "authorize_payment",
@@ -2142,13 +2147,11 @@ The list of expected status codes:
         }
       },
       "applicationContext": {
-        "id": "DEMO",
+        "id": "democlient",
         "name": "Demo application",
         "description": "Web Flow demo application",
+        "originalScopes": ["pisp"], 
         "extras": {
-          "_requestedScopes": [
-            "PISP"
-          ],
           "applicationOwner": "Wultra"
         }
       }
@@ -2199,6 +2202,161 @@ The list of expected status codes:
   "status": "OK",
   "responseObject": {
     "saveSucceeded": false
+  }
+}
+```
+
+## Execute an AFS action
+
+### Execute an AFS action - request parameters
+
+<table>
+	<tr>
+		<td>Method</td>
+		<td><code>POST</code></td>
+	</tr>
+	<tr>
+		<td>Resource URI</td>
+		<td><code>/api/afs/action/execute</code></td>
+	</tr>
+</table>
+
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - AFS action was successfully executed |
+| 400  | `OPERATION_CONTEXT_INVALID` - invalid operation context |
+| 400  | `REMOTE_ERROR` - communication with remote system failed |
+| 500  | Server errors - provide error details in the message, this is only for unexpected errors |
+
+### Execute an AFS action - request
+
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "requestObject": {
+    "userId": "12345678",
+    "organizationId": "RETAIL",
+    "operationContext": {
+      "id": "47a74437-83f9-4567-8c9e-270bea98d9de",
+      "name": "authorize_payment",
+      "data": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
+      "formData": {
+        "title": {
+          "id": "operation.title",
+          "message": "Confirm Payment"
+        },
+        "greeting": {
+          "id": "operation.greeting",
+          "message": "Hello,\nplease confirm following payment:"
+        },
+        "summary": {
+          "id": "operation.summary",
+          "message": "Hello, please confirm payment 100 CZK to account 238400856/0300."
+        },
+        "config": [],
+        "banners": [],
+        "parameters": [
+          {
+            "type": "AMOUNT",
+            "id": "operation.amount",
+            "label": "Amount",
+            "valueFormatType": "AMOUNT",
+            "formattedValues": {
+              "amount": "100.00",
+              "currency": "CZK"
+            },
+            "amount": 100,
+            "currency": "CZK",
+            "currencyId": "operation.currency"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.account",
+            "label": "To Account",
+            "valueFormatType": "ACCOUNT",
+            "formattedValues": {
+              "value": "238400856/0300"
+            },
+            "value": "238400856/0300"
+          },
+          {
+            "type": "KEY_VALUE",
+            "id": "operation.dueDate",
+            "label": "Due Date",
+            "valueFormatType": "DATE",
+            "formattedValues": {
+              "value": "Jun 29, 2019"
+            },
+            "value": "2019-06-29"
+          },
+          {
+            "type": "NOTE",
+            "id": "operation.note",
+            "label": "Note",
+            "valueFormatType": "TEXT",
+            "formattedValues": {
+              "value": "Utility Bill Payment - 05/2019"
+            },
+            "note": "Utility Bill Payment - 05/2019"
+          }
+        ],
+        "userInput": {
+          "smsFallback.enabled": "true",
+          "operation.bankAccountChoice": "CZ4012340000000012345678",
+          "operation.bankAccountChoice.disabled": "true"
+        }
+      },
+      "applicationContext": {
+        "id": "democlient",
+        "name": "Demo application",
+        "description": "Web Flow demo application",
+        "originalScopes": [
+          "pisp"
+        ],
+        "extras": {
+          "applicationOwner": "Wultra"
+        }
+      }
+    },
+    "afsRequestParameters": {
+      "afsType": "THREAT_MARK",
+      "afsAction": "APPROVAL_INIT",
+      "clientIpAddress": "",
+      "stepIndex": 1,
+      "username": null,
+      "authInstruments": [],
+      "authStepResult": null,
+      "operationTerminationReason": null
+    },
+    "extras": {
+      "cookie1": "123xyz",
+      "cookie2": "abc67890"
+    }
+  }
+}
+```
+
+### Response - AFS action was successfully executed
+
+- Status Code: `200`
+- Headers:
+	- `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "afsResponseApplied": true,
+    "afsLabel": "1FA",
+    "authStepOptions": {
+      "smsOtpRequired": true,
+      "passwordRequired": false
+    },
+    "extras": {}
   }
 }
 ```

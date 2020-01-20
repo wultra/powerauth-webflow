@@ -16,6 +16,8 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
+
 /**
  * Response with user details.
  *
@@ -27,6 +29,7 @@ public class UserDetailResponse {
     private String givenName;
     private String familyName;
     private String organizationId;
+    private AccountStatus accountStatus;
 
     /**
      * Get user ID.
@@ -90,5 +93,21 @@ public class UserDetailResponse {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get user account status.
+     * @return User account status.
+     */
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set user account status.
+     * @param accountStatus Status.
+     */
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }

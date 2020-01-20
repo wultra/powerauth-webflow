@@ -15,49 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
-
 /**
- * Model for an init request for SCA login.
+ * Request object used for preparing login form data.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class LoginScaInitRequest extends AuthStepRequest {
+public class LoginScaInitRequest {
 
-    private String username;
-    private String organizationId;
-
-    /**
-     * Get username.
-     *
-     * @return Username.
-     */
-    public String getUsername() {
-        return username;
-    }
-
-    /**
-     * Set username.
-     *
-     * @param username Username.
-     */
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
 }

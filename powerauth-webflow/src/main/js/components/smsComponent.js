@@ -96,52 +96,54 @@ export default class SmsComponent extends React.Component {
                                 </div>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <input className="form-control" type="password" value={this.state.password} onChange={this.handlePasswordChange}/>
+                                        <input className="form-control" type="password" value={this.state.password} onChange={this.handlePasswordChange} maxLength={passwordMaxLength}/>
                                     </div>
                                 </div>
                             </div>
                         ) : (
                             undefined
                         )}
-                        <div className="attribute row">
-                            <div className="message-information">
-                                <FormattedMessage id="smsAuthorization.authCodeText"/>
-                            </div>
-                        </div>
-                        <div className="attribute row">
-                            <div className="col-xs-12">
-                                <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange}/>
-                            </div>
-                        </div>
-                        <div className="font-small message-information">
-                            {(this.props.resendEnabled) ? (
-                                <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
-                                    <FormattedMessage id="smsAuthorization.resendActive"/>
+                        {(this.props.smsOtpEnabled) ? (
+                            <div>
+                                <div className="attribute row">
+                                    <div className="message-information">
+                                        <FormattedMessage id="smsAuthorization.authCodeText"/>
+                                    </div>
                                 </div>
-                            ) : (
-                                <div id="resend-disabled" className="sms-resend-disabled">
-                                    <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange} maxLength={smsOtpMaxLength}/>
+                                    </div>
                                 </div>
-                            )}
-                        </div>
-                        <div className="buttons">
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                        {(this.props.username && this.props.passwordEnabled) ? (
-                                            <FormattedMessage id="loginSca.confirm"/>
-                                        ) : (
-                                            <FormattedMessage id="operation.confirm"/>
-                                        )}
-                                    </Button>
+                                <div className="font-small message-information">
+                                    {(this.props.resendEnabled) ? (
+                                        <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
+                                            <FormattedMessage id="smsAuthorization.resendActive"/>
+                                        </div>
+                                    ) : (
+                                        <div id="resend-disabled" className="sms-resend-disabled">
+                                            <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                        </div>
+                                    )}
                                 </div>
                             </div>
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                        <FormattedMessage id="operation.cancel"/>
-                                    </a>
-                                </div>
+                         ) : (
+                             undefined
+                         )}
+                        <div className="row buttons">
+                            <div className="col-xs-6">
+                                <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="operation.cancel"/>
+                                </a>
+                            </div>
+                            <div className="col-xs-6">
+                                <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                    {(this.props.username && this.props.passwordEnabled) ? (
+                                        <FormattedMessage id="loginSca.confirm"/>
+                                    ) : (
+                                        <FormattedMessage id="operation.confirm"/>
+                                    )}
+                                </Button>
                             </div>
                         </div>
                     </div>

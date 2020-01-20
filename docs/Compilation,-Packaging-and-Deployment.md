@@ -8,6 +8,7 @@ Web Flow can be deployed to any Java web container (such as Tomcat) using war ar
 
 In order to build Web Flow using Maven, following PowerAuth dependencies need to be satisfied:
 
+* [powerauth-server](https://github.com/wultra/powerauth-server) - dependency **powerauth-java-client-spring**
 * [powerauth-push-server](https://github.com/wultra/powerauth-push-server) - dependency **powerauth-push-client**
 * [powerauth-restful-integration](https://github.com/wultra/powerauth-restful-integration) - dependency **powerauth-restful-security-spring**
 * [powerauth-crypto](https://github.com/wultra/powerauth-crypto) - dependency **powerauth-java-crypto**
@@ -37,35 +38,6 @@ The whole installation process is described in the [Web Flow Installation Manual
 
 You can test the web flow demo application by navigating to: http://localhost:8080/powerauth-webflow-client
 
-* Use the "Login" action to test the user authentication. The Credential Server Sample project uses "test" as password for any username.
+* Use the "Login" action to test the user authentication. The Data Adapter sample project uses "test" as password for any username.
 * Use the "Payment (DEMO)" action to test payment authorization. You will need to enable POWERAUTH_TOKEN authentication method for the user who will authorize the payment (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#enable-an-authentication-method-for-given-user)).
 * Use the "Authorization" action to test operation authorization. In order to test this action you will need to create an operation and obtain its operationId (using [Next Step REST API](./Next-Step-Server-REST-API-Reference.md#create-an-operation)).
-
-## Maven Profiles (Advanced)
-
-There are following Maven profiles defined:
-* **prod** - used for deployment to a production environment (default profile)
-* **fast** - used for fast redeployment to a development environment (do not use when dependencies change, in this case prod build is required)
-* **dev** - used for development in the IDE (mainly for debugging)
-
-Path to the pom.xml file:
-
-`powerauth-webflow/powerauth-webflow/pom.xml`
-
-## Development
-
-During development you can start the backend and the frontend separately for easier continuous redeployment.
-
-### Backend
-To start the backend part in the IDE, simply point the IDE to run Main class:
-
-`io.getlime.security.powerauth.app.webflow.PowerAuthWebFlowApplication`
-
-You should see a Spring boot console in IDE log and the last message should start with "Started PowerAuthWebFlowApplication". To redeploy, trigger a build in the IDE and Maven should redeploy changes automatically.
-
-### Frontend
-To start the frontend part in the IDE, use the **package** phase with the "dev" Maven profile:
-
-`mvn package -P dev`
-
-Maven builds the application and stops the deployment in the moment when webpack starts watching for changes. When you make any change in JavaScript code, you should see a message from compiler and bundle.js in target folder should be redeployed automatically using the WebpackDeployPlugin (see [webpack.config.js](../powerauth-webflow/webpack.config.js) and [webpack-deploy.js](../powerauth-webflow/src/main/js/webpack-deploy.js)). Note that bundle.js is built in full debug mode, hence the large size of the output of the compiler. Compiled frontend code is located in target/classes/static/built/bundle.js

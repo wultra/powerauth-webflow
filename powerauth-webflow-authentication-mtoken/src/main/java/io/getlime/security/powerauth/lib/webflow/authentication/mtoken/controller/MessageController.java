@@ -15,8 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.WebSocketRegistrationRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.WebSocketMessageService;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.request.WebSocketRegistrationRequest;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
@@ -30,8 +30,12 @@ import org.springframework.stereotype.Controller;
 @Controller
 public class MessageController {
 
+    private final WebSocketMessageService webSocketMessageService;
+
     @Autowired
-    private WebSocketMessageService webSocketMessageService;
+    public MessageController(WebSocketMessageService webSocketMessageService) {
+        this.webSocketMessageService = webSocketMessageService;
+    }
 
     /**
      * Registration of WebSockets. WebSocket sessions are linked to operations for later authorization messages
@@ -45,7 +49,8 @@ public class MessageController {
     public void register(SimpMessageHeaderAccessor headerAccessor, WebSocketRegistrationRequest registrationRequest) {
         String sessionId = headerAccessor.getSessionId();
         String webSocketId = registrationRequest.getWebSocketId();
-        webSocketMessageService.putWebSocketSession(webSocketId, sessionId);
+        String clientIpAddress = (String) headerAccessor.getSessionAttributes().get("client_ip_address");
+        webSocketMessageService.storeWebSocketSession(webSocketId, sessionId, clientIpAddress);
         webSocketMessageService.sendRegistrationMessage(webSocketId, sessionId);
     }
 

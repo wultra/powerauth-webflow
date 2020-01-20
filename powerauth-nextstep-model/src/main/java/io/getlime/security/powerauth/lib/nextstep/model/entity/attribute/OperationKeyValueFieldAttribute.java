@@ -59,7 +59,9 @@ public class OperationKeyValueFieldAttribute extends OperationFormFieldAttribute
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        this.formattedValues.putAll(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
     /**

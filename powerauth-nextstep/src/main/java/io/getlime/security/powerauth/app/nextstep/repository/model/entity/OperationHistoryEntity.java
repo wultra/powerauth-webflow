@@ -45,6 +45,9 @@ public class OperationHistoryEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthMethod requestAuthMethod;
 
+    @Column(name = "request_auth_instruments")
+    private String requestAuthInstruments;
+
     @Column(name = "request_params")
     private String requestParams;
 
@@ -67,6 +70,9 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "chosen_auth_method")
     @Enumerated(EnumType.STRING)
     private AuthMethod chosenAuthMethod;
+
+    @Column(name = "mobile_token_active")
+    private boolean mobileTokenActive;
 
     @ManyToOne
     @JoinColumn(name = "operation_id", insertable = false, updatable = false)
@@ -101,6 +107,14 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setRequestAuthMethod(AuthMethod requestAuthMethod) {
         this.requestAuthMethod = requestAuthMethod;
+    }
+
+    public String getRequestAuthInstruments() {
+        return requestAuthInstruments;
+    }
+
+    public void setRequestAuthInstruments(String requestAuthInstruments) {
+        this.requestAuthInstruments = requestAuthInstruments;
     }
 
     public String getRequestParams() {
@@ -157,6 +171,14 @@ public class OperationHistoryEntity implements Serializable {
 
     public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
         this.chosenAuthMethod = chosenAuthMethod;
+    }
+
+    public boolean isMobileTokenActive() {
+        return mobileTokenActive;
+    }
+
+    public void setMobileTokenActive(boolean mobileTokenActive) {
+        this.mobileTokenActive = mobileTokenActive;
     }
 
     /**

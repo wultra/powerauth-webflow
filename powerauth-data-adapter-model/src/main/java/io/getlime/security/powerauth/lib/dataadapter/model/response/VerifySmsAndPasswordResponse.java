@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 
@@ -30,6 +31,7 @@ public class VerifySmsAndPasswordResponse {
     private String errorMessage;
     private Integer remainingAttempts;
     private boolean showRemainingAttempts;
+    private AccountStatus accountStatus;
 
     /**
      * Default constructor.
@@ -126,4 +128,21 @@ public class VerifySmsAndPasswordResponse {
     public void setShowRemainingAttempts(boolean showRemainingAttempts) {
         this.showRemainingAttempts = showRemainingAttempts;
     }
+
+    /**
+     * Get user account status.
+     * @return User account status.
+     */
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set user account status.
+     * @param accountStatus Status.
+     */
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
+    }
+
 }

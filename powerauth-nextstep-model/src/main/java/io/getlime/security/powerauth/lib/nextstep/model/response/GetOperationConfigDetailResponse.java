@@ -25,7 +25,10 @@ public class GetOperationConfigDetailResponse {
     private String operationName;
     private String templateVersion;
     private Integer templateId;
+    private boolean mobileTokenEnabled;
     private String mobileTokenMode;
+    private boolean afsEnabled;
+    private String afsConfigId;
 
     /**
      * Get operation name.
@@ -76,6 +79,22 @@ public class GetOperationConfigDetailResponse {
     }
 
     /**
+     * Get whether mobile token is enabled for this operation.
+     * @return Whether mobile token is enabled.
+     */
+    public boolean isMobileTokenEnabled() {
+        return mobileTokenEnabled;
+    }
+
+    /**
+     * Set whether mobile token is enabled for this operation.
+     * @param mobileTokenEnabled Whether mobile token is enabled.
+     */
+    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
+        this.mobileTokenEnabled = mobileTokenEnabled;
+    }
+
+    /**
      * Get mobile token mode - JSON configuration of mobile token signatures.
      * @return Mobile token mode.
      */
@@ -89,5 +108,37 @@ public class GetOperationConfigDetailResponse {
      */
     public void setMobileTokenMode(String mobileTokenMode) {
         this.mobileTokenMode = mobileTokenMode;
+    }
+
+    /**
+     * Get whether anti-fraud system is enabled.
+     * @return Whether anti-fraud system is enabled.
+     */
+    public boolean isAfsEnabled() {
+        return afsEnabled;
+    }
+
+    /**
+     * Set whether anti-fraud system is enabled.
+     * @param afsEnabled Whether anti-fraud system is enabled.
+     */
+    public void setAfsEnabled(boolean afsEnabled) {
+        this.afsEnabled = afsEnabled;
+    }
+
+    /**
+     * Get AFS configuration ID.
+     * @return AFS configuration ID.
+     */
+    public String getAfsConfigId() {
+        return afsConfigId;
+    }
+
+    /**
+     * Set AFS configuration ID.
+     * @param afsConfigId AFS configuration ID.
+     */
+    public void setAfsConfigId(String afsConfigId) {
+        this.afsConfigId = afsConfigId;
     }
 }

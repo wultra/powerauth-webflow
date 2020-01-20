@@ -15,6 +15,7 @@
  */
 import axios from "axios";
 import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
+import {handleAuthFailedError} from "./errorHandling";
 
 /**
  * Get operation detail.
@@ -107,30 +108,16 @@ export function authenticateOnline(callback) {
                     break;
                 }
                 case 'AUTH_FAILED': {
-                    // handle case when authentication method is no longer available
-                    if (response.data.message === "operation.methodNotAvailable") {
-                        dispatchAction(dispatch, response);
-                        break;
+                    if (!handleAuthFailedError(dispatch, response)) {
+                        callback(true);
+                        dispatch({
+                            type: "SHOW_SCREEN_TOKEN",
+                            payload: {
+                                info: "reload",
+                                init: false
+                            }
+                        });
                     }
-                    // handle timeout - action can not succeed anymore, show error
-                    if (response.data.message === "operation.timeout") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    // if there is no supported auth method, show error, there is no point in continuing
-                    // TODO - handle fallback - see issue #32
-                    if (response.data.message === "error.noAuthMethod") {
-                        dispatchAction(dispatch, response);
-                        break;
-                    }
-                    callback(true);
-                    dispatch({
-                        type: "SHOW_SCREEN_TOKEN",
-                        payload: {
-                            info: "reload",
-                            init: false
-                        }
-                    });
                     break;
                 }
             }

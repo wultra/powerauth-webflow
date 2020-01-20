@@ -7,14 +7,14 @@
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.22.0</version>
+        <version>0.23.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow</artifactId>
     <name>powerauth-webflow</name>
     <description>Federated Authentication and Authorization Server for Web</description>
-    <version>0.22.0</version>
+    <version>0.23.0</version>
     <packaging>war</packaging>
 
     <properties>
@@ -38,17 +38,6 @@
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.security.oauth.boot</groupId>
-            <artifactId>spring-security-oauth2-autoconfigure</artifactId>
-            <version>2.0.0.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>bcpkix-jdk15on</artifactId>
-                    <groupId>org.bouncycastle</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
@@ -57,16 +46,12 @@
             <artifactId>spring-boot-devtools</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-messaging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-websocket</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-messaging</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
 
         <!-- Set scope of tomcat-embed-websocket to provided to avoid startup errors on WildFly -->
@@ -80,7 +65,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>27.0.1-jre</version>
+            <version>28.1-jre</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -90,12 +75,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-joda</artifactId>
-            <version>2.10.0.pr1</version>
+            <version>2.10.0</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.61</version>
+            <version>1.64</version>
             <scope>provided</scope>
         </dependency>
 
@@ -103,27 +88,27 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-form</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-login-sca</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-init</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-operation-review</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcprov-jdk15on</artifactId>
@@ -134,27 +119,27 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-sms</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-approval-sca</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication-consent</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-resources</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-i18n</artifactId>
-            <version>0.22.0</version>
+            <version>0.23.0</version>
         </dependency>
 
         <!-- JAXB dependency for Java 11 -->
@@ -261,77 +246,6 @@
                                 </goals>
                                 <configuration>
                                     <arguments>-p</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>fast</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.7.5</version>
-                        <configuration>
-                            <installDirectory>target</installDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>webpack build</id>
-                                <goals>
-                                    <goal>webpack</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>dev</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.7.5</version>
-                        <configuration>
-                            <installDirectory>target</installDirectory>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>v10.15.3</nodeVersion>
-                                    <npmVersion>6.4.1</npmVersion>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>npm install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>install</arguments>
-                                </configuration>
-                            </execution>
-                            <execution>
-                                <id>webpack build</id>
-                                <goals>
-                                    <goal>webpack</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>-d --watch</arguments>
                                 </configuration>
                             </execution>
                         </executions>

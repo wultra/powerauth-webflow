@@ -248,20 +248,16 @@ export default class TokenOffline extends React.Component {
                                 undefined
                             )}
                             <div className="auth-actions">
-                                <div className="buttons">
-                                    <div className="attribute row">
-                                        <div className="col-xs-12">
-                                            <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                                <FormattedMessage id="operation.confirm"/>
-                                            </Button>
-                                        </div>
+                                <div className="row buttons">
+                                    <div className="col-xs-6">
+                                        <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                            <FormattedMessage id="operation.cancel"/>
+                                        </a>
                                     </div>
-                                    <div className="attribute row">
-                                        <div className="col-xs-12">
-                                            <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                                <FormattedMessage id="operation.cancel"/>
-                                            </a>
-                                        </div>
+                                    <div className="col-xs-6">
+                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 
 /**
  * Request for SMS authorization code verification.
@@ -45,6 +46,11 @@ public class VerifySmsAuthorizationRequest {
     private String organizationId;
 
     /**
+     * User account status.
+     */
+    private AccountStatus accountStatus;
+
+    /**
      * Operation context.
      */
     private OperationContext operationContext;
@@ -61,13 +67,16 @@ public class VerifySmsAuthorizationRequest {
      * @param authorizationCode Authorization code from user.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param accountStatus Current user account status.
      * @param operationContext Operation context.
      */
-    public VerifySmsAuthorizationRequest(String messageId, String authorizationCode, String userId, String organizationId, OperationContext operationContext) {
+    public VerifySmsAuthorizationRequest(String messageId, String authorizationCode, String userId, String organizationId,
+                                         AccountStatus accountStatus, OperationContext operationContext) {
         this.messageId = messageId;
         this.authorizationCode = authorizationCode;
         this.userId = userId;
         this.organizationId = organizationId;
+        this.accountStatus = accountStatus;
         this.operationContext = operationContext;
     }
 
@@ -133,6 +142,22 @@ public class VerifySmsAuthorizationRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get current user account status.
+     * @return User account status.
+     */
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    /**
+     * Set current user account status.
+     * @param accountStatus User account status.
+     */
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 
     /**

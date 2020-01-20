@@ -19,9 +19,12 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.powerauth.soap.v3.ActivationStatus;
 import io.getlime.powerauth.soap.v3.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetMobileTokenConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.slf4j.Logger;
@@ -78,7 +81,7 @@ public class AuthMethodQueryService {
                     if (authMethod != AuthMethod.POWERAUTH_TOKEN) {
                         return true;
                     } else {
-                        return isMobileTokenAuthMethodAvailable(userId, operationId);
+                        return isMobileTokenAvailable(userId, operationId);
                     }
                 }
             }
@@ -115,22 +118,50 @@ public class AuthMethodQueryService {
     }
 
     /**
-     * Returns whether Mobile Token authentication method is currently available by querying the PowerAuth backend for ACTIVE activations.
+     * Get information whether mobile token is available. Following checks are performed:
+     * <ul>
+     * <li>Non-SCA operations: POWERAUTH_TOKEN method is available as a next step for the operation.</li>
+     * <li>SCA operations: Operation is among pending operations for mobile token.</li>
+     * <li>User has an ACTIVE activation in PowerAuth server and it matches configured activation ID in Next Step.</li>
+     * </ul>
+     *
      * @param userId User ID.
      * @param operationId Operation ID.
-     * @return Whether Mobile Token authentication method is available.
+     * @return Whether Mobile Token is currently available for given user ID and operation ID.
      * @throws NextStepServiceException Thrown when Next Step request fails.
      */
-    public boolean isMobileTokenAuthMethodAvailable(String userId, String operationId) throws NextStepServiceException {
-        String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
-        if (configuredActivationId == null) {
-            return false;
+    public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepServiceException {
+        // Non-SCA usage: check whether POWERAUTH_TOKEN method is available as next step for operation (used in operation review step)
+        ObjectResponse<GetOperationDetailResponse> objectResponseOperation = nextStepClient.getOperationDetail(operationId);
+        GetOperationDetailResponse operation = objectResponseOperation.getResponseObject();
+        boolean mobileTokenAvailableAsNextStep = false;
+        for (AuthStep step: operation.getSteps()) {
+            if (step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                mobileTokenAvailableAsNextStep = true;
+                break;
+            }
         }
-        // check whether user has an ACTIVE activation and it matches configured activation
+
+        // SCA usage: check whether mobile token is enabled using configuration for user ID, operation name and chosen authentication method
+        if (!mobileTokenAvailableAsNextStep) {
+            // Retrieve pending mobile token operations for given user and check that operation with given operation ID is among them
+            if (operation.getChosenAuthMethod() != null) {
+                ObjectResponse<GetMobileTokenConfigResponse> objectResponse = nextStepClient.getMobileTokenConfig(userId, operation.getOperationName(), operation.getChosenAuthMethod());
+                GetMobileTokenConfigResponse configResponse = objectResponse.getResponseObject();
+                if (!configResponse.isMobileTokenEnabled()) {
+                    return false;
+                }
+            }
+        }
+
+        // Retrieve activation ID configured for mobile token
+        String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
+
+        // Check whether user has an ACTIVE activation and it matches configured activation
         List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
-        for (GetActivationListForUserResponse.Activations activation: allActivations) {
+        for (GetActivationListForUserResponse.Activations activation : allActivations) {
             if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                // user has an active activation and it is the configured activation - method can be used
+                // User has an active activation and it is the configured activation - mobile token is available
                 return true;
             }
         }

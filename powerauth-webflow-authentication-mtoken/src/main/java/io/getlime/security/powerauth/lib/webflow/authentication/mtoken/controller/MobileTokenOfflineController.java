@@ -128,7 +128,6 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         final String operationName = operation.getOperationName();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
         // nonce is received from the UI - it was stored together with the QR code
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
@@ -153,7 +152,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), null);
+            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
             if (response.getResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
                 cleanHttpSession();
@@ -193,7 +192,6 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName();
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        checkOperationExpiration(operation);
 
         String userId = operation.getUserId();
 
@@ -255,7 +253,6 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         GetOperationDetailResponse operation = getOperation();
         AuthMethod authMethod = getAuthMethodName(operation);
         try {
-            checkOperationExpiration(operation);
             return buildAuthorizationResponse(request, new AuthResponseProvider() {
 
                 @Override
@@ -354,7 +351,6 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         GetOperationDetailResponse operation = getOperation();
-        checkOperationExpiration(operation);
         String operationId = operation.getOperationId();
         String operationData = operation.getOperationData();
         String operationName = operation.getOperationName();

@@ -37,7 +37,7 @@ export default class TokenAuthSms extends React.Component {
         this.storeRemainingAttempts = this.storeRemainingAttempts.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.handleSmsResend = this.handleSmsResend.bind(this);
-        this.state = {username: null, error: null, message: null, remainingAttempts: null, resendEnabled: false, initialized: false};
+        this.state = {passwordEnabled: null, smsOtpEnabled: null, username: null, error: null, message: null, remainingAttempts: null, resendEnabled: false, initialized: false};
     }
 
     componentWillMount() {
@@ -48,6 +48,8 @@ export default class TokenAuthSms extends React.Component {
         if (props.context.init) {
             // Store information whether password is enabled
             this.setState({passwordEnabled: props.context.passwordEnabled});
+            // Store information whether SMS authorization is enabled
+            this.setState({smsOtpEnabled: props.context.smsOtpEnabled});
             // Store username for LOGIN_SCA step
             this.setState({username: props.context.username});
             // Set the component to initialized state
@@ -102,7 +104,8 @@ export default class TokenAuthSms extends React.Component {
 
     render() {
         return (
-            <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled} resendEnabled={this.state.resendEnabled}
+            <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled}
+                          smsOtpEnabled={this.state.smsOtpEnabled} resendEnabled={this.state.resendEnabled}
                           smsResendCallback={this.handleSmsResend} cancelCallback={this.handleCancel} parentComponent="TOKEN"
                           message={this.state.message} error={this.state.error} remainingAttempts={this.state.remainingAttempts}
                           initialized={this.state.initialized}/>
