@@ -25,7 +25,6 @@ import sun.security.x509.AVA;
 import sun.security.x509.X500Name;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -68,6 +67,9 @@ public class ICACertificateParser implements ICertificateParser {
 
         try {
             final byte[] qcStatement = cert.getExtensionValue("1.3.6.1.5.5.7.1.3");
+            if (qcStatement == null) {
+                throw new CertificateException("Unable to extract PSD2 mandates.");
+            }
             final ASN1Primitive qcStatementAsn1Primitive = JcaX509ExtensionUtils.parseExtensionValue(qcStatement);
 
             final DLSequence it = ((DLSequence) qcStatementAsn1Primitive);
@@ -162,7 +164,7 @@ public class ICACertificateParser implements ICertificateParser {
             }
 
             return new CertInfo(serialNumber, commonName, psd2License, organization, street, city, zipCode, region, country, psd2Mandates);
-        } catch (IOException e) {
+        } catch (Throwable e) { // catch all errors that can occur
             throw new CertificateException("Unable to extract PSD2 mandates.");
         }
 
