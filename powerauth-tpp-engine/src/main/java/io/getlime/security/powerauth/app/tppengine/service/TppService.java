@@ -163,7 +163,7 @@ public class TppService {
         // Check if an app with given name exists
         final Iterable<TppAppDetailEntity> appWithName = appDetailRepository.findByTppIdAndAppName(tppEntity.getTppId(), request.getAppName());
         if (appWithName.iterator().hasNext()) { // app with given name already exists
-            List<String> errors = Collections.singletonList("Application with given name already exists. Chose different one or delete existing application.");
+            List<String> errors = Collections.singletonList("Application with given name already exists. Chose a different name or rename/delete existing application.");
             throw new UnableToCreateAppException(errors);
         }
 
@@ -216,9 +216,16 @@ public class TppService {
      * @throws TppAppNotFoundException In case TPP app is not found.
      */
     @Transactional
-    public TppAppDetailResponse updateApp(String clientId, CreateTppAppRequest request) throws TppNotFoundException, TppAppNotFoundException {
+    public TppAppDetailResponse updateApp(String clientId, CreateTppAppRequest request) throws TppNotFoundException, TppAppNotFoundException, UnableToCreateAppException {
         // Get TPP entity
         TppEntity tppEntity = getTppEntity(request.getTppLicense());
+
+        // Check if an app with given name exists
+        final Iterable<TppAppDetailEntity> appWithName = appDetailRepository.findByTppIdAndAppName(tppEntity.getTppId(), request.getAppName());
+        if (appWithName.iterator().hasNext()) { // app with given name already exists
+            List<String> errors = Collections.singletonList("Application with given name already exists. Chose a different name or rename/delete existing application.");
+            throw new UnableToCreateAppException(errors);
+        }
 
         // Find application by client ID
         final Optional<TppAppDetailEntity> appDetailEntityOptional = appDetailRepository.findByClientId(clientId);
