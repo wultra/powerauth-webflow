@@ -64,9 +64,10 @@ public class CertInfo {
     private String zipCode;
     private String region;
     private String country;
+    private String website;
     private Set<PSD2> psd2Mandates;
 
-    public CertInfo(String serialNumber, String commonName, String psd2License, String organization, String street, String city, String zipCode, String region, String country, Set<PSD2> psd2Mandates) {
+    public CertInfo(String serialNumber, String commonName, String psd2License, String organization, String street, String city, String zipCode, String region, String country, String website, Set<PSD2> psd2Mandates) {
         this.serialNumber = serialNumber;
         this.commonName = commonName;
         this.psd2License = psd2License;
@@ -76,6 +77,7 @@ public class CertInfo {
         this.zipCode = zipCode;
         this.region = region;
         this.country = country;
+        this.website = website;
         this.psd2Mandates = new HashSet<>(psd2Mandates);
     }
 
@@ -113,6 +115,10 @@ public class CertInfo {
 
     public String getCountry() {
         return country;
+    }
+
+    public String getWebsite() {
+        return website;
     }
 
     public Set<PSD2> getPsd2Mandates() {

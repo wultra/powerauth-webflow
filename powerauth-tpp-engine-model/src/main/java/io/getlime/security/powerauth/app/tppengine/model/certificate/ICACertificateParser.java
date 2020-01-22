@@ -119,6 +119,7 @@ public class ICACertificateParser implements ICertificateParser {
             String city = null;
             String zipCode = null;
             String region = null;
+            String website = null;
             for (AVA ava: avaList) {
                 final String oid = ava.getObjectIdentifier().toString();
                 final String val = ava.getValueString();
@@ -130,6 +131,7 @@ public class ICACertificateParser implements ICertificateParser {
                     }
                     case "2.5.4.3": {   //    CN=cnb.cz => 2.5.4.3
                         commonName = val;
+                        website = "https://" + val;
                         break;
                     }
                     case "2.5.4.10": {  //    O=ČESKÁ NÁRODNÍ BANKA => 2.5.4.10
@@ -163,7 +165,7 @@ public class ICACertificateParser implements ICertificateParser {
                 }
             }
 
-            return new CertInfo(serialNumber, commonName, psd2License, organization, street, city, zipCode, region, country, psd2Mandates);
+            return new CertInfo(serialNumber, commonName, psd2License, organization, street, city, zipCode, region, country, website, psd2Mandates);
         } catch (Throwable e) { // catch all errors that can occur
             throw new CertificateException("Unable to extract PSD2 mandates.");
         }
