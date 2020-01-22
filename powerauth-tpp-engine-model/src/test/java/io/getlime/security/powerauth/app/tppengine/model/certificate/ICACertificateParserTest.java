@@ -91,6 +91,7 @@ class ICACertificateParserTest {
         Assertions.assertEquals("Hlavní město Praha", parse.getRegion());
         Assertions.assertEquals("11000", parse.getZipCode());
         Assertions.assertEquals("CZ", parse.getCountry());
+        Assertions.assertEquals("https://cnb.cz", parse.getWebsite());
         Assertions.assertEquals("Na příkopě 864/28\nPraha 1\n11000\nHlavní město Praha\nCZ", parse.getAddressUnstructured());
 
         Set<CertInfo.PSD2> expected = new HashSet<>();
