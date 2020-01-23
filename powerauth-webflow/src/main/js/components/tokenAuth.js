@@ -281,7 +281,7 @@ export default class Token extends React.Component {
         return (
             <div id="operation">
                 <Panel>
-                    <OperationTimeout/>
+                    <OperationTimeout timeoutCheckActive="true"/>
                     <OperationDetail/>
                     <div>
                         {(this.state.initialized && this.state.configurationInitialized) ? (

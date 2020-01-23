@@ -38,7 +38,6 @@
                 <img class="logo" src="./images/logo.png" alt="logo"/>
             </p>
             <div th:each="providerId : ${providerIds}" class="operations">
-
                 <table class="operations-table">
                     <tr>
                         <td>
@@ -58,7 +57,6 @@
                                                 Zvolte typ připojení třetí strany:
                                             </p>
                                             <form th:action="@{/connect/demo}" method="POST">
-                                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                                 <p>
                                                     <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Služba informování o platebním účtu</label>
                                                 </p>
@@ -75,7 +73,6 @@
                                                     th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
                                             </p>
                                             <form id="disconnect" th:action="@{/connect/demo}" method="post">
-                                                <input type="hidden" name="_csrf" th:value="${_csrf.token}"/>
                                                 <input type="hidden" name="_method" value="delete"/>
                                                 <button type="submit" class="btn btn-lg btn-danger">Odpojit</button>
                                             </form>
