@@ -108,7 +108,7 @@ export default class OperationReview extends React.Component {
                 <div id="operation">
                     <form>
                         <Panel>
-                            <OperationTimeout/>
+                            <OperationTimeout timeoutCheckActive="true"/>
                             <OperationDetail/>
                             {(this.props.context.authMethods.length > 0) ? (
                                 <div className="auth-actions">

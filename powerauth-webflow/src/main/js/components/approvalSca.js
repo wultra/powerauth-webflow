@@ -60,7 +60,7 @@ export default class ApprovalSca extends React.Component {
                 <div id="operation">
                     <form onSubmit={this.handleSubmit}>
                         <Panel>
-                            <OperationTimeout/>
+                            <OperationTimeout timeoutCheckActive="true"/>
                             <OperationDetail/>
                             <div className="auth-actions">
                                 <div className="row buttons">
