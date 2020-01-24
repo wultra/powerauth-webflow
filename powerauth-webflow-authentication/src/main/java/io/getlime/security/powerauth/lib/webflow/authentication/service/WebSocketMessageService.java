@@ -96,7 +96,7 @@ public class WebSocketMessageService {
      * @return Whether Whether Web Socket registration was successful.
      */
     public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
-        return operationSessionService.registerWebSocketSessionId(operationHash, webSocketSessionId, clientIpAddress);
+        return operationSessionService.registerWebSocketSession(operationHash, webSocketSessionId, clientIpAddress);
     }
 
 }

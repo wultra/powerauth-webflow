@@ -145,7 +145,7 @@ public class OperationSessionService {
      * @param clientIpAddress Remote client IP address.
      * @return Whether Web Socket session ID was successfully registered for the operation.
      */
-    public boolean registerWebSocketSessionId(String operationHash, String webSocketSessionId, String clientIpAddress) {
+    public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
         OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
         if (operationSessionEntity == null) {
             // Registration failed because operation was not found
