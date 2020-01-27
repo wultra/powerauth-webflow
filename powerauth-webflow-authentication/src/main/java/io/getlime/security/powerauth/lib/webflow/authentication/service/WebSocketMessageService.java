@@ -68,10 +68,12 @@ public class WebSocketMessageService {
      *
      * @param operationHash Operation hash.
      * @param sessionId Session ID.
+     * @param registrationSucceeded Whether Web Socket registration was successful.
      */
-    public void sendRegistrationMessage(String operationHash, String sessionId) {
+    public void sendRegistrationMessage(String operationHash, String sessionId, boolean registrationSucceeded) {
         WebSocketRegistrationResponse registrationResponse = new WebSocketRegistrationResponse();
         registrationResponse.setWebSocketId(operationHash);
+        registrationResponse.setRegistrationSucceeded(registrationSucceeded);
         websocket.convertAndSendToUser(sessionId, "/topic/registration", registrationResponse, createHeaders(sessionId));
     }
 
@@ -91,9 +93,10 @@ public class WebSocketMessageService {
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket Session ID.
      * @param clientIpAddress Remote client IP address.
+     * @return Whether Whether Web Socket registration was successful.
      */
-    public void storeWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
-        operationSessionService.storeWebSocketSessionId(operationHash, webSocketSessionId, clientIpAddress);
+    public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
+        return operationSessionService.registerWebSocketSession(operationHash, webSocketSessionId, clientIpAddress);
     }
 
 }

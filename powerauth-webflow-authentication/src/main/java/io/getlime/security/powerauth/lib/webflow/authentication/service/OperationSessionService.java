@@ -143,14 +143,24 @@ public class OperationSessionService {
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket session ID.
      * @param clientIpAddress Remote client IP address.
+     * @return Whether Web Socket session ID was successfully registered for the operation.
      */
-    public void storeWebSocketSessionId(String operationHash, String webSocketSessionId, String clientIpAddress) {
+    public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
         OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
-        if (operationSessionEntity != null) {
-            operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
-            operationSessionEntity.setClientIp(clientIpAddress);
-            operationSessionRepository.save(operationSessionEntity);
+        if (operationSessionEntity == null) {
+            // Registration failed because operation was not found
+            return false;
         }
+        String existingWebSocketSessionId = operationSessionEntity.getWebSocketSessionId();
+        if (existingWebSocketSessionId != null && !webSocketSessionId.equals(existingWebSocketSessionId)) {
+            // Registration failed because operation is being accessed from another browser tab or window
+            return false;
+        }
+        operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
+        operationSessionEntity.setClientIp(clientIpAddress);
+        operationSessionRepository.save(operationSessionEntity);
+        // Registration succeeded
+        return true;
     }
 
 }
