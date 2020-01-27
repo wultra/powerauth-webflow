@@ -391,8 +391,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             String organizationId = responseObject.getOrganizationId();
-            // persist mapping of operation to HTTP session
-            operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, responseObject.getResult());
+            // Persist mapping of operation to HTTP session
+            boolean registrationSucceeded = operationSessionService.registerHttpSession(operationId, httpSessionId, responseObject.getResult());
+            if (!registrationSucceeded) {
+                // Registration of HTTP session failed for the operation
+                R initResponse = provider.failedAuthentication(null, "error.invalidRequest");
+                logger.info("Operation initiate failed during registration of HTTP session, operation name: {}", operationName);
+                return initResponse;
+            }
             filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), null, operationId);
             authenticationManagementService.createAuthenticationWithOperationId(operationId, organizationId);
             R initResponse = provider.continueAuthentication(operationId, null, responseObject.getSteps());
@@ -409,7 +415,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      *
      * @param operationId ID of operation to be fetched.
      * @param httpSessionId HTTP session ID.
-     * @param provider    Provider that implements authentication callback.
+     * @param provider Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
     protected R continueOperationWithId(String operationId, String httpSessionId, AuthResponseProvider provider) {
@@ -421,16 +427,27 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.info("Operation failed because operation could not be retrieved, operation ID: {}", operationId);
                 return provider.failedAuthentication(null, "Operation is not available");
             }
-            // check whether session is already initiated - page refresh could cause double initialization
-            // if it is not initiated yet, persist operation to session mapping
+            final String userId = operation.getUserId();
+            // Check whether session is already initiated - page refresh could cause double initialization.
+            // If it is not initiated yet, persist operation to session mapping.
             OperationSessionEntity operationSessionEntity = operationSessionService.getOperationToSessionMapping(operationId);
             if (operationSessionEntity == null) {
-                // cancel previous active operations
+                // Cancel previous active operations
                 cancelOperationsInHttpSession(httpSessionId);
-                // persist mapping of operation to HTTP session
-                operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, operation.getResult());
+                // Persist mapping of operation to HTTP session
+                boolean registrationSucceeded = operationSessionService.registerHttpSession(operationId, httpSessionId, operation.getResult());
+                if (!registrationSucceeded) {
+                    //  Registration of HTTP session failed for the operation
+                    R failed = provider.failedAuthentication(null, "error.invalidRequest");
+                    logger.info("Operation continue failed during registration of HTTP session, operation ID: {}", operationId);
+                    return failed;
+                }
+            } else if (!operationSessionEntity.getHttpSessionId().equals(httpSessionId)){
+                // Operation continue failed because operation is accessed from another HTTP session
+                R failed = provider.failedAuthentication(userId, "error.invalidRequest");
+                logger.info("Operation continue failed because HTTP session ID has changed, operation ID: {}", operationId);
+                return failed;
             }
-            final String userId = operation.getUserId();
             final String organizationId = operation.getOrganizationId();
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), userId, operationId);
             if (!authenticationManagementService.isPendingSessionAuthenticated() && userId != null && organizationId != null) {

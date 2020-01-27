@@ -60,12 +60,19 @@ public class OperationSessionService {
      * @param operationId Operation ID.
      * @param httpSessionId HTTP session ID.
      * @param result Operation result.
+     * @return Whether HTTP session was successfully registered for the operation.
      */
-    public void persistOperationToSessionMapping(String operationId, String httpSessionId, AuthResult result) {
+    public boolean registerHttpSession(String operationId, String httpSessionId, AuthResult result) {
+        OperationSessionEntity existingSession = getOperationToSessionMapping(operationId);
+        if (existingSession != null) {
+            // Registration failed because operation is being accessed from another HTTP session
+            return false;
+        }
         OperationSessionEntity operationSessionEntity = new OperationSessionEntity(operationId, httpSessionId, result);
         String operationHash = generateOperationHash(operationId);
         operationSessionEntity.setOperationHash(operationHash);
         operationSessionRepository.save(operationSessionEntity);
+        return true;
     }
 
     /**
@@ -152,8 +159,9 @@ public class OperationSessionService {
             return false;
         }
         String existingWebSocketSessionId = operationSessionEntity.getWebSocketSessionId();
-        if (existingWebSocketSessionId != null && !webSocketSessionId.equals(existingWebSocketSessionId)) {
-            // Registration failed because operation is being accessed from another browser tab or window
+        if (existingWebSocketSessionId != null) {
+            // Registration failed because operation is being accessed from another browser tab / window or Web Socket
+            // session has been already registered.
             return false;
         }
         operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
