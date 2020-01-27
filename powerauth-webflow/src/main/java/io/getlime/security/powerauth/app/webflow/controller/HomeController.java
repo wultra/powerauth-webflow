@@ -85,7 +85,7 @@ public class HomeController {
      * @param operationCancellationService Service used for canceling operations.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService, DataAdapterClient dataAdapterClient, AfsIntegrationService afsIntegrationService, OperationCancellationService operationCancellationService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService, OperationCancellationService operationCancellationService) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
