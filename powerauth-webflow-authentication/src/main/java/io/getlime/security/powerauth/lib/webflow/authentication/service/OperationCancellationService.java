@@ -70,6 +70,7 @@ public class OperationCancellationService {
      * @param operationId Operation ID.
      * @param authMethod Authentication method which triggered operation cancellation.
      * @param cancelReason Reason for canceling the operation.
+     * @return Update operation response or null in case cancellation was skipped.
      */
     public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason) {
         try {
@@ -87,6 +88,7 @@ public class OperationCancellationService {
      * @param operationDetail Operation.
      * @param authMethod Authentication method which triggered operation cancellation.
      * @param cancelReason Reason for canceling the operation.
+     * @return Update operation response or null in case cancellation was skipped.
      */
     public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason) {
         try {
