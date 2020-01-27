@@ -29,21 +29,17 @@ public class OperationCancellationConverter {
      * @return Operation termination reason for AFS.
      */
     public OperationTerminationReason convertCancelReason(OperationCancelReason cancelReason) {
-        OperationTerminationReason terminationReason;
         if (cancelReason == null) {
             return OperationTerminationReason.FAILED;
         }
         switch (cancelReason) {
             case INTERRUPTED_OPERATION:
-                terminationReason = OperationTerminationReason.INTERRUPTED;
-                break;
+                return OperationTerminationReason.INTERRUPTED;
             case TIMED_OUT_OPERATION:
-                terminationReason = OperationTerminationReason.TIMED_OUT;
-                break;
+                return OperationTerminationReason.TIMED_OUT;
             default:
-                terminationReason = OperationTerminationReason.FAILED;
+                return OperationTerminationReason.FAILED;
         }
-        return terminationReason;
     }
 
 }
