@@ -18,14 +18,20 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.AfsConfigRepository;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.AfsConfigEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +50,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Simple controller, redirects to the main HTML page with JavaScript content.
@@ -67,6 +70,7 @@ public class HomeController {
     private final AfsConfigRepository afsConfigRepository;
     private final HttpSession httpSession;
     private final ClientDetailsService clientDetailsService;
+    private final OperationCancellationService operationCancellationService;
 
     /**
      * Initialization of the HomeController with application configuration.
@@ -78,9 +82,10 @@ public class HomeController {
      * @param afsConfigRepository Anti-fraud system configuration repository.
      * @param httpSession HTTP session.
      * @param clientDetailsService Client details service for accessing OAuth 2.0 client data.
+     * @param operationCancellationService Service used for canceling operations.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService, DataAdapterClient dataAdapterClient, AfsIntegrationService afsIntegrationService, OperationCancellationService operationCancellationService) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
@@ -89,6 +94,7 @@ public class HomeController {
         this.afsConfigRepository = afsConfigRepository;
         this.httpSession = httpSession;
         this.clientDetailsService = clientDetailsService;
+        this.operationCancellationService = operationCancellationService;
     }
 
     /**
@@ -299,6 +305,13 @@ public class HomeController {
             return "redirect:/oauth/error";
         } else if (stateParameter.length == 1) {
             state = stateParameter[0];
+        }
+
+        // Cancel existing operation in Next Step in case operation is still active
+        final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
+        if (pendingUserAuthentication != null) {
+            String operationId = pendingUserAuthentication.getOperationId();
+            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR);
         }
 
         String clearContext = request.getParameter("clearContext");
