@@ -39,7 +39,7 @@ public class LookupOperationsByExternalIdResponse {
      * Set operations.
      * @param operations Operations.
      */
-    public void setOrganizations(List<GetOperationDetailResponse> operations) {
+    public void setOperations(List<GetOperationDetailResponse> operations) {
         this.operations = operations;
     }
 
