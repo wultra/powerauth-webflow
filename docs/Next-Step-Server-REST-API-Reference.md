@@ -1662,7 +1662,7 @@ Find all operations with matching external transaction ID.
         "userId": null,
         "organizationId": "RETAIL",
         "accountStatus": "ACTIVE",
-        "externalTransactionId": "1234567890",
+        "externalTransactionId": "12345678",
         "result": "CONTINUE",
         "timestampCreated": "2020-01-28T15:58:11+0000",
         "timestampExpires": "2020-01-28T16:03:11+0000",
