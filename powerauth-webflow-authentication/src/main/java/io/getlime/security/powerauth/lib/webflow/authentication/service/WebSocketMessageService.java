@@ -93,7 +93,7 @@ public class WebSocketMessageService {
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket Session ID.
      * @param clientIpAddress Remote client IP address.
-     * @return Whether Whether Web Socket registration was successful.
+     * @return Whether Web Socket registration was successful.
      */
     public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
         return operationSessionService.registerWebSocketSession(operationHash, webSocketSessionId, clientIpAddress);
