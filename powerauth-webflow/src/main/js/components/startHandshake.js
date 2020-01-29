@@ -48,7 +48,16 @@ export default class StartHandshake extends React.Component {
         }));
     }
 
-    onRegister() {
+    onRegister(message) {
+        if (!message || !message.body) {
+            // Invalid registration response
+            window.location = './oauth/error';
+        }
+        const responseBody = JSON.parse(message.body);
+        if (!responseBody.registrationSucceeded) {
+            // Web Socket registration failed, typically because authorization URL was opened in another browser tab or window
+            window.location = './oauth/error';
+        }
         // Debug logging is disabled.
         // console.log('WebSocket has been registered.');
     }

@@ -40,4 +40,11 @@ public interface OperationRepository extends CrudRepository<OperationEntity, Str
             "AND o.timestampExpires > CURRENT_TIMESTAMP ORDER BY o.timestampExpires")
     List<OperationEntity> findPendingOperationsForUser(String userId);
 
+    /**
+     * Find operations by external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     * @return List of operations matching the query.
+     */
+    List<OperationEntity> findAllByExternalTransactionId(String externalTransactionId);
+
 }
