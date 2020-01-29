@@ -279,7 +279,9 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
-            webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+            if (updateOperationResponse != null) {
+                webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+            }
             return new Response();
 
         } else {

@@ -23,12 +23,37 @@ package io.getlime.security.powerauth.lib.webflow.authentication.model.response;
 public class WebSocketRegistrationResponse {
 
     private String webSocketId;
+    private boolean registrationSucceeded;
 
+    /**
+     * Get Web Socket ID.
+     * @return Web Socket ID.
+     */
     public String getWebSocketId() {
         return webSocketId;
     }
 
+    /**
+     * Set Web Socket ID.
+     * @param webSocketId Web Socket ID.
+     */
     public void setWebSocketId(String webSocketId) {
         this.webSocketId = webSocketId;
+    }
+
+    /**
+     * Get whether Web Socket registration succeeded.
+     * @return Whether Web Socket registration succeeded.
+     */
+    public boolean isRegistrationSucceeded() {
+        return registrationSucceeded;
+    }
+
+    /**
+     * Set whether Web Socket registration succeeded.
+     * @param registrationSucceeded Whether Web Socket registration succeeded.
+     */
+    public void setRegistrationSucceeded(boolean registrationSucceeded) {
+        this.registrationSucceeded = registrationSucceeded;
     }
 }
