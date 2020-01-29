@@ -66,6 +66,7 @@ public class TppAppConverter {
         result.setClientId(tppAppDetailEntity.getPrimaryKey().getAppClientId());
         result.setName(tppAppDetailEntity.getAppName());
         result.setDescription(tppAppDetailEntity.getAppInfo());
+        result.setAppType(tppAppDetailEntity.getAppType());
 
         // Convert TPP info
         result.setTpp(fromTppEntity(tppAppDetailEntity.getTpp()));

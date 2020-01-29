@@ -271,6 +271,7 @@ CREATE TABLE tpp_app_detail (
   app_client_id         VARCHAR(256) NOT NULL,
   app_name              VARCHAR(256) NOT NULL,
   app_info              TEXT NULL,
+  app_type              VARCHAR(32) NULL,
   PRIMARY KEY (tpp_id, app_client_id),
   FOREIGN KEY tpp_detail_fk (tpp_id) REFERENCES tpp_detail (tpp_id),
   FOREIGN KEY tpp_client_secret_fk (app_client_id) REFERENCES oauth_client_details (client_id)

@@ -182,6 +182,7 @@ public class TppService {
         tppAppDetailKey.setTppId(tppEntity.getTppId());
         tppAppDetailKey.setAppClientId(clientId);
         tppAppDetailEntity.setTpp(tppEntity);
+        tppAppDetailEntity.setAppType(request.getAppType());
         tppAppDetailEntity.setPrimaryKey(tppAppDetailKey);
 
         // Sanitize redirect URIs by Base64 decoding them
@@ -239,6 +240,7 @@ public class TppService {
 
             tppAppDetailEntity.setAppName(request.getAppName());
             tppAppDetailEntity.setAppInfo(request.getAppDescription());
+            tppAppDetailEntity.setAppType(request.getAppType());
 
             // Sanitize redirect URIs by Base64 decoding them
             final String redirectUris = sanitizeRedirectUris(request.getRedirectUris());

@@ -41,6 +41,11 @@ public class TppAppDetailResponse {
     private String description;
 
     /**
+     * App Type.
+     */
+    private String appType;
+
+    /**
      * OAuth 2.0 scopes of this application.
      */
     private String[] scopes;
@@ -82,6 +87,14 @@ public class TppAppDetailResponse {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
     }
 
     public String[] getScopes() {

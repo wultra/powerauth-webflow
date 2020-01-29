@@ -53,6 +53,15 @@ public class CreateTppAppRequestValidator {
             errors.add("Application name is not present.");
         }
 
+        final String appType = source.getAppType();
+        if (appType == null || appType.isEmpty()) {
+            errors.add("Application type is not present.");
+        } else {
+            if (!"web".equals(appType) && !"native".equals(appType)) {
+                errors.add("Invalid application type - must be 'native' or 'web'.");
+            }
+        }
+
         final String[] redirectUris = source.getRedirectUris();
         if (redirectUris == null || redirectUris.length == 0) {
             errors.add("You must provide at least one redirect URI.");

@@ -41,6 +41,9 @@ public class TppAppDetailEntity implements Serializable {
     @Column(name = "app_info")
     private String appInfo;
 
+    @Column(name = "app_type")
+    private String appType;
+
     @ManyToOne
     @JoinColumn(name = "tpp_id", referencedColumnName = "tpp_id", insertable = false, updatable = false)
     private TppEntity tpp;
@@ -74,6 +77,14 @@ public class TppAppDetailEntity implements Serializable {
 
     public void setAppInfo(String appInfo) {
         this.appInfo = appInfo;
+    }
+
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
     }
 
     public TppEntity getTpp() {

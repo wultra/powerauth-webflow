@@ -32,6 +32,11 @@ public class CreateTppAppRequest {
     private String appDescription;
 
     /**
+     * App Type.
+     */
+    private String appType;
+
+    /**
      * TPP app OAuth 2.0 redirect URIs.
      */
     private String[] redirectUris;
@@ -75,6 +80,14 @@ public class CreateTppAppRequest {
 
     public void setAppDescription(String appDescription) {
         this.appDescription = appDescription;
+    }
+
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
     }
 
     public String getTppName() {
