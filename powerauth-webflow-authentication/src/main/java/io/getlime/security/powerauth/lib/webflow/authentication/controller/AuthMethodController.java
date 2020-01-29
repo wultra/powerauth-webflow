@@ -90,6 +90,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private AfsIntegrationService afsIntegrationService;
 
+    @Autowired
+    private OperationCancellationService operationCancellationService;
+
     /**
      * Get operation detail.
      * @return Operation detail.
@@ -345,31 +348,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
-        ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
-        // notify Data Adapter in case operation is in FAILED state now
-        if (response.getResponseObject().getResult() == AuthResult.FAILED) {
-            try {
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operation.getOrganizationId(), operationContext);
-                // notify AFS about logout
-                if (cancelReason == OperationCancelReason.TIMED_OUT_OPERATION) {
-                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.TIMED_OUT);
-                } else {
-                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
-                }
-            } catch (DataAdapterClientErrorException ex) {
-                logger.error("Error while notifying Data Adapter", ex);
-            }
+        UpdateOperationResponse updateOperationResponse = operationCancellationService.cancelOperation(operation, authMethod, cancelReason);
+        if (updateOperationResponse != null) {
+            filterStepsBasedOnActiveAuthMethods(updateOperationResponse.getSteps(), userId, operationId);
+            return updateOperationResponse;
         }
-
-        // update operation result in operation to HTTP session mapping
-        operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
-        filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
-        logger.info("Step cancel succeeded, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
-        return response.getResponseObject();
+        return null;
     }
 
     /**
@@ -461,25 +445,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param httpSessionId HTTP session ID.
      */
     private void cancelOperationsInHttpSession(String httpSessionId) {
-        // at first cancel operations within same HTTP session in the operation to session mapping
+        // At first cancel operations within same HTTP session in the operation to session mapping
         List<OperationSessionEntity> operationsToCancel = operationSessionService.cancelOperationsInHttpSession(httpSessionId);
         for (OperationSessionEntity operationToCancel: operationsToCancel) {
-            try {
-                // cancel operations in Next Step
-                final ObjectResponse<GetOperationDetailResponse> operation = nextStepClient.getOperationDetail(operationToCancel.getOperationId());
-                final GetOperationDetailResponse operationDetail = operation.getResponseObject();
-                final ApplicationContext applicationContext = operationDetail.getApplicationContext();
-                nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), getAuthMethodName(), Collections.emptyList(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null, applicationContext);
-                // notify Data Adapter about cancellation
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getResponseObject().getFormData());
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
-                // notify AFS about logout
-                afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), OperationTerminationReason.INTERRUPTED);
-            } catch (NextStepServiceException | DataAdapterClientErrorException e) {
-                // errors occurring when canceling previous operations are not critical
-                logger.error("Error while canceling previous operation", e);
-            }
+            operationCancellationService.cancelOperation(operationToCancel.getOperationId(), getAuthMethodName(), OperationCancelReason.INTERRUPTED_OPERATION);
         }
     }
 
