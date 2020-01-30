@@ -58,6 +58,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,7 +108,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Exception is thrown when authorization fails.
      */
     @Override
-    protected AuthenticationResult authenticate(SmsAuthorizationRequest request) throws AuthStepException {
+    protected AuthenticationResult authenticate(@Valid SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
