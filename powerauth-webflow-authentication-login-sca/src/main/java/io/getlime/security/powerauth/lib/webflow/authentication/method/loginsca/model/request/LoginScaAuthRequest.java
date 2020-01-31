@@ -30,11 +30,13 @@ import java.util.List;
  */
 public class LoginScaAuthRequest extends AuthStepRequest {
 
-    @Pattern(regexp = "^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$", message = "login.username.invalidFormat")
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$", message = "login.username.invalidFormat")
     @NotEmpty(message = "login.username.empty")
     private String username;
 
-    @Pattern(regexp = "^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~\\s]{2,256}$", message = "login.organization.invalidFormat")
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~\\s]{2,256}$", message = "login.organization.invalidFormat")
     @NotEmpty(message = "login.organization.empty")
     private String organizationId;
 
