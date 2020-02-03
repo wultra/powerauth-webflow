@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.sms.model.reque
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +30,13 @@ import java.util.List;
  */
 public class SmsAuthorizationRequest extends AuthStepRequest {
 
+    @Pattern(regexp = "^[0-9]{4,8}$", message = "login.authenticationFailed")
     private String authCode;
+
+    @Pattern(regexp = "^.{4,128}$", message = "login.authenticationFailed")
     private String password;
+
+    @NotNull(message = "error.invalidRequest")
     private List<AuthInstrument> authInstruments = new ArrayList<>();
 
     /**

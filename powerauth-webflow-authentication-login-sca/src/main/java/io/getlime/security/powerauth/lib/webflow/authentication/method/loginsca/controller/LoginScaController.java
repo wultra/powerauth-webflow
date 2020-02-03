@@ -50,12 +50,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.Authenti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.List;
 
 
@@ -69,8 +67,6 @@ import java.util.List;
 public class LoginScaController extends AuthMethodController<LoginScaAuthRequest, LoginScaAuthResponse, AuthStepException> {
 
     private static final Logger logger = LoggerFactory.getLogger(LoginScaController.class);
-
-    private static final String USERNAME_VALIDATION_REGEXP = "^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
@@ -106,7 +102,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public LoginScaAuthResponse authenticateScaLogin(@RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
+    public LoginScaAuthResponse authenticateScaLogin(@Valid @RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         try {
@@ -121,23 +117,6 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
                 String username = request.getUsername();
-                // Verify username format
-                if (username == null || username.isEmpty()) {
-                    logger.debug("Empty username specified during user authentication");
-                    // Send error in case username is empty
-                    LoginScaAuthResponse response = new LoginScaAuthResponse();
-                    response.setResult(AuthStepResult.AUTH_FAILED);
-                    response.setMessage("login.username.empty");
-                    return response;
-                }
-                if (!username.matches(USERNAME_VALIDATION_REGEXP)) {
-                    logger.debug("Invalid username specified during user authentication: {}", username);
-                    // Send error in case username format is not acceptable
-                    LoginScaAuthResponse response = new LoginScaAuthResponse();
-                    response.setResult(AuthStepResult.AUTH_FAILED);
-                    response.setMessage("login.username.invalidFormat");
-                    return response;
-                }
                 ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, operationContext);
                 updateUsernameInHttpSession(username);
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
@@ -200,7 +179,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public LoginScaInitResponse initScaLogin(@RequestBody LoginScaInitRequest request) throws AuthStepException {
+    public LoginScaInitResponse initScaLogin(@Valid @RequestBody LoginScaInitRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request in prepareLoginForm", "error.invalidRequest");
         }

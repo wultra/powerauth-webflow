@@ -38,7 +38,10 @@ export default class SmsComponent extends React.Component {
     }
 
     handleAuthCodeChange(event) {
-        this.setState({authCode: event.target.value});
+        let targetValue = event.target.value;
+        // Keep only numeric characters
+        targetValue = targetValue.replace(/\D/g,'');
+        this.setState({authCode: targetValue});
     }
 
     handlePasswordChange(event) {

@@ -51,13 +51,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +64,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Controller
+@RestController
 @RequestMapping(value = "/api/auth/sms")
 public class SmsAuthorizationController extends AuthMethodController<SmsAuthorizationRequest, SmsAuthorizationResponse, AuthStepException> {
 
@@ -329,7 +326,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody InitSmsAuthorizationResponse initSmsAuthorization() throws AuthStepException {
+    public InitSmsAuthorizationResponse initSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -416,7 +413,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/resend", method = RequestMethod.POST)
-    public @ResponseBody ResendSmsAuthorizationResponse resendSmsAuthorization() throws AuthStepException {
+    public ResendSmsAuthorizationResponse resendSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Resend step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -454,7 +451,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException In case authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody SmsAuthorizationResponse authenticateHandler(@RequestBody SmsAuthorizationRequest request) throws AuthStepException {
+    public SmsAuthorizationResponse authenticateHandler(@Valid @RequestBody SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         // Extract username for LOGIN_SCA
@@ -555,7 +552,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody SmsAuthorizationResponse cancelAuthentication() throws AuthStepException {
+    public SmsAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
             final AuthMethod authMethod = getAuthMethodName(operation);

@@ -100,7 +100,7 @@ powerauth.webflow.afs.tm.cookies.sessionSid=
 
 # User input validation
 powerauth.webflow.input.username.maxLength=256
-powerauth.webflow.input.password.maxLength=256
+powerauth.webflow.input.password.maxLength=128
 powerauth.webflow.input.smsOtp.maxLength=8
 ```
 
