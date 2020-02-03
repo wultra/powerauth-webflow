@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,7 +30,14 @@ import java.util.List;
  */
 public class LoginScaAuthRequest extends AuthStepRequest {
 
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$", message = "login.username.invalidFormat")
+    @NotEmpty(message = "login.username.empty")
     private String username;
+
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~\\s]{2,256}$", message = "login.organization.invalidFormat")
+    @NotEmpty(message = "login.organization.empty")
     private String organizationId;
 
     /**
