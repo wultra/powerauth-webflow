@@ -121,7 +121,8 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
-            ObjectResponse<UserDetailResponse> lookupResponse = dataAdapterClient.lookupUser(request.getUsername(), request.getOrganizationId(), operationContext);
+            // Client certificate is not yet supported in non SCA login method
+            ObjectResponse<UserDetailResponse> lookupResponse = dataAdapterClient.lookupUser(request.getUsername(), request.getOrganizationId(), null, operationContext);
 
             String userId = lookupResponse.getResponseObject().getId();
             String organizationId = lookupResponse.getResponseObject().getOrganizationId();

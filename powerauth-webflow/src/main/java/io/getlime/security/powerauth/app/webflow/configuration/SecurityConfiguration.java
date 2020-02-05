@@ -16,10 +16,15 @@
 
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.google.common.collect.ImmutableList;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 /**
  * Default Spring Security configuration.
@@ -38,11 +43,29 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .httpBasic().disable()
-                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**").and()
+                .csrf().ignoringAntMatchers("/api/auth/token/app/**", "/api/push/**", "/pa/**", "/client/**").and()
                 .antMatcher("/**").authorizeRequests()
-                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**").permitAll()
+                .antMatchers("/", "/authenticate", "/authenticate/**", "/oauth/error", "/api/**", "/pa/**", "/resources/**", "/ext-resources/**", "/websocket/**", "/v2/api-docs", "/swagger-resources/**", "/swagger-ui.html", "/webjars/**", "/actuator/**", "/tls/client/**").permitAll()
                 .anyRequest().authenticated()
                 .and().exceptionHandling()
                 .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/authenticate"));
+        http.cors();
+    }
+
+    /**
+     * Configure CORS to allow client TLS certificate verification from a different port.
+     * @return CORS configuration source.
+     */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        // Configuration of CORS for client TLS certificate validation which can be requested from another host/port
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(ImmutableList.of("*"));
+        configuration.setAllowedMethods(ImmutableList.of("GET", "POST", "OPTIONS"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedHeaders(ImmutableList.of("Content-Type", "X-CSRF-Token"));
+        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/tls/client/login", configuration);
+        return source;
     }
 }

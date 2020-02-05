@@ -35,6 +35,11 @@ public class UserLookupRequest {
     private String organizationId;
 
     /**
+     * Client TLS certificate.
+     */
+    private String clientCertificate;
+
+    /**
      * Operation context.
      */
     private OperationContext operationContext;
@@ -49,11 +54,13 @@ public class UserLookupRequest {
      * Constructor with username and organization ID.
      * @param username Username for this lookup request.
      * @param organizationId Organization ID for this lookup request.
+     * @param clientCertificate Client TLS certificate.
      * @param operationContext Operation context.
      */
-    public UserLookupRequest(String username, String organizationId, OperationContext operationContext) {
+    public UserLookupRequest(String username, String organizationId, String clientCertificate, OperationContext operationContext) {
         this.username = username;
         this.organizationId = organizationId;
+        this.clientCertificate = clientCertificate;
         this.operationContext = operationContext;
     }
 
@@ -87,6 +94,22 @@ public class UserLookupRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get client TLS certificate.
+     * @return Client TLS certificate.
+     */
+    public String getClientCertificate() {
+        return clientCertificate;
+    }
+
+    /**
+     * Set client TLS certificate.
+     * @param clientCertificate Client TLS certificate.
+     */
+    public void setClientCertificate(String clientCertificate) {
+        this.clientCertificate = clientCertificate;
     }
 
     /**

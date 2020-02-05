@@ -120,7 +120,7 @@ export function init() {
                         payload: {
                             loading: true,
                             error: false,
-                            message: "",
+                            message: ""
                         }
                     });
                 }
@@ -188,6 +188,35 @@ export function organizationConfigurationError() {
             payload: {
                 message: "organization.configurationError"
             }
+        })
+    }
+}
+
+/**
+ * Verify client TLS certificate.
+ * @param certificateVerificationUrl URL to be used to verify client TLS certificate.
+ * @param callbackOnSuccess Callback in case of successful verification.
+ * @returns {Function} No return value.
+ */
+export function checkClientCertificate(certificateVerificationUrl, callbackOnSuccess) {
+    return function (dispatch) {
+        axios.post(certificateVerificationUrl, {}, {
+            // Send cookies so that HTTP session is the same
+            withCredentials: true
+        }).then((response) => {
+            callbackOnSuccess();
+            return null;
+        }).catch((error) => {
+            // Convert error message to a user friendly error message
+            dispatch({
+                type: "SHOW_SCREEN_LOGIN_SCA",
+                payload: {
+                    loading: false,
+                    error: true,
+                    message: "clientCertificate.failed"
+                }
+            });
+            return null;
         })
     }
 }

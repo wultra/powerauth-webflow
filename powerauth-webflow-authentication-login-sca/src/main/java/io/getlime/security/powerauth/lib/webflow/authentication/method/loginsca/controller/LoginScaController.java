@@ -33,6 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
@@ -50,10 +51,14 @@ import io.getlime.security.powerauth.lib.webflow.authentication.service.Authenti
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 
@@ -73,6 +78,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private final AuthMethodQueryService authMethodQueryService;
     private final AuthenticationManagementService authenticationManagementService;
     private final HttpSession httpSession;
+    private final WebFlowServicesConfiguration config;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
     private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
@@ -84,14 +90,16 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @param authMethodQueryService Service for querying authentication methods.
      * @param authenticationManagementService Authentication management service.
      * @param httpSession HTTP session.
+     * @param config Web Flow services configuration.
      */
     @Autowired
-    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
+    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession, WebFlowServicesConfiguration config) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
         this.authenticationManagementService = authenticationManagementService;
         this.httpSession = httpSession;
+        this.config = config;
     }
 
     /**
@@ -116,8 +124,18 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             if (userId == null) {
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
+                String clientCertificate = getClientCertificateFromHttpSession();
                 String username = request.getUsername();
-                ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, operationContext);
+                // Verify username format
+                if (clientCertificate == null && username == null) {
+                    logger.warn("Missing username or client certificate");
+                    // Send error in case username format is not acceptable
+                    LoginScaAuthResponse response = new LoginScaAuthResponse();
+                    response.setResult(AuthStepResult.AUTH_FAILED);
+                    response.setMessage("login.userNotFound");
+                    return response;
+                }
+                ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, clientCertificate, operationContext);
                 updateUsernameInHttpSession(username);
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
                 userId = userDetailResponse.getId();
@@ -186,6 +204,10 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         final LoginScaInitResponse response = new LoginScaInitResponse();
+        if (config.isClientCertificateAuthenticationEnabled()) {
+            response.setClientCertificateAuthenticationEnabled(true);
+            response.setClientCertificateVerificationUrl(config.getClientCertificateVerificationUrl());
+        }
         if (operation.getUserId() != null && operation.getOrganizationId() != null) {
             // Username form can be skipped
             response.setUserAlreadyKnown(true);
@@ -232,6 +254,16 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private void updateUsernameInHttpSession(String username) {
         synchronized (httpSession.getServletContext()) {
             httpSession.setAttribute(HttpSessionAttributeNames.USERNAME, username);
+        }
+    }
+
+    /**
+     * Get client TLS certificate from HTTP session.
+     * @return Client certificate.
+     */
+    private String getClientCertificateFromHttpSession() {
+        synchronized (httpSession.getServletContext()) {
+            return (String) httpSession.getAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
         }
     }
 

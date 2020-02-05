@@ -389,3 +389,11 @@ a:hover, a:active, a:focus {
 .sms-resend-disabled {
     color: #777777;
 }
+
+.client-certificate-active {
+    color: #7FC000;
+}
+
+.client-certificate-active:hover {
+    cursor: pointer;
+}
