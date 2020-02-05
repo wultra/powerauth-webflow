@@ -126,10 +126,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 userIdAlreadyAvailable = false;
                 String clientCertificate = getClientCertificateFromHttpSession();
                 String username = request.getUsername();
-                // Verify username format
+                // Check that either certificate or username is available
                 if (clientCertificate == null && username == null) {
                     logger.warn("Missing username or client certificate");
-                    // Send error in case username format is not acceptable
                     LoginScaAuthResponse response = new LoginScaAuthResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage("login.userNotFound");
