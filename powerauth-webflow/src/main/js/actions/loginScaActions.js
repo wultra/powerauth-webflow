@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import axios from "axios";
-import {dispatchError} from "../dispatcher/dispatcher";
+import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
@@ -43,6 +43,11 @@ export function authenticate(username, organizationId) {
         }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
+                    if (response.data.next.length > 0) {
+                        // Step was completely authenticated, move to next step
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     if (response.data.mobileTokenEnabled) {
                         dispatch({
                             type: "SHOW_SCREEN_TOKEN",

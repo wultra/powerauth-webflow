@@ -25,6 +25,8 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountSt
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
@@ -32,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServic
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -58,7 +61,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -121,6 +124,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             String organizationId = request.getOrganizationId();
             AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
             boolean userIdAlreadyAvailable;
+            boolean userAuthenticatedUsingCertificate = false;
             if (userId == null) {
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
@@ -135,7 +139,11 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                     return response;
                 }
                 ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, clientCertificate, operationContext);
-                updateUsernameInHttpSession(username);
+                if (clientCertificate != null) {
+                    userAuthenticatedUsingCertificate = true;
+                } else {
+                    updateUsernameInHttpSession(username);
+                }
                 UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
                 userId = userDetailResponse.getId();
                 accountStatus = userDetailResponse.getAccountStatus();
@@ -150,6 +158,10 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
                 authenticationManagementService.upgradeToStrongCustomerAuthentication();
                 nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, statusConverter.fromAccountStatus(accountStatus));
+            }
+            if (userAuthenticatedUsingCertificate) {
+                logger.debug("Step authentication succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                return authorizeUsingTlsCertificate(operation.getOperationId(), userId, organizationId);
             }
             if (userId == null || accountStatus != AccountStatus.ACTIVE) {
                 // User ID is not available or user account is not ACTIVE, mock SMS and password fallback to avoid fishing for active accounts
@@ -287,6 +299,38 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");
             logger.info("Step result: AUTH_FAILED, authentication method: {}", getAuthMethodName().toString());
+            return response;
+        }
+    }
+
+    /**
+     * User was successfully authenticated using client TLS certificate. Move user to the next step.
+     * @return Login SCA authentication response.
+     */
+    private LoginScaAuthResponse authorizeUsingTlsCertificate(String operationId, String userId, String organizationId) {
+        List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
+        try {
+            UpdateOperationResponse updateResponse = authorize(operationId, userId, organizationId, authInstruments, null);
+            final LoginScaAuthResponse response = new LoginScaAuthResponse();
+            response.setResult(AuthStepResult.CONFIRMED);
+            response.setMessage("authentication.success");
+            response.getNext().addAll(updateResponse.getSteps());
+            for (AuthStep step: updateResponse.getSteps()) {
+                System.out.println("Next step: " + step.getAuthMethod());
+            }
+            logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, AuthMethod.LOGIN_SCA);
+            return response;
+        } catch (AuthStepException ex) {
+            logger.error("Error while building authorization response for client TLS certificate verification", ex);
+            final LoginScaAuthResponse response = new LoginScaAuthResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("authentication.fail");
+            return response;
+        } catch (NextStepServiceException ex) {
+            logger.error("Error while communicating with Next Step service", ex);
+            final LoginScaAuthResponse response = new LoginScaAuthResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("error.communication");
             return response;
         }
     }
