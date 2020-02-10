@@ -132,7 +132,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 String username = request.getUsername();
                 // Check that either certificate or username is available
                 if (clientCertificate == null && username == null) {
-                    logger.warn("Missing username or client certificate");
+                    logger.warn("Both username and client certificate are unknown");
                     LoginScaAuthResponse response = new LoginScaAuthResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage("login.userNotFound");
@@ -315,9 +315,6 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             response.setResult(AuthStepResult.CONFIRMED);
             response.setMessage("authentication.success");
             response.getNext().addAll(updateResponse.getSteps());
-            for (AuthStep step: updateResponse.getSteps()) {
-                System.out.println("Next step: " + step.getAuthMethod());
-            }
             logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, AuthMethod.LOGIN_SCA);
             return response;
         } catch (AuthStepException ex) {
