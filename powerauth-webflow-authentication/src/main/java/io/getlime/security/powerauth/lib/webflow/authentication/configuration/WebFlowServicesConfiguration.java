@@ -133,10 +133,16 @@ public class WebFlowServicesConfiguration {
     private boolean clientCertificateAuthenticationEnabled;
 
     /**
-     * Get client TLS certificate verification URL which is used in case client TLS certificate verification is enabled.
+     * Get client TLS certificate verification URL for login which is used in case client TLS certificate verification is enabled.
      */
-    @Value("${powerauth.webflow.authentication.client.certificate.url}")
-    private String clientCertificateVerificationUrl;
+    @Value("${powerauth.webflow.authentication.client.certificate.login.url}")
+    private String certificateVerificationUrlForLogin;
+
+    /**
+     * Get client TLS certificate verification URL for approval which is used in case client TLS certificate verification is enabled.
+     */
+    @Value("${powerauth.webflow.authentication.client.certificate.approval.url}")
+    private String certificateVerificationUrlForApproval;
 
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
@@ -294,11 +300,19 @@ public class WebFlowServicesConfiguration {
     }
 
     /**
-     * Get client TLS certificate verification URL.
+     * Get client TLS certificate verification URL for login.
      * @return Client TLS certificate verification URL.
      */
-    public String getClientCertificateVerificationUrl() {
-        return clientCertificateVerificationUrl;
+    public String getCertificateVerificationUrlForLogin() {
+        return certificateVerificationUrlForLogin;
+    }
+
+    /**
+     * Get client TLS certificate verification URL for approval.
+     * @return Client TLS certificate verification URL for approval.
+     */
+    public String getCertificateVerificationUrlForApproval() {
+        return certificateVerificationUrlForApproval;
     }
 
 }

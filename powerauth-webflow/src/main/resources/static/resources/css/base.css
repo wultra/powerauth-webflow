@@ -348,6 +348,10 @@ a:hover, a:active, a:focus {
     font-size: 12pt;
 }
 
+.consent-checkbox-wrapper {
+    z-index: 1;
+}
+
 .consent-checkbox {
     vertical-align: top;
     margin-top: 6px !important;

@@ -14,31 +14,56 @@
  * limitations under the License.
  */
 import axios from "axios";
-import {dispatchError} from "../dispatcher/dispatcher";
+import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
  * Initialize SCA approval.
  * @returns {Function} No return value.
  */
-export function init() {
+export function init(callback) {
     return function (dispatch) {
+        dispatch({
+            type: "SHOW_SCREEN_APPROVAL_SCA",
+            payload: {
+                loading: true,
+                error: false,
+                message: ""
+            }
+        });
         axios.post("./api/auth/approval-sca/init", {}).then((response) => {
-            axios.post("./api/auth/operation/detail", {}, {
-                headers: {
-                    'X-OPERATION-HASH': operationHash,
-                }
-            }).then((response) => {
-                dispatch({
-                    type: "SHOW_SCREEN_APPROVAL_SCA",
-                    loading: false,
-                    error: false,
-                    payload: response.data
-                });
-                return null;
-            }).catch((error) => {
-                dispatchError(dispatch, error);
-            })
+            dispatch({
+                type: "SHOW_SCREEN_APPROVAL_SCA",
+                loading: true,
+                error: false,
+                payload: response.data
+            });
+            callback(true);
+            return null;
+        }).catch((error) => {
+            dispatchError(dispatch, error);
+        })
+    }
+}
+
+/**
+ * Get operation detail.
+ * @returns {Function} Operation detail.
+ */
+export function getOperationData() {
+    return function (dispatch) {
+        axios.post("./api/auth/operation/detail", {}, {
+            headers: {
+                'X-OPERATION-HASH': operationHash,
+            }
+        }).then((response) => {
+            dispatch({
+                type: "SHOW_SCREEN_APPROVAL_SCA",
+                loading: false,
+                error: false,
+                payload: response.data
+            });
+            return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
         })
@@ -129,6 +154,35 @@ export function cancel() {
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
+        })
+    }
+}
+
+/**
+ * Verify client TLS certificate.
+ * @param certificateVerificationUrl URL to be used to verify client TLS certificate.
+ * @param callbackOnSuccess Callback in case of successful verification.
+ * @returns {Function} No return value.
+ */
+export function checkClientCertificate(certificateVerificationUrl, callbackOnSuccess) {
+    return function (dispatch) {
+        axios.post(certificateVerificationUrl, {}, {
+            // Send cookies so that HTTP session is the same
+            withCredentials: true
+        }).then((response) => {
+            callbackOnSuccess();
+            return null;
+        }).catch((error) => {
+            // Convert error message to a user friendly error message
+            dispatch({
+                type: "SHOW_SCREEN_APPROVAL_SCA",
+                payload: {
+                    loading: false,
+                    error: true,
+                    message: "clientCertificate.failed"
+                }
+            });
+            return null;
         })
     }
 }

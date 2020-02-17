@@ -44,7 +44,7 @@ export function authenticate(username, organizationId) {
             switch (response.data.result) {
                 case 'CONFIRMED': {
                     if (response.data.next.length > 0) {
-                        // Step was completely authenticated, move to next step
+                        // Step was completely authenticated, move to the next step
                         dispatchAction(dispatch, response);
                         break;
                     }

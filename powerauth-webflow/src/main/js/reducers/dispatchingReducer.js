@@ -85,6 +85,9 @@ function mergeContext(actionType, oldContext, newContext) {
             mergeOrganizations(oldContext, newContext);
             mergeCertificateData(oldContext, newContext);
             break;
+        case "SHOW_SCREEN_APPROVAL_SCA":
+            mergeCertificateData(oldContext, newContext);
+            break;
         case "SHOW_SCREEN_OPERATION_REVIEW":
             mergeAuthMethods(oldContext, newContext);
             mergeData(oldContext, newContext);
@@ -115,6 +118,10 @@ function mergeCertificateData(oldContext, newContext) {
     // clientCertificateAuthenticationEnabled need to remain in context
     if (oldContext.clientCertificateAuthenticationEnabled !== undefined && newContext.clientCertificateAuthenticationEnabled === undefined) {
         newContext.clientCertificateAuthenticationEnabled = oldContext.clientCertificateAuthenticationEnabled;
+    }
+    // clientCertificateUsed need to remain in context
+    if (oldContext.clientCertificateUsed !== undefined && newContext.clientCertificateUsed === undefined) {
+        newContext.clientCertificateUsed = oldContext.clientCertificateUsed;
     }
     // clientCertificateVerificationUrl need to remain in context
     if (oldContext.clientCertificateVerificationUrl !== undefined && newContext.clientCertificateVerificationUrl === undefined) {
