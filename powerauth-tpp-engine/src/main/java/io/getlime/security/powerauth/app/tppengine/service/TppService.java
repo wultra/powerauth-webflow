@@ -45,7 +45,7 @@ import java.util.*;
 @Service
 public class TppService {
 
-    private static final Long OAUTH_ACCESS_TOKEN_VALIDITY = 5 * 60L;
+    private static final Long OAUTH_ACCESS_TOKEN_VALIDITY = 15 * 60L;
 
     private final TppRepository tppRepository;
     private final TppAppDetailRepository appDetailRepository;
