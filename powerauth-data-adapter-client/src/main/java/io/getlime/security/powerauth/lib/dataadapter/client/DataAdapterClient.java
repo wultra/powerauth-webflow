@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
@@ -112,14 +113,15 @@ public class DataAdapterClient {
      *
      * @param username Username for user account which is being looked up.
      * @param organizationId Organization ID for which the user ID is assigned to.
+     * @param clientCertificate Client TLS certificate.
      * @param operationContext Operation context.
      * @return Response with user details.
      * @throws DataAdapterClientErrorException Thrown when client request fails or user does not exist.
      */
-    public ObjectResponse<UserDetailResponse> lookupUser(String username, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<UserDetailResponse> lookupUser(String username, String organizationId, String clientCertificate, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange authentication request with data adapter.
-            UserLookupRequest request = new UserLookupRequest(username, organizationId, operationContext);
+            UserLookupRequest request = new UserLookupRequest(username, organizationId, clientCertificate, operationContext);
             HttpEntity<ObjectRequest<UserLookupRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/lookup", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
             });
@@ -276,6 +278,32 @@ public class DataAdapterClient {
             CreateImplicitLoginOperationRequest request = new CreateImplicitLoginOperationRequest(clientId, scopes);
             HttpEntity<ObjectRequest<CreateImplicitLoginOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateImplicitLoginOperationResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/create", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateImplicitLoginOperationResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Verify client TLS certificate.
+     *
+     * @param userId User ID for this authentication request.
+     * @param organizationId Organization ID for this authentication request.
+     * @param clientCertificate Client TLS certificate.
+     * @param authMethod Authentication method.
+     * @param accountStatus Current user account status.
+     * @param operationContext Operation context.
+     * @return Empty response returned when action succeeds.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
+     */
+    public ObjectResponse<VerifyCertificateResponse> verifyClientCertificate(String userId, String organizationId, String clientCertificate, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
+        try {
+            VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, clientCertificate, authMethod, accountStatus, operationContext);
+            HttpEntity<ObjectRequest<VerifyCertificateRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<VerifyCertificateResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/certificate/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifyCertificateResponse>>() {
             });
             return new ObjectResponse<>(response.getBody().getResponseObject());
         } catch (HttpStatusCodeException ex) {

@@ -195,6 +195,18 @@ CREATE TABLE wf_afs_config (
   parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table wf_certificate_verification is used for storing information about verified client TLS certificates.
+CREATE TABLE wf_certificate_verification (
+  operation_id               VARCHAR(256) NOT NULL,
+  auth_method                VARCHAR(32) NOT NULL,
+  client_certificate_issuer  VARCHAR(4000) NOT NULL,
+  client_certificate_subject VARCHAR(4000) NOT NULL,
+  client_certificate_sn      VARCHAR(256) NOT NULL,
+  operation_data             TEXT NOT NULL,
+  timestamp_verified         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (operation_id, auth_method)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Table da_sms_authorization stores data for SMS OTP authorization.
 CREATE TABLE da_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY NOT NULL,
@@ -280,3 +292,4 @@ CREATE TABLE tpp_app_detail (
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
+CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);

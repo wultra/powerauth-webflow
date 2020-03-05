@@ -27,5 +27,6 @@ public class HttpSessionAttributeNames {
     public static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
     public static final String CONSENT_SKIPPED = "CONSENT_SKIPPED";
     public static final String USERNAME = "USERNAME";
+    public static final String CLIENT_CERTIFICATE = "CLIENT_CERTIFICATE";
 
 }

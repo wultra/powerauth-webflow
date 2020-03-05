@@ -220,6 +220,8 @@ public class HomeController {
             authenticationManagementService.pendingAuthenticationToAuthentication();
             redirectUrl = savedRequest.getRedirectUrl();
         }
+        // Make sure HTTP session is cleaned when authentication is complete
+        cleanHttpSession();
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
         logger.info("The /authenticate/continue request succeeded");
@@ -320,6 +322,9 @@ public class HomeController {
             authenticationManagementService.clearContext();
         }
 
+        // Make sure HTTP session is cleaned when authentication is canceled
+        cleanHttpSession();
+
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", "access_denied")
                 .queryParam("error_description", "User%20canceled%20authentication%20request");
@@ -343,6 +348,9 @@ public class HomeController {
      */
     @RequestMapping(value = "/oauth/error", method = RequestMethod.GET)
     public String oauthError(Map<String, Object> model) {
+        // Make sure HTTP session is cleaned when error is displayed
+        cleanHttpSession();
+
         model.put("title", webFlowConfig.getPageTitle());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
         return "oauth/error";
@@ -359,5 +367,6 @@ public class HomeController {
         httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
         httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
         httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+        httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
     }
 }

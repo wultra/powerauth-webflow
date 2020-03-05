@@ -61,7 +61,6 @@ public class AuthenticationManagementService {
         synchronized (session.getServletContext()) {
             session.setAttribute(HttpSessionAttributeNames.PENDING_AUTH_OBJECT, auth);
         }
-        logger.info("PENDING_AUTH_OBJECT was added into HTTP session");
     }
 
     /**
@@ -97,12 +96,12 @@ public class AuthenticationManagementService {
      * @param organizationId Organization ID.
      */
     public void createAuthenticationWithOperationId(String operationId, String organizationId) {
-        logger.info("Authentication object created for operation ID: {}", operationId);
         UserOperationAuthentication auth = new UserOperationAuthentication();
         auth.setOperationId(operationId);
         auth.setAuthenticated(false);
         auth.setOrganizationId(organizationId);
         setPendingUserAuthentication(auth);
+        logger.info("Authentication object was created for operation ID: {}", operationId);
     }
 
     /**
@@ -126,6 +125,7 @@ public class AuthenticationManagementService {
         auth.setUserId(userId);
         auth.setOrganizationId(organizationId);
         setPendingUserAuthentication(auth);
+        logger.info("Authentication object was updated in HTTP session with user details");
         return auth.getOperationId();
     }
 
@@ -148,6 +148,7 @@ public class AuthenticationManagementService {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         auth.setStrongAuthentication(true);
         setPendingUserAuthentication(auth);
+        logger.info("Authentication object was updated in HTTP session with upgrade to SCA");
     }
 
     /**
@@ -158,6 +159,7 @@ public class AuthenticationManagementService {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         auth.setLanguage(language);
         setPendingUserAuthentication(auth);
+        logger.info("Authentication object was updated in HTTP session with language");
     }
 
     /**
@@ -167,6 +169,7 @@ public class AuthenticationManagementService {
         UserOperationAuthentication auth = getPendingUserAuthentication();
         auth.setAuthenticated(true);
         setPendingUserAuthentication(auth);
+        logger.info("Authentication object was updated in HTTP session with authenticated state");
     }
 
     /**

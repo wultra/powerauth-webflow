@@ -30,10 +30,10 @@ import java.util.List;
  */
 public class SmsAuthorizationRequest extends AuthStepRequest {
 
-    @Pattern(regexp = "^[0-9]{4,8}$", message = "login.authenticationFailed")
+    @Pattern(regexp = "^[0-9]{4,8}$", message = "smsAuthorization.failed")
     private String authCode;
 
-    @Pattern(regexp = "^.{4,128}$", message = "login.authenticationFailed")
+    @Pattern(regexp = "^$|^.{4,128}$", message = "smsAuthorization.failed")
     private String password;
 
     @NotNull(message = "error.invalidRequest")
