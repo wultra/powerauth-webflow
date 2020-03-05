@@ -40,6 +40,11 @@ public enum AuthInstrument {
     /**
      * Hardware token is used for step authentication / authorization.
      */
-    HW_TOKEN
+    HW_TOKEN,
+
+    /**
+     * TLS client certificate is used for authentication / authorization.
+     */
+    CLIENT_CERTIFICATE
 
 }

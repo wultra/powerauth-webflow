@@ -224,7 +224,7 @@ export default class Consent extends React.Component {
                                             }
                                             return (
                                                 <div className="row attribute" key={option.id}>
-                                                    <div className="col-xs-1 text-nowrap">
+                                                    <div className="col-xs-1 text-nowrap consent-checkbox-wrapper">
                                                         {(required) ? (
                                                             <span className={optionPrefixClassName}>*&nbsp;</span>
                                                         ) : (

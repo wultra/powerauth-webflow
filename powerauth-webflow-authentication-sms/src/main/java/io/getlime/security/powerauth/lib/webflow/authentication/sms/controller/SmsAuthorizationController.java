@@ -42,6 +42,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessio
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.CertificateVerificationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SmsAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
@@ -77,6 +79,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private final WebFlowServicesConfiguration configuration;
     private final AfsIntegrationService afsIntegrationService;
     private final HttpSession httpSession;
+    private final CertificateVerificationRepository certificateVerificationRepository;
 
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
     private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
@@ -87,13 +90,15 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @param configuration Web Flow configuration.
      * @param afsIntegrationService Anti-fraud system integration service.
      * @param httpSession HTTP session.
+     * @param certificateVerificationRepository Certificate verification repository.
      */
     @Autowired
-    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession) {
+    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession, CertificateVerificationRepository certificateVerificationRepository) {
         this.dataAdapterClient = dataAdapterClient;
         this.configuration = configuration;
         this.afsIntegrationService = afsIntegrationService;
         this.httpSession = httpSession;
+        this.certificateVerificationRepository = certificateVerificationRepository;
     }
 
     /**
@@ -187,7 +192,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             Integer remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
             boolean showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
             String errorMessage = smsAndPasswordResponse.getErrorMessage();
-            boolean userAccountBlocked = smsAndPasswordResponse.getAccountStatus() != AccountStatus.ACTIVE;
             UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(smsAndPasswordResponse.getAccountStatus());
 
             try {
@@ -343,7 +347,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             initResponse.setUsername(username);
         }
 
-        if (configuration.isAfsEnabled()) {
+        if (isCertificateUsedForAuthentication(operation.getOperationId())) {
+
+            // Currently AFS integration and client certificate authentication are exclusive
+            logger.debug("Disabling password verification due to client TLS certificate usage in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());
+            AuthStepOptions authStepOptions = new AuthStepOptions();
+            authStepOptions.setPasswordRequired(false);
+            authStepOptions.setSmsOtpRequired(true);
+            updateAuthStepOptionsInHttpSession(authStepOptions);
+            initResponse.setSmsOtpEnabled(true);
+            initResponse.setPasswordEnabled(false);
+
+        } else if (configuration.isAfsEnabled()) {
 
             AfsAction afsAction = determineAfsActionInit(authMethod, operation.getOperationName());
 
@@ -673,6 +688,16 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 afsAction = null;
         }
         return afsAction;
+    }
+
+    /**
+     * Whether client TLS certificate is used for authentication.
+     * @param operationId Operation ID.
+     * @return Whether client TLS certificate is used for authentication.
+     */
+    private boolean isCertificateUsedForAuthentication(String operationId) {
+        CertificateVerificationEntity.CertificateVerificationKey key = new CertificateVerificationEntity.CertificateVerificationKey(operationId, AuthMethod.APPROVAL_SCA);
+        return certificateVerificationRepository.findByCertificateVerificationKey(key).isPresent();
     }
 
 }
