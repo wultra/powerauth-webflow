@@ -114,8 +114,9 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             String operationId = operation.getOperationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
+            final String externalTransactionId = operation.getExternalTransactionId();
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
             List<ConsentOption> options = request.getOptions();
             ObjectResponse<ValidateConsentFormResponse> daResponse = dataAdapterClient.validateConsentForm(userId, organizationId, operationContext, LocaleContextHolder.getLocale().getLanguage(), options);
             ValidateConsentFormResponse validateResponse = daResponse.getResponseObject();
@@ -199,7 +200,8 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             String organizationId = operation.getOrganizationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            String externalTransactionId = operation.getExternalTransactionId();
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
             // Check whether consent form should be shown at all
             ObjectResponse<InitConsentFormResponse> formInitResponse = dataAdapterClient.initConsentForm(userId, organizationId, operationContext);
             if (!formInitResponse.getResponseObject().getShouldDisplayConsentForm()) {
