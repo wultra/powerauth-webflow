@@ -158,7 +158,7 @@ public class AfsIntegrationService {
                     String organizationId = operation.getOrganizationId();
                     FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
                     ApplicationContext applicationContext = operation.getApplicationContext();
-                    OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                    OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                     AfsType afsType = configuration.getAfsType();
                     String clientIpAddress = operationSessionService.getOperationToSessionMapping(operation.getOperationId()).getClientIp();
                     int stepIndex = deriveStepIndex(operation, afsAction);
