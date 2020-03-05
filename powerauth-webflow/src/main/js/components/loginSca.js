@@ -22,7 +22,8 @@ import {
     authenticate,
     cancel,
     organizationConfigurationError,
-    selectOrganization
+    selectOrganization,
+    checkClientCertificate
 } from '../actions/loginScaActions'
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
@@ -47,6 +48,7 @@ export default class LoginSca extends React.Component {
         this.handleLogin = this.handleLogin.bind(this);
         this.handleCancel = this.handleCancel.bind(this);
         this.organizationChanged = this.organizationChanged.bind(this);
+        this.verifyClientCertificate = this.verifyClientCertificate.bind(this);
     }
 
     componentWillMount() {
@@ -185,6 +187,17 @@ export default class LoginSca extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
+    verifyClientCertificate() {
+        const organizationId = this.props.context.chosenOrganizationId;
+        const certificateVerificationUrl = this.props.context.clientCertificateVerificationUrl;
+        const dispatch = this.props.dispatch;
+        const callbackOnSuccess = function() {
+            // Authentication is performed using client certificate
+            dispatch(authenticate(null, organizationId));
+        };
+        dispatch(checkClientCertificate(certificateVerificationUrl, callbackOnSuccess));
+    }
+
     banners(timeoutCheckActive) {
         return (
             <OperationTimeout timeoutCheckActive={timeoutCheckActive}/>
@@ -212,18 +225,20 @@ export default class LoginSca extends React.Component {
                                 <FormattedMessage
                                     id="authentication.attemptsRemaining"/> {this.props.context.remainingAttempts}
                             </div>
-                        ) : (
-                            undefined
-                        )}
+                        ) : undefined }
                     </FormGroup>
-                ) : (
-                    undefined
-                )
-                }
+                ) : undefined }
                 <FormGroup>
                     <FormControl autoComplete="new-password" ref={usernameField} type="text" maxLength={usernameMaxLength}
                                  placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
                 </FormGroup>
+                {this.props.context.clientCertificateAuthenticationEnabled ? (
+                    <FormGroup>
+                        <div onClick={this.verifyClientCertificate} className="client-certificate-active">
+                            <FormattedMessage id="clientCertificate.use"/>
+                        </div>
+                    </FormGroup>
+                ) : undefined }
                 <FormGroup>
                     <div className="row buttons">
                         <div className="col-xs-6">
