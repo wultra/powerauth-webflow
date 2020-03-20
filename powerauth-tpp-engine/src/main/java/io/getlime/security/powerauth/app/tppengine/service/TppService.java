@@ -142,6 +142,7 @@ public class TppService {
      * Create a new application with provided information.
      * @param request Request with information about a newly created app.
      * @return Information about a newly created app, including the OAuth 2.0 credentials (including "client secret").
+     * @throws UnableToCreateAppException When attempting to create application with a name that already exists.
      */
     @Transactional
     public TppAppDetailResponse createApp(CreateTppAppRequest request) throws UnableToCreateAppException {
@@ -215,6 +216,7 @@ public class TppService {
      * @return Information about the updated app.
      * @throws TppNotFoundException In case TPP is not found.
      * @throws TppAppNotFoundException In case TPP app is not found.
+     * @throws UnableToCreateAppException When attempting to create application with a name that already exists.
      */
     @Transactional
     public TppAppDetailResponse updateApp(String clientId, CreateTppAppRequest request) throws TppNotFoundException, TppAppNotFoundException, UnableToCreateAppException {
