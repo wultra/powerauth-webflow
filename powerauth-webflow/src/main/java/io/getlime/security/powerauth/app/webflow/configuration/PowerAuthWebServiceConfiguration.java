@@ -1,8 +1,11 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
+import kong.unirest.ObjectMapper;
+import kong.unirest.Unirest;
 import org.apache.wss4j.dom.WSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,6 +16,8 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
 
+import javax.annotation.PostConstruct;
+
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
  *
@@ -20,10 +25,12 @@ import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
  */
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
-@SuppressWarnings("deprecation")
 public class PowerAuthWebServiceConfiguration {
 
     private SSLConfigurationService sslConfigurationService;
+
+    @Autowired
+    private com.fasterxml.jackson.databind.ObjectMapper mapper;
 
     @Value("${powerauth.service.url}")
     private String powerAuthServiceUrl;
@@ -41,6 +48,18 @@ public class PowerAuthWebServiceConfiguration {
     private boolean acceptInvalidSslCertificate;
 
     /**
+     * Configuration of the total Unirest parallel connections.
+     */
+    @Value("${powerauth.unirest.concurrency.total:500}")
+    private int unirestConcurrencyTotal;
+
+    /**
+     * Configuration of the per-route Unirest parallel connections.
+     */
+    @Value("${powerauth.unirest.concurrency.perRoute:50}")
+    private int unirestConcurrencyPerRoute;
+
+    /**
      * Configuration constructor.
      * @param sslConfigurationService SSL configuration service.
      */
@@ -49,9 +68,33 @@ public class PowerAuthWebServiceConfiguration {
         this.sslConfigurationService = sslConfigurationService;
     }
 
+    @PostConstruct
+    public void postConstruct() {
+        // Configure Unirest properties
+        Unirest.config()
+                .concurrency(unirestConcurrencyTotal, unirestConcurrencyPerRoute)
+                .setObjectMapper(new ObjectMapper() {
+
+            public String writeValue(Object value) {
+                try {
+                    return mapper.writeValueAsString(value);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            public <T> T readValue(String value, Class<T> valueType) {
+                try {
+                    return mapper.readValue(value, valueType);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+    }
+
     /**
      * Initialize security interceptor.
-     * Must use DEPRECATED class here, wss4j2 is not yet production ready
      * @return Security interceptor.
      */
     @Bean
@@ -103,8 +146,7 @@ public class PowerAuthWebServiceConfiguration {
      */
     @Bean
     public PushServerClient pushServerClient() {
-        PushServerClient client = new PushServerClient();
-        client.setServiceBaseUrl(powerAuthPushServiceUrl);
+        PushServerClient client = new PushServerClient(powerAuthPushServiceUrl);
         // whether invalid SSL certificates should be accepted
         if (acceptInvalidSslCertificate) {
             sslConfigurationService.trustAllCertificates();
