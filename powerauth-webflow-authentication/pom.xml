@@ -64,12 +64,12 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-client-spring</artifactId>
-            <version>0.24.0-SNAPSHOT</version>
+            <version>0.23.2</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>0.24.0-SNAPSHOT</version>
+            <version>0.23.0</version>
         </dependency>
 
         <!-- Library for formatting monetary amounts -->
