@@ -98,10 +98,10 @@ public class TppAppDetailEntity implements Serializable {
     @Embeddable
     public static class TppAppDetailKey implements Serializable {
 
-        @Column(name = "app_client_id")
+        @Column(name = "app_client_id", nullable = false)
         private String appClientId;
 
-        @Column(name = "tpp_id")
+        @Column(name = "tpp_id", nullable = false)
         private Long tppId;
 
         public TppAppDetailKey() {

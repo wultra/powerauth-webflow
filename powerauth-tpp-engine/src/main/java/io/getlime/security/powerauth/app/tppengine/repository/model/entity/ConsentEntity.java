@@ -32,7 +32,7 @@ import java.io.Serializable;
 public class ConsentEntity implements Serializable {
 
     @Id
-    @Column(name = "consent_id")
+    @Column(name = "consent_id", nullable = false)
     private String id;
 
     @Column(name = "consent_name")

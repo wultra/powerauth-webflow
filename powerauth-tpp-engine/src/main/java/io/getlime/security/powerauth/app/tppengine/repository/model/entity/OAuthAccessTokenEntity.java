@@ -27,7 +27,7 @@ import java.io.Serializable;
 public class OAuthAccessTokenEntity implements Serializable {
 
     @Id
-    @Column(name = "token_id")
+    @Column(name = "token_id", nullable = false)
     private String tokenId;
 
     @Lob

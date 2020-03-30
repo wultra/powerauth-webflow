@@ -30,7 +30,7 @@ import java.io.Serializable;
 public class OAuthClientDetailsEntity implements Serializable {
 
     @Id
-    @Column(name = "client_id")
+    @Column(name = "client_id", nullable = false)
     private String clientId;
 
     @Column(name = "resource_ids")

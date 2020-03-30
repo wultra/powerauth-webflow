@@ -32,7 +32,7 @@ public class UserConsentEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "tpp_user_consent", sequenceName = "tpp_user_consent_seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_user_consent")
-    @Column(name = "id")
+    @Column(name = "id", nullable = false)
     private Long id;
 
     @Column(name = "user_id")

@@ -32,7 +32,7 @@ public class TppEntity implements Serializable {
     @Id
     @SequenceGenerator(name = "tpp_detail", sequenceName = "tpp_detail_seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_detail")
-    @Column(name = "tpp_id")
+    @Column(name = "tpp_id", nullable = false)
     private Long tppId;
 
     @Column(name = "tpp_name")
