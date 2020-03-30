@@ -32,6 +32,8 @@ import java.util.Date;
 @Table(name = "tpp_user_consent_history")
 public class UserConsentHistoryEntity implements Serializable {
 
+    private static final long serialVersionUID = 6697728608700209704L;
+
     @Id
     @SequenceGenerator(name = "tpp_user_consent_history", sequenceName = "tpp_user_consent_history_seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_user_consent_history")

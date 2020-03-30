@@ -29,6 +29,8 @@ import java.io.Serializable;
 @Table(name = "oauth_client_details")
 public class OAuthClientDetailsEntity implements Serializable {
 
+    private static final long serialVersionUID = 2872642226881979597L;
+
     @Id
     @Column(name = "client_id", nullable = false)
     private String clientId;
