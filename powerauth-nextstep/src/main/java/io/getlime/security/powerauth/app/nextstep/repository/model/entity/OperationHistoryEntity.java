@@ -208,6 +208,8 @@ public class OperationHistoryEntity implements Serializable {
     @Embeddable
     public static class OperationHistoryKey implements Serializable {
 
+        private static final long serialVersionUID = 7125401949386229372L;
+
         @Column(name = "operation_id")
         private String operationId;
 

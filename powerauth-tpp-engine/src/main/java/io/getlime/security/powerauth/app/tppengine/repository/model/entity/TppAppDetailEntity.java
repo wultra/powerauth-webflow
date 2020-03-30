@@ -32,6 +32,8 @@ import java.util.Objects;
 @Table(name = "tpp_app_detail")
 public class TppAppDetailEntity implements Serializable {
 
+    private static final long serialVersionUID = 4100688209055833070L;
+
     @EmbeddedId
     private TppAppDetailKey primaryKey;
 
@@ -97,6 +99,8 @@ public class TppAppDetailEntity implements Serializable {
 
     @Embeddable
     public static class TppAppDetailKey implements Serializable {
+
+        private static final long serialVersionUID = -527239721500406289L;
 
         @Column(name = "app_client_id", nullable = false)
         private String appClientId;
