@@ -26,6 +26,8 @@ import java.io.Serializable;
 @Table(name = "oauth_access_token")
 public class OAuthAccessTokenEntity implements Serializable {
 
+    private static final long serialVersionUID = 2673062323484827793L;
+
     @Id
     @Column(name = "token_id", nullable = false)
     private String tokenId;

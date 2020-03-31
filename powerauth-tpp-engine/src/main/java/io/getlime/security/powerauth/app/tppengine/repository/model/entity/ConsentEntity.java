@@ -31,6 +31,8 @@ import java.io.Serializable;
 @Table(name = "tpp_consent")
 public class ConsentEntity implements Serializable {
 
+    private static final long serialVersionUID = -3031091688188605604L;
+
     @Id
     @Column(name = "consent_id", nullable = false)
     private String id;
