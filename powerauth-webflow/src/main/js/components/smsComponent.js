@@ -38,7 +38,10 @@ export default class SmsComponent extends React.Component {
     }
 
     handleAuthCodeChange(event) {
-        this.setState({authCode: event.target.value});
+        let targetValue = event.target.value;
+        // Keep only numeric characters
+        targetValue = targetValue.replace(/\D/g,'');
+        this.setState({authCode: targetValue});
     }
 
     handlePasswordChange(event) {
@@ -130,24 +133,20 @@ export default class SmsComponent extends React.Component {
                          ) : (
                              undefined
                          )}
-                        <div className="buttons">
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                        {(this.props.username && this.props.passwordEnabled) ? (
-                                            <FormattedMessage id="loginSca.confirm"/>
-                                        ) : (
-                                            <FormattedMessage id="operation.confirm"/>
-                                        )}
-                                    </Button>
-                                </div>
+                        <div className="row buttons">
+                            <div className="col-xs-6">
+                                <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="operation.cancel"/>
+                                </a>
                             </div>
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                        <FormattedMessage id="operation.cancel"/>
-                                    </a>
-                                </div>
+                            <div className="col-xs-6">
+                                <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                    {(this.props.username && this.props.passwordEnabled) ? (
+                                        <FormattedMessage id="loginSca.confirm"/>
+                                    ) : (
+                                        <FormattedMessage id="operation.confirm"/>
+                                    )}
+                                </Button>
                             </div>
                         </div>
                     </div>

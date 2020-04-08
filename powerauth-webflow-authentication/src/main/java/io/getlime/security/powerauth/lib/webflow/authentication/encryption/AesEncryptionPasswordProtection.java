@@ -16,10 +16,9 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.encryption;
 
 import com.google.common.io.BaseEncoding;
-import io.getlime.security.powerauth.crypto.lib.config.PowerAuthConfiguration;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
-import io.getlime.security.powerauth.provider.CryptoProviderUtil;
+import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +36,7 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
 
     private final AESEncryptionUtils aes = new AESEncryptionUtils();
     private KeyGenerator keyGenerator = new KeyGenerator();
+    private KeyConvertor keyConvertor = new KeyConvertor();
 
     private String cipherTransformation;
     private String secretKeyBase64;
@@ -53,7 +53,7 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
 
     @Override
     public String protect(String password) {
-        CryptoProviderUtil keyConvertor = PowerAuthConfiguration.INSTANCE.getKeyConvertor();
+
         // Password is encrypted using AES with random IV and with configured mode and padding
         try {
             if (cipherTransformation == null || cipherTransformation.isEmpty()) {

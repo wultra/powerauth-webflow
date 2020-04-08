@@ -5,7 +5,7 @@ body {
 }
 
 .background {
-    /* background: url('../images/background.png') 0 0 repeat-x;*/
+    /* background: url('../images/background.jpg') 0 0 repeat-x;*/
     position: fixed;
     top: 0;
     left: 0;
@@ -348,6 +348,10 @@ a:hover, a:active, a:focus {
     font-size: 12pt;
 }
 
+.consent-checkbox-wrapper {
+    z-index: 1;
+}
+
 .consent-checkbox {
     vertical-align: top;
     margin-top: 6px !important;
@@ -365,10 +369,6 @@ a:hover, a:active, a:focus {
     display: unset;
     font-size: 12pt;
     font-weight: normal;
-}
-
-.consent-nopadding {
-    padding: 0;
 }
 
 .consent-error {
@@ -392,4 +392,12 @@ a:hover, a:active, a:focus {
 
 .sms-resend-disabled {
     color: #777777;
+}
+
+.client-certificate-active {
+    color: #7FC000;
+}
+
+.client-certificate-active:hover {
+    cursor: pointer;
 }

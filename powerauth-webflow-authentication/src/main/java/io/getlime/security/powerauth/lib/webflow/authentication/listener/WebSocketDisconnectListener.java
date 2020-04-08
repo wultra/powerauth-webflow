@@ -15,34 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.listener;
 
-import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
-
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Listener for Web Socket disconnect events.
@@ -52,29 +32,18 @@ import java.util.List;
 @Component
 public class WebSocketDisconnectListener implements ApplicationListener<SessionDisconnectEvent> {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketDisconnectListener.class);
-
     private final OperationSessionService operationSessionService;
-    private final AuthMethodResolutionService authMethodResolutionService;
-    private final AfsIntegrationService afsIntegrationService;
-    private final NextStepClient nextStepClient;
-    private final DataAdapterClient dataAdapterClient;
+    private final OperationCancellationService operationCancellationService;
 
     /**
      * Constructor for Web Socket disconnect listener.
      * @param operationSessionService Operation to session mapping service.
-     * @param authMethodResolutionService Authentication method resolution service.
-     * @param afsIntegrationService Anti-fraud system integration service.
-     * @param nextStepClient Next Step client.
-     * @param dataAdapterClient Data Adapter client.
+     * @param operationCancellationService Service used for cancelling operations.
      */
     @Autowired
-    public WebSocketDisconnectListener(OperationSessionService operationSessionService, AuthMethodResolutionService authMethodResolutionService, AfsIntegrationService afsIntegrationService, NextStepClient nextStepClient, DataAdapterClient dataAdapterClient) {
+    public WebSocketDisconnectListener(OperationSessionService operationSessionService, OperationCancellationService operationCancellationService) {
         this.operationSessionService = operationSessionService;
-        this.authMethodResolutionService = authMethodResolutionService;
-        this.afsIntegrationService = afsIntegrationService;
-        this.nextStepClient = nextStepClient;
-        this.dataAdapterClient = dataAdapterClient;
+        this.operationCancellationService = operationCancellationService;
     }
 
     /**
@@ -89,34 +58,7 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
             // Operation does not exist, nothing to do
             return;
         }
-        try {
-            ObjectResponse<GetOperationDetailResponse> operationDetailResponse = nextStepClient.getOperationDetail(operationId);
-            GetOperationDetailResponse operationDetail = operationDetailResponse.getResponseObject();
-            if (operationDetail.getResult() == AuthResult.CONTINUE) {
-                // Update operation result in operation to session mapping
-                operationSessionService.updateOperationResult(operationId, AuthResult.FAILED);
-                // Cancel operation due to interrupt by close browser event
-                List<OperationHistory> operationHistory = operationDetail.getHistory();
-                if (!operationHistory.isEmpty()) {
-                    // Check whether authentication method is overridden, in this case use overridden authentication method
-                    AuthMethod authMethod = authMethodResolutionService.resolveAuthMethodOverride(operationDetail);
-                    if (authMethod == null) {
-                        // Authentication method is not overridden, use last known authentication method
-                        authMethod = operationHistory.get(operationHistory.size() - 1).getAuthMethod();
-                    }
-                    nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null, operationDetail.getApplicationContext());
-                    // Notify Data Adapter about cancellation
-                    FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-                    OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, operationDetail.getApplicationContext());
-                    dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
-                    // notify AFS about logout
-                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.INTERRUPTED);
-                } else {
-                    logger.warn("Operation history is not available for operation ID {}", operationId);
-                }
-            }
-        } catch (NextStepServiceException | DataAdapterClientErrorException ex) {
-            logger.error(ex.getMessage(), ex);
-        }
+        // Cancel operation due to interrupted operation
+        operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.INTERRUPTED_OPERATION);
     }
 }

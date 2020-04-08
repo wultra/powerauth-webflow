@@ -16,20 +16,16 @@
 
 package io.getlime.security.powerauth.app.nextstep.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
+import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.service.MobileTokenConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationPersistenceService;
 import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -47,10 +43,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller class related to Next Step operations.
@@ -66,8 +60,7 @@ public class OperationController {
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final OperationConverter operationConverter = new OperationConverter();
 
     /**
      * Controller constructor.
@@ -199,23 +192,8 @@ public class OperationController {
 
         GetOperationDetailRequest requestObject = request.getRequestObject();
 
-        GetOperationDetailResponse response = new GetOperationDetailResponse();
-
         OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId());
-        response.setOperationId(operation.getOperationId());
-        response.setOperationName(operation.getOperationName());
-        response.setUserId(operation.getUserId());
-        response.setOrganizationId(operation.getOrganizationId());
-        response.setAccountStatus(operation.getUserAccountStatus());
-        response.setExternalTransactionId(operation.getExternalTransactionId());
-        response.setOperationData(operation.getOperationData());
-        if (operation.getResult() != null) {
-            response.setResult(operation.getResult());
-        }
-        assignFormData(response, operation);
-        assignApplicationContext(response, operation);
-        assignOperationHistory(response, operation);
-        assignAfsActions(response, operation);
+        GetOperationDetailResponse response = operationConverter.fromEntity(operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -288,27 +266,36 @@ public class OperationController {
             throw new IllegalArgumentException("Invalid query for pending operations, user ID: " + requestObject.getUserId());
         }
         for (OperationEntity operation : operations) {
-            GetOperationDetailResponse response = new GetOperationDetailResponse();
-            response.setOperationId(operation.getOperationId());
-            response.setOperationName(operation.getOperationName());
-            response.setUserId(operation.getUserId());
-            response.setOrganizationId(operation.getOrganizationId());
-            response.setAccountStatus(operation.getUserAccountStatus());
-            response.setExternalTransactionId(operation.getExternalTransactionId());
-            response.setOperationData(operation.getOperationData());
-            if (operation.getResult() != null) {
-                response.setResult(operation.getResult());
-            }
-            assignFormData(response, operation);
-            assignApplicationContext(response, operation);
-            assignOperationHistory(response, operation);
-            response.setTimestampCreated(operation.getTimestampCreated());
-            response.setTimestampExpires(operation.getTimestampExpires());
+            GetOperationDetailResponse response = operationConverter.fromEntity(operation);
             responseList.add(response);
         }
 
         logger.debug("The getPendingOperations request succeeded, operation list size: {}", responseList.size());
         return new ObjectResponse<>(responseList);
+    }
+
+    /**
+     * Lookup operations for given external transaction ID.
+     *
+     * @param request Lookup operations by external transaction ID request.
+     * @return Response for operations lookup by external transaction ID.
+     */
+    @RequestMapping(value = "/operation/lookup/external", method = RequestMethod.POST)
+    public @ResponseBody ObjectResponse<LookupOperationsByExternalIdResponse> lookupOperationsByExternalId(@RequestBody ObjectRequest<LookupOperationsByExternalIdRequest> request) {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received lookupOperationsByExternalId request, external transaction ID: {}", request.getRequestObject().getExternalTransactionId());
+
+        LookupOperationsByExternalIdRequest requestObject = request.getRequestObject();
+
+        LookupOperationsByExternalIdResponse response = new LookupOperationsByExternalIdResponse();
+        List<OperationEntity> operations = operationPersistenceService.findByExternalTransactionId(requestObject.getExternalTransactionId());
+        for (OperationEntity operation : operations) {
+            GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
+            response.addOperation(operationDetail);
+        }
+
+        logger.debug("The lookupOperationsByExternalId request succeeded, operation list size: {}", response.getOperations().size());
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -463,113 +450,4 @@ public class OperationController {
         return new Response();
     }
 
-    /**
-     * In case operation entity has serialized form data, attempt to deserialize the
-     * object and assign it to the response with operation detail.
-     * @param response Response to be enriched by operation detail.
-     * @param operation Database entity representing operation.
-     */
-    private void assignFormData(GetOperationDetailResponse response, OperationEntity operation) {
-        if (operation.getOperationFormData() != null) {
-            //TODO: This needs to be written better, see issue #39.
-            OperationFormData formData = null;
-            try {
-                formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
-            } catch (IOException ex) {
-                logger.error("Error while deserializing operation display formData", ex);
-            }
-            response.setFormData(formData);
-        }
-    }
-
-    /**
-     * In case operation entity has an application context, assign it to the operation.
-     * The application extras are deserialized from JSON.
-     * @param response Response to be enriched by application context.
-     * @param operation Database entity representing operation.
-     */
-    private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
-        if (operation.getApplicationId() != null) {
-            ApplicationContext applicationContext = new ApplicationContext();
-            applicationContext.setId(operation.getApplicationId());
-            applicationContext.setName(operation.getApplicationName());
-            applicationContext.setDescription(operation.getApplicationDescription());
-            if (operation.getApplicationOriginalScopes() != null) {
-                try {
-                    JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
-                    List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
-                    applicationContext.getOriginalScopes().addAll(originalScopes);
-                } catch (IOException ex) {
-                    logger.error("Error while deserializing application scopes.", ex);
-                }
-            }
-            if (operation.getApplicationExtras() != null) {
-                try {
-                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
-                    Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
-                    applicationContext.getExtras().putAll(extras);
-                } catch (IOException ex) {
-                    logger.error("Error while deserializing application extras.", ex);
-                }
-            }
-            response.setApplicationContext(applicationContext);
-        }
-    }
-
-    /**
-     * Assign operation history to operation.
-     * @param response Response to be enriched by operation history.
-     * @param operation Database entity representing operation.
-     */
-    private void assignOperationHistory(GetOperationDetailResponse response, OperationEntity operation) {
-        // add operation history
-        for (OperationHistoryEntity history: operation.getOperationHistory()) {
-            OperationHistory h = new OperationHistory();
-            h.setAuthMethod(history.getRequestAuthMethod());
-            h.setRequestAuthStepResult(history.getRequestAuthStepResult());
-            h.setAuthResult(history.getResponseResult());
-            response.getHistory().add(h);
-        }
-        // set chosen authentication method
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
-        if (currentHistory != null) {
-            response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
-        }
-    }
-
-
-    /**
-     * Assign AFS actions to operation.
-     * @param response Response to be enriched by AFS actions.
-     * @param operation Database entity representing operation.
-     */
-    private void assignAfsActions(GetOperationDetailResponse response, OperationEntity operation) {
-        // add AFS actions
-        for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
-            AfsActionDetail action = new AfsActionDetail();
-            action.setAction(afsAction.getAfsAction());
-            action.setStepIndex(afsAction.getStepIndex());
-            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
-            action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
-            action.setAfsLabel(afsAction.getAfsLabel());
-            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
-            response.getAfsActions().add(action);
-        }
-    }
-
-    /**
-     * Convert extras String to map.
-     * @param extras String with extras.
-     * @return Extras map.
-     */
-    private Map<String, Object> convertExtrasToMap(String extras) {
-        try {
-            TypeReference<Map<String, Object>> typeRef
-                    = new TypeReference<Map<String, Object>>() {};
-            return objectMapper.readValue(extras, typeRef);
-        } catch (IOException e) {
-            logger.error("Error occurred while deserializing data", e);
-            return null;
-        }
-    }
 }

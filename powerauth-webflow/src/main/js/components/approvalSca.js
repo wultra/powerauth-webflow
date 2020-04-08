@@ -16,13 +16,14 @@
 import React from 'react';
 import {connect} from 'react-redux';
 // Actions
-import {init, confirm, cancel} from "../actions/approvalScaActions";
+import {init, getOperationData, confirm, cancel} from "../actions/approvalScaActions";
 // Components
 import Spinner from 'react-tiny-spin';
 import {Button, Panel} from "react-bootstrap";
 import OperationTimeout from "./operationTimeout";
 import OperationDetail from "./operationDetail";
 import {FormattedMessage} from "react-intl";
+import {checkClientCertificate} from "../actions/loginScaActions";
 
 /**
  * SCA approval component.
@@ -41,12 +42,28 @@ export default class ApprovalSca extends React.Component {
     }
 
     componentWillMount() {
-        this.props.dispatch(init());
+        const dispatch = this.props.dispatch;
+        dispatch(init(function(initSucceeded) {
+            if (initSucceeded) {
+                // continue only when init() succeeds
+                dispatch(getOperationData());
+            }
+        }));
     }
 
     handleSubmit(event) {
         event.preventDefault();
-        this.props.dispatch(confirm());
+        const dispatch = this.props.dispatch;
+        if (this.props.context.clientCertificateUsed) {
+            const certificateVerificationUrl = this.props.context.clientCertificateVerificationUrl;
+            const callbackOnSuccess = function() {
+                // Authentication is performed using client certificate
+                dispatch(confirm());
+            };
+            dispatch(checkClientCertificate(certificateVerificationUrl, callbackOnSuccess));
+        } else {
+            dispatch(confirm());
+        }
     }
 
     handleCancel(event) {
@@ -60,21 +77,24 @@ export default class ApprovalSca extends React.Component {
                 <div id="operation">
                     <form onSubmit={this.handleSubmit}>
                         <Panel>
-                            <OperationTimeout/>
+                            <OperationTimeout timeoutCheckActive="true"/>
                             <OperationDetail/>
-                            <div className="auth-actions">
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                            <FormattedMessage id="operation.confirm"/>
-                                        </Button>
-                                    </div>
+                            {(this.props.context.clientCertificateUsed) ? (
+                                <div>
+                                    <FormattedMessage id="clientCertificate.approval"/>
                                 </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
+                            ): undefined}
+                            <div className="auth-actions">
+                                <div className="row buttons">
+                                    <div className="col-xs-6">
                                         <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
                                             <FormattedMessage id="operation.cancel"/>
                                         </a>
+                                    </div>
+                                    <div className="col-xs-6">
+                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                            <FormattedMessage id="operation.confirm"/>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>

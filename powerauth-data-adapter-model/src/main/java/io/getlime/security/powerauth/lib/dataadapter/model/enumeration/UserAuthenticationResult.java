@@ -21,7 +21,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * <ul>
  * <li>SUCCEEDED - user ID and password have been verified and verification succeeded.</li>
  * <li>FAILED - user ID and password have been verified and verification failed.</li>
- * <li>SKIPPED - user ID and password verification has not been performed at all.</li>
+ * <li>SKIPPED - verification of user ID and password has not been performed at all.</li>
  * </ul>
  *
  * @author Roman Strobl, roman.strobl@wultra.com

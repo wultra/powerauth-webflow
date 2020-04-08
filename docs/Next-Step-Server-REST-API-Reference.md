@@ -20,6 +20,7 @@ Following topics are covered in this chapter:
   - [Update an operation](#update-an-operation)
   - [Operation detail](#operation-detail)
   - [List pending operations](#list-pending-operations)
+  - [Lookup operations by external transaction ID](#lookup-operations-by-external-transaction-id)
   - [Update operation form data](#update-operation-formdata)
   - [Update application context for an operation](#update-application-context-for-an-operation)  
   - [Update user for an operation](#update-user-for-an-operation)
@@ -1614,6 +1615,136 @@ Lists pending operation for given user and authentication method.
       "expired": false
     }
   ]
+}
+```
+
+### Lookup operations by external transaction ID
+
+Find all operations with matching external transaction ID.
+
+<table>
+    <tr>
+        <td>Method</td>
+        <td><code>POST</code></td>
+    </tr>
+    <tr>
+        <td>Resource URI</td>
+        <td><code>/operation/lookup/external</code></td>
+    </tr>
+</table>
+
+#### Request
+
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "requestObject" : {
+    "externalTransactionId" : "12345678"
+  }
+}
+```
+
+#### Response
+- Status Code: `200`
+- Headers:
+    - `Content-Type: application/json`
+
+```json
+{
+  "status": "OK",
+  "responseObject": {
+    "operations": [
+      {
+        "operationId": "e6d3a5e7-e291-42f7-bd46-49d9fbac4282",
+        "operationName": "authorize_payment",
+        "userId": null,
+        "organizationId": "RETAIL",
+        "accountStatus": "ACTIVE",
+        "externalTransactionId": "12345678",
+        "result": "CONTINUE",
+        "timestampCreated": "2020-01-28T15:58:11+0000",
+        "timestampExpires": "2020-01-28T16:03:11+0000",
+        "operationData": "A1*A100CZK*Q238400856/0300**D20170629*NUtility Bill Payment - 05/2017",
+        "steps": [],
+        "history": [
+          {
+            "authMethod": "INIT",
+            "authResult": "CONTINUE",
+            "requestAuthStepResult": "CONFIRMED"
+          }
+        ],
+        "afsActions": [],
+        "formData": {
+          "title": {
+            "id": "operation.title",
+            "message": null
+          },
+          "greeting": {
+            "id": "operation.greeting",
+            "message": null
+          },
+          "summary": {
+            "id": "operation.summary",
+            "message": null
+          },
+          "config": [],
+          "banners": [],
+          "parameters": [
+            {
+              "type": "AMOUNT",
+              "id": "operation.amount",
+              "label": null,
+              "valueFormatType": "AMOUNT",
+              "formattedValues": {},
+              "amount": 100,
+              "currency": "CZK",
+              "currencyId": "operation.currency"
+            },
+            {
+              "type": "KEY_VALUE",
+              "id": "operation.account",
+              "label": null,
+              "valueFormatType": "ACCOUNT",
+              "formattedValues": {},
+              "value": "238400856/0300"
+            },
+            {
+              "type": "KEY_VALUE",
+              "id": "operation.dueDate",
+              "label": null,
+              "valueFormatType": "DATE",
+              "formattedValues": {},
+              "value": "2017-06-29"
+            },
+            {
+              "type": "NOTE",
+              "id": "operation.note",
+              "label": null,
+              "valueFormatType": "TEXT",
+              "formattedValues": {},
+              "note": "Utility Bill Payment - 05/2017"
+            }
+          ],
+          "dynamicDataLoaded": false,
+          "userInput": {}
+        },
+        "chosenAuthMethod": null,
+        "remainingAttempts": null,
+        "applicationContext": {
+          "id": "democlient",
+          "name": "Demo application",
+          "description": "Web Flow demo application",
+          "originalScopes": ["pisp"],
+          "extras": {
+            "applicationOwner": "Wultra"
+          }
+        },
+        "expired": false
+      }
+    ]
+  }
 }
 ```
 
