@@ -4,7 +4,7 @@
 
 Following database changes were introduced in version `0.24.0`:
  
-- Added `client_certificate_used`, `client_certificate_cn`, `client_certificate_sn` columns to table `ns_operation`
+- Added table `wf_certificate_verification` for storing information about certificate verification.
 - Added index on table `ns_operation` for pending operations
   
 DDL update script for Oracle:
