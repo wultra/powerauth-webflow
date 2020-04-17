@@ -53,6 +53,7 @@ public class AesEncryptionPasswordProtection implements PasswordProtection {
 
     @Override
     public String protect(String password) {
+
         // Password is encrypted using AES with random IV and with configured mode and padding
         try {
             if (cipherTransformation == null || cipherTransformation.isEmpty()) {
