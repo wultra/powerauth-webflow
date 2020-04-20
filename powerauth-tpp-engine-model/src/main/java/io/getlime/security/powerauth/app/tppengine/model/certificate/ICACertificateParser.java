@@ -25,6 +25,8 @@ import sun.security.x509.AVA;
 import sun.security.x509.X500Name;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -54,6 +56,20 @@ public class ICACertificateParser implements ICertificateParser {
      * @throws CertificateException In case certificate cannot be parsed (or in rare case X.509 is not supported).
      */
     public CertInfo parse(String certificatePem) throws CertificateException {
+
+        // Check for null certificate value
+        if (certificatePem == null) {
+            throw new CertificateException("Certificate in PEM format not found.");
+        }
+
+        // Handle the URL encoded certificates
+        if (certificatePem.startsWith("-----BEGIN%20CERTIFICATE-----")) { // certificate is URL encoded by nginx.
+            try {
+                certificatePem = URLDecoder.decode(certificatePem, StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                throw new CertificateException("Unable to extract certificate in PEM format (nginx).");
+            }
+        }
 
         // Replace spaces in Apache forwarded certificate by newlines correctly
         certificatePem = certificatePem
