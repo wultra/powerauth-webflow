@@ -60,8 +60,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Application Service Configuration
@@ -157,8 +156,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Operation expiration time in seconds
@@ -201,8 +199,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # SMS OTP expiration time in seconds
