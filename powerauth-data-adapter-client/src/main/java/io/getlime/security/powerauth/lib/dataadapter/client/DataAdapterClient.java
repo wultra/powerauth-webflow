@@ -183,6 +183,31 @@ public class DataAdapterClient {
     }
 
     /**
+     * Initialize an authentication method.
+     *
+     * @param userId User ID.
+     * @param organizationId Organization ID.
+     * @param authMethod Authentication method.
+     * @param operationContext Operation context.
+     * @return Response with user details.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<InitAuthMethodResponse> initAuthMethod(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
+        try {
+            // Exchange initialization request with data adapter.
+            InitAuthMethodRequest request = new InitAuthMethodRequest(userId, organizationId, authMethod, operationContext);
+            HttpEntity<ObjectRequest<InitAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<InitAuthMethodResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/method/init", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<InitAuthMethodResponse>>() {
+            });
+            return new ObjectResponse<>(response.getBody().getResponseObject());
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
      * Create authorization SMS message with OTP authorization code.
      *
      * @param userId           User ID.
