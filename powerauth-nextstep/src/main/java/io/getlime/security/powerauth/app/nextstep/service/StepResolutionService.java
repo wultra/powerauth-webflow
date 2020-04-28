@@ -33,10 +33,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationR
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
-import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,7 +113,8 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = filterStepDefinitions(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
         response.getSteps().addAll(filterAuthSteps(stepDefinitions, null, request.getOperationName()));
         response.setTimestampCreated(new Date());
-        response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         response.setFormData(request.getFormData());
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
@@ -156,7 +157,8 @@ public class StepResolutionService {
             response.setResultDescription("operation.timeout");
             return response;
         }
-        response.setTimestampExpires(new DateTime().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime()).toDate());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         AuthStepResult authStepResult = request.getAuthStepResult();
         if (isAuthMethodFailed(operation, request.getAuthMethod(), authStepResult)) {
             // check whether the authentication method has already failed completely, in case it has failed, update the authStepResult
