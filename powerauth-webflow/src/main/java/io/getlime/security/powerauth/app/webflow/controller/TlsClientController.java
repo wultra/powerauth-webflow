@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.app.webflow.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -30,7 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.security.auth.x500.X500Principal;
 import javax.servlet.http.HttpServletRequest;
@@ -39,7 +40,6 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.List;
 
 /**
  * Controller which verifies TLS client certificate.
@@ -93,6 +93,9 @@ public class TlsClientController {
 
         // Extract operation ID
         UserOperationAuthentication authentication = authenticationManagementService.getPendingUserAuthentication();
+        if (authentication == null) {
+            throw new InsufficientAuthenticationException("Missing user authentication object");
+        }
         String operationId = authentication.getOperationId();
         if (operationId == null) {
             throw new InsufficientAuthenticationException("Missing operation ID");
