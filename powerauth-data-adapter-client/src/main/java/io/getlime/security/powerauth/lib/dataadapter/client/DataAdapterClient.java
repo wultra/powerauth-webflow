@@ -213,15 +213,16 @@ public class DataAdapterClient {
      * @param userId           User ID.
      * @param organizationId   Organization ID.
      * @param accountStatus    User account status.
+     * @param authMethod       Authentication method.
      * @param operationContext Operation context.
      * @param lang             Language for i18n.
      * @param resend           Whether SMS is being resent.
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         try {
-            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, operationContext, resend);
+            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
             HttpEntity<ObjectRequest<CreateSmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<CreateSmsAuthorizationResponse>> response = restTemplate.exchange(
                     serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
@@ -321,13 +322,14 @@ public class DataAdapterClient {
      * @param userId User ID of the user for this request.
      * @param organizationId Organization ID for this request.
      * @param operationContext Operation context.
+     * @param authMethod Authentication method.
      * @return Decorated operation form data.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+    public ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
         try {
             // Exchange user details with data adapter.
-            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, operationContext);
+            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, authMethod, operationContext);
             HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
             });

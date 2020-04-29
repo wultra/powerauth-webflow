@@ -26,7 +26,10 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Operation
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -42,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -147,9 +149,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 validateOperationState(operation);
             }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
-            // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-            // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-            updateOperationForScaLogin(operation);
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
         } catch (NextStepServiceException e) {
@@ -242,7 +241,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse operation: responseObject) {
-                updateOperationForScaLogin(operation);
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }
@@ -668,28 +666,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         authSteps.removeAll(authStepsToRemove);
-    }
-
-    /**
-     * Update operation for SCA login in case of an approval operation.
-     * @param operation Operation to update.
-     */
-    private void updateOperationForScaLogin(GetOperationDetailResponse operation) {
-        // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-        // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA) {
-            // Make sure Mobile Token and Data Adapter recognize the operation name
-            operation.setOperationName("login");
-            // Update operation data for login
-            operation.setOperationData("A2");
-            // Update operation form data
-            OperationFormData formData = new OperationFormData();
-            formData.addTitle("login.title");
-            formData.addGreeting("login.greeting");
-            formData.addSummary("login.summary");
-            formData.setUserInput(operation.getFormData().getUserInput());
-            operation.setFormData(formData);
-        }
     }
 
     /**
