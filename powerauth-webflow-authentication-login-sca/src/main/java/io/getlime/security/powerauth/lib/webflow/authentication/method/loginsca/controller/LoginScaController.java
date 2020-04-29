@@ -218,7 +218,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
 
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
             ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
             InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
             switch (initResponse.getCertificateAuthenticationMode()) {
