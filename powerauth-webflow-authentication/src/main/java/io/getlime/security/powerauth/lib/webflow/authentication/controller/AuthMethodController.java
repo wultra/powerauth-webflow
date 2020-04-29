@@ -241,6 +241,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse operation: responseObject) {
+                // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+                // In case of an approval operation the data would be incorrect, because it is related to the payment.
+                // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+                if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+                    authMethodResolutionService.updateOperationForScaLogin(operation);
+                }
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }

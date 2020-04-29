@@ -152,14 +152,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             Map<String, GetOperationConfigDetailResponse> operationConfigs;
             try {
                 operationList = getOperationListForUser(userId, true);
-                // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
-                // In case of an approval operation the data would be incorrect, because it is related to the payment.
-                // This is a workaround until Web Flow supports multiple types of operation data within an operation.
-                for (GetOperationDetailResponse operation: operationList) {
-                    if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
-                        authMethodResolutionService.updateOperationForScaLogin(operation);
-                    }
-                }
                 operationConfigs = getOperationConfigs(operationList);
             } catch (AuthStepException e) {
                 logger.error("Could not retrieve operation list", e);
@@ -247,6 +239,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
+            // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+            // In case of an approval operation the data would be incorrect, because it is related to the payment.
+            // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+            if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+                authMethodResolutionService.updateOperationForScaLogin(operation);
+            }
 
             // Check if signature type is allowed
             if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
