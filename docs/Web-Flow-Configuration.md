@@ -42,9 +42,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -138,9 +138,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -181,9 +181,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
