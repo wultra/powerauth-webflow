@@ -18,12 +18,12 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 // Actions
 import {
-    init,
     authenticate,
     cancel,
+    checkClientCertificate,
+    init,
     organizationConfigurationError,
-    selectOrganization,
-    checkClientCertificate
+    selectOrganization
 } from '../actions/loginScaActions'
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
@@ -232,27 +232,65 @@ export default class LoginSca extends React.Component {
                     <FormControl autoComplete="new-password" ref={usernameField} type="text" maxLength={usernameMaxLength}
                                  placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
                 </FormGroup>
-                {this.props.context.clientCertificateAuthenticationEnabled ? (
+                {this.props.context.clientCertificateAuthenticationAvailable ? (
+                    <div>
+                        <FormGroup>
+                            <div className="row">
+                                <div className="col-xs-6">
+                                    &nbsp;
+                                </div>
+                                <div className="col-xs-6">
+                                    <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                        <FormattedMessage id="loginSca.confirmInit"/>
+                                    </Button>
+                                </div>
+                            </div>
+                        </FormGroup>
+                        <hr/>
+                        <FormGroup>
+                            <div className="row">
+                                <div className="col-xs-6 client-certificate-label">
+                                    <FormattedMessage id="clientCertificate.login"/>
+                                </div>
+                                <div className="col-xs-6">
+                                    {this.props.context.clientCertificateAuthenticationEnabled ? (
+                                        <a href="#" onClick={this.verifyClientCertificate} className="btn btn-lg btn-success">
+                                            <FormattedMessage id="clientCertificate.use"/>
+                                        </a>
+                                    ) : (
+                                        <div className="btn btn-lg btn-default disabled">
+                                            <FormattedMessage id="clientCertificate.use"/>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </FormGroup>
+                        <FormGroup>
+                            <div className="row">
+                                <div className="col-xs-6">
+                                    <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                        <FormattedMessage id="login.cancel"/>
+                                    </a>
+                                </div>
+                            </div>
+                        </FormGroup>
+                    </div>
+                ) : (
                     <FormGroup>
-                        <div onClick={this.verifyClientCertificate} className="client-certificate-active">
-                            <FormattedMessage id="clientCertificate.use"/>
+                        <div className="row buttons">
+                            <div className="col-xs-6">
+                                <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
+                                    <FormattedMessage id="login.cancel"/>
+                                </a>
+                            </div>
+                            <div className="col-xs-6">
+                                <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                    <FormattedMessage id="loginSca.continue"/>
+                                </Button>
+                            </div>
                         </div>
                     </FormGroup>
-                ) : undefined }
-                <FormGroup>
-                    <div className="row buttons">
-                        <div className="col-xs-6">
-                            <a href="#" onClick={this.handleCancel} className="btn btn-lg btn-default">
-                                <FormattedMessage id="login.cancel"/>
-                            </a>
-                        </div>
-                        <div className="col-xs-6">
-                            <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                <FormattedMessage id="loginSca.continue"/>
-                            </Button>
-                        </div>
-                    </div>
-                </FormGroup>
+                )}
             </div>
         )
     }

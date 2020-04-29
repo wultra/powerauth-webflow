@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.CertificateVerificationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.InitAuthMethodResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -215,10 +216,25 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             // Set chosen authentication method to LOGIN_SCA
             nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.LOGIN_SCA);
 
-            if (config.isClientCertificateAuthenticationEnabled()) {
-                response.setClientCertificateAuthenticationEnabled(true);
-                response.setClientCertificateVerificationUrl(config.getCertificateVerificationUrlForLogin());
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+            ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
+            InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
+            switch (initResponse.getCertificateAuthenticationMode()) {
+                case ENABLED:
+                    response.setClientCertificateAuthenticationAvailable(true);
+                    response.setClientCertificateAuthenticationEnabled(true);
+                    break;
+                case DISABLED:
+                    response.setClientCertificateAuthenticationAvailable(true);
+                    response.setClientCertificateAuthenticationEnabled(false);
+                    break;
+                default:
+                    response.setClientCertificateAuthenticationAvailable(false);
+                    response.setClientCertificateAuthenticationEnabled(false);
             }
+            response.setClientCertificateVerificationUrl(initResponse.getCertificateVerificationUrl());
             if (operation.getUserId() != null && operation.getOrganizationId() != null) {
                 // Username form can be skipped
                 response.setUserAlreadyKnown(true);
@@ -244,6 +260,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
         } catch (NextStepServiceException ex) {
             logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Communication with Next Step service failed");
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error("Error occurred in Data Adapter", ex);
+            throw new CommunicationFailedException("Communication with Data Adapter service failed");
         }
         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         return response;
