@@ -258,9 +258,9 @@ export default class LoginSca extends React.Component {
                                             <FormattedMessage id="clientCertificate.use"/>
                                         </a>
                                     ) : (
-                                        <a href="#" className="btn btn-lg btn-default">
+                                        <div className="btn btn-lg btn-default disabled">
                                             <FormattedMessage id="clientCertificate.use"/>
-                                        </a>
+                                        </div>
                                     )}
                                 </div>
                             </div>
