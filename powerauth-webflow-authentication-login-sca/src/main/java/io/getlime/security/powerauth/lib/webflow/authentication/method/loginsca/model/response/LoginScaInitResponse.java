@@ -30,6 +30,7 @@ public class LoginScaInitResponse {
     private List<OrganizationDetail> organizations = new ArrayList<>();
     private boolean userAlreadyKnown;
     private boolean mobileTokenEnabled;
+    private boolean clientCertificateAuthenticationAvailable;
     private boolean clientCertificateAuthenticationEnabled;
     private String clientCertificateVerificationUrl;
 
@@ -87,6 +88,22 @@ public class LoginScaInitResponse {
      */
     public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
         this.mobileTokenEnabled = mobileTokenEnabled;
+    }
+
+    /**
+     * Get whether authentication using client TLS certificate is available.
+     * @return Whether authentication using client TLS certificate is available.
+     */
+    public boolean isClientCertificateAuthenticationAvailable() {
+        return clientCertificateAuthenticationAvailable;
+    }
+
+    /**
+     * Set whether authentication using client TLS certificate is available.
+     * @param clientCertificateAuthenticationAvailable Whether authentication using client TLS certificate is available.
+     */
+    public void setClientCertificateAuthenticationAvailable(boolean clientCertificateAuthenticationAvailable) {
+        this.clientCertificateAuthenticationAvailable = clientCertificateAuthenticationAvailable;
     }
 
     /**

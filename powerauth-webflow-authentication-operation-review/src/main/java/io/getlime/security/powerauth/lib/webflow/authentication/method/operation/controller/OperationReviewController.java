@@ -43,6 +43,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +74,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final MessageTranslationService messageTranslationService;
+    private final AuthMethodResolutionService authMethodResolutionService;
 
     /**
      * Controller constructor.
@@ -80,12 +82,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @param dataAdapterClient Data adapter client.
      * @param nextStepClient Next step client.
      * @param messageTranslationService Message translation service.
+     * @param authMethodResolutionService Authentication method resolution service.
      */
     @Autowired
-    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService) {
+    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService, AuthMethodResolutionService authMethodResolutionService) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.messageTranslationService = messageTranslationService;
+        this.authMethodResolutionService = authMethodResolutionService;
     }
 
     /**
@@ -121,6 +125,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
+        // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+        // In case of an approval operation the data would be incorrect, because it is related to the payment.
+        // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+            authMethodResolutionService.updateOperationForScaLogin(operation);
+        }
         OperationReviewDetailResponse response = new OperationReviewDetailResponse();
         response.setData(operation.getOperationData());
         response.setFormData(decorateFormData(operation));
@@ -301,8 +311,9 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 FormDataConverter converter = new FormDataConverter();
                 FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
                 ApplicationContext applicationContext = operation.getApplicationContext();
+                final AuthMethod authMethod = getAuthMethodName(operation);
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formDataDA, applicationContext);
-                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operation.getOrganizationId(), operationContext);
+                ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operation.getOrganizationId(), authMethod, operationContext);
                 DecorateOperationFormDataResponse responseObject = response.getResponseObject();
                 formDataNS = converter.fromFormData(responseObject.getFormData());
                 formDataNS.setDynamicDataLoaded(true);

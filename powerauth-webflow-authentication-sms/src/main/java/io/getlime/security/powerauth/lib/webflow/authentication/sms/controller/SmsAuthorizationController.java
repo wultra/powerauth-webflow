@@ -27,7 +27,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContex
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -53,7 +52,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -613,9 +615,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         String operationId = operation.getOperationId();
         String operationName = operation.getOperationName();
         String operationData = operation.getOperationData();
+        final AuthMethod authMethod = getAuthMethodName(operation);
         final String externalTransactionId = operation.getExternalTransactionId();
         OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
-        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
+        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, authMethod, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
         updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
         return daResponse.getResponseObject();
     }

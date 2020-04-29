@@ -42,9 +42,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -60,8 +60,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Application Service Configuration
@@ -139,9 +138,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -157,8 +156,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Operation expiration time in seconds
@@ -183,9 +181,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
@@ -201,8 +199,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # SMS OTP expiration time in seconds

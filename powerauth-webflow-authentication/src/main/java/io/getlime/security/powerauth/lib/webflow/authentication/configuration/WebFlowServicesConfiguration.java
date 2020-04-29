@@ -126,24 +126,6 @@ public class WebFlowServicesConfiguration {
     @Value("${powerauth.webflow.afs.tm.cookies.sessionSid}")
     private String tmSessionSidCookie;
 
-    /**
-     * Whether client TLS certificate can be used for authenticating user.
-     */
-    @Value("${powerauth.webflow.authentication.client.certificate.enabled}")
-    private boolean clientCertificateAuthenticationEnabled;
-
-    /**
-     * Get client TLS certificate verification URL for login which is used in case client TLS certificate verification is enabled.
-     */
-    @Value("${powerauth.webflow.authentication.client.certificate.login.url}")
-    private String certificateVerificationUrlForLogin;
-
-    /**
-     * Get client TLS certificate verification URL for approval which is used in case client TLS certificate verification is enabled.
-     */
-    @Value("${powerauth.webflow.authentication.client.certificate.approval.url}")
-    private String certificateVerificationUrlForApproval;
-
     @Autowired
     public WebFlowServicesConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
@@ -289,30 +271,6 @@ public class WebFlowServicesConfiguration {
      */
     public String getTmSessionSidCookie() {
         return tmSessionSidCookie;
-    }
-
-    /**
-     * Get whether authentication using client TLS certificate is enabled.
-     * @return Whether authentication using client TLS certificate is enabled.
-     */
-    public boolean isClientCertificateAuthenticationEnabled() {
-        return clientCertificateAuthenticationEnabled;
-    }
-
-    /**
-     * Get client TLS certificate verification URL for login.
-     * @return Client TLS certificate verification URL.
-     */
-    public String getCertificateVerificationUrlForLogin() {
-        return certificateVerificationUrlForLogin;
-    }
-
-    /**
-     * Get client TLS certificate verification URL for approval.
-     * @return Client TLS certificate verification URL for approval.
-     */
-    public String getCertificateVerificationUrlForApproval() {
-        return certificateVerificationUrlForApproval;
     }
 
 }

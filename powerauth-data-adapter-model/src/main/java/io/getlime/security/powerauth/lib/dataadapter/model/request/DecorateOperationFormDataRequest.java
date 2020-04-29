@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
  * Request object for decorating operation form data.
@@ -27,6 +28,7 @@ public class DecorateOperationFormDataRequest {
 
     private String userId;
     private String organizationId;
+    private AuthMethod authMethod;
     private OperationContext operationContext;
 
     /**
@@ -39,11 +41,13 @@ public class DecorateOperationFormDataRequest {
      * Constructor with user ID and operation context as a parameter.
      * @param userId User ID.
      * @param organizationId Organization ID.
+     * @param authMethod Authentication method.
      * @param operationContext Operation context.
      */
-    public DecorateOperationFormDataRequest(String userId, String organizationId, OperationContext operationContext) {
+    public DecorateOperationFormDataRequest(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) {
         this.userId = userId;
         this.organizationId = organizationId;
+        this.authMethod = authMethod;
         this.operationContext = operationContext;
     }
 
@@ -77,6 +81,22 @@ public class DecorateOperationFormDataRequest {
      */
     public void setOrganizationId(String organizationId) {
         this.organizationId = organizationId;
+    }
+
+    /**
+     * Get authentication method.
+     * @return Authentication method.
+     */
+    public AuthMethod getAuthMethod() {
+        return authMethod;
+    }
+
+    /**
+     * Set authentication method.
+     * @param authMethod Authentication method.
+     */
+    public void setAuthMethod(AuthMethod authMethod) {
+        this.authMethod = authMethod;
     }
 
     /**

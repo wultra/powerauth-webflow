@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2020 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,30 +16,24 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
- * Request for creating SMS OTP authorization message.
+ * Request for initialization of an authentication method.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class CreateSmsAuthorizationRequest {
+public class InitAuthMethodRequest {
 
     /**
-     * User ID for this authorization request.
+     * User ID for this request.
      */
     private String userId;
 
     /**
-     * Organization ID for this authorization request.
+     * Organization ID for this request.
      */
     private String organizationId;
-
-    /**
-     * User account status.
-     */
-    private AccountStatus accountStatus;
 
     /**
      * Authentication method.
@@ -47,44 +41,28 @@ public class CreateSmsAuthorizationRequest {
     private AuthMethod authMethod;
 
     /**
-     * Operation context.
+     * Operation context which provides context for creating the consent form.
      */
     private OperationContext operationContext;
 
     /**
-     * Language used in the SMS OTP messages.
-     */
-    private String lang;
-
-    /**
-     * Whether SMS is being resent.
-     */
-    private boolean resend;
-
-    /**
      * Default constructor.
      */
-    public CreateSmsAuthorizationRequest() {
+    public InitAuthMethodRequest() {
     }
 
     /**
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param accountStatus User account status.
-     * @param lang SMS language.
      * @param authMethod Authentication method.
-     * @param operationContext Operation context.
-     * @param resend Whether SMS is being resent.
+     * @param operationContext Operation context which provides context for creating the consent form.
      */
-    public CreateSmsAuthorizationRequest(String userId, String organizationId, AccountStatus accountStatus, String lang, AuthMethod authMethod, OperationContext operationContext, boolean resend) {
+    public InitAuthMethodRequest(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) {
         this.userId = userId;
         this.organizationId = organizationId;
-        this.accountStatus = accountStatus;
-        this.lang = lang;
         this.authMethod = authMethod;
         this.operationContext = operationContext;
-        this.resend = resend;
     }
 
     /**
@@ -120,23 +98,7 @@ public class CreateSmsAuthorizationRequest {
     }
 
     /**
-     * Get current user account status.
-     * @return User account status.
-     */
-    public AccountStatus getAccountStatus() {
-        return accountStatus;
-    }
-
-    /**
-     * Set current user account status.
-     * @param accountStatus User account status.
-     */
-    public void setAccountStatus(AccountStatus accountStatus) {
-        this.accountStatus = accountStatus;
-    }
-
-    /**
-     * Get authentication method.
+     * Get authentication method
      * @return Authentication method.
      */
     public AuthMethod getAuthMethod() {
@@ -152,50 +114,18 @@ public class CreateSmsAuthorizationRequest {
     }
 
     /**
-     * Get operation context.
-     * @return Operation context.
+     * Get operation context which provides context for creating the consent form.
+     * @return Operation context which provides context for creating the consent form.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context.
-     * @param operationContext Operation context.
+     * Set operation context which provides context for creating the consent form.
+     * @param operationContext Operation context which provides context for creating the consent form.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;
-    }
-
-    /**
-     * Get SMS language.
-     * @return SMS language.
-     */
-    public String getLang() {
-        return lang;
-    }
-
-    /**
-     * Set SMS language.
-     * @param lang SMS language.
-     */
-    public void setLang(String lang) {
-        this.lang = lang;
-    }
-
-    /**
-     * Get whether SMS is being resent.
-     * @return Whether SMS is being resent.
-     */
-    public boolean isResend() {
-        return resend;
-    }
-
-    /**
-     * Set whether SMS is being resent.
-     * @param resend Whether SMS is being resent.
-     */
-    public void setResend(boolean resend) {
-        this.resend = resend;
     }
 }

@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.app.webflow.demo.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,9 +49,10 @@ public class WebApplicationConfig implements WebMvcConfigurer {
         bean.setIndentOutput(true);
         bean.afterPropertiesSet();
         ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JodaModule());
-        // replacement for ISO8601DateFormat which is deprecated
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        if (objectMapper != null) {
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false); // replacement for ISO8601DateFormat which is deprecated
+        }
         return objectMapper;
     }
 
@@ -75,7 +76,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public FilterRegistrationBean hiddenHttpMethodFilter() {
+    public FilterRegistrationBean<HiddenHttpMethodFilter> hiddenHttpMethodFilter() {
         FilterRegistrationBean<HiddenHttpMethodFilter> filterRegistrationBean = new FilterRegistrationBean<>(new HiddenHttpMethodFilter());
         filterRegistrationBean.setUrlPatterns(Collections.singletonList("/*"));
         return filterRegistrationBean;

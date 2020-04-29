@@ -22,7 +22,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.approval
  */
 public class ApprovalScaInitResponse {
 
-    private boolean clientCertificateUsed = false;
+    private boolean clientCertificateUsed;
     private String clientCertificateVerificationUrl;
 
     /**
