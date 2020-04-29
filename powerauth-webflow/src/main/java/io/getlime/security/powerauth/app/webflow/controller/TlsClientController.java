@@ -77,27 +77,34 @@ public class TlsClientController {
 
     @RequestMapping(value = "login", method = { RequestMethod.GET, RequestMethod.POST })
     public void verifyTlsCertificateForLogin() {
+        logger.info("Received verifyTlsCertificateForLogin request");
         verifyTlsCertificateImpl();
+        logger.info("The verifyTlsCertificateForLogin request succeeded");
     }
 
     @RequestMapping(value = "approve", method = { RequestMethod.GET, RequestMethod.POST })
     public void verifyTlsCertificateForApprove() {
+        logger.info("Received verifyTlsCertificateForApprove request");
         verifyTlsCertificateImpl();
+        logger.info("The verifyTlsCertificateForApprove request succeeded");
     }
 
     private void verifyTlsCertificateImpl() {
         String certificate = httpServletRequest.getHeader("X-Client-Certificate");
         if (certificate == null || certificate.isEmpty()) {
+            logger.warn("Verification of TLS certificate failed because certificate is missing");
             throw new InsufficientAuthenticationException("Missing client certificate");
         }
 
         // Extract operation ID
         UserOperationAuthentication authentication = authenticationManagementService.getPendingUserAuthentication();
         if (authentication == null) {
+            logger.warn("Verification of TLS certificate failed because user authentication object is missing");
             throw new InsufficientAuthenticationException("Missing user authentication object");
         }
         String operationId = authentication.getOperationId();
         if (operationId == null) {
+            logger.warn("Verification of TLS certificate failed because operation ID is missing");
             throw new InsufficientAuthenticationException("Missing operation ID");
         }
 
