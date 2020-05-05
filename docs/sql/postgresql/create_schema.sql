@@ -97,6 +97,7 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
+  mobile_token_enabled      BOOLEAN DEFAULT false NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
   afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL,
   afs_config_id             VARCHAR(256)
@@ -284,7 +285,7 @@ CREATE TABLE tpp_detail (
   tpp_website           TEXT NULL,
   tpp_phone             VARCHAR(256) NULL,
   tpp_email             VARCHAR(256) NULL,
-  tpp_logo              BYTEA NULL
+  tpp_logo              TEXT NULL
 );
 
 CREATE TABLE tpp_app_detail (
