@@ -21,7 +21,7 @@ import {
     authenticate,
     cancel,
     checkClientCertificate,
-    init,
+    initLoginSca,
     organizationConfigurationError,
     selectOrganization
 } from '../actions/loginScaActions'
@@ -49,10 +49,25 @@ export default class LoginSca extends React.Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.organizationChanged = this.organizationChanged.bind(this);
         this.verifyClientCertificate = this.verifyClientCertificate.bind(this);
+        this.init = this.init.bind(this);
+        this.setDefaultOrganization = this.setDefaultOrganization.bind(this);
     }
 
     componentWillMount() {
-        this.props.dispatch(init());
+        this.init();
+    }
+
+    init() {
+        const props = this.props;
+        const setDefaultOrganization = this.setDefaultOrganization;
+        props.dispatch(initLoginSca(function(initSucceeded) {
+            if (initSucceeded) {
+                // Set the default organization after loading organizations unless chosen organization was previously set
+                if (props.context.chosenOrganizationId === undefined) {
+                    setDefaultOrganization();
+                }
+            }
+        }));
     }
 
     handleLogin(event) {
@@ -105,9 +120,6 @@ export default class LoginSca extends React.Component {
 
     singleOrganization() {
         const organizations = this.props.context.organizations;
-        if (this.props.context.chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        }
         return (
             <Panel>
                 {this.banners(true)}
@@ -120,56 +132,48 @@ export default class LoginSca extends React.Component {
     fewOrganizations() {
         const formatMessage = this.props.intl.formatMessage;
         const organizations = this.props.context.organizations;
-        if (this.props.context.chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        } else {
-            return (
-                <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
-                    {organizations.map((org) => {
-                        return (
-                            <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
-                                <Panel>
-                                    {this.banners(org.organizationId === this.props.context.chosenOrganizationId)}
-                                    {this.title()}
-                                    {this.loginForm(org.organizationId)}
-                                </Panel>
-                            </Tab>
-                        )
-                    })}
-                </Tabs>
-            )
-        }
+        return (
+            <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
+                {organizations.map((org) => {
+                    return (
+                        <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                            <Panel>
+                                {this.banners(org.organizationId === this.props.context.chosenOrganizationId)}
+                                {this.title()}
+                                {this.loginForm(org.organizationId)}
+                            </Panel>
+                        </Tab>
+                    )
+                })}
+            </Tabs>
+        )
     }
 
     manyOrganizations() {
         const organizations = this.props.context.organizations;
         const chosenOrganizationId = this.props.context.chosenOrganizationId;
         const formatMessage = this.props.intl.formatMessage;
-        if (chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        } else {
-            let chosenOrganization = organizations[0];
-            organizations.forEach(function (org) {
-                // perform i18n, the select component does not support i18n
-                org.displayName = formatMessage({id: org.displayNameKey});
-                if (org.organizationId === chosenOrganizationId) {
-                    chosenOrganization = org;
-                }
-            });
-            return (
-                <Panel>
-                    <OrganizationSelect
-                        organizations={organizations}
-                        chosenOrganization={chosenOrganization}
-                        intl={this.props.intl}
-                        callback={organization => this.organizationChanged(organization.organizationId)}
-                    />
-                    {this.banners(true)}
-                    {this.title()}
-                    {this.loginForm(chosenOrganizationId)}
-                </Panel>
-            )
-        }
+        let chosenOrganization = organizations[0];
+        organizations.forEach(function (org) {
+            // perform i18n, the select component does not support i18n
+            org.displayName = formatMessage({id: org.displayNameKey});
+            if (org.organizationId === chosenOrganizationId) {
+                chosenOrganization = org;
+            }
+        });
+        return (
+            <Panel>
+                <OrganizationSelect
+                    organizations={organizations}
+                    chosenOrganization={chosenOrganization}
+                    intl={this.props.intl}
+                    callback={organization => this.organizationChanged(organization.organizationId)}
+                />
+                {this.banners(true)}
+                {this.title()}
+                {this.loginForm(chosenOrganizationId)}
+            </Panel>
+        )
     }
 
     setDefaultOrganization() {

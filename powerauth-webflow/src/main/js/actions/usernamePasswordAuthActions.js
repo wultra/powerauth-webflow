@@ -108,7 +108,7 @@ export function cancel() {
     }
 }
 
-export function init() {
+export function initLogin(callback) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN",
@@ -123,6 +123,7 @@ export function init() {
                 type: "SHOW_SCREEN_LOGIN",
                 payload: response.data
             });
+            callback(true);
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);

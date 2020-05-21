@@ -77,7 +77,7 @@ export default class TokenOnline extends React.Component {
                         </div>
                         <div className="attribute row">
                             <div className="col-xs-12">
-                                <input className="form-control" type="text" value={this.props.username} disabled="true"/>
+                                <input className="form-control" autoComplete="off" type="text" value={this.props.username} disabled="true"/>
                             </div>
                         </div>
                     </div>
