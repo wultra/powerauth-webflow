@@ -170,14 +170,14 @@ The meaning of individual fields is explained in chapter [Operation Attributes](
 
 #### 1.2. Fetch Data For Offline Signatures
 
-Now, you need to prepare the data for the QR code display. Call the PowerAuth SOAP method to create a personalized offline signature payload. The SOAP method `createPersonalizedOfflineSignaturePayload` requires two parameters:
+Now, you need to prepare the data for the QR code display. Call the PowerAuth REST method to create a personalized offline signature payload. The REST method `createPersonalizedOfflineSignaturePayload` requires two parameters:
 
 - `activationId` - ID of the activation of mobile device
 - `data` - data constructed in step 1
 
-The SOAP method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
+The REST method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
 
-In the response from the SOAP method `createPersonalizedOfflineSignaturePayload`, you will receive:
+In the response from the REST method `createPersonalizedOfflineSignaturePayload`, you will receive:
 
 - `offlineData` - The exact data to be displayed inside the QR code.
 - `nonce` - A random cryptographic nonce.
@@ -190,7 +190,7 @@ Note: The format of the `offlineData` is the following:
 {DATA}\n{NONCE_B64}\n{KEY_SERVER_PRIVATE_INDICATOR}{ECDSA_QRDATA_SIGNATURE_BASE64}
 ```
 
-As you can see, the `offlineData` already contain `nonce` value (in Base64 format) since the mobile app needs to scan the `nonce` value to compute the signature. However, the SOAP service still returns the value separately - since `nonce` must be used later on the back-end side, we wanted to avoid the necessity to parse the `offlineData` and hence we return `nonce` as a standalone response attribute.
+As you can see, the `offlineData` already contain `nonce` value (in Base64 format) since the mobile app needs to scan the `nonce` value to compute the signature. However, the REST service still returns the value separately - since `nonce` must be used later on the back-end side, we wanted to avoid the necessity to parse the `offlineData` and hence we return `nonce` as a standalone response attribute.
 
 #### 1.3. Display Data To The User
 
@@ -260,12 +260,12 @@ String signatureBaseString
 
 #### 3.4. Verifying Signature
 
-To verify signature, you need to call the SOAP method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
+To verify signature, you need to call the REST method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
 
 - `activationId` - identifier of the activation (to know which device is responsible for verification)
 - `data` (represented by `signatureBaseString` as obtained in 3.2.) - as data for verification
 - `signature` - value of the signature entered by the user (as obtained in 3.1., 2x8 digits)
-- `signatureType` - type of the signature (`POSSESSION_KNOWLEDGE`).
+- `biometryAllowed` - whether biometry signature factor is allowed
 
 The method returns information about signature verification:
 
@@ -278,4 +278,4 @@ The method returns information about signature verification:
 - `signatureType` - Signature type that was used to compute the signature value.
 - `remainingAttempts` - How many attempts are remaining for the signature validation (single, activation related counter).
 
-See the SOAP method documentation for details.
+See the REST method documentation for details.
