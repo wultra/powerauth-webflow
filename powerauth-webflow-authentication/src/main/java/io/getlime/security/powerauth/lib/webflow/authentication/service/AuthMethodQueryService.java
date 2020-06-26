@@ -15,9 +15,10 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.v3.ActivationStatus;
+import com.wultra.security.powerauth.client.v3.GetActivationListForUserResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.powerauth.soap.v3.ActivationStatus;
-import io.getlime.powerauth.soap.v3.GetActivationListForUserResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
@@ -26,7 +27,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServic
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetMobileTokenConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
-import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,17 +46,17 @@ public class AuthMethodQueryService {
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodQueryService.class);
 
     private final NextStepClient nextStepClient;
-    private final PowerAuthServiceClient powerAuthServiceClient;
+    private final PowerAuthClient powerAuthClient;
 
     /**
      * Service constructor.
      * @param nextStepClient Next step client.
-     * @param powerAuthServiceClient PowerAuth 2.0 client.
+     * @param powerAuthClient PowerAuth 2.0 client.
      */
     @Autowired
-    public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthServiceClient powerAuthServiceClient) {
+    public AuthMethodQueryService(NextStepClient nextStepClient, PowerAuthClient powerAuthClient) {
         this.nextStepClient = nextStepClient;
-        this.powerAuthServiceClient = powerAuthServiceClient;
+        this.powerAuthClient = powerAuthClient;
     }
 
     /**
@@ -158,7 +158,7 @@ public class AuthMethodQueryService {
         String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
 
         // Check whether user has an ACTIVE activation and it matches configured activation
-        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthServiceClient.getActivationListForUser(userId);
+        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthClient.getActivationListForUser(userId);
         for (GetActivationListForUserResponse.Activations activation : allActivations) {
             if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
                 // User has an active activation and it is the configured activation - mobile token is available

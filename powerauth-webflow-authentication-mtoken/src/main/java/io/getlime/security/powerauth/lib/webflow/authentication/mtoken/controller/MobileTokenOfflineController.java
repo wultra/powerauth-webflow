@@ -17,10 +17,11 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import com.google.common.io.BaseEncoding;
-import io.getlime.powerauth.soap.v3.ActivationStatus;
-import io.getlime.powerauth.soap.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
-import io.getlime.powerauth.soap.v3.GetActivationStatusResponse;
-import io.getlime.powerauth.soap.v3.VerifyOfflineSignatureResponse;
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.v3.ActivationStatus;
+import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
+import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
+import com.wultra.security.powerauth.client.v3.VerifyOfflineSignatureResponse;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
@@ -54,7 +55,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QrCodeInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
-import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,7 +86,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
     private static final String OFFLINE_MODE_ALLOW_BIOMETRY = "B";
     private static final int QR_CODE_SIZE = 250;
 
-    private final PowerAuthServiceClient powerAuthServiceClient;
+    private final PowerAuthClient powerAuthClient;
     private final AuthMethodQueryService authMethodQueryService;
     private final WebFlowServicesConfiguration webFlowServicesConfiguration;
     private final PushMessageService pushMessageService;
@@ -94,15 +94,15 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
 
     /**
      * Controller constructor.
-     * @param powerAuthServiceClient PowerAuth 2.0 service client.
+     * @param powerAuthClient PowerAuth 2.0 service client.
      * @param authMethodQueryService Authentication method query service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public MobileTokenOfflineController(PowerAuthServiceClient powerAuthServiceClient, AuthMethodQueryService authMethodQueryService, WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
-        this.powerAuthServiceClient = powerAuthServiceClient;
+    public MobileTokenOfflineController(PowerAuthClient powerAuthClient, AuthMethodQueryService authMethodQueryService, WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
+        this.powerAuthClient = powerAuthClient;
         this.authMethodQueryService = authMethodQueryService;
         this.webFlowServicesConfiguration = webFlowServicesConfiguration;
         this.pushMessageService = pushMessageService;
@@ -135,7 +135,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
         boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
-        VerifyOfflineSignatureResponse signatureResponse = powerAuthServiceClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
+        VerifyOfflineSignatureResponse signatureResponse = powerAuthClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -209,7 +209,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         }
 
         // get activation status
-        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(configuredActivationId);
+        GetActivationStatusResponse activationStatusResponse = powerAuthClient.getActivationStatus(configuredActivationId);
 
         // if activation is not active, fail request
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
@@ -368,7 +368,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // Construct offline signature data payload as {OPERATION_ID}\n{TITLE}\n{MESSAGE}\n{OPERATION_DATA}\n{FLAGS}
         String data = operationId+"\n"+title+"\n"+message+"\n"+operationData+"\n"+flags;
 
-        CreatePersonalizedOfflineSignaturePayloadResponse response = powerAuthServiceClient.createPersonalizedOfflineSignaturePayload(activation.getActivationId(), data);
+        CreatePersonalizedOfflineSignaturePayloadResponse response = powerAuthClient.createPersonalizedOfflineSignaturePayload(activation.getActivationId(), data);
 
         return new OfflineSignatureQrCode(QR_CODE_SIZE, response.getOfflineData(), response.getNonce());
     }

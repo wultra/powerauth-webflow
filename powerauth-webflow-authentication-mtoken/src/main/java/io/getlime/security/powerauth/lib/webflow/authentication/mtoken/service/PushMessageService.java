@@ -1,9 +1,10 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service;
 
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.v3.ActivationStatus;
+import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
-import io.getlime.powerauth.soap.v3.ActivationStatus;
-import io.getlime.powerauth.soap.v3.GetActivationStatusResponse;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.push.client.PushServerClientException;
 import io.getlime.push.model.entity.PushMessage;
@@ -19,7 +20,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhand
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.ActivationNotConfiguredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
-import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,21 +50,21 @@ public class PushMessageService {
 
     private final PushServerClient pushServerClient;
     private final AuthMethodQueryService authMethodQueryService;
-    private final PowerAuthServiceClient powerAuthServiceClient;
+    private final PowerAuthClient powerAuthClient;
     private final I18NService i18nService;
 
     /**
      * Service constructor.
      * @param pushServerClient Push server client.
      * @param authMethodQueryService Authentication method query service.
-     * @param powerAuthServiceClient PowerAuth service client.
+     * @param powerAuthClient PowerAuth service client.
      * @param i18nService I18n service.
      */
     @Autowired
-    public PushMessageService(PushServerClient pushServerClient, AuthMethodQueryService authMethodQueryService, PowerAuthServiceClient powerAuthServiceClient, I18NService i18nService) {
+    public PushMessageService(PushServerClient pushServerClient, AuthMethodQueryService authMethodQueryService, PowerAuthClient powerAuthClient, I18NService i18nService) {
         this.pushServerClient = pushServerClient;
         this.authMethodQueryService = authMethodQueryService;
-        this.powerAuthServiceClient = powerAuthServiceClient;
+        this.powerAuthClient = powerAuthClient;
         this.i18nService = i18nService;
     }
 
@@ -231,7 +231,7 @@ public class PushMessageService {
      * @throws ActivationNotActiveException Thrown when activation is not active.
      */
     private Long getApplicationId(String activationId) throws ActivationNotActiveException {
-        GetActivationStatusResponse activationStatusResponse = powerAuthServiceClient.getActivationStatus(activationId);
+        GetActivationStatusResponse activationStatusResponse = powerAuthClient.getActivationStatus(activationId);
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
             throw new ActivationNotActiveException(activationId);
         }
