@@ -1,11 +1,8 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import io.getlime.security.powerauth.soap.spring.client.PowerAuthServiceClient;
-import kong.unirest.ObjectMapper;
-import kong.unirest.Unirest;
 import org.apache.wss4j.dom.WSConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,8 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.ws.client.support.interceptor.ClientInterceptor;
 import org.springframework.ws.soap.security.wss4j2.Wss4jSecurityInterceptor;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Configuration for the PowerAuth 2.0 Server connector.
@@ -66,31 +61,6 @@ public class PowerAuthWebServiceConfiguration {
     @Autowired
     public PowerAuthWebServiceConfiguration(SSLConfigurationService sslConfigurationService) {
         this.sslConfigurationService = sslConfigurationService;
-    }
-
-    @PostConstruct
-    public void postConstruct() {
-        // Configure Unirest properties
-        Unirest.config()
-                .concurrency(unirestConcurrencyTotal, unirestConcurrencyPerRoute)
-                .setObjectMapper(new ObjectMapper() {
-
-            public String writeValue(Object value) {
-                try {
-                    return mapper.writeValueAsString(value);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            public <T> T readValue(String value, Class<T> valueType) {
-                try {
-                    return mapper.readValue(value, valueType);
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        });
     }
 
     /**
