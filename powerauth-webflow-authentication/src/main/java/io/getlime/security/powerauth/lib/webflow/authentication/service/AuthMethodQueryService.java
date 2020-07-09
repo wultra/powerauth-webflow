@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationListForUserResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -158,12 +159,17 @@ public class AuthMethodQueryService {
         String configuredActivationId = getActivationIdForMobileTokenAuthMethod(userId);
 
         // Check whether user has an ACTIVE activation and it matches configured activation
-        List<GetActivationListForUserResponse.Activations> allActivations = powerAuthClient.getActivationListForUser(userId);
-        for (GetActivationListForUserResponse.Activations activation : allActivations) {
-            if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
-                // User has an active activation and it is the configured activation - mobile token is available
-                return true;
+        try {
+            List<GetActivationListForUserResponse.Activations> allActivations = powerAuthClient.getActivationListForUser(userId);
+            for (GetActivationListForUserResponse.Activations activation : allActivations) {
+                if (activation.getActivationStatus() == ActivationStatus.ACTIVE && activation.getActivationId().equals(configuredActivationId)) {
+                    // User has an active activation and it is the configured activation - mobile token is available
+                    return true;
+                }
             }
+        } catch (PowerAuthClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            return false;
         }
         return false;
     }

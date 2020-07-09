@@ -1,6 +1,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -90,7 +91,7 @@ public class PushMessageService {
 
         try {
             applicationId = getApplicationId(activationId);
-        } catch (ActivationNotActiveException e) {
+        } catch (ActivationNotActiveException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.activationNotActive");
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -231,7 +232,13 @@ public class PushMessageService {
      * @throws ActivationNotActiveException Thrown when activation is not active.
      */
     private Long getApplicationId(String activationId) throws ActivationNotActiveException {
-        GetActivationStatusResponse activationStatusResponse = powerAuthClient.getActivationStatus(activationId);
+        GetActivationStatusResponse activationStatusResponse;
+        try {
+            activationStatusResponse = powerAuthClient.getActivationStatus(activationId);
+        } catch (PowerAuthClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new ActivationNotActiveException(activationId);
+        }
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
             throw new ActivationNotActiveException(activationId);
         }

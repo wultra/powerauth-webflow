@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 
 import com.google.common.io.BaseEncoding;
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
 import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
@@ -42,10 +43,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.Commun
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeDisabledException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeInvalidActivationException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeInvalidAuthCodeException;
-import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.OfflineModeMissingActivationException;
+import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.ActivationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.entity.OfflineSignatureQrCode;
@@ -135,7 +133,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String signatureBaseString = PowerAuthHttpBody.getSignatureBaseString("POST", "/operation/authorize/offline", BaseEncoding.base64().decode(nonce), data.getBytes());
         // determine whether biometry is allowed in offline mode
         boolean biometryAllowed = isBiometryAllowedInOfflineMode(operationName);
-        VerifyOfflineSignatureResponse signatureResponse = powerAuthClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
+        VerifyOfflineSignatureResponse signatureResponse;
+        try {
+            signatureResponse = powerAuthClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
+        } catch (PowerAuthClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new OfflineModeInvalidAuthCodeException("Authentication failed");
+        }
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
@@ -164,7 +168,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             logger.error("Error occurred in Next Step server", e);
             throw new CommunicationFailedException("Authorization failed due to communication error");
         }
-        OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid.");
+        OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
         Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsPA, remainingAttemptsNS);
         authEx.setRemainingAttempts(remainingAttempts);
         throw authEx;
@@ -209,7 +213,15 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         }
 
         // get activation status
-        GetActivationStatusResponse activationStatusResponse = powerAuthClient.getActivationStatus(configuredActivationId);
+        GetActivationStatusResponse activationStatusResponse;
+        try {
+            activationStatusResponse = powerAuthClient.getActivationStatus(configuredActivationId);
+        } catch (PowerAuthClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            initResponse.setResult(AuthStepResult.AUTH_FAILED);
+            initResponse.setMessage("offlineMode.noActivation");
+            return initResponse;
+        }
 
         // if activation is not active, fail request
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
@@ -368,7 +380,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // Construct offline signature data payload as {OPERATION_ID}\n{TITLE}\n{MESSAGE}\n{OPERATION_DATA}\n{FLAGS}
         String data = operationId+"\n"+title+"\n"+message+"\n"+operationData+"\n"+flags;
 
-        CreatePersonalizedOfflineSignaturePayloadResponse response = powerAuthClient.createPersonalizedOfflineSignaturePayload(activation.getActivationId(), data);
+        CreatePersonalizedOfflineSignaturePayloadResponse response;
+        try {
+            response = powerAuthClient.createPersonalizedOfflineSignaturePayload(activation.getActivationId(), data);
+        } catch (PowerAuthClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new OfflineModeInvalidDataException("Could not generate QR code");
+        }
 
         return new OfflineSignatureQrCode(QR_CODE_SIZE, response.getOfflineData(), response.getNonce());
     }
