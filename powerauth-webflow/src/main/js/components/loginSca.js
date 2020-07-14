@@ -51,6 +51,8 @@ export default class LoginSca extends React.Component {
         this.verifyClientCertificate = this.verifyClientCertificate.bind(this);
         this.init = this.init.bind(this);
         this.setDefaultOrganization = this.setDefaultOrganization.bind(this);
+        this.updateButtonState = this.updateButtonState.bind(this);
+        this.state = {continueDisabled: true};
     }
 
     componentWillMount() {
@@ -191,6 +193,22 @@ export default class LoginSca extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
+    updateButtonState() {
+        if (this.props.context.chosenOrganizationId === undefined) {
+            return;
+        }
+        const usernameField = "username" + "_" + this.props.context.chosenOrganizationId;
+        if (document.getElementById(usernameField).value.length === 0) {
+            if (!this.state.continueDisabled) {
+                this.setState({continueDisabled: true});
+            }
+        } else {
+            if (this.state.continueDisabled) {
+                this.setState({continueDisabled: false});
+            }
+        }
+    }
+
     verifyClientCertificate() {
         const organizationId = this.props.context.chosenOrganizationId;
         const certificateVerificationUrl = this.props.context.clientCertificateVerificationUrl;
@@ -233,8 +251,9 @@ export default class LoginSca extends React.Component {
                     </FormGroup>
                 ) : undefined }
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={usernameField} type="text" maxLength={usernameMaxLength}
-                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
+                    <FormControl autoComplete="new-password" id={usernameField} ref={usernameField} type="text" maxLength={usernameMaxLength}
+                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus
+                                 onChange={this.updateButtonState.bind(this)}/>
                 </FormGroup>
                 {this.props.context.clientCertificateAuthenticationAvailable ? (
                     <div>
@@ -288,7 +307,7 @@ export default class LoginSca extends React.Component {
                                 </a>
                             </div>
                             <div className="col-xs-6">
-                                <Button bsSize="lg" type="submit" bsStyle="success" block>
+                                <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.continueDisabled}>
                                     <FormattedMessage id="loginSca.continue"/>
                                 </Button>
                             </div>
