@@ -83,7 +83,7 @@ export default class SmsComponent extends React.Component {
                                 </div>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <input autoFocus className="form-control" type="text" value={this.props.username} disabled="true"/>
+                                        <input className="form-control" autoComplete="off" type="text" value={this.props.username} disabled="true"/>
                                     </div>
                                 </div>
                             </div>
@@ -99,7 +99,7 @@ export default class SmsComponent extends React.Component {
                                 </div>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <input className="form-control" type="password" value={this.state.password} onChange={this.handlePasswordChange} maxLength={passwordMaxLength}/>
+                                        <input className="form-control" autoComplete="new-password" type="password" value={this.state.password} onChange={this.handlePasswordChange} maxLength={passwordMaxLength}/>
                                     </div>
                                 </div>
                             </div>
@@ -115,7 +115,7 @@ export default class SmsComponent extends React.Component {
                                 </div>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange} maxLength={smsOtpMaxLength}/>
+                                        <input className="form-control" autoComplete="new-password" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange} maxLength={smsOtpMaxLength}/>
                                     </div>
                                 </div>
                                 <div className="font-small message-information">
