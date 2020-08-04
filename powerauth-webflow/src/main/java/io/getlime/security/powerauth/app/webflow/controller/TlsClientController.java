@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.webflow.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.webflow.exception.TlsClientAuthenticationException;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
@@ -76,20 +77,20 @@ public class TlsClientController {
     }
 
     @RequestMapping(value = "login", method = { RequestMethod.GET, RequestMethod.POST })
-    public void verifyTlsCertificateForLogin() {
+    public void verifyTlsCertificateForLogin() throws TlsClientAuthenticationException {
         logger.info("Received verifyTlsCertificateForLogin request");
         verifyTlsCertificateImpl();
         logger.info("The verifyTlsCertificateForLogin request succeeded");
     }
 
     @RequestMapping(value = "approve", method = { RequestMethod.GET, RequestMethod.POST })
-    public void verifyTlsCertificateForApprove() {
+    public void verifyTlsCertificateForApprove() throws TlsClientAuthenticationException {
         logger.info("Received verifyTlsCertificateForApprove request");
         verifyTlsCertificateImpl();
         logger.info("The verifyTlsCertificateForApprove request succeeded");
     }
 
-    private void verifyTlsCertificateImpl() {
+    private void verifyTlsCertificateImpl() throws TlsClientAuthenticationException {
         String certificate = httpServletRequest.getHeader("X-Client-Certificate");
         if (certificate == null || certificate.isEmpty()) {
             logger.warn("Verification of TLS certificate failed because certificate is missing");
@@ -150,7 +151,7 @@ public class TlsClientController {
             }
         } catch (Exception ex) {
             logger.warn(ex.getMessage(), ex);
-            throw new InsufficientAuthenticationException("Invalid client certificate");
+            throw new TlsClientAuthenticationException("Invalid client certificate");
         }
     }
 
