@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
+import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
@@ -59,6 +60,8 @@ public class StepResolutionService {
     private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
+
+    private final OperationConverter operationConverter = new OperationConverter();
 
     /**
      * Service constructor.
@@ -141,6 +144,11 @@ public class StepResolutionService {
         response.setOperationId(request.getOperationId());
         response.setOperationName(operation.getOperationName());
         response.setUserId(request.getUserId());
+        response.setOrganizationId(request.getOrganizationId());
+        response.setExternalTransactionId(operation.getExternalTransactionId());
+        // attach operation data and form data to the response
+        response.setOperationData(operation.getOperationData());
+        response.setFormData(operationConverter.fromEntity(operation).getFormData());
         response.setTimestampCreated(new Date());
         if (request.getAuthStepResult() == AuthStepResult.CANCELED) {
             // User canceled the operation. Save authStepResultDescription which contains the reason for cancellation.

@@ -1050,6 +1050,7 @@ Documentation for operation data is available [in a separate document](https://d
   "requestObject": {
     "operationName": "login",
     "operationData": "A2",
+    "externalTransactionId": "1234567890",
     "formData": {
       "title": {
         "id": "login.title"
@@ -1085,6 +1086,7 @@ Documentation for operation data is available [in a separate document](https://d
     "operationName": "authorize_payment",
     "operationId": null,
     "organizationId": null,
+    "externalTransactionId": "1234567890",
     "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "params": [],
     "formData": {
@@ -1165,6 +1167,7 @@ AISP:
     "operationId": "ec039314-7560-470a-b226-116c712e8fb3",
     "operationName": "login",
     "organizationId": null,
+    "externalTransactionId": "1234567890",
     "result": "CONTINUE",
     "resultDescription": null,
     "timestampCreated": "2019-07-30T12:51:28+0000",
@@ -1213,6 +1216,7 @@ PISP:
     "operationId": "f415a617-f7c0-4800-8436-f85eb075eb6f",
     "operationName": "authorize_payment",
     "organizationId": null,
+    "externalTransactionId": "1234567890",
     "result": "CONTINUE",
     "resultDescription": null,
     "timestampCreated": "2019-07-30T12:52:35+0000",
@@ -1346,16 +1350,69 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
     "operationName": "authorize_payment",
     "userId": "12345678",
     "organizationId": "RETAIL",
+    "externalTransactionId": "1234567890",
     "result": "CONTINUE",
     "resultDescription": null,
     "timestampCreated": "2018-06-28T12:20:28+0000",
     "timestampExpires": "2018-06-28T12:20:43+0000",
+    "operationData": "A1*A100CZK*Q238400856/0300**D20190629*NUtility Bill Payment - 05/2019",
     "steps": [
       {
         "authMethod": "SMS_KEY",
         "params": []
       }
     ],
+    "formData": {
+      "title": {
+        "id": "operation.title",
+        "value": null
+      },
+      "greeting": {
+        "id": "operation.greeting",
+        "value": null
+      },
+      "summary": {
+        "id": "operation.summary",
+        "value": null
+      },
+      "config": [],
+      "parameters": [
+        {
+          "type": "AMOUNT",
+          "id": "operation.amount",
+          "label": null,
+          "valueFormatType": "AMOUNT",
+          "formattedValues": {},
+          "amount": 100,
+          "currency": "CZK",
+          "currencyId": "operation.currency"
+        },
+        {
+          "type": "KEY_VALUE",
+          "id": "operation.account",
+          "label": null,
+          "valueFormatType": "ACCOUNT",
+          "formattedValues": {},
+          "value": "238400856/0300"
+        },
+        {
+          "type": "KEY_VALUE",
+          "id": "operation.dueDate",
+          "label": null,
+          "valueFormatType": "DATE",
+          "formattedValues": {},
+          "value": "2019-06-29"
+        },
+        {
+          "type": "NOTE",
+          "id": "operation.note",
+          "label": null,
+          "valueFormatType": "TEXT",
+          "formattedValues": {},
+          "note": "Utility Bill Payment - 05/2019"
+        }
+      ]
+    },
     "expired": false
   }
 }

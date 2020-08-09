@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 
 import java.util.ArrayList;
@@ -32,11 +33,15 @@ public class UpdateOperationResponse {
     private String operationId;
     private String operationName;
     private String userId;
+    private String organizationId;
+    private String externalTransactionId;
     private AuthResult result;
     private String resultDescription;
     private Date timestampCreated;
     private Date timestampExpires;
+    private String operationData;
     private List<AuthStep> steps;
+    private OperationFormData formData;
 
     /**
      * Default constructor.
@@ -91,6 +96,54 @@ public class UpdateOperationResponse {
      */
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    /**
+     * Get operation data.
+     * @return Operation data.
+     */
+    public String getOperationData() {
+        return operationData;
+    }
+
+    /**
+     * Get organization ID.
+     * @return Organization ID.
+     */
+    public String getOrganizationId() {
+        return organizationId;
+    }
+
+    /**
+     * Set organization ID.
+     * @param organizationId Organization ID.
+     */
+    public void setOrganizationId(String organizationId) {
+        this.organizationId = organizationId;
+    }
+
+    /**
+     * Get external transaction ID.
+     * @return External transaction ID.
+     */
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    /**
+     * Set external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     */
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
+    }
+
+    /**
+     * Set operation data.
+     * @param operationData Operation data.
+     */
+    public void setOperationData(String operationData) {
+        this.operationData = operationData;
     }
 
     /**
@@ -174,6 +227,22 @@ public class UpdateOperationResponse {
      */
     public List<AuthStep> getSteps() {
         return steps;
+    }
+
+    /**
+     * Get form data (title, message, other visual attributes, ...) of the operation.
+     * @return Form data.
+     */
+    public OperationFormData getFormData() {
+        return formData;
+    }
+
+    /**
+     * Set form data object.
+     * @param formData Set form data.
+     */
+    public void setFormData(OperationFormData formData) {
+        this.formData = formData;
     }
 
 }
