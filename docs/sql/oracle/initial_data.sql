@@ -24,10 +24,10 @@ INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_pr
 VALUES ('APPROVAL_SCA', 9, 0, NULL, NULL, 1, 5, 1, 1, 'method.approvalSca');
 
 -- operation configuration
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('login', 'A', 2, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('login_sca', 'A', 2, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('login', 'A', 2, 0, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('login_sca', 'A', 2, 0, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment', 'A', 1, 0, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, 0, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
 -- organization configuration
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
