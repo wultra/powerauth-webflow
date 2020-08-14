@@ -16,7 +16,6 @@
 
 package io.getlime.security.powerauth.app.tppengine.service;
 
-import com.google.common.base.Joiner;
 import io.getlime.security.powerauth.app.tppengine.converter.TppAppConverter;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
@@ -378,8 +377,7 @@ public class TppService {
     private String sortAndUniqueCommaSeparated(String[] source) {
         TreeSet<String> set = new TreeSet<>();
         Collections.addAll(set, source);
-        String[] result = set.toArray(new String[0]);
-        return Joiner.on(",").join(result);
+        return String.join(",", set);
     }
 
     /**

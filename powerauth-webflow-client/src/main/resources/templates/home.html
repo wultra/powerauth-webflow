@@ -54,41 +54,41 @@
 
                                         <div th:if="${#lists.isEmpty(connectionMap[__${providerId}__])}">
                                             <p>
-                                                Zvolte typ připojení třetí strany:
+                                                Select the third party connection type:
                                             </p>
                                             <form th:action="@{/connect/demo}" method="POST">
                                                 <p>
-                                                    <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Služba informování o platebním účtu</label>
+                                                    <label class="radio"><input id="scope_aisp" type="radio" name="scope" value="aisp" checked="checked"/> AIS - Account Information Service Provider</label>
                                                 </p>
                                                 <p>
-                                                    <label class="radio"><input id="scope_pisp" type="radio" name="scope" value="pisp"/> PIS - Služba nepřímého dání platebního příkazu</label>
+                                                    <label class="radio"><input id="scope_pisp" type="radio" name="scope" value="pisp"/> PIS - Payment Initiation Service Povider</label>
                                                 </p>
-                                                <button type="submit" class="btn btn-lg btn-success">Propojit</button>
+                                                <button type="submit" class="btn btn-lg btn-success">Connect</button>
                                             </form>
                                         </div>
 
                                         <div class="authorized" th:if="${!#lists.isEmpty(connectionMap[__${providerId}__])}">
                                             <p>
-                                                Připojený účet uživatele s ID: <span class="tint"><span
+                                                User ID of a connected user: <span class="tint"><span
                                                     th:text="${connectionMap[__${providerId}__][0].displayName}">user display name</span></span>!
                                             </p>
                                             <form id="disconnect" th:action="@{/connect/demo}" method="post">
                                                 <input type="hidden" name="_method" value="delete"/>
-                                                <button type="submit" class="btn btn-lg btn-danger">Odpojit</button>
+                                                <button type="submit" class="btn btn-lg btn-danger">Disconnect</button>
                                             </form>
                                         </div>
 
                                     </div>
                                     <div th:if="${opConfig.getType().name() == 'AUTHORIZATION'}" class="padding text-left">
                                         <p>
-                                            Autorizovat platbu s ID:
+                                            Authorize operation with ID:
                                         </p>
                                         <form th:action="@{/connect/demo}" method="POST" id="operationAuthorizeForm">
                                             <div class="input-group input-group-lg">
                                                 <input type="text" class="form-control" name="operation_id"
-                                                       th:value="${operationId}" placeholder="Hodnota Sign ID"/>
+                                                       th:value="${operationId}" placeholder="Operation ID"/>
                                                 <span class="input-group-btn">
-                                                    <button type="submit" class="btn btn-success">Autorizovat</button>
+                                                    <button type="submit" class="btn btn-success">Authorize</button>
                                                 </span>
                                             </div>
                                         </form>
