@@ -85,14 +85,6 @@
     <build>
         <plugins>
             <plugin>
-                <!-- Avoid compilation warnings for package sun.security.x509 -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <compilerArgument>-XDignore.symbol.file</compilerArgument>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
