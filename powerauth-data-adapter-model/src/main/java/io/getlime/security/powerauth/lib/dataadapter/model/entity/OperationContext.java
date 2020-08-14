@@ -12,6 +12,7 @@ public class OperationContext {
     private String id;
     private String name;
     private String data;
+    private String externalTransactionId;
     private FormData formData;
     private ApplicationContext applicationContext;
 
@@ -26,10 +27,11 @@ public class OperationContext {
      * @param id Operation ID.
      * @param name Operation name.
      * @param data Operation data.
+     * @param externalTransactionId External transaction ID (for example, ID in some other system).
      * @param formData Operation form data.
      * @param applicationContext Application context.
      */
-    public OperationContext(String id, String name, String data, FormData formData, ApplicationContext applicationContext) {
+    public OperationContext(String id, String name, String data, String externalTransactionId, FormData formData, ApplicationContext applicationContext) {
         this.id = id;
         this.name = name;
         this.data = data;
@@ -83,6 +85,22 @@ public class OperationContext {
      */
     public void setData(String data) {
         this.data = data;
+    }
+
+    /**
+     * Get external transaction ID.
+     * @return External transaction ID.
+     */
+    public String getExternalTransactionId() {
+        return externalTransactionId;
+    }
+
+    /**
+     * Set external transaction ID.
+     * @param externalTransactionId External transaction ID.
+     */
+    public void setExternalTransactionId(String externalTransactionId) {
+        this.externalTransactionId = externalTransactionId;
     }
 
     /**

@@ -26,6 +26,8 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class TppEngineError extends Error {
 
+    private String[] causes;
+
     /**
      * Response codes for different authentication failures.
      */
@@ -51,4 +53,19 @@ public class TppEngineError extends Error {
         super(code, message);
     }
 
+    /**
+     * Set the causes of this error.
+     * @param causes Array of causes for the error.
+     */
+    public void setCauses(String[] causes) {
+        this.causes = causes;
+    }
+
+    /**
+     * Get the array of causes for this error.
+     * @return Array of causes for the error.
+     */
+    public String[] getCauses() {
+        return causes;
+    }
 }

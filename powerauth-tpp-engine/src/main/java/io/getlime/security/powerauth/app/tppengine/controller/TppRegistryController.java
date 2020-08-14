@@ -16,15 +16,20 @@
 
 package io.getlime.security.powerauth.app.tppengine.controller;
 
+import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
+import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
+import io.getlime.security.powerauth.app.tppengine.model.validator.CreateTppAppRequestValidator;
 import io.getlime.security.powerauth.app.tppengine.service.TppService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Controller for lookup and registration of TPP service providers
@@ -43,13 +48,66 @@ public class TppRegistryController {
     }
 
     @RequestMapping(value = "app", method = RequestMethod.GET)
-    public ObjectResponse<TppAppDetailResponse> fetchAppInfoFromClientId(@RequestParam("clientId") String clientId) throws TppAppNotFoundException {
-        final TppAppDetailResponse response = tppService.fetchAppDetailByClientId(clientId);
+    public ObjectResponse<TppAppDetailResponse> fetchAppInfoFromClientId(
+            @RequestParam("clientId") String clientId,
+            @RequestParam(value = "tppLicense", required = false) String tppLicense) throws TppAppNotFoundException, TppNotFoundException {
+        if (tppLicense != null) {
+            final TppAppDetailResponse response = tppService.fetchAppDetailByClientId(clientId, tppLicense);
+            return new ObjectResponse<>(response);
+        } else {
+            final TppAppDetailResponse response = tppService.fetchAppDetailByClientId(clientId);
+            return new ObjectResponse<>(response);
+        }
+    }
+
+    @RequestMapping(value = "app/list", method = RequestMethod.GET)
+    public ObjectResponse<List<TppAppDetailResponse>> getAppList(@RequestParam("tppLicense") String tppLicense) throws TppNotFoundException {
+        final List<TppAppDetailResponse> response = tppService.fetchAppListByTppLicense(tppLicense);
         if (response != null) {
             return new ObjectResponse<>(response);
         } else {
-            throw new TppAppNotFoundException(clientId);
+            throw new TppNotFoundException("tpp.notFound", tppLicense);
         }
+    }
+
+    @RequestMapping(value = "app", method = RequestMethod.POST)
+    public ObjectResponse<TppAppDetailResponse> createApp(@RequestBody ObjectRequest<CreateTppAppRequest> request) throws UnableToCreateAppException {
+        final CreateTppAppRequest requestObject = request.getRequestObject();
+        final List<String> errors = CreateTppAppRequestValidator.validate(requestObject);
+        if (errors != null) { // request was not valid
+            throw new UnableToCreateAppException(errors);
+        }
+        final TppAppDetailResponse tppAppDetailResponse = tppService.createApp(requestObject);
+        return new ObjectResponse<>(tppAppDetailResponse);
+    }
+
+    @RequestMapping(value = "app", method = RequestMethod.PUT)
+    public ObjectResponse<TppAppDetailResponse> updateApp(
+            @RequestParam("clientId") String clientId,
+            @RequestBody ObjectRequest<CreateTppAppRequest> request) throws UnableToCreateAppException, TppNotFoundException, TppAppNotFoundException {
+        final CreateTppAppRequest requestObject = request.getRequestObject();
+        final List<String> errors = CreateTppAppRequestValidator.validate(requestObject);
+        if (errors != null) { // request was not valid
+            throw new UnableToCreateAppException(errors);
+        }
+        final TppAppDetailResponse tppAppDetailResponse = tppService.updateApp(clientId, requestObject);
+        return new ObjectResponse<>(tppAppDetailResponse);
+    }
+
+    @RequestMapping(value = "app/renewSecret", method = RequestMethod.POST)
+    public ObjectResponse<TppAppDetailResponse> updateApp(
+            @RequestParam("clientId") String clientId,
+            @RequestParam("tppLicense") String tppLicense) throws UnableToCreateAppException, TppNotFoundException, TppAppNotFoundException {
+        final TppAppDetailResponse tppAppDetailResponse = tppService.renewAppSecret(clientId, tppLicense);
+        return new ObjectResponse<>(tppAppDetailResponse);
+    }
+
+    @RequestMapping(value = "app", method = RequestMethod.DELETE)
+    public Response deleteApp(
+            @RequestParam("clientId") String clientId,
+            @RequestParam("tppLicense") String tppLicense) throws TppNotFoundException, TppAppNotFoundException {
+        tppService.deleteApp(clientId, tppLicense);
+        return new Response();
     }
 
 }

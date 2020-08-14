@@ -26,7 +26,7 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>0.24.0-SNAPSHOT</version>
+            <version>0.24.0</version>
         </dependency>
 
     </dependencies>
