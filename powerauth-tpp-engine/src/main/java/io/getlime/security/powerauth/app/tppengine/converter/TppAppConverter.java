@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.tppengine.converter;
 
 import io.getlime.security.powerauth.app.tppengine.model.entity.TppInfo;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
+import io.getlime.security.powerauth.app.tppengine.repository.model.entity.OAuthClientDetailsEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppAppDetailEntity;
 import io.getlime.security.powerauth.app.tppengine.repository.model.entity.TppEntity;
 
@@ -40,6 +41,7 @@ public class TppAppConverter {
         }
         TppInfo tpp = new TppInfo();
         tpp.setName(tppEntity.getTppName());
+        tpp.setLicense(tppEntity.getTppLicense());
         tpp.setInfo(tppEntity.getTppInfo());
         tpp.setAddress(tppEntity.getTppAddress());
         tpp.setWebsite(tppEntity.getTppWebsite());
@@ -50,19 +52,54 @@ public class TppAppConverter {
 
     /**
      * Convert TppAppDetailResponse response entity from TppAppDetail entity in database.
-     * @param tppAppDetailEntity DB entity to be converted.
+     * @param tppAppDetailEntity DB entity of TPP app to be converted.
+     * @param oAuthClientDetailsEntity DB entity of OAuth client details to be converted.
+     * @param clientSecret OAuth 2.0 client secret, available when new app is created or on renewal only (otherwise, we store a bcrypted version).
      * @return Response entity with TPP app details.
      */
-    public static TppAppDetailResponse fromTppAppEntity(TppAppDetailEntity tppAppDetailEntity) {
+    public static TppAppDetailResponse fromTppAppEntity(TppAppDetailEntity tppAppDetailEntity, OAuthClientDetailsEntity oAuthClientDetailsEntity, String clientSecret) {
         if (tppAppDetailEntity == null) {
             return null;
         }
         TppAppDetailResponse result = new TppAppDetailResponse();
+        // Convert app info
         result.setClientId(tppAppDetailEntity.getPrimaryKey().getAppClientId());
         result.setName(tppAppDetailEntity.getAppName());
         result.setDescription(tppAppDetailEntity.getAppInfo());
+        result.setAppType(tppAppDetailEntity.getAppType());
+
+        // Convert TPP info
         result.setTpp(fromTppEntity(tppAppDetailEntity.getTpp()));
+
+        // Convert OAuth 2.0 info
+        if (oAuthClientDetailsEntity != null) {
+            // Decode sanitized redirect URIs
+            final String[] redirectUris = oAuthClientDetailsEntity.getWebServerRedirectUri().split(",");
+            final String[] scopes = oAuthClientDetailsEntity.getScope().split(",");
+            result.setRedirectUris(redirectUris);
+            result.setScopes(scopes);
+            result.setClientSecret(clientSecret);
+        }
         return result;
+    }
+
+    /**
+     * Convert TppAppDetailResponse response entity from TppAppDetail entity in database.
+     * @param tppAppDetailEntity DB entity of TPP app to be converted.
+     * @param oAuthClientDetailsEntity DB entity of OAuth client details to be converted.
+     * @return Response entity with TPP app details.
+     */
+    public static TppAppDetailResponse fromTppAppEntity(TppAppDetailEntity tppAppDetailEntity, OAuthClientDetailsEntity oAuthClientDetailsEntity) {
+        return fromTppAppEntity(tppAppDetailEntity, oAuthClientDetailsEntity, null);
+    }
+
+    /**
+     * Convert TppAppDetailResponse response entity from TppAppDetail entity in database.
+     * @param tppAppDetailEntity DB entity of TPP app to be converted.
+     * @return Response entity with TPP app details.
+     */
+    public static TppAppDetailResponse fromTppAppEntity(TppAppDetailEntity tppAppDetailEntity) {
+        return fromTppAppEntity(tppAppDetailEntity, null);
     }
 
 }

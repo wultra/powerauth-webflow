@@ -22,9 +22,12 @@ import io.getlime.security.powerauth.app.tppengine.errorhandling.error.ConsentEr
 import io.getlime.security.powerauth.app.tppengine.errorhandling.error.TppAppError;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.ConsentNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
+import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -54,6 +57,19 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Default exception handler, for unexpected errors.
+     * @param t Throwable.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleParameterException(MissingServletRequestParameterException t) {
+        logger.warn("Missing request parameter", t);
+        Error error = new Error(Error.Code.ERROR_GENERIC, t.getMessage());
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception thrown in case consent was not found.
      * @param t Exception thrown when consent is not found.
      * @return Response with error details.
@@ -73,8 +89,32 @@ public class DefaultExceptionResolver {
     @ExceptionHandler(TppAppNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public @ResponseBody ErrorResponse handleTppAppNotFoundException(TppAppNotFoundException t) {
-        logger.error("App with client ID {} was not found", t.getId(), t);
+        logger.error("App with client ID '{}' was not found", t.getId(), t);
         return new ErrorResponse(new TppAppError("tpp.app.notFound"));
+    }
+
+    /**
+     * Exception thrown in case TPP was not found.
+     * @param t Exception thrown when TPP is not found.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(TppNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public @ResponseBody ErrorResponse handleTppNotFoundException(TppNotFoundException t) {
+        logger.error("TPP was not found for provided license info: {}", t.getLicenseInfo(), t);
+        return new ErrorResponse(new TppAppError("tpp.notFound"));
+    }
+
+    /**
+     * Exception thrown in case TPP app cannot be created.
+     * @param t Exception thrown when TPP app cannot be created.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UnableToCreateAppException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUnableToCreateAppException(UnableToCreateAppException t) {
+        logger.error("Unable to create an app due to request errors: {}", t.getErrors(), t);
+        return new ErrorResponse(new TppAppError("tpp.app.unableToCreate", t.getErrors()));
     }
 
 }

@@ -256,7 +256,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
             bankAccountChoice.setBankAccountId(request.getFormData().getUserInput().get(FIELD_BANK_ACCOUNT_CHOICE));
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
             dataAdapterClient.formDataChangedNotification(bankAccountChoice, operation.getUserId(), operation.getOrganizationId(), operationContext);
         }
         return new Response();
@@ -311,8 +311,8 @@ public class OperationReviewController extends AuthMethodController<OperationRev
                 FormDataConverter converter = new FormDataConverter();
                 FormData formDataDA = converter.fromOperationFormData(operation.getFormData());
                 ApplicationContext applicationContext = operation.getApplicationContext();
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formDataDA, applicationContext);
-                AuthMethod authMethod = getAuthMethodName(operation);
+                final AuthMethod authMethod = getAuthMethodName(operation);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formDataDA, applicationContext);
                 ObjectResponse<DecorateOperationFormDataResponse> response = dataAdapterClient.decorateOperationFormData(operation.getUserId(), operation.getOrganizationId(), authMethod, operationContext);
                 DecorateOperationFormDataResponse responseObject = response.getResponseObject();
                 formDataNS = converter.fromFormData(responseObject.getFormData());

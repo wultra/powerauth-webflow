@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
@@ -121,6 +122,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         } else {
             throw new OperationNotAvailableException("Operation is not available");
+        }
+    }
+
+    /**
+     * Create a new implicit login operation based on the OAuth 2.0 scopes.
+     * @param clientId OAuth 2.0 Client ID.
+     * @param scopes OAuth 2.0 Scopes
+     * @return Information about a new operation.
+     * @throws CommunicationFailedException In case the communication with data adapter fails.
+     */
+    protected CreateImplicitLoginOperationResponse createImplicitLoginOperation(String clientId, String[] scopes) throws CommunicationFailedException {
+        try {
+            final ObjectResponse<CreateImplicitLoginOperationResponse> implicitLoginOperation = dataAdapterClient.createImplicitLoginOperation(clientId, scopes);
+            return implicitLoginOperation.getResponseObject();
+        } catch (DataAdapterClientErrorException e) {
+            logger.error("Error occurred in Data Adapter server", e);
+            throw new CommunicationFailedException("Implicit login operation cannot be created");
         }
     }
 
@@ -291,7 +309,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, organizationId, operationContext);
                 // notify AFS about logout
                 afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
@@ -327,7 +345,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
