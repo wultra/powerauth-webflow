@@ -135,7 +135,6 @@ CREATE TABLE ns_operation (
 );
 
 -- Table ns_operation_history stores all changes of operations.
--- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,
   result_id                   INTEGER NOT NULL,

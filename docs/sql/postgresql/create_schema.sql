@@ -96,6 +96,7 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
+  mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
   afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL,
   afs_config_id             VARCHAR(256)
@@ -134,7 +135,6 @@ CREATE TABLE ns_operation (
 );
 
 -- Table ns_operation_history stores all changes of operations.
--- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,
   result_id                   INTEGER NOT NULL,
