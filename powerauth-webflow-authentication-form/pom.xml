@@ -8,25 +8,25 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.23.0-SNAPSHOT</version>
+        <version>0.24.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <name>powerauth-webflow-authentication-form</name>
     <artifactId>powerauth-webflow-authentication-form</artifactId>
     <groupId>io.getlime.security</groupId>
-    <version>0.23.0-SNAPSHOT</version>
+    <version>0.24.0-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>0.23.0-SNAPSHOT</version>
+            <version>0.24.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.64</version>
+            <version>1.65</version>
             <scope>test</scope>
         </dependency>
         <dependency>

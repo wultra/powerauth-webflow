@@ -41,6 +41,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.con
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
@@ -55,7 +56,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This controller presents endpoints that are consumed by the native mobile app,
@@ -71,16 +75,19 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
+    private final AuthMethodResolutionService authMethodResolutionService;
 
     /**
      * Controller constructor.
      * @param webSocketMessageService Web Socket message service.
      * @param authMethodQueryService Authentication method query service.
+     * @param authMethodResolutionService Authentication method resolution service.
      */
     @Autowired
-    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService) {
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, AuthMethodResolutionService authMethodResolutionService) {
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
+        this.authMethodResolutionService = authMethodResolutionService;
     }
 
     /**
@@ -147,6 +154,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 operationList = getOperationListForUser(userId, true);
                 operationConfigs = getOperationConfigs(operationList);
             } catch (AuthStepException e) {
+                logger.error("Could not retrieve operation list", e);
                 // Next step operation list failed, return empty operation list
                 return new ObjectResponse<>(new OperationListResponse());
             }
@@ -231,6 +239,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final GetOperationDetailResponse operation = getOperation(operationId);
+            // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+            // In case of an approval operation the data would be incorrect, because it is related to the payment.
+            // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+            if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+                authMethodResolutionService.updateOperationForScaLogin(operation);
+            }
 
             // Check if signature type is allowed
             if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
@@ -278,7 +292,9 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             }
 
             final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
-            webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+            if (updateOperationResponse != null) {
+                webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+            }
             return new Response();
 
         } else {
@@ -319,6 +335,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
         try {
             operationConfig = getOperationConfig(operationName);
         } catch (AuthStepException e) {
+            logger.error("Could not retrieve operation configuration", e);
             // Next step request failed, cannot decide
             return false;
         }

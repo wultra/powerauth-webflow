@@ -112,7 +112,7 @@ export default class SmsAuthorization extends React.Component {
         return (
             <div id="operation">
                 <Panel>
-                    <OperationTimeout/>
+                    <OperationTimeout timeoutCheckActive="true"/>
                     <OperationDetail/>
                     <SmsComponent username={this.state.username} passwordEnabled={this.state.passwordEnabled}
                                   smsOtpEnabled={this.state.smsOtpEnabled} resendEnabled={this.state.resendEnabled}

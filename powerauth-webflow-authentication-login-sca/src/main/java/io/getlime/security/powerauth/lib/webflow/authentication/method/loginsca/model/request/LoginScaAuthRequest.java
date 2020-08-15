@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
 import java.util.Collections;
 import java.util.List;
 
@@ -28,8 +30,16 @@ import java.util.List;
  */
 public class LoginScaAuthRequest extends AuthStepRequest {
 
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~]{4,256}$", message = "login.username.invalidFormat")
+    // Empty username can be sent in case client certificate is used
     private String username;
+
+    // Empty String is accepted in regexp to allow returning different message in @NotEmpty validation
+    @Pattern(regexp = "^$|^[a-zA-Z0-9_\\-@./\\\\:;<>!#$%&'\"*+=?^`(){}\\[\\]|~\\s]{2,256}$", message = "login.organization.invalidFormat")
+    @NotEmpty(message = "login.organization.empty")
     private String organizationId;
+    private boolean clientCertificateUsed;
 
     /**
      * Get username.
@@ -65,8 +75,27 @@ public class LoginScaAuthRequest extends AuthStepRequest {
         this.organizationId = organizationId;
     }
 
+    /**
+     * Get whether client certificate is used for authentication.
+     * @return Whether client certificate is used for authentication.
+     */
+    public boolean isClientCertificateUsed() {
+        return clientCertificateUsed;
+    }
+
+    /**
+     * Set whether client certificate is used for authentication.
+     * @param clientCertificateUsed Whether client certificate is used for authentication.
+     */
+    public void setClientCertificateUsed(boolean clientCertificateUsed) {
+        this.clientCertificateUsed = clientCertificateUsed;
+    }
+
     @Override
     public List<AuthInstrument> getAuthInstruments() {
+        if (isClientCertificateUsed()) {
+            return Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
+        }
         return Collections.emptyList();
     }
 }

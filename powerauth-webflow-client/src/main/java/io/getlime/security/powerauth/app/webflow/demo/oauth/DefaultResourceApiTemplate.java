@@ -41,7 +41,7 @@ public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding impleme
 
     public DefaultResourceApiTemplate(String accessToken, String baseUrl) {
         super(accessToken);
-        logger.info("OAuth 2.0 Access Token is: {}", accessToken);
+        logger.debug("OAuth 2.0 Access Token is: {}", accessToken);
         this.API_URL_BASE = baseUrl;
     }
 

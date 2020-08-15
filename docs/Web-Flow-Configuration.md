@@ -42,9 +42,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -60,8 +60,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Application Service Configuration
@@ -86,13 +85,22 @@ powerauth.webflow.sms.resend.delayMs=60000
 # Configuration of Delay for Showing Operation Timeout Warning in Milliseconds
 powerauth.webflow.timeout.warning.delayMs=60000
 
+# Configuration of Limit for Large Consent Panel in Number of Characters
+powerauth.webflow.consent.limit.enabled=false
+powerauth.webflow.consent.limit.characters=750
+
 # Anti-fraud system configuration
-powerauth.webflow.afs.enabled=true
+powerauth.webflow.afs.enabled=false
 powerauth.webflow.afs.type=THREAT_MARK
 powerauth.webflow.afs.detectIpAddress=false
 powerauth.webflow.afs.forceIpv4=true
 powerauth.webflow.afs.tm.cookies.deviceTag=
 powerauth.webflow.afs.tm.cookies.sessionSid=
+
+# User input validation
+powerauth.webflow.input.username.maxLength=256
+powerauth.webflow.input.password.maxLength=128
+powerauth.webflow.input.smsOtp.maxLength=8
 ```
 
 Encryption of user passwords during transport can be configured using following properties:
@@ -130,9 +138,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -148,8 +156,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # Operation expiration time in seconds
@@ -174,9 +181,9 @@ spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
 spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
-spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
+#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
@@ -192,8 +199,7 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 #spring.datasource.username=powerauth
 #spring.datasource.password=
 #spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
-# The following properties speed up Spring Boot startup
-#spring.jpa.database-platform=org.hibernate.dialect.Oracle12cDialect
+# The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
 # SMS OTP expiration time in seconds

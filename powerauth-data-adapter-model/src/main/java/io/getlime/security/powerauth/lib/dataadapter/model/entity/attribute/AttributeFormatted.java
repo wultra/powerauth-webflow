@@ -62,7 +62,7 @@ public class AttributeFormatted extends Attribute {
      * @param formattedValues Formatted values.
      */
     public void addFormattedValues(Map<String, String> formattedValues) {
-        addFormattedValues(formattedValues);
+        this.formattedValues.putAll(formattedValues);
     }
 
 }

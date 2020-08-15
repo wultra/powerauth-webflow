@@ -29,10 +29,12 @@ import java.util.List;
 @Table(name = "tpp_detail")
 public class TppEntity implements Serializable {
 
+    private static final long serialVersionUID = -7089801604663605351L;
+
     @Id
     @SequenceGenerator(name = "tpp_detail", sequenceName = "tpp_detail_seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "tpp_detail")
-    @Column(name = "tpp_id")
+    @Column(name = "tpp_id", nullable = false)
     private Long tppId;
 
     @Column(name = "tpp_name")

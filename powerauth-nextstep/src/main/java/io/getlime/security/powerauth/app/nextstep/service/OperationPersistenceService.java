@@ -328,11 +328,11 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Retrieve list of pending operations for given user id from database.
+     * Retrieve list of pending operations for given user ID from database.
      *
-     * @param userId User id.
+     * @param userId User ID.
      * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
-     * @return list of operations which match the query
+     * @return List of operations which match the query.
      */
     public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) {
         List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
@@ -353,6 +353,16 @@ public class OperationPersistenceService {
             }
         }
         return filteredList;
+    }
+
+    /**
+     * Retrieve list of operations for given external transaction ID from database.
+     *
+     * @param externalTransactionId External transaction ID.
+     * @return List of operations which match the query.
+     */
+    public List<OperationEntity> findByExternalTransactionId(String externalTransactionId) {
+        return operationRepository.findAllByExternalTransactionId(externalTransactionId);
     }
 
     /**

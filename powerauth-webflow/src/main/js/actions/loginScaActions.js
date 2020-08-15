@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 import axios from "axios";
-import {dispatchError} from "../dispatcher/dispatcher";
+import {dispatchAction, dispatchError} from "../dispatcher/dispatcher";
 import {handleAuthFailedError} from "./errorHandling";
 
 /**
@@ -43,6 +43,11 @@ export function authenticate(username, organizationId) {
         }).then((response) => {
             switch (response.data.result) {
                 case 'CONFIRMED': {
+                    if (response.data.next.length > 0) {
+                        // Step was completely authenticated, move to the next step
+                        dispatchAction(dispatch, response);
+                        break;
+                    }
                     if (response.data.mobileTokenEnabled) {
                         dispatch({
                             type: "SHOW_SCREEN_TOKEN",
@@ -91,7 +96,7 @@ export function authenticate(username, organizationId) {
  * Initialize SCA login.
  * @returns {Function} No return value.
  */
-export function init() {
+export function initLoginSca(callback) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN_SCA",
@@ -120,7 +125,7 @@ export function init() {
                         payload: {
                             loading: true,
                             error: false,
-                            message: "",
+                            message: ""
                         }
                     });
                 }
@@ -130,6 +135,7 @@ export function init() {
                 type: "SHOW_SCREEN_LOGIN_SCA",
                 payload: response.data
             });
+            callback(true);
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);
@@ -188,6 +194,35 @@ export function organizationConfigurationError() {
             payload: {
                 message: "organization.configurationError"
             }
+        })
+    }
+}
+
+/**
+ * Verify client TLS certificate.
+ * @param certificateVerificationUrl URL to be used to verify client TLS certificate.
+ * @param callbackOnSuccess Callback in case of successful verification.
+ * @returns {Function} No return value.
+ */
+export function checkClientCertificate(certificateVerificationUrl, callbackOnSuccess) {
+    return function (dispatch) {
+        axios.post(certificateVerificationUrl, {}, {
+            // Send cookies so that HTTP session is the same
+            withCredentials: true
+        }).then((response) => {
+            callbackOnSuccess();
+            return null;
+        }).catch((error) => {
+            // Convert error message to a user friendly error message
+            dispatch({
+                type: "SHOW_SCREEN_LOGIN_SCA",
+                payload: {
+                    loading: false,
+                    error: true,
+                    message: "clientCertificate.failed"
+                }
+            });
+            return null;
         })
     }
 }

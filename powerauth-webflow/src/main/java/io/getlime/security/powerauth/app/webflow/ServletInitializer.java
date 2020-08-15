@@ -15,8 +15,6 @@
  */
 package io.getlime.security.powerauth.app.webflow;
 
-import io.getlime.security.powerauth.crypto.lib.config.PowerAuthConfiguration;
-import io.getlime.security.powerauth.provider.CryptoProviderUtilFactory;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -39,9 +37,6 @@ public class ServletInitializer extends SpringBootServletInitializer {
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
         // Register BC provider
         Security.addProvider(new BouncyCastleProvider());
-
-        // Tell PowerAuth components to use BC provider
-        PowerAuthConfiguration.INSTANCE.setKeyConvertor(CryptoProviderUtilFactory.getCryptoProviderUtils());
 
         return application.sources(PowerAuthWebFlowApplication.class);
     }

@@ -252,19 +252,19 @@ public class ApiController extends AuthMethodController<InitOperationRequest, In
         }
 
         // Get OAuth 2.0 Client ID
-        final String[] client_ids = savedRequest.getParameterValues("client_id");
-        if (client_ids.length != 1) { // no client ID is present, or worse - more are present
+        final String[] clientIds = savedRequest.getParameterValues("client_id");
+        if (clientIds == null || clientIds.length != 1) { // no client ID is present, or worse - more are present
             logger.debug("OAuth 2.0 Client ID must be present and unique.");
             return null;
         }
-        final String client_id = client_ids[0];
+        final String clientId = clientIds[0];
 
         // Get OAuth 2.0 Scopes
         final String[] scopes = savedRequest.getParameterValues("scope");
 
         // Return the result
         OAuthBasicContext result = new OAuthBasicContext();
-        result.setClientId(client_id);
+        result.setClientId(clientId);
         result.setScopes(scopes);
 
         return result;

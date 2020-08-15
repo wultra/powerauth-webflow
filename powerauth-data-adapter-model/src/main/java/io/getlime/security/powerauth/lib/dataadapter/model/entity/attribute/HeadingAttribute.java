@@ -56,7 +56,9 @@ public class HeadingAttribute extends KeyValueAttribute {
         this.label = label;
         this.value = value;
         this.valueFormatType = valueFormatType;
-        addFormattedValues(formattedValues);
+        if (formattedValues != null) {
+            addFormattedValues(formattedValues);
+        }
     }
 
 }

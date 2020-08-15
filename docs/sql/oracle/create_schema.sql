@@ -64,7 +64,7 @@ CREATE TABLE oauth_code (
 -- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY NOT NULL,  -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH
-  order_number       INTEGER NOT NULL,                  -- Order of the authentication method.
+  order_number       INTEGER NOT NULL,                  -- Order of the authentication method, incrementing value, starts with 1.
   check_user_prefs   NUMBER(1) DEFAULT 0 NOT NULL,      -- Indication if the authentication method requires checking the user preference first.
   user_prefs_column  INTEGER,                           -- In case the previous column is 'true', this is pointer to the user preferences configuration column index.
   user_prefs_default NUMBER(1) DEFAULT 0,               -- Default value of the user preferences, in case the per-user preference is not found.
@@ -94,11 +94,11 @@ CREATE TABLE ns_user_prefs (
 -- Table ns_operation_config stores configuration of operations.
 -- Each operation type (defined by operation_name) has a related mobile token template and configuration of signatures.
 CREATE TABLE ns_operation_config (
-  operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,   -- Name of the operation, for example "login" or "payment approval".
+  operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,   -- Name of the operation, for example "login" or "approve_payment".
   template_version          VARCHAR(1) NOT NULL,                -- Version of the template, used for data signing base.
   template_id               INTEGER NOT NULL,                   -- ID of the template, used for data signing base.
   mobile_token_enabled      NUMBER(1) DEFAULT 0 NOT NULL,       -- Flag indicating if the mobile token is enabled for this operation type.
-  mobile_token_mode         VARCHAR(256) NOT NULL,              -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants.
+  mobile_token_mode         VARCHAR(256) NOT NULL,              -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.
   afs_enabled               NUMBER(1) DEFAULT 0 NOT NULL,       -- Flag indicating if AFS system is enabled.
   afs_config_id             VARCHAR(256)                        -- Configuration of AFS system.
 );
@@ -110,14 +110,14 @@ CREATE TABLE ns_organization (
   organization_id          VARCHAR(256) PRIMARY KEY NOT NULL,   -- ID of organization.
   display_name_key         VARCHAR(256),                        -- Localization key for the organization display name.
   is_default               NUMBER(1) DEFAULT 0 NOT NULL,        -- Flag indicating if this organization is the default.
-  order_number             INTEGER NOT NULL                     -- Ordering column for this organization.
+  order_number             INTEGER NOT NULL                     -- Ordering column for this organization, incrementing value, starts with 1.
 );
 
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
-  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,  -- ID of an operation.
-  operation_name                VARCHAR(32) NOT NULL,               -- Name of the operation.
+  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,  -- ID of a specific operation instance, random value in the UUID format or any value that external system decides to set as the operation ID when creating the operation.
+  operation_name                VARCHAR(32) NOT NULL,               -- Name of the operation, represents a type of the operation, for example, "login" or "approve_payment".
   operation_data                CLOB NOT NULL,                      -- Signing data of the operation.
   operation_form_data           CLOB,                               -- Structured data of the operation that are displayed to the end user.
   application_id                VARCHAR(256),                       -- ID of the application that initiated the operation, usually OAuth 2.0 client ID.
@@ -127,21 +127,20 @@ CREATE TABLE ns_operation (
   application_extras            CLOB,                               -- Any additional information related to the application that initiated the operation.
   user_id                       VARCHAR(256),                       -- Associated user ID.
   organization_id               VARCHAR(256),                       -- Associated organization ID.
-  user_account_status           VARCHAR(32),                        -- Status of the user account while initiated the operation (for example, active or blocked).
+  user_account_status           VARCHAR(32),                        -- Status of the user account while initiated the operation - ACTIVE, NOT_ACTIVE.
   external_transaction_id       VARCHAR(256),                       -- External transaction ID, for example ID of a payment in a transaction system.
-  result                        VARCHAR(32),                        -- Operation result - FAILED, CANCELLED, DONE.
+  result                        VARCHAR(32),                        -- Operation result - CONTINUE, FAILED, DONE.
   timestamp_created             TIMESTAMP,                          -- Timestamp when this operation was created.
   timestamp_expires             TIMESTAMP,                          -- Timestamp of the expiration of the operation.
   CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
 -- Table ns_operation_history stores all changes of operations.
--- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
-  result_id                   INTEGER NOT NULL,                     -- Result ordering index identifier.
+  result_id                   INTEGER NOT NULL,                     -- Result ordering index identifier, incrementing value, starts with 1.
   request_auth_method         VARCHAR(32) NOT NULL,                 -- Authentication method used for the step.
-  request_auth_instruments    VARCHAR(256),                         -- Which specific instruments were used for the step (for example, password and sms for SCA).
+  request_auth_instruments    VARCHAR(256),                         -- Which specific instruments were used for the step. Supported values are: PASSWORD, SMS_KEY, POWERAUTH_TOKEN, HW_TOKEN. There can be multiple supported instruments, they are stored encoded in JSON format.
   request_auth_step_result    VARCHAR(32) NOT NULL,                 -- Authentication result: CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED, CONFIRMED
   request_params              VARCHAR(4000),                        -- Additional request parameters.
   response_result             VARCHAR(32) NOT NULL,                 -- Authentication step result: FAILED, CONTINUE, DONE
@@ -150,7 +149,7 @@ CREATE TABLE ns_operation_history (
   response_timestamp_created  TIMESTAMP,                            -- Timestamp when the record was created.
   response_timestamp_expires  TIMESTAMP,                            -- Timestamp when the operation step should expire.
   chosen_auth_method          VARCHAR(32),                          -- Information about which authentication method was chosen, in case user can chose the authentication method.
-  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,         -- Information about if mobile token is active during the authentication step.
+  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,         -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
   CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
   CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method)
@@ -161,8 +160,8 @@ CREATE TABLE ns_operation_afs (
   afs_action_id               INTEGER PRIMARY KEY NOT NULL,         -- ID of the AFS action.
   operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
   request_afs_action          VARCHAR(256) NOT NULL,                -- Information about requested AFS action.
-  request_step_index          INTEGER NOT NULL,                     -- Information about which operation step is associated with AFS action.
-  request_afs_extras          VARCHAR(256),                         -- Additional information about AFS action.
+  request_step_index          INTEGER NOT NULL,                     -- Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.
+  request_afs_extras          VARCHAR(256),                         -- Additional information about AFS action, typically a cookie values used in AFS system.
   response_afs_apply          NUMBER(1) DEFAULT 0 NOT NULL,         -- Response information about if AFS was applied.
   response_afs_label          VARCHAR(256),                         -- Response AFS label (information about what should the application do).
   response_afs_extras         VARCHAR(256),                         -- Additional information sent in AFS response.
@@ -202,6 +201,18 @@ CREATE TABLE wf_afs_config (
   config_id                 VARCHAR(256) PRIMARY KEY NOT NULL,      -- AFS config ID.
   js_snippet_url            VARCHAR(256) NOT NULL,                  -- URL of the AFS JavaScript snippet (relative to application or absolute).
   parameters                CLOB                                    -- Additional AFS snippet parameters.
+);
+
+-- Table wf_certificate_verification is used for storing information about verified client TLS certificates.
+CREATE TABLE wf_certificate_verification (
+  operation_id               VARCHAR(256) NOT NULL,                 -- Operation ID associated with the certificate verification.
+  auth_method                VARCHAR(32) NOT NULL,                  -- Authentication method in which the certificate authentication was used (for example, during "login" or "authorize_payment").
+  client_certificate_issuer  VARCHAR(4000) NOT NULL,                -- Certificate attribute representing the certificate issuer.
+  client_certificate_subject VARCHAR(4000) NOT NULL,                -- Certificate attribute representing the certificate subject.
+  client_certificate_sn      VARCHAR(256) NOT NULL,                 -- Certificate attribute representing the certificate serial number.
+  operation_data             CLOB NOT NULL,                         -- Operation data that were included in the certificate authentication request.
+  timestamp_verified         TIMESTAMP NOT NULL,                    -- Timestamp of the certificate verification.
+  CONSTRAINT certificate_verification_pk PRIMARY KEY (operation_id, auth_method)
 );
 
 -- Table da_sms_authorization stores data for SMS OTP authorization.
@@ -278,9 +289,10 @@ CREATE TABLE tpp_detail (
 
 CREATE TABLE tpp_app_detail (
   tpp_id                INTEGER NOT NULL,                           -- TPP ID.
-  app_client_id         VARCHAR(256) NOT NULL,                      -- TPP app ID, represented as OAuth 2.0 client ID.
+  app_client_id         VARCHAR(256) NOT NULL,                      -- TPP app ID, represented as OAuth 2.0 client ID and connecting the application to OAuth 2.0 credentials.
   app_name              VARCHAR(256) NOT NULL,                      -- TPP app name.
-  app_info              CLOB NULL,                                  -- Additional info about TPP app, if available.
+  app_info              CLOB NULL,                                  -- An arbitrary additional info about TPP app, if available.
+  app_type              VARCHAR(32) NULL,                           -- Application type, "web" or "native".
   CONSTRAINT tpp_detail_pk PRIMARY KEY (tpp_id, app_client_id),
   CONSTRAINT tpp_detail_fk FOREIGN KEY (tpp_id) REFERENCES tpp_detail (tpp_id),
   CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth_client_details (client_id)
@@ -288,5 +300,6 @@ CREATE TABLE tpp_app_detail (
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
-
+CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);

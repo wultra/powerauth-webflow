@@ -60,12 +60,19 @@ public class OperationSessionService {
      * @param operationId Operation ID.
      * @param httpSessionId HTTP session ID.
      * @param result Operation result.
+     * @return Whether HTTP session was successfully registered for the operation.
      */
-    public void persistOperationToSessionMapping(String operationId, String httpSessionId, AuthResult result) {
+    public boolean registerHttpSession(String operationId, String httpSessionId, AuthResult result) {
+        OperationSessionEntity existingSession = getOperationToSessionMapping(operationId);
+        if (existingSession != null) {
+            // Registration failed because operation is being accessed from another HTTP session
+            return false;
+        }
         OperationSessionEntity operationSessionEntity = new OperationSessionEntity(operationId, httpSessionId, result);
         String operationHash = generateOperationHash(operationId);
         operationSessionEntity.setOperationHash(operationHash);
         operationSessionRepository.save(operationSessionEntity);
+        return true;
     }
 
     /**
@@ -143,14 +150,25 @@ public class OperationSessionService {
      * @param operationHash Operation hash.
      * @param webSocketSessionId Web Socket session ID.
      * @param clientIpAddress Remote client IP address.
+     * @return Whether Web Socket session ID was successfully registered for the operation.
      */
-    public void storeWebSocketSessionId(String operationHash, String webSocketSessionId, String clientIpAddress) {
+    public boolean registerWebSocketSession(String operationHash, String webSocketSessionId, String clientIpAddress) {
         OperationSessionEntity operationSessionEntity = operationSessionRepository.findByOperationHash(operationHash);
-        if (operationSessionEntity != null) {
-            operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
-            operationSessionEntity.setClientIp(clientIpAddress);
-            operationSessionRepository.save(operationSessionEntity);
+        if (operationSessionEntity == null) {
+            // Registration failed because operation was not found
+            return false;
         }
+        String existingWebSocketSessionId = operationSessionEntity.getWebSocketSessionId();
+        if (existingWebSocketSessionId != null) {
+            // Registration failed because operation is being accessed from another browser tab / window or Web Socket
+            // session has been already registered.
+            return false;
+        }
+        operationSessionEntity.setWebSocketSessionId(webSocketSessionId);
+        operationSessionEntity.setClientIp(clientIpAddress);
+        operationSessionRepository.save(operationSessionEntity);
+        // Registration succeeded
+        return true;
     }
 
 }

@@ -24,6 +24,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.tppengine.model.entity.TppEngineError;
+import io.getlime.security.powerauth.app.tppengine.model.request.CreateTppAppRequest;
 import io.getlime.security.powerauth.app.tppengine.model.request.GiveConsentRequest;
 import io.getlime.security.powerauth.app.tppengine.model.request.RemoveConsentRequest;
 import io.getlime.security.powerauth.app.tppengine.model.response.ConsentDetailResponse;
@@ -131,7 +132,7 @@ public class TppEngineClient {
                     new ParameterizedTypeReference<ObjectResponse<ConsentDetailResponse>>() {},
                     params
             );
-            return new ObjectResponse<>(Objects.requireNonNull(response.getBody()).getResponseObject());
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -161,7 +162,7 @@ public class TppEngineClient {
                     new ParameterizedTypeReference<ObjectResponse<UserConsentDetailResponse>>() {},
                     params
             );
-            return new ObjectResponse<>(Objects.requireNonNull(response.getBody()).getResponseObject());
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -184,7 +185,7 @@ public class TppEngineClient {
                     HttpMethod.POST,
                     entity,
                     new ParameterizedTypeReference<ObjectResponse<GiveConsentResponse>>() {});
-            return new ObjectResponse<>(Objects.requireNonNull(response.getBody()).getResponseObject());
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -207,7 +208,7 @@ public class TppEngineClient {
                     HttpMethod.DELETE,
                     entity,
                     new ParameterizedTypeReference<Response>() {});
-            return new Response();
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down
@@ -233,7 +234,168 @@ public class TppEngineClient {
                     new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
                     params
             );
-            return new ObjectResponse<>(Objects.requireNonNull(response.getBody()).getResponseObject());
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Lookup information about a provided app.
+     *
+     * @param clientId Identifier of a TPP app.
+     * @param tppLicense TPP license information.
+     * @return Response with details TPP app with given client ID.
+     * @throws TppEngineClientException Thrown when client request fails or app does not exist.
+     */
+    public ObjectResponse<TppAppDetailResponse> fetchAppInfoWithLicenseRestriction(String clientId, String tppLicense) throws TppEngineClientException {
+        try {
+            final Map<String, String> params = new HashMap<>();
+            params.put("clientId", clientId);
+            params.put("tppLicense", tppLicense);
+            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app?clientId={clientId}&tppLicense={tppLicense}",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
+                    params
+            );
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Fetch list of TPP applications based on the license info.
+     *
+     * @param tppLicense TPP license information.
+     * @return Response with details TPP app with given client ID.
+     * @throws TppEngineClientException Thrown when client request fails or app does not exist.
+     */
+    public ObjectResponse<List<TppAppDetailResponse>> fetchApplicationList(String tppLicense) throws TppEngineClientException {
+        try {
+            final Map<String, String> params = new HashMap<>();
+            params.put("tppLicense", tppLicense);
+            ResponseEntity<ObjectResponse<List<TppAppDetailResponse>>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app/list?tppLicense={tppLicense}",
+                    HttpMethod.GET,
+                    null,
+                    new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>() {},
+                    params
+            );
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Create an application with provided information.
+     *
+     * @param request New application information.
+     * @return Information about newly created application.
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
+     */
+    public ObjectResponse<TppAppDetailResponse> createApplication(CreateTppAppRequest request) throws TppEngineClientException {
+        try {
+            HttpEntity<ObjectRequest<CreateTppAppRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app",
+                    HttpMethod.POST,
+                    entity,
+                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {});
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Update an application with provided client ID with a new information.
+     *
+     * @param clientId Client ID of an app to be updated.
+     * @param request New application information.
+     * @return Information about newly created application.
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
+     */
+    public ObjectResponse<TppAppDetailResponse> updateApplication(String clientId, CreateTppAppRequest request) throws TppEngineClientException {
+        try {
+            HttpEntity<ObjectRequest<CreateTppAppRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
+            final Map<String, String> params = new HashMap<>();
+            params.put("clientId", clientId);
+            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app?clientId={clientId}",
+                    HttpMethod.PUT,
+                    entity,
+                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
+                    params
+            );
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Renew the client secret for the application.
+     *
+     * @param clientId Client ID of an application to be refreshed.
+     * @param tppLicense License information of TPP.
+     * @return Information about newly created application.
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
+     */
+    public ObjectResponse<TppAppDetailResponse> renewClientSecret(String clientId, String tppLicense) throws TppEngineClientException {
+        try {
+            final Map<String, String> params = new HashMap<>();
+            params.put("clientId", clientId);
+            params.put("tppLicense", tppLicense);
+            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app/renewSecret?clientId={clientId}&tppLicense={tppLicense}",
+                    HttpMethod.POST,
+                    null,
+                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
+                    params
+            );
+            return response.getBody();
+        } catch (HttpStatusCodeException ex) {
+            throw httpStatusException(ex);
+        } catch (ResourceAccessException ex) { // Data Adapter service is down
+            throw resourceAccessException(ex);
+        }
+    }
+
+    /**
+     * Delete an application with provided information.
+     *
+     * @param clientId Client ID of the app.
+     * @param tppLicense License information of TPP.
+     * @return Generic response.
+     * @throws TppEngineClientException Thrown when client request fails or user does not exist.
+     */
+    public Response deleteApplication(String clientId, String tppLicense) throws TppEngineClientException {
+        try {
+            final Map<String, String> params = new HashMap<>();
+            params.put("clientId", clientId);
+            params.put("tppLicense", tppLicense);
+            ResponseEntity<Response> response = restTemplate.exchange(
+                    serviceUrl + "/tpp/app?clientId={clientId}&tppLicense={tppLicense}",
+                    HttpMethod.DELETE,
+                    null,
+                    new ParameterizedTypeReference<Response>() {},
+                    params
+            );
+            return response.getBody();
         } catch (HttpStatusCodeException ex) {
             throw httpStatusException(ex);
         } catch (ResourceAccessException ex) { // Data Adapter service is down

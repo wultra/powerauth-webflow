@@ -92,4 +92,17 @@ public class DefaultExceptionResolver {
         return "redirect:/oauth/error";
     }
 
+
+    /**
+     * Handling of client authentication exception.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(TlsClientAuthenticationException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public @ResponseBody ErrorResponse handleTlsClientAuthenticationException(TlsClientAuthenticationException ex) {
+        logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
+        return new ErrorResponse(error);
+    }
 }

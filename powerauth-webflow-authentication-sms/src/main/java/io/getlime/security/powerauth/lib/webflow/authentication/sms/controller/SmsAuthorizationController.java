@@ -27,7 +27,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContex
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -42,6 +41,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessio
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
+import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.CertificateVerificationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.request.SmsAuthorizationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.response.InitSmsAuthorizationResponse;
@@ -51,13 +52,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -67,7 +68,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Controller
+@RestController
 @RequestMapping(value = "/api/auth/sms")
 public class SmsAuthorizationController extends AuthMethodController<SmsAuthorizationRequest, SmsAuthorizationResponse, AuthStepException> {
 
@@ -80,6 +81,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private final WebFlowServicesConfiguration configuration;
     private final AfsIntegrationService afsIntegrationService;
     private final HttpSession httpSession;
+    private final CertificateVerificationRepository certificateVerificationRepository;
 
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
     private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
@@ -90,13 +92,15 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @param configuration Web Flow configuration.
      * @param afsIntegrationService Anti-fraud system integration service.
      * @param httpSession HTTP session.
+     * @param certificateVerificationRepository Certificate verification repository.
      */
     @Autowired
-    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession) {
+    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession, CertificateVerificationRepository certificateVerificationRepository) {
         this.dataAdapterClient = dataAdapterClient;
         this.configuration = configuration;
         this.afsIntegrationService = afsIntegrationService;
         this.httpSession = httpSession;
+        this.certificateVerificationRepository = certificateVerificationRepository;
     }
 
     /**
@@ -117,11 +121,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String operationId = operation.getOperationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
+            final String externalTransactionId = operation.getExternalTransactionId();
             String userId = operation.getUserId();
             String organizationId = operation.getOrganizationId();
             AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
             SmsAuthorizationResult smsAuthorizationResult;
 
             String authCode = request.getAuthCode();
@@ -190,7 +195,6 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             Integer remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
             boolean showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
             String errorMessage = smsAndPasswordResponse.getErrorMessage();
-            boolean userAccountBlocked = smsAndPasswordResponse.getAccountStatus() != AccountStatus.ACTIVE;
             UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(smsAndPasswordResponse.getAccountStatus());
 
             try {
@@ -329,7 +333,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody InitSmsAuthorizationResponse initSmsAuthorization() throws AuthStepException {
+    public InitSmsAuthorizationResponse initSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -346,7 +350,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             initResponse.setUsername(username);
         }
 
-        if (configuration.isAfsEnabled()) {
+        if (isCertificateUsedForAuthentication(operation.getOperationId())) {
+
+            // Currently AFS integration and client certificate authentication are exclusive
+            logger.debug("Disabling password verification due to client TLS certificate usage in INIT step of authentication method: {}, operation ID: {}", authMethod, operation.getOperationId());
+            AuthStepOptions authStepOptions = new AuthStepOptions();
+            authStepOptions.setPasswordRequired(false);
+            authStepOptions.setSmsOtpRequired(true);
+            updateAuthStepOptionsInHttpSession(authStepOptions);
+            initResponse.setSmsOtpEnabled(true);
+            initResponse.setPasswordEnabled(false);
+
+        } else if (configuration.isAfsEnabled()) {
 
             AfsAction afsAction = determineAfsActionInit(authMethod, operation.getOperationName());
 
@@ -416,7 +431,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/resend", method = RequestMethod.POST)
-    public @ResponseBody ResendSmsAuthorizationResponse resendSmsAuthorization() throws AuthStepException {
+    public ResendSmsAuthorizationResponse resendSmsAuthorization() throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Resend step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -454,7 +469,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException In case authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody SmsAuthorizationResponse authenticateHandler(@RequestBody SmsAuthorizationRequest request) throws AuthStepException {
+    public SmsAuthorizationResponse authenticateHandler(@Valid @RequestBody SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         // Extract username for LOGIN_SCA
@@ -555,7 +570,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Thrown when operation is invalid or not available.
      */
     @RequestMapping(value = "/cancel", method = RequestMethod.POST)
-    public @ResponseBody SmsAuthorizationResponse cancelAuthentication() throws AuthStepException {
+    public SmsAuthorizationResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
             final AuthMethod authMethod = getAuthMethodName(operation);
@@ -600,8 +615,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         String operationId = operation.getOperationId();
         String operationName = operation.getOperationName();
         String operationData = operation.getOperationData();
-        OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
-        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
+        final AuthMethod authMethod = getAuthMethodName(operation);
+        final String externalTransactionId = operation.getExternalTransactionId();
+        OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
+        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, authMethod, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
         updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
         return daResponse.getResponseObject();
     }
@@ -676,6 +693,16 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 afsAction = null;
         }
         return afsAction;
+    }
+
+    /**
+     * Whether client TLS certificate is used for authentication.
+     * @param operationId Operation ID.
+     * @return Whether client TLS certificate is used for authentication.
+     */
+    private boolean isCertificateUsedForAuthentication(String operationId) {
+        CertificateVerificationEntity.CertificateVerificationKey key = new CertificateVerificationEntity.CertificateVerificationKey(operationId, AuthMethod.APPROVAL_SCA);
+        return certificateVerificationRepository.findByCertificateVerificationKey(key).isPresent();
     }
 
 }

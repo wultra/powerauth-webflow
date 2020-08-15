@@ -18,9 +18,9 @@ import ReactDOM from 'react-dom';
 import {connect} from 'react-redux';
 // Actions
 import {
-    init,
     authenticate,
     cancel,
+    initLogin,
     organizationConfigurationError,
     selectOrganization
 } from '../actions/usernamePasswordAuthActions'
@@ -48,10 +48,27 @@ export default class Login extends React.Component {
         this.handleCancel = this.handleCancel.bind(this);
         this.organizationChanged = this.organizationChanged.bind(this);
         this.banners = this.banners.bind(this);
+        this.init = this.init.bind(this);
+        this.setDefaultOrganization = this.setDefaultOrganization.bind(this);
+        this.updateButtonState = this.updateButtonState.bind(this);
+        this.state = {signInDisabled: true};
     }
 
     componentWillMount() {
-        this.props.dispatch(init());
+        this.init();
+    }
+
+    init() {
+        const props = this.props;
+        const setDefaultOrganization = this.setDefaultOrganization;
+        props.dispatch(initLogin(function(initSucceeded) {
+            if (initSucceeded) {
+                // Set the default organization after loading organizations unless chosen organization was previously set
+                if (props.context.chosenOrganizationId === undefined) {
+                    setDefaultOrganization();
+                }
+            }
+        }));
     }
 
     handleLogin(event) {
@@ -110,12 +127,9 @@ export default class Login extends React.Component {
 
     singleOrganization() {
         const organizations = this.props.context.organizations;
-        if (this.props.context.chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        }
         return (
             <Panel>
-                {this.banners()}
+                {this.banners(true)}
                 {this.title()}
                 {this.loginForm(organizations[0].organizationId)}
             </Panel>
@@ -125,56 +139,48 @@ export default class Login extends React.Component {
     fewOrganizations() {
         const formatMessage = this.props.intl.formatMessage;
         const organizations = this.props.context.organizations;
-        if (this.props.context.chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        } else {
-            return (
-                <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
-                    {organizations.map((org) => {
-                        return (
-                            <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
-                                <Panel>
-                                    {this.banners()}
-                                    {this.title()}
-                                    {this.loginForm(org.organizationId)}
-                                </Panel>
-                            </Tab>
-                        )
-                    })}
-                </Tabs>
-            )
-        }
+        return (
+            <Tabs defaultActiveKey={this.props.context.chosenOrganizationId} onSelect={key => this.organizationChanged(key)}>
+                {organizations.map((org) => {
+                    return (
+                        <Tab key={org.organizationId} eventKey={org.organizationId} title={formatMessage({id: org.displayNameKey})}>
+                            <Panel>
+                                {this.banners(org.organizationId === this.props.context.chosenOrganizationId)}
+                                {this.title()}
+                                {this.loginForm(org.organizationId)}
+                            </Panel>
+                        </Tab>
+                    )
+                })}
+            </Tabs>
+        )
     }
 
     manyOrganizations() {
         const organizations = this.props.context.organizations;
         const chosenOrganizationId = this.props.context.chosenOrganizationId;
         const formatMessage = this.props.intl.formatMessage;
-        if (chosenOrganizationId === undefined) {
-            this.setDefaultOrganization();
-        } else {
-            let chosenOrganization = organizations[0];
-            organizations.forEach(function (org) {
-                // perform i18n, the select component does not support i18n
-                org.displayName = formatMessage({id: org.displayNameKey});
-                if (org.organizationId === chosenOrganizationId) {
-                    chosenOrganization = org;
-                }
-            });
-            return (
-                <Panel>
-                    <OrganizationSelect
-                        organizations={organizations}
-                        chosenOrganization={chosenOrganization}
-                        intl={this.props.intl}
-                        callback={organization => this.organizationChanged(organization.organizationId)}
-                    />
-                    {this.banners()}
-                    {this.title()}
-                    {this.loginForm(chosenOrganizationId)}
-                </Panel>
-            )
-        }
+        let chosenOrganization = organizations[0];
+        organizations.forEach(function (org) {
+            // perform i18n, the select component does not support i18n
+            org.displayName = formatMessage({id: org.displayNameKey});
+            if (org.organizationId === chosenOrganizationId) {
+                chosenOrganization = org;
+            }
+        });
+        return (
+            <Panel>
+                <OrganizationSelect
+                    organizations={organizations}
+                    chosenOrganization={chosenOrganization}
+                    intl={this.props.intl}
+                    callback={organization => this.organizationChanged(organization.organizationId)}
+                />
+                {this.banners(true)}
+                {this.title()}
+                {this.loginForm(chosenOrganizationId)}
+            </Panel>
+        )
     }
 
     setDefaultOrganization() {
@@ -192,9 +198,26 @@ export default class Login extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
-    banners() {
+    updateButtonState() {
+        if (this.props.context.chosenOrganizationId === undefined) {
+            return;
+        }
+        const usernameField = "username" + "_" + this.props.context.chosenOrganizationId;
+        const passwordField = "password" + "_" + this.props.context.chosenOrganizationId;
+        if (document.getElementById(usernameField).value.length === 0 || document.getElementById(passwordField).value.length === 0) {
+            if (!this.state.signInDisabled) {
+                this.setState({signInDisabled: true});
+            }
+        } else {
+            if (this.state.signInDisabled) {
+                this.setState({signInDisabled: false});
+            }
+        }
+    }
+
+    banners(timeoutCheckActive) {
         return (
-            <OperationTimeout/>
+            <OperationTimeout timeoutCheckActive={timeoutCheckActive}/>
         )
     }
 
@@ -230,12 +253,14 @@ export default class Login extends React.Component {
                 )
                 }
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={usernameField} type="text"
-                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
+                    <FormControl autoComplete="new-password" id={usernameField} ref={usernameField} type="text" maxLength={usernameMaxLength}
+                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus
+                                 onChange={this.updateButtonState.bind(this)}/>
                 </FormGroup>
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={passwordField} type="password"
-                                 placeholder={formatMessage({id: 'login.password'})}/>
+                    <FormControl autoComplete="new-password" id={passwordField} ref={passwordField} type="password" maxLength={passwordMaxLength}
+                                 placeholder={formatMessage({id: 'login.password'})}
+                                 onChange={this.updateButtonState.bind(this)}/>
                 </FormGroup>
                 <FormGroup>
                     <div className="row buttons">
@@ -245,7 +270,7 @@ export default class Login extends React.Component {
                             </a>
                         </div>
                         <div className="col-xs-6">
-                            <Button bsSize="lg" type="submit" bsStyle="success" block>
+                            <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.signInDisabled}>
                                 <FormattedMessage id="login.signIn"/>
                             </Button>
                         </div>

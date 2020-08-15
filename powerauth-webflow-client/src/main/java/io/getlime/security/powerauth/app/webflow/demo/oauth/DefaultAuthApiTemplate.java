@@ -16,7 +16,23 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.ssl.SSLContextBuilder;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.social.oauth2.OAuth2Template;
+import org.springframework.util.ResourceUtils;
+import org.springframework.web.client.RestTemplate;
+
+import javax.net.ssl.SSLContext;
+import java.io.File;
+import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateException;
 
 /**
  * Default template used to access resources needed for OAuth 2.0 dance.
@@ -27,6 +43,44 @@ public class DefaultAuthApiTemplate extends OAuth2Template {
 
     public DefaultAuthApiTemplate(String clientId, String clientSecret, String authorizeUrl, String accessTokenUrl) {
         super(clientId, clientSecret, authorizeUrl, accessTokenUrl);
+    }
+
+    @Override
+    protected RestTemplate createRestTemplate() {
+        RestTemplate restTemplate = super.createRestTemplate();
+        try {
+            final HttpComponentsClientHttpRequestFactory requestFactory = configureSsl();
+            if (requestFactory != null) {
+                restTemplate.setRequestFactory(requestFactory);
+            }
+        } catch (IOException | UnrecoverableKeyException | CertificateException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
+            //
+        }
+        return restTemplate;
+    }
+
+    private HttpComponentsClientHttpRequestFactory configureSsl() throws IOException, UnrecoverableKeyException, CertificateException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException {
+        // Prepare keystore and truststore configurations
+        SSLContextBuilder sslContextBuilder = new SSLContextBuilder();
+
+        // Configure keystore
+        File keyStoreResource = ResourceUtils.getFile("keystore.jks");
+        if (keyStoreResource.exists()) {
+            final String keyAlias = "key";
+            final char[] keyStorePassword = "changeme".toCharArray();
+            final char[] keyStorePrivateKeyPassword = "aaaa".toCharArray();
+            sslContextBuilder.loadKeyMaterial(keyStoreResource, keyStorePassword, keyStorePrivateKeyPassword, (map, socket) -> keyAlias);
+        }
+
+        // Prepare request factory
+        SSLContext sslContext = sslContextBuilder.build();
+        if (sslContext != null) {
+            SSLConnectionSocketFactory socketFactory = new SSLConnectionSocketFactory(sslContext);
+            HttpClient httpClient = HttpClients.custom().setSSLSocketFactory(socketFactory).build();
+            return new HttpComponentsClientHttpRequestFactory(httpClient);
+        }
+
+        return null;
     }
 
 }
