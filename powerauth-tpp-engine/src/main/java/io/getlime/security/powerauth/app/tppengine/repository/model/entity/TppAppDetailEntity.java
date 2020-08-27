@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.tppengine.repository.model.entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  * Entity representing a TPP application details. This entity is connected to TPP via tpp_id on one end,
@@ -31,6 +32,8 @@ import java.io.Serializable;
 @Table(name = "tpp_app_detail")
 public class TppAppDetailEntity implements Serializable {
 
+    private static final long serialVersionUID = 4100688209055833070L;
+
     @EmbeddedId
     private TppAppDetailKey primaryKey;
 
@@ -39,6 +42,9 @@ public class TppAppDetailEntity implements Serializable {
 
     @Column(name = "app_info")
     private String appInfo;
+
+    @Column(name = "app_type")
+    private String appType;
 
     @ManyToOne
     @JoinColumn(name = "tpp_id", referencedColumnName = "tpp_id", insertable = false, updatable = false)
@@ -75,6 +81,14 @@ public class TppAppDetailEntity implements Serializable {
         this.appInfo = appInfo;
     }
 
+    public String getAppType() {
+        return appType;
+    }
+
+    public void setAppType(String appType) {
+        this.appType = appType;
+    }
+
     public TppEntity getTpp() {
         return tpp;
     }
@@ -86,10 +100,12 @@ public class TppAppDetailEntity implements Serializable {
     @Embeddable
     public static class TppAppDetailKey implements Serializable {
 
-        @Column(name = "app_client_id")
+        private static final long serialVersionUID = -527239721500406289L;
+
+        @Column(name = "app_client_id", nullable = false)
         private String appClientId;
 
-        @Column(name = "tpp_id")
+        @Column(name = "tpp_id", nullable = false)
         private Long tppId;
 
         public TppAppDetailKey() {
@@ -116,6 +132,18 @@ public class TppAppDetailEntity implements Serializable {
             this.tppId = tppId;
         }
 
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof TppAppDetailKey)) return false;
+            TppAppDetailKey that = (TppAppDetailKey) o;
+            return Objects.equals(appClientId, that.appClientId) && Objects.equals(tppId, that.tppId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(appClientId, tppId);
+        }
     }
 
 }

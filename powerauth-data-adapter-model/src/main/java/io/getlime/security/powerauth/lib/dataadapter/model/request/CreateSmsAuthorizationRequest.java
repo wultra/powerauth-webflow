@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
 /**
  * Request for creating SMS OTP authorization message.
@@ -24,7 +25,6 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountSt
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class CreateSmsAuthorizationRequest {
-
 
     /**
      * User ID for this authorization request.
@@ -40,6 +40,11 @@ public class CreateSmsAuthorizationRequest {
      * User account status.
      */
     private AccountStatus accountStatus;
+
+    /**
+     * Authentication method.
+     */
+    private AuthMethod authMethod;
 
     /**
      * Operation context.
@@ -68,14 +73,16 @@ public class CreateSmsAuthorizationRequest {
      * @param organizationId Organization ID.
      * @param accountStatus User account status.
      * @param lang SMS language.
+     * @param authMethod Authentication method.
      * @param operationContext Operation context.
      * @param resend Whether SMS is being resent.
      */
-    public CreateSmsAuthorizationRequest(String userId, String organizationId, AccountStatus accountStatus, String lang, OperationContext operationContext, boolean resend) {
+    public CreateSmsAuthorizationRequest(String userId, String organizationId, AccountStatus accountStatus, String lang, AuthMethod authMethod, OperationContext operationContext, boolean resend) {
         this.userId = userId;
         this.organizationId = organizationId;
         this.accountStatus = accountStatus;
         this.lang = lang;
+        this.authMethod = authMethod;
         this.operationContext = operationContext;
         this.resend = resend;
     }
@@ -126,6 +133,22 @@ public class CreateSmsAuthorizationRequest {
      */
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
+    }
+
+    /**
+     * Get authentication method.
+     * @return Authentication method.
+     */
+    public AuthMethod getAuthMethod() {
+        return authMethod;
+    }
+
+    /**
+     * Set authentication method.
+     * @param authMethod Authentication method.
+     */
+    public void setAuthMethod(AuthMethod authMethod) {
+        this.authMethod = authMethod;
     }
 
     /**

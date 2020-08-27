@@ -22,7 +22,9 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.CertificateAuthenticationMode;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.CertificateVerificationResult;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.InitAuthMethodResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -125,7 +127,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
             AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
             try {
                 boolean userAuthenticatedUsingCertificate = verifyClientCertificate(operation.getOperationId(), userId, organizationId, clientCertificate, accountStatus, operationContext);
                 if (userAuthenticatedUsingCertificate) {
@@ -194,9 +196,15 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             // Set chosen authentication method to APPROVAL_SCA
             nextStepClient.updateChosenAuthMethod(operation.getOperationId(), AuthMethod.APPROVAL_SCA);
 
+            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+            ObjectResponse<InitAuthMethodResponse> objectResponse = dataAdapterClient.initAuthMethod(operation.getUserId(), operation.getOrganizationId(), AuthMethod.LOGIN_SCA, operationContext);
+            InitAuthMethodResponse initResponse = objectResponse.getResponseObject();
             // In case client TLS certificate was used during SCA login, use the client TLS certificate for authentication during payment
-            if (isCertificateUsedForAuthentication(operation.getOperationId())) {
-                String certificateVerificationUrl = config.getCertificateVerificationUrlForApproval();
+            if (initResponse.getCertificateAuthenticationMode() == CertificateAuthenticationMode.ENABLED
+                    && isCertificateUsedForAuthentication(operation.getOperationId())) {
+                String certificateVerificationUrl = initResponse.getCertificateVerificationUrl();
                 logger.debug("Step init succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return new ApprovalScaInitResponse(true, certificateVerificationUrl);
             }
@@ -204,6 +212,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         } catch (NextStepServiceException ex) {
             logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Communication with Next Step service failed");
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error("Error occurred in Data Adapter", ex);
+            throw new CommunicationFailedException("Communication with Data Adapter service failed");
         }
 
         logger.debug("Step init succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());

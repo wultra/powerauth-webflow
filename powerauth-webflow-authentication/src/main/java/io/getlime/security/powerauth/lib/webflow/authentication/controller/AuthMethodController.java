@@ -23,10 +23,14 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -42,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -123,6 +126,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
+     * Create a new implicit login operation based on the OAuth 2.0 scopes.
+     * @param clientId OAuth 2.0 Client ID.
+     * @param scopes OAuth 2.0 Scopes
+     * @return Information about a new operation.
+     * @throws CommunicationFailedException In case the communication with data adapter fails.
+     */
+    protected CreateImplicitLoginOperationResponse createImplicitLoginOperation(String clientId, String[] scopes) throws CommunicationFailedException {
+        try {
+            final ObjectResponse<CreateImplicitLoginOperationResponse> implicitLoginOperation = dataAdapterClient.createImplicitLoginOperation(clientId, scopes);
+            return implicitLoginOperation.getResponseObject();
+        } catch (DataAdapterClientErrorException e) {
+            logger.error("Error occurred in Data Adapter server", e);
+            throw new CommunicationFailedException("Implicit login operation cannot be created");
+        }
+    }
+
+    /**
      * Get operation detail with given operation ID.
      * @param operationId Operation ID.
      * @return Operation detail.
@@ -147,9 +167,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 validateOperationState(operation);
             }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
-            // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-            // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-            updateOperationForScaLogin(operation);
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
         } catch (NextStepServiceException e) {
@@ -242,7 +259,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse operation: responseObject) {
-                updateOperationForScaLogin(operation);
+                // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+                // In case of an approval operation the data would be incorrect, because it is related to the payment.
+                // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+                if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+                    authMethodResolutionService.updateOperationForScaLogin(operation);
+                }
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }
@@ -287,7 +309,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, organizationId, operationContext);
                 // notify AFS about logout
                 afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
@@ -323,7 +345,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
@@ -668,28 +690,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         authSteps.removeAll(authStepsToRemove);
-    }
-
-    /**
-     * Update operation for SCA login in case of an approval operation.
-     * @param operation Operation to update.
-     */
-    private void updateOperationForScaLogin(GetOperationDetailResponse operation) {
-        // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-        // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA) {
-            // Make sure Mobile Token and Data Adapter recognize the operation name
-            operation.setOperationName("login");
-            // Update operation data for login
-            operation.setOperationData("A2");
-            // Update operation form data
-            OperationFormData formData = new OperationFormData();
-            formData.addTitle("login.title");
-            formData.addGreeting("login.greeting");
-            formData.addSummary("login.summary");
-            formData.setUserInput(operation.getFormData().getUserInput());
-            operation.setFormData(formData);
-        }
     }
 
     /**

@@ -401,3 +401,8 @@ a:hover, a:active, a:focus {
 .client-certificate-active:hover {
     cursor: pointer;
 }
+
+.client-certificate-label {
+    text-align: left;
+    margin-top: 10px;
+}

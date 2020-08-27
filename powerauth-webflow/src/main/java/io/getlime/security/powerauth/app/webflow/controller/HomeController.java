@@ -302,7 +302,7 @@ public class HomeController {
         // Extract optional state parameter from original request
         String[] stateParameter = savedRequest.getParameterMap().get("state");
         String state = null;
-        if (stateParameter.length > 1) {
+        if (stateParameter == null || stateParameter.length > 1) {
             logger.error("Multiple state request parameters found");
             return "redirect:/oauth/error";
         } else if (stateParameter.length == 1) {

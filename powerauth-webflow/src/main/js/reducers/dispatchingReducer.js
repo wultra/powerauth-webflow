@@ -115,6 +115,10 @@ function mergeOrganizations(oldContext, newContext) {
 }
 
 function mergeCertificateData(oldContext, newContext) {
+    // clientCertificateAuthenticationAvailable need to remain in context
+    if (oldContext.clientCertificateAuthenticationAvailable !== undefined && newContext.clientCertificateAuthenticationAvailable === undefined) {
+        newContext.clientCertificateAuthenticationAvailable = oldContext.clientCertificateAuthenticationAvailable;
+    }
     // clientCertificateAuthenticationEnabled need to remain in context
     if (oldContext.clientCertificateAuthenticationEnabled !== undefined && newContext.clientCertificateAuthenticationEnabled === undefined) {
         newContext.clientCertificateAuthenticationEnabled = oldContext.clientCertificateAuthenticationEnabled;

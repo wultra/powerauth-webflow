@@ -1,4 +1,5 @@
 DROP TABLE IF EXISTS da_sms_authorization;
+DROP TABLE IF EXISTS da_user_credentials;
 DROP TABLE IF EXISTS wf_afs_config;
 DROP TABLE IF EXISTS wf_operation_session;
 DROP TABLE IF EXISTS tpp_consent;
@@ -19,3 +20,8 @@ DROP TABLE IF EXISTS oauth_refresh_token;
 DROP TABLE IF EXISTS oauth_access_token;
 DROP TABLE IF EXISTS oauth_client_token;
 DROP TABLE IF EXISTS oauth_client_details;
+DROP TABLE IF EXISTS tpp_app_detail;
+DROP TABLE IF EXISTS tpp_consent;
+DROP TABLE IF EXISTS tpp_detail;
+DROP TABLE IF EXISTS tpp_user_consent;
+DROP TABLE IF EXISTS tpp_user_consent_history;

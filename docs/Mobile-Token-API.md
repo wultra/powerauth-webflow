@@ -15,7 +15,7 @@ List of error codes in Mobile Token API:
 | Code | Description | HTTP Status Code |
 |---|---|---|
 | `INVALID_REQUEST` | Invalid request sent - missing request object in request | 400 |
-| `INVALID_ACTIVATION` | Activation is not valid (it is different from configured activation) | 400 |
+| `INVALID_ACTIVATION` | Activation is not valid (it is different from configured activation). Return this error in case the activation does not exist, or in case the activation is not allowed to perform the action (for example, user did not allow operation approvals on such device). | 400 |
 | `POWERAUTH_AUTH_FAIL` | PowerAuth authentication failed | 401 |
 | `OPERATION_ALREADY_FINISHED` | Operation is already finished | 400 |
 | `OPERATION_ALREADY_FAILED` | Operation is already failed | 400 |

@@ -1,6 +1,7 @@
 --
 --  Create sequences.
 --
+CREATE SEQUENCE "tpp_detail_seq" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20;
 CREATE SEQUENCE "tpp_user_consent_seq" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20;
 CREATE SEQUENCE "tpp_user_consent_history_seq" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20;
 CREATE SEQUENCE "ns_operation_afs_seq" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20;
@@ -96,6 +97,7 @@ CREATE TABLE ns_operation_config (
   operation_name            VARCHAR(32) PRIMARY KEY NOT NULL,
   template_version          VARCHAR(1) NOT NULL,
   template_id               INTEGER NOT NULL,
+  mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,
   mobile_token_mode         VARCHAR(256) NOT NULL,
   afs_enabled               BOOLEAN DEFAULT FALSE NOT NULL,
   afs_config_id             VARCHAR(256)
@@ -134,7 +136,6 @@ CREATE TABLE ns_operation (
 );
 
 -- Table ns_operation_history stores all changes of operations.
--- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_operation_history (
   operation_id                VARCHAR(256) NOT NULL,
   result_id                   INTEGER NOT NULL,
@@ -274,7 +275,31 @@ CREATE TABLE tpp_user_consent_history (
   timestamp_created     TIMESTAMP
 );
 
+CREATE TABLE tpp_detail (
+  tpp_id                INTEGER PRIMARY KEY NOT NULL,
+  tpp_name              VARCHAR(256) NOT NULL,
+  tpp_license           VARCHAR(256) NOT NULL,
+  tpp_info              TEXT NULL,
+  tpp_address           TEXT NULL,
+  tpp_website           TEXT NULL,
+  tpp_phone             VARCHAR(256) NULL,
+  tpp_email             VARCHAR(256) NULL,
+  tpp_logo              TEXT NULL
+);
+
+CREATE TABLE tpp_app_detail (
+  tpp_id                INTEGER NOT NULL,
+  app_client_id         VARCHAR(256) NOT NULL,
+  app_name              VARCHAR(256) NOT NULL,
+  app_info              TEXT NULL,
+  app_type              VARCHAR(32) NULL,
+  CONSTRAINT tpp_detail_pk PRIMARY KEY (tpp_id, app_client_id),
+  CONSTRAINT tpp_detail_fk FOREIGN KEY (tpp_id) REFERENCES tpp_detail (tpp_id),
+  CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth_client_details (client_id)
+);
+
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
 CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);

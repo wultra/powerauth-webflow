@@ -96,7 +96,7 @@ export function authenticate(username, organizationId) {
  * Initialize SCA login.
  * @returns {Function} No return value.
  */
-export function init() {
+export function initLoginSca(callback) {
     return function (dispatch) {
         dispatch({
             type: "SHOW_SCREEN_LOGIN_SCA",
@@ -135,6 +135,7 @@ export function init() {
                 type: "SHOW_SCREEN_LOGIN_SCA",
                 payload: response.data
             });
+            callback(true);
             return null;
         }).catch((error) => {
             dispatchError(dispatch, error);

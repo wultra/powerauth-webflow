@@ -149,6 +149,8 @@ public class CertificateVerificationEntity implements Serializable {
     @Embeddable
     public static class CertificateVerificationKey implements Serializable {
 
+        private static final long serialVersionUID = -8783963465967422879L;
+
         @Column(name = "operation_id", nullable = false)
         private String operationId;
 

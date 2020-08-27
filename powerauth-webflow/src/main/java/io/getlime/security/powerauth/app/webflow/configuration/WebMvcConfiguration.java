@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.getlime.security.powerauth.app.webflow.i18n.ReloadableResourceBundleMessageSourceWithListing;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthAnnotationInterceptor;
 import io.getlime.security.powerauth.rest.api.spring.annotation.PowerAuthEncryptionArgumentResolver;
@@ -149,7 +149,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
         bean.setIndentOutput(true);
         bean.afterPropertiesSet();
         ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JodaModule());
+        objectMapper.registerModule(new JavaTimeModule());
         // replacement for ISO8601DateFormat which is deprecated
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);

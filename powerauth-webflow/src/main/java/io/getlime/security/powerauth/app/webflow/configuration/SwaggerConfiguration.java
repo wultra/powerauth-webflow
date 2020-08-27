@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -36,7 +37,10 @@ public class SwaggerConfiguration {
     public Docket productApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("io.getlime.security.powerauth"))
+                .apis(Predicates.or(
+                        RequestHandlerSelectors.basePackage("io.getlime.security.powerauth"),
+                        RequestHandlerSelectors.basePackage("org.springframework.security.oauth2.provider.endpoint")
+                ))
                 .paths(PathSelectors.any())
                 .build();
     }
