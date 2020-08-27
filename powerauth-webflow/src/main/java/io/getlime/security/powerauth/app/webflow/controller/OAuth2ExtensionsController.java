@@ -52,7 +52,7 @@ public class OAuth2ExtensionsController {
             if (tokenServices instanceof DefaultTokenServices) {
                 final DefaultTokenServices defaultTokenServices = (DefaultTokenServices) tokenServices;
                 final String clientId = defaultTokenServices.getClientId(tokenId);
-                logger.info("Removing access token: {}, for client ID: {}", tokenId, clientId);
+                logger.debug("Removing access token: {}, for client ID: {}", tokenId, clientId);
                 if (principal != null && clientId.equals(principal.getName())) {
                     defaultTokenServices.revokeToken(tokenId);
                 }
