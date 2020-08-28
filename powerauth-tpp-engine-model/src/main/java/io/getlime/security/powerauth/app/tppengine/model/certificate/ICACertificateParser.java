@@ -88,6 +88,10 @@ public class ICACertificateParser implements ICertificateParser {
             }
             final ASN1Primitive qcStatementAsn1Primitive = JcaX509ExtensionUtils.parseExtensionValue(qcStatement);
 
+            if (qcStatementAsn1Primitive == null) {
+                throw new CertificateException("Unable to extract PSD2 mandates from extension value.");
+            }
+
             final DLSequence it = ((DLSequence) qcStatementAsn1Primitive);
 
             Set<CertInfo.PSD2> psd2Mandates = new HashSet<>();
