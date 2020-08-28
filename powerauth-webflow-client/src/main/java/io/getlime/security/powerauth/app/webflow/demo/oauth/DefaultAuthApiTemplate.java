@@ -20,6 +20,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContextBuilder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.social.oauth2.OAuth2Template;
 import org.springframework.util.ResourceUtils;
@@ -41,6 +43,8 @@ import java.security.cert.CertificateException;
  */
 public class DefaultAuthApiTemplate extends OAuth2Template {
 
+    private static final Logger logger = LoggerFactory.getLogger(DefaultAuthApiTemplate.class);
+
     public DefaultAuthApiTemplate(String clientId, String clientSecret, String authorizeUrl, String accessTokenUrl) {
         super(clientId, clientSecret, authorizeUrl, accessTokenUrl);
     }
@@ -53,8 +57,8 @@ public class DefaultAuthApiTemplate extends OAuth2Template {
             if (requestFactory != null) {
                 restTemplate.setRequestFactory(requestFactory);
             }
-        } catch (IOException | UnrecoverableKeyException | CertificateException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException e) {
-            //
+        } catch (IOException | UnrecoverableKeyException | CertificateException | NoSuchAlgorithmException | KeyStoreException | KeyManagementException ex) {
+            logger.warn(ex.getMessage(), ex);
         }
         return restTemplate;
     }
