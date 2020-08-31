@@ -348,6 +348,10 @@ a:hover, a:active, a:focus {
     font-size: 12pt;
 }
 
+.consent-checkbox-wrapper {
+    z-index: 1;
+}
+
 .consent-checkbox {
     vertical-align: top;
     margin-top: 6px !important;
@@ -388,4 +392,17 @@ a:hover, a:active, a:focus {
 
 .sms-resend-disabled {
     color: #777777;
+}
+
+.client-certificate-active {
+    color: #7FC000;
+}
+
+.client-certificate-active:hover {
+    cursor: pointer;
+}
+
+.client-certificate-label {
+    text-align: left;
+    margin-top: 10px;
 }

@@ -30,6 +30,9 @@ public class LoginScaInitResponse {
     private List<OrganizationDetail> organizations = new ArrayList<>();
     private boolean userAlreadyKnown;
     private boolean mobileTokenEnabled;
+    private boolean clientCertificateAuthenticationAvailable;
+    private boolean clientCertificateAuthenticationEnabled;
+    private String clientCertificateVerificationUrl;
 
     /**
      * Get organizations.
@@ -55,19 +58,83 @@ public class LoginScaInitResponse {
         organizations.add(organization);
     }
 
+    /**
+     * Get whether user ID is already known, used during page refresh.
+     * @return Whether user ID is already known.
+     */
     public boolean isUserAlreadyKnown() {
         return userAlreadyKnown;
     }
 
+    /**
+     * Set whether user ID is already known, used during page refresh.
+     * @param userAlreadyKnown Whether user ID is already known.
+     */
     public void setUserAlreadyKnown(boolean userAlreadyKnown) {
         this.userAlreadyKnown = userAlreadyKnown;
     }
 
+    /**
+     * Get whether mobile token is enabled.
+     * @return Whether mobile token is enabled.
+     */
     public boolean isMobileTokenEnabled() {
         return mobileTokenEnabled;
     }
 
+    /**
+     * Set whether mobile token is enabled.
+     * @param mobileTokenEnabled Whether mobile token is enabled.
+     */
     public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
         this.mobileTokenEnabled = mobileTokenEnabled;
+    }
+
+    /**
+     * Get whether authentication using client TLS certificate is available.
+     * @return Whether authentication using client TLS certificate is available.
+     */
+    public boolean isClientCertificateAuthenticationAvailable() {
+        return clientCertificateAuthenticationAvailable;
+    }
+
+    /**
+     * Set whether authentication using client TLS certificate is available.
+     * @param clientCertificateAuthenticationAvailable Whether authentication using client TLS certificate is available.
+     */
+    public void setClientCertificateAuthenticationAvailable(boolean clientCertificateAuthenticationAvailable) {
+        this.clientCertificateAuthenticationAvailable = clientCertificateAuthenticationAvailable;
+    }
+
+    /**
+     * Get whether authentication using client TLS certificate is enabled.
+     * @return Whether authentication using client TLS certificate is enabled.
+     */
+    public boolean isClientCertificateAuthenticationEnabled() {
+        return clientCertificateAuthenticationEnabled;
+    }
+
+    /**
+     * Set whether authentication using client TLS certificate is enabled.
+     * @param clientCertificateAuthenticationEnabled Whether authentication using client TLS certificate is enabled.
+     */
+    public void setClientCertificateAuthenticationEnabled(boolean clientCertificateAuthenticationEnabled) {
+        this.clientCertificateAuthenticationEnabled = clientCertificateAuthenticationEnabled;
+    }
+
+    /**
+     * Get client TLS certificate verification URL.
+     * @return Client TLS certificate verification URL.
+     */
+    public String getClientCertificateVerificationUrl() {
+        return clientCertificateVerificationUrl;
+    }
+
+    /**
+     * Set client TLS certificate verification URL.
+     * @param clientCertificateVerificationUrl Client TLS certificate verification URL.
+     */
+    public void setClientCertificateVerificationUrl(String clientCertificateVerificationUrl) {
+        this.clientCertificateVerificationUrl = clientCertificateVerificationUrl;
     }
 }

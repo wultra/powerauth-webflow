@@ -23,10 +23,14 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -42,7 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -90,6 +93,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     @Autowired
     private AfsIntegrationService afsIntegrationService;
 
+    @Autowired
+    private OperationCancellationService operationCancellationService;
+
     /**
      * Get operation detail.
      * @return Operation detail.
@@ -120,6 +126,23 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     }
 
     /**
+     * Create a new implicit login operation based on the OAuth 2.0 scopes.
+     * @param clientId OAuth 2.0 Client ID.
+     * @param scopes OAuth 2.0 Scopes
+     * @return Information about a new operation.
+     * @throws CommunicationFailedException In case the communication with data adapter fails.
+     */
+    protected CreateImplicitLoginOperationResponse createImplicitLoginOperation(String clientId, String[] scopes) throws CommunicationFailedException {
+        try {
+            final ObjectResponse<CreateImplicitLoginOperationResponse> implicitLoginOperation = dataAdapterClient.createImplicitLoginOperation(clientId, scopes);
+            return implicitLoginOperation.getResponseObject();
+        } catch (DataAdapterClientErrorException e) {
+            logger.error("Error occurred in Data Adapter server", e);
+            throw new CommunicationFailedException("Implicit login operation cannot be created");
+        }
+    }
+
+    /**
      * Get operation detail with given operation ID.
      * @param operationId Operation ID.
      * @return Operation detail.
@@ -144,9 +167,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 validateOperationState(operation);
             }
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
-            // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-            // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-            updateOperationForScaLogin(operation);
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
         } catch (NextStepServiceException e) {
@@ -239,7 +259,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse operation: responseObject) {
-                updateOperationForScaLogin(operation);
+                // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
+                // In case of an approval operation the data would be incorrect, because it is related to the payment.
+                // This is a workaround until Web Flow supports multiple types of operation data within an operation.
+                if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
+                    authMethodResolutionService.updateOperationForScaLogin(operation);
+                }
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }
@@ -284,7 +309,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.DONE) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, organizationId, operationContext);
                 // notify AFS about logout
                 afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
@@ -320,7 +345,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (response.getResponseObject().getResult()==AuthResult.FAILED) {
             try {
                 FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
             } catch (DataAdapterClientErrorException ex) {
                 logger.error("Error while notifying Data Adapter", ex);
@@ -345,31 +370,12 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Step cancel started, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
-        ApplicationContext applicationContext = operation.getApplicationContext();
-        ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), params, applicationContext);
-        // notify Data Adapter in case operation is in FAILED state now
-        if (response.getResponseObject().getResult() == AuthResult.FAILED) {
-            try {
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, userId, operation.getOrganizationId(), operationContext);
-                // notify AFS about logout
-                if (cancelReason == OperationCancelReason.TIMED_OUT_OPERATION) {
-                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.TIMED_OUT);
-                } else {
-                    afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.FAILED);
-                }
-            } catch (DataAdapterClientErrorException ex) {
-                logger.error("Error while notifying Data Adapter", ex);
-            }
+        UpdateOperationResponse updateOperationResponse = operationCancellationService.cancelOperation(operation, authMethod, cancelReason);
+        if (updateOperationResponse != null) {
+            filterStepsBasedOnActiveAuthMethods(updateOperationResponse.getSteps(), userId, operationId);
+            return updateOperationResponse;
         }
-
-        // update operation result in operation to HTTP session mapping
-        operationSessionService.updateOperationResult(operationId, response.getResponseObject().getResult());
-        filterStepsBasedOnActiveAuthMethods(response.getResponseObject().getSteps(), userId, operationId);
-        logger.info("Step cancel succeeded, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
-        return response.getResponseObject();
+        return null;
     }
 
     /**
@@ -391,8 +397,14 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             CreateOperationResponse responseObject = response.getResponseObject();
             String operationId = responseObject.getOperationId();
             String organizationId = responseObject.getOrganizationId();
-            // persist mapping of operation to HTTP session
-            operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, responseObject.getResult());
+            // Persist mapping of operation to HTTP session
+            boolean registrationSucceeded = operationSessionService.registerHttpSession(operationId, httpSessionId, responseObject.getResult());
+            if (!registrationSucceeded) {
+                // Registration of HTTP session failed for the operation
+                R initResponse = provider.failedAuthentication(null, "error.invalidRequest");
+                logger.info("Operation initiate failed during registration of HTTP session, operation name: {}", operationName);
+                return initResponse;
+            }
             filterStepsBasedOnActiveAuthMethods(responseObject.getSteps(), null, operationId);
             authenticationManagementService.createAuthenticationWithOperationId(operationId, organizationId);
             R initResponse = provider.continueAuthentication(operationId, null, responseObject.getSteps());
@@ -409,7 +421,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      *
      * @param operationId ID of operation to be fetched.
      * @param httpSessionId HTTP session ID.
-     * @param provider    Provider that implements authentication callback.
+     * @param provider Provider that implements authentication callback.
      * @return Response indicating next step, based on provider response.
      */
     protected R continueOperationWithId(String operationId, String httpSessionId, AuthResponseProvider provider) {
@@ -421,16 +433,27 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 logger.info("Operation failed because operation could not be retrieved, operation ID: {}", operationId);
                 return provider.failedAuthentication(null, "Operation is not available");
             }
-            // check whether session is already initiated - page refresh could cause double initialization
-            // if it is not initiated yet, persist operation to session mapping
+            final String userId = operation.getUserId();
+            // Check whether session is already initiated - page refresh could cause double initialization.
+            // If it is not initiated yet, persist operation to session mapping.
             OperationSessionEntity operationSessionEntity = operationSessionService.getOperationToSessionMapping(operationId);
             if (operationSessionEntity == null) {
-                // cancel previous active operations
+                // Cancel previous active operations
                 cancelOperationsInHttpSession(httpSessionId);
-                // persist mapping of operation to HTTP session
-                operationSessionService.persistOperationToSessionMapping(operationId, httpSessionId, operation.getResult());
+                // Persist mapping of operation to HTTP session
+                boolean registrationSucceeded = operationSessionService.registerHttpSession(operationId, httpSessionId, operation.getResult());
+                if (!registrationSucceeded) {
+                    //  Registration of HTTP session failed for the operation
+                    R failed = provider.failedAuthentication(null, "error.invalidRequest");
+                    logger.info("Operation continue failed during registration of HTTP session, operation ID: {}", operationId);
+                    return failed;
+                }
+            } else if (!operationSessionEntity.getHttpSessionId().equals(httpSessionId)){
+                // Operation continue failed because operation is accessed from another HTTP session
+                R failed = provider.failedAuthentication(userId, "error.invalidRequest");
+                logger.info("Operation continue failed because HTTP session ID has changed, operation ID: {}", operationId);
+                return failed;
             }
-            final String userId = operation.getUserId();
             final String organizationId = operation.getOrganizationId();
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), userId, operationId);
             if (!authenticationManagementService.isPendingSessionAuthenticated() && userId != null && organizationId != null) {
@@ -461,25 +484,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param httpSessionId HTTP session ID.
      */
     private void cancelOperationsInHttpSession(String httpSessionId) {
-        // at first cancel operations within same HTTP session in the operation to session mapping
+        // At first cancel operations within same HTTP session in the operation to session mapping
         List<OperationSessionEntity> operationsToCancel = operationSessionService.cancelOperationsInHttpSession(httpSessionId);
         for (OperationSessionEntity operationToCancel: operationsToCancel) {
-            try {
-                // cancel operations in Next Step
-                final ObjectResponse<GetOperationDetailResponse> operation = nextStepClient.getOperationDetail(operationToCancel.getOperationId());
-                final GetOperationDetailResponse operationDetail = operation.getResponseObject();
-                final ApplicationContext applicationContext = operationDetail.getApplicationContext();
-                nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), getAuthMethodName(), Collections.emptyList(), AuthStepResult.CANCELED, OperationCancelReason.INTERRUPTED_OPERATION.toString(), null, applicationContext);
-                // notify Data Adapter about cancellation
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getResponseObject().getFormData());
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
-                // notify AFS about logout
-                afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), OperationTerminationReason.INTERRUPTED);
-            } catch (NextStepServiceException | DataAdapterClientErrorException e) {
-                // errors occurring when canceling previous operations are not critical
-                logger.error("Error while canceling previous operation", e);
-            }
+            operationCancellationService.cancelOperation(operationToCancel.getOperationId(), getAuthMethodName(), OperationCancelReason.INTERRUPTED_OPERATION);
         }
     }
 
@@ -682,28 +690,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             }
         }
         authSteps.removeAll(authStepsToRemove);
-    }
-
-    /**
-     * Update operation for SCA login in case of an approval operation.
-     * @param operation Operation to update.
-     */
-    private void updateOperationForScaLogin(GetOperationDetailResponse operation) {
-        // Convert operation definition for LOGIN_SCA step which requires login operation definition and not approval operation definition.
-        // This is a temporary workaround until Web Flow supports configuration of multiple operations in a compound operation.
-        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA) {
-            // Make sure Mobile Token and Data Adapter recognize the operation name
-            operation.setOperationName("login");
-            // Update operation data for login
-            operation.setOperationData("A2");
-            // Update operation form data
-            OperationFormData formData = new OperationFormData();
-            formData.addTitle("login.title");
-            formData.addGreeting("login.greeting");
-            formData.addSummary("login.summary");
-            formData.setUserInput(operation.getFormData().getUserInput());
-            operation.setFormData(formData);
-        }
     }
 
     /**

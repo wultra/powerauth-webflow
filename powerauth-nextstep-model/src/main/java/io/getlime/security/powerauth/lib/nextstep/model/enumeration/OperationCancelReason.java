@@ -43,9 +43,14 @@ public enum OperationCancelReason {
     AUTH_METHOD_NOT_AVAILABLE,
 
     /**
-     * Operation has been interrupted by another new operation.
+     * Operation has been interrupted by another new operation or by closing browser tab / window.
      */
     INTERRUPTED_OPERATION,
+
+    /**
+     * Unexpected error occurred during execution of the operation.
+     */
+    UNEXPECTED_ERROR,
 
     /**
      * Operation has timed out.

@@ -50,8 +50,8 @@ public class MessageController {
         String sessionId = headerAccessor.getSessionId();
         String webSocketId = registrationRequest.getWebSocketId();
         String clientIpAddress = (String) headerAccessor.getSessionAttributes().get("client_ip_address");
-        webSocketMessageService.storeWebSocketSession(webSocketId, sessionId, clientIpAddress);
-        webSocketMessageService.sendRegistrationMessage(webSocketId, sessionId);
+        boolean registrationSucceeded = webSocketMessageService.registerWebSocketSession(webSocketId, sessionId, clientIpAddress);
+        webSocketMessageService.sendRegistrationMessage(webSocketId, sessionId, registrationSucceeded);
     }
 
 }

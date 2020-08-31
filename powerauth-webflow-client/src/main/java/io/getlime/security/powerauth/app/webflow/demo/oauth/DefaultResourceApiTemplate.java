@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.app.webflow.demo.oauth;
 
 import io.getlime.security.powerauth.app.webflow.demo.model.UserResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.social.oauth2.AbstractOAuth2ApiBinding;
 import org.springframework.social.support.URIBuilder;
 
@@ -29,7 +31,9 @@ import java.net.URI;
  */
 public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding implements DefaultApiBinding {
 
-    private String API_URL_BASE = null;
+    private String API_URL_BASE;
+
+    private static final Logger logger = LoggerFactory.getLogger(DefaultResourceApiTemplate.class);
 
     private URI buildUri(String path) {
         return URIBuilder.fromUri(API_URL_BASE + path).build();
@@ -37,6 +41,7 @@ public class DefaultResourceApiTemplate extends AbstractOAuth2ApiBinding impleme
 
     public DefaultResourceApiTemplate(String accessToken, String baseUrl) {
         super(accessToken);
+        logger.debug("OAuth 2.0 Access Token is: {}", accessToken);
         this.API_URL_BASE = baseUrl;
     }
 

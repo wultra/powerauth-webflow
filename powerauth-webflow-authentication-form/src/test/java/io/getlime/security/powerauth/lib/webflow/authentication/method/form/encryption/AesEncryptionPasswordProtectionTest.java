@@ -17,9 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.encryption;
 
 import com.google.common.io.BaseEncoding;
-import io.getlime.security.powerauth.crypto.lib.config.PowerAuthConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
-import io.getlime.security.powerauth.provider.CryptoProviderUtilBouncyCastle;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -40,7 +38,6 @@ class AesEncryptionPasswordProtectionTest {
     @BeforeAll
     static void setUp() {
         Security.addProvider(new BouncyCastleProvider());
-        PowerAuthConfiguration.INSTANCE.setKeyConvertor(new CryptoProviderUtilBouncyCastle());
     }
 
     @org.junit.jupiter.api.Test

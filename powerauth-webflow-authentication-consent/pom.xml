@@ -24,25 +24,25 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>0.23.0</version>
+        <version>0.24.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow-authentication-consent</artifactId>
     <name>powerauth-webflow-authentication-consent</name>
     <groupId>io.getlime.security</groupId>
-    <version>0.23.0</version>
+    <version>0.24.0</version>
 
     <dependencies>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>0.23.0</version>
+            <version>0.24.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-client</artifactId>
-            <version>0.23.0</version>
+            <version>0.24.0</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>

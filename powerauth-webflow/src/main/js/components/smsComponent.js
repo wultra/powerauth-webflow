@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {Button, FormGroup} from "react-bootstrap";
+import {Button, FormControl, FormGroup} from "react-bootstrap";
 import {FormattedMessage} from "react-intl";
 import React from "react";
 import {authenticate} from "../actions/smsAuthActions";
@@ -34,15 +34,45 @@ export default class SmsComponent extends React.Component {
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handlePasswordChange = this.handlePasswordChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
-        this.state = {authCode: '', password: ''};
+        this.updateButtonState = this.updateButtonState.bind(this);
+        this.state = {authCode: '', password: '', confirmDisabled: true};
     }
 
     handleAuthCodeChange(event) {
-        this.setState({authCode: event.target.value});
+        let targetValue = event.target.value;
+        // Keep only numeric characters
+        targetValue = targetValue.replace(/\D/g,'');
+        this.setState({authCode: targetValue}, this.updateButtonState);
     }
 
     handlePasswordChange(event) {
-        this.setState({password: event.target.value});
+        this.setState({password: event.target.value}, this.updateButtonState);
+    }
+
+    updateButtonState() {
+        if (!this.props.initialized) {
+            return;
+        }
+        let disabled = false;
+        if (this.props.passwordEnabled) {
+            if (this.state.password.length === 0) {
+                disabled = true;
+            }
+        }
+        if (this.props.smsOtpEnabled) {
+            if (this.state.authCode.length === 0) {
+                disabled = true;
+            }
+        }
+        if (disabled) {
+            if (!this.state.confirmDisabled) {
+                this.setState({confirmDisabled: true});
+            }
+        } else {
+            if (this.state.confirmDisabled) {
+                this.setState({confirmDisabled: false});
+            }
+        }
     }
 
     handleSubmit(event) {
@@ -73,79 +103,100 @@ export default class SmsComponent extends React.Component {
                         )}
                         {(this.props.username) ? (
                             <div>
-                                <div className="attribute row">
-                                    <div className="message-information">
-                                        <FormattedMessage id="login.loginNumber"/>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="message-information">
+                                            <FormattedMessage id="login.loginNumber"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <input autoFocus className="form-control" type="text" value={this.props.username} disabled="true"/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="col-xs-12">
+                                            <FormControl autoComplete="off" id="username" type="text" value={this.props.username} disabled="true"/>
+                                        </div>
                                     </div>
-                                </div>
+                                </FormGroup>
                             </div>
                         ) : (
                             undefined
                         )}
                         {(this.props.passwordEnabled) ? (
                             <div>
-                                <div className="attribute row">
-                                    <div className="message-information">
-                                        <FormattedMessage id="loginSca.password"/>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="message-information">
+                                            <FormattedMessage id="loginSca.password"/>
+                                        </div>
                                     </div>
-                                </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <input className="form-control" type="password" value={this.state.password} onChange={this.handlePasswordChange} maxLength={passwordMaxLength}/>
+                                </FormGroup>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="col-xs-12">
+                                            <FormControl id="password" autoComplete="new-password" type="password"
+                                                         value={this.state.password} onChange={this.handlePasswordChange}
+                                                         maxLength={passwordMaxLength}/>
+                                        </div>
                                     </div>
-                                </div>
+                                </FormGroup>
                             </div>
                         ) : (
                             undefined
                         )}
                         {(this.props.smsOtpEnabled) ? (
                             <div>
-                                <div className="attribute row">
-                                    <div className="message-information">
-                                        <FormattedMessage id="smsAuthorization.authCodeText"/>
-                                    </div>
-                                </div>
-                                <div className="attribute row">
-                                    <div className="col-xs-12">
-                                        <input className="form-control" type="text" value={this.state.authCode} onChange={this.handleAuthCodeChange} maxLength={smsOtpMaxLength}/>
-                                    </div>
-                                </div>
-                                <div className="font-small message-information">
-                                    {(this.props.resendEnabled) ? (
-                                        <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
-                                            <FormattedMessage id="smsAuthorization.resendActive"/>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="message-information">
+                                            <FormattedMessage id="smsAuthorization.authCodeText"/>
                                         </div>
-                                    ) : (
-                                        <div id="resend-disabled" className="sms-resend-disabled">
-                                            <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup>
+                                    <div className="attribute row">
+                                        <div className="col-xs-12">
+                                            <FormControl id="sms-otp" autoComplete="new-password" type="text"
+                                                         value={this.state.authCode} onChange={this.handleAuthCodeChange}
+                                                         maxLength={smsOtpMaxLength}/>
                                         </div>
-                                    )}
-                                </div>
+                                    </div>
+                                </FormGroup>
+                                <FormGroup>
+                                    <div className="font-small message-information">
+                                        {(this.props.resendEnabled) ? (
+                                            <div id="resend-active" onClick={this.props.smsResendCallback} className="sms-resend-active">
+                                                <FormattedMessage id="smsAuthorization.resendActive"/>
+                                            </div>
+                                        ) : (
+                                            <div id="resend-disabled" className="sms-resend-disabled">
+                                                <FormattedMessage id="smsAuthorization.resendDisabled"/>
+                                            </div>
+                                        )}
+                                    </div>
+                                </FormGroup>
                             </div>
                          ) : (
                              undefined
                          )}
-                        <div className="row buttons">
-                            <div className="col-xs-6">
-                                <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                    <FormattedMessage id="operation.cancel"/>
-                                </a>
+                        <FormGroup>
+
+                            <div className="row buttons">
+                                <div className="col-xs-6">
+                                    <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                        <FormattedMessage id="operation.cancel"/>
+                                    </a>
+                                </div>
+                                <div className="col-xs-6">
+                                    <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.confirmDisabled}>
+                                        {(this.props.username && this.props.passwordEnabled) ? (
+                                            <FormattedMessage id="loginSca.confirm"/>
+                                        ) : (
+                                            <FormattedMessage id="operation.confirm"/>
+                                        )}
+                                    </Button>
+                                </div>
                             </div>
-                            <div className="col-xs-6">
-                                <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                    {(this.props.username && this.props.passwordEnabled) ? (
-                                        <FormattedMessage id="loginSca.confirm"/>
-                                    ) : (
-                                        <FormattedMessage id="operation.confirm"/>
-                                    )}
-                                </Button>
-                            </div>
-                        </div>
+                        </FormGroup>
                     </div>
                 ) : (
                     undefined

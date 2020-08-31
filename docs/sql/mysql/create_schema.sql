@@ -195,6 +195,18 @@ CREATE TABLE wf_afs_config (
   parameters                TEXT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- Table wf_certificate_verification is used for storing information about verified client TLS certificates.
+CREATE TABLE wf_certificate_verification (
+  operation_id               VARCHAR(256) NOT NULL,
+  auth_method                VARCHAR(32) NOT NULL,
+  client_certificate_issuer  VARCHAR(4000) NOT NULL,
+  client_certificate_subject VARCHAR(4000) NOT NULL,
+  client_certificate_sn      VARCHAR(256) NOT NULL,
+  operation_data             TEXT NOT NULL,
+  timestamp_verified         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (operation_id, auth_method)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- Table da_sms_authorization stores data for SMS OTP authorization.
 CREATE TABLE da_sms_authorization (
   message_id           VARCHAR(256) PRIMARY KEY NOT NULL,
@@ -237,7 +249,7 @@ CREATE TABLE tpp_user_consent (
   user_id               VARCHAR(256) NOT NULL,
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   timestamp_updated     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -249,7 +261,7 @@ CREATE TABLE tpp_user_consent_history (
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
   consent_change        VARCHAR(16) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -257,6 +269,7 @@ CREATE TABLE tpp_user_consent_history (
 CREATE TABLE tpp_detail (
   tpp_id                INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT,
   tpp_name              VARCHAR(256) NOT NULL,
+  tpp_license           VARCHAR(256) NOT NULL,
   tpp_info              TEXT NULL,
   tpp_address           TEXT NULL,
   tpp_website           TEXT NULL,
@@ -270,6 +283,7 @@ CREATE TABLE tpp_app_detail (
   app_client_id         VARCHAR(256) NOT NULL,
   app_name              VARCHAR(256) NOT NULL,
   app_info              TEXT NULL,
+  app_type              VARCHAR(32) NULL,
   PRIMARY KEY (tpp_id, app_client_id),
   FOREIGN KEY tpp_detail_fk (tpp_id) REFERENCES tpp_detail (tpp_id),
   FOREIGN KEY tpp_client_secret_fk (app_client_id) REFERENCES oauth_client_details (client_id)
@@ -277,4 +291,6 @@ CREATE TABLE tpp_app_detail (
 
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
+CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
+CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);

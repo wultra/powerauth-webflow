@@ -18,19 +18,28 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.AfsConfigRepository;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.AfsConfigEntity;
+import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.security.oauth2.provider.ClientDetails;
+import org.springframework.security.oauth2.provider.ClientDetailsService;
+import org.springframework.security.oauth2.provider.ClientRegistrationException;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.stereotype.Controller;
@@ -41,9 +50,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * Simple controller, redirects to the main HTML page with JavaScript content.
@@ -62,6 +69,8 @@ public class HomeController {
     private final NextStepClient nextStepClient;
     private final AfsConfigRepository afsConfigRepository;
     private final HttpSession httpSession;
+    private final ClientDetailsService clientDetailsService;
+    private final OperationCancellationService operationCancellationService;
 
     /**
      * Initialization of the HomeController with application configuration.
@@ -72,9 +81,11 @@ public class HomeController {
      * @param nextStepClient Next step client.
      * @param afsConfigRepository Anti-fraud system configuration repository.
      * @param httpSession HTTP session.
+     * @param clientDetailsService Client details service for accessing OAuth 2.0 client data.
+     * @param operationCancellationService Service used for canceling operations.
      */
     @Autowired
-    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession) {
+    public HomeController(AuthenticationManagementService authenticationManagementService, WebFlowServerConfiguration webFlowConfig, I18NService i18nService, OperationSessionService operationSessionService, NextStepClient nextStepClient, AfsConfigRepository afsConfigRepository, HttpSession httpSession, ClientDetailsService clientDetailsService, OperationCancellationService operationCancellationService) {
         this.webFlowConfig = webFlowConfig;
         this.authenticationManagementService = authenticationManagementService;
         this.i18nService = i18nService;
@@ -82,6 +93,8 @@ public class HomeController {
         this.nextStepClient = nextStepClient;
         this.afsConfigRepository = afsConfigRepository;
         this.httpSession = httpSession;
+        this.clientDetailsService = clientDetailsService;
+        this.operationCancellationService = operationCancellationService;
     }
 
     /**
@@ -207,6 +220,8 @@ public class HomeController {
             authenticationManagementService.pendingAuthenticationToAuthentication();
             redirectUrl = savedRequest.getRedirectUrl();
         }
+        // Make sure HTTP session is cleaned when authentication is complete
+        cleanHttpSession();
         response.setHeader("Location", redirectUrl);
         response.setStatus(HttpServletResponse.SC_FOUND);
         logger.info("The /authenticate/continue request succeeded");
@@ -230,20 +245,75 @@ public class HomeController {
             return "redirect:/oauth/error";
         }
         String[] redirectUriParameter = savedRequest.getParameterMap().get("redirect_uri");
-        if (redirectUriParameter == null || redirectUriParameter.length != 1) {
+        if (redirectUriParameter == null) {
+            logger.error("Parameter redirect_uri is missing");
+            return "redirect:/oauth/error";
+        }
+        if (redirectUriParameter.length != 1) {
             logger.error("Multiple redirect_uri request parameters found");
             return "redirect:/oauth/error";
         }
         String redirectUri = redirectUriParameter[0];
 
-        // extract optional state parameter from original request
+        // Verify client_id against oauth_client_details database table
+        String[] clientIdParameter = savedRequest.getParameterMap().get("client_id");
+        if (clientIdParameter == null) {
+            logger.error("Parameter client_id is missing");
+            return "redirect:/oauth/error";
+        }
+        if (clientIdParameter.length != 1) {
+            logger.error("Multiple client_id request parameters found");
+            return "redirect:/oauth/error";
+        }
+
+        String clientId = clientIdParameter[0];
+
+        try {
+            ClientDetails clientDetails = clientDetailsService.loadClientByClientId(clientId);
+            Set<String> registeredRedirectUris = clientDetails.getRegisteredRedirectUri();
+
+            // Verify that redirect URI is registered for provided client ID
+            if (!registeredRedirectUris.contains(redirectUri)) {
+                logger.error("Redirect URI '{}' is not registered for client_id: {}", redirectUri, clientId);
+                return "redirect:/oauth/error";
+            }
+        } catch (ClientRegistrationException ex) {
+            logger.error("Client details not found for client_id: {}, error: {}", clientId, ex.getMessage());
+            return "redirect:/oauth/error";
+        }
+
+        // Verify response type, only 'code' is supported
+        String[] responseTypeParameter = savedRequest.getParameterMap().get("response_type");
+        if (responseTypeParameter == null) {
+            logger.error("Parameter response_type is missing");
+            return "redirect:/oauth/error";
+        }
+        if (responseTypeParameter.length != 1) {
+            logger.error("Multiple response_type request parameters found");
+            return "redirect:/oauth/error";
+        }
+
+        String responseType = responseTypeParameter[0];
+        if (!"code".equals(responseType)) {
+            logger.error("Invalid response type: {}", responseType);
+            return "redirect:/oauth/error";
+        }
+
+        // Extract optional state parameter from original request
         String[] stateParameter = savedRequest.getParameterMap().get("state");
         String state = null;
-        if (stateParameter.length > 1) {
+        if (stateParameter == null || stateParameter.length > 1) {
             logger.error("Multiple state request parameters found");
             return "redirect:/oauth/error";
         } else if (stateParameter.length == 1) {
             state = stateParameter[0];
+        }
+
+        // Cancel existing operation in Next Step in case operation is still active
+        final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
+        if (pendingUserAuthentication != null) {
+            String operationId = pendingUserAuthentication.getOperationId();
+            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR);
         }
 
         String clearContext = request.getParameter("clearContext");
@@ -252,6 +322,9 @@ public class HomeController {
             authenticationManagementService.clearContext();
         }
 
+        // Make sure HTTP session is cleaned when authentication is canceled
+        cleanHttpSession();
+
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("error", "access_denied")
                 .queryParam("error_description", "User%20canceled%20authentication%20request");
@@ -259,7 +332,7 @@ public class HomeController {
             uriBuilder.queryParam("state", state);
         }
 
-        // append error, error_description and state based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
+        // Append error, error_description and state based on https://www.oauth.com/oauth2-servers/authorization/the-authorization-response
         final String redirectWithError = uriBuilder
                 .build()
                 .toUriString();
@@ -275,6 +348,9 @@ public class HomeController {
      */
     @RequestMapping(value = "/oauth/error", method = RequestMethod.GET)
     public String oauthError(Map<String, Object> model) {
+        // Make sure HTTP session is cleaned when error is displayed
+        cleanHttpSession();
+
         model.put("title", webFlowConfig.getPageTitle());
         model.put("stylesheet", webFlowConfig.getCustomStyleSheetUrl());
         return "oauth/error";
@@ -291,5 +367,6 @@ public class HomeController {
         httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
         httpSession.removeAttribute(HttpSessionAttributeNames.CONSENT_SKIPPED);
         httpSession.removeAttribute(HttpSessionAttributeNames.USERNAME);
+        httpSession.removeAttribute(HttpSessionAttributeNames.CLIENT_CERTIFICATE);
     }
 }

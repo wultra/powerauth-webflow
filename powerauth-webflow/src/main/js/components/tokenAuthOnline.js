@@ -17,9 +17,10 @@ import React from "react";
 import {connect} from "react-redux";
 // Actions
 import {updateFormData} from "../actions/tokenAuthOnlineActions";
+// Components
+import {FormControl, FormGroup} from "react-bootstrap";
 // i18n
 import {FormattedMessage} from "react-intl";
-
 
 /**
  * Online mobile token UI component.
@@ -70,16 +71,20 @@ export default class TokenOnline extends React.Component {
             <div className="auth-actions">
                 {(this.props.username) ? (
                     <div>
-                        <div className="attribute row">
-                            <div className="message-information">
-                                <FormattedMessage id="login.loginNumber"/>
+                        <FormGroup>
+                            <div className="attribute row">
+                                <div className="message-information">
+                                    <FormattedMessage id="login.loginNumber"/>
+                                </div>
                             </div>
-                        </div>
-                        <div className="attribute row">
-                            <div className="col-xs-12">
-                                <input className="form-control" type="text" value={this.props.username} disabled="true"/>
+                        </FormGroup>
+                        <FormGroup>
+                            <div className="attribute row">
+                                <div className="col-xs-12">
+                                    <FormControl autoComplete="off" type="text" value={this.props.username} disabled="true"/>
+                                </div>
                             </div>
-                        </div>
+                        </FormGroup>
                     </div>
                 ) : (
                     undefined

@@ -29,6 +29,11 @@ public class TppInfo {
     private String name;
 
     /**
+     * TPP license number.
+     */
+    private String license;
+
+    /**
      * TPP information (about company).
      */
     private String info;
@@ -59,6 +64,14 @@ public class TppInfo {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getLicense() {
+        return license;
+    }
+
+    public void setLicense(String license) {
+        this.license = license;
     }
 
     public String getInfo() {
