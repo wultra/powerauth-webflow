@@ -257,7 +257,7 @@ CREATE TABLE tpp_user_consent (
     user_id             VARCHAR(256) NOT NULL,                      -- User ID.
     client_id           VARCHAR(256) NOT NULL,                      -- OAuth 2.0 client ID.
     consent_id          VARCHAR(64) NOT NULL,                       -- Consent ID.
-    external_id         VARCHAR(256) NOT NULL,                      -- External ID associated with the consent approval, usually the operation ID.
+    external_id         VARCHAR(256),                               -- External ID associated with the consent approval, usually the operation ID.
     consent_parameters  CLOB NOT NULL,                              -- Specific parameters that were filled in into the user consent template.
     timestamp_created   TIMESTAMP,                                  -- Timestamp the consent with given ID was first created.
     timestamp_updated   TIMESTAMP                                   -- Timestamp the consent with given ID was given again before it was revoked (updated, prolonged).
@@ -270,7 +270,7 @@ CREATE TABLE tpp_user_consent_history (
     client_id           VARCHAR(256) NOT NULL,                      -- Client ID.
     consent_id          VARCHAR(64) NOT NULL,                       -- Consent ID.
     consent_change      VARCHAR(16) NOT NULL,                       -- Type of the consent change: APPROVE, PROLONG, REJECT
-    external_id         VARCHAR(256) NOT NULL,                      -- External ID that was responsible for this specific consent change, usually the operation ID.
+    external_id         VARCHAR(256),                               -- External ID that was responsible for this specific consent change, usually the operation ID.
     consent_parameters  CLOB NOT NULL,                              -- Specific parameters that were filled in into the user consent template in this consent change.
     timestamp_created   TIMESTAMP                                   -- Timestamp of the consent change.
 );
