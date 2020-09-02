@@ -1,6 +1,6 @@
 # Compilation, Packaging and Deployment
 
-Web Flow uses Maven for compilation and packaging. Java 8 should be used to compile Web Flow.
+Web Flow uses Maven for compilation and packaging. Java 11 should be used to compile Web Flow.
 
 Web Flow can be deployed to any Java web container (such as Tomcat) using war artifacts produced during compilation.
 

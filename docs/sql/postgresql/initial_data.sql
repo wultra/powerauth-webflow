@@ -24,10 +24,10 @@ INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_pr
 VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.approvalSca');
 
 -- operation configuration
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('login', 'A', 2, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('login_sca', 'A', 2, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
-INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('login', 'A', 2, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('login_sca', 'A', 2, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment', 'A', 1, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
+INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
 -- organization configuration
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
@@ -265,3 +265,23 @@ VALUES (64, 'authorize_payment_sca', 'UPDATE', 'CONSENT', 'AUTH_METHOD_FAILED', 
 -- authorize_payment_sca - update operation (consent) - AUTH_FAILED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (65, 'authorize_payment_sca', 'UPDATE', 'CONSENT', 'AUTH_FAILED', 1, 'CONSENT', 'CONTINUE');
+
+-- authorize_payment_sca - init operation -> CONTINUE
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (66, 'authorize_payment_sca', 'CREATE', null, null, 1, 'USER_ID_ASSIGN', 'CONTINUE');
+
+-- authorize_payment_sca - update operation (user ID assignment) - CONFIRMED -> CONTINUE
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (67, 'authorize_payment_sca', 'UPDATE', 'USER_ID_ASSIGN', 'CONFIRMED', 1, 'APPROVAL_SCA', 'CONTINUE');
+
+-- authorize_payment_sca - update operation (user ID assignment) - CANCELED -> FAILED
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (68, 'authorize_payment_sca', 'UPDATE', 'USER_ID_ASSIGN', 'CANCELED', 1, null, 'FAILED');
+
+-- authorize_payment_sca - update operation (user ID assignment) - AUTH_METHOD_FAILED -> FAILED
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (69, 'authorize_payment_sca', 'UPDATE', 'USER_ID_ASSIGN', 'AUTH_METHOD_FAILED', 1, null, 'FAILED');
+
+-- authorize_payment_sca - update operation (user ID assignment) - AUTH_FAILED -> FAILED
+INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
+VALUES (70, 'authorize_payment_sca', 'UPDATE', 'USER_ID_ASSIGN', 'AUTH_FAILED', 1, null, 'FAILED');

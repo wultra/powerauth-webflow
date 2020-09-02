@@ -121,11 +121,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             String operationId = operation.getOperationId();
             String operationName = operation.getOperationName();
             String operationData = operation.getOperationData();
+            final String externalTransactionId = operation.getExternalTransactionId();
             String userId = operation.getUserId();
             String organizationId = operation.getOrganizationId();
             AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
             ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
             SmsAuthorizationResult smsAuthorizationResult;
 
             String authCode = request.getAuthCode();
@@ -614,8 +615,9 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         String operationId = operation.getOperationId();
         String operationName = operation.getOperationName();
         String operationData = operation.getOperationData();
-        AuthMethod authMethod = getAuthMethodName(operation);
-        OperationContext operationContext = new OperationContext(operationId, operationName, operationData, formData, applicationContext);
+        final AuthMethod authMethod = getAuthMethodName(operation);
+        final String externalTransactionId = operation.getExternalTransactionId();
+        OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
         ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, authMethod, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
         updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
         return daResponse.getResponseObject();

@@ -35,4 +35,11 @@ public interface TppAppDetailRepository extends CrudRepository<TppAppDetailEntit
     @Query("SELECT app FROM TppAppDetailEntity app WHERE app.primaryKey.appClientId=:clientId")
     Optional<TppAppDetailEntity> findByClientId(@Param("clientId") String clientId);
 
+    @Query("SELECT app FROM TppAppDetailEntity app WHERE app.primaryKey.tppId=:tppId")
+    Iterable<TppAppDetailEntity> findByTppId(@Param("tppId") Long tppId);
+
+    @Query("SELECT app FROM TppAppDetailEntity app WHERE app.primaryKey.tppId=:tppId AND app.appName=:appName")
+    Iterable<TppAppDetailEntity> findByTppIdAndAppName(@Param("tppId") Long tppId, @Param("appName") String appName);
+
+
 }
