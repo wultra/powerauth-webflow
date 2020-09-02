@@ -257,7 +257,7 @@ CREATE TABLE tpp_user_consent (
   user_id               VARCHAR(256) NOT NULL,
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP,
   timestamp_updated     TIMESTAMP
@@ -270,7 +270,7 @@ CREATE TABLE tpp_user_consent_history (
   client_id             VARCHAR(256) NOT NULL,
   consent_id            VARCHAR(64) NOT NULL,
   consent_change        VARCHAR(16) NOT NULL,
-  external_id           VARCHAR(256) NOT NULL,
+  external_id           VARCHAR(256),
   consent_parameters    TEXT NOT NULL,
   timestamp_created     TIMESTAMP
 );
