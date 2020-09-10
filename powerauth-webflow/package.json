@@ -21,7 +21,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "react": "^15.6.2",
-    "react-bootstrap": "^0.30.10",
+    "react-bootstrap": "^0.33.1",
     "react-select": "1.0.1",
     "react-dom": "^15.6.2",
     "react-redux": "^5.0.7",
