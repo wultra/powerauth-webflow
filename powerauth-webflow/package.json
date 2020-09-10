@@ -39,7 +39,7 @@
     "bluebird": "^3.7.1",
     "intl": "^1.2.5",
     "sanitize-html": "^1.20.1",
-    "snyk": "^1.316.1",
+    "snyk": "^1.380.0",
     "lodash": "^4.17.20"
   },
   "scripts": {
