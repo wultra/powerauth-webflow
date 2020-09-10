@@ -138,7 +138,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             signatureResponse = powerAuthClient.verifyOfflineSignature(request.getActivationId(), signatureBaseString, request.getAuthCode(), biometryAllowed);
         } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
-            throw new OfflineModeInvalidAuthCodeException("Authentication failed");
+            throw new OfflineModeInvalidAuthCodeException("Offline signature verification failed, reason: " + ex.getMessage());
         }
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
