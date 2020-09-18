@@ -26,7 +26,7 @@ import {
 } from '../actions/usernamePasswordAuthActions'
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from 'react-intl';
@@ -50,6 +50,8 @@ export default class Login extends React.Component {
         this.banners = this.banners.bind(this);
         this.init = this.init.bind(this);
         this.setDefaultOrganization = this.setDefaultOrganization.bind(this);
+        this.updateButtonState = this.updateButtonState.bind(this);
+        this.state = {signInDisabled: true};
     }
 
     componentWillMount() {
@@ -196,6 +198,23 @@ export default class Login extends React.Component {
         this.props.dispatch(selectOrganization(organizationId));
     }
 
+    updateButtonState() {
+        if (this.props.context.chosenOrganizationId === undefined) {
+            return;
+        }
+        const usernameField = "username" + "_" + this.props.context.chosenOrganizationId;
+        const passwordField = "password" + "_" + this.props.context.chosenOrganizationId;
+        if (document.getElementById(usernameField).value.length === 0 || document.getElementById(passwordField).value.length === 0) {
+            if (!this.state.signInDisabled) {
+                this.setState({signInDisabled: true});
+            }
+        } else {
+            if (this.state.signInDisabled) {
+                this.setState({signInDisabled: false});
+            }
+        }
+    }
+
     banners(timeoutCheckActive) {
         return (
             <OperationTimeout timeoutCheckActive={timeoutCheckActive}/>
@@ -234,12 +253,14 @@ export default class Login extends React.Component {
                 )
                 }
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={usernameField} type="text" maxLength={usernameMaxLength}
-                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus/>
+                    <FormControl autoComplete="new-password" id={usernameField} ref={usernameField} type="text" maxLength={usernameMaxLength}
+                                 placeholder={formatMessage({id: 'login.loginNumber'})} autoFocus
+                                 onChange={this.updateButtonState.bind(this)}/>
                 </FormGroup>
                 <FormGroup>
-                    <FormControl autoComplete="new-password" ref={passwordField} type="password" maxLength={passwordMaxLength}
-                                 placeholder={formatMessage({id: 'login.password'})}/>
+                    <FormControl autoComplete="new-password" id={passwordField} ref={passwordField} type="password" maxLength={passwordMaxLength}
+                                 placeholder={formatMessage({id: 'login.password'})}
+                                 onChange={this.updateButtonState.bind(this)}/>
                 </FormGroup>
                 <FormGroup>
                     <div className="row buttons">
@@ -249,7 +270,7 @@ export default class Login extends React.Component {
                             </a>
                         </div>
                         <div className="col-xs-6">
-                            <Button bsSize="lg" type="submit" bsStyle="success" block>
+                            <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.signInDisabled}>
                                 <FormattedMessage id="login.signIn"/>
                             </Button>
                         </div>

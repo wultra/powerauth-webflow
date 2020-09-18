@@ -40,7 +40,7 @@ public class DefaultApiAdapter<T extends DefaultApiBinding> implements ApiAdapte
         UserResponse userResponse = api.getProfile();
         if (userResponse != null) {
             values.setProviderUserId(userResponse.getUser().getId());
-            values.setDisplayName(userResponse.getUser().getGivenName() + " " + userResponse.getUser().getFamilyName() + " (" + userResponse.getConnection().getOrganizationId() + ")");
+            values.setDisplayName(userResponse.getUser().getId());
         }
     }
 

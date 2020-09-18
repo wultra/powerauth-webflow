@@ -15,7 +15,7 @@
  */
 
 html {
-    background-image: url(../images/background-wultra.jpg);
+    background-image: url(../images/background.png);
     background-position: center center;
     background-size: cover;
     height: 100%;
@@ -35,6 +35,14 @@ p {
     font-size: 21px;
     margin-bottom: 10px;
     color: gray;
+}
+
+label {
+    font-weight: 200 !important;
+    font-size: 19px;
+    color: white;
+    text-align: left;
+    margin: 20px;
 }
 
 #content {

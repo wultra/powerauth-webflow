@@ -20,7 +20,7 @@ import {cancel, getOperationData, init, resend} from "../actions/smsAuthActions"
 // Components
 import OperationDetail from "./operationDetail";
 import {Panel} from "react-bootstrap";
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import SmsComponent from "./smsComponent";
 import OperationTimeout from "./operationTimeout";
 

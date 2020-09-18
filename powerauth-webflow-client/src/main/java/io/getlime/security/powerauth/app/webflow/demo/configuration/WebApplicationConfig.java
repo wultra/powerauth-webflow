@@ -45,9 +45,10 @@ public class WebApplicationConfig implements WebMvcConfigurer {
         bean.setIndentOutput(true);
         bean.afterPropertiesSet();
         ObjectMapper objectMapper = bean.getObject();
-        objectMapper.registerModule(new JavaTimeModule());
-        // replacement for ISO8601DateFormat which is deprecated
-        objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
+        if (objectMapper != null) {
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false); // replacement for ISO8601DateFormat which is deprecated
+        }
         return objectMapper;
     }
 

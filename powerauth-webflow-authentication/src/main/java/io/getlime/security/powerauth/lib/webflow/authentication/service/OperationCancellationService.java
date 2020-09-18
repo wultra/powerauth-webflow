@@ -98,7 +98,7 @@ public class OperationCancellationService {
                 ObjectResponse<UpdateOperationResponse> updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
                 // Notify Data Adapter about cancellation event
                 FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), formData, applicationContext);
+                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), operationDetail.getExternalTransactionId(), formData, applicationContext);
                 dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
                 // Notify AFS about logout event
                 OperationTerminationReason terminationReason = operationCancellationConverter.convertCancelReason(cancelReason);

@@ -18,8 +18,8 @@ import {connect} from "react-redux";
 // Actions
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
-import {Button, FormGroup} from "react-bootstrap";
-import Spinner from 'react-tiny-spin';
+import {Button, FormControl, FormGroup} from "react-bootstrap";
+import Spinner from './spinner';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
 // i18n
@@ -51,7 +51,7 @@ export default class TokenOffline extends React.Component {
         this.handleAuthCodeChange = this.handleAuthCodeChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSwitchToSmsAuthorization = this.handleSwitchToSmsAuthorization.bind(this);
-        this.state = {authCode: '', activations: null, chosenActivation: null, qrCode: null, nonce: null, error: null, message: null, remainingAttempts: null};
+        this.state = {authCode: '', activations: null, chosenActivation: null, qrCode: null, nonce: null, error: null, message: null, remainingAttempts: null, confirmDisabled: true};
     }
 
     componentWillMount() {
@@ -149,7 +149,19 @@ export default class TokenOffline extends React.Component {
             // the final value - add dash in between of the two 8-digit parts of the code
             value = value.substr(0, 8) + "-" + value.substr(8);
         }
-        this.setState({authCode: value});
+        this.setState({authCode: value}, this.updateButtonState);
+    }
+
+    updateButtonState() {
+        if (this.state.authCode.length !== 17) {
+            if (!this.state.confirmDisabled) {
+                this.setState({confirmDisabled: true});
+            }
+        } else {
+            if (this.state.confirmDisabled) {
+                this.setState({confirmDisabled: false});
+            }
+        }
     }
 
     handleSubmit(event) {
@@ -179,16 +191,20 @@ export default class TokenOffline extends React.Component {
                 <div>
                     {(this.props.username) ? (
                         <div>
-                            <div className="attribute row">
-                                <div className="message-information">
-                                    <FormattedMessage id="login.loginNumber"/>
+                            <FormGroup>
+                                <div className="attribute row">
+                                    <div className="message-information">
+                                        <FormattedMessage id="login.loginNumber"/>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="attribute row">
-                                <div className="col-xs-12">
-                                    <input className="form-control" autoComplete="off" type="text" value={this.props.username} disabled="true"/>
+                            </FormGroup>
+                            <FormGroup>
+                                <div className="attribute row">
+                                    <div className="col-xs-12">
+                                        <FormControl autoComplete="off" type="text" value={this.props.username} disabled={true}/>
+                                    </div>
                                 </div>
-                            </div>
+                            </FormGroup>
                         </div>
                     ) : (
                         undefined
@@ -247,20 +263,22 @@ export default class TokenOffline extends React.Component {
                             ) : (
                                 undefined
                             )}
-                            <div className="auth-actions">
-                                <div className="row buttons">
-                                    <div className="col-xs-6">
-                                        <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
-                                            <FormattedMessage id="operation.cancel"/>
-                                        </a>
-                                    </div>
-                                    <div className="col-xs-6">
-                                        <Button bsSize="lg" type="submit" bsStyle="success" block>
-                                            <FormattedMessage id="operation.confirm"/>
-                                        </Button>
+                            <FormGroup>
+                                <div className="auth-actions">
+                                    <div className="row buttons">
+                                        <div className="col-xs-6">
+                                            <a href="#" onClick={this.props.cancelCallback} className="btn btn-lg btn-default">
+                                                <FormattedMessage id="operation.cancel"/>
+                                            </a>
+                                        </div>
+                                        <div className="col-xs-6">
+                                            <Button bsSize="lg" type="submit" bsStyle="success" block disabled={this.state.confirmDisabled}>
+                                                <FormattedMessage id="operation.confirm"/>
+                                            </Button>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            </FormGroup>
                         </div>
                     ) : (
                         <Spinner/>

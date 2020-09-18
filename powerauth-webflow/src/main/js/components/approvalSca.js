@@ -16,9 +16,9 @@
 import React from 'react';
 import {connect} from 'react-redux';
 // Actions
-import {init, getOperationData, confirm, cancel} from "../actions/approvalScaActions";
+import {cancel, confirm, getOperationData, init} from "../actions/approvalScaActions";
 // Components
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import {Button, Panel} from "react-bootstrap";
 import OperationTimeout from "./operationTimeout";
 import OperationDetail from "./operationDetail";

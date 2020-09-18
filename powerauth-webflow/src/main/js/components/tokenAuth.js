@@ -21,7 +21,7 @@ import {authenticateOnline, cancel, getOperationData, initOnline} from "../actio
 import OperationDetail from "./operationDetail";
 import TokenOffline from "./tokenAuthOffline";
 import TokenOnline from "./tokenAuthOnline";
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import {Panel} from "react-bootstrap";
 import TokenAuthSms from "./tokenAuthSms";
 import OperationTimeout from "./operationTimeout";

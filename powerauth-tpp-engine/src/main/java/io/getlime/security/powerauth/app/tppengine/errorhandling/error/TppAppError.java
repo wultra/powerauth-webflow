@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.app.tppengine.errorhandling.error;
 
 import io.getlime.core.rest.model.base.entity.Error;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Error related to consent.
  *
@@ -27,6 +30,8 @@ public class TppAppError extends Error {
 
     private static final String code = "TPP_APP_ERROR";
 
+    private List<String> causes;
+
     public TppAppError() {
         super();
         this.setCode(code);
@@ -34,5 +39,14 @@ public class TppAppError extends Error {
 
     public TppAppError(String message) {
         super(code, message);
+    }
+
+    public TppAppError(String message, List<String> causes) {
+        super(code, message);
+        this.causes = new ArrayList<>(causes);
+    }
+
+    public List<String> getCauses() {
+        return causes;
     }
 }

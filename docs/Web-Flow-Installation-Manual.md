@@ -124,7 +124,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
     <Parameter name="powerauth.nextstep.service.url" value="http://10.x.x.x:8080/powerauth-nextstep"/>
 
     <!-- PowerAuth Server Service URL -->
-    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
+    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/rest"/>
 
     <!-- PowerAuthServer Service Security Settings -->
     <Parameter name="powerauth.service.security.clientToken" value=""/>
@@ -183,7 +183,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 <Context>
 
     <!-- PowerAuth Server Service URL -->
-    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
+    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/rest"/>
 
 </Context>
 ```
@@ -212,7 +212,7 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 <Context>
 
     <!-- PowerAuth Server Service URL -->
-    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/soap"/>
+    <Parameter name="powerauth.service.url" value="http://10.x.x.x:8080/powerauth-java-server/rest"/>
 
     <!-- PowerAuth Server Service Security Settings -->
     <Parameter name="powerauth.service.security.clientToken" value=""/>

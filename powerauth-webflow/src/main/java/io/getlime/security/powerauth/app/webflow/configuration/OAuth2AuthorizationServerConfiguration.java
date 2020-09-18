@@ -168,6 +168,7 @@ public class OAuth2AuthorizationServerConfiguration extends AuthorizationServerC
     @Override
     public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
         security.allowFormAuthenticationForClients();
+        security.checkTokenAccess("isAuthenticated()");
     }
 
     /**
