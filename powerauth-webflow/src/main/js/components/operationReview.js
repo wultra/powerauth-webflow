@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {cancel, getOperationData, updateOperation} from "../actions/operationReviewActions";
 // Components
 import {Panel} from "react-bootstrap";
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from "react-intl";

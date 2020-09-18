@@ -18,7 +18,7 @@ import {connect} from 'react-redux';
 // Actions
 import {authenticate} from '../actions/startHandshakeActions'
 // Components
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 // Web Socket support
 const stompClient = require('../websocket-client');
 /**

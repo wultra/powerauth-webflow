@@ -25,7 +25,7 @@
     "react-select": "1.3.0",
     "react-dom": "^16.3.0",
     "react-redux": "^5.0.7",
-    "react-tiny-spin": "^0.6.5",
+    "spin.js": "^2.3.2",
     "react-device-detect": "^1.13.1",
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
