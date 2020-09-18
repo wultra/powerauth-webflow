@@ -171,6 +171,7 @@ export function authenticate(userAuthCode, userPassword, component) {
                             }
                         }).then((response) => {
                             dispatchAction(dispatch, response);
+                            return null;
                         }).catch((error) => {
                             dispatchError(dispatch, error);
                         });
@@ -238,6 +239,7 @@ export function cancel(component) {
                             message: response.data.message
                         }
                     });
+                    return null;
                 }).catch((error) => {
                     dispatchError(dispatch, error);
                 });

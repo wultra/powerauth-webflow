@@ -201,7 +201,7 @@ export default class TokenOffline extends React.Component {
                             <FormGroup>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <FormControl autoComplete="off" type="text" value={this.props.username} disabled="true"/>
+                                        <FormControl autoComplete="off" type="text" value={this.props.username} disabled={true}/>
                                     </div>
                                 </div>
                             </FormGroup>
