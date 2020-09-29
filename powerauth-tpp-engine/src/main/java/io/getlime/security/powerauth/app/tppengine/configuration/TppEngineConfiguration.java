@@ -34,20 +34,27 @@ public class TppEngineConfiguration {
     /**
      * Application name.
      */
-    @Value("${powerauth.webflow.service.applicationName}")
+    @Value("${powerauth.tppEngine.service.applicationName}")
     private String applicationName;
 
     /**
      * Application display name.
      */
-    @Value("${powerauth.webflow.service.applicationDisplayName}")
+    @Value("${powerauth.tppEngine.service.applicationDisplayName}")
     private String applicationDisplayName;
 
     /**
      * Application environment.
      */
-    @Value("${powerauth.webflow.service.applicationEnvironment}")
+    @Value("${powerauth.tppEngine.service.applicationEnvironment}")
     private String applicationEnvironment;
+
+    /**
+     * When a new app is created in TPP engine, this value is set as the default
+     * access token validity in seconds.
+     */
+    @Value("${powerauth.tppEngine.service.oauth2.defaultAccessTokenValidityInSeconds}")
+    private Long defaultAccessTokenValidityInSeconds;
 
     /**
      * Get application name.
@@ -71,6 +78,14 @@ public class TppEngineConfiguration {
      */
     public String getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    /**
+     * Get default app access token validity in seconds.
+     * @return Access token validity in seconds.
+     */
+    public Long getDefaultAccessTokenValidityInSeconds() {
+        return defaultAccessTokenValidityInSeconds;
     }
 
 }
