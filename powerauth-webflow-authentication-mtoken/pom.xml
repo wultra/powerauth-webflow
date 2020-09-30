@@ -83,7 +83,7 @@
         <dependency>
             <groupId>com.google.zxing</groupId>
             <artifactId>javase</artifactId>
-            <version>3.4.0</version>
+            <version>3.4.1</version>
         </dependency>
 
         <!-- Dependencies for Java 11 -->
