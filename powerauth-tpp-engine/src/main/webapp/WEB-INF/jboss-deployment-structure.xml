@@ -7,7 +7,7 @@
 		</exclude-subsystems>
 
 		<dependencies>
-			<module name="com.wultra.powerauth.nextstep.conf" />
+			<module name="com.wultra.powerauth.tpp-engine.conf" />
 		</dependencies>
 		<local-last value="true" />
 	</deployment>
