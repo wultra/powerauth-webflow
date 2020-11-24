@@ -10,8 +10,11 @@ module.exports = {
     cache: true,
     resolve: {
         alias: {
-            'stompjs': node_dir + '/stompjs/lib/stomp.js',
-            'path': 'path-browserify'
+            'stompjs': node_dir + '/stompjs/lib/stomp.js'
+        },
+        fallback: {
+            "url": false,
+            "path": false
         }
     },
     output: {
