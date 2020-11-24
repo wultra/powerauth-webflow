@@ -6,11 +6,15 @@ var webpack = require('webpack');
 
 module.exports = {
     entry: './src/main/js/client.js',
-    devtool: 'sourcemaps',
+    devtool: 'source-map',
     cache: true,
     resolve: {
         alias: {
             'stompjs': node_dir + '/stompjs/lib/stomp.js'
+        },
+        fallback: {
+            "url": false,
+            "path": false
         }
     },
     output: {
@@ -23,10 +27,17 @@ module.exports = {
                 test: path.join(__dirname, '.'),
                 exclude: /(node_modules)/,
                 loader: 'babel-loader',
-                query: {
+                options: {
                     cacheDirectory: true,
-                    presets: ['env', 'react'],
-                    plugins: ['transform-object-rest-spread', 'transform-decorators-legacy', 'transform-class-properties']
+                    presets: ['@babel/preset-env', '@babel/preset-react'],
+                    plugins: ['@babel/plugin-proposal-object-rest-spread', ['@babel/plugin-proposal-decorators', { "legacy": true }], '@babel/plugin-proposal-class-properties']
+                }
+            },
+            {
+                // See https://github.com/webpack/webpack/issues/11467
+                test: /\.m?js/,
+                resolve: {
+                    fullySpecified: false
                 }
             }
         ]
