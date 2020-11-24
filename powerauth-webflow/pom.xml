@@ -245,6 +245,12 @@
                                     <arguments>install</arguments>
                                 </configuration>
                             </execution>
+                            <execution>
+                                <id>webpack build</id>
+                                <goals>
+                                    <goal>webpack</goal>
+                                </goals>
+                            </execution>
                         </executions>
                     </plugin>
                 </plugins>

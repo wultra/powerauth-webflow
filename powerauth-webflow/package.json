@@ -40,7 +40,9 @@
     "intl": "^1.2.5",
     "sanitize-html": "^2.0.0",
     "snyk": "^1.425.4",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.20",
+    "url": "^0.11.0",
+    "path-browserify": "^1.0.1"
   },
   "scripts": {
     "watch": "webpack --watch -d",
