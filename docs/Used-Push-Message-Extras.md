@@ -5,7 +5,7 @@ During the Mobile Token authentication and authorization, PowerAuth Web Flow may
 - `messageType` (required) - message type, one of the following values:
     - `mtoken.operationInit` - in case new operation was triggerred
     - `mtoken.operationFinished` - in case operation was finished, successfully or non-successfully
-- `mtokenOperationResult` (required only in case of a finished operation, `messageType` = `mtoken.operationFinished`) - this key contains more information about the operation finish result, namely one of the following values:
+- `mtokenOperationResult` (required only in case of a finished operation, `messageType` = `mtoken.operationFinished`, otherwise ignored) - this key contains more information about the operation finish result, namely one of the following values:
     - `authentication.success` - operation was successfully confirmed
     - `authentication.fail` - operation failed to confirm
     - `operation.timeout` - operation expired
