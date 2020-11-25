@@ -2,16 +2,16 @@
 
 During the Mobile Token authentication and authorization, PowerAuth Web Flow may send following push messages to the Mobile Token app:
 
-- `messageType` - message type, one of the following values:
+- `messageType` (required) - message type, one of the following values:
     - `mtoken.operationInit` - in case new operation was triggerred
     - `mtoken.operationFinished` - in case operation was finished, successfully or non-successfully
-- `mtokenOperationResult` - this key arrives only in case of a finished operation (`messageType` = `mtoken.operationFinished`) and it contains more information about the operation finish result, namely one of the following values:
+- `mtokenOperationResult` (required only in case of a finished operation, `messageType` = `mtoken.operationFinished`) - this key contains more information about the operation finish result, namely one of the following values:
     - `authentication.success` - operation was successfully confirmed
     - `authentication.fail` - operation failed to confirm
     - `operation.timeout` - operation expired
     - `operation.canceled` - operation was cancelled by the user
     - `operation.methodNotAvailable` - (rare) mToken authentication method was removed from the user
-- `operationId` - operation ID, in UUID format
-- `operationName` - operation name, for example "login" or "authorize_payment"
+- `operationId` (required) - operation ID, in UUID format
+- `operationName` (required) - operation name, for example "login" or "authorize_payment"
 
 Please note that push notifications work on "best effort" principle and therefore, application must not rely on them. It can use the notification for example to deliver more prompt response on events in desktop web browser.
