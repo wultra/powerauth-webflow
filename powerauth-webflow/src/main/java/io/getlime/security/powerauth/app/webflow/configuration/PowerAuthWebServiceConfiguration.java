@@ -1,10 +1,13 @@
 package io.getlime.security.powerauth.app.webflow.configuration;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.push.client.PushServerClient;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +22,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class PowerAuthWebServiceConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(PowerAuthWebServiceConfiguration.class);
 
     private SSLConfigurationService sslConfigurationService;
 
@@ -71,7 +76,12 @@ public class PowerAuthWebServiceConfiguration {
         config.setPowerAuthClientToken(clientToken);
         config.setPowerAuthClientSecret(clientSecret);
         config.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
-        return new PowerAuthRestClient(powerAuthRestUrl, config);
+        try {
+            return new PowerAuthRestClient(powerAuthRestUrl, config);
+        } catch (PowerAuthClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
     }
 
     /**
