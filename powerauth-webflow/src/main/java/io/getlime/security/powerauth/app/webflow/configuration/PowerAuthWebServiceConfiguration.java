@@ -5,6 +5,7 @@ import com.wultra.security.powerauth.client.model.error.PowerAuthClientException
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.push.client.PushServerClient;
+import io.getlime.push.client.PushServerClientException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,12 +91,12 @@ public class PowerAuthWebServiceConfiguration {
      */
     @Bean
     public PushServerClient pushServerClient() {
-        PushServerClient client = new PushServerClient(powerAuthPushServiceUrl);
-        // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificate) {
-            sslConfigurationService.trustAllCertificates();
+        try {
+            return new PushServerClient(powerAuthPushServiceUrl);
+        } catch (PushServerClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
         }
-        return client;
     }
 
 }
