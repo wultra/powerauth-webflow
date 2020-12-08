@@ -92,12 +92,7 @@ public class PowerAuthWebServiceConfiguration {
     @Bean
     public PushServerClient pushServerClient() {
         try {
-            PushServerClient client = new PushServerClient(powerAuthPushServiceUrl);
-            // whether invalid SSL certificates should be accepted
-            if (acceptInvalidSslCertificate) {
-                sslConfigurationService.trustAllCertificates();
-            }
-            return client;
+            return new PushServerClient(powerAuthPushServiceUrl);
         } catch (PushServerClientException ex) {
             logger.error(ex.getMessage(), ex);
             return null;
