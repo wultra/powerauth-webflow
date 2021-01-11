@@ -129,7 +129,7 @@ a:hover, a:active, a:focus {
     color: #439fe6;
 }
 
-#login .panel-body .title {
+#login .panel-default .title {
     color: gray;
 }
 

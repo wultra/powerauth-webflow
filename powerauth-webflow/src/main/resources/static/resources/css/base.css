@@ -140,7 +140,7 @@ a:hover, a:active, a:focus {
     right: 10px;
 }
 
-#operation .panel-body {
+#operation .panel-default {
     padding: 30px;
     min-height: 400px;
 }
@@ -244,11 +244,11 @@ a:hover, a:active, a:focus {
 
 /* LOGIN */
 
-#login .panel-body {
+#login .panel-default {
     padding: 30px;
 }
 
-#login .panel-body .title {
+#login .panel-default .title {
     color: #7FC000;
 }
 
