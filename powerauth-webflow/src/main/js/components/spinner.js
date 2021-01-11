@@ -8,7 +8,7 @@ class ReactSpinner extends Component {
         const spinnerColor = getComputedStyle(spinner).getPropertyValue('color');
         let opts = {
             // Default Spinner color
-            color: '#FFFFFF'
+            color: '#000000'
         }
         if (spinnerColor) {
             // Spinner color is overriden using CSS
