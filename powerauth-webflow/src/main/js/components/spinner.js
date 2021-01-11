@@ -4,7 +4,17 @@ import Spinner from 'spin.js';
 class ReactSpinner extends Component {
 
     componentDidMount() {
-        this.spinner = new Spinner(this.props.config);
+        const spinner = document.getElementById('spinner');
+        const spinnerColor = getComputedStyle(spinner).getPropertyValue('color');
+        let opts = {
+            // Default Spinner color
+            color: '#000000'
+        }
+        if (spinnerColor) {
+            // Spinner color is overriden using CSS
+            opts.color = spinnerColor;
+        }
+        this.spinner = new Spinner(opts);
         if (!this.props.stopped) {
             this.spinner.spin(this.container);
         }
@@ -24,7 +34,7 @@ class ReactSpinner extends Component {
 
     render() {
         return (
-            <span ref={(container) => (this.container = container)} />
+            <span id='spinner' className='spinner' ref={(container) => (this.container = container)} />
         );
     }
 }

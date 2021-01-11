@@ -251,3 +251,7 @@ a:hover, a:active, a:focus {
 #login .form-group .form-control {
     border-radius: 6px;
 }
+
+.spinner {
+    color: #FFFFFF;
+}
