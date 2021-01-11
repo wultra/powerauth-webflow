@@ -406,3 +406,7 @@ a:hover, a:active, a:focus {
     text-align: left;
     margin-top: 10px;
 }
+
+.spinner {
+    color: #000000;
+}
