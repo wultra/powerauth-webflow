@@ -40,7 +40,7 @@
     "intl": "^1.2.5",
     "sanitize-html": "^2.0.0",
     "snyk": "^1.436.0",
-    "lodash": "^4.17.20"
+    "lodash": "^4.17.19"
   },
   "scripts": {
     "watch": "webpack --watch -d",
