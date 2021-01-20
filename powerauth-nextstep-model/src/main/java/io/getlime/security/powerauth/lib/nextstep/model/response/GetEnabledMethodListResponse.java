@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,7 @@ public class GetEnabledMethodListResponse {
     @NotNull
     private String userId;
     private UserIdentityStatus status;
-    private List<AuthMethod> enabledAuthMethods;
+    @NotNull
+    private List<AuthMethod> enabledAuthMethods = new ArrayList<>();
 
 }

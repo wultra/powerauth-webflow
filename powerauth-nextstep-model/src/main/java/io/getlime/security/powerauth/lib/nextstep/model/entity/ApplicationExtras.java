@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class ApplicationExtras {
 
-    private List<String> requestedScopes;
+    private final List<String> requestedScopes;
     private String applicationOwner;
 
     /**

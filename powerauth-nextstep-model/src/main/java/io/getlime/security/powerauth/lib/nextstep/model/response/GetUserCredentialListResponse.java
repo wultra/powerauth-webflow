@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,6 +32,7 @@ public class GetUserCredentialListResponse {
 
     @NotNull
     private String userId;
-    private List<CredentialDetail> credentials;
+    @NotNull
+    private List<CredentialDetail> credentials = new ArrayList<>();
 
 }

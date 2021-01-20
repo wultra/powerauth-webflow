@@ -38,10 +38,13 @@ public class UpdateUserResponse {
 
     private Map<String, Object> extras = new LinkedHashMap<>();
 
+    @NotNull
     private List<String> roles = new ArrayList<>();
 
+    @NotNull
     private List<UserContactDetail> contacts = new ArrayList<>();
 
+    @NotNull
     private List<CredentialDetail> credentials = new ArrayList<>();
 
 }

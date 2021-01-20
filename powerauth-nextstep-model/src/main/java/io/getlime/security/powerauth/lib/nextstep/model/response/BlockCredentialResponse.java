@@ -29,5 +29,7 @@ public class BlockCredentialResponse {
 
     @NotNull
     private String userId;
+    @NotNull
+    private String credentialName;
 
 }

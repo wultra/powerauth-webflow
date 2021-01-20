@@ -28,7 +28,7 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@EqualsAndHashCode(of = {"hashConfigName"})
+@EqualsAndHashCode(of = {"hashConfigNameCreateCredentialRequest"})
 public class HashConfigDetail {
 
     @NotNull

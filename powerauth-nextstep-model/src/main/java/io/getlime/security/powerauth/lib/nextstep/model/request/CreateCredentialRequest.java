@@ -35,7 +35,6 @@ public class CreateCredentialRequest {
     @NotNull
     private CredentialType credentialType;
     private String username;
-    @NotNull
     private String credentialValue;
 
 }

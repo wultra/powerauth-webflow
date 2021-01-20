@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuditDetail;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,6 +30,7 @@ import java.util.List;
 @Data
 public class GetAuditListResponse {
 
-    private List<AuditDetail> audits = new ArrayList<>();;
+    @NotNull
+    private List<AuditDetail> audits = new ArrayList<>();
 
 }

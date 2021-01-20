@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ import java.util.List;
 public class UpdateUsersRequest {
 
     @NotNull
-    private List<String> userIds;
+    private List<String> userIds = new ArrayList<>();
     private UserIdentityStatus status;
 
 }
