@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
@@ -27,6 +28,7 @@ import java.util.Date;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
+@EqualsAndHashCode(of = "credentialName")
 public class CredentialDetail {
 
     @NotNull

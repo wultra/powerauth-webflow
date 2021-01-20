@@ -28,11 +28,11 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@EqualsAndHashCode(of = {"name"})
+@EqualsAndHashCode(of = {"hashConfigName"})
 public class HashConfigDetail {
 
     @NotNull
-    private String name;
+    private String hashConfigName;
     @NotNull
     private String algorithm;
     private Map<String, String> parameters;
