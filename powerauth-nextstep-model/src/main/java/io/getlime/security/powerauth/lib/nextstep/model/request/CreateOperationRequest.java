@@ -32,9 +32,10 @@ public class CreateOperationRequest {
     private String operationName;
     private String operationId;
     private String operationData;
+    private String userId;
     private String organizationId;
     private String externalTransactionId;
-    private List<KeyValueParameter> params;
+    private final List<KeyValueParameter> params;
     private OperationFormData formData;
     private ApplicationContext applicationContext;
 
@@ -93,6 +94,22 @@ public class CreateOperationRequest {
      */
     public void setOperationData(String operationData) {
         this.operationData = operationData;
+    }
+
+    /**
+     * Get user ID.
+     * @return User ID.
+     */
+    public String getUserId() {
+        return userId;
+    }
+
+    /**
+     * Set user ID.
+     * @param userId User ID.
+     */
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     /**

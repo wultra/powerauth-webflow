@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class GetOperationConfigListResponse {
 
-    private List<GetOperationConfigDetailResponse> operationConfigs = new ArrayList<>();
+    private final List<GetOperationConfigDetailResponse> operationConfigs = new ArrayList<>();
 
     /**
      * Get operation configurations.
@@ -33,14 +33,6 @@ public class GetOperationConfigListResponse {
      */
     public List<GetOperationConfigDetailResponse> getOperationConfigs() {
         return operationConfigs;
-    }
-
-    /**
-     * Set operation configurations.
-     * @param operationConfigs Operation configurations.
-     */
-    public void setOperationConfigs(List<GetOperationConfigDetailResponse> operationConfigs) {
-        this.operationConfigs = operationConfigs;
     }
 
     /**

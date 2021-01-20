@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class LookupOperationsByExternalIdResponse {
 
-    private List<GetOperationDetailResponse> operations = new ArrayList<>();
+    private final List<GetOperationDetailResponse> operations = new ArrayList<>();
 
     /**
      * Get operations.
@@ -33,14 +33,6 @@ public class LookupOperationsByExternalIdResponse {
      */
     public List<GetOperationDetailResponse> getOperations() {
         return operations;
-    }
-
-    /**
-     * Set operations.
-     * @param operations Operations.
-     */
-    public void setOperations(List<GetOperationDetailResponse> operations) {
-        this.operations = operations;
     }
 
     /**

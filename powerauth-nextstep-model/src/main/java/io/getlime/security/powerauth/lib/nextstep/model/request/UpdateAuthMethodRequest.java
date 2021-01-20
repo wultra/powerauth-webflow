@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,7 +29,14 @@ public class UpdateAuthMethodRequest {
 
     private String userId;
     private AuthMethod authMethod;
-    private Map<String, String> config;
+    private final Map<String, String> config;
+
+    /**
+     * Default constructor.
+     */
+    public UpdateAuthMethodRequest() {
+        this.config = new LinkedHashMap<>();
+    }
 
     /**
      * Get the user ID.
@@ -74,11 +82,4 @@ public class UpdateAuthMethodRequest {
         return config;
     }
 
-    /**
-     * Set the authentication method configuration.
-     * @param config Configuration.
-     */
-    public void setConfig(Map<String, String> config) {
-        this.config = config;
-    }
 }

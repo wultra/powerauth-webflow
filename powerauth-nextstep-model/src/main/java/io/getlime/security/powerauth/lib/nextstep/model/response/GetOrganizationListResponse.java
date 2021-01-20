@@ -25,7 +25,7 @@ import java.util.List;
  */
 public class GetOrganizationListResponse {
 
-    private List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
+    private final List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
 
     /**
      * Get organizations.
@@ -33,14 +33,6 @@ public class GetOrganizationListResponse {
      */
     public List<GetOrganizationDetailResponse> getOrganizations() {
         return organizations;
-    }
-
-    /**
-     * Set organizations.
-     * @param organizations Organizations.
-     */
-    public void setOrganizations(List<GetOrganizationDetailResponse> organizations) {
-        this.organizations = organizations;
     }
 
     /**

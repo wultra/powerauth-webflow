@@ -39,7 +39,7 @@ public class CreateOperationResponse {
     private Date timestampCreated;
     private Date timestampExpires;
     private String operationData;
-    private List<AuthStep> steps;
+    private final List<AuthStep> steps;
     private OperationFormData formData;
 
     /**

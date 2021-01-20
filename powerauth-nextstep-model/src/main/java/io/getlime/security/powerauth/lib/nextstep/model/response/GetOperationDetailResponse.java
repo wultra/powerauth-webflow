@@ -41,9 +41,9 @@ public class GetOperationDetailResponse {
     private Date timestampCreated;
     private Date timestampExpires;
     private String operationData;
-    private List<AuthStep> steps;
-    private List<OperationHistory> history;
-    private List<AfsActionDetail> afsActions;
+    private final List<AuthStep> steps;
+    private final List<OperationHistory> history;
+    private final List<AfsActionDetail> afsActions;
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
     private Integer remainingAttempts;

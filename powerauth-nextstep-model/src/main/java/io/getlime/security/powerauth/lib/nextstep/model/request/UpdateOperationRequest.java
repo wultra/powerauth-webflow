@@ -35,10 +35,10 @@ public class UpdateOperationRequest {
     private String userId;
     private String organizationId;
     private AuthMethod authMethod;
-    private List<AuthInstrument> authInstruments;
+    private final List<AuthInstrument> authInstruments;
     private AuthStepResult authStepResult;
     private String authStepResultDescription;
-    private List<KeyValueParameter> params;
+    private final List<KeyValueParameter> params;
     private ApplicationContext applicationContext;
 
     /**
@@ -46,6 +46,7 @@ public class UpdateOperationRequest {
      */
     public UpdateOperationRequest() {
         params = new ArrayList<>();
+        authInstruments = new ArrayList<>();
     }
 
     /**
@@ -118,14 +119,6 @@ public class UpdateOperationRequest {
      */
     public List<AuthInstrument> getAuthInstruments() {
         return authInstruments;
-    }
-
-    /**
-     * Set used authentication / authorization instruments.
-     * @param authInstruments Used authentication / authorization instruments.
-     */
-    public void setAuthInstruments(List<AuthInstrument> authInstruments) {
-        this.authInstruments = authInstruments;
     }
 
     /**

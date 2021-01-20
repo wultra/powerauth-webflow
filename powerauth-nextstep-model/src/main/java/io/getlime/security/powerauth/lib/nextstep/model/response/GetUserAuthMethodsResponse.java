@@ -27,7 +27,7 @@ import java.util.List;
  */
 public class GetUserAuthMethodsResponse {
 
-    private List<UserAuthMethodDetail> userAuthMethods;
+    private final List<UserAuthMethodDetail> userAuthMethods;
 
     /**
      * Default constructor.
@@ -40,7 +40,4 @@ public class GetUserAuthMethodsResponse {
         return userAuthMethods;
     }
 
-    public void setUserAuthMethods(List<UserAuthMethodDetail> userAuthMethods) {
-        this.userAuthMethods = userAuthMethods;
-    }
 }
