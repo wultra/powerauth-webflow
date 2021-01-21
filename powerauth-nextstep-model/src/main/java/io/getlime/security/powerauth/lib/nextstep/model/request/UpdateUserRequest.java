@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -35,6 +36,8 @@ public class UpdateUserRequest {
 
     @NotNull
     private String userId;
+
+    private UserIdentityStatus status;
 
     private Map<String, Object> extras = new LinkedHashMap<>();
 
