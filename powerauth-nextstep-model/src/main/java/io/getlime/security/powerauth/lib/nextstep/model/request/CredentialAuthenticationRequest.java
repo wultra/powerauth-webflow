@@ -33,5 +33,6 @@ public class CredentialAuthenticationRequest {
     @NotNull
     private String credentialValue;
     private String operationId;
+    private boolean updateOperation;
 
 }

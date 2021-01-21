@@ -31,11 +31,13 @@ public class CombinedAuthenticationRequest {
     private String credentialName;
     @NotNull
     private String otpName;
-    private String username;
+    @NotNull
+    private String userId;
     @NotNull
     private String credentialValue;
     @NotNull
     private String otpValue;
     private String operationId;
+    private boolean updateOperation;
 
 }

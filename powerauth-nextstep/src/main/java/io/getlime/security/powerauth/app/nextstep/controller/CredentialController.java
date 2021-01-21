@@ -53,9 +53,9 @@ public class CredentialController {
         return new ObjectResponse<>(new UpdateCredentialResponse());
     }
 
-    @RequestMapping(value = "verify", method = RequestMethod.POST)
-    public ObjectResponse<VerifyCredentialResponse> verifyCredential(@RequestBody ObjectRequest<VerifyCredentialRequest> request) {
-        return new ObjectResponse<>(new VerifyCredentialResponse());
+    @RequestMapping(value = "validate", method = RequestMethod.POST)
+    public ObjectResponse<ValidateCredentialResponse> verifyCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) {
+        return new ObjectResponse<>(new ValidateCredentialResponse());
     }
 
     @RequestMapping(value = "reset", method = RequestMethod.POST)

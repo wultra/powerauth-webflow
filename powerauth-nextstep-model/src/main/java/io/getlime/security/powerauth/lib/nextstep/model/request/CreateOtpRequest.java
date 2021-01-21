@@ -31,7 +31,8 @@ public class CreateOtpRequest {
     private String userId;
     @NotNull
     private String otpName;
-    @NotNull
+    // The otpData parameter has priority over data extracted from operation
     private String otpData;
+    private String operationId;
 
 }

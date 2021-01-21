@@ -38,10 +38,13 @@ public class CredentialDetail {
     private CredentialType credentialType;
     @NotNull
     private CredentialStatus credentialStatus;
+    private boolean credentialChangeRequired;
     @NotNull
     private Date timestampCreated;
     @NotNull
     private Date timestampExpired;
+    @NotNull
+    private Date timestampBlocked;
     @NotNull
     private Date timestampLastUpdated;
     @NotNull

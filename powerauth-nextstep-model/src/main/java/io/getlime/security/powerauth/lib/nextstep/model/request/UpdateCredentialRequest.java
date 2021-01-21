@@ -32,7 +32,6 @@ public class UpdateCredentialRequest {
     private String userId;
     @NotNull
     private String credentialName;
-    @NotNull
     private CredentialType credentialType;
     private String username;
     private String credentialValue;

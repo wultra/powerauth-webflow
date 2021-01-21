@@ -13,25 +13,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
-
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Request object used for resetting a credential.
+ * Enum representing a credential validation error.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-public class ResetCredentialRequest {
+public enum CredentialValidationError {
 
-    @NotNull
-    private String userId;
-    @NotNull
-    private String credentialName;
-    private CredentialType credentialType;
+    /**
+     * Credential is empty.
+     */
+    CREDENTIAL_EMPTY,
+
+    /**
+     * Credential is too short.
+     */
+    CREDENTIAL_TOO_SHORT,
+
+    /**
+     * Credential is too long.
+     */
+    CREDENTIAL_TOO_LONG,
+
+    /**
+     * Credential has invalid characters.
+     */
+    CREDENTIAL_CONTAINS_INVALID_CHARACTERS,
+
+    /**
+     * Credential history check failed.
+     */
+    CREDENTIAL_HISTORY_CHECK_FAILED
 
 }

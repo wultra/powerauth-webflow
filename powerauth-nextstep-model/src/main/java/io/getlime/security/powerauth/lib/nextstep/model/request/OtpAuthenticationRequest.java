@@ -34,5 +34,6 @@ public class OtpAuthenticationRequest {
     @NotNull
     private String otpValue;
     private String operationId;
+    private boolean updateOperation;
 
 }

@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
+package io.getlime.security.powerauth.lib.nextstep.model.request;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
- * Enum representing a policy verification result.
+ * Request object used for verifying a credential against credential policy.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum VerificationResult {
+@Data
+public class ValidateCredentialRequest {
 
-    /**
-     * Verification succeeded.
-     */
-    SUCCEEDED,
-
-    /**
-     * Verification failed.
-     */
-    FAILED
+    @NotNull
+    private String credentialName;
+    @NotNull
+    private String credentialValue;
+    @NotNull
+    private String userId;
 
 }

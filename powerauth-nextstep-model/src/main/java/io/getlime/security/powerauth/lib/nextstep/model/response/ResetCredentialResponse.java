@@ -33,6 +33,8 @@ public class ResetCredentialResponse {
     @NotNull
     private String credentialName;
     @NotNull
+    private String credentialValue;
+    @NotNull
     private CredentialStatus credentialStatus;
 
 }

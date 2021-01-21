@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationResult;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
- * Request object used for verifying a credential against credential policy.
+ * Response object used for verifying a credential against a credential policy.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-public class VerifyCredentialRequest {
+public class ValidateCredentialResponse {
 
     @NotNull
-    private String credentialName;
+    private CredentialValidationResult validationResult;
     @NotNull
-    private String credentialValue;
+    private List<CredentialValidationError> validationErrors;
 
 }
