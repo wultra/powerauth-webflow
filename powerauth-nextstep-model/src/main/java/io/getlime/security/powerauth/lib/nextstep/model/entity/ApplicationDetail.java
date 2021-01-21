@@ -34,7 +34,7 @@ public class ApplicationDetail {
     @NotNull
     private String applicationName;
     @NotNull
-    private ApplicationStatus status;
+    private ApplicationStatus applicationStatus;
     private String description;
     private String organizationId;
     @NotNull

@@ -35,7 +35,7 @@ public class GetUserDetailResponse {
     private String userId;
 
     @NotNull
-    private UserIdentityStatus status;
+    private UserIdentityStatus userIdentityStatus;
 
     @NotNull
     private Map<String, Object> extras = new LinkedHashMap<>();

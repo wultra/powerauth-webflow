@@ -46,7 +46,7 @@ public class CredentialDefinitionDetail {
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
     @NotNull
-    private CredentialDefinitionStatus status;
+    private CredentialDefinitionStatus credentialDefinitionStatus;
     @NotNull
     private Date timestampCreated;
     @NotNull

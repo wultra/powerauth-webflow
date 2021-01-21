@@ -33,7 +33,7 @@ public class GetEnabledMethodListResponse {
 
     @NotNull
     private String userId;
-    private UserIdentityStatus status;
+    private UserIdentityStatus userIdentityStatus;
     @NotNull
     private List<AuthMethod> enabledAuthMethods = new ArrayList<>();
 

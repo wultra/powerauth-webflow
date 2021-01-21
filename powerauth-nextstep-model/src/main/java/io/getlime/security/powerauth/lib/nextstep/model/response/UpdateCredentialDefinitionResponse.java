@@ -43,6 +43,6 @@ public class UpdateCredentialDefinitionResponse {
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
     @NotNull
-    private CredentialDefinitionStatus status;
+    private CredentialDefinitionStatus credentialDefinitionStatus;
 
 }

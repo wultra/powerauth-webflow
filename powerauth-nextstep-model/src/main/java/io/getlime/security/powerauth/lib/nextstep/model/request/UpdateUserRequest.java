@@ -37,7 +37,7 @@ public class UpdateUserRequest {
     @NotNull
     private String userId;
 
-    private UserIdentityStatus status;
+    private UserIdentityStatus userIdentityStatus;
 
     private Map<String, Object> extras = new LinkedHashMap<>();
 

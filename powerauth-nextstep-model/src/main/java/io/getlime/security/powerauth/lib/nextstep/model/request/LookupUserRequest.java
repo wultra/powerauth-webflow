@@ -31,7 +31,7 @@ import java.util.List;
 public class LookupUserRequest {
 
     // Filter by user identity status
-    private UserIdentityStatus status;
+    private UserIdentityStatus userIdentityStatus;
 
     // Filter by created date
     private Date createdStartDate;

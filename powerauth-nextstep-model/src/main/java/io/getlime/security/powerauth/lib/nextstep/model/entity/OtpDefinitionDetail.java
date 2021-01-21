@@ -40,7 +40,7 @@ public class OtpDefinitionDetail {
     private boolean encryptionEnabled;
     private String encryption;
     @NotNull
-    private OtpDefinitionStatus status;
+    private OtpDefinitionStatus otpDefinitionStatus;
     @NotNull
     private Date timestampCreated;
     @NotNull

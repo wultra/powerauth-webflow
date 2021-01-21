@@ -37,6 +37,6 @@ public class CreateOtpDefinitionResponse {
     private boolean encryptionEnabled;
     private String encryption;
     @NotNull
-    private OtpDefinitionStatus status;
+    private OtpDefinitionStatus otpDefinitionStatus;
 
 }
