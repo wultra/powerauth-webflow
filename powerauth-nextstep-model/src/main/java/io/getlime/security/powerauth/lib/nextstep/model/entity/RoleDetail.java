@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.management.relation.RoleStatus;
 import javax.validation.constraints.NotNull;
 import java.util.Date;
 
@@ -33,6 +34,8 @@ public class RoleDetail {
     @NotNull
     private String roleName;
     private String description;
+    @NotNull
+    private RoleStatus roleStatus;
     @NotNull
     private Date timestampCreated;
     @NotNull

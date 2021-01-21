@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
+import javax.management.relation.RoleStatus;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -30,5 +31,7 @@ public class CreateRoleResponse {
     @NotNull
     private String roleName;
     private String description;
+    @NotNull
+    private RoleStatus roleStatus;
 
 }

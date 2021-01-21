@@ -23,7 +23,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
- * Class represents details of a credential.
+ * Class represents details of an authentication.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

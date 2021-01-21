@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -29,5 +30,7 @@ public class DeleteCredentialPolicyResponse {
 
     @NotNull
     private String credentialPolicyName;
+    @NotNull
+    private CredentialPolicyStatus credentialPolicyStatus;
 
 }

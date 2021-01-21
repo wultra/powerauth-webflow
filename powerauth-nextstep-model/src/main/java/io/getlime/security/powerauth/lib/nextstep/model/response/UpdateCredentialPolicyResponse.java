@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -42,5 +43,7 @@ public class UpdateCredentialPolicyResponse {
     private boolean rotationEnabled;
     private String usernameGenAlgorithm;
     private String passwordGenAlgorithm;
+    @NotNull
+    private CredentialPolicyStatus credentialPolicyStatus;
 
 }

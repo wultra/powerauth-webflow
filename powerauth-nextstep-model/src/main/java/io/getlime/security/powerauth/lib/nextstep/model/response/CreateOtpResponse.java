@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -33,5 +34,7 @@ public class CreateOtpResponse {
     private String userId;
     @NotNull
     private String otpValue;
+    @NotNull
+    private OtpStatus otpStatus;
 
 }

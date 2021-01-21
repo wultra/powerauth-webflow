@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -30,6 +31,8 @@ public class OtpAuthenticationResponse {
 
     @NotNull
     private String userId;
+    @NotNull
+    private OtpStatus otpStatus;
     private AuthenticationResult authenticationResult;
     private Integer remainingAttempts;
 

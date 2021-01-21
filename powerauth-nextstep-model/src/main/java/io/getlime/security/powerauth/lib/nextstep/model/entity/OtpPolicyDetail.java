@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,6 +39,8 @@ public class OtpPolicyDetail {
     private Long attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    @NotNull
+    private OtpPolicyStatus otpPolicyStatus;
     @NotNull
     private Date timestampCreated;
     @NotNull

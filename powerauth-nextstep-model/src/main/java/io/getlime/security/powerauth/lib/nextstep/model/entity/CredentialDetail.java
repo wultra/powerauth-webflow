@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -35,6 +36,8 @@ public class CredentialDetail {
     private String credentialName;
     @NotNull
     private CredentialType credentialType;
+    @NotNull
+    private CredentialStatus credentialStatus;
     @NotNull
     private Date timestampCreated;
     @NotNull

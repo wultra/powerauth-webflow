@@ -13,24 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.response;
-
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Response object used for deleting an OTP definition.
+ * Enum representing a credential policy status.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-public class DeleteOtpDefinitionResponse {
+public enum CredentialPolicyStatus {
 
-    @NotNull
-    private String otpDefinitionName;
-    @NotNull
-    private OtpDefinitionStatus otpDefinitionStatus;
+    /**
+     * Credential policy is active.
+     */
+    ACTIVE,
+
+    /**
+     * Credential policy is removed.
+     */
+    REMOVED
 
 }

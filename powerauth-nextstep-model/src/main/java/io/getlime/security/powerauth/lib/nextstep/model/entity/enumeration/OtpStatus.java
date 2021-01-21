@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.response;
-
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Response object used for deleting an OTP definition.
+ * Enumeration representing OTP status.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-public class DeleteOtpDefinitionResponse {
+public enum OtpStatus {
 
-    @NotNull
-    private String otpDefinitionName;
-    @NotNull
-    private OtpDefinitionStatus otpDefinitionStatus;
+    /**
+     * OTP is active.
+     */
+    ACTIVE,
+
+    /**
+     * OTP is used.
+     */
+    USED,
+
+    /**
+     * OTP is blocked.
+     */
+    BLOCKED,
+
+    /**
+     * OTP is removed.
+     */
+    REMOVED
 
 }
