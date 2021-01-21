@@ -22,13 +22,8 @@ import io.getlime.security.powerauth.app.nextstep.service.AuthMethodService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetAuthMethodListRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetUserAuthMethodsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateAuthMethodRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetEnabledMethodListResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +54,11 @@ public class AuthMethodController {
     @Autowired
     public AuthMethodController(AuthMethodService authMethodService) {
         this.authMethodService = authMethodService;
+    }
+
+    @RequestMapping(value = "auth-method", method = RequestMethod.POST)
+    public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@RequestBody ObjectRequest<CreateAuthMethodRequest> request) {
+        return new ObjectResponse<>(new CreateAuthMethodResponse());
     }
 
     /**
@@ -166,6 +166,11 @@ public class AuthMethodController {
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) {
         return new ObjectResponse<>(new GetEnabledMethodListResponse());
+    }
+
+    @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) {
+        return new ObjectResponse<>(new DeleteAuthMethodResponse());
     }
 
 }

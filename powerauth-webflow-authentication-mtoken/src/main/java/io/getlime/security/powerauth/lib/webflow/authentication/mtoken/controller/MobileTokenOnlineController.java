@@ -143,7 +143,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @throws AuthStepException Thrown when authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
+    public @ResponseBody MobileTokenAuthenticationResponse authenticateHandler(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
         final GetOperationDetailResponse operation = getOperation(false);
         final AuthMethod authMethod = getAuthMethodName(operation);

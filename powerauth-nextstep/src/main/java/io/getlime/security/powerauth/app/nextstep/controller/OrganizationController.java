@@ -22,8 +22,12 @@ import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverte
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOrganizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOrganizationDetailRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOrganizationListRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOrganizationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOrganizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
 import org.slf4j.Logger;
@@ -58,6 +62,11 @@ public class OrganizationController {
     @Autowired
     public OrganizationController(OrganizationRepository organizationRepository) {
         this.organizationRepository = organizationRepository;
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    public ObjectResponse<CreateOrganizationResponse> createOrganization(@RequestBody ObjectRequest<CreateOrganizationRequest> request) {
+        return new ObjectResponse<>(new CreateOrganizationResponse());
     }
 
     /**
@@ -101,5 +110,11 @@ public class OrganizationController {
         logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);
     }
+
+    @RequestMapping(value = "delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@RequestBody ObjectRequest<DeleteOrganizationRequest> request) {
+        return new ObjectResponse<>(new DeleteOrganizationResponse());
+    }
+
 
 }

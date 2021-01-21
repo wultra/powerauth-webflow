@@ -446,4 +446,14 @@ public class OperationController {
         return new Response();
     }
 
+    @RequestMapping(value = "operation/config", method = RequestMethod.POST)
+    public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@RequestBody ObjectRequest<CreateOperationConfigRequest> request) {
+        return new ObjectResponse<>(new CreateOperationConfigResponse());
+    }
+
+    @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@RequestBody ObjectRequest<DeleteOperationConfigRequest> request) {
+        return new ObjectResponse<>(new DeleteOperationConfigResponse());
+    }
+
 }
