@@ -175,7 +175,7 @@ Now, you need to prepare the data for the QR code display. Call the PowerAuth RE
 - `activationId` - ID of the activation of mobile device
 - `data` - data constructed in step 1
 
-The REST method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/SOAP-Service-Methods.md#method-createpersonalizedofflinesignaturepayload).
+The REST method is documented in the [PowerAuth documentation](https://github.com/wultra/powerauth-server/blob/develop/docs/WebServices-Methods.md#method-createpersonalizedofflinesignaturepayload).
 
 In the response from the REST method `createPersonalizedOfflineSignaturePayload`, you will receive:
 
@@ -260,7 +260,7 @@ String signatureBaseString
 
 #### 3.4. Verifying Signature
 
-To verify signature, you need to call the REST method [`verifyOfflineSignature`](https://developers.wultra.com/docs/develop/powerauth-server/SOAP-Service-Methods#method-verifyofflinesignature) providing:
+To verify signature, you need to call the REST method [`verifyOfflineSignature`](https://github.com/wultra/powerauth-server/blob/develop/docs/WebServices-Methods.md#method-verifyofflinesignature) providing:
 
 - `activationId` - identifier of the activation (to know which device is responsible for verification)
 - `data` (represented by `signatureBaseString` as obtained in 3.2.) - as data for verification
