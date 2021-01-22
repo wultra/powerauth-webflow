@@ -19,7 +19,7 @@ import {connect} from "react-redux";
 import {authenticateOffline, initOffline, updateFormData} from "../actions/tokenAuthOfflineActions";
 // Components
 import {Button, FormControl, FormGroup} from "react-bootstrap";
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import ActivationSelect from "./activationSelect";
 import OfflineAuthCode from "./offlineAuthCode";
 // i18n
@@ -201,7 +201,7 @@ export default class TokenOffline extends React.Component {
                             <FormGroup>
                                 <div className="attribute row">
                                     <div className="col-xs-12">
-                                        <FormControl autoComplete="off" type="text" value={this.props.username} disabled="true"/>
+                                        <FormControl autoComplete="off" type="text" value={this.props.username} disabled={true}/>
                                     </div>
                                 </div>
                             </FormGroup>

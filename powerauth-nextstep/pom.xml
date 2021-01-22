@@ -6,13 +6,13 @@
     <name>powerauth-nextstep</name>
     <artifactId>powerauth-nextstep</artifactId>
     <description>PowerAuth 2.0 Next Step Server</description>
-    <version>0.24.0</version>
+    <version>1.0.0</version>
     <packaging>war</packaging>
 
     <parent>
         <groupId>io.getlime.security</groupId>
         <artifactId>powerauth-webflow-parent</artifactId>
-        <version>0.24.0</version>
+        <version>1.0.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
@@ -45,14 +45,14 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-model</artifactId>
-            <version>0.24.0</version>
+            <version>1.0.0</version>
         </dependency>
 
         <!-- Other Dependencies -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
-            <version>2.10.3</version>
+            <version>2.11.3</version>
         </dependency>
 
         <!-- JAXB dependency for Java 11 -->
@@ -69,21 +69,16 @@
 
         <!-- Documentation -->
         <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.5.0</version>
         </dependency>
 
         <!-- Upgrade Swagger Guava dependency due to CVE-2018-10237 -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>28.2-jre</version>
+            <version>30.0-jre</version>
         </dependency>
 
         <!-- Testing -->

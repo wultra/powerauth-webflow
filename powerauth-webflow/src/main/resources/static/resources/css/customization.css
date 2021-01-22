@@ -129,7 +129,7 @@ a:hover, a:active, a:focus {
     color: #439fe6;
 }
 
-#login .panel-body .title {
+#login .panel-default .title {
     color: gray;
 }
 
@@ -250,4 +250,8 @@ a:hover, a:active, a:focus {
 
 #login .form-group .form-control {
     border-radius: 6px;
+}
+
+.spinner {
+    color: #FFFFFF;
 }

@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.app.tppengine.service;
 
+import io.getlime.security.powerauth.app.tppengine.configuration.TppEngineConfiguration;
 import io.getlime.security.powerauth.app.tppengine.converter.TppAppConverter;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppAppNotFoundException;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNotFoundException;
@@ -44,17 +45,17 @@ import java.util.*;
 @Service
 public class TppService {
 
-    private static final Long OAUTH_ACCESS_TOKEN_VALIDITY = 15 * 60L;
-
     private final TppRepository tppRepository;
     private final TppAppDetailRepository appDetailRepository;
+    private final TppEngineConfiguration tppEngineConfiguration;
     private final OAuthClientDetailsRepository clientDetailsRepository;
     private final OAuthAccessTokenRepository accessTokenRepository;
 
     @Autowired
-    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, OAuthClientDetailsRepository clientDetailsRepository, OAuthAccessTokenRepository accessTokenRepository) {
+    public TppService(TppRepository tppRepository, TppAppDetailRepository appDetailRepository, TppEngineConfiguration tppEngineConfiguration, OAuthClientDetailsRepository clientDetailsRepository, OAuthAccessTokenRepository accessTokenRepository) {
         this.tppRepository = tppRepository;
         this.appDetailRepository = appDetailRepository;
+        this.tppEngineConfiguration = tppEngineConfiguration;
         this.clientDetailsRepository = clientDetailsRepository;
         this.accessTokenRepository = accessTokenRepository;
     }
@@ -198,7 +199,7 @@ public class TppService {
         oAuthClientDetailsEntity.setAuthorizedGrantTypes("authorization_code");
         oAuthClientDetailsEntity.setWebServerRedirectUri(redirectUris);
         oAuthClientDetailsEntity.setScope(scopes);
-        oAuthClientDetailsEntity.setAccessTokenValidity(OAUTH_ACCESS_TOKEN_VALIDITY);
+        oAuthClientDetailsEntity.setAccessTokenValidity(tppEngineConfiguration.getDefaultAccessTokenValidityInSeconds());
         oAuthClientDetailsEntity.setAdditionalInformation("{}");
         oAuthClientDetailsEntity.setAutoapprove("true");
         clientDetailsRepository.save(oAuthClientDetailsEntity);

@@ -26,7 +26,7 @@ import {
 } from '../actions/usernamePasswordAuthActions'
 // Components
 import {Button, FormControl, FormGroup, Panel, Tab, Tabs} from 'react-bootstrap';
-import Spinner from 'react-tiny-spin';
+import Spinner from './spinner';
 import OperationTimeout from "./operationTimeout";
 // i18n
 import {FormattedMessage} from 'react-intl';

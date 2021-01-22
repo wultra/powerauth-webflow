@@ -45,6 +45,24 @@ Similarly, Next Step contains the following configuration in `jboss-deployment-s
 </jboss-deployment-structure>
 ```
 
+Optionally, TPP engine contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
+```
+<?xml version="1.0"?>
+<jboss-deployment-structure xmlns="urn:jboss:deployment-structure:1.2">
+	<deployment>
+		<exclude-subsystems>
+			<!-- disable the logging subsystem because the application manages its own logging independently -->
+			<subsystem name="logging" />
+		</exclude-subsystems>
+
+		<dependencies>
+			<module name="com.wultra.powerauth.tpp-engine.conf" />
+		</dependencies>
+		<local-last value="true" />
+	</deployment>
+</jboss-deployment-structure>
+```
+
 Optionally, Web Flow Client contains the following configuration in `jboss-deployment-structure.xml` file for JBoss / Wildfly:
 
 ```
@@ -67,7 +85,7 @@ Optionally, Web Flow Client contains the following configuration in `jboss-deplo
 ```
 
 The deployment descriptor requires configuration of the `com.wultra.powerauth.webflow.conf` and `com.wultra.powerauth.nextstep.conf` modules.
-Optionally configure also the `com.wultra.powerauth.webflow-client.conf`.
+Optionally configure also the `com.wultra.powerauth.tpp-engine.conf` and `com.wultra.powerauth.webflow-client.conf` modules.
 
 ## JBoss Module for Web Flow Configuration
 
@@ -151,7 +169,7 @@ For Next Step you can use the same configuration, just change the variable `LOG_
 The `application-ext.properties` file is used to override default configuration properties, for example:
 ```
 # PowerAuth 2.0 Client configuration
-powerauth.service.url=http://[host]:[port]/powerauth-java-server/soap
+powerauth.service.url=http://[host]:[port]/powerauth-java-server/rest
 ```
 
 Web Flow Spring application uses the `ext` Spring profile which activates overriding of default properties by `application-ext.properties`.

@@ -113,7 +113,7 @@ export default class SmsComponent extends React.Component {
                                 <FormGroup>
                                     <div className="attribute row">
                                         <div className="col-xs-12">
-                                            <FormControl autoComplete="off" id="username" type="text" value={this.props.username} disabled="true"/>
+                                            <FormControl autoComplete="off" id="username" type="text" value={this.props.username} disabled={true}/>
                                         </div>
                                     </div>
                                 </FormGroup>
