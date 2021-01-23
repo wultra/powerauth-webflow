@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class AuthMethodConfiguration {
 
-    private Map<String, String> parameters = new HashMap<>();
+    private final Map<String, String> parameters = new HashMap<>();
 
     /**
      * Get all configuration parameters.

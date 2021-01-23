@@ -15,28 +15,19 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * Request object used obtaining operation details.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class GetOperationDetailRequest {
 
+    @NotNull
     private String operationId;
 
-    /**
-     * Get the operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set the operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
 }

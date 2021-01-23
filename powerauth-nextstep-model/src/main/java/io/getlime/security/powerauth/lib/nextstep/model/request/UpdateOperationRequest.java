@@ -20,7 +20,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,152 +31,18 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class UpdateOperationRequest {
 
+    @NotNull
     private String operationId;
     private String userId;
     private String organizationId;
     private AuthMethod authMethod;
-    private final List<AuthInstrument> authInstruments;
+    private List<AuthInstrument> authInstruments = new ArrayList<>();
     private AuthStepResult authStepResult;
     private String authStepResultDescription;
-    private final List<KeyValueParameter> params;
+    private List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateOperationRequest() {
-        params = new ArrayList<>();
-        authInstruments = new ArrayList<>();
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get user ID of the user who is associated with the operation.
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set user ID of the user who is associated with the operation.
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    /**
-     * Get the used authentication method.
-     * @return Authentication method.
-     */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    /**
-     * Set the used authentication method.
-     * @param authMethod Authentication method.
-     */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    /**
-     * Get used authentication / authorization instruments.
-     * @return Used authentication / authorization instruments.
-     */
-    public List<AuthInstrument> getAuthInstruments() {
-        return authInstruments;
-    }
-
-    /**
-     * Get the result of the previous authentication step.
-     * @return Authentication step result.
-     */
-    public AuthStepResult getAuthStepResult() {
-        return authStepResult;
-    }
-
-    /**
-     * Set the result of the previous authentication step.
-     * @param authStepResult Authentication step result.
-     */
-    public void setAuthStepResult(AuthStepResult authStepResult) {
-        this.authStepResult = authStepResult;
-    }
-
-    /**
-     * Get the description of the previous authentication step result.
-     *
-     * @return Description of authentication step result.
-     */
-    public String getAuthStepResultDescription() {
-        return authStepResultDescription;
-    }
-
-    /**
-     * Set the description of the previous authentication step result.
-     *
-     * @param authStepResultDescription Description of authentication step result.
-     */
-    public void setAuthStepResultDescription(String authStepResultDescription) {
-        this.authStepResultDescription = authStepResultDescription;
-    }
-    /**
-     * Get the list with optional extra parameters.
-     * @return Extra parameters.
-     */
-    public List<KeyValueParameter> getParams() {
-        return params;
-    }
-
-    /**
-     * Get application context for OAuth 2.0 consent screen.
-     * @return Application context for OAuth 2.0 consent screen.
-     */
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    /**
-     * Set application context for OAuth 2.0 consent screen.
-     * @param applicationContext Application context for OAuth 2.0 consent screen.
-     */
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 }

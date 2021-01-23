@@ -31,7 +31,7 @@ public class ApplicationContext {
     private String name;
     private String description;
     private final List<String> originalScopes;
-    private Map<String, Object> extras;
+    private final Map<String, Object> extras;
 
     /**
      * Default constructor.

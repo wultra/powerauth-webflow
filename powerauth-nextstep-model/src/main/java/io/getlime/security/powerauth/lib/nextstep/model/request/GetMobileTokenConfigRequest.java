@@ -16,63 +16,23 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Request object used obtaining mobile token configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetMobileTokenConfigRequest {
 
+    @NotNull
     private String userId;
+    @NotNull
     private String operationName;
+    @NotNull
     private AuthMethod authMethod;
 
-    /**
-     * Get user ID.
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set user ID.
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get the operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
-
-    /**
-     * Set the operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    /**
-     * Get authentication method.
-     * @return Authentication method.
-     */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    /**
-     * Set authentication method.
-     * @param authMethod Authentication method.
-     */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
 }

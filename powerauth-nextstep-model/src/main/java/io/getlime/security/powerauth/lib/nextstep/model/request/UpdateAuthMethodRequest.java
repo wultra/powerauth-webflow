@@ -16,7 +16,9 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -25,61 +27,14 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateAuthMethodRequest {
 
+    @NotNull
     private String userId;
+    @NotNull
     private AuthMethod authMethod;
-    private final Map<String, String> config;
-
-    /**
-     * Default constructor.
-     */
-    public UpdateAuthMethodRequest() {
-        this.config = new LinkedHashMap<>();
-    }
-
-    /**
-     * Get the user ID.
-     *
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set the user ID.
-     *
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get the authentication method.
-     *
-     * @return Authentication method.
-     */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    /**
-     * Set the authentication method.
-     *
-     * @param authMethod Authentication method.
-     */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    /**
-     * Get the authentication method configuration.
-     * @return Configuration.
-     */
-    public Map<String, String> getConfig() {
-        return config;
-    }
+    @NotNull
+    private final Map<String, String> config = new LinkedHashMap<>();
 
 }

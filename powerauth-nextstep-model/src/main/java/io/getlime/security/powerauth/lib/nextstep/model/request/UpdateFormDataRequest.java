@@ -16,62 +16,21 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Request object used for updating form data of an operation.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateFormDataRequest {
 
+    @NotNull
     private String operationId;
+    @NotNull
     private OperationFormData formData;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateFormDataRequest() {
-    }
-
-    /**
-     * Constructor with operation ID and form data.
-     * @param operationId Operation ID.
-     * @param formData Form data.
-     */
-    public UpdateFormDataRequest(String operationId, OperationFormData formData) {
-        this.operationId = operationId;
-        this.formData = formData;
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get form data.
-     * @return Form data.
-     */
-    public OperationFormData getFormData() {
-        return formData;
-    }
-
-    /**
-     * Set form data.
-     * @param formData Form data.
-     */
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
-    }
 }

@@ -145,7 +145,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, accountStatus, operationContext);
                     VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
                     smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
-                    request.setAuthInstruments(Collections.singletonList(AuthInstrument.SMS_KEY));
+                    request.setAuthInstruments(Collections.singletonList(AuthInstrument.OTP_KEY));
                     if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED) {
                         cleanHttpSession();
                         logger.info("Step authentication succeeded (1FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -156,7 +156,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             }
 
             List<AuthInstrument> authInstruments = new ArrayList<>();
-            authInstruments.add(AuthInstrument.SMS_KEY);
+            authInstruments.add(AuthInstrument.OTP_KEY);
             authInstruments.add(AuthInstrument.PASSWORD);
             request.setAuthInstruments(authInstruments);
 
