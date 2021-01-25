@@ -33,6 +33,8 @@ public class CreateOtpResponse {
     @NotNull
     private String userId;
     @NotNull
+    private String otpId;
+    @NotNull
     private String otpValue;
     @NotNull
     private OtpStatus otpStatus;

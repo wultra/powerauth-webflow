@@ -30,11 +30,11 @@ public class CombinedAuthenticationRequest {
     @NotNull
     private String credentialName;
     @NotNull
-    private String otpName;
-    @NotNull
     private String userId;
     @NotNull
     private String credentialValue;
+    @NotNull
+    private String otpId;
     @NotNull
     private String otpValue;
     private String operationId;

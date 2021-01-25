@@ -28,9 +28,7 @@ import javax.validation.constraints.NotNull;
 public class OtpAuthenticationRequest {
 
     @NotNull
-    private String userId;
-    @NotNull
-    private String otpName;
+    private String otpId;
     @NotNull
     private String otpValue;
     private String operationId;

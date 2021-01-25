@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
@@ -50,6 +50,6 @@ public class CreateUserResponse {
     private List<UserContactDetail> contacts = new ArrayList<>();
 
     @NotNull
-    private List<CredentialDetail> credentials = new ArrayList<>();
+    private List<CredentialSecretDetail> credentials = new ArrayList<>();
 
 }
