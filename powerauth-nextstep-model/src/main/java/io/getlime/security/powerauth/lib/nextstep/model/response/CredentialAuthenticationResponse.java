@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Response object used for authenticating using a credential.
@@ -33,6 +34,7 @@ public class CredentialAuthenticationResponse {
     private String userId;
     @NotNull
     private UserIdentityStatus userIdentityStatus;
+    private Date timestampBlocked;
     private AuthenticationResult authenticationResult;
     private Integer remainingAttempts;
 

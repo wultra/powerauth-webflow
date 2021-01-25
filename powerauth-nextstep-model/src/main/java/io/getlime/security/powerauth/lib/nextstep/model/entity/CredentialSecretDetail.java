@@ -42,11 +42,10 @@ public class CredentialSecretDetail {
     private String credentialValue;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampExpired;
+    private Date timestampBlocked;
     @NotNull
     private Date timestampLastUpdated;
-    @NotNull
     private Date timestampLastCredentialChange;
 
 }
