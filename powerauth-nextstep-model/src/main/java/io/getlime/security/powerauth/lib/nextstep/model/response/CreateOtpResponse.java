@@ -30,7 +30,6 @@ public class CreateOtpResponse {
 
     @NotNull
     private String otpName;
-    @NotNull
     private String userId;
     @NotNull
     private String otpId;
