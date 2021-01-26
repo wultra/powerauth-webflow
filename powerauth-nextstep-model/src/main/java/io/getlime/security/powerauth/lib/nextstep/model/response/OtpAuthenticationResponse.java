@@ -16,11 +16,13 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * Response object used for authenticating using an OTP.
@@ -34,6 +36,9 @@ public class OtpAuthenticationResponse {
     private String userId;
     // User identity status is null in OTP authentication without user ID
     private UserIdentityStatus userIdentityStatus;
+    // Credential status is sent in case OTP is linked with a credential
+    private CredentialStatus credentialStatus;
+    private Date timestampBlocked;
     @NotNull
     private OtpStatus otpStatus;
     @NotNull
