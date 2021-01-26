@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
@@ -35,7 +36,11 @@ public class CredentialAuthenticationResponse {
     @NotNull
     private UserIdentityStatus userIdentityStatus;
     private Date timestampBlocked;
+    @NotNull
+    private CredentialStatus credentialStatus;
+    @NotNull
     private AuthenticationResult authenticationResult;
+    @NotNull
     private Integer remainingAttempts;
 
 }
