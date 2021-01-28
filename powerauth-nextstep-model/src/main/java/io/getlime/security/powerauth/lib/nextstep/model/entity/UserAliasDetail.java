@@ -38,7 +38,6 @@ public class UserAliasDetail {
     private Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

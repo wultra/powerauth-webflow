@@ -41,15 +41,15 @@ public class CreateUserResponse {
     private UserIdentityStatus userIdentityStatus;
 
     @NotNull
-    private Map<String, Object> extras = new LinkedHashMap<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
     @NotNull
-    private List<String> roles = new ArrayList<>();
+    private final List<String> roles = new ArrayList<>();
 
     @NotNull
-    private List<UserContactDetail> contacts = new ArrayList<>();
+    private final List<UserContactDetail> contacts = new ArrayList<>();
 
     @NotNull
-    private List<CredentialSecretDetail> credentials = new ArrayList<>();
+    private final List<CredentialSecretDetail> credentials = new ArrayList<>();
 
 }

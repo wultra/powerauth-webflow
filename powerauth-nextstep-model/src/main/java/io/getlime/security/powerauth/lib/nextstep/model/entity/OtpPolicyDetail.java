@@ -43,7 +43,6 @@ public class OtpPolicyDetail {
     private OtpPolicyStatus otpPolicyStatus;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

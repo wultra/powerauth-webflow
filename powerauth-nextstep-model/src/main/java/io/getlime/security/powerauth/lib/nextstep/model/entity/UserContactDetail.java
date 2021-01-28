@@ -40,7 +40,6 @@ public class UserContactDetail {
     private boolean primary;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

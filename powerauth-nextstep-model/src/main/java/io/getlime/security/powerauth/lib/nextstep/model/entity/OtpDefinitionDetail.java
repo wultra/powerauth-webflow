@@ -43,7 +43,6 @@ public class OtpDefinitionDetail {
     private OtpDefinitionStatus otpDefinitionStatus;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

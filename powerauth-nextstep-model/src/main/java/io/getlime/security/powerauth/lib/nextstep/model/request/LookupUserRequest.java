@@ -38,7 +38,7 @@ public class LookupUserRequest {
     private Date createdEndDate;
 
     // Filter by roles
-    private List<String> roles = new ArrayList<>();
+    private final List<String> roles = new ArrayList<>();
 
     // Filter by username and credentialName to allow username -> user ID mapping
     private String username;

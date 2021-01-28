@@ -33,6 +33,6 @@ public class GetUserAuthenticationListResponse {
     @NotNull
     private String userId;
     @NotNull
-    private List<AuthenticationDetail> authentications = new ArrayList<>();
+    private final List<AuthenticationDetail> authentications = new ArrayList<>();
 
 }

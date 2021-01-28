@@ -33,6 +33,6 @@ public class GetUserCredentialListResponse {
     @NotNull
     private String userId;
     @NotNull
-    private List<CredentialDetail> credentials = new ArrayList<>();
+    private final List<CredentialDetail> credentials = new ArrayList<>();
 
 }

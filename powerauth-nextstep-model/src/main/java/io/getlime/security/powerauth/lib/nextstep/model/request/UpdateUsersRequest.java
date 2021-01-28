@@ -31,7 +31,7 @@ import java.util.List;
 public class UpdateUsersRequest {
 
     @NotNull
-    private List<String> userIds = new ArrayList<>();
+    private final List<String> userIds = new ArrayList<>();
     private UserIdentityStatus userIdentityStatus;
 
 }

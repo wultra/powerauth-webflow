@@ -31,6 +31,6 @@ import java.util.List;
 public class GetAuditListResponse {
 
     @NotNull
-    private List<AuditDetail> audits = new ArrayList<>();
+    private final List<AuditDetail> audits = new ArrayList<>();
 
 }

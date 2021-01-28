@@ -38,7 +38,6 @@ public class RoleDetail {
     private RoleStatus roleStatus;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

@@ -33,6 +33,6 @@ public class GetUserAliasListResponse {
     @NotNull
     private String userId;
     @NotNull
-    private List<UserAliasDetail> aliases = new ArrayList<>();
+    private final List<UserAliasDetail> aliases = new ArrayList<>();
 
 }

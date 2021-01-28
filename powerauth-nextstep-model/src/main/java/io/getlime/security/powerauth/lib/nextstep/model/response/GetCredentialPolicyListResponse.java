@@ -31,6 +31,6 @@ import java.util.List;
 public class GetCredentialPolicyListResponse {
 
     @NotNull
-    private List<CredentialPolicyDetail> credentialPolicies = new ArrayList<>();
+    private final List<CredentialPolicyDetail> credentialPolicies = new ArrayList<>();
 
 }

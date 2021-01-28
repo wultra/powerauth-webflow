@@ -39,11 +39,11 @@ public class UpdateOperationRequest {
     private String userId;
     private String organizationId;
     private AuthMethod authMethod;
-    private List<AuthInstrument> authInstruments = new ArrayList<>();
+    private final List<AuthInstrument> authInstruments = new ArrayList<>();
     private AuthStepResult authStepResult;
     private AuthMethod targetAuthMethod;
     private String authStepResultDescription;
-    private List<KeyValueParameter> params = new ArrayList<>();
+    private final List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
 
 }

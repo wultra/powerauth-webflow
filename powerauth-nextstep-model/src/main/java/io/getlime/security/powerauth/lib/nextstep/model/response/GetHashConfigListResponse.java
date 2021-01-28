@@ -31,6 +31,6 @@ import java.util.List;
 public class GetHashConfigListResponse {
 
     @NotNull
-    private List<HashConfigDetail> hashConfigs = new ArrayList<>();
+    private final List<HashConfigDetail> hashConfigs = new ArrayList<>();
 
 }

@@ -31,6 +31,6 @@ import java.util.List;
 public class GetRoleListResponse {
 
     @NotNull
-    private List<RoleDetail> roles = new ArrayList<>();
+    private final List<RoleDetail> roles = new ArrayList<>();
 
 }

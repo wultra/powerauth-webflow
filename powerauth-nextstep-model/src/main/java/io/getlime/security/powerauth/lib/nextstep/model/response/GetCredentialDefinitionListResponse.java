@@ -31,6 +31,6 @@ import java.util.List;
 public class GetCredentialDefinitionListResponse {
 
     @NotNull
-    private List<CredentialDefinitionDetail> credentialDefinitions = new ArrayList<>();
+    private final List<CredentialDefinitionDetail> credentialDefinitions = new ArrayList<>();
 
 }

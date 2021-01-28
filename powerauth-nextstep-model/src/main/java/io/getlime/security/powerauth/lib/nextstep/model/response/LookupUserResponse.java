@@ -30,6 +30,6 @@ import java.util.List;
 public class LookupUserResponse {
 
     @NotNull
-    private List<GetUserDetailResponse> users = new ArrayList<>();
+    private final List<GetUserDetailResponse> users = new ArrayList<>();
 
 }

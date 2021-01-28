@@ -20,6 +20,7 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -28,14 +29,14 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@EqualsAndHashCode(of = {"hashConfigNameCreateCredentialRequest"})
+@EqualsAndHashCode(of = {"hashConfigName"})
 public class HashConfigDetail {
 
     @NotNull
     private String hashConfigName;
     @NotNull
     private String algorithm;
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;
 

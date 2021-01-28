@@ -33,6 +33,6 @@ public class GetUserContactListResponse {
     @NotNull
     private String userId;
     @NotNull
-    private List<UserContactDetail> contacts = new ArrayList<>();
+    private final List<UserContactDetail> contacts = new ArrayList<>();
 
 }

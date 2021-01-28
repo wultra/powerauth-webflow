@@ -31,6 +31,6 @@ import java.util.List;
 public class GetOtpPolicyListResponse {
 
     @NotNull
-    private List<OtpPolicyDetail> otpPolicies = new ArrayList<>();
+    private final List<OtpPolicyDetail> otpPolicies = new ArrayList<>();
 
 }

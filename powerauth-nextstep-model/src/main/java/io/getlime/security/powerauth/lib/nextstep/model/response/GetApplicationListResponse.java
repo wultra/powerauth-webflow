@@ -31,6 +31,6 @@ import java.util.List;
 public class GetApplicationListResponse {
 
     @NotNull
-    private List<ApplicationDetail> applications = new ArrayList<>();
+    private final List<ApplicationDetail> applications = new ArrayList<>();
 
 }

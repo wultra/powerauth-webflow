@@ -50,7 +50,6 @@ public class CredentialPolicyDetail {
     private CredentialPolicyStatus credentialPolicyStatus;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

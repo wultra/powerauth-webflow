@@ -39,7 +39,6 @@ public class ApplicationDetail {
     private String organizationId;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

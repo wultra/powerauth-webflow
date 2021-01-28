@@ -32,6 +32,6 @@ public class CreateHashConfigResponse {
     private String hashConfigName;
     @NotNull
     private String algorithm;
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters;
 
 }

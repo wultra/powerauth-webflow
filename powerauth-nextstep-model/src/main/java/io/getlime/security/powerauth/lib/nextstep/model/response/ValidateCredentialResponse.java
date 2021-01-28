@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -33,6 +34,6 @@ public class ValidateCredentialResponse {
     @NotNull
     private CredentialValidationResult validationResult;
     @NotNull
-    private List<CredentialValidationError> validationErrors;
+    private final List<CredentialValidationError> validationErrors = new ArrayList<>();
 
 }

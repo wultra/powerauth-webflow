@@ -49,7 +49,6 @@ public class CredentialDefinitionDetail {
     private CredentialDefinitionStatus credentialDefinitionStatus;
     @NotNull
     private Date timestampCreated;
-    @NotNull
     private Date timestampLastUpdated;
 
 }

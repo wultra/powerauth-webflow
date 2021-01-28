@@ -31,6 +31,6 @@ import java.util.List;
 public class GetOtpDefinitionListResponse {
 
     @NotNull
-    private List<OtpDefinitionDetail> otpDefinitions = new ArrayList<>();
+    private final List<OtpDefinitionDetail> otpDefinitions = new ArrayList<>();
 
 }

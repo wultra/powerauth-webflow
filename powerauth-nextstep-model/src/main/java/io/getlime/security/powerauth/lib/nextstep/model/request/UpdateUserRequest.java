@@ -39,12 +39,12 @@ public class UpdateUserRequest {
 
     private UserIdentityStatus userIdentityStatus;
 
-    private Map<String, Object> extras = new LinkedHashMap<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
-    private List<String> roles = new ArrayList<>();
+    private final List<String> roles = new ArrayList<>();
 
-    private List<UserContactDetail> contacts = new ArrayList<>();
+    private final List<UserContactDetail> contacts = new ArrayList<>();
 
-    private List<CredentialSecretDetail> credentials = new ArrayList<>();
+    private final List<CredentialSecretDetail> credentials = new ArrayList<>();
 
 }
