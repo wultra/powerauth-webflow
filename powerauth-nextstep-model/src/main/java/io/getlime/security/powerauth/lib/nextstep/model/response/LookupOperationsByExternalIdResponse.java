@@ -15,6 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+import lombok.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,24 +26,10 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class LookupOperationsByExternalIdResponse {
 
+    @NonNull
     private final List<GetOperationDetailResponse> operations = new ArrayList<>();
-
-    /**
-     * Get operations.
-     * @return Operations.
-     */
-    public List<GetOperationDetailResponse> getOperations() {
-        return operations;
-    }
-
-    /**
-     * Add an operation.
-     * @param operation Operation
-     */
-    public void addOperation(GetOperationDetailResponse operation) {
-        operations.add(operation);
-    }
 
 }

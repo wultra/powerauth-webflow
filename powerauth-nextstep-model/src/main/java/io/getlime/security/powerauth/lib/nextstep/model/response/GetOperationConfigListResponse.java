@@ -15,6 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,23 +26,10 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetOperationConfigListResponse {
 
+    @NotNull
     private final List<GetOperationConfigDetailResponse> operationConfigs = new ArrayList<>();
 
-    /**
-     * Get operation configurations.
-     * @return Operation configurations.
-     */
-    public List<GetOperationConfigDetailResponse> getOperationConfigs() {
-        return operationConfigs;
-    }
-
-    /**
-     * Add operation configuration.
-     * @param operationConfig Add operation configuration.
-     */
-    public void addOperationConfig(GetOperationConfigDetailResponse operationConfig) {
-        operationConfigs.add(operationConfig);
-    }
 }

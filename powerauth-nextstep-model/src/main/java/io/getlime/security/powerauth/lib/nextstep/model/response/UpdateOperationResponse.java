@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -28,221 +30,27 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class UpdateOperationResponse {
 
+    @NotNull
     private String operationId;
+    @NotNull
     private String operationName;
     private String userId;
     private String organizationId;
+    private String operationNameExternal;
     private String externalTransactionId;
+    @NotNull
     private AuthResult result;
     private String resultDescription;
+    @NotNull
     private Date timestampCreated;
+    @NotNull
     private Date timestampExpires;
     private String operationData;
-    private final List<AuthStep> steps;
+    @NotNull
+    private final List<AuthStep> steps = new ArrayList<>();;
     private OperationFormData formData;
-
-    /**
-     * Default constructor.
-     */
-    public UpdateOperationResponse() {
-        steps = new ArrayList<>();
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
-
-    /**
-     * Set operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    /**
-     * Get user ID of the user who is associated with the operation.
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set user ID of the user who is associated with the operation.
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get operation data.
-     * @return Operation data.
-     */
-    public String getOperationData() {
-        return operationData;
-    }
-
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    /**
-     * Get external transaction ID.
-     * @return External transaction ID.
-     */
-    public String getExternalTransactionId() {
-        return externalTransactionId;
-    }
-
-    /**
-     * Set external transaction ID.
-     * @param externalTransactionId External transaction ID.
-     */
-    public void setExternalTransactionId(String externalTransactionId) {
-        this.externalTransactionId = externalTransactionId;
-    }
-
-    /**
-     * Set operation data.
-     * @param operationData Operation data.
-     */
-    public void setOperationData(String operationData) {
-        this.operationData = operationData;
-    }
-
-    /**
-     * Get the authentication step result.
-     * @return Authentication step result.
-     */
-    public AuthResult getResult() {
-        return result;
-    }
-
-    /**
-     * Set the authentication step result.
-     * @param result Authentication step result.
-     */
-    public void setResult(AuthResult result) {
-        this.result = result;
-    }
-
-    /**
-     * Get the authentication result description.
-     *
-     * @return Result description.
-     */
-    public String getResultDescription() {
-        return resultDescription;
-    }
-
-    /**
-     * Set the authentication result description.
-     *
-     * @param resultDescription Result description.
-     */
-    public void setResultDescription(String resultDescription) {
-        this.resultDescription = resultDescription;
-    }
-
-    /**
-     * Get the timestamp of when the operation was created.
-     * @return Timestamp when operation was created.
-     */
-    public Date getTimestampCreated() {
-        return timestampCreated;
-    }
-
-    /**
-     * Set the timestamp of when the operation was created.
-     * @param timestampCreated Timestamp when operation was created.
-     */
-    public void setTimestampCreated(Date timestampCreated) {
-        this.timestampCreated = timestampCreated;
-    }
-
-    /**
-     * Get the timestamp of when the operation expires.
-     * @return Timestamp when operation expires.
-     */
-    public Date getTimestampExpires() {
-        return timestampExpires;
-    }
-
-    /**
-     * Set the timestamp of when the operation expires.
-     * @param timestampExpires Timestamp when operation expires.
-     */
-    public void setTimestampExpires(Date timestampExpires) {
-        this.timestampExpires = timestampExpires;
-    }
-
-    /**
-     * Is the operation expired?
-     *
-     * @return true if expired
-     */
-    public boolean isExpired() {
-        return new Date().after(timestampExpires);
-    }
-
-    /**
-     * Get the list with optional extra parameters.
-     * @return Extra parameters.
-     */
-    public List<AuthStep> getSteps() {
-        return steps;
-    }
-
-    /**
-     * Get form data (title, message, other visual attributes, ...) of the operation.
-     * @return Form data.
-     */
-    public OperationFormData getFormData() {
-        return formData;
-    }
-
-    /**
-     * Set form data object.
-     * @param formData Set form data.
-     */
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
-    }
 
 }

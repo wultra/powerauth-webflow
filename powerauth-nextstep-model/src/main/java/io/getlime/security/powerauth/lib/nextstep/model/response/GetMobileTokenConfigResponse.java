@@ -15,28 +15,16 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
 /**
  * Response object used obtaining mobile token configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetMobileTokenConfigResponse {
 
     private boolean mobileTokenEnabled;
 
-    /**
-     * Get whether mobile token is enabled.
-     * @return Whether mobile token is enabled.
-     */
-    public boolean isMobileTokenEnabled() {
-        return mobileTokenEnabled;
-    }
-
-    /**
-     * Set whether mobile token is enabled.
-     * @param mobileTokenEnabled Whether mobile token is enabled.
-     */
-    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
-        this.mobileTokenEnabled = mobileTokenEnabled;
-    }
 }

@@ -287,7 +287,7 @@ public class OperationController {
         List<OperationEntity> operations = operationPersistenceService.findByExternalTransactionId(requestObject.getExternalTransactionId());
         for (OperationEntity operation : operations) {
             GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
-            response.addOperation(operationDetail);
+            response.getOperations().add(operationDetail);
         }
 
         logger.debug("The lookupOperationsByExternalId request succeeded, operation list size: {}", response.getOperations().size());

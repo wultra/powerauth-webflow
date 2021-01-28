@@ -105,7 +105,7 @@ public class OrganizationController {
         List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
         for (OrganizationEntity organization: organizations) {
             GetOrganizationDetailResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
-            response.addOrganization(orgResponse);
+            response.getOrganizations().add(orgResponse);
         }
         logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);

@@ -71,7 +71,7 @@ public class OperationConfigurationService {
         Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
         for (OperationConfigEntity operationConfig: allConfigs) {
             GetOperationConfigDetailResponse config = configConverter.fromOperationConfigEntity(operationConfig);
-            configsResponse.addOperationConfig(config);
+            configsResponse.getOperationConfigs().add(config);
         }
         return configsResponse;
     }

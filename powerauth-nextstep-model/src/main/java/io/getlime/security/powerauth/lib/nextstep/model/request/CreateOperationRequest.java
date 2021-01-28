@@ -38,6 +38,7 @@ public class CreateOperationRequest {
     private String operationId;
     @NotNull
     private String operationData;
+    private String operationNameExternal;
     private String userId;
     private String organizationId;
     private String externalTransactionId;

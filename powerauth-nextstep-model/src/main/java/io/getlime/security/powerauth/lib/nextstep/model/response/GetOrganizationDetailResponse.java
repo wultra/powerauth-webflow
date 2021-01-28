@@ -15,79 +15,23 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * Response object used for querying an organization.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetOrganizationDetailResponse {
 
+    @NotNull
     private String organizationId;
     private String displayNameKey;
     private boolean isDefault;
-    private int orderNumber;
+    @NotNull
+    private Integer orderNumber;
 
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    /**
-     * Get display name key.
-     * @return Display name key.
-     */
-    public String getDisplayNameKey() {
-        return displayNameKey;
-    }
-
-    /**
-     * Set display name key.
-     * @param displayNameKey Display name key.
-     */
-    public void setDisplayNameKey(String displayNameKey) {
-        this.displayNameKey = displayNameKey;
-    }
-
-    /**
-     * Get whether the organization is the default organization.
-     * @return Whether the organization is the default organization.
-     */
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    /**
-     * Set whether the organization is the default organization.
-     * @param isDefault Whether the organization is the default organization.
-     */
-    public void setDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    /**
-     * Get the order number.
-     * @return Order number.
-     */
-    public int getOrderNumber() {
-        return orderNumber;
-    }
-
-    /**
-     * Set the order number.
-     * @param orderNumber Order number.
-     */
-    public void setOrderNumber(int orderNumber) {
-        this.orderNumber = orderNumber;
-    }
 }
