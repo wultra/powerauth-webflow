@@ -41,7 +41,7 @@ public class UpdateOperationRequest {
     private AuthMethod authMethod;
     private List<AuthInstrument> authInstruments = new ArrayList<>();
     private AuthStepResult authStepResult;
-    private String targetAuthMethod;
+    private AuthMethod targetAuthMethod;
     private String authStepResultDescription;
     private List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
