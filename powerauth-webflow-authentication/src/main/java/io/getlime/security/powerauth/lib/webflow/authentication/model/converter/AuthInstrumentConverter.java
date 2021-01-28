@@ -36,7 +36,7 @@ public class AuthInstrumentConverter {
                     authInstrumentsAfs.add(AfsAuthInstrument.PASSWORD);
                     break;
                 case OTP_KEY:
-                    authInstrumentsAfs.add(AfsAuthInstrument.SMS_KEY);
+                    authInstrumentsAfs.add(AfsAuthInstrument.OTP_KEY);
                     break;
                 case POWERAUTH_TOKEN:
                     authInstrumentsAfs.add(AfsAuthInstrument.POWERAUTH_TOKEN);
