@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2019 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.response;
-
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
-import java.util.LinkedHashMap;
-import java.util.Map;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Response object used for creating a hash config.
+ * Credential validation mode.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-public class CreateHashConfigResponse {
+public enum CredentialValidationMode {
 
-    @NotNull
-    private String hashConfigName;
-    @NotNull
-    private String algorithm;
-    private final Map<String, String> parameters = new LinkedHashMap<>();
+    /**
+     * Validate only the username.
+     */
+    VALIDATE_USERNAME,
+
+    /**
+     * Validate only the credential value.
+     */
+    VALIDATE_CREDENTIAL,
+
+    /**
+     * Validate both the username and credential value.
+     */
+    VALIDATE_USERNAME_AND_CREDENTIAL
 
 }

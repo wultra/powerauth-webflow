@@ -38,13 +38,39 @@ public enum CredentialValidationError {
     CREDENTIAL_TOO_LONG,
 
     /**
-     * Credential has invalid characters.
+     * Credential contains invalid characters.
      */
     CREDENTIAL_CONTAINS_INVALID_CHARACTERS,
 
     /**
      * Credential history check failed.
      */
-    CREDENTIAL_HISTORY_CHECK_FAILED
+    CREDENTIAL_HISTORY_CHECK_FAILED,
+
+    /**
+     * Username is empty.
+     */
+    USERNAME_EMPTY,
+
+    /**
+     * Username is too short.
+     */
+    USERNAME_TOO_SHORT,
+
+    /**
+     * Username is too long.
+     */
+    USERNAME_TOO_LONG,
+
+    /**
+     * Username contains invalid characters.
+     */
+    USERNAME_CONTAINS_INVALID_CHARACTERS,
+
+    /**
+     * Username already exists.
+     */
+    USERNAME_ALREADY_EXISTS
+
 
 }
