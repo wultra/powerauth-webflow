@@ -89,23 +89,6 @@ CREATE TABLE ns_auth_method (
   display_name_key   VARCHAR(32)                        -- Localization key to the display name of the authentication method.
 );
 
--- Table ns_user_prefs stores user preferences.
--- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
-CREATE TABLE ns_user_prefs (
-  user_id       VARCHAR(256) PRIMARY KEY NOT NULL,      -- User ID.
-  auth_method_1 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 1" is enabled.
-  auth_method_2 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 2" is enabled.
-  auth_method_3 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 3" is enabled.
-  auth_method_4 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 4" is enabled.
-  auth_method_5 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 5" is enabled.
-  auth_method_1_config VARCHAR(256),                    -- Configuration for "authentication method 1".
-  auth_method_2_config VARCHAR(256),                    -- Configuration for "authentication method 2".
-  auth_method_3_config VARCHAR(256),                    -- Configuration for "authentication method 3".
-  auth_method_4_config VARCHAR(256),                    -- Configuration for "authentication method 4".
-  auth_method_5_config VARCHAR(256),                    -- Configuration for "authentication method 5".
-  CONSTRAINT user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
-
 -- Table ns_operation_config stores configuration of operations.
 -- Each operation type (defined by operation_name) has a related mobile token template and configuration of signatures.
 CREATE TABLE ns_operation_config (
@@ -126,66 +109,6 @@ CREATE TABLE ns_organization (
   display_name_key         VARCHAR(256),                        -- Localization key for the organization display name.
   is_default               NUMBER(1) DEFAULT 0 NOT NULL,        -- Flag indicating if this organization is the default.
   order_number             INTEGER NOT NULL                     -- Ordering column for this organization, incrementing value, starts with 1.
-);
-
--- Table ns_operation stores details of Web Flow operations.
--- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
-CREATE TABLE ns_operation (
-  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,  -- ID of a specific operation instance, random value in the UUID format or any value that external system decides to set as the operation ID when creating the operation.
-  operation_name                VARCHAR(32) NOT NULL,               -- Name of the operation, represents a type of the operation, for example, "login" or "approve_payment".
-  operation_data                CLOB NOT NULL,                      -- Signing data of the operation.
-  operation_form_data           CLOB,                               -- Structured data of the operation that are displayed to the end user.
-  application_id                VARCHAR(256),                       -- ID of the application that initiated the operation, usually OAuth 2.0 client ID.
-  application_name              VARCHAR(256),                       -- Displayable name of the application that initiated the operation.
-  application_description       VARCHAR(256),                       -- Displayable description of the application that initiated the operation.
-  application_original_scopes   VARCHAR(256),                       -- Original OAuth 2.0 scopes used by the application that initiated the operation.
-  application_extras            CLOB,                               -- Any additional information related to the application that initiated the operation.
-  user_id                       VARCHAR(256),                       -- Associated user ID.
-  organization_id               VARCHAR(256),                       -- Associated organization ID.
-  user_account_status           VARCHAR(32),                        -- Status of the user account while initiated the operation - ACTIVE, NOT_ACTIVE.
-  external_transaction_id       VARCHAR(256),                       -- External transaction ID, for example ID of a payment in a transaction system.
-  result                        VARCHAR(32),                        -- Operation result - CONTINUE, FAILED, DONE.
-  timestamp_created             TIMESTAMP,                          -- Timestamp when this operation was created.
-  timestamp_expires             TIMESTAMP,                          -- Timestamp of the expiration of the operation.
-  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
-  CONSTRAINT operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
-  CONSTRAINT operation_config_fk FOREIGN KEY (operation_name) REFERENCES ns_operation_config (operation_name)
-);
-
--- Table ns_operation_history stores all changes of operations.
-CREATE TABLE ns_operation_history (
-  operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
-  result_id                   INTEGER NOT NULL,                     -- Result ordering index identifier, incrementing value, starts with 1.
-  request_auth_method         VARCHAR(32) NOT NULL,                 -- Authentication method used for the step.
-  request_auth_instruments    VARCHAR(256),                         -- Which specific instruments were used for the step. Supported values are: PASSWORD, SMS_KEY, POWERAUTH_TOKEN, HW_TOKEN. There can be multiple supported instruments, they are stored encoded in JSON format.
-  request_auth_step_result    VARCHAR(32) NOT NULL,                 -- Authentication result: CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED, CONFIRMED
-  request_params              VARCHAR(4000),                        -- Additional request parameters.
-  response_result             VARCHAR(32) NOT NULL,                 -- Authentication step result: FAILED, CONTINUE, DONE
-  response_result_description VARCHAR(256),                         -- Additional information about the authentication step result.
-  response_steps              VARCHAR(4000),                        -- Information about which methods are allowed in the next step.
-  response_timestamp_created  TIMESTAMP,                            -- Timestamp when the record was created.
-  response_timestamp_expires  TIMESTAMP,                            -- Timestamp when the operation step should expire.
-  chosen_auth_method          VARCHAR(32),                          -- Information about which authentication method was chosen, in case user can chose the authentication method.
-  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,         -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
-  authentication_id           NUMBER(19,0)                          -- Optional reference to the authentication record.
-  CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
-  CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
-  CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
-  CONSTRAINT history_authentication_fk FOREIGN KEY (authentication_id) REFERENCES ns_authentication (authentication_id)
-);
-
--- Table ns_operation_afs stores AFS requests and responses.
-CREATE TABLE ns_operation_afs (
-  afs_action_id               INTEGER PRIMARY KEY NOT NULL,         -- ID of the AFS action.
-  operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
-  request_afs_action          VARCHAR(256) NOT NULL,                -- Information about requested AFS action.
-  request_step_index          INTEGER NOT NULL,                     -- Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.
-  request_afs_extras          VARCHAR(256),                         -- Additional information about AFS action, typically a cookie values used in AFS system.
-  response_afs_apply          NUMBER(1) DEFAULT 0 NOT NULL,         -- Response information about if AFS was applied.
-  response_afs_label          VARCHAR(256),                         -- Response AFS label (information about what should the application do).
-  response_afs_extras         VARCHAR(256),                         -- Additional information sent in AFS response.
-  timestamp_created           TIMESTAMP,                            -- Timestamp this AFS action was created.
-  CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
@@ -378,19 +301,19 @@ CREATE TABLE ns_credential_storage (
     timestamp_blocked                TIMESTAMP,                               -- Timestamp when credential was blocked.
     timestamp_last_updated           TIMESTAMP,                               -- Timestamp when credential was last updated.
     timestamp_last_credential_change TIMESTAMP,                               -- Timestamp when credential value was last changed.
-    CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_definition (credential_definition_id),
+    CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
     CONSTRAINT ns_credential_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );
 
 -- Table ns_credential_history stores historical values of credentials.
 CREATE TABLE ns_credential_history (
     credential_history_id       NUMBER(19,0) NOT NULL PRIMARY KEY,            -- Credential history identifier (autogenerated).
-    credential_id               NUMBER(19,0) NOT NULL,                        -- Credential identifier.
+    credential_definition_id    NUMBER(19,0) NOT NULL,                        -- Credential identifier.
     user_id                     VARCHAR2(255 CHAR) NOT NULL,                  -- User identity identifier.
     user_name                   VARCHAR2(255 CHAR),                           -- Username.
     value                       VARCHAR2(255 CHAR) NOT NULL,                  -- Credential value.
     timestamp_created           TIMESTAMP,                                    -- Timestamp when credential was created.
-    CONSTRAINT ns_credential_history_definition_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_definition (credential_definition_id),
+    CONSTRAINT ns_credential_history_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
     CONSTRAINT ns_credential_history_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );
 
@@ -408,8 +331,32 @@ CREATE TABLE ns_otp_storage (
     failed_attempt_counter      NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password failed attempt counter.
     timestamp_created           TIMESTAMP,                                    -- Timestamp when one time password was created.
     timestamp_expired           TIMESTAMP,                                    -- Timestamp when one time password was expired.
-    CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_definition (otp_definition_id),
+    CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
     CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_operation stores details of Web Flow operations.
+-- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
+CREATE TABLE ns_operation (
+  operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,  -- ID of a specific operation instance, random value in the UUID format or any value that external system decides to set as the operation ID when creating the operation.
+  operation_name                VARCHAR(32) NOT NULL,               -- Name of the operation, represents a type of the operation, for example, "login" or "approve_payment".
+  operation_data                CLOB NOT NULL,                      -- Signing data of the operation.
+  operation_form_data           CLOB,                               -- Structured data of the operation that are displayed to the end user.
+  application_id                VARCHAR(256),                       -- ID of the application that initiated the operation, usually OAuth 2.0 client ID.
+  application_name              VARCHAR(256),                       -- Displayable name of the application that initiated the operation.
+  application_description       VARCHAR(256),                       -- Displayable description of the application that initiated the operation.
+  application_original_scopes   VARCHAR(256),                       -- Original OAuth 2.0 scopes used by the application that initiated the operation.
+  application_extras            CLOB,                               -- Any additional information related to the application that initiated the operation.
+  user_id                       VARCHAR(256),                       -- Associated user ID.
+  organization_id               VARCHAR(256),                       -- Associated organization ID.
+  user_account_status           VARCHAR(32),                        -- Status of the user account while initiated the operation - ACTIVE, NOT_ACTIVE.
+  external_transaction_id       VARCHAR(256),                       -- External transaction ID, for example ID of a payment in a transaction system.
+  result                        VARCHAR(32),                        -- Operation result - CONTINUE, FAILED, DONE.
+  timestamp_created             TIMESTAMP,                          -- Timestamp when this operation was created.
+  timestamp_expires             TIMESTAMP,                          -- Timestamp of the expiration of the operation.
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
+  CONSTRAINT operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
+  CONSTRAINT operation_config_fk FOREIGN KEY (operation_name) REFERENCES ns_operation_config (operation_name)
 );
 
 -- Table ns_authentication stores authentication attempts.
@@ -417,17 +364,53 @@ CREATE TABLE ns_authentication (
     authentication_id           NUMBER(19,0) NOT NULL PRIMARY KEY,            -- Authentication identifier (autogenerated).
     user_id                     VARCHAR2(255 CHAR) NOT NULL,                  -- User identity identifier.
     type                        NUMBER(10,0) NOT NULL,                        -- Authentication type: CREDENTIAL, OTP, CREDENTIAL_OTP.
-    credential_id               NUMBER(19,0),                                 -- Credential identifier.
-    otp_id                      NUMBER(19,0),                                 -- One time password identifier.
+    credential_id               VARCHAR2(255 CHAR),                                 -- Credential identifier.
+    otp_id                      VARCHAR2(255 CHAR),                                 -- One time password identifier.
     operation_id                VARCHAR(256),                                 -- Operation identifier.
     result                      NUMBER(10,0) NOT NULL,                        -- Overall authentication result.
     result_credential           NUMBER(10,0),                                 -- Authentication result for credential authentication.
     result_otp                  NUMBER(10,0),                                 -- Authentication result for one time password authentication.
     timestamp_created           TIMESTAMP,                                    -- Timestamp when authentication record was created.
     CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
-    CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_storage_id),
-    CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_storage_id),
-    CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id);
+    CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_id),
+    CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_id),
+    CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
+);
+
+-- Table ns_operation_history stores all changes of operations.
+CREATE TABLE ns_operation_history (
+  operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
+  result_id                   INTEGER NOT NULL,                     -- Result ordering index identifier, incrementing value, starts with 1.
+  request_auth_method         VARCHAR(32) NOT NULL,                 -- Authentication method used for the step.
+  request_auth_instruments    VARCHAR(256),                         -- Which specific instruments were used for the step. Supported values are: PASSWORD, SMS_KEY, POWERAUTH_TOKEN, HW_TOKEN. There can be multiple supported instruments, they are stored encoded in JSON format.
+  request_auth_step_result    VARCHAR(32) NOT NULL,                 -- Authentication result: CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED, CONFIRMED
+  request_params              VARCHAR(4000),                        -- Additional request parameters.
+  response_result             VARCHAR(32) NOT NULL,                 -- Authentication step result: FAILED, CONTINUE, DONE
+  response_result_description VARCHAR(256),                         -- Additional information about the authentication step result.
+  response_steps              VARCHAR(4000),                        -- Information about which methods are allowed in the next step.
+  response_timestamp_created  TIMESTAMP,                            -- Timestamp when the record was created.
+  response_timestamp_expires  TIMESTAMP,                            -- Timestamp when the operation step should expire.
+  chosen_auth_method          VARCHAR(32),                          -- Information about which authentication method was chosen, in case user can chose the authentication method.
+  mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,         -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
+  authentication_id           NUMBER(19,0),                          -- Optional reference to the authentication record.
+  CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
+  CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
+  CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  CONSTRAINT history_authentication_fk FOREIGN KEY (authentication_id) REFERENCES ns_authentication (authentication_id)
+);
+
+-- Table ns_operation_afs stores AFS requests and responses.
+CREATE TABLE ns_operation_afs (
+  afs_action_id               INTEGER PRIMARY KEY NOT NULL,         -- ID of the AFS action.
+  operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
+  request_afs_action          VARCHAR(256) NOT NULL,                -- Information about requested AFS action.
+  request_step_index          INTEGER NOT NULL,                     -- Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.
+  request_afs_extras          VARCHAR(256),                         -- Additional information about AFS action, typically a cookie values used in AFS system.
+  response_afs_apply          NUMBER(1) DEFAULT 0 NOT NULL,         -- Response information about if AFS was applied.
+  response_afs_label          VARCHAR(256),                         -- Response AFS label (information about what should the application do).
+  response_afs_extras         VARCHAR(256),                         -- Additional information sent in AFS response.
+  timestamp_created           TIMESTAMP,                            -- Timestamp this AFS action was created.
+  CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
 -- Table ns_audit_log stores audit information.
@@ -436,6 +419,23 @@ CREATE TABLE ns_audit_log (
     action                 VARCHAR2(255 CHAR) NOT NULL,                       -- Action which is being audited.
     data                   CLOB,                                              -- Data for the audit record.
     timestamp_created      TIMESTAMP                                          -- Timestamp when audit record was created.
+);
+
+-- Table ns_user_prefs stores user preferences.
+-- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
+CREATE TABLE ns_user_prefs (
+  user_id       VARCHAR(256) PRIMARY KEY NOT NULL,      -- User ID.
+  auth_method_1 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 1" is enabled.
+  auth_method_2 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 2" is enabled.
+  auth_method_3 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 3" is enabled.
+  auth_method_4 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 4" is enabled.
+  auth_method_5 NUMBER(1) DEFAULT 0,                    -- Flag indicating if "authentication method 5" is enabled.
+  auth_method_1_config VARCHAR(256),                    -- Configuration for "authentication method 1".
+  auth_method_2_config VARCHAR(256),                    -- Configuration for "authentication method 2".
+  auth_method_3_config VARCHAR(256),                    -- Configuration for "authentication method 3".
+  auth_method_4_config VARCHAR(256),                    -- Configuration for "authentication method 4".
+  auth_method_5_config VARCHAR(256),                    -- Configuration for "authentication method 5".
+  CONSTRAINT user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );
 
 -- Table wf_operation_session maps operations to HTTP sessions.
@@ -557,3 +557,20 @@ CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id)
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
 CREATE UNIQUE INDEX ns_operation_afs_unique on ns_operation_afs (operation_id, request_afs_action, request_step_index);
 CREATE INDEX wf_certificate_operation ON wf_certificate_verification (operation_id);
+CREATE INDEX ns_application_name ON ns_application (name);
+CREATE INDEX ns_credential_policy_name ON ns_credential_policy (name);
+CREATE INDEX ns_otp_policy_name ON ns_otp_policy (name);
+CREATE INDEX ns_user_contact_user_id ON ns_user_contact (user_id);
+CREATE INDEX ns_user_identity_history_user ON ns_user_identity_history (user_id);
+CREATE INDEX ns_user_identity_history_created ON ns_user_identity_history (timestamp_created);
+CREATE INDEX ns_role_name ON ns_role (name);
+CREATE INDEX ns_user_role_user_id ON ns_user_role (user_id);
+CREATE INDEX ns_user_alias_user_id ON ns_user_alias (user_id);
+CREATE INDEX ns_credential_definition_name ON ns_credential_definition (name);
+CREATE INDEX ns_otp_definition_name ON ns_otp_definition (name);
+CREATE INDEX ns_credential_storage_user_id ON ns_credential_storage (user_id);
+CREATE INDEX ns_credential_storage_username ON ns_credential_storage (user_name);
+CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
+CREATE INDEX ns_otp_storage_user_id ON ns_otp_storage (user_id);
+CREATE INDEX ns_authentication_user_id ON ns_authentication (user_id);
+CREATE INDEX ns_audit_log_created ON ns_audit_log (timestamp_created);
