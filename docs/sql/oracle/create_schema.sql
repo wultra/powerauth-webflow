@@ -5,6 +5,20 @@ CREATE SEQUENCE "TPP_DETAIL_SEQ" MINVALUE 1 MAXVALUE 999999999999999999999999999
 CREATE SEQUENCE "TPP_USER_CONSENT_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 CREATE SEQUENCE "TPP_USER_CONSENT_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 CREATE SEQUENCE "NS_OPERATION_AFS_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_APPLICATION_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_CREDENTIAL_POLICY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_OTP_POLICY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_USER_CONTACT_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_USER_IDENTITY_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_ROLE_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_USER_ROLE_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_USER_ALIAS_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_HASHING_CONFIG_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_CREDENTIAL_DEFINITION_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_OTP_DEFINITION_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_CREDENTIAL_HISTORY_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_AUTHENTICATION_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
+CREATE SEQUENCE "NS_AUDIT_LOG_SEQ" MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 1 CACHE 20 NOORDER NOCYCLE;
 
 -- Table oauth_client_details stores details about OAuth2 client applications.
 -- Every Web Flow client application should have a record in this table.
@@ -88,7 +102,8 @@ CREATE TABLE ns_user_prefs (
   auth_method_2_config VARCHAR(256),                    -- Configuration for "authentication method 2".
   auth_method_3_config VARCHAR(256),                    -- Configuration for "authentication method 3".
   auth_method_4_config VARCHAR(256),                    -- Configuration for "authentication method 4".
-  auth_method_5_config VARCHAR(256)                     -- Configuration for "authentication method 5".
+  auth_method_5_config VARCHAR(256),                    -- Configuration for "authentication method 5".
+  CONSTRAINT user_prefs_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );
 
 -- Table ns_operation_config stores configuration of operations.
@@ -132,7 +147,9 @@ CREATE TABLE ns_operation (
   result                        VARCHAR(32),                        -- Operation result - CONTINUE, FAILED, DONE.
   timestamp_created             TIMESTAMP,                          -- Timestamp when this operation was created.
   timestamp_expires             TIMESTAMP,                          -- Timestamp of the expiration of the operation.
-  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
+  CONSTRAINT operation_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id),
+  CONSTRAINT operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
+  CONSTRAINT operation_config_fk FOREIGN KEY (operation_name) REFERENCES ns_operation_config (operation_name)
 );
 
 -- Table ns_operation_history stores all changes of operations.
@@ -150,9 +167,11 @@ CREATE TABLE ns_operation_history (
   response_timestamp_expires  TIMESTAMP,                            -- Timestamp when the operation step should expire.
   chosen_auth_method          VARCHAR(32),                          -- Information about which authentication method was chosen, in case user can chose the authentication method.
   mobile_token_active         NUMBER(1) DEFAULT 0 NOT NULL,         -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
+  authentication_id           NUMBER(19,0)                          -- Optional reference to the authentication record.
   CONSTRAINT history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
-  CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method)
+  CONSTRAINT history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  CONSTRAINT history_authentication_fk FOREIGN KEY (authentication_id) REFERENCES ns_authentication (authentication_id)
 );
 
 -- Table ns_operation_afs stores AFS requests and responses.
@@ -179,9 +198,244 @@ CREATE TABLE ns_step_definition (
   request_auth_step_result VARCHAR(32),                             -- Result of the authentication method execution: CONFIRMED, CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED
   response_priority        INTEGER NOT NULL,                        -- Response priority (ordering column).
   response_auth_method     VARCHAR(32),                             -- Response with the authentication method that should be applied next.
-  response_result          VARCHAR(32) NOT NULL,                    -- Result of the operation: CONTINUE, FAILED, DONE
+  response_result          VARCHAR(32) NOT NULL,                    -- Result of the operation: CONTINUE, FAILED, or DONE
   CONSTRAINT step_request_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
   CONSTRAINT step_response_auth_method_fk FOREIGN KEY (response_auth_method) REFERENCES ns_auth_method (auth_method)
+);
+
+-- Table ns_application stores Next Step applications.
+CREATE TABLE ns_application (
+    application_id         NUMBER(19,0) NOT NULL PRIMARY KEY,       -- Next Step application ID (autogenerated).
+    name                   VARCHAR2(255 CHAR) NOT NULL,             -- Application name used for identification.
+    description            VARCHAR2(255 CHAR),                      -- Description of the application.
+    status                 NUMBER(10,0) NOT NULL,                   -- Application status: ACTIVE, REMOVED.
+    organization_id        VARCHAR2(255 CHAR),                      -- Organization this application belongs to.
+    timestamp_created      TIMESTAMP,                               -- Timestamp when application was created.
+    timestamp_last_updated TIMESTAMP,                               -- Timestamp when application was last updated.
+    CONSTRAINT ns_application_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
+);
+
+-- Table ns_credential_policy stores credential policies.
+CREATE TABLE ns_credential_policy (
+    credential_policy_id       NUMBER(19,0) NOT NULL PRIMARY KEY,             -- Credential policy ID (autogenerated).
+    name                       VARCHAR2(255 CHAR) NOT NULL,                   -- Credential policy name used for identification.
+    description                VARCHAR2(255 CHAR),                            -- Description of the credential policy.
+    username_length_min        NUMBER(10,0),                                  -- Minimum length of username.
+    username_length_max        NUMBER(10,0),                                  -- Maximum length of username.
+    username_allowed_chars     VARCHAR2(255 CHAR),                            -- Allowed characters in username (regular expression).
+    credential_length_min      NUMBER(10,0),                                  -- Minimum length of credential value.
+    credential_length_max      NUMBER(10,0),                                  -- Maximum length of credential value.
+    credential_allowed_chars   VARCHAR2(255 CHAR),                            -- Allowed characters in credential value.
+    limit_soft                 NUMBER(10,0),                                  -- Soft limit of failed attempts.
+    limit_hard                 NUMBER(10,0),                                  -- Hard limit of failed attempts.
+    check_history_count        NUMBER(10,0) DEFAULT 0 NOT NULL,               -- Number of historical credential values to check.
+    rotation_enabled           NUMBER(1) DEFAULT 0 NOT NULL,                  -- Whether credential rotation is enabled.
+    rotation_days              NUMBER(10,0),                                  -- Number of days for credential rotation.
+    username_gen_algorithm     VARCHAR2(255 CHAR) DEFAULT 'DEFAULT' NOT NULL, -- Algorithm used for generating the username.
+    credential_gen_algorithm   VARCHAR2(255 CHAR) DEFAULT 'DEFAULT' NOT NULL, -- Algorithm used for generating the credential.
+    timestamp_created          TIMESTAMP,                                     -- Timestamp when policy was created.
+    timestamp_last_updated     TIMESTAMP                                      -- Timestamp when policy was last updated.
+);
+
+-- Table ns_credential_policy stores one time password policies.
+CREATE TABLE ns_otp_policy (
+    otp_policy_id          NUMBER(19,0) NOT NULL PRIMARY KEY,                 -- One time password policy ID (autogenerated).
+    name                   VARCHAR2(255 CHAR) NOT NULL,                       -- One time password policy name used for identification.
+    description            VARCHAR2(255 CHAR),                                -- Description of the one time password policy.
+    length                 NUMBER(10,0),                                      -- One time password length.
+    attempt_limit          NUMBER(10,0),                                      -- Maximum number of authentication attempts.
+    expiration_time        NUMBER(10,0),                                      -- One time password expiration time.
+    gen_algorithm          VARCHAR2(255 CHAR) DEFAULT 'DEFAULT' NOT NULL,     -- Algorithm used for generating the one time password.
+    timestamp_created      TIMESTAMP,                                         -- Timestamp when policy was created.
+    timestamp_last_updated TIMESTAMP                                          -- Timestamp when policy was last updated.
+);
+
+-- Table ns_user_identity stores user identities.
+CREATE TABLE ns_user_identity (
+    user_id                VARCHAR2(255 CHAR) NOT NULL PRIMARY KEY,           -- User identity identifier (not autogenerated).
+    status                 NUMBER(10,0) NOT NULL,                             -- User identity status: ACTIVE, BLOCKED, REMOVED.
+    extras                 VARCHAR2(255 CHAR),                                -- Extra attributes with data related to user identity.
+    timestamp_created      TIMESTAMP,                                         -- Timestamp when user identity was created.
+    timestamp_last_updated TIMESTAMP                                          -- Timestamp when user identity was last updated.
+);
+
+-- Table ns_user_contact stores contact information for user identities.
+CREATE TABLE ns_user_contact (
+    user_contact_id        NUMBER(19,0) NOT NULL PRIMARY KEY,                 -- User contact identifier (autogenerated).
+    user_id                VARCHAR2(255 CHAR) NOT NULL,                       -- User identity identifier.
+    name                   VARCHAR2(255 CHAR) NOT NULL,                       -- User contact name used for identification.
+    type                   NUMBER(10,0),                                      -- User contact type: PHONE, EMAIL, OTHER.
+    value                  VARCHAR2(255 CHAR),                                -- User contact value.
+    is_primary             NUMBER(1) DEFAULT 0 NOT NULL,                      -- Whether contact is primary.
+    timestamp_created      TIMESTAMP,                                         -- Timestamp when contact was created.
+    timestamp_last_updated TIMESTAMP,                                         -- Timestamp when contact was last updated.
+    CONSTRAINT ns_user_contact_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_user_identity stores history for user identities.
+CREATE TABLE ns_user_identity_history (
+    user_identity_history_id NUMBER(19,0) NOT NULL PRIMARY KEY,               -- User identity history identifier (autogenerated).
+    user_id                  VARCHAR2(255 CHAR) NOT NULL,                     -- User identity identifier.
+    status                   NUMBER(10,0) NOT NULL,                           -- User identity status: ACTIVE, BLOCKED, REMOVED.
+    roles                    VARCHAR2(255 CHAR),                              -- Assigned user roles.
+    extras                   VARCHAR2(255 CHAR),                              -- Extra attributes with data related to user identity.
+    timestamp_created        TIMESTAMP,                                       -- Timestamp when user identity snapshot was created.
+    CONSTRAINT ns_user_identity_history_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_role stores user role definitions.
+CREATE TABLE ns_role (
+    role_id                NUMBER(19,0) NOT NULL PRIMARY KEY,                 -- Role identifier (autogenerated).
+    name                   VARCHAR2(255 CHAR) NOT NULL,                       -- Role name used for identification.
+    description            VARCHAR2(255 CHAR),                                -- Description of role.
+    timestamp_created      TIMESTAMP,                                         -- Timestamp when role was created.
+    timestamp_last_updated TIMESTAMP                                          -- Timestamp when role was last updated.
+);
+
+-- Table ns_user_role stores assignment of roles to user identities.
+CREATE TABLE ns_user_role (
+    user_role_id             NUMBER(19,0) NOT NULL PRIMARY KEY,               -- User role identifier (autogenerated).
+    user_id                  VARCHAR2(255 CHAR) NOT NULL,                     -- User identity identifier.
+    role_id                  NUMBER(19,0) NOT NULL,                           -- Role identifier.
+    status                   NUMBER(10,0) NOT NULL,                           -- User role status: ACTIVE, BLOCKED, REMOVED.
+    timestamp_created        TIMESTAMP,                                       -- Timestamp when user role was created.
+    timestamp_last_updated   TIMESTAMP,                                       -- Timestamp when user role was last updated.
+    CONSTRAINT ns_role_identity_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
+    CONSTRAINT ns_user_role_fk FOREIGN KEY (role_id) REFERENCES ns_role (role_id)
+);
+
+-- Table ns_user_alias stores user aliases.
+CREATE TABLE ns_user_alias (
+    user_alias_id            NUMBER(19,0) NOT NULL PRIMARY KEY,               -- User alias identifier (autogenerated).
+    user_id                  VARCHAR2(255 CHAR) NOT NULL,                     -- User identity identifier.
+    name                     VARCHAR2(255 CHAR) NOT NULL,                     -- User alias name used for identification.
+    value                    VARCHAR2(255 CHAR) NOT NULL,                     -- User alias value.
+    status                   NUMBER(10,0) NOT NULL,                           -- User alias status: ACTIVE, REMOVED.
+    extras                   VARCHAR2(255 CHAR),                              -- Extra attributes with data related to user alias.
+    timestamp_created        TIMESTAMP,                                       -- Timestamp when user alias was created.
+    timestamp_last_updated   TIMESTAMP,                                       -- Timestamp when user alias was last updated.
+    CONSTRAINT ns_user_alias_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_hashing_config stores configuration of hashing algorithms.
+CREATE TABLE ns_hashing_config (
+    hashing_config_id        NUMBER(19,0) NOT NULL PRIMARY KEY,               -- Hashing configuration identifier (autogenerated).
+    name                     VARCHAR2(255 CHAR) NOT NULL,                     -- Hashing configuration name used for identification.
+    algorithm                VARCHAR2(255 CHAR) NOT NULL,                     -- Hashing algorithm name.
+    parameters               VARCHAR2(255 CHAR),                              -- Hashing algorithm parameters.
+    timestamp_created        TIMESTAMP                                        -- Timestamp when hashing configuration was created.
+);
+
+-- Table ns_credential_definition stores definitions of credentials with reference to credential policies and applications.
+CREATE TABLE ns_credential_definition (
+    credential_definition_id NUMBER(19,0) NOT NULL PRIMARY KEY,               -- Credential definition identifier (autogenerated).
+    name                     VARCHAR2(255 CHAR) NOT NULL,                     -- Credential definition name used for identification.
+    application_id           NUMBER(19,0) NOT NULL,                           -- Application identifier.
+    credential_policy_id     NUMBER(19,0) NOT NULL,                           -- Credential policy identifier.
+    category                 NUMBER(10,0),                                    -- Credential category: PASSWORD, PIN, OTHER.
+    encryption_enabled       NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether encryption of stored credentials is enabled.
+    encryption_algorithm     VARCHAR2(255 CHAR),                              -- Algorithm used for stored credential encryption.
+    hashing_enabled          NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether credential hashing is enabled.
+    hashing_config_id        NUMBER(19,0) NOT NULL,                           -- Algorithm used for credential hashing.
+    e2e_encryption_enabled   NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether end to end encryption of credential is enabled.
+    status                   NUMBER(10,0) NOT NULL,                           -- Credential definition status: ACTIVE, REMOVED.
+    timestamp_created        TIMESTAMP,                                       -- Timestamp when credential definition was created.
+    timestamp_last_updated   TIMESTAMP,                                       -- Timestamp when credential definition was last updated.
+    CONSTRAINT ns_credential_application_fk FOREIGN KEY (application_id) REFERENCES ns_application (application_id),
+    CONSTRAINT ns_credential_policy_fk FOREIGN KEY (credential_policy_id) REFERENCES ns_credential_policy (credential_policy_id),
+    CONSTRAINT ns_credential_hash_fk FOREIGN KEY (hashing_config_id) REFERENCES ns_hashing_config (hashing_config_id)
+);
+
+-- Table ns_otp_definition stores definitions of one time passwords with reference to credential policies and applications.
+CREATE TABLE ns_otp_definition (
+    otp_definition_id        NUMBER(19,0) NOT NULL PRIMARY KEY,               -- One time password definition identifier (autogenerated).
+    name                     VARCHAR2(255 CHAR) NOT NULL,                     -- One time password definition name used for identification.
+    application_id           NUMBER(19,0) NOT NULL,                           -- Application identifier.
+    otp_policy_id            NUMBER(19,0) NOT NULL,                           -- One time password policy identifier.
+    encryption_enabled       NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether encryption of stored one time passwords is enabled.
+    encryption_algorithm     VARCHAR2(255 CHAR),                              -- Algorithm used for stored one time password encryption.
+    status                   NUMBER(10,0) NOT NULL,                           -- One time password definition status: ACTIVE, REMOVED.
+    timestamp_created        TIMESTAMP,                                       -- Timestamp when one time password definition was created.
+    timestamp_last_updated   TIMESTAMP,                                       -- Timestamp when one time password definition was last updated.
+    CONSTRAINT ns_otp_application_fk FOREIGN KEY (application_id) REFERENCES ns_application (application_id),
+    CONSTRAINT ns_otp_policy_fk FOREIGN KEY (otp_policy_id) REFERENCES ns_otp_policy (otp_policy_id)
+);
+
+-- Table ns_credential_storage stores credential values, counters and other data related to credentials.
+CREATE TABLE ns_credential_storage (
+    credential_id                    VARCHAR(256) NOT NULL PRIMARY KEY,       -- Credential identifier (generated by application as UUID).
+    credential_definition_id         NUMBER(19,0) NOT NULL,                   -- Credential definition identifier.
+    user_id                          VARCHAR2(255 CHAR) NOT NULL,             -- User identity identifier.
+    type                             NUMBER(10,0),                            -- Credential type: PERMANENT, TEMPORARY.
+    user_name                        VARCHAR2(255 CHAR),                      -- Username.
+    value                            VARCHAR2(255 CHAR) NOT NULL,             -- Credential value.
+    status                           NUMBER(10,0) NOT NULL,                   -- Credential status: ACTIVE, BLOCKED_TEMPORARY, BLOCKED_PERMANENT, REMOVED.
+    attempt_counter                  NUMBER(19,0) DEFAULT 0 NOT NULL,         -- Attempt counter for both successful and failed attempts.
+    failed_attempt_counter_soft      NUMBER(19,0) DEFAULT 0 NOT NULL,         -- Soft failed attempt counter.
+    failed_attempt_counter_hard      NUMBER(19,0) DEFAULT 0 NOT NULL,         -- Hard failed attempt counter.
+    timestamp_created                TIMESTAMP,                               -- Timestamp when credential was created.
+    timestamp_expired                TIMESTAMP,                               -- Timestamp when credential was expired.
+    timestamp_blocked                TIMESTAMP,                               -- Timestamp when credential was blocked.
+    timestamp_last_updated           TIMESTAMP,                               -- Timestamp when credential was last updated.
+    timestamp_last_credential_change TIMESTAMP,                               -- Timestamp when credential value was last changed.
+    CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_definition (credential_definition_id),
+    CONSTRAINT ns_credential_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_credential_history stores historical values of credentials.
+CREATE TABLE ns_credential_history (
+    credential_history_id       NUMBER(19,0) NOT NULL PRIMARY KEY,            -- Credential history identifier (autogenerated).
+    credential_id               NUMBER(19,0) NOT NULL,                        -- Credential identifier.
+    user_id                     VARCHAR2(255 CHAR) NOT NULL,                  -- User identity identifier.
+    user_name                   VARCHAR2(255 CHAR),                           -- Username.
+    value                       VARCHAR2(255 CHAR) NOT NULL,                  -- Credential value.
+    timestamp_created           TIMESTAMP,                                    -- Timestamp when credential was created.
+    CONSTRAINT ns_credential_history_definition_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_definition (credential_definition_id),
+    CONSTRAINT ns_credential_history_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_otp_storage stores one time password values, counters and other data related to one time passwords.
+CREATE TABLE ns_otp_storage (
+    otp_id                      VARCHAR(256) NOT NULL PRIMARY KEY,            -- One time password identifier (generated by application as UUID).
+    otp_definition_id           NUMBER(19,0) NOT NULL,                        -- One time password definition identifier.
+    user_id                     VARCHAR2(255 CHAR) NOT NULL,                  -- User identifier.
+    credential_definition_id    NUMBER(19,0),                                 -- Credential definition identifier used when updating failed counter.
+    value                       VARCHAR2(255 CHAR) NOT NULL,                  -- One time password value.
+    salt                        BLOB NOT NULL,                                -- Cryptographic salt used when generating one time password.
+    status                      NUMBER(10,0) NOT NULL,                        -- One time password status: ACTIVE, USED, BLOCKED, REMOVED.
+    otp_data                    CLOB NOT NULL,                                -- Data used for generating one time password.
+    attempt_counter             NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password attempt counter.
+    failed_attempt_counter      NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password failed attempt counter.
+    timestamp_created           TIMESTAMP,                                    -- Timestamp when one time password was created.
+    timestamp_expired           TIMESTAMP,                                    -- Timestamp when one time password was expired.
+    CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_definition (otp_definition_id),
+    CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+);
+
+-- Table ns_authentication stores authentication attempts.
+CREATE TABLE ns_authentication (
+    authentication_id           NUMBER(19,0) NOT NULL PRIMARY KEY,            -- Authentication identifier (autogenerated).
+    user_id                     VARCHAR2(255 CHAR) NOT NULL,                  -- User identity identifier.
+    type                        NUMBER(10,0) NOT NULL,                        -- Authentication type: CREDENTIAL, OTP, CREDENTIAL_OTP.
+    credential_id               NUMBER(19,0),                                 -- Credential identifier.
+    otp_id                      NUMBER(19,0),                                 -- One time password identifier.
+    operation_id                VARCHAR(256),                                 -- Operation identifier.
+    result                      NUMBER(10,0) NOT NULL,                        -- Overall authentication result.
+    result_credential           NUMBER(10,0),                                 -- Authentication result for credential authentication.
+    result_otp                  NUMBER(10,0),                                 -- Authentication result for one time password authentication.
+    timestamp_created           TIMESTAMP,                                    -- Timestamp when authentication record was created.
+    CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
+    CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_storage_id),
+    CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_storage_id),
+    CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id);
+);
+
+-- Table ns_audit_log stores audit information.
+CREATE TABLE ns_audit_log (
+    audit_log_id           NUMBER(19,0) NOT NULL PRIMARY KEY,                 -- Audit log identifier.
+    action                 VARCHAR2(255 CHAR) NOT NULL,                       -- Action which is being audited.
+    data                   CLOB,                                              -- Data for the audit record.
+    timestamp_created      TIMESTAMP                                          -- Timestamp when audit record was created.
 );
 
 -- Table wf_operation_session maps operations to HTTP sessions.

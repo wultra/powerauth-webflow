@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -35,6 +36,9 @@ public class UserAliasDetail {
     @NotNull
     private String aliasName;
     private String aliasValue;
+    @NotNull
+    private UserAliasStatus userAliasStatus;
+    @NotNull
     private Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;
