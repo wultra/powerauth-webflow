@@ -15,9 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Request object used for authenticating using a credential and an OTP.
@@ -33,6 +35,8 @@ public class CombinedAuthenticationRequest {
     private String userId;
     @NotNull
     private String credentialValue;
+    private CredentialAuthenticationMode authenticationMode;
+    private List<Integer> credentialPositionsToVerify;
     @NotNull
     private String otpId;
     @NotNull
