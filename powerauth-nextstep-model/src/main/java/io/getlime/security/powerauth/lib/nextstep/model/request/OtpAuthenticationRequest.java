@@ -31,7 +31,7 @@ public class OtpAuthenticationRequest {
     private String otpId;
     @NotNull
     private String otpValue;
-    private String operationId;
+    // Operation ID is extracted from OTP record
     private boolean updateOperation;
 
 }
