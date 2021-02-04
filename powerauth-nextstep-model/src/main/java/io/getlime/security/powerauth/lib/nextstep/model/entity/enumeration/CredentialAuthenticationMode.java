@@ -16,20 +16,20 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Enum representing a credential type.
+ * Enum representing mode of credential authentication.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum CredentialType {
+public enum CredentialAuthenticationMode {
 
     /**
-     * Credential type is permanent.
+     * Verify exact match of the credential.
      */
-    PERMANENT,
+    MATCH_EXACT,
 
     /**
-     * Credential type is temporary.
+     * Verify only specified positions of the credential.
      */
-    TEMPORARY
+    MATCH_ONLY_SPECIFIED_POSITIONS
 
 }

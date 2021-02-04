@@ -15,9 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * Request object used for authenticating using a credential.
@@ -32,6 +34,8 @@ public class CredentialAuthenticationRequest {
     private String username;
     @NotNull
     private String credentialValue;
+    private CredentialAuthenticationMode authenticationMode;
+    private List<Integer> credentialPositionsToVerify;
     private String operationId;
     private boolean updateOperation;
 
