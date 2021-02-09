@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,18 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.repository;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import javax.validation.constraints.NotNull;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
- * Crud repository for persistence of AFS actions for operations.
+ * Class represents details of a hashing configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Repository
-public interface OperationAfsActionRepository extends CrudRepository<OperationAfsActionEntity, Long> {
+@Data
+@EqualsAndHashCode(of = "hashConfigName")
+public class HashingConfigDetail {
+
+    @NotNull
+    private String hashConfigName;
+    @NotNull
+    private String algorithm;
+    private final Map<String, String> parameters = new LinkedHashMap<>();
+    @NotNull
+    private Date timestampCreated;
 
 }

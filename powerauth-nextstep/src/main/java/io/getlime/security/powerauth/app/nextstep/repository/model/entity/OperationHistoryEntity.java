@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -26,10 +29,12 @@ import java.util.Date;
 /**
  * Entity which stores history for an operation including request and response data.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
 @Table(name = "ns_operation_history")
+@Data
+@EqualsAndHashCode(of = "primaryKey")
 public class OperationHistoryEntity implements Serializable {
 
     private static final long serialVersionUID = 4536813173706547247L;
@@ -37,11 +42,11 @@ public class OperationHistoryEntity implements Serializable {
     @EmbeddedId
     private OperationHistoryKey primaryKey;
 
-    @Column(name = "request_auth_step_result")
+    @Column(name = "request_auth_step_result", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthStepResult requestAuthStepResult;
 
-    @Column(name = "request_auth_method")
+    @Column(name = "request_auth_method", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthMethod requestAuthMethod;
 
@@ -51,7 +56,7 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "request_params")
     private String requestParams;
 
-    @Column(name = "response_result")
+    @Column(name = "response_result", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthResult responseResult;
 
@@ -61,10 +66,10 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "response_steps")
     private String responseSteps;
 
-    @Column(name = "response_timestamp_created")
+    @Column(name = "response_timestamp_created", nullable = false)
     private Date responseTimestampCreated;
 
-    @Column(name = "response_timestamp_expires")
+    @Column(name = "response_timestamp_expires", nullable = false)
     private Date responseTimestampExpires;
 
     @Column(name = "chosen_auth_method")
@@ -75,7 +80,7 @@ public class OperationHistoryEntity implements Serializable {
     private boolean mobileTokenActive;
 
     @ManyToOne
-    @JoinColumn(name = "operation_id", insertable = false, updatable = false)
+    @JoinColumn(name = "operation_id", insertable = false, updatable = false, nullable = false)
     private OperationEntity operation;
 
     public OperationHistoryEntity() {
@@ -83,102 +88,6 @@ public class OperationHistoryEntity implements Serializable {
 
     public OperationHistoryEntity(String operationId, Long resultId) {
         primaryKey = new OperationHistoryKey(operationId, resultId);
-    }
-
-    public OperationHistoryKey getPrimaryKey() {
-        return primaryKey;
-    }
-
-    public void setPrimaryKey(OperationHistoryKey primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public AuthStepResult getRequestAuthStepResult() {
-        return requestAuthStepResult;
-    }
-
-    public void setRequestAuthStepResult(AuthStepResult requestAuthStepResult) {
-        this.requestAuthStepResult = requestAuthStepResult;
-    }
-
-    public AuthMethod getRequestAuthMethod() {
-        return requestAuthMethod;
-    }
-
-    public void setRequestAuthMethod(AuthMethod requestAuthMethod) {
-        this.requestAuthMethod = requestAuthMethod;
-    }
-
-    public String getRequestAuthInstruments() {
-        return requestAuthInstruments;
-    }
-
-    public void setRequestAuthInstruments(String requestAuthInstruments) {
-        this.requestAuthInstruments = requestAuthInstruments;
-    }
-
-    public String getRequestParams() {
-        return requestParams;
-    }
-
-    public void setRequestParams(String requestParams) {
-        this.requestParams = requestParams;
-    }
-
-    public AuthResult getResponseResult() {
-        return responseResult;
-    }
-
-    public void setResponseResult(AuthResult responseResult) {
-        this.responseResult = responseResult;
-    }
-
-    public String getResponseResultDescription() {
-        return responseResultDescription;
-    }
-
-    public void setResponseResultDescription(String responseResultDescription) {
-        this.responseResultDescription = responseResultDescription;
-    }
-
-    public String getResponseSteps() {
-        return responseSteps;
-    }
-
-    public void setResponseSteps(String responseSteps) {
-        this.responseSteps = responseSteps;
-    }
-
-    public Date getResponseTimestampCreated() {
-        return responseTimestampCreated;
-    }
-
-    public void setResponseTimestampCreated(Date responseTimestampCreated) {
-        this.responseTimestampCreated = responseTimestampCreated;
-    }
-
-    public Date getResponseTimestampExpires() {
-        return responseTimestampExpires;
-    }
-
-    public void setResponseTimestampExpires(Date responseTimestampExpires) {
-        this.responseTimestampExpires = responseTimestampExpires;
-    }
-
-    public AuthMethod getChosenAuthMethod() {
-        return chosenAuthMethod;
-    }
-
-    public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
-        this.chosenAuthMethod = chosenAuthMethod;
-    }
-
-    public boolean isMobileTokenActive() {
-        return mobileTokenActive;
-    }
-
-    public void setMobileTokenActive(boolean mobileTokenActive) {
-        this.mobileTokenActive = mobileTokenActive;
     }
 
     /**
@@ -190,72 +99,19 @@ public class OperationHistoryEntity implements Serializable {
         return new Date().after(responseTimestampExpires);
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        OperationHistoryEntity that = (OperationHistoryEntity) o;
-
-        return getPrimaryKey() != null ? getPrimaryKey().equals(that.getPrimaryKey()) : that.getPrimaryKey() == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return getPrimaryKey() != null ? getPrimaryKey().hashCode() : 0;
-    }
-
     @Embeddable
+    @Data
     public static class OperationHistoryKey implements Serializable {
 
         private static final long serialVersionUID = 7125401949386229372L;
 
         @Column(name = "operation_id")
+        @NonNull
         private String operationId;
 
         @Column(name = "result_id")
+        @NonNull
         private Long resultId;
 
-        public OperationHistoryKey() {
-        }
-
-        public OperationHistoryKey(String operationId, Long resultId) {
-            this.operationId = operationId;
-            this.resultId = resultId;
-        }
-
-        public String getOperationId() {
-            return operationId;
-        }
-
-        public void setOperationId(String operationId) {
-            this.operationId = operationId;
-        }
-
-        public Long getResultId() {
-            return resultId;
-        }
-
-        public void setResultId(Long resultId) {
-            this.resultId = resultId;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            OperationHistoryKey that = (OperationHistoryKey) o;
-
-            if (operationId != null ? !operationId.equals(that.operationId) : that.operationId != null) return false;
-            return resultId != null ? resultId.equals(that.resultId) : that.resultId == null;
-        }
-
-        @Override
-        public int hashCode() {
-            int result = operationId != null ? operationId.hashCode() : 0;
-            result = 31 * result + (resultId != null ? resultId.hashCode() : 0);
-            return result;
-        }
     }
 }

@@ -13,31 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity;
+package io.getlime.security.powerauth.app.nextstep.repository;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-
-import javax.validation.constraints.NotNull;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * Class represents details of a hashing configuration.
+ * Crud repository for persistence of one time password policies.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-@EqualsAndHashCode(of = {"hashConfigName"})
-public class HashConfigDetail {
-
-    @NotNull
-    private String hashConfigName;
-    @NotNull
-    private String algorithm;
-    private final Map<String, String> parameters = new LinkedHashMap<>();
-    @NotNull
-    private Date timestampCreated;
+@Repository
+public interface OtpPolicyRepository extends CrudRepository<OtpPolicyEntity, Long> {
 
 }

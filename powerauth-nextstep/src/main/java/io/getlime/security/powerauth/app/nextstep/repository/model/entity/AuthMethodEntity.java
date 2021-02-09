@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -23,23 +25,25 @@ import java.io.Serializable;
 /**
  * Entity which stores configuration of authentication methods.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
 @Table(name = "ns_auth_method")
+@Data
+@EqualsAndHashCode(of = "authMethod")
 public class AuthMethodEntity implements Serializable {
 
     private static final long serialVersionUID = -2015768978885351433L;
 
     @Id
-    @Column(name = "auth_method")
+    @Column(name = "auth_method", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthMethod authMethod;
 
-    @Column(name = "order_number")
+    @Column(name = "order_number", nullable = false)
     private Long orderNumber;
 
-    @Column(name = "check_user_prefs")
+    @Column(name = "check_user_prefs", nullable = false)
     private Boolean checkUserPrefs;
 
     @Column(name = "user_prefs_column")
@@ -48,114 +52,19 @@ public class AuthMethodEntity implements Serializable {
     @Column(name = "user_prefs_default")
     private Boolean userPrefsDefault;
 
-    @Column(name = "check_auth_fails")
+    @Column(name = "check_auth_fails", nullable = false)
     private Boolean checkAuthorizationFailures;
 
     @Column(name = "max_auth_fails")
     private Integer maxAuthorizationFailures;
 
-    @Column(name = "has_user_interface")
+    @Column(name = "has_user_interface", nullable = false)
     private Boolean hasUserInterface;
 
     @Column(name = "display_name_key")
     private String displayNameKey;
 
-    @Column(name = "has_mobile_token")
+    @Column(name = "has_mobile_token", nullable = false)
     private Boolean hasMobileToken;
-
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    public Long getOrderNumber() {
-        return orderNumber;
-    }
-
-    public void setOrderNumber(Long orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    public Boolean getCheckUserPrefs() {
-        return checkUserPrefs;
-    }
-
-    public void setCheckUserPrefs(Boolean checkUserPrefs) {
-        this.checkUserPrefs = checkUserPrefs;
-    }
-
-    public Integer getUserPrefsColumn() {
-        return userPrefsColumn;
-    }
-
-    public void setUserPrefsColumn(Integer userPrefsColumn) {
-        this.userPrefsColumn = userPrefsColumn;
-    }
-
-    public Boolean getUserPrefsDefault() {
-        return userPrefsDefault;
-    }
-
-    public void setUserPrefsDefault(Boolean userPrefsDefault) {
-        this.userPrefsDefault = userPrefsDefault;
-    }
-
-    public Boolean getCheckAuthorizationFailures() {
-        return checkAuthorizationFailures;
-    }
-
-    public void setCheckAuthorizationFailures(Boolean checkAuthorizationFailures) {
-        this.checkAuthorizationFailures = checkAuthorizationFailures;
-    }
-
-    public Integer getMaxAuthorizationFailures() {
-        return maxAuthorizationFailures;
-    }
-
-    public void setMaxAuthorizationFailures(Integer maxAuthorizationFailures) {
-        this.maxAuthorizationFailures = maxAuthorizationFailures;
-    }
-
-    public Boolean getHasUserInterface() {
-        return hasUserInterface;
-    }
-
-    public void setHasUserInterface(Boolean hasUserInterface) {
-        this.hasUserInterface = hasUserInterface;
-    }
-
-    public String getDisplayNameKey() {
-        return displayNameKey;
-    }
-
-    public void setDisplayNameKey(String displayNameKey) {
-        this.displayNameKey = displayNameKey;
-    }
-
-    public Boolean getHasMobileToken() {
-        return hasMobileToken;
-    }
-
-    public void setHasMobileToken(Boolean hasMobileToken) {
-        this.hasMobileToken = hasMobileToken;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        AuthMethodEntity that = (AuthMethodEntity) o;
-
-        return authMethod == that.authMethod;
-    }
-
-    @Override
-    public int hashCode() {
-        return authMethod != null ? authMethod.hashCode() : 0;
-    }
 
 }

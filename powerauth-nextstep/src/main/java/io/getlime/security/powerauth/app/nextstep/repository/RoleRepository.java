@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,16 +15,16 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 /**
- * Crud repository for persistence of AFS actions for operations.
+ * Crud repository for persistence of roles.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface OperationAfsActionRepository extends CrudRepository<OperationAfsActionEntity, Long> {
+public interface RoleRepository extends CrudRepository<RoleEntity, Long> {
 
 }

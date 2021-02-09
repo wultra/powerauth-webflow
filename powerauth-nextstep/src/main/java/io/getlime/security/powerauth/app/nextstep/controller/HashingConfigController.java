@@ -38,9 +38,9 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("hashconfig")
-public class HashConfigController {
+public class HashingConfigController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HashConfigController.class);
+    private static final Logger logger = LoggerFactory.getLogger(HashingConfigController.class);
 
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) {

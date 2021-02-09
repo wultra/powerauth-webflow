@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -23,31 +24,35 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
 
 /**
- * Organization entity which adds organization context to operations.
+ * Entity which stores user identities.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
-@Table(name = "ns_organization")
+@Table(name = "ns_user_identity")
 @Data
-@EqualsAndHashCode(of = "organizationId")
-public class OrganizationEntity implements Serializable {
+@EqualsAndHashCode(of = "userId")
+public class UserIdentityEntity implements Serializable {
 
-    private static final long serialVersionUID = -3682348562614758414L;
+    private static final long serialVersionUID = -372574158382801384L;
 
     @Id
-    @Column(name = "organization_id", nullable = false)
-    private String organizationId;
+    @Column(name = "user_id", nullable = false)
+    private String userId;
 
-    @Column(name = "display_name_key")
-    private String displayNameKey;
+    @Column(name = "status", nullable = false)
+    private UserIdentityStatus status;
 
-    @Column(name = "is_default", nullable = false)
-    private boolean isDefault;
+    @Column(name = "extras")
+    private String extras;
 
-    @Column(name = "order_number", nullable = false)
-    private int orderNumber;
+    @Column(name = "timestamp_created", nullable = false)
+    private Date timestampCreated;
+
+    @Column(name = "timestamp_last_updated")
+    private Date timestampLastUpdated;
 
 }

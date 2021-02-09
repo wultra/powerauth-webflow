@@ -15,10 +15,12 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.Objects;
 
 /**
  * Entity which stores AFS requests and responses.
@@ -27,6 +29,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "ns_operation_afs")
+@Data
+@EqualsAndHashCode(of = {"afsAction", "stepIndex", "timestampCreated", "operation"})
 public class OperationAfsActionEntity implements Serializable {
 
     private static final long serialVersionUID = 744614077188309148L;
@@ -55,102 +59,11 @@ public class OperationAfsActionEntity implements Serializable {
     @Column(name = "response_afs_extras")
     private String responseAfsExtras;
 
-    @Column(name = "timestamp_created")
+    @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 
     @ManyToOne
-    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false)
+    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", insertable = false, updatable = false, nullable = false)
     private OperationEntity operation;
 
-    public Long getAfsActionId() {
-        return afsActionId;
-    }
-
-    public void setAfsActionId(Long afsActionId) {
-        this.afsActionId = afsActionId;
-    }
-
-    public OperationEntity getOperation() {
-        return operation;
-    }
-
-    public void setOperation(OperationEntity operation) {
-        this.operation = operation;
-    }
-
-    public String getAfsAction() {
-        return afsAction;
-    }
-
-    public void setAfsAction(String afsAction) {
-        this.afsAction = afsAction;
-    }
-
-    public int getStepIndex() {
-        return stepIndex;
-    }
-
-    public void setStepIndex(int stepIndex) {
-        this.stepIndex = stepIndex;
-    }
-
-    public String getRequestAfsExtras() {
-        return requestAfsExtras;
-    }
-
-    public void setRequestAfsExtras(String requestAfsExtras) {
-        this.requestAfsExtras = requestAfsExtras;
-    }
-
-    public boolean isAfsResponseApplied() {
-        return afsResponseApplied;
-    }
-
-    public void setAfsResponseApplied(boolean afsResponseApplied) {
-        this.afsResponseApplied = afsResponseApplied;
-    }
-
-    public String getAfsLabel() {
-        return afsLabel;
-    }
-
-    public void setAfsLabel(String afsLabel) {
-        this.afsLabel = afsLabel;
-    }
-
-    public String getResponseAfsExtras() {
-        return responseAfsExtras;
-    }
-
-    public void setResponseAfsExtras(String responseAfsExtras) {
-        this.responseAfsExtras = responseAfsExtras;
-    }
-
-    public Date getTimestampCreated() {
-        return timestampCreated;
-    }
-
-    public void setTimestampCreated(Date timestampCreated) {
-        this.timestampCreated = timestampCreated;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OperationAfsActionEntity that = (OperationAfsActionEntity) o;
-        return stepIndex == that.stepIndex &&
-                afsResponseApplied == that.afsResponseApplied &&
-                afsAction.equals(that.afsAction) &&
-                Objects.equals(requestAfsExtras, that.requestAfsExtras) &&
-                Objects.equals(afsLabel, that.afsLabel) &&
-                Objects.equals(responseAfsExtras, that.responseAfsExtras) &&
-                Objects.equals(timestampCreated, that.timestampCreated) &&
-                operation.equals(that.operation);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(afsAction, stepIndex, requestAfsExtras, afsResponseApplied, afsLabel, responseAfsExtras, timestampCreated, operation);
-    }
 }

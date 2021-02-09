@@ -19,7 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMe
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -28,7 +28,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, AuthMethod> {
 
     /**

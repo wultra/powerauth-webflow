@@ -15,22 +15,30 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
-import javax.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.io.Serializable;
 
 /**
  * Entity which stores user preferences for various authentication methods.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
 @Table(name = "ns_user_prefs")
+@Data
+@EqualsAndHashCode(of = "userId")
 public class UserPrefsEntity implements Serializable {
 
     private static final long serialVersionUID = -7165002311514127800L;
 
     @Id
-    @Column(name = "user_id")
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
     @Column(name = "auth_method_1")
@@ -62,94 +70,6 @@ public class UserPrefsEntity implements Serializable {
 
     @Column(name = "auth_method_5_config")
     private String authMethod5Config;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Boolean getAuthMethod1Enabled() {
-        return authMethod1Enabled;
-    }
-
-    public void setAuthMethod1Enabled(Boolean authMethod1Enabled) {
-        this.authMethod1Enabled = authMethod1Enabled;
-    }
-
-    public Boolean getAuthMethod2Enabled() {
-        return authMethod2Enabled;
-    }
-
-    public void setAuthMethod2Enabled(Boolean authMethod2Enabled) {
-        this.authMethod2Enabled = authMethod2Enabled;
-    }
-
-    public Boolean getAuthMethod3Enabled() {
-        return authMethod3Enabled;
-    }
-
-    public void setAuthMethod3Enabled(Boolean authMethod3Enabled) {
-        this.authMethod3Enabled = authMethod3Enabled;
-    }
-
-    public Boolean getAuthMethod4Enabled() {
-        return authMethod4Enabled;
-    }
-
-    public void setAuthMethod4Enabled(Boolean authMethod4Enabled) {
-        this.authMethod4Enabled = authMethod4Enabled;
-    }
-
-    public Boolean getAuthMethod5Enabled() {
-        return authMethod5Enabled;
-    }
-
-    public void setAuthMethod5Enabled(Boolean authMethod5Enabled) {
-        this.authMethod5Enabled = authMethod5Enabled;
-    }
-
-    public String getAuthMethod1Config() {
-        return authMethod1Config;
-    }
-
-    public void setAuthMethod1Config(String authMethod1Config) {
-        this.authMethod1Config = authMethod1Config;
-    }
-
-    public String getAuthMethod2Config() {
-        return authMethod2Config;
-    }
-
-    public void setAuthMethod2Config(String authMethod2Config) {
-        this.authMethod2Config = authMethod2Config;
-    }
-
-    public String getAuthMethod3Config() {
-        return authMethod3Config;
-    }
-
-    public void setAuthMethod3Config(String authMethod3Config) {
-        this.authMethod3Config = authMethod3Config;
-    }
-
-    public String getAuthMethod4Config() {
-        return authMethod4Config;
-    }
-
-    public void setAuthMethod4Config(String authMethod4Config) {
-        this.authMethod4Config = authMethod4Config;
-    }
-
-    public String getAuthMethod5Config() {
-        return authMethod5Config;
-    }
-
-    public void setAuthMethod5Config(String authMethod5Config) {
-        this.authMethod5Config = authMethod5Config;
-    }
 
     /**
      * Get the status of an authentication method given the column number in user preferences.
@@ -242,18 +162,4 @@ public class UserPrefsEntity implements Serializable {
 
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        UserPrefsEntity that = (UserPrefsEntity) o;
-
-        return userId != null ? userId.equals(that.userId) : that.userId == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return userId != null ? userId.hashCode() : 0;
-    }
 }

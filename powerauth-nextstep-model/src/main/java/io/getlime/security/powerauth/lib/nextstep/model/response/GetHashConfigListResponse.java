@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.HashingConfigDetail;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -31,6 +31,6 @@ import java.util.List;
 public class GetHashConfigListResponse {
 
     @NotNull
-    private final List<HashConfigDetail> hashConfigs = new ArrayList<>();
+    private final List<HashingConfigDetail> hashConfigs = new ArrayList<>();
 
 }
