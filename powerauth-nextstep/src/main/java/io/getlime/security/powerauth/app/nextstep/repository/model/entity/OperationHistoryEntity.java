@@ -20,7 +20,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -106,11 +105,9 @@ public class OperationHistoryEntity implements Serializable {
         private static final long serialVersionUID = 7125401949386229372L;
 
         @Column(name = "operation_id")
-        @NonNull
         private String operationId;
 
         @Column(name = "result_id")
-        @NonNull
         private Long resultId;
 
     }
