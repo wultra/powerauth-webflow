@@ -2,9 +2,11 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDataAttribute;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * Operation data contains structured data used for signatures.
@@ -13,12 +15,16 @@ import java.util.TreeMap;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class OperationData {
 
     public static final int OPERATION_DATA_ATTRIBUTE_COUNT = 5;
+
+    @NotNull
     private final String templateVersion;
+    @NotNull
     private final Integer templateId;
-    private final Map<Integer, OperationDataAttribute> attributes;
+    private final Map<Integer, OperationDataAttribute> attributes = new LinkedHashMap<>();
 
     /**
      * Operation data constructor.
@@ -29,23 +35,6 @@ public class OperationData {
     public OperationData(String templateVersion, Integer templateId) {
         this.templateVersion = templateVersion;
         this.templateId = templateId;
-        this.attributes = new TreeMap<>();
-    }
-
-    /**
-     * Get template version.
-     * @return Template version.
-     */
-    public String getTemplateVersion() {
-        return templateVersion;
-    }
-
-    /**
-     * Get template ID.
-     * @return Template ID.
-     */
-    public Integer getTemplateId() {
-        return templateId;
     }
 
     /**

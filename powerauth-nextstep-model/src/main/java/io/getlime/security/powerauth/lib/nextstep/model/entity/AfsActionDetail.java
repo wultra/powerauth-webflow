@@ -15,6 +15,10 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -22,60 +26,16 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class AfsActionDetail {
 
+    @NotNull
     private String action;
     private int stepIndex;
+    @NotNull
     private String afsLabel;
     private boolean afsResponseApplied;
-    private Map<String, Object> requestExtras;
-    private Map<String, Object> responseExtras;
+    private Map<String, Object> requestExtras = new LinkedHashMap<>();
+    private Map<String, Object> responseExtras = new LinkedHashMap<>();
 
-    public String getAction() {
-        return action;
-    }
-
-    public void setAction(String action) {
-        this.action = action;
-    }
-
-    public int getStepIndex() {
-        return stepIndex;
-    }
-
-    public void setStepIndex(int stepIndex) {
-        this.stepIndex = stepIndex;
-    }
-
-    public String getAfsLabel() {
-        return afsLabel;
-    }
-
-    public void setAfsLabel(String afsLabel) {
-        this.afsLabel = afsLabel;
-    }
-
-    public boolean isAfsResponseApplied() {
-        return afsResponseApplied;
-    }
-
-    public void setAfsResponseApplied(boolean afsResponseApplied) {
-        this.afsResponseApplied = afsResponseApplied;
-    }
-
-    public Map<String, Object> getRequestExtras() {
-        return requestExtras;
-    }
-
-    public void setRequestExtras(Map<String, Object> requestExtras) {
-        this.requestExtras = requestExtras;
-    }
-
-    public Map<String, Object> getResponseExtras() {
-        return responseExtras;
-    }
-
-    public void setResponseExtras(Map<String, Object> responseExtras) {
-        this.responseExtras = responseExtras;
-    }
 }

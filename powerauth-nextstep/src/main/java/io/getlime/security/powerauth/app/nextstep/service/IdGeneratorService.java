@@ -30,7 +30,7 @@ import java.util.UUID;
 @Service
 public class IdGeneratorService {
 
-    private OperationHistoryRepository operationHistoryRepository;
+    private final OperationHistoryRepository operationHistoryRepository;
 
     /**
      * ID generator constructor.

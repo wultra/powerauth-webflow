@@ -15,8 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,98 +28,15 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class ApplicationContext {
 
+    @NotNull
     private String id;
+    @NotNull
     private String name;
     private String description;
-    private final List<String> originalScopes;
-    private final Map<String, Object> extras;
-
-    /**
-     * Default constructor.
-     */
-    public ApplicationContext() {
-        extras = new HashMap<>();
-        originalScopes = new ArrayList<>();
-    }
-
-    /**
-     * Constructor with all details.
-     * @param id Application identifier.
-     * @param name Application name.
-     * @param description Application description
-     */
-    public ApplicationContext(String id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.originalScopes = new ArrayList<>();
-        this.extras = new HashMap<>();
-    }
-
-    /**
-     * Get application identifier.
-     * @return Application identifier.
-     */
-    public String getId() {
-        return id;
-    }
-
-    /**
-     * Set application identifier.
-     * @param id Application identifier.
-     */
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    /**
-     * Get application name.
-     * @return Application name.
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Set application name.
-     * @param name Application name.
-     */
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    /**
-     * Get application description.
-     * @return Application description.
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Set application description.
-     * @param description Application description.
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    /**
-     * Get the list with the original OAuth 2.0 scopes used when requesting the operation.
-     * @return List of originally requested scopes.
-     */
-    public List<String> getOriginalScopes() {
-        return originalScopes;
-    }
-
-    /**
-     * Get extra information for OAuth 2.0 consent screen.
-     * @return Extra information for OAuth 2.0 consent screen.
-     */
-    public Map<String, Object> getExtras() {
-        return extras;
-    }
+    private final List<String> originalScopes = new ArrayList<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
 }

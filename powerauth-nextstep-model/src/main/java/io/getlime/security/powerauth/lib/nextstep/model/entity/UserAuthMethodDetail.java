@@ -1,7 +1,10 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -9,61 +12,18 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UserAuthMethodDetail {
 
+    @NotNull
     private String userId;
+    @NotNull
     private AuthMethod authMethod;
+    @NotNull
     private Boolean hasUserInterface;
     private String displayNameKey;
+    @NotNull
     private Boolean hasMobileToken;
-    private Map<String, String> config;
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    public Boolean getHasUserInterface() {
-        return hasUserInterface;
-    }
-
-    public void setHasUserInterface(Boolean hasUserInterface) {
-        this.hasUserInterface = hasUserInterface;
-    }
-
-    public String getDisplayNameKey() {
-        return displayNameKey;
-    }
-
-    public void setDisplayNameKey(String displayNameKey) {
-        this.displayNameKey = displayNameKey;
-    }
-
-    public Boolean getHasMobileToken() {
-        return hasMobileToken;
-    }
-
-    public void setHasMobileToken(Boolean hasMobileToken) {
-        this.hasMobileToken = hasMobileToken;
-    }
-
-    public Map<String, String> getConfig() {
-        return config;
-    }
-
-    public void setConfig(Map<String, String> config) {
-        this.config = config;
-    }
+    private Map<String, String> config = new LinkedHashMap<>();
 
 }

@@ -16,7 +16,9 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,40 +28,11 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class AuthStep {
 
+    @NotNull
     private AuthMethod authMethod;
-    private final List<KeyValueParameter> params;
-
-    /**
-     * Default constructor.
-     */
-    public AuthStep() {
-        params = new ArrayList<>();
-    }
-
-    /**
-     * Get authentication method.
-     * @return Authentication method.
-     */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    /**
-     * Set authentication method.
-     * @param authMethod Authentication method.
-     */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    /**
-     * Get the list of extra parameters.
-     * @return Extra parameters.
-     */
-    public List<KeyValueParameter> getParams() {
-        return params;
-    }
+    private final List<KeyValueParameter> params = new ArrayList<>();
 
 }
