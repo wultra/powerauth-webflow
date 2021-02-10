@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.RoleService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetRoleListRequest;
@@ -26,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteRoleRespo
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetRoleListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,19 +46,31 @@ public class RoleController {
 
     private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
 
+    private final RoleService roleService;
+
+    @Autowired
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateRoleResponse> createRole(@RequestBody ObjectRequest<CreateRoleRequest> request) {
-        return new ObjectResponse<>(new CreateRoleResponse());
+    public ObjectResponse<CreateRoleResponse> createRole(@RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
+        // TODO - validate request
+        CreateRoleResponse response = roleService.createRole(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetRoleListResponse> listRoles(@RequestBody ObjectRequest<GetRoleListRequest> request) {
-        return new ObjectResponse<>(new GetRoleListResponse());
+        GetRoleListResponse response = roleService.getRoleList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) {
-        return new ObjectResponse<>(new DeleteRoleResponse());
+    public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException {
+        // TODO - validate request
+        DeleteRoleResponse response = roleService.deleteRole(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

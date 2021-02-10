@@ -47,11 +47,11 @@ public class CredentialDefinitionEntity implements Serializable {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "application_id", referencedColumnName = "application_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "application_id", referencedColumnName = "application_id", nullable = false)
     private ApplicationEntity application;
 
     @ManyToOne
-    @JoinColumn(name = "credential_policy_id", referencedColumnName = "credential_policy_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "credential_policy_id", referencedColumnName = "credential_policy_id", nullable = false)
     private CredentialPolicyEntity credentialPolicy;
 
     @Column(name = "category", nullable = false)
@@ -64,7 +64,7 @@ public class CredentialDefinitionEntity implements Serializable {
     private String encryptionAlgorithm;
 
     @ManyToOne
-    @JoinColumn(name = "hashing_config_id", referencedColumnName = "hashing_config_id", insertable = false, updatable = false)
+    @JoinColumn(name = "hashing_config_id", referencedColumnName = "hashing_config_id")
     private HashingConfigEntity hashingConfig;
 
     @Column(name = "e2e_encryption_enabled")

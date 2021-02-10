@@ -44,11 +44,11 @@ public class CredentialEntity implements Serializable {
     private UUID credentialId;
 
     @ManyToOne
-    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)
     private CredentialDefinitionEntity credentialDefinition;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, nullable = false)
     private UserIdentityEntity userId;
 
     @Column(name = "type", nullable = false)

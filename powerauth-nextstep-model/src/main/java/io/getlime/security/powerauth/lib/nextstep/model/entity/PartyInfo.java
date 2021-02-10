@@ -1,5 +1,6 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -10,6 +11,7 @@ import javax.validation.constraints.NotNull;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
+@AllArgsConstructor
 public class PartyInfo {
 
     @NotNull

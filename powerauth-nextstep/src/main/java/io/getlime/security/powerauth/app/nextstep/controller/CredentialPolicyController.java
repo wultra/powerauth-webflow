@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.CredentialPolicyService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetCredentialPolicyListRequest;
@@ -28,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetCredentialPo
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentialPolicyResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,29 +48,45 @@ public class CredentialPolicyController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialPolicyController.class);
 
+    private final CredentialPolicyService credentialPolicyService;
+
+    @Autowired
+    public CredentialPolicyController(CredentialPolicyService credentialPolicyService) {
+        this.credentialPolicyService = credentialPolicyService;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) {
-        return new ObjectResponse<>(new CreateCredentialPolicyResponse());
+    public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) throws CredentialPolicyAlreadyExistsException {
+        // TODO - request validation
+        CreateCredentialPolicyResponse response = credentialPolicyService.createCredentialPolicy(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialPolicyResponse());
+    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
+        // TODO - request validation
+        UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialPolicyResponse());
+    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
+        // TODO - request validation
+        UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetCredentialPolicyListResponse> listCredentialPolicies(@RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) {
-        return new ObjectResponse<>(new GetCredentialPolicyListResponse());
+        GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteCredentialPolicyResponse> deleteCredentialPolicy(@RequestBody ObjectRequest<DeleteCredentialPolicyRequest> request) {
-        return new ObjectResponse<>(new DeleteCredentialPolicyResponse());
+    public ObjectResponse<DeleteCredentialPolicyResponse> deleteCredentialPolicy(@RequestBody ObjectRequest<DeleteCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
+        // TODO - request validation
+        DeleteCredentialPolicyResponse response = credentialPolicyService.deleteCredentialPolicy(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

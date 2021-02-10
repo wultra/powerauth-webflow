@@ -63,7 +63,7 @@ public class OperationAfsActionEntity implements Serializable {
     private Date timestampCreated;
 
     @ManyToOne
-    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false, nullable = false)
     private OperationEntity operation;
 
 }

@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -46,11 +46,11 @@ public class OtpDefinitionEntity implements Serializable {
     private String name;
 
     @ManyToOne
-    @JoinColumn(name = "application_id", referencedColumnName = "application_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "application_id", referencedColumnName = "application_id", nullable = false)
     private ApplicationEntity application;
 
     @ManyToOne
-    @JoinColumn(name = "otp_policy_id", referencedColumnName = "otp_policy_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "otp_policy_id", referencedColumnName = "otp_policy_id", nullable = false)
     private OtpPolicyEntity otpPolicy;
 
     @Column(name = "encryption_enabled")
@@ -60,7 +60,7 @@ public class OtpDefinitionEntity implements Serializable {
     private String encryptionAlgorithm;
 
     @Column(name = "status", nullable = false)
-    private OtpStatus status;
+    private OtpDefinitionStatus status;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.CredentialDefinitionService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetCredentialDefinitionListRequest;
@@ -28,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetCredentialDe
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentialDefinitionResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -44,29 +47,45 @@ public class CredentialDefinitionController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialDefinitionController.class);
 
+    private final CredentialDefinitionService credentialDefinitionService;
+
+    @Autowired
+    public CredentialDefinitionController(CredentialDefinitionService credentialDefinitionService) {
+        this.credentialDefinitionService = credentialDefinitionService;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) {
-        return new ObjectResponse<>(new CreateCredentialDefinitionResponse());
+    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+        // TODO - request validation
+        CreateCredentialDefinitionResponse response = credentialDefinitionService.createCredentialDefinition(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialDefinitionResponse());
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+        // TODO - request validation
+        UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialDefinitionResponse());
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+        // TODO - request validation
+        UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetCredentialDefinitionListResponse> listCredentialDefinitions(@RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
-        return new ObjectResponse<>(new GetCredentialDefinitionListResponse());
+    public ObjectResponse<GetCredentialDefinitionListResponse> listCredentialPolicies(@RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
+        GetCredentialDefinitionListResponse response = credentialDefinitionService.getCredentialDefinitionList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) {
-        return new ObjectResponse<>(new DeleteCredentialDefinitionResponse());
+    public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException {
+        // TODO - request validation
+        DeleteCredentialDefinitionResponse response = credentialDefinitionService.deleteCredentialDefinition(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

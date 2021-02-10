@@ -16,8 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuditLogEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Date;
+import java.util.List;
 
 /**
  * Crud repository for persistence of audit logs.
@@ -26,5 +31,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AuditLogRepository extends CrudRepository<AuditLogEntity, Long> {
+
+    @Query(value = "from AuditLogEntity a where a.timestampCreated BETWEEN :startDate AND :endDate")
+    List<AuditLogEntity> findAllByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

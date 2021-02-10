@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -47,17 +48,20 @@ public class OtpPolicyEntity implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "status", nullable = false)
+    private OtpPolicyStatus status;
+
     @Column(name = "length")
     private Integer length;
 
     @Column(name = "attempt_limit")
-    private Integer limitSoft;
+    private Integer attemptLimit;
 
     @Column(name = "expiration_time")
     private Long expirationTime;
 
     @Column(name = "gen_algorithm", nullable = false)
-    private String generationAlgorithm;
+    private String genAlgorithm;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

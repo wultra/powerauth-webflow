@@ -52,7 +52,7 @@ public class ApplicationEntity implements Serializable {
     private ApplicationStatus status;
 
     @ManyToOne
-    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id", insertable = false, updatable = false)
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
     private OrganizationEntity organization;
 
     @Column(name = "timestamp_created", nullable = false)

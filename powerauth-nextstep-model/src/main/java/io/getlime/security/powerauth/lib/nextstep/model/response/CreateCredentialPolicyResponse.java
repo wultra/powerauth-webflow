@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -30,17 +31,19 @@ public class CreateCredentialPolicyResponse {
     @NotNull
     private String credentialPolicyName;
     private String description;
-    private Long usernameLengthMin;
-    private Long usernameLengthMax;
+    private CredentialPolicyStatus credentialPolicyStatus;
+    private Integer usernameLengthMin;
+    private Integer usernameLengthMax;
     private String usernameAllowedChars;
-    private Long passwordLengthMin;
-    private Long passwordLengthMax;
-    private String passwordAllowedChars;
-    private Long limitSoft;
-    private Long limitHard;
+    private Integer credentialLengthMin;
+    private Integer credentialLengthMax;
+    private String credentialAllowedChars;
+    private Integer limitSoft;
+    private Integer limitHard;
     private long checkHistoryCount;
     private boolean rotationEnabled;
+    private Integer rotationDays;
     private String usernameGenAlgorithm;
-    private String passwordGenAlgorithm;
+    private String credentialGenAlgorithm;
 
 }

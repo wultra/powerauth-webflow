@@ -44,22 +44,22 @@ public class AuthenticationEntity implements Serializable {
     private Long authenticationId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false)
     private UserIdentityEntity userId;
 
     @Column(name = "type", nullable = false)
     private AuthenticationType authenticationType;
 
     @ManyToOne
-    @JoinColumn(name = "credential_id", referencedColumnName = "credential_id", insertable = false, updatable = false)
+    @JoinColumn(name = "credential_id", referencedColumnName = "credential_id", updatable = false)
     private CredentialEntity credential;
 
     @ManyToOne
-    @JoinColumn(name = "otp_id", referencedColumnName = "otp_id", insertable = false, updatable = false)
+    @JoinColumn(name = "otp_id", referencedColumnName = "otp_id", updatable = false)
     private OtpEntity otp;
 
     @ManyToOne
-    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", insertable = false, updatable = false)
+    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false)
     private OperationEntity operation;
 
     @Column(name = "result", nullable = false)

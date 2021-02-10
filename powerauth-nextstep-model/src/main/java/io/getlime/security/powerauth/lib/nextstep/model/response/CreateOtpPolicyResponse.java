@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -31,9 +32,11 @@ public class CreateOtpPolicyResponse {
     private String otpPolicyName;
     private String description;
     @NotNull
-    private Long length;
-    private Long attemptLimit;
+    private Integer length;
+    private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    @NotNull
+    private OtpPolicyStatus otpPolicyStatus;
 
 }

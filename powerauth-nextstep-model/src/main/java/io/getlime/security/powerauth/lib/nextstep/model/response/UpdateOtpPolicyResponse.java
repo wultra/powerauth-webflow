@@ -32,8 +32,8 @@ public class UpdateOtpPolicyResponse {
     private String otpPolicyName;
     private String description;
     @NotNull
-    private Long length;
-    private Long attemptLimit;
+    private Integer length;
+    private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
     @NotNull

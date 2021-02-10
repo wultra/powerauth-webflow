@@ -43,7 +43,7 @@ public class UserAliasEntity implements Serializable {
     private Long userAliasId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private UserIdentityEntity userId;
 
     @Column(name = "name", nullable = false)

@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
-import javax.management.relation.RoleStatus;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -30,7 +29,4 @@ public class DeleteRoleResponse {
 
     @NotNull
     private String roleName;
-    @NotNull
-    private RoleStatus roleStatus;
-
 }

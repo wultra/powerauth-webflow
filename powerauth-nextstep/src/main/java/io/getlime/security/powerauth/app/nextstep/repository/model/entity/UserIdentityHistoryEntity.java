@@ -43,7 +43,7 @@ public class UserIdentityHistoryEntity implements Serializable {
     private Long userIdentityId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, nullable = false)
     private UserIdentityEntity userId;
 
     @Column(name = "status", nullable = false)

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -47,6 +48,9 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "status", nullable = false)
+    private CredentialPolicyStatus status;
+
     @Column(name = "username_length_min")
     private Integer usernameLengthMin;
 
@@ -54,7 +58,7 @@ public class CredentialPolicyEntity implements Serializable {
     private Integer usernameLengthMax;
 
     @Column(name = "username_allowed_chars")
-    private String usernameAllowedCharacters;
+    private String usernameAllowedChars;
 
     @Column(name = "credential_length_min")
     private Integer credentialLengthMin;
@@ -63,7 +67,7 @@ public class CredentialPolicyEntity implements Serializable {
     private Integer credentialLengthMax;
 
     @Column(name = "credential_allowed_chars")
-    private String credentialAllowedCharacters;
+    private String credentialAllowedChars;
 
     @Column(name = "limit_soft")
     private Integer limitSoft;
@@ -81,10 +85,10 @@ public class CredentialPolicyEntity implements Serializable {
     private Integer rotationDays;
 
     @Column(name = "username_gen_algorithm", nullable = false)
-    private String usernameGenerationAlgorithm;
+    private String usernameGenAlgorithm;
 
     @Column(name = "credential_gen_algorithm", nullable = false)
-    private String credentialGenerationAlgorithm;
+    private String credentialGenAlgorithm;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

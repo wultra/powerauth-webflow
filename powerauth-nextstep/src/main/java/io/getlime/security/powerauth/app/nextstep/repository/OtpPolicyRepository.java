@@ -16,8 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of one time password policies.
@@ -26,5 +31,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface OtpPolicyRepository extends CrudRepository<OtpPolicyEntity, Long> {
+
+    Optional<OtpPolicyEntity> findByName(String name);
+
+    @Query(value = "from OtpPolicyEntity op where op.status = :status")
+    Iterable<OtpPolicyEntity> findOtpPolicyByStatus(@Param("status") OtpPolicyStatus status);
 
 }

@@ -38,7 +38,7 @@ public class OtpDefinitionDetail {
     @NotNull
     private String otpPolicyName;
     private boolean encryptionEnabled;
-    private String encryption;
+    private String encryptionAlgorithm;
     @NotNull
     private OtpDefinitionStatus otpDefinitionStatus;
     @NotNull

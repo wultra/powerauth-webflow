@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Hashin
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 /**
  * Crud repository for persistence of hashing configurations.
  *
@@ -26,5 +28,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface HashingConfigRepository extends CrudRepository<HashingConfigEntity, Long> {
+
+    Optional<HashingConfigEntity> findByName(String name);
 
 }

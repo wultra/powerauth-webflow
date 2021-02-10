@@ -16,8 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of credential definitions.
@@ -26,5 +31,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CredentialDefinitionRepository extends CrudRepository<CredentialDefinitionEntity, Long> {
+
+    Optional<CredentialDefinitionEntity> findByName(String name);
+
+    @Query(value = "from CredentialDefinitionEntity cd where cd.status = :status")
+    Iterable<CredentialDefinitionEntity> findCredentialDefinitionByStatus(@Param("status") CredentialDefinitionStatus status);
 
 }

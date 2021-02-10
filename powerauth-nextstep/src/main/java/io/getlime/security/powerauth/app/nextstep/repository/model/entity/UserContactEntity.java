@@ -43,7 +43,7 @@ public class UserContactEntity implements Serializable {
     private Long userContactId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private UserIdentityEntity userId;
 
     @Column(name = "name", nullable = false)

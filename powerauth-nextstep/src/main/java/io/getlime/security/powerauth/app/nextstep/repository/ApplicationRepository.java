@@ -16,8 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of Next Step applications.
@@ -26,5 +31,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface ApplicationRepository extends CrudRepository<ApplicationEntity, Long> {
+
+    Optional<ApplicationEntity> findByName(String name);
+
+    @Query(value = "from ApplicationEntity a where a.status = :status")
+    Iterable<ApplicationEntity> findApplicationsByStatus(@Param("status") ApplicationStatus status);
 
 }

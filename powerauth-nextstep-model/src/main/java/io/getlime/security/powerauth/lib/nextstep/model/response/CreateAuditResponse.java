@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Response object used for creating an auditing record.
  *
@@ -24,5 +26,8 @@ import lombok.Data;
  */
 @Data
 public class CreateAuditResponse {
+
+    @NotNull
+    private String action;
 
 }

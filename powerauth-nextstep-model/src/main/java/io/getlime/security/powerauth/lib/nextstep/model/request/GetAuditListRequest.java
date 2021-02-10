@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -27,7 +28,10 @@ import java.util.Date;
 @Data
 public class GetAuditListRequest {
 
+    // Expected default date format: 2021-02-10T13:50:45+0000
+    @NotNull
     private Date startDate;
+    @NotNull
     private Date endDate;
 
 }

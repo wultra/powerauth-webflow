@@ -43,11 +43,11 @@ public class UserRoleEntity implements Serializable {
     private Long userRoleId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
     private UserIdentityEntity userId;
 
     @ManyToOne
-    @JoinColumn(name = "role_id", referencedColumnName = "role_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "role_id", referencedColumnName = "role_id", nullable = false)
     private RoleEntity role;
 
     @Column(name = "status", nullable = false)

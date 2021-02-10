@@ -43,15 +43,15 @@ public class OtpEntity implements Serializable {
     private UUID otpId;
 
     @ManyToOne
-    @JoinColumn(name = "otp_definition_id", referencedColumnName = "otp_definition_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "otp_definition_id", referencedColumnName = "otp_definition_id", updatable = false, nullable = false)
     private OtpDefinitionEntity otpDefinition;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false)
     private UserIdentityEntity userId;
 
     @ManyToOne
-    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)
     private CredentialDefinitionEntity credentialDefinition;
 
     @Column(name = "value", nullable = false)
