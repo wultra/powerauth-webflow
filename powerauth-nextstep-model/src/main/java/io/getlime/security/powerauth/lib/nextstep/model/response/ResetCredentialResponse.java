@@ -32,6 +32,7 @@ public class ResetCredentialResponse {
     private String userId;
     @NotNull
     private String credentialName;
+    private String username;
     @NotNull
     private String credentialValue;
     @NotNull
