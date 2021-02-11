@@ -86,6 +86,6 @@ public class UsernamePasswordAuthRequest extends AuthStepRequest {
 
     @Override
     public List<AuthInstrument> getAuthInstruments() {
-        return Collections.singletonList(AuthInstrument.PASSWORD);
+        return Collections.singletonList(AuthInstrument.CREDENTIAL);
     }
 }

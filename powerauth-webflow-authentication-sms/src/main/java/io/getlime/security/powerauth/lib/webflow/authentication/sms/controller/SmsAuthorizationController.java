@@ -157,7 +157,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
             List<AuthInstrument> authInstruments = new ArrayList<>();
             authInstruments.add(AuthInstrument.OTP_KEY);
-            authInstruments.add(AuthInstrument.PASSWORD);
+            authInstruments.add(AuthInstrument.CREDENTIAL);
             request.setAuthInstruments(authInstruments);
 
             PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
