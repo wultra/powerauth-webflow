@@ -135,7 +135,7 @@ public class CredentialDefinitionService {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
         }
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
-        if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE) {
+        if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE && request.getCredentialDefinitionStatus() != CredentialDefinitionStatus.ACTIVE) {
             throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + request.getCredentialDefinitionName());
         }
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
@@ -163,7 +163,9 @@ public class CredentialDefinitionService {
             hashConfigEntity = hashConfigOptional.get();
         }
         credentialDefinition.setName(request.getCredentialDefinitionName());
-        credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
+        if (request.getCredentialDefinitionStatus() != null) {
+            credentialDefinition.setStatus(request.getCredentialDefinitionStatus());
+        }
         credentialDefinition.setApplication(application);
         credentialDefinition.setCredentialPolicy(credentialPolicy);
         credentialDefinition.setCategory(request.getCategory());
@@ -173,7 +175,6 @@ public class CredentialDefinitionService {
             credentialDefinition.setHashingConfig(hashConfigEntity);
         }
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
-        credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
         UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();

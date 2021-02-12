@@ -89,12 +89,14 @@ public class OtpPolicyService {
             throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
         }
         OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
-        if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE) {
+        if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE && request.getOtpPolicyStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("One time password policy is not ACTIVE: " + request.getOtpPolicyName());
         }
         otpPolicy.setName(request.getOtpPolicyName());
         otpPolicy.setDescription(request.getDescription());
-        otpPolicy.setStatus(OtpPolicyStatus.ACTIVE);
+        if (request.getOtpPolicyStatus() != null) {
+            otpPolicy.setStatus(request.getOtpPolicyStatus());
+        }
         otpPolicy.setLength(request.getLength());
         otpPolicy.setAttemptLimit(request.getAttemptLimit());
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());

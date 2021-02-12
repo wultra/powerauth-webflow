@@ -107,12 +107,14 @@ public class CredentialPolicyService {
             throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
         }
         CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
-        if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE) {
+        if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE && request.getCredentialPolicyStatus() != CredentialPolicyStatus.ACTIVE) {
             throw new CredentialPolicyNotFoundException("Credential policy is not ACTIVE: " + request.getCredentialPolicyName());
         }
         credentialPolicy.setName(request.getCredentialPolicyName());
         credentialPolicy.setDescription(request.getDescription());
-        credentialPolicy.setStatus(CredentialPolicyStatus.ACTIVE);
+        if (request.getCredentialPolicyStatus() != null) {
+            credentialPolicy.setStatus(request.getCredentialPolicyStatus());
+        }
         credentialPolicy.setUsernameLengthMin(request.getUsernameLengthMin());
         credentialPolicy.setUsernameLengthMax(request.getUsernameLengthMax());
         credentialPolicy.setUsernameAllowedChars(request.getUsernameAllowedChars());

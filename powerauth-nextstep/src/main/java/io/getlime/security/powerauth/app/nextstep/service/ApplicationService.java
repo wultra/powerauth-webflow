@@ -84,11 +84,14 @@ public class ApplicationService {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
         }
         ApplicationEntity application = applicationOptional.get();
-        if (application.getStatus() != ApplicationStatus.ACTIVE) {
+        if (application.getStatus() != ApplicationStatus.ACTIVE && request.getApplicationStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
         application.setDescription(request.getDescription());
         // TODO - lookup organization and add reference
+        if (request.getApplicationStatus() != null) {
+            application.setStatus(request.getApplicationStatus());
+        }
         application.setTimestampLastUpdated(new Date());
         applicationRepository.save(application);
         UpdateApplicationResponse response = new UpdateApplicationResponse();

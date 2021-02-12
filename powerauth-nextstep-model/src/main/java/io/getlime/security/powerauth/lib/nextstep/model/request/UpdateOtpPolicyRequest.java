@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -35,5 +36,6 @@ public class UpdateOtpPolicyRequest {
     private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    private OtpPolicyStatus otpPolicyStatus;
 
 }

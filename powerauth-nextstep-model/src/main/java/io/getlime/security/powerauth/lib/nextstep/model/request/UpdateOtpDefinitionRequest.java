@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -35,5 +36,5 @@ public class UpdateOtpDefinitionRequest {
     private String otpPolicyName;
     private boolean encryptionEnabled;
     private String encryptionAlgorithm;
-
+    private OtpDefinitionStatus otpDefinitionStatus;
 }

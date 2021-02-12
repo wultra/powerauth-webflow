@@ -28,11 +28,6 @@ public enum UserRoleStatus {
     ACTIVE,
 
     /**
-     * Role is blocked.
-     */
-    BLOCKED,
-
-    /**
      * Role is removed.
      */
     REMOVED

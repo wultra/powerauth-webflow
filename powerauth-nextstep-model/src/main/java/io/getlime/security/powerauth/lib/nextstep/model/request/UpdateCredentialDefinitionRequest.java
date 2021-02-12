@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -41,5 +42,6 @@ public class UpdateCredentialDefinitionRequest {
     private boolean hashingEnabled;
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
+    private CredentialDefinitionStatus credentialDefinitionStatus;
 
 }

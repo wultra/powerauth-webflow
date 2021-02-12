@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -31,5 +32,6 @@ public class UpdateApplicationRequest {
     private String applicationName;
     private String description;
     private String organizationId;
+    private ApplicationStatus applicationStatus;
 
 }
