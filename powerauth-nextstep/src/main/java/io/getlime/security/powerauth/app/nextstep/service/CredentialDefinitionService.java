@@ -195,9 +195,14 @@ public class CredentialDefinitionService {
 
     @Transactional
     public GetCredentialDefinitionListResponse getCredentialDefinitionList(GetCredentialDefinitionListRequest request) {
-        Iterable<CredentialDefinitionEntity> credentialPolicies = credentialDefinitionRepository.findCredentialDefinitionByStatus(CredentialDefinitionStatus.ACTIVE);
+        Iterable<CredentialDefinitionEntity> credentialDefinitions;
+        if (request.isIncludeRemoved()) {
+            credentialDefinitions = credentialDefinitionRepository.findAll();
+        } else {
+            credentialDefinitions = credentialDefinitionRepository.findCredentialDefinitionByStatus(CredentialDefinitionStatus.ACTIVE);
+        }
         GetCredentialDefinitionListResponse response = new GetCredentialDefinitionListResponse();
-        for (CredentialDefinitionEntity credentialDefinition: credentialPolicies) {
+        for (CredentialDefinitionEntity credentialDefinition: credentialDefinitions) {
             // TODO - use converter
             CredentialDefinitionDetail credentialDefinitionDetail = new CredentialDefinitionDetail();
             credentialDefinitionDetail.setCredentialDefinitionName(credentialDefinition.getName());

@@ -152,7 +152,12 @@ public class CredentialPolicyService {
 
     @Transactional
     public GetCredentialPolicyListResponse getCredentialPolicyList(GetCredentialPolicyListRequest request) {
-        Iterable<CredentialPolicyEntity> credentialPolicies = credentialPolicyRepository.findCredentialPolicyByStatus(CredentialPolicyStatus.ACTIVE);
+        Iterable<CredentialPolicyEntity> credentialPolicies;
+        if (request.isIncludeRemoved()) {
+            credentialPolicies = credentialPolicyRepository.findAll();
+        } else {
+            credentialPolicies = credentialPolicyRepository.findCredentialPolicyByStatus(CredentialPolicyStatus.ACTIVE);
+        }
         GetCredentialPolicyListResponse response = new GetCredentialPolicyListResponse();
         for (CredentialPolicyEntity credentialPolicy: credentialPolicies) {
             // TODO - use converter
@@ -173,6 +178,8 @@ public class CredentialPolicyService {
             credentialPolicyDetail.setRotationDays(credentialPolicy.getRotationDays());
             credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
             credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
+            credentialPolicyDetail.setTimestampCreated(credentialPolicy.getTimestampCreated());
+            credentialPolicyDetail.setTimestampLastUpdated(credentialPolicy.getTimestampLastUpdated());
             response.getCredentialPolicies().add(credentialPolicyDetail);
         }
         return response;

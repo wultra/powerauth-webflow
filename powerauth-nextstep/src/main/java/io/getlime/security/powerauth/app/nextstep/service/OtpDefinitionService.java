@@ -112,11 +112,11 @@ public class OtpDefinitionService {
     public UpdateOtpDefinitionResponse updateOtpDefinition(UpdateOtpDefinitionRequest request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
         if (!otpDefinitionOptional.isPresent()) {
-            throw new OtpDefinitionNotFoundException("One time password not found: " + request.getOtpDefinitionName());
+            throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
         }
         OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
         if (otpDefinition.getStatus() != OtpDefinitionStatus.ACTIVE && request.getOtpDefinitionStatus() != OtpDefinitionStatus.ACTIVE) {
-            throw new OtpDefinitionNotFoundException("One time password is not ACTIVE: " + request.getOtpDefinitionName());
+            throw new OtpDefinitionNotFoundException("One time password definition is not ACTIVE: " + request.getOtpDefinitionName());
         }
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
@@ -156,9 +156,14 @@ public class OtpDefinitionService {
 
     @Transactional
     public GetOtpDefinitionListResponse getOtpDefinitionList(GetOtpDefinitionListRequest request) {
-        Iterable<OtpDefinitionEntity> otpPolicies = otpDefinitionRepository.findOtpDefinitionByStatus(OtpDefinitionStatus.ACTIVE);
+        Iterable<OtpDefinitionEntity> otpDefinitions;
+        if (request.isIncludeRemoved()) {
+            otpDefinitions = otpDefinitionRepository.findAll();
+        } else {
+            otpDefinitions = otpDefinitionRepository.findOtpDefinitionByStatus(OtpDefinitionStatus.ACTIVE);
+        }
         GetOtpDefinitionListResponse response = new GetOtpDefinitionListResponse();
-        for (OtpDefinitionEntity otpDefinition: otpPolicies) {
+        for (OtpDefinitionEntity otpDefinition: otpDefinitions) {
             // TODO - use converter
             OtpDefinitionDetail otpDefinitionDetail = new OtpDefinitionDetail();
             otpDefinitionDetail.setOtpDefinitionName(otpDefinition.getName());
@@ -167,6 +172,8 @@ public class OtpDefinitionService {
             otpDefinitionDetail.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
             otpDefinitionDetail.setEncryptionEnabled(otpDefinition.isEncryptionEnabled());
             otpDefinitionDetail.setEncryptionAlgorithm(otpDefinition.getEncryptionAlgorithm());
+            otpDefinitionDetail.setTimestampCreated(otpDefinition.getTimestampCreated());
+            otpDefinitionDetail.setTimestampLastUpdated(otpDefinition.getTimestampLastUpdated());
             response.getOtpDefinitions().add(otpDefinitionDetail);
         }
         return response;

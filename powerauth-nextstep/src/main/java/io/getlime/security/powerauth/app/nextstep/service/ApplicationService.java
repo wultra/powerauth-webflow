@@ -105,7 +105,12 @@ public class ApplicationService {
 
     @Transactional
     public GetApplicationListResponse getApplicationList(GetApplicationListRequest request) {
-        Iterable<ApplicationEntity> applications = applicationRepository.findApplicationsByStatus(ApplicationStatus.ACTIVE);
+        Iterable<ApplicationEntity> applications;
+        if (request.isIncludeRemoved()) {
+            applications = applicationRepository.findAll();
+        } else {
+            applications = applicationRepository.findApplicationsByStatus(ApplicationStatus.ACTIVE);
+        }
         GetApplicationListResponse response = new GetApplicationListResponse();
         for (ApplicationEntity application: applications) {
             // TODO - use converter

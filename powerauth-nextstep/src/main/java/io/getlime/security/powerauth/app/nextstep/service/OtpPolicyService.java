@@ -116,7 +116,12 @@ public class OtpPolicyService {
 
     @Transactional
     public GetOtpPolicyListResponse getOtpPolicyList(GetOtpPolicyListRequest request) {
-        Iterable<OtpPolicyEntity> otpPolicies = otpPolicyRepository.findOtpPolicyByStatus(OtpPolicyStatus.ACTIVE);
+        Iterable<OtpPolicyEntity> otpPolicies;
+        if (request.isIncludeRemoved()) {
+            otpPolicies = otpPolicyRepository.findAll();
+        } else {
+            otpPolicies = otpPolicyRepository.findOtpPolicyByStatus(OtpPolicyStatus.ACTIVE);
+        }
         GetOtpPolicyListResponse response = new GetOtpPolicyListResponse();
         for (OtpPolicyEntity otpPolicy: otpPolicies) {
             // TODO - use converter
@@ -128,6 +133,8 @@ public class OtpPolicyService {
             otpPolicyDetail.setAttemptLimit(otpPolicy.getAttemptLimit());
             otpPolicyDetail.setGenAlgorithm(otpPolicy.getGenAlgorithm());
             otpPolicyDetail.setExpirationTime(otpPolicy.getExpirationTime());
+            otpPolicyDetail.setTimestampCreated(otpPolicy.getTimestampCreated());
+            otpPolicyDetail.setTimestampLastUpdated(otpPolicy.getTimestampLastUpdated());
             response.getOtpPolicies().add(otpPolicyDetail);
         }
         return response;
