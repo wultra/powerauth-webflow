@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRo
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * Crud repository for persistence of user roles.
  *
@@ -26,5 +28,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long> {
+
+    List<UserRoleEntity> findAllByUserId(String userId);
 
 }

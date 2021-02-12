@@ -22,7 +22,6 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Entity which stores one time passwords.
@@ -38,9 +37,8 @@ public class OtpEntity implements Serializable {
     private static final long serialVersionUID = 8483820995210446509L;
 
     @Id
-    @GeneratedValue
     @Column(name = "otp_id", nullable = false)
-    private UUID otpId;
+    private String otpId;
 
     @ManyToOne
     @JoinColumn(name = "otp_definition_id", referencedColumnName = "otp_definition_id", updatable = false, nullable = false)

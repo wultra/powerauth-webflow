@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,6 @@ public interface OtpPolicyRepository extends CrudRepository<OtpPolicyEntity, Lon
     Optional<OtpPolicyEntity> findByName(String name);
 
     @Query(value = "from OtpPolicyEntity op where op.status = :status")
-    Iterable<OtpPolicyEntity> findOtpPolicyByStatus(@Param("status") OtpPolicyStatus status);
+    List<OtpPolicyEntity> findOtpPolicyByStatus(@Param("status") OtpPolicyStatus status);
 
 }

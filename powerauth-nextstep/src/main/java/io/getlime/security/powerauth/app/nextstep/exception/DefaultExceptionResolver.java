@@ -349,4 +349,30 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Exception handler for user identity already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserAlreadyExistsException.CODE, "User identity already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user identity is not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserNotFoundException.CODE, "User identity not found.");
+        return new ErrorResponse(error);
+    }
+
 }

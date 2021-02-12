@@ -16,9 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashingConfigEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -30,5 +34,8 @@ import java.util.Optional;
 public interface HashingConfigRepository extends CrudRepository<HashingConfigEntity, Long> {
 
     Optional<HashingConfigEntity> findByName(String name);
+
+    @Query(value = "from HashingConfigEntity cp where cp.status = :status")
+    List<HashingConfigEntity> findHashingConfigByStatus(@Param("status") HashingConfigStatus status);
 
 }

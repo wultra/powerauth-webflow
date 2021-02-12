@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,6 @@ public interface CredentialPolicyRepository extends CrudRepository<CredentialPol
     Optional<CredentialPolicyEntity> findByName(String name);
 
     @Query(value = "from CredentialPolicyEntity cp where cp.status = :status")
-    Iterable<CredentialPolicyEntity> findCredentialPolicyByStatus(@Param("status") CredentialPolicyStatus status);
+    List<CredentialPolicyEntity> findCredentialPolicyByStatus(@Param("status") CredentialPolicyStatus status);
 
 }

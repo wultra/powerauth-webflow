@@ -15,8 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -40,8 +40,33 @@ public class CreateUserRequest {
 
     private final List<String> roles = new ArrayList<>();
 
-    private final List<UserContactDetail> contacts = new ArrayList<>();
+    private final List<NewContact> contacts = new ArrayList<>();
 
-    private final List<CredentialSecretDetail> credentials = new ArrayList<>();
+    private final List<NewCredential> credentials = new ArrayList<>();
+
+    @Data
+    public static class NewContact {
+
+        @NotNull
+        private String contactName;
+        @NotNull
+        private ContactType contactType;
+        @NotNull
+        private String contactValue;
+        private boolean primary;
+
+    }
+
+    @Data
+    public static class NewCredential {
+
+        @NotNull
+        private String credentialName;
+        @NotNull
+        private CredentialType credentialType;
+        private String username;
+        private String credentialValue;
+
+    }
 
 }

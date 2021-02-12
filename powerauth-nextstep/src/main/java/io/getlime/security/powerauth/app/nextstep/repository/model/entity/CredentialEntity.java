@@ -23,7 +23,6 @@ import lombok.EqualsAndHashCode;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Entity which stores credentials.
@@ -39,9 +38,8 @@ public class CredentialEntity implements Serializable {
     private static final long serialVersionUID = -1331139715085676624L;
 
     @Id
-    @GeneratedValue
     @Column(name = "credential_id", nullable = false)
-    private UUID credentialId;
+    private String credentialId;
 
     @ManyToOne
     @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)

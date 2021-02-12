@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -35,6 +36,6 @@ public interface CredentialDefinitionRepository extends CrudRepository<Credentia
     Optional<CredentialDefinitionEntity> findByName(String name);
 
     @Query(value = "from CredentialDefinitionEntity cd where cd.status = :status")
-    Iterable<CredentialDefinitionEntity> findCredentialDefinitionByStatus(@Param("status") CredentialDefinitionStatus status);
+    List<CredentialDefinitionEntity> findCredentialDefinitionByStatus(@Param("status") CredentialDefinitionStatus status);
 
 }

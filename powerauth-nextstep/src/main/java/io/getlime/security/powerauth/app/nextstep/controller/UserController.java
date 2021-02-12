@@ -18,10 +18,15 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.UserIdentityService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -38,9 +43,17 @@ public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
+    private final UserIdentityService userIdentityService;
+
+    @Autowired
+    public UserController(UserIdentityService userIdentityService) {
+        this.userIdentityService = userIdentityService;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateUserResponse> createUser(@RequestBody ObjectRequest<CreateUserRequest> request) {
-        return new ObjectResponse<>(new CreateUserResponse());
+    public ObjectResponse<CreateUserResponse> createUser(@RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidConfigurationException, InvalidRequestException {
+        CreateUserResponse response = userIdentityService.createUserIdentity(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)

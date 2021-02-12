@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.HashingConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashingConfigEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.HashingConfigDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashingConfigAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashingConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
@@ -54,7 +55,7 @@ public class HashingConfigService {
     private final Logger logger = LoggerFactory.getLogger(HashingConfigService.class);
 
     @Autowired
-    public HashingConfigService(HashingConfigRepository hashingConfigRepository, ObjectMapper objectMapper) {
+    public HashingConfigService(HashingConfigRepository hashingConfigRepository) {
         this.hashingConfigRepository = hashingConfigRepository;
     }
 
@@ -67,12 +68,15 @@ public class HashingConfigService {
         HashingConfigEntity hashConfig = new HashingConfigEntity();
         hashConfig.setName(request.getHashConfigName());
         hashConfig.setAlgorithm(request.getAlgorithm());
+        hashConfig.setStatus(HashingConfigStatus.ACTIVE);
         // TODO - create converter
-        try {
-            String parameters = objectMapper.writeValueAsString(request.getParameters());
-            hashConfig.setParameters(parameters);
-        } catch (JsonProcessingException ex) {
-            throw new InvalidRequestException(ex);
+        if (request.getParameters() != null) {
+            try {
+                String parameters = objectMapper.writeValueAsString(request.getParameters());
+                hashConfig.setParameters(parameters);
+            } catch (JsonProcessingException ex) {
+                throw new InvalidRequestException(ex);
+            }
         }
         hashConfig.setTimestampCreated(new Date());
         hashingConfigRepository.save(hashConfig);
@@ -85,13 +89,19 @@ public class HashingConfigService {
 
     @Transactional
     public GetHashConfigListResponse getHashConfigList(GetHashConfigListRequest request) throws InvalidRequestException {
-        Iterable<HashingConfigEntity> hashConfigs = hashingConfigRepository.findAll();
+        Iterable<HashingConfigEntity> hashConfigs;
+        if (request.isIncludeRemoved()) {
+            hashConfigs = hashingConfigRepository.findAll();
+        } else {
+            hashConfigs = hashingConfigRepository.findHashingConfigByStatus(HashingConfigStatus.ACTIVE);
+        }
         GetHashConfigListResponse response = new GetHashConfigListResponse();
         for (HashingConfigEntity hashConfig: hashConfigs) {
             // TODO - use converter
             HashingConfigDetail hashingConfigDetail = new HashingConfigDetail();
             hashingConfigDetail.setHashConfigName(hashConfig.getName());
             hashingConfigDetail.setAlgorithm(hashConfig.getAlgorithm());
+            hashingConfigDetail.setHashConfigStatus(hashConfig.getStatus());
             hashingConfigDetail.setTimestampCreated(hashConfig.getTimestampCreated());
             try {
                 Map<String, String> parameters = objectMapper.readValue(hashConfig.getParameters(), new TypeReference<Map<String, String>>() {});
@@ -111,7 +121,8 @@ public class HashingConfigService {
             throw new HashingConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
         HashingConfigEntity hashConfig = hashConfigOptional.get();
-        hashingConfigRepository.delete(hashConfig);
+        hashConfig.setStatus(HashingConfigStatus.REMOVED);
+        hashingConfigRepository.save(hashConfig);
         DeleteHashConfigResponse response = new DeleteHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         return response;

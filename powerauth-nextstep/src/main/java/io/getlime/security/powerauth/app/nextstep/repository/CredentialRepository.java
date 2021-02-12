@@ -15,20 +15,18 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserContactEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.UUID;
 
 /**
- * Crud repository for persistence of user contacts.
+ * Crud repository for persistence of credentials.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface UserContactRepository extends CrudRepository<UserContactEntity, Long> {
-
-    List<UserContactEntity> findAllByUserId(String userId);
+public interface CredentialRepository extends CrudRepository<CredentialEntity, UUID> {
 
 }

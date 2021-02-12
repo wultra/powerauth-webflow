@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,20 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.repository;
-
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.UUID;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Crud repository for persistence of credentials.
+ * Enumeration representing hashing configuration status.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Repository
-public interface CredentialRepositoryRepository extends CrudRepository<CredentialEntity, UUID> {
+public enum HashingConfigStatus {
+
+    /**
+     * Hashing configuration is active.
+     */
+    ACTIVE,
+
+    /**
+     * Hashing configuration s is removed.
+     */
+    REMOVED
 
 }

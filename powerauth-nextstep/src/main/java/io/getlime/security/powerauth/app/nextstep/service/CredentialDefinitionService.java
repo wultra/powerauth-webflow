@@ -27,6 +27,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDefinit
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteCredentialDefinitionRequest;
@@ -97,6 +98,9 @@ public class CredentialDefinitionService {
                 throw new HashingConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
             hashConfigEntity = hashConfigOptional.get();
+            if (hashConfigEntity.getStatus() != HashingConfigStatus.ACTIVE) {
+                throw new HashingConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
+            }
         }
         CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
         credentialDefinition.setName(request.getCredentialDefinitionName());
@@ -161,6 +165,9 @@ public class CredentialDefinitionService {
                 throw new HashingConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
             hashConfigEntity = hashConfigOptional.get();
+            if (hashConfigEntity.getStatus() != HashingConfigStatus.ACTIVE) {
+                throw new HashingConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
+            }
         }
         credentialDefinition.setName(request.getCredentialDefinitionName());
         if (request.getCredentialDefinitionStatus() != null) {
@@ -173,6 +180,8 @@ public class CredentialDefinitionService {
         credentialDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
         if (hashConfigEntity != null) {
             credentialDefinition.setHashingConfig(hashConfigEntity);
+        } else {
+            credentialDefinition.setHashingConfig(null);
         }
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
