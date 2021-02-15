@@ -27,8 +27,9 @@ import javax.validation.constraints.NotNull;
 @Data
 public class OtpAuthenticationRequest {
 
-    @NotNull
+    // Either otpId or operationId should be present
     private String otpId;
+    private String operationId;
     @NotNull
     private String otpValue;
     // Operation ID is extracted from OTP record

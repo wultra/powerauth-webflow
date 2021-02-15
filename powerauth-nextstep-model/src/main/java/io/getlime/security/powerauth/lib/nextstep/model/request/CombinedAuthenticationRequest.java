@@ -37,8 +37,9 @@ public class CombinedAuthenticationRequest {
     private String credentialValue;
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify;
-    @NotNull
+    // Either otpId or operationId should be present
     private String otpId;
+    private String operationId;
     @NotNull
     private String otpValue;
     // Operation ID is extracted from OTP record
