@@ -28,7 +28,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigu
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateUserResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateUserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -100,12 +102,12 @@ public class UserIdentityService {
             user.setStatus(UserIdentityStatus.ACTIVE);
             // Remove existing user roles
             List<UserRoleEntity> existingRoles = userRoleRepository.findAllByUserId(user.getUserId());
-            for (UserRoleEntity role: existingRoles) {
+            for (UserRoleEntity role : existingRoles) {
                 userRoleRepository.delete(role);
             }
             // Remove existing user contacts
             Iterable<UserContactEntity> existingContacts = userContactRepository.findAllByUserId(user.getUserId());
-            for (UserContactEntity contact: existingContacts) {
+            for (UserContactEntity contact : existingContacts) {
                 userContactRepository.delete(contact);
             }
             // Credentials are updated later
@@ -191,6 +193,11 @@ public class UserIdentityService {
             }
         }
         return response;
+    }
+
+    @Transactional
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) {
+        return new UpdateUserResponse();
     }
 
 }

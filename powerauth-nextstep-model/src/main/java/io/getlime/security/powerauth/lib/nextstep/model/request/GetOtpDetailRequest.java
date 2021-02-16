@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import lombok.Data;
 
 /**
- * Request object used for deleting an OTP.
+ * Request object used obtaining one time password detail.
  *
- * @author Roman Strobl, roman.strobl@wultra.com
+ * @author Petr Dvorak, petr@wultra.com
  */
 @Data
-public class DeleteOtpRequest {
+public class GetOtpDetailRequest {
 
-    // Either specify an operationId or otpId
-    private String otpId;
+    // Either operationId or otpId should be specified
     private String operationId;
+    private String otpId;
 
 }

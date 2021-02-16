@@ -21,6 +21,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.ApplicationService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateApplicationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteApplicationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetApplicationListRequest;
@@ -56,21 +57,21 @@ public class ApplicationController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateApplicationResponse> createApplication(@RequestBody ObjectRequest<CreateApplicationRequest> request) throws ApplicationAlreadyExistsException {
+    public ObjectResponse<CreateApplicationResponse> createApplication(@RequestBody ObjectRequest<CreateApplicationRequest> request) throws ApplicationAlreadyExistsException, OrganizationNotFoundException {
         // TODO - request validation
         CreateApplicationResponse response = applicationService.createApplication(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateApplicationResponse> updateApplication(@RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
+    public ObjectResponse<UpdateApplicationResponse> updateApplication(@RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException, OrganizationNotFoundException {
         // TODO - request validation
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
+    public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException, OrganizationNotFoundException {
         // TODO - request validation
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
         return new ObjectResponse<>(response);

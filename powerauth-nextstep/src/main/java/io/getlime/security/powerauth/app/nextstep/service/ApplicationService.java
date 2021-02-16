@@ -16,11 +16,14 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.ApplicationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateApplicationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteApplicationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetApplicationListRequest;
@@ -47,16 +50,18 @@ import java.util.Optional;
 public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
+    private final OrganizationRepository organizationRepository;
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
 
     @Autowired
-    public ApplicationService(ApplicationRepository applicationRepository) {
+    public ApplicationService(ApplicationRepository applicationRepository, OrganizationRepository organizationRepository) {
         this.applicationRepository = applicationRepository;
+        this.organizationRepository = organizationRepository;
     }
 
     @Transactional
-    public CreateApplicationResponse createApplication(CreateApplicationRequest request) throws ApplicationAlreadyExistsException {
+    public CreateApplicationResponse createApplication(CreateApplicationRequest request) throws ApplicationAlreadyExistsException, OrganizationNotFoundException {
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (applicationOptional.isPresent()) {
             throw new ApplicationAlreadyExistsException("Application already exists: " + request.getApplicationName());
@@ -64,7 +69,13 @@ public class ApplicationService {
         ApplicationEntity application = new ApplicationEntity();
         application.setName(request.getApplicationName());
         application.setDescription(request.getDescription());
-        // TODO - lookup organization and add reference
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            application.setOrganization(organizationOptional.get());
+        }
         application.setStatus(ApplicationStatus.ACTIVE);
         application.setTimestampCreated(new Date());
         applicationRepository.save(application);
@@ -72,13 +83,14 @@ public class ApplicationService {
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
         response.setApplicationStatus(application.getStatus());
-        // TODO - set organization
-        response.setOrganizationId(null);
+        if (application.getOrganization() != null) {
+            response.setOrganizationId(application.getOrganization().getOrganizationId());
+        }
         return response;
     }
 
     @Transactional
-    public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException {
+    public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException, OrganizationNotFoundException {
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
@@ -88,7 +100,15 @@ public class ApplicationService {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
         application.setDescription(request.getDescription());
-        // TODO - lookup organization and add reference
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            application.setOrganization(organizationOptional.get());
+        } else {
+            application.setOrganization(null);
+        }
         if (request.getApplicationStatus() != null) {
             application.setStatus(request.getApplicationStatus());
         }
@@ -98,8 +118,9 @@ public class ApplicationService {
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
         response.setApplicationStatus(application.getStatus());
-        // TODO - set organization
-        response.setOrganizationId(null);
+        if (application.getOrganization() != null) {
+            response.setOrganizationId(application.getOrganization().getOrganizationId());
+        }
         return response;
     }
 

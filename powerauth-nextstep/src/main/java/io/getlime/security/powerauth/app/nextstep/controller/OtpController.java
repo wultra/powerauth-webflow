@@ -20,8 +20,12 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOtpRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetOtpDetailRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetOtpListRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOtpResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOtpResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpDetailResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -40,6 +44,16 @@ public class OtpController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpResponse> createOtp(@RequestBody ObjectRequest<CreateOtpRequest> request) {
         return new ObjectResponse<>(new CreateOtpResponse());
+    }
+
+    @RequestMapping(value = "list", method = RequestMethod.POST)
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestBody ObjectRequest<GetOtpListRequest> request) {
+        return new ObjectResponse<>(new GetOtpListResponse());
+    }
+
+    @RequestMapping(value = "detail", method = RequestMethod.POST)
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestBody ObjectRequest<GetOtpDetailRequest> request) {
+        return new ObjectResponse<>(new GetOtpDetailResponse());
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)

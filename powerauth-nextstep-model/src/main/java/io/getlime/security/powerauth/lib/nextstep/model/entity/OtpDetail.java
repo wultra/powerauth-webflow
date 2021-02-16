@@ -13,28 +13,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
- * Request object used for creating an OTP.
+ * Class represents details of a one time password.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-public class CreateOtpRequest {
+@EqualsAndHashCode(of = {"otpName", "userId", "otpId"})
+public class OtpDetail {
 
-    // The userId is optional to allow creating OTP codes for users without identity
-    private String userId;
     @NotNull
     private String otpName;
-    // Optional credential name for updating credential counters
-    private String credentialName;
-    // The otpData parameter has priority over data extracted from operation
+    private String userId;
+    @NotNull
+    private String otpId;
+    @NotNull
     private String otpData;
-    private String operationId;
+    @NotNull
+    private String otpValue;
+    private String credentialName;
+    private long attemptCounter;
+    private long failedAttemptCounter;
+    private long remainingAttempts;
+    @NotNull
+    private OtpStatus otpStatus;
+    @NotNull
+    private Date timestampCreated;
+    private Date timestampLastUpdated;
 
 }

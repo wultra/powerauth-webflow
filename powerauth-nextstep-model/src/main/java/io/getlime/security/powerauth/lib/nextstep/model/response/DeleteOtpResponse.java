@@ -29,9 +29,8 @@ import javax.validation.constraints.NotNull;
 public class DeleteOtpResponse {
 
     @NotNull
-    private String userId;
-    @NotNull
-    private String otpName;
+    private String otpId;
+    private String operationId;
     @NotNull
     private OtpStatus otpStatus;
 
