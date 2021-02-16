@@ -15,6 +15,9 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,32 +26,10 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetOrganizationListResponse {
 
-    private List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
-
-    /**
-     * Get organizations.
-     * @return Organizations.
-     */
-    public List<GetOrganizationDetailResponse> getOrganizations() {
-        return organizations;
-    }
-
-    /**
-     * Set organizations.
-     * @param organizations Organizations.
-     */
-    public void setOrganizations(List<GetOrganizationDetailResponse> organizations) {
-        this.organizations = organizations;
-    }
-
-    /**
-     * Add an organization.
-     * @param organization Organization.
-     */
-    public void addOrganization(GetOrganizationDetailResponse organization) {
-        organizations.add(organization);
-    }
+    @NotNull
+    private final List<GetOrganizationDetailResponse> organizations = new ArrayList<>();
 
 }

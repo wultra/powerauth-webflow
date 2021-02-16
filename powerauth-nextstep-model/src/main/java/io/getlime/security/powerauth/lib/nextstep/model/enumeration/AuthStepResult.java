@@ -28,7 +28,7 @@ public enum AuthStepResult {
     CONFIRMED,
 
     /**
-     * User cancelled the authentication, user may be redirected to the fallback authentication method.
+     * User canceled the authentication.
      */
     CANCELED,
 
@@ -41,5 +41,16 @@ public enum AuthStepResult {
      * Authentication method failed completely, user cannot proceed to the next step and this authentication method
      * should no longer be used.
      */
-    AUTH_METHOD_FAILED
+    AUTH_METHOD_FAILED,
+
+    /**
+     * Authentication method for the next authentication step was chosen by the user.
+     */
+    AUTH_METHOD_CHOSEN,
+
+    /**
+     * User requested downgrade of the authentication method.
+     */
+    AUTH_METHOD_DOWNGRADE
+
 }

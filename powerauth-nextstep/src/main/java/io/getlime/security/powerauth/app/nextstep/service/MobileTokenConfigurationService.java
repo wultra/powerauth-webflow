@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotCo
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,6 +45,7 @@ public class MobileTokenConfigurationService {
      * @param operationConfigurationService Operation configuration service.
      * @param authMethodService Authentication method service.
      */
+    @Autowired
     public MobileTokenConfigurationService(OperationConfigurationService operationConfigurationService, AuthMethodService authMethodService) {
         this.operationConfigurationService = operationConfigurationService;
         this.authMethodService = authMethodService;

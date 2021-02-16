@@ -28,8 +28,8 @@ import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
@@ -236,7 +236,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setOrganizationId(organizationId);
             request.setAuthMethod(authMethod);
-            request.setAuthInstruments(authInstruments);
+            request.getAuthInstruments().addAll(authInstruments);
             request.setAuthStepResult(authStepResult);
             request.setAuthStepResultDescription(authStepResultDescription);
             if (params != null) {
@@ -277,7 +277,7 @@ public class NextStepClient {
             request.setUserId(userId);
             request.setOrganizationId(organizationId);
             request.setAuthMethod(authMethod);
-            request.setAuthInstruments(authInstruments);
+            request.getAuthInstruments().addAll(authInstruments);
             request.setAuthStepResult(authStepResult);
             request.setAuthStepResultDescription(authStepResultDescription);
             if (params != null) {
@@ -307,7 +307,11 @@ public class NextStepClient {
     public Response updateOperationUser(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId, accountStatus);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
+            request.setOperationId(operationId);
+            request.setUserId(userId);
+            request.setOrganizationId(organizationId);
+            request.setAccountStatus(accountStatus);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user", HttpMethod.PUT, entity, Response.class);
             return nsResponse.getBody();
@@ -330,7 +334,11 @@ public class NextStepClient {
     public Response updateOperationUserPost(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) throws NextStepServiceException {
         try {
             // Exchange request with NextStep server.
-            UpdateOperationUserRequest request = new UpdateOperationUserRequest(operationId, userId, organizationId, accountStatus);
+            UpdateOperationUserRequest request = new UpdateOperationUserRequest();
+            request.setOperationId(operationId);
+            request.setUserId(userId);
+            request.setOrganizationId(organizationId);
+            request.setAccountStatus(accountStatus);
             HttpEntity<ObjectRequest<UpdateOperationUserRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             ResponseEntity<Response> nsResponse = restTemplate.exchange(serviceUrl + "/operation/user/update", HttpMethod.POST, entity, Response.class);
             return nsResponse.getBody();
@@ -711,7 +719,7 @@ public class NextStepClient {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);
             request.setAuthMethod(authMethod);
-            request.setConfig(config);
+            request.getConfig().putAll(config);
             HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
             // Exchange next step request with NextStep server.
             ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
@@ -725,7 +733,7 @@ public class NextStepClient {
     }
 
     /**
-     * Disable an authentication method for given user via DELETE method.
+     * Disable an authentication method for given user.
      *
      * @param userId User ID.
      * @param authMethod Authentication method.
@@ -733,31 +741,6 @@ public class NextStepClient {
      * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
      */
     public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUser(String userId, AuthMethod authMethod) throws NextStepServiceException {
-        try {
-            UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
-            request.setUserId(userId);
-            request.setAuthMethod(authMethod);
-            HttpEntity<ObjectRequest<UpdateAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            // Exchange next step request with NextStep server.
-            ResponseEntity<ObjectResponse<GetAuthMethodsResponse>> response = restTemplate.exchange(serviceUrl + "/user/auth-method", HttpMethod.DELETE, entity, new ParameterizedTypeReference<ObjectResponse<GetAuthMethodsResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw handleHttpError(ex);
-        } catch (ResourceAccessException ex) {
-            throw handleResourceAccessError(ex);
-        }
-    }
-
-    /**
-     * Disable an authentication method for given user via POST method.
-     *
-     * @param userId User ID.
-     * @param authMethod Authentication method.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
-     * @throws NextStepServiceException Thrown when communication with Next Step server fails, including {@link Error} with ERROR code.
-     */
-    public ObjectResponse<GetAuthMethodsResponse> disableAuthMethodForUserPost(String userId, AuthMethod authMethod) throws NextStepServiceException {
         try {
             UpdateAuthMethodRequest request = new UpdateAuthMethodRequest();
             request.setUserId(userId);

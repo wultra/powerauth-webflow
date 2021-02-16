@@ -15,28 +15,19 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+
 /**
  * Request object used for looking operations by external transaction ID.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class LookupOperationsByExternalIdRequest {
 
+    @NotNull
     private String externalTransactionId;
 
-    /**
-     * Get the external transaction ID.
-     * @return External transaction ID.
-     */
-    public String getExternalTransactionId() {
-        return externalTransactionId;
-    }
-
-    /**
-     * Set the external transaction ID.
-     * @param externalTransactionId External transaction ID.
-     */
-    public void setExternalTransactionId(String externalTransactionId) {
-        this.externalTransactionId = externalTransactionId;
-    }
 }

@@ -16,100 +16,25 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Request object used for updating a user of an operation.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateOperationUserRequest {
 
+    @NotNull
     private String operationId;
+    @NotNull
     private String userId;
+    @NotNull
     private String organizationId;
+    @NotNull
     private UserAccountStatus accountStatus;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateOperationUserRequest() {
-    }
-
-    /**
-     * Constructor with all details.
-     * @param operationId Operation ID.
-     * @param userId User ID.
-     * @param organizationId Organization ID.
-     * @param accountStatus User account status.
-     */
-    public UpdateOperationUserRequest(String operationId, String userId, String organizationId, UserAccountStatus accountStatus) {
-        this.operationId = operationId;
-        this.userId = userId;
-        this.organizationId = organizationId;
-        this.accountStatus = accountStatus;
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get user ID of the user who is associated with the operation.
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set user ID of the user who is associated with the operation.
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    /**
-     * Get current user account status.
-     * @return User account status.
-     */
-    public UserAccountStatus getAccountStatus() {
-        return accountStatus;
-    }
-
-    /**
-     * Set current user account status.
-     * @param accountStatus User account status.
-     */
-    public void setAccountStatus(UserAccountStatus accountStatus) {
-        this.accountStatus = accountStatus;
-    }
 }

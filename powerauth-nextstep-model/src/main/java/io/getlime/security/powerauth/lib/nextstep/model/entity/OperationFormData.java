@@ -22,9 +22,9 @@ public class OperationFormData {
     private OperationFormMessageAttribute title;
     private OperationFormMessageAttribute greeting;
     private OperationFormMessageAttribute summary;
-    private List<OperationFormFieldConfig> config;
-    private List<OperationFormBanner> banners;
-    private List<OperationFormFieldAttribute> parameters;
+    private final List<OperationFormFieldConfig> config;
+    private final List<OperationFormBanner> banners;
+    private final List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
     private Map<String, String> userInput;
 

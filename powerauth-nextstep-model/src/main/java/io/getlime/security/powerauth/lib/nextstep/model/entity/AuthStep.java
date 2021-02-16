@@ -29,7 +29,7 @@ import java.util.List;
 public class AuthStep {
 
     private AuthMethod authMethod;
-    private List<KeyValueParameter> params;
+    private final List<KeyValueParameter> params;
 
     /**
      * Default constructor.

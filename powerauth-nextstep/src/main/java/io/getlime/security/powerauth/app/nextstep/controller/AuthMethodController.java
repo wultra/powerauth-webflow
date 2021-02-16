@@ -22,34 +22,30 @@ import io.getlime.security.powerauth.app.nextstep.service.AuthMethodService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetAuthMethodListRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetUserAuthMethodsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateAuthMethodRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
 
 /**
- * Controller class related to Next Step authentication methods and user preferences.
+ * REST controller class related to Next Step authentication methods and user preferences.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Controller
+@RestController
 public class AuthMethodController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodController.class);
 
-    private AuthMethodService authMethodService;
+    private final AuthMethodService authMethodService;
 
     /**
      * Controller constructor.
@@ -60,14 +56,19 @@ public class AuthMethodController {
         this.authMethodService = authMethodService;
     }
 
+    @RequestMapping(value = "auth-method", method = RequestMethod.POST)
+    public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@RequestBody ObjectRequest<CreateAuthMethodRequest> request) {
+        return new ObjectResponse<>(new CreateAuthMethodResponse());
+    }
+
     /**
      * Get all authentication methods supported by Next Step server.
      *
      * @param request Get auth methods request. Use null user ID in request.
      * @return List of authentication methods wrapped in GetAuthMethodResponse.
      */
-    @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodListRequest> request) {
+    @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodListRequest> request) {
         logger.info("Received getAuthMethods request");
         List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
         if (authMethods == null || authMethods.isEmpty()) {
@@ -75,7 +76,7 @@ public class AuthMethodController {
             throw new IllegalStateException("No authentication method is configured in Next Step server.");
         }
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        response.setAuthMethods(authMethods);
+        response.getAuthMethods().addAll(authMethods);
         logger.debug("The getAuthMethods request succeeded, available authentication method count: {}", authMethods.size());
         return new ObjectResponse<>(response);
     }
@@ -86,8 +87,8 @@ public class AuthMethodController {
      * @param request Get auth methods request. In case user ID is null, list of auth methods enabled by default is returned.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
-    @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) {
+    @RequestMapping(value = "user/auth-method/list", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", request.getRequestObject().getUserId());
         GetUserAuthMethodsRequest requestObject = request.getRequestObject();
@@ -95,7 +96,7 @@ public class AuthMethodController {
         String userId = requestObject.getUserId();
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
+        response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication method count: {}", userAuthMethods.size());
         return new ObjectResponse<>(response);
     }
@@ -106,8 +107,8 @@ public class AuthMethodController {
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+    @RequestMapping(value = "user/auth-method", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
         logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
         UpdateAuthMethodRequest requestObject = request.getRequestObject();
         String userId = requestObject.getUserId();
@@ -124,30 +125,19 @@ public class AuthMethodController {
         authMethodService.updateAuthMethodForUser(userId, authMethod, true, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
+        response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The enableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
     }
 
     /**
-     * Disable an authentication method for given user (DELETE method).
+     * Disable an authentication method for given user.
      *
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        return disableAuthMethodForUserImpl(request);
-    }
-
-    /**
-     * Disable an authentication method for given user (POST method alternative).
-     *
-     * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
-     */
-    @RequestMapping(value = "/user/auth-method/delete", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserPost(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+    @RequestMapping(value = "user/auth-method/delete", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
         return disableAuthMethodForUserImpl(request);
     }
 
@@ -168,9 +158,19 @@ public class AuthMethodController {
         authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
+        response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The disableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
+    }
+
+    @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) {
+        return new ObjectResponse<>(new GetEnabledMethodListResponse());
+    }
+
+    @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) {
+        return new ObjectResponse<>(new DeleteAuthMethodResponse());
     }
 
 }

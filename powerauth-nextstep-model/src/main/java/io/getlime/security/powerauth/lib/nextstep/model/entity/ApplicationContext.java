@@ -30,8 +30,8 @@ public class ApplicationContext {
     private String id;
     private String name;
     private String description;
-    private List<String> originalScopes;
-    private Map<String, Object> extras;
+    private final List<String> originalScopes;
+    private final Map<String, Object> extras;
 
     /**
      * Default constructor.

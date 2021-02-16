@@ -28,9 +28,9 @@ public enum AfsAuthInstrument {
     PASSWORD,
 
     /**
-     * SMS authorization code is used for step authentication / authorization.
+     * OTP authorization code is used for step authentication / authorization.
      */
-    SMS_KEY,
+    OTP_KEY,
 
     /**
      * PowerAuth mobile token application is used for step authentication / authorization.

@@ -16,6 +16,9 @@
 
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 /**
@@ -23,108 +26,17 @@ import java.util.Date;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class ServiceStatusResponse {
 
+    @NotNull
     private String applicationName;
     private String applicationDisplayName;
     private String applicationEnvironment;
+    @NotNull
     private String version;
     private Date buildTime;
+    @NotNull
     private Date timestamp;
 
-    /**
-     * Get the application name.
-     * @return Application name.
-     */
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    /**
-     * Set the application name.
-     * @param applicationName Application name.
-     */
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    /**
-     * Get the application display name.
-     * @return Application display name.
-     */
-    public String getApplicationDisplayName() {
-        return applicationDisplayName;
-    }
-
-    /**
-     * Set the application display name.
-     * @param applicationDisplayName Application display name.
-     */
-    public void setApplicationDisplayName(String applicationDisplayName) {
-        this.applicationDisplayName = applicationDisplayName;
-    }
-
-    /**
-     * Get application environment name.
-     * @return Environment name.
-     */
-    public String getApplicationEnvironment() {
-        return applicationEnvironment;
-    }
-
-    /**
-     * Set application environment name.
-     * @param applicationEnvironment Environment name.
-     */
-    public void setApplicationEnvironment(String applicationEnvironment) {
-        this.applicationEnvironment = applicationEnvironment;
-    }
-
-    /**
-     * Get version.
-     * @return version.
-     */
-    public String getVersion() {
-        return version;
-    }
-
-    /**
-     * Set version.
-     * @param version Version.
-     */
-    public void setVersion(String version) {
-        this.version = version;
-    }
-
-    /**
-     * Get build time.
-     * @return Build time.
-     */
-    public Date getBuildTime() {
-        return buildTime;
-    }
-
-    /**
-     * Set build time.
-     * @param buildTime Build time.
-     */
-    public void setBuildTime(Date buildTime) {
-        this.buildTime = buildTime;
-    }
-
-    /**
-     * Get current timestamp.
-     * @return Timestamp.
-     */
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    /**
-     * Set current timestamp.
-     * @param timestamp Timestamp.
-     */
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
 }

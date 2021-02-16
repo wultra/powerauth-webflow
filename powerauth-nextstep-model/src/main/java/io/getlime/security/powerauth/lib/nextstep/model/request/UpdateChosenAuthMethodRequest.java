@@ -16,62 +16,21 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
 
 /**
  * Request object used for updating chosen authentication method.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateChosenAuthMethodRequest {
 
+    @NotNull
     private String operationId;
+    @NotNull
     private AuthMethod chosenAuthMethod;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateChosenAuthMethodRequest() {
-    }
-
-    /**
-     * Constructor with operation ID and chosen authentication method.
-     * @param operationId Operation ID.
-     * @param chosenAuthMethod Chosen authentication method.
-     */
-    public UpdateChosenAuthMethodRequest(String operationId, AuthMethod chosenAuthMethod) {
-        this.operationId = operationId;
-        this.chosenAuthMethod = chosenAuthMethod;
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get chosen authentication method.
-     * @return Chosen authentication method.
-     */
-    public AuthMethod getChosenAuthMethod() {
-        return chosenAuthMethod;
-    }
-
-    /**
-     * Set chosen authentication method.
-     * @param chosenAuthMethod Chosen authentication method.
-     */
-    public void setChosenAuthMethod(AuthMethod chosenAuthMethod) {
-        this.chosenAuthMethod = chosenAuthMethod;
-    }
 }
