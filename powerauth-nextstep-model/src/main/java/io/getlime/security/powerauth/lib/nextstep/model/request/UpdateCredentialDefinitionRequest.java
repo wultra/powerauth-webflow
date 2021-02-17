@@ -35,6 +35,7 @@ public class UpdateCredentialDefinitionRequest {
     private String applicationName;
     @NotNull
     private String credentialPolicyName;
+    private String description;
     @NotNull
     private CredentialCategory category;
     private boolean encryptionEnabled;

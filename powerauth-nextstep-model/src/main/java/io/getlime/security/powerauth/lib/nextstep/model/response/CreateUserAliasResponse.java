@@ -35,6 +35,7 @@ public class CreateUserAliasResponse {
     private String aliasName;
     @NotNull
     private String aliasValue;
+    @NotNull
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
 }

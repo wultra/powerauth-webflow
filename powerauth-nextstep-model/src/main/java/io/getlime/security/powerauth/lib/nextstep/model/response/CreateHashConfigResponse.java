@@ -33,6 +33,7 @@ public class CreateHashConfigResponse {
     private String hashConfigName;
     @NotNull
     private String algorithm;
+    @NotNull
     private final Map<String, String> parameters = new LinkedHashMap<>();
 
 }

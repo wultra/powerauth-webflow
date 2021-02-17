@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,7 +37,7 @@ public class CombinedAuthenticationRequest {
     @NotNull
     private String credentialValue;
     private CredentialAuthenticationMode authenticationMode;
-    private List<Integer> credentialPositionsToVerify;
+    private List<Integer> credentialPositionsToVerify = new ArrayList<>();
     // Either otpId or operationId should be present
     private String otpId;
     private String operationId;

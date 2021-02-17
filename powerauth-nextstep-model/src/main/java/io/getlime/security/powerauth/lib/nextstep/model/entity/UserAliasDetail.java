@@ -39,7 +39,7 @@ public class UserAliasDetail {
     @NotNull
     private UserAliasStatus userAliasStatus;
     @NotNull
-    private Map<String, Object> extras = new LinkedHashMap<>();
+    private final Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

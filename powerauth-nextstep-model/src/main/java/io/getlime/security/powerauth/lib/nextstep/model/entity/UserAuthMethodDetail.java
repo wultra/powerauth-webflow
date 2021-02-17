@@ -24,6 +24,6 @@ public class UserAuthMethodDetail {
     private String displayNameKey;
     @NotNull
     private Boolean hasMobileToken;
-    private Map<String, String> config = new LinkedHashMap<>();
+    private final Map<String, String> config = new LinkedHashMap<>();
 
 }

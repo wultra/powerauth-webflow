@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -154,10 +155,10 @@ public class OperationConverter {
             AfsActionDetail action = new AfsActionDetail();
             action.setAction(afsAction.getAfsAction());
             action.setStepIndex(afsAction.getStepIndex());
-            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
+            action.getRequestExtras().putAll(convertExtrasToMap(afsAction.getRequestAfsExtras()));
             action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
             action.setAfsLabel(afsAction.getAfsLabel());
-            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
+            action.getResponseExtras().putAll(convertExtrasToMap(afsAction.getResponseAfsExtras()));
             response.getAfsActions().add(action);
         }
     }
@@ -174,7 +175,7 @@ public class OperationConverter {
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {
             logger.error("Error occurred while deserializing data", e);
-            return null;
+            return new HashMap<>();
         }
     }
 }

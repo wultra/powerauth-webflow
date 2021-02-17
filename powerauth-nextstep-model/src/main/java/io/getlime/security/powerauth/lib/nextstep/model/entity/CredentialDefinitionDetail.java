@@ -38,6 +38,7 @@ public class CredentialDefinitionDetail {
     private String applicationName;
     @NotNull
     private String credentialPolicyName;
+    private String description;
     @NotNull
     private CredentialCategory category;
     private boolean encryptionEnabled;

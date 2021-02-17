@@ -207,7 +207,7 @@ public class OperationPersistenceService {
         try {
             OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             // update only formData.userInput which should contain all input from the user
-            formData.setUserInput(request.getFormData().getUserInput());
+            formData.getUserInput().putAll(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
         } catch (IOException e) {
             logger.error(

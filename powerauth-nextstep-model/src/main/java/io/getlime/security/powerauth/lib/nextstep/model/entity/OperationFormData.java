@@ -26,7 +26,7 @@ public class OperationFormData {
     private final List<OperationFormBanner> banners;
     private final List<OperationFormFieldAttribute> parameters;
     private boolean dynamicDataLoaded;
-    private Map<String, String> userInput;
+    private final Map<String, String> userInput;
 
     /**
      * Default constructor.
@@ -430,14 +430,6 @@ public class OperationFormData {
      */
     public void addUserInput(String key, String value) {
         userInput.put(key, value);
-    }
-
-    /**
-     * Set user input map.
-     * @param userInput User input.
-     */
-    public void setUserInput(Map<String, String> userInput) {
-        this.userInput = userInput;
     }
 
     /**

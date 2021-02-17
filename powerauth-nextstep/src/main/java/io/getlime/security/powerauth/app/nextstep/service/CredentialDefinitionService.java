@@ -104,6 +104,7 @@ public class CredentialDefinitionService {
         }
         CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
         credentialDefinition.setName(request.getCredentialDefinitionName());
+        credentialDefinition.setDescription(request.getDescription());
         credentialDefinition.setApplication(application);
         credentialDefinition.setCredentialPolicy(credentialPolicy);
         credentialDefinition.setCategory(request.getCategory());
@@ -118,6 +119,7 @@ public class CredentialDefinitionService {
         credentialDefinitionRepository.save(credentialDefinition);
         CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
+        response.setDescription(credentialDefinition.getDescription());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         response.setApplicationName(credentialDefinition.getApplication().getName());
         response.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());
@@ -170,6 +172,7 @@ public class CredentialDefinitionService {
             }
         }
         credentialDefinition.setName(request.getCredentialDefinitionName());
+        credentialDefinition.setDescription(request.getDescription());
         if (request.getCredentialDefinitionStatus() != null) {
             credentialDefinition.setStatus(request.getCredentialDefinitionStatus());
         }
@@ -188,6 +191,7 @@ public class CredentialDefinitionService {
         credentialDefinitionRepository.save(credentialDefinition);
         UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
+        response.setDescription(credentialDefinition.getDescription());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         response.setApplicationName(credentialDefinition.getApplication().getName());
         response.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());
@@ -215,6 +219,7 @@ public class CredentialDefinitionService {
             // TODO - use converter
             CredentialDefinitionDetail credentialDefinitionDetail = new CredentialDefinitionDetail();
             credentialDefinitionDetail.setCredentialDefinitionName(credentialDefinition.getName());
+            credentialDefinitionDetail.setDescription(credentialDefinition.getDescription());
             credentialDefinitionDetail.setCredentialDefinitionStatus(credentialDefinition.getStatus());
             credentialDefinitionDetail.setApplicationName(credentialDefinition.getApplication().getName());
             credentialDefinitionDetail.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());

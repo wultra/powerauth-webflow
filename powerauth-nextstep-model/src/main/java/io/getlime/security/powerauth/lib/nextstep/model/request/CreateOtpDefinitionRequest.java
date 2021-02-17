@@ -33,6 +33,7 @@ public class CreateOtpDefinitionRequest {
     private String applicationName;
     @NotNull
     private String otpPolicyName;
+    private String description;
     @NotNull
     private boolean encryptionEnabled;
     private String encryptionAlgorithm;

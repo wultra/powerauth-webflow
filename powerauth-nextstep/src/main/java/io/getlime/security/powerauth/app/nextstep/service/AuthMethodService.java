@@ -227,7 +227,7 @@ public class AuthMethodService {
         userAuthMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         userAuthMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
         userAuthMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());
-        userAuthMethodDetail.setConfig(config);
+        userAuthMethodDetail.getConfig().putAll(config);
         return userAuthMethodDetail;
     }
 }

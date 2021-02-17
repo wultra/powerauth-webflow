@@ -45,6 +45,9 @@ public class OtpDefinitionEntity implements Serializable {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "description")
+    private String description;
+
     @ManyToOne
     @JoinColumn(name = "application_id", referencedColumnName = "application_id", nullable = false)
     private ApplicationEntity application;

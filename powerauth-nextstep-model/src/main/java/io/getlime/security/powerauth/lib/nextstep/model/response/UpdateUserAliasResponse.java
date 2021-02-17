@@ -36,6 +36,7 @@ public class UpdateUserAliasResponse {
     private String aliasName;
     @NotNull
     private String aliasValue;
+    @NotNull
     private final Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private UserAliasStatus userAliasStatus;

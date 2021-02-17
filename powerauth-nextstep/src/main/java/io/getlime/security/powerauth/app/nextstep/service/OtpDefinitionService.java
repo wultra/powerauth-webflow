@@ -91,6 +91,7 @@ public class OtpDefinitionService {
         }
         OtpDefinitionEntity otpDefinition = new OtpDefinitionEntity();
         otpDefinition.setName(request.getOtpDefinitionName());
+        otpDefinition.setDescription(request.getDescription());
         otpDefinition.setApplication(application);
         otpDefinition.setOtpPolicy(otpPolicy);
         otpDefinition.setEncryptionEnabled(request.isEncryptionEnabled());
@@ -135,6 +136,7 @@ public class OtpDefinitionService {
             throw new OtpPolicyNotFoundException("Otp policy is not ACTIVE: " + request.getOtpPolicyName());
         }
         otpDefinition.setName(request.getOtpDefinitionName());
+        otpDefinition.setDescription(request.getDescription());
         if (request.getOtpDefinitionStatus() != null) {
             otpDefinition.setStatus(request.getOtpDefinitionStatus());
         }
@@ -146,6 +148,7 @@ public class OtpDefinitionService {
         otpDefinitionRepository.save(otpDefinition);
         UpdateOtpDefinitionResponse response  = new UpdateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
+        response.setDescription(otpDefinition.getDescription());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());
         response.setApplicationName(otpDefinition.getApplication().getName());
         response.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
@@ -167,6 +170,7 @@ public class OtpDefinitionService {
             // TODO - use converter
             OtpDefinitionDetail otpDefinitionDetail = new OtpDefinitionDetail();
             otpDefinitionDetail.setOtpDefinitionName(otpDefinition.getName());
+            otpDefinitionDetail.setDescription(otpDefinition.getDescription());
             otpDefinitionDetail.setOtpDefinitionStatus(otpDefinition.getStatus());
             otpDefinitionDetail.setApplicationName(otpDefinition.getApplication().getName());
             otpDefinitionDetail.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());

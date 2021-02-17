@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +31,7 @@ import java.util.List;
 public class GetOtpListResponse {
 
     private String operationId;
-    private List<OtpDetail> otpDetails;
+    @NotNull
+    private final List<OtpDetail> otpDetails = new ArrayList<>();
 
 }
