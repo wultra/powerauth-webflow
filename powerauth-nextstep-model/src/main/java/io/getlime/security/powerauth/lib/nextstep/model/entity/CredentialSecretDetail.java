@@ -40,11 +40,12 @@ public class CredentialSecretDetail {
     private CredentialStatus credentialStatus;
     private String username;
     private String credentialValue;
+    private boolean credentialChangeRequired;
     @NotNull
     private Date timestampCreated;
-    private Date timestampExpired;
-    private Date timestampBlocked;
     private Date timestampLastUpdated;
+    private Date timestampBlocked;
+    private Date timestampExpired;
     private Date timestampLastCredentialChange;
 
 }

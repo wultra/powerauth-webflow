@@ -33,8 +33,18 @@ import java.util.Optional;
 @Repository
 public interface CredentialDefinitionRepository extends CrudRepository<CredentialDefinitionEntity, Long> {
 
+    /**
+     * Find credential definition by name.
+     * @param name Credential definition name.
+     * @return Credential definition.
+     */
     Optional<CredentialDefinitionEntity> findByName(String name);
 
+    /**
+     * Find credential definitions by status.
+     * @param status Credential definition status.
+     * @return List of credential definitions.
+     */
     @Query(value = "from CredentialDefinitionEntity cd where cd.status = :status")
     List<CredentialDefinitionEntity> findCredentialDefinitionByStatus(@Param("status") CredentialDefinitionStatus status);
 

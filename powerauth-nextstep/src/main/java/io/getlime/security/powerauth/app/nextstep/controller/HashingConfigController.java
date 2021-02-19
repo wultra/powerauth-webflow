@@ -25,9 +25,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequest
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetHashConfigListRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateHashConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteHashConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetHashConfigListResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateHashConfigResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +60,20 @@ public class HashingConfigController {
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashingConfigAlreadyExistsException {
         // TODO - validate request
         CreateHashConfigResponse response = hashingConfigService.createHashConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    @RequestMapping(method = RequestMethod.PUT)
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashingConfigNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        UpdateHashConfigResponse response = hashingConfigService.updateHashConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashingConfigNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        UpdateHashConfigResponse response = hashingConfigService.updateHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 

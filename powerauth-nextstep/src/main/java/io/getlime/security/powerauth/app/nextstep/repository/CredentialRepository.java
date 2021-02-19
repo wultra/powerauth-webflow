@@ -15,10 +15,15 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -28,5 +33,36 @@ import java.util.UUID;
  */
 @Repository
 public interface CredentialRepository extends CrudRepository<CredentialEntity, UUID> {
+
+    /**
+     * Find credentials by user identity.
+     * @param userId User identity entity.
+     * @return All credentials for a user identity.
+     */
+    List<CredentialEntity> findAllByUserId(UserIdentityEntity userId);
+
+    /**
+     * Find credentials by credential definition and credential status.
+     * @param credentialDefinition Credential definition.
+     * @param status Credential status.
+     * @return Credentials matching query criteria.
+     */
+    List<CredentialEntity> findAllByCredentialDefinitionAndStatus(CredentialDefinitionEntity credentialDefinition, CredentialStatus status);
+
+    /**
+     * Find credential by credential definition and user identity.
+     * @param credentialDefinition Credential definition.
+     * @param userId User identity entity.
+     * @return Credential matching query criteria.
+     */
+    Optional<CredentialEntity> findByCredentialDefinitionAndUserId(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity userId);
+
+    /**
+     * Find credential by credential name and username.
+     * @param credentialDefinition Credential definition.
+     * @param username Username.
+     * @return Credential matching query criteria.
+     */
+    Optional<CredentialEntity> findByCredentialDefinitionAndUsername(CredentialDefinitionEntity credentialDefinition, String username);
 
 }

@@ -20,6 +20,7 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.RoleService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleCannotBeDeletedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteRoleRequest;
@@ -67,7 +68,7 @@ public class RoleController {
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException {
+    public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, RoleCannotBeDeletedException {
         // TODO - validate request
         DeleteRoleResponse response = roleService.deleteRole(request.getRequestObject());
         return new ObjectResponse<>(response);

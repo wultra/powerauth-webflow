@@ -32,7 +32,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ns_authentication")
 @Data
-@EqualsAndHashCode(of = {"userId", "authenticationType", "credential", "otp", "timestampCreated"})
+@EqualsAndHashCode(of = {"userId", "authenticationType", "credential", "otp", "operation", "timestampCreated"})
 public class AuthenticationEntity implements Serializable {
 
     private static final long serialVersionUID = 1598100682966462736L;

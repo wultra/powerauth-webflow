@@ -33,8 +33,18 @@ import java.util.Optional;
 @Repository
 public interface ApplicationRepository extends CrudRepository<ApplicationEntity, Long> {
 
+    /**
+     * Find application by name.
+     * @param name Application name.
+     * @return Application entity.
+     */
     Optional<ApplicationEntity> findByName(String name);
 
+    /**
+     * Find applications by application status.
+     * @param status Application status.
+     * @return Application list.
+     */
     @Query(value = "from ApplicationEntity a where a.status = :status")
     List<ApplicationEntity> findApplicationsByStatus(@Param("status") ApplicationStatus status);
 

@@ -33,8 +33,18 @@ import java.util.Optional;
 @Repository
 public interface OtpPolicyRepository extends CrudRepository<OtpPolicyEntity, Long> {
 
+    /**
+     * Find OTP policy by name.
+     * @param name OTP policy name.
+     * @return OTP policy.
+     */
     Optional<OtpPolicyEntity> findByName(String name);
 
+    /**
+     * Find OTP policies by status.
+     * @param status OTP policy status.
+     * @return List of OTP policies.
+     */
     @Query(value = "from OtpPolicyEntity op where op.status = :status")
     List<OtpPolicyEntity> findOtpPolicyByStatus(@Param("status") OtpPolicyStatus status);
 

@@ -33,8 +33,18 @@ import java.util.Optional;
 @Repository
 public interface OtpDefinitionRepository extends CrudRepository<OtpDefinitionEntity, Long> {
 
+    /**
+     * Find OTP definition by name.
+     * @param name OTP definition name.
+     * @return OTP definition.
+     */
     Optional<OtpDefinitionEntity> findByName(String name);
 
+    /**
+     * Find OTP definitions by status.
+     * @param status OTP definition status.
+     * @return List of OTP definitions.
+     */
     @Query(value = "from OtpDefinitionEntity od where od.status = :status")
     List<OtpDefinitionEntity> findOtpDefinitionByStatus(@Param("status") OtpDefinitionStatus status);
 

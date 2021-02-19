@@ -47,9 +47,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("application")
 public class ApplicationController {
 
-    private final ApplicationService applicationService;
-
     private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
+
+    private final ApplicationService applicationService;
 
     @Autowired
     public ApplicationController(ApplicationService applicationService) {

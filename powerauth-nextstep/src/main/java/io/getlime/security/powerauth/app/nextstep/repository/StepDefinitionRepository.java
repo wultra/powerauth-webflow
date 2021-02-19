@@ -40,7 +40,7 @@ public interface StepDefinitionRepository extends CrudRepository<StepDefinitionE
     List<StepDefinitionEntity> findStepDefinitionsForOperation(String operationName);
 
     /**
-     * Finds all distict operation names.
+     * Finds all distinct operation names.
      *
      * @return List of operation names
      */

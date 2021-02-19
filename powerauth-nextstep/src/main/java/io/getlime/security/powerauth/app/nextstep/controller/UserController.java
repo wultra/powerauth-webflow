@@ -18,10 +18,11 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.UserAliasService;
+import io.getlime.security.powerauth.app.nextstep.service.UserContactService;
 import io.getlime.security.powerauth.app.nextstep.service.UserIdentityService;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserAlreadyExistsException;
+import io.getlime.security.powerauth.app.nextstep.service.UserRoleService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
@@ -44,131 +45,183 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserIdentityService userIdentityService;
+    private final UserRoleService userRoleService;
+    private final UserContactService userContactService;
+    private final UserAliasService userAliasService;
 
     @Autowired
-    public UserController(UserIdentityService userIdentityService) {
+    public UserController(UserIdentityService userIdentityService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService) {
         this.userIdentityService = userIdentityService;
+        this.userRoleService = userRoleService;
+        this.userContactService = userContactService;
+        this.userAliasService = userAliasService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateUserResponse> createUser(@RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidConfigurationException, InvalidRequestException {
+    public ObjectResponse<CreateUserResponse> createUser(@RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException {
+        // TODO - request validation
         CreateUserResponse response = userIdentityService.createUserIdentity(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateUserResponse> updateUser(@RequestBody ObjectRequest<UpdateUserRequest> request) {
-        return new ObjectResponse<>(new UpdateUserResponse());
+    public ObjectResponse<UpdateUserResponse> updateUser(@RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException {
+        // TODO - request validation
+        UpdateUserResponse response = userIdentityService.updateUserIdentity(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateUserResponse> updateUserPost(@RequestBody ObjectRequest<UpdateUserRequest> request) {
-        return new ObjectResponse<>(new UpdateUserResponse());
+    public ObjectResponse<UpdateUserResponse> updateUserPost(@RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException {
+        // TODO - request validation
+        UpdateUserResponse response = userIdentityService.updateUserIdentity(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestBody ObjectRequest<GetUserDetailRequest> request) {
-        return new ObjectResponse<>(new GetUserDetailResponse());
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        GetUserDetailResponse response = userIdentityService.getUserDetail(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
-    public ObjectResponse<LookupUserResponse> lookupUser(@RequestBody ObjectRequest<LookupUserRequest> request) {
-        return new ObjectResponse<>(new LookupUserResponse());
+    public ObjectResponse<LookupUserResponse> lookupUser(@RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        LookupUserResponse response = userIdentityService.lookupUser(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "multi", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateUsersResponse> updateMultipleUsers(@RequestBody ObjectRequest<UpdateUsersRequest> request) {
-        return new ObjectResponse<>(new UpdateUsersResponse());
+    public ObjectResponse<UpdateUsersResponse> updateMultipleUsers(@RequestBody ObjectRequest<UpdateUsersRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        UpdateUsersResponse response = userIdentityService.updateUsers(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update/multi", method = RequestMethod.POST)
-    public ObjectResponse<UpdateUsersResponse> updateMultipleUsersPost(@RequestBody ObjectRequest<UpdateUsersRequest> request) {
-        return new ObjectResponse<>(new UpdateUsersResponse());
+    public ObjectResponse<UpdateUsersResponse> updateMultipleUsersPost(@RequestBody ObjectRequest<UpdateUsersRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        UpdateUsersResponse response = userIdentityService.updateUsers(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "role", method = RequestMethod.POST)
-    public ObjectResponse<AddUserRoleResponse> assignRole(@RequestBody ObjectRequest<AddUserRoleRequest> request) {
-        return new ObjectResponse<>(new AddUserRoleResponse());
+    public ObjectResponse<AddUserRoleResponse> addRole(@RequestBody ObjectRequest<AddUserRoleRequest> request) throws UserNotFoundException, InvalidRequestException, UserRoleAlreadyAssignedException {
+        // TODO - request validation
+        AddUserRoleResponse response = userRoleService.addUserRole(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "role/remove", method = RequestMethod.POST)
-    public ObjectResponse<RemoveUserRoleResponse> removeRole(@RequestBody ObjectRequest<RemoveUserRoleRequest> request) {
-        return new ObjectResponse<>(new RemoveUserRoleResponse());
+    public ObjectResponse<RemoveUserRoleResponse> removeRole(@RequestBody ObjectRequest<RemoveUserRoleRequest> request) throws UserNotFoundException, UserRoleNotAssignedException, InvalidRequestException {
+        // TODO - request validation
+        RemoveUserRoleResponse response = userRoleService.removeUserRole(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "contact", method = RequestMethod.POST)
-    public ObjectResponse<CreateUserContactResponse> createUserContact(@RequestBody ObjectRequest<CreateUserContactRequest> request) {
-        return new ObjectResponse<>(new CreateUserContactResponse());
+    public ObjectResponse<CreateUserContactResponse> createUserContact(@RequestBody ObjectRequest<CreateUserContactRequest> request) throws UserNotFoundException, UserContactAlreadyExistsException {
+        // TODO - request validation
+        CreateUserContactResponse response = userContactService.createUserContact(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "contact/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserContactListResponse> getUserContactList(@RequestBody ObjectRequest<GetUserContactListRequest> request) {
-        return new ObjectResponse<>(new GetUserContactListResponse());
+    public ObjectResponse<GetUserContactListResponse> getUserContactList(@RequestBody ObjectRequest<GetUserContactListRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        GetUserContactListResponse response = userContactService.getUserContactList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "contact", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateUserContactResponse> updateUserContact(@RequestBody ObjectRequest<UpdateUserContactRequest> request) {
-        return new ObjectResponse<>(new UpdateUserContactResponse());
+    public ObjectResponse<UpdateUserContactResponse> updateUserContact(@RequestBody ObjectRequest<UpdateUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
+        // TODO - request validation
+        UpdateUserContactResponse response = userContactService.updateUserContact(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "contact/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@RequestBody ObjectRequest<UpdateUserContactRequest> request) {
-        return new ObjectResponse<>(new UpdateUserContactResponse());
+    public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@RequestBody ObjectRequest<UpdateUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
+        // TODO - request validation
+        UpdateUserContactResponse response = userContactService.updateUserContact(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "contact/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@RequestBody ObjectRequest<DeleteUserContactRequest> request) {
-        return new ObjectResponse<>(new DeleteUserContactResponse());
+    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@RequestBody ObjectRequest<DeleteUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
+        // TODO - request validation
+        DeleteUserContactResponse response = userContactService.deleteUserContact(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "alias", method = RequestMethod.POST)
-    public ObjectResponse<CreateUserAliasResponse> createUserAlias(@RequestBody ObjectRequest<CreateUserAliasRequest> request) {
-        return new ObjectResponse<>(new CreateUserAliasResponse());
+    public ObjectResponse<CreateUserAliasResponse> createUserAlias(@RequestBody ObjectRequest<CreateUserAliasRequest> request) throws UserNotFoundException, UserAliasAlreadyExistsException, InvalidRequestException {
+        // TODO - request validation
+        CreateUserAliasResponse response = userAliasService.createUserAlias(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "alias/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestBody ObjectRequest<GetUserAliasListRequest> request) {
-        return new ObjectResponse<>(new GetUserAliasListResponse());
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestBody ObjectRequest<GetUserAliasListRequest> request) throws InvalidRequestException, UserNotFoundException {
+        // TODO - request validation
+        GetUserAliasListResponse response = userAliasService.getUserAliasList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "alias", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateUserAliasResponse> updateUserAlias(@RequestBody ObjectRequest<UpdateUserAliasRequest> request) {
-        return new ObjectResponse<>(new UpdateUserAliasResponse());
+    public ObjectResponse<UpdateUserAliasResponse> updateUserAlias(@RequestBody ObjectRequest<UpdateUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        UpdateUserAliasResponse response = userAliasService.updateUserAlias(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "alias/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateUserAliasResponse> updateUserAliasPost(@RequestBody ObjectRequest<UpdateUserAliasRequest> request) {
-        return new ObjectResponse<>(new UpdateUserAliasResponse());
+    public ObjectResponse<UpdateUserAliasResponse> updateUserAliasPost(@RequestBody ObjectRequest<UpdateUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        UpdateUserAliasResponse response = userAliasService.updateUserAlias(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "alias/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteUserAliasResponse> deleteUserAlias(@RequestBody ObjectRequest<DeleteUserAliasRequest> request) {
-        return new ObjectResponse<>(new DeleteUserAliasResponse());
+    public ObjectResponse<DeleteUserAliasResponse> deleteUserAlias(@RequestBody ObjectRequest<DeleteUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException {
+        // TODO - request validation
+        DeleteUserAliasResponse response = userAliasService.deleteUserAlias(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestBody ObjectRequest<GetUserCredentialListRequest> request) {
-        return new ObjectResponse<>(new GetUserCredentialListResponse());
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        GetUserCredentialListResponse response = userIdentityService.getCredentialList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "authentication/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) {
+        // TODO - implement method
         return new ObjectResponse<>(new GetUserAuthenticationListResponse());
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteUserResponse> deleteUser(@RequestBody ObjectRequest<DeleteUserRequest> request) {
-        return new ObjectResponse<>(new DeleteUserResponse());
+    public ObjectResponse<DeleteUserResponse> deleteUser(@RequestBody ObjectRequest<DeleteUserRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        DeleteUserResponse response = userIdentityService.deleteUser(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "block", method = RequestMethod.POST)
-    public ObjectResponse<BlockUserResponse> blockUser(@RequestBody ObjectRequest<BlockUserRequest> request) {
-        return new ObjectResponse<>(new BlockUserResponse());
+    public ObjectResponse<BlockUserResponse> blockUser(@RequestBody ObjectRequest<BlockUserRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        BlockUserResponse response = userIdentityService.blockUser(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
-    public ObjectResponse<UnblockUserResponse> unblockUser(@RequestBody ObjectRequest<UnblockUserRequest> request) {
-        return new ObjectResponse<>(new UnblockUserResponse());
+    public ObjectResponse<UnblockUserResponse> unblockUser(@RequestBody ObjectRequest<UnblockUserRequest> request) throws UserNotFoundException, InvalidRequestException {
+        // TODO - request validation
+        UnblockUserResponse response = userIdentityService.unblockUser(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

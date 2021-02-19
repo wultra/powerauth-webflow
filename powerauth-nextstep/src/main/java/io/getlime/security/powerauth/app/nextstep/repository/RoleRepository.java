@@ -29,6 +29,11 @@ import java.util.Optional;
 @Repository
 public interface RoleRepository extends CrudRepository<RoleEntity, Long> {
 
+    /**
+     * Find role by name.
+     * @param name Role name.
+     * @return Role.
+     */
     Optional<RoleEntity> findByName(String name);
 
 }

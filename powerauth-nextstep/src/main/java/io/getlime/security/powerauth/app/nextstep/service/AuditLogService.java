@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.AuditLogConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuditLogRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuditLogEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuditDetail;
@@ -38,15 +39,26 @@ import java.util.Date;
 @Service
 public class AuditLogService {
 
-    private final AuditLogRepository auditLogRepository;
-
     private final Logger logger = LoggerFactory.getLogger(AuditLogService.class);
 
+    private final AuditLogRepository auditLogRepository;
+
+    private final AuditLogConverter auditLogConverter = new AuditLogConverter();
+
+    /**
+     * Audit log service constructor.
+     * @param auditLogRepository Audit log repository.
+     */
     @Autowired
     public AuditLogService(AuditLogRepository auditLogRepository) {
         this.auditLogRepository = auditLogRepository;
     }
 
+    /**
+     * Create an audit log.
+     * @param request Create audit log request.
+     * @return Create audit log response.
+     */
     @Transactional
     public CreateAuditResponse createAuditLog(CreateAuditRequest request) {
         AuditLogEntity auditLog = new AuditLogEntity();
@@ -59,18 +71,19 @@ public class AuditLogService {
         return response;
     }
 
+    /**
+     * Get list of audit logs.
+     * @param request Get audit logs request.
+     * @return Get audit logs response.
+     */
     @Transactional
     public GetAuditListResponse getAuditLogList(GetAuditListRequest request) {
         Date startDate = request.getStartDate();
         Date endDate = request.getEndDate();
         Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAllByCreatedDate(startDate, endDate);
         GetAuditListResponse response = new GetAuditListResponse();
-        for (AuditLogEntity auditLog: auditLogs) {
-            // TODO - use converter
-            AuditDetail auditDetail = new AuditDetail();
-            auditDetail.setAction(auditLog.getAction());
-            auditDetail.setData(auditLog.getData());
-            auditDetail.setTimestampCreated(auditLog.getTimestampCreated());
+        for (AuditLogEntity auditLog : auditLogs) {
+            AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);
             response.getAudits().add(auditDetail);
         }
         return response;

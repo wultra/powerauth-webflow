@@ -46,7 +46,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in Next Step server", t);
-        Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
+        Error error = new Error(Error.Code.ERROR_GENERIC, "Unknown error occurred");
         return new ErrorResponse(error);
     }
 
@@ -246,6 +246,45 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for role cannot be deleted exception.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(RoleCannotBeDeletedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleRoleCannotBeDeletedException(RoleCannotBeDeletedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(RoleCannotBeDeletedException.CODE, "Role cannot be deleted.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user role already assigned error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserRoleAlreadyAssignedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserRoleAlreadyAssignedException(UserRoleAlreadyAssignedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserRoleAlreadyAssignedException.CODE, "User role is already assigned.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for role is not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserRoleNotAssignedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserRoleNotAssignedException(UserRoleNotAssignedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserRoleNotAssignedException.CODE, "User role is not assigned.");
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception handler for credential policy already exists error.
      * @param ex Exception.
      * @return Response with error details.
@@ -363,7 +402,7 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for user identity is not found error.
+     * Exception handler for user identity not found error.
      * @param ex Exception.
      * @return Response with error details.
      */
@@ -375,4 +414,81 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Exception handler for user alias already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserAliasAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserAliasAlreadyExistsException(UserAliasAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserAliasAlreadyExistsException.CODE, "User alias already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user alias not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserAliasNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserAliasNotFoundException(UserAliasNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserAliasNotFoundException.CODE, "User alias not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user contact already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserContactAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserContactAlreadyExistsException(UserContactAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserContactAlreadyExistsException.CODE, "User contact already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user contact not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserContactNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserContactNotFoundException(UserContactNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserContactNotFoundException.CODE, "User contact not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user identity already blocked error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserAlreadyBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserAlreadyBlockedException(UserAlreadyBlockedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserAlreadyBlockedException.CODE, "User identity is already blocked.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for user identity not blocked error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserNotBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserNotBlockedException(UserNotBlockedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserNotBlockedException.CODE, "User identity is not blocked.");
+        return new ErrorResponse(error);
+    }
 }

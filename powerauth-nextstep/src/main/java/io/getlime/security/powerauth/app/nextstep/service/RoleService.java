@@ -15,10 +15,14 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.RoleConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRoleEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.RoleDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleCannotBeDeletedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteRoleRequest;
@@ -33,6 +37,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -43,15 +48,30 @@ import java.util.Optional;
 @Service
 public class RoleService {
 
-    private final RoleRepository roleRepository;
-
     private final Logger logger = LoggerFactory.getLogger(RoleService.class);
 
+    private final RoleRepository roleRepository;
+    private final UserRoleRepository userRoleRepository;
+
+    private final RoleConverter roleConverter = new RoleConverter();
+
+    /**
+     * Role service constructor.
+     * @param roleRepository Role repository.
+     * @param userRoleRepository User role repository.
+     */
     @Autowired
-    public RoleService(RoleRepository roleRepository) {
+    public RoleService(RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
         this.roleRepository = roleRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
+    /**
+     * Create a role.
+     * @param request Create role request.
+     * @return Create role response.
+     * @throws RoleAlreadyExistsException Thrown when role already exists.
+     */
     @Transactional
     public CreateRoleResponse createRole(CreateRoleRequest request) throws RoleAlreadyExistsException {
         Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
@@ -69,29 +89,40 @@ public class RoleService {
         return response;
     }
 
+    /**
+     * Get list of roles.
+     * @param request Get role list request.
+     * @return Get role list response.
+     */
     @Transactional
     public GetRoleListResponse getRoleList(GetRoleListRequest request) {
         Iterable<RoleEntity> roles = roleRepository.findAll();
         GetRoleListResponse response = new GetRoleListResponse();
-        for (RoleEntity role: roles) {
-            // TODO - use converter
-            RoleDetail roleDetail = new RoleDetail();
-            roleDetail.setRoleName(role.getName());
-            roleDetail.setDescription(role.getDescription());
-            roleDetail.setTimestampCreated(role.getTimestampCreated());
-            roleDetail.setTimestampLastUpdated(role.getTimestampLastUpdated());
+        for (RoleEntity role : roles) {
+            RoleDetail roleDetail = roleConverter.fromEntity(role);
             response.getRoles().add(roleDetail);
         }
         return response;
     }
 
+    /**
+     * Delete a role.
+     * @param request Delete role request.
+     * @return Delete role response.
+     * @throws RoleNotFoundException Thrown when role is not found.
+     */
     @Transactional
-    public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException {
+    public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, RoleCannotBeDeletedException {
         Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new RoleNotFoundException("Role not found: " + request.getRoleName());
         }
+        // TODO - check whether role is used by any user identities
         RoleEntity role = roleOptional.get();
+        List<UserRoleEntity> usedRoles = userRoleRepository.findAllByRole(role);
+        if (!usedRoles.isEmpty()) {
+            throw new RoleCannotBeDeletedException("Role cannot be deleted because it is used: " + request.getRoleName());
+        }
         roleRepository.delete(role);
         DeleteRoleResponse response = new DeleteRoleResponse();
         response.setRoleName(role.getName());

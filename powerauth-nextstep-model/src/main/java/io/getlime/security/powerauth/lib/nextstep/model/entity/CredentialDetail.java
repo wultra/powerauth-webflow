@@ -38,6 +38,7 @@ public class CredentialDetail {
     private CredentialType credentialType;
     @NotNull
     private CredentialStatus credentialStatus;
+    private String username;
     private boolean credentialChangeRequired;
     @NotNull
     private Date timestampCreated;

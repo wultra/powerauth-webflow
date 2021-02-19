@@ -29,5 +29,6 @@ public class GetUserCredentialListRequest {
 
     @NotNull
     private String userId;
+    private boolean includeRemoved;
 
 }

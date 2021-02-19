@@ -52,6 +52,10 @@ public class OtpEntity implements Serializable {
     @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)
     private CredentialDefinitionEntity credentialDefinition;
 
+    @ManyToOne
+    @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false)
+    private OperationEntity operation;
+
     @Column(name = "value", nullable = false)
     private String value;
 

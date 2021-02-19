@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -31,5 +32,7 @@ public class DeleteUserAliasResponse {
     private String userId;
     @NotNull
     private String aliasName;
+    @NotNull
+    private UserAliasStatus userAliasStatus;
 
 }

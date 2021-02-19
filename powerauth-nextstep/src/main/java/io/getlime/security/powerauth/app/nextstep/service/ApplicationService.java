@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.ApplicationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
@@ -49,17 +50,31 @@ import java.util.Optional;
 @Service
 public class ApplicationService {
 
+    private final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
+
     private final ApplicationRepository applicationRepository;
     private final OrganizationRepository organizationRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
+    private final ApplicationConverter applicationConverter = new ApplicationConverter();
 
+    /**
+     * Application service constructor.
+     * @param applicationRepository Application repository.
+     * @param organizationRepository Organization repository.
+     */
     @Autowired
     public ApplicationService(ApplicationRepository applicationRepository, OrganizationRepository organizationRepository) {
         this.applicationRepository = applicationRepository;
         this.organizationRepository = organizationRepository;
     }
 
+    /**
+     * Create an application.
+     * @param request Create application request.
+     * @return Create application response.
+     * @throws ApplicationAlreadyExistsException Thrown when application already exists.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
+     */
     @Transactional
     public CreateApplicationResponse createApplication(CreateApplicationRequest request) throws ApplicationAlreadyExistsException, OrganizationNotFoundException {
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
@@ -89,6 +104,13 @@ public class ApplicationService {
         return response;
     }
 
+    /**
+     * Update an application.
+     * @param request Update application request.
+     * @return Update application response.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
+     */
     @Transactional
     public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException, OrganizationNotFoundException {
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
@@ -124,6 +146,11 @@ public class ApplicationService {
         return response;
     }
 
+    /**
+     * Get application list.
+     * @param request Get application list request.
+     * @return Get application list response.
+     */
     @Transactional
     public GetApplicationListResponse getApplicationList(GetApplicationListRequest request) {
         Iterable<ApplicationEntity> applications;
@@ -134,18 +161,18 @@ public class ApplicationService {
         }
         GetApplicationListResponse response = new GetApplicationListResponse();
         for (ApplicationEntity application: applications) {
-            // TODO - use converter
-            ApplicationDetail applicationDetail = new ApplicationDetail();
-            applicationDetail.setApplicationName(application.getName());
-            applicationDetail.setDescription(application.getDescription());
-            applicationDetail.setApplicationStatus(application.getStatus());
-            applicationDetail.setTimestampCreated(application.getTimestampCreated());
-            applicationDetail.setTimestampLastUpdated(application.getTimestampLastUpdated());
+            ApplicationDetail applicationDetail = applicationConverter.fromEntity(application);
             response.getApplications().add(applicationDetail);
         }
         return response;
     }
 
+    /**
+     * Delete an application.
+     * @param request Delete application request.
+     * @return Delete application response.
+     * @throws ApplicationNotFoundException Thrown when applicaiton is not found.
+     */
     @Transactional
     public DeleteApplicationResponse deleteApplication(DeleteApplicationRequest request) throws ApplicationNotFoundException {
         Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());

@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -32,7 +32,7 @@ import java.util.Date;
 @Table(name = "ns_hashing_config")
 @Data
 @EqualsAndHashCode(of = "name")
-public class HashingConfigEntity implements Serializable {
+public class HashConfigEntity implements Serializable {
 
     private static final long serialVersionUID = 5186710016544178844L;
 
@@ -49,7 +49,7 @@ public class HashingConfigEntity implements Serializable {
     private String algorithm;
 
     @Column(name = "status", nullable = false)
-    private HashingConfigStatus status;
+    private HashConfigStatus status;
 
     @Column(name = "parameters")
     private String parameters;

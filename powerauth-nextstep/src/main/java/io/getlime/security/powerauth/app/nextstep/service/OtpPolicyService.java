@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.OtpPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
@@ -46,15 +47,27 @@ import java.util.Optional;
 @Service
 public class OtpPolicyService {
 
-    private final OtpPolicyRepository otpPolicyRepository;
-
     private final Logger logger = LoggerFactory.getLogger(OtpPolicyService.class);
 
+    private final OtpPolicyRepository otpPolicyRepository;
+
+    private final OtpPolicyConverter otpPolicyConverter = new OtpPolicyConverter();
+
+    /**
+     * Constructor for OTP policy service.
+     * @param otpPolicyRepository OTP policy repository.
+     */
     @Autowired
     public OtpPolicyService(OtpPolicyRepository otpPolicyRepository) {
         this.otpPolicyRepository = otpPolicyRepository;
     }
 
+    /**
+     * Create an OTP policy.
+     * @param request Create OTP policy request.
+     * @return Create OTP policy response.
+     * @throws OtpPolicyAlreadyExistsException Thrown when OTP policy already exists.
+     */
     @Transactional
     public CreateOtpPolicyResponse createOtpPolicy(CreateOtpPolicyRequest request) throws OtpPolicyAlreadyExistsException {
         Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
@@ -82,6 +95,12 @@ public class OtpPolicyService {
         return response;
     }
 
+    /**
+     * Update an OTP policy.
+     * @param request Update OTP policy request.
+     * @return Update OTP policy response.
+     * @throws OtpPolicyNotFoundException Thrown when OTP policy does not exist.
+     */
     @Transactional
     public UpdateOtpPolicyResponse updateOtpPolicy(UpdateOtpPolicyRequest request) throws OtpPolicyNotFoundException {
         Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
@@ -114,6 +133,11 @@ public class OtpPolicyService {
         return response;
     }
 
+    /**
+     * Get OTP policy list.
+     * @param request Get OTP policy list request.
+     * @return Get OTP policy list response.
+     */
     @Transactional
     public GetOtpPolicyListResponse getOtpPolicyList(GetOtpPolicyListRequest request) {
         Iterable<OtpPolicyEntity> otpPolicies;
@@ -123,23 +147,19 @@ public class OtpPolicyService {
             otpPolicies = otpPolicyRepository.findOtpPolicyByStatus(OtpPolicyStatus.ACTIVE);
         }
         GetOtpPolicyListResponse response = new GetOtpPolicyListResponse();
-        for (OtpPolicyEntity otpPolicy: otpPolicies) {
-            // TODO - use converter
-            OtpPolicyDetail otpPolicyDetail = new OtpPolicyDetail();
-            otpPolicyDetail.setOtpPolicyName(otpPolicy.getName());
-            otpPolicyDetail.setDescription(otpPolicy.getDescription());
-            otpPolicyDetail.setOtpPolicyStatus(otpPolicy.getStatus());
-            otpPolicyDetail.setLength(otpPolicy.getLength());
-            otpPolicyDetail.setAttemptLimit(otpPolicy.getAttemptLimit());
-            otpPolicyDetail.setGenAlgorithm(otpPolicy.getGenAlgorithm());
-            otpPolicyDetail.setExpirationTime(otpPolicy.getExpirationTime());
-            otpPolicyDetail.setTimestampCreated(otpPolicy.getTimestampCreated());
-            otpPolicyDetail.setTimestampLastUpdated(otpPolicy.getTimestampLastUpdated());
+        for (OtpPolicyEntity otpPolicy : otpPolicies) {
+            OtpPolicyDetail otpPolicyDetail = otpPolicyConverter.fromEntity(otpPolicy);
             response.getOtpPolicies().add(otpPolicyDetail);
         }
         return response;
     }
 
+    /**
+     * Delete an OTP policy.
+     * @param request Delete OTP policy request.
+     * @return Delete OTP policy response.
+     * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
+     */
     @Transactional
     public DeleteOtpPolicyResponse deleteOtpPolicy(DeleteOtpPolicyRequest request) throws OtpPolicyNotFoundException {
         Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
@@ -147,6 +167,9 @@ public class OtpPolicyService {
             throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
         }
         OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        if (otpPolicy.getStatus() == OtpPolicyStatus.REMOVED) {
+            throw new OtpPolicyNotFoundException("One time password policy is already REMOVED: " + request.getOtpPolicyName());
+        }
         otpPolicy.setStatus(OtpPolicyStatus.REMOVED);
         otpPolicyRepository.save(otpPolicy);
         DeleteOtpPolicyResponse response = new DeleteOtpPolicyResponse();

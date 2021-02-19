@@ -33,8 +33,18 @@ import java.util.Optional;
 @Repository
 public interface CredentialPolicyRepository extends CrudRepository<CredentialPolicyEntity, Long> {
 
+    /**
+     * Find credential policy by name.
+     * @param name Credential policy name.
+     * @return Credential policy.
+     */
     Optional<CredentialPolicyEntity> findByName(String name);
 
+    /**
+     * Find credential policies by status.
+     * @param status Credential policy status.
+     * @return List of credential policies.
+     */
     @Query(value = "from CredentialPolicyEntity cp where cp.status = :status")
     List<CredentialPolicyEntity> findCredentialPolicyByStatus(@Param("status") CredentialPolicyStatus status);
 

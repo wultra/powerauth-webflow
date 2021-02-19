@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.OtpDefinitionConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
@@ -54,12 +55,20 @@ import java.util.Optional;
 @Service
 public class OtpDefinitionService {
 
+    private final Logger logger = LoggerFactory.getLogger(OtpDefinitionService.class);
+
     private final OtpDefinitionRepository otpDefinitionRepository;
     private final OtpPolicyRepository otpPolicyRepository;
     private final ApplicationRepository applicationRepository;
 
-    private final Logger logger = LoggerFactory.getLogger(OtpDefinitionService.class);
+    private final OtpDefinitionConverter otpDefinitionConverter = new OtpDefinitionConverter();
 
+    /**
+     * OTP definition service constructor.
+     * @param otpDefinitionRepository OTP definition repository.
+     * @param otpPolicyRepository OTP policy repository.
+     * @param applicationRepository Application repository.
+     */
     @Autowired
     public OtpDefinitionService(OtpDefinitionRepository otpDefinitionRepository, OtpPolicyRepository otpPolicyRepository, ApplicationRepository applicationRepository) {
         this.otpDefinitionRepository = otpDefinitionRepository;
@@ -67,6 +76,14 @@ public class OtpDefinitionService {
         this.applicationRepository = applicationRepository;
     }
 
+    /**
+     * Create an OTP definition.
+     * @param request Create OTP definition request.
+     * @return Create OTP definition response.
+     * @throws OtpDefinitionAlreadyExistsException Thrown when OTP definition already exists.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
+     */
     @Transactional
     public CreateOtpDefinitionResponse createOtpDefinition(CreateOtpDefinitionRequest request) throws OtpDefinitionAlreadyExistsException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
@@ -109,6 +126,14 @@ public class OtpDefinitionService {
         return response;
     }
 
+    /**
+     * Update an OTP definition.
+     * @param request Update OTP definition request.
+     * @return Update OTP definition response.
+     * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
+     */
     @Transactional
     public UpdateOtpDefinitionResponse updateOtpDefinition(UpdateOtpDefinitionRequest request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
@@ -157,6 +182,11 @@ public class OtpDefinitionService {
         return response;
     }
 
+    /**
+     * Get OTP definition list.
+     * @param request Get OTP definition list request.
+     * @return Get OTP definition list response.
+     */
     @Transactional
     public GetOtpDefinitionListResponse getOtpDefinitionList(GetOtpDefinitionListRequest request) {
         Iterable<OtpDefinitionEntity> otpDefinitions;
@@ -166,30 +196,29 @@ public class OtpDefinitionService {
             otpDefinitions = otpDefinitionRepository.findOtpDefinitionByStatus(OtpDefinitionStatus.ACTIVE);
         }
         GetOtpDefinitionListResponse response = new GetOtpDefinitionListResponse();
-        for (OtpDefinitionEntity otpDefinition: otpDefinitions) {
-            // TODO - use converter
-            OtpDefinitionDetail otpDefinitionDetail = new OtpDefinitionDetail();
-            otpDefinitionDetail.setOtpDefinitionName(otpDefinition.getName());
-            otpDefinitionDetail.setDescription(otpDefinition.getDescription());
-            otpDefinitionDetail.setOtpDefinitionStatus(otpDefinition.getStatus());
-            otpDefinitionDetail.setApplicationName(otpDefinition.getApplication().getName());
-            otpDefinitionDetail.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
-            otpDefinitionDetail.setEncryptionEnabled(otpDefinition.isEncryptionEnabled());
-            otpDefinitionDetail.setEncryptionAlgorithm(otpDefinition.getEncryptionAlgorithm());
-            otpDefinitionDetail.setTimestampCreated(otpDefinition.getTimestampCreated());
-            otpDefinitionDetail.setTimestampLastUpdated(otpDefinition.getTimestampLastUpdated());
+        for (OtpDefinitionEntity otpDefinition : otpDefinitions) {
+            OtpDefinitionDetail otpDefinitionDetail = otpDefinitionConverter.fromEntity(otpDefinition);
             response.getOtpDefinitions().add(otpDefinitionDetail);
         }
         return response;
     }
 
+    /**
+     * Delete an OTP definition.
+     * @param request Delete OTP definition request.
+     * @return Delete OTP definition response.
+     * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
+     */
     @Transactional
     public DeleteOtpDefinitionResponse deleteOtpDefinition(DeleteOtpDefinitionRequest request) throws OtpDefinitionNotFoundException {
         Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(request.getOtpDefinitionName());
         if (!otpDefinitionOptional.isPresent()) {
-            throw new OtpDefinitionNotFoundException("One time password not found: " + request.getOtpDefinitionName());
+            throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
         }
         OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        if (otpDefinition.getStatus() == OtpDefinitionStatus.REMOVED) {
+            throw new OtpDefinitionNotFoundException("One time password definition is already REMOVED: " + request.getOtpDefinitionName());
+        }
         otpDefinition.setStatus(OtpDefinitionStatus.REMOVED);
         otpDefinitionRepository.save(otpDefinition);
         DeleteOtpDefinitionResponse response = new DeleteOtpDefinitionResponse();

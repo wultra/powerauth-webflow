@@ -15,8 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashingConfigEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -31,11 +31,21 @@ import java.util.Optional;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface HashingConfigRepository extends CrudRepository<HashingConfigEntity, Long> {
+public interface HashingConfigRepository extends CrudRepository<HashConfigEntity, Long> {
 
-    Optional<HashingConfigEntity> findByName(String name);
+    /**
+     * Find hashing configuration by name.
+     * @param name Hashing configuration name.
+     * @return Hashing configuration.
+     */
+    Optional<HashConfigEntity> findByName(String name);
 
-    @Query(value = "from HashingConfigEntity cp where cp.status = :status")
-    List<HashingConfigEntity> findHashingConfigByStatus(@Param("status") HashingConfigStatus status);
+    /**
+     * Find hashing configurations by status.
+     * @param status Hashing configuration status.
+     * @return List of hashing configurations.
+     */
+    @Query(value = "from HashConfigEntity cp where cp.status = :status")
+    List<HashConfigEntity> findHashingConfigByStatus(@Param("status") HashConfigStatus status);
 
 }

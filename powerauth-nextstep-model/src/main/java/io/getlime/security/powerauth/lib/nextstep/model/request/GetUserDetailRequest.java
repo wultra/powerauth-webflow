@@ -29,5 +29,6 @@ public class GetUserDetailRequest {
 
     @NotNull
     private String userId;
+    private boolean includeRemoved;
 
 }

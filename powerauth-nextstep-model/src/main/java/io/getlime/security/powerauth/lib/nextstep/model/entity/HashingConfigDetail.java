@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashingConfigStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -38,7 +38,7 @@ public class HashingConfigDetail {
     @NotNull
     private String algorithm;
     @NotNull
-    private HashingConfigStatus hashConfigStatus;
+    private HashConfigStatus hashConfigStatus;
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;

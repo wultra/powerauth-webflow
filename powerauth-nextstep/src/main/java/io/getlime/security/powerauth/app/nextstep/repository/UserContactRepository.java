@@ -16,10 +16,12 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserContactEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of user contacts.
@@ -29,6 +31,19 @@ import java.util.List;
 @Repository
 public interface UserContactRepository extends CrudRepository<UserContactEntity, Long> {
 
-    List<UserContactEntity> findAllByUserId(String userId);
+    /**
+     * Find user contacts for a user identity.
+     * @param userId User identity entity.
+     * @return List of user contacts.
+     */
+    List<UserContactEntity> findAllByUserId(UserIdentityEntity userId);
+
+    /**
+     * Find user contact for a user identity with given name.
+     * @param userId User identity entity.
+     * @param name User contact name.
+     * @return User contact.
+     */
+    Optional<UserContactEntity> findByUserIdAndName(UserIdentityEntity userId, String name);
 
 }

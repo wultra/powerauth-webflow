@@ -15,11 +15,15 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRoleEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserRoleStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of user roles.
@@ -29,6 +33,34 @@ import java.util.List;
 @Repository
 public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long> {
 
-    List<UserRoleEntity> findAllByUserId(String userId);
+    /**
+     * Find roles for a user identity.
+     * @param userId User identity entity.
+     * @return List of user roles.
+     */
+    List<UserRoleEntity> findAllByUserId(UserIdentityEntity userId);
+
+    /**
+     * Find user roles by a role.
+     * @param role Role
+     * @return List of user roles.
+     */
+    List<UserRoleEntity> findAllByRole(RoleEntity role);
+
+    /**
+     * Find roles for a user identity with given status.
+     * @param userId User identity entity.
+     * @param status User role status.
+     * @return List of user roles.
+     */
+    List<UserRoleEntity> findAllByUserIdAndStatus(UserIdentityEntity userId, UserRoleStatus status);
+
+    /**
+     * Find role for a user identity.
+     * @param userId User identity entity.
+     * @param role Role.
+     * @return User role.
+     */
+    Optional<UserRoleEntity> findByUserIdAndRole(UserIdentityEntity userId, RoleEntity role);
 
 }

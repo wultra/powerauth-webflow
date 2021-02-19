@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
@@ -30,12 +31,12 @@ import java.util.List;
 @Data
 public class LookupUserRequest {
 
-    // Filter by user identity status
-    private UserIdentityStatus userIdentityStatus;
-
     // Filter by created date
     private Date createdStartDate;
     private Date createdEndDate;
+
+    // Filter by user identity status
+    private UserIdentityStatus userIdentityStatus;
 
     // Filter by roles
     private final List<String> roles = new ArrayList<>();
@@ -43,5 +44,8 @@ public class LookupUserRequest {
     // Filter by username and credentialName to allow username -> user ID mapping
     private String username;
     private String credentialName;
+
+    // Filter by credential status to allow lookup of blocked credentials
+    private CredentialStatus credentialStatus;
 
 }

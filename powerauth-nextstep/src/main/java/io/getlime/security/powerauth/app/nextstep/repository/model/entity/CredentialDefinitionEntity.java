@@ -68,7 +68,7 @@ public class CredentialDefinitionEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "hashing_config_id", referencedColumnName = "hashing_config_id")
-    private HashingConfigEntity hashingConfig;
+    private HashConfigEntity hashingConfig;
 
     @Column(name = "e2e_encryption_enabled")
     private boolean e2eEncryptionEnabled;

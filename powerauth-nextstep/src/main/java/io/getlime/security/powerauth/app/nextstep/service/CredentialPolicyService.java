@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.CredentialPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
@@ -46,15 +47,27 @@ import java.util.Optional;
 @Service
 public class CredentialPolicyService {
 
-    private final CredentialPolicyRepository credentialPolicyRepository;
-
     private final Logger logger = LoggerFactory.getLogger(CredentialPolicyService.class);
 
+    private final CredentialPolicyRepository credentialPolicyRepository;
+
+    private final CredentialPolicyConverter credentialPolicyConverter = new CredentialPolicyConverter();
+
+    /**
+     * Credential policy service constructor.
+     * @param credentialPolicyRepository Credential policy repository.
+     */
     @Autowired
     public CredentialPolicyService(CredentialPolicyRepository credentialPolicyRepository) {
         this.credentialPolicyRepository = credentialPolicyRepository;
     }
 
+    /**
+     * Create a credential policy.
+     * @param request Create credential policy request.
+     * @return Create credential policy response.
+     * @throws CredentialPolicyAlreadyExistsException Thrown when credential policy already exists.
+     */
     @Transactional
     public CreateCredentialPolicyResponse createCredentialPolicy(CreateCredentialPolicyRequest request) throws CredentialPolicyAlreadyExistsException {
         Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
@@ -100,6 +113,12 @@ public class CredentialPolicyService {
         return response;
     }
 
+    /**
+     * Update a credential policy.
+     * @param request Update credential policy request.
+     * @return Update credential policy response.
+     * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     */
     @Transactional
     public UpdateCredentialPolicyResponse updateCredentialPolicy(UpdateCredentialPolicyRequest request) throws CredentialPolicyNotFoundException {
         Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
@@ -150,6 +169,11 @@ public class CredentialPolicyService {
         return response;
     }
 
+    /**
+     * Get credential policy list.
+     * @param request Credential policy list request.
+     * @return Credential policy list response.
+     */
     @Transactional
     public GetCredentialPolicyListResponse getCredentialPolicyList(GetCredentialPolicyListRequest request) {
         Iterable<CredentialPolicyEntity> credentialPolicies;
@@ -159,32 +183,19 @@ public class CredentialPolicyService {
             credentialPolicies = credentialPolicyRepository.findCredentialPolicyByStatus(CredentialPolicyStatus.ACTIVE);
         }
         GetCredentialPolicyListResponse response = new GetCredentialPolicyListResponse();
-        for (CredentialPolicyEntity credentialPolicy: credentialPolicies) {
-            // TODO - use converter
-            CredentialPolicyDetail credentialPolicyDetail = new CredentialPolicyDetail();
-            credentialPolicyDetail.setCredentialPolicyName(credentialPolicy.getName());
-            credentialPolicyDetail.setDescription(credentialPolicy.getDescription());
-            credentialPolicyDetail.setCredentialPolicyStatus(credentialPolicy.getStatus());
-            credentialPolicyDetail.setUsernameLengthMin(credentialPolicy.getUsernameLengthMin());
-            credentialPolicyDetail.setUsernameLengthMax(credentialPolicy.getUsernameLengthMax());
-            credentialPolicyDetail.setUsernameAllowedChars(credentialPolicy.getUsernameAllowedChars());
-            credentialPolicyDetail.setCredentialLengthMin(credentialPolicy.getCredentialLengthMin());
-            credentialPolicyDetail.setCredentialLengthMax(credentialPolicy.getCredentialLengthMax());
-            credentialPolicyDetail.setCredentialAllowedChars(credentialPolicy.getCredentialAllowedChars());
-            credentialPolicyDetail.setLimitSoft(credentialPolicy.getLimitSoft());
-            credentialPolicyDetail.setLimitHard(credentialPolicy.getLimitHard());
-            credentialPolicyDetail.setCheckHistoryCount(credentialPolicy.getCheckHistoryCount());
-            credentialPolicyDetail.setRotationEnabled(credentialPolicy.isRotationEnabled());
-            credentialPolicyDetail.setRotationDays(credentialPolicy.getRotationDays());
-            credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
-            credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
-            credentialPolicyDetail.setTimestampCreated(credentialPolicy.getTimestampCreated());
-            credentialPolicyDetail.setTimestampLastUpdated(credentialPolicy.getTimestampLastUpdated());
+        for (CredentialPolicyEntity credentialPolicy : credentialPolicies) {
+            CredentialPolicyDetail credentialPolicyDetail = credentialPolicyConverter.fromEntity(credentialPolicy);
             response.getCredentialPolicies().add(credentialPolicyDetail);
         }
         return response;
     }
 
+    /**
+     * Delete a credential policy.
+     * @param request Delete credential policy request.
+     * @return Delete credential policy response.
+     * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     */
     @Transactional
     public DeleteCredentialPolicyResponse deleteCredentialPolicy(DeleteCredentialPolicyRequest request) throws CredentialPolicyNotFoundException {
         Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
@@ -192,6 +203,9 @@ public class CredentialPolicyService {
             throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
         }
         CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        if (credentialPolicy.getStatus() == CredentialPolicyStatus.REMOVED) {
+            throw new CredentialPolicyNotFoundException("Credential policy is already REMOVED: " + request.getCredentialPolicyName());
+        }
         credentialPolicy.setStatus(CredentialPolicyStatus.REMOVED);
         credentialPolicyRepository.save(credentialPolicy);
         DeleteCredentialPolicyResponse response = new DeleteCredentialPolicyResponse();

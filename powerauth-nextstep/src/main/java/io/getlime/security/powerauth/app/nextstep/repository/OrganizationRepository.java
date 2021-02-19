@@ -29,5 +29,10 @@ import java.util.List;
 @Repository
 public interface OrganizationRepository extends CrudRepository<OrganizationEntity, String> {
 
+    /**
+     * Find all organizations ordered by order number.
+     * @return List of organizations.
+     */
     List<OrganizationEntity> findAllByOrderByOrderNumber();
+
 }

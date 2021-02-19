@@ -29,5 +29,6 @@ public class GetUserAliasListRequest {
 
     @NotNull
     private String userId;
+    private boolean includeRemoved;
 
 }

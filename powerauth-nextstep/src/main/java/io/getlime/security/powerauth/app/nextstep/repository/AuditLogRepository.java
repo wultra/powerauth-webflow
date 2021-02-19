@@ -32,6 +32,12 @@ import java.util.List;
 @Repository
 public interface AuditLogRepository extends CrudRepository<AuditLogEntity, Long> {
 
+    /**
+     * Find audit logs with specified created date.
+     * @param startDate Start of interval for created date.
+     * @param endDate End of interval for created date.
+     * @return List of audit logs.
+     */
     @Query(value = "from AuditLogEntity a where a.timestampCreated BETWEEN :startDate AND :endDate")
     List<AuditLogEntity> findAllByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
