@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.HashingConfigDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 
 import java.util.Map;
@@ -27,7 +27,7 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class HashingConfigConverter {
+public class HashConfigConverter {
 
     private final ParameterConverter parameterConverter = new ParameterConverter();
 
@@ -36,19 +36,19 @@ public class HashingConfigConverter {
      * @param hashConfig Hashing configuration entity.
      * @return Hashing configuration detail.
      */
-    public HashingConfigDetail fromEntity(HashConfigEntity hashConfig) throws InvalidRequestException {
-        HashingConfigDetail hashingConfigDetail = new HashingConfigDetail();
-        hashingConfigDetail.setHashConfigName(hashConfig.getName());
-        hashingConfigDetail.setAlgorithm(hashConfig.getAlgorithm());
-        hashingConfigDetail.setHashConfigStatus(hashConfig.getStatus());
-        hashingConfigDetail.setTimestampCreated(hashConfig.getTimestampCreated());
+    public HashConfigDetail fromEntity(HashConfigEntity hashConfig) throws InvalidRequestException {
+        HashConfigDetail hashConfigDetail = new HashConfigDetail();
+        hashConfigDetail.setHashConfigName(hashConfig.getName());
+        hashConfigDetail.setAlgorithm(hashConfig.getAlgorithm());
+        hashConfigDetail.setHashConfigStatus(hashConfig.getStatus());
+        hashConfigDetail.setTimestampCreated(hashConfig.getTimestampCreated());
         try {
             Map<String, String> parameters = parameterConverter.fromString(hashConfig.getParameters());
-            hashingConfigDetail.getParameters().putAll(parameters);
+            hashConfigDetail.getParameters().putAll(parameters);
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
-        return hashingConfigDetail;
+        return hashConfigDetail;
     }
 
 }

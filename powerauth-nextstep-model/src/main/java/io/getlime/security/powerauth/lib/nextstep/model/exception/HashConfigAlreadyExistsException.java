@@ -3,13 +3,13 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
 import io.getlime.core.rest.model.base.entity.Error;
 
 /**
- * Exception for case when hashing configuration is not found.
+ * Exception for case when hashing configuration already exists.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class HashingConfigNotFoundException extends NextStepServiceException {
+public class HashConfigAlreadyExistsException extends NextStepServiceException {
 
-    public static final String CODE = "HASHING_CONFIG_NOT_FOUND";
+    public static final String CODE = "HASHING_CONFIG_ALREADY_EXISTS";
 
     private Error error;
 
@@ -17,7 +17,7 @@ public class HashingConfigNotFoundException extends NextStepServiceException {
      * Constructor with error message.
      * @param message Error message.
      */
-    public HashingConfigNotFoundException(String message) {
+    public HashConfigAlreadyExistsException(String message) {
         super(message);
     }
 
@@ -25,7 +25,7 @@ public class HashingConfigNotFoundException extends NextStepServiceException {
      * Constructor with cause.
      * @param cause Original exception.
      */
-    public HashingConfigNotFoundException(Throwable cause) {
+    public HashConfigAlreadyExistsException(Throwable cause) {
         super(cause);
     }
 
@@ -34,7 +34,7 @@ public class HashingConfigNotFoundException extends NextStepServiceException {
      * @param cause Original exception.
      * @param error Object with error information.
      */
-    public HashingConfigNotFoundException(Throwable cause, Error error) {
+    public HashConfigAlreadyExistsException(Throwable cause, Error error) {
         super(cause);
         this.error = error;
     }

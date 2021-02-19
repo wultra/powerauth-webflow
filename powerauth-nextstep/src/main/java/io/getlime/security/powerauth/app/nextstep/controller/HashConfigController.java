@@ -18,9 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.service.HashingConfigService;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.HashingConfigAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.HashingConfigNotFoundException;
+import io.getlime.security.powerauth.app.nextstep.service.HashConfigService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteHashConfigRequest;
@@ -45,48 +45,48 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("hashconfig")
-public class HashingConfigController {
+public class HashConfigController {
 
-    private static final Logger logger = LoggerFactory.getLogger(HashingConfigController.class);
+    private static final Logger logger = LoggerFactory.getLogger(HashConfigController.class);
 
-    private final HashingConfigService hashingConfigService;
+    private final HashConfigService hashConfigService;
 
     @Autowired
-    public HashingConfigController(HashingConfigService hashingConfigService) {
-        this.hashingConfigService = hashingConfigService;
+    public HashConfigController(HashConfigService hashConfigService) {
+        this.hashConfigService = hashConfigService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashingConfigAlreadyExistsException {
+    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
         // TODO - validate request
-        CreateHashConfigResponse response = hashingConfigService.createHashConfig(request.getRequestObject());
+        CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashingConfigNotFoundException, InvalidRequestException {
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         // TODO - request validation
-        UpdateHashConfigResponse response = hashingConfigService.updateHashConfig(request.getRequestObject());
+        UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashingConfigNotFoundException, InvalidRequestException {
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         // TODO - request validation
-        UpdateHashConfigResponse response = hashingConfigService.updateHashConfig(request.getRequestObject());
+        UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetHashConfigListResponse> listHashConfigs(@RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidRequestException {
-        GetHashConfigListResponse response = hashingConfigService.getHashConfigList(request.getRequestObject());
+        GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashingConfigNotFoundException {
+    public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
         // TODO - validate request
-        DeleteHashConfigResponse response = hashingConfigService.deleteHashConfig(request.getRequestObject());
+        DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 

@@ -31,7 +31,7 @@ import java.util.Optional;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface HashingConfigRepository extends CrudRepository<HashConfigEntity, Long> {
+public interface HashConfigRepository extends CrudRepository<HashConfigEntity, Long> {
 
     /**
      * Find hashing configuration by name.

@@ -198,11 +198,11 @@ public class DefaultExceptionResolver {
      * @param ex Exception.
      * @return Response with error details.
      */
-    @ExceptionHandler(HashingConfigAlreadyExistsException.class)
+    @ExceptionHandler(HashConfigAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleHashingConfigAlreadyExistsException(HashingConfigAlreadyExistsException ex) {
+    public @ResponseBody ErrorResponse handleHashingConfigAlreadyExistsException(HashConfigAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(HashingConfigAlreadyExistsException.CODE, "Hashing configuration already exists.");
+        Error error = new Error(HashConfigAlreadyExistsException.CODE, "Hashing configuration already exists.");
         return new ErrorResponse(error);
     }
 
@@ -211,11 +211,11 @@ public class DefaultExceptionResolver {
      * @param ex Exception.
      * @return Response with error details.
      */
-    @ExceptionHandler(HashingConfigNotFoundException.class)
+    @ExceptionHandler(HashConfigNotFoundException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleHashingConfigNotFoundException(HashingConfigNotFoundException ex) {
+    public @ResponseBody ErrorResponse handleHashingConfigNotFoundException(HashConfigNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(HashingConfigNotFoundException.CODE, "Hashing configuration not found.");
+        Error error = new Error(HashConfigNotFoundException.CODE, "Hashing configuration not found.");
         return new ErrorResponse(error);
     }
 

@@ -55,21 +55,21 @@ public class CredentialDefinitionController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         // TODO - request validation
         CreateCredentialDefinitionResponse response = credentialDefinitionService.createCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         // TODO - request validation
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashingConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         // TODO - request validation
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);

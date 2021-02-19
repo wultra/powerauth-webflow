@@ -19,7 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.converter.CredentialDefinition
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.HashingConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.HashConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
@@ -60,7 +60,7 @@ public class CredentialDefinitionService {
     private final CredentialDefinitionRepository credentialDefinitionRepository;
     private final CredentialPolicyRepository credentialPolicyRepository;
     private final ApplicationRepository applicationRepository;
-    private final HashingConfigRepository hashingConfigRepository;
+    private final HashConfigRepository hashConfigRepository;
 
     private final CredentialDefinitionConverter credentialDefinitionConverter = new CredentialDefinitionConverter();
 
@@ -69,14 +69,14 @@ public class CredentialDefinitionService {
      * @param credentialDefinitionRepository Credential definition repository.
      * @param credentialPolicyRepository Credential policy repository.
      * @param applicationRepository Application repository.
-     * @param hashingConfigRepository Hashing configuration repository.
+     * @param hashConfigRepository Hashing configuration repository.
      */
     @Autowired
-    public CredentialDefinitionService(CredentialDefinitionRepository credentialDefinitionRepository, CredentialPolicyRepository credentialPolicyRepository, ApplicationRepository applicationRepository, HashingConfigRepository hashingConfigRepository) {
+    public CredentialDefinitionService(CredentialDefinitionRepository credentialDefinitionRepository, CredentialPolicyRepository credentialPolicyRepository, ApplicationRepository applicationRepository, HashConfigRepository hashConfigRepository) {
         this.credentialDefinitionRepository = credentialDefinitionRepository;
         this.credentialPolicyRepository = credentialPolicyRepository;
         this.applicationRepository = applicationRepository;
-        this.hashingConfigRepository = hashingConfigRepository;
+        this.hashConfigRepository = hashConfigRepository;
     }
 
     /**
@@ -86,10 +86,10 @@ public class CredentialDefinitionService {
      * @throws CredentialDefinitionAlreadyExistsException Thrown when credential definition already exists.
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
-     * @throws HashingConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
      */
     @Transactional
-    public CreateCredentialDefinitionResponse createCredentialDefinition(CreateCredentialDefinitionRequest request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashingConfigNotFoundException {
+    public CreateCredentialDefinitionResponse createCredentialDefinition(CreateCredentialDefinitionRequest request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException {
         Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionAlreadyExistsException("Credential definition already exists: " + request.getCredentialDefinitionName());
@@ -112,13 +112,13 @@ public class CredentialDefinitionService {
         }
         HashConfigEntity hashConfigEntity = null;
         if (request.isHashingEnabled() && request.getHashConfigName() != null) {
-            Optional<HashConfigEntity> hashConfigOptional = hashingConfigRepository.findByName(request.getHashConfigName());
+            Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
             if (!hashConfigOptional.isPresent()) {
-                throw new HashingConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
+                throw new HashConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
             hashConfigEntity = hashConfigOptional.get();
             if (hashConfigEntity.getStatus() != HashConfigStatus.ACTIVE) {
-                throw new HashingConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
+                throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
             }
         }
         CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
@@ -160,10 +160,10 @@ public class CredentialDefinitionService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
-     * @throws HashingConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
      */
     @Transactional
-    public UpdateCredentialDefinitionResponse updateCredentialDefinition(UpdateCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashingConfigNotFoundException {
+    public UpdateCredentialDefinitionResponse updateCredentialDefinition(UpdateCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException {
         Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
@@ -190,13 +190,13 @@ public class CredentialDefinitionService {
         }
         HashConfigEntity hashConfigEntity = null;
         if (request.isHashingEnabled() && request.getHashConfigName() != null) {
-            Optional<HashConfigEntity> hashConfigOptional = hashingConfigRepository.findByName(request.getHashConfigName());
+            Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
             if (!hashConfigOptional.isPresent()) {
-                throw new HashingConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
+                throw new HashConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
             hashConfigEntity = hashConfigOptional.get();
             if (hashConfigEntity.getStatus() != HashConfigStatus.ACTIVE) {
-                throw new HashingConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
+                throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
             }
         }
         credentialDefinition.setName(request.getCredentialDefinitionName());

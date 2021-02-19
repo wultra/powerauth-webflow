@@ -31,7 +31,7 @@ import java.util.Map;
  */
 @Data
 @EqualsAndHashCode(of = "hashConfigName")
-public class HashingConfigDetail {
+public class HashConfigDetail {
 
     @NotNull
     private String hashConfigName;
