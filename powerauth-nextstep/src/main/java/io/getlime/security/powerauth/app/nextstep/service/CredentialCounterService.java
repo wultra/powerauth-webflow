@@ -86,25 +86,21 @@ public class CredentialCounterService {
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
+        if (credential.getStatus() != CredentialStatus.ACTIVE) {
+            throw new InvalidRequestException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
+        }
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
         Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
         Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
         switch (request.getAuthenticationResult()) {
             case SUCCEEDED:
-                if (credential.getStatus() != CredentialStatus.ACTIVE) {
-                    throw new InvalidRequestException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
-                }
                 credential.setFailedAttemptCounterSoft(0L);
                 credential.setFailedAttemptCounterHard(0L);
                 break;
 
             case FAILED:
-                if (credential.getStatus() == CredentialStatus.ACTIVE) {
-                    credential.setFailedAttemptCounterSoft(credential.getFailedAttemptCounterSoft() + 1);
-                    credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
-                } else if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY) {
-                    credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
-                }
+                credential.setFailedAttemptCounterSoft(credential.getFailedAttemptCounterSoft() + 1);
+                credential.setFailedAttemptCounterHard(credential.getFailedAttemptCounterHard() + 1);
                 if (hardLimit != null && credential.getFailedAttemptCounterHard() >= hardLimit) {
                     if (credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT) {
                         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
