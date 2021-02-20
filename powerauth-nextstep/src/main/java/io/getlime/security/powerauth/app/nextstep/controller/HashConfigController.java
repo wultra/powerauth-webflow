@@ -58,7 +58,7 @@ public class HashConfigController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
-        // TODO - validate request
+        // TODO - request validation
         CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -85,7 +85,7 @@ public class HashConfigController {
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
-        // TODO - validate request
+        // TODO - request validation
         DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

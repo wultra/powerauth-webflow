@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -47,6 +48,19 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in Next Step server", t);
         Error error = new Error(Error.Code.ERROR_GENERIC, "Unknown error occurred");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for HTTP message not readable exception.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(InvalidRequestException.CODE, "Invalid request data.");
         return new ErrorResponse(error);
     }
 
@@ -491,4 +505,31 @@ public class DefaultExceptionResolver {
         Error error = new Error(UserNotBlockedException.CODE, "User identity is not blocked.");
         return new ErrorResponse(error);
     }
+
+    /**
+     * Exception handler for credential not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(CredentialNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleCredentialNotFoundException(CredentialNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(CredentialNotFoundException.CODE, "Credential not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for username already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UsernameAlreadyExistsException.CODE, "Username already exists.");
+        return new ErrorResponse(error);
+    }
+
 }

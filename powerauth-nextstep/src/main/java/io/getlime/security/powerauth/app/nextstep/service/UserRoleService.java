@@ -48,19 +48,19 @@ public class UserRoleService {
 
     private final Logger logger = LoggerFactory.getLogger(UserRoleService.class);
 
-    private final UserIdentityService userIdentityService;
+    private final UserIdentityLookupService userIdentityLookupService;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
 
     /**
      * Service constructor.
-     * @param userIdentityService User identity service.
+     * @param userIdentityLookupService User identity lookup service.
      * @param roleRepository Role repository.
      * @param userRoleRepository User role repository.
      */
     @Autowired
-    public UserRoleService(UserIdentityService userIdentityService, RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
-        this.userIdentityService = userIdentityService;
+    public UserRoleService(UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
+        this.userIdentityLookupService = userIdentityLookupService;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
     }
@@ -75,7 +75,7 @@ public class UserRoleService {
      */
     @Transactional
     public AddUserRoleResponse addUserRole(AddUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleAlreadyAssignedException {
-        UserIdentityEntity user = userIdentityService.findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
@@ -114,7 +114,7 @@ public class UserRoleService {
      */
     @Transactional
     public RemoveUserRoleResponse removeUserRole(RemoveUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleNotAssignedException {
-        UserIdentityEntity user = userIdentityService.findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());

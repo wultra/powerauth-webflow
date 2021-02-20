@@ -117,7 +117,6 @@ public class RoleService {
         if (!roleOptional.isPresent()) {
             throw new RoleNotFoundException("Role not found: " + request.getRoleName());
         }
-        // TODO - check whether role is used by any user identities
         RoleEntity role = roleOptional.get();
         List<UserRoleEntity> usedRoles = userRoleRepository.findAllByRole(role);
         if (!usedRoles.isEmpty()) {

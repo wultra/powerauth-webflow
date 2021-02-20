@@ -37,5 +37,7 @@ public class CreateCredentialResponse {
     private CredentialType credentialType;
     @NotNull
     private CredentialStatus credentialStatus;
+    private String username;
+    private String credentialValue;
 
 }

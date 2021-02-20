@@ -37,5 +37,6 @@ public class UpdateCredentialResponse {
     private CredentialType credentialType;
     @NotNull
     private CredentialStatus credentialStatus;
+    private String username;
 
 }

@@ -72,5 +72,4 @@ public enum CredentialValidationError {
      */
     USERNAME_ALREADY_EXISTS
 
-
 }

@@ -25,10 +25,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialDefinitionNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
@@ -57,6 +54,8 @@ public class UserIdentityService {
     private final CredentialDefinitionRepository credentialDefinitionRepository;
     private final CredentialRepository credentialRepository;
     private final OtpRepository otpRepository;
+    private final UserIdentityLookupService userIdentityLookupService;
+    private final CredentialService credentialService;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
     private final CredentialConverter credentialConverter = new CredentialConverter();
@@ -71,9 +70,11 @@ public class UserIdentityService {
      * @param credentialDefinitionRepository Credential definition repository.
      * @param credentialRepository Credential repository.
      * @param otpRepository OTP repository.
+     * @param userIdentityLookupService User identity lookup service.
+     * @param credentialService Credential service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
         this.userIdentityRepository = userIdentityRepository;
         this.userContactRepository = userContactRepository;
         this.roleRepository = roleRepository;
@@ -81,6 +82,8 @@ public class UserIdentityService {
         this.credentialDefinitionRepository = credentialDefinitionRepository;
         this.credentialRepository = credentialRepository;
         this.otpRepository = otpRepository;
+        this.userIdentityLookupService = userIdentityLookupService;
+        this.credentialService = credentialService;
     }
 
     /**
@@ -90,9 +93,10 @@ public class UserIdentityService {
      * @throws UserAlreadyExistsException Thrown when user identity already exists.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      */
     @Transactional
-    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException {
+    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
         // TODO - finish support for more complex use cases (generate credentials)
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
@@ -164,7 +168,7 @@ public class UserIdentityService {
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
                 CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition,
+                CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
                         credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
                 newCredentials.add(credentialDetail);
             }
@@ -182,10 +186,11 @@ public class UserIdentityService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      */
     @Transactional
-    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException {
-        UserIdentityEntity user = findUser(request.getUserId());
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -246,7 +251,7 @@ public class UserIdentityService {
                 // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
                 for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
                     CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                    CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition,
+                    CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
                             credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
                     newCredentials.add(credentialDetail);
                 }
@@ -267,7 +272,7 @@ public class UserIdentityService {
      */
     @Transactional
     public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException {
-        UserIdentityEntity user = findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -441,7 +446,7 @@ public class UserIdentityService {
      */
     @Transactional
     public DeleteUserResponse deleteUser(DeleteUserRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         user.setStatus(UserIdentityStatus.REMOVED);
         userIdentityRepository.save(user);
         removeAllCredentials(user);
@@ -460,7 +465,7 @@ public class UserIdentityService {
      */
     @Transactional
     public BlockUserResponse blockUser(BlockUserRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.BLOCKED) {
             user.setStatus(UserIdentityStatus.BLOCKED);
             userIdentityRepository.save(user);
@@ -479,7 +484,7 @@ public class UserIdentityService {
      */
     @Transactional
     public UnblockUserResponse unblockUser(UnblockUserRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
             user.setStatus(UserIdentityStatus.ACTIVE);
             userIdentityRepository.save(user);
@@ -498,7 +503,7 @@ public class UserIdentityService {
      */
     @Transactional
     public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = findUser(request.getUserId());
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
         List<CredentialEntity> credentials = credentialRepository.findAllByUserId(user);
@@ -510,25 +515,6 @@ public class UserIdentityService {
             response.getCredentials().add(credentialDetail);
         }
         return response;
-    }
-
-
-    /**
-     * Find a user identity. The method is not transactional and should be used for utility purposes only.
-     * @param userId User ID.
-     * @return User identity entity.
-     * @throws UserNotFoundException Thrown when user identity entity is not found.
-     */
-    public UserIdentityEntity findUser(String userId) throws UserNotFoundException {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
-        if (!userOptional.isPresent()) {
-            throw new UserNotFoundException("User identity not found: " + userId);
-        }
-        UserIdentityEntity user = userOptional.get();
-        if (user.getStatus() == UserIdentityStatus.REMOVED) {
-            throw new UserNotFoundException("User identity is REMOVED: " + userId);
-        }
-        return user;
     }
 
     /**
@@ -633,62 +619,6 @@ public class UserIdentityService {
             }
         });
         return contactListResponse;
-    }
-
-    /**
-     * Create a credential. In case the credential is already defined in the database, reuse the existing record.
-     *
-     * @param user User identity entity.
-     * @param credentialDefinition Credential definition entity.
-     * @param credentialType Credential type.
-     * @param username Username, use null for generated username.
-     * @param credentialValue Credential value, use null for generated credential value.
-     */
-    private CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                                    CredentialType credentialType, String username, String credentialValue) {
-        // Lookup credential in case it already exists and username is sent with request
-        CredentialEntity userCredential = null;
-        if (username != null) {
-            Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
-            if (credentialOptional.isPresent()) {
-                // TODO - auditing
-                userCredential = credentialOptional.get();
-                userCredential.setTimestampLastUpdated(new Date());
-            }
-        }
-        if (userCredential == null) {
-            userCredential = new CredentialEntity();
-            userCredential.setCredentialId(UUID.randomUUID().toString());
-            userCredential.setCredentialDefinition(credentialDefinition);
-            userCredential.setUserId(user);
-            userCredential.setTimestampCreated(new Date());
-        }
-        userCredential.setType(credentialType);
-        // TODO - generate username if username is null
-        userCredential.setUsername(username);
-        // TODO - generate credential value if credential value is null
-        userCredential.setValue(credentialValue);
-        userCredential.setStatus(CredentialStatus.ACTIVE);
-        // Counters are reset even in case of an existing credential
-        userCredential.setAttemptCounter(0L);
-        userCredential.setFailedAttemptCounterSoft(0L);
-        userCredential.setFailedAttemptCounterHard(0L);
-        credentialRepository.save(userCredential);
-        CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
-        credentialDetail.setCredentialName(userCredential.getCredentialDefinition().getName());
-        credentialDetail.setCredentialType(userCredential.getType());
-        credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
-        credentialDetail.setUsername(userCredential.getUsername());
-        if (credentialValue == null) {
-            // TODO - generated credential will be set here
-            credentialDetail.setCredentialValue(userCredential.getValue());
-        }
-        credentialDetail.setTimestampCreated(userCredential.getTimestampCreated());
-        credentialDetail.setTimestampLastUpdated(userCredential.getTimestampLastUpdated());
-        credentialDetail.setTimestampExpired(userCredential.getTimestampExpired());
-        credentialDetail.setTimestampBlocked(userCredential.getTimestampBlocked());
-        credentialDetail.setTimestampLastCredentialChange(userCredential.getTimestampLastCredentialChange());
-        return credentialDetail;
     }
 
     /**

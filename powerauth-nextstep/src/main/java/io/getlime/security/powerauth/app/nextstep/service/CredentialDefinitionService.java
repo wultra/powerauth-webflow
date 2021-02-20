@@ -275,4 +275,22 @@ public class CredentialDefinitionService {
         return response;
     }
 
+    /**
+     * Find a credential definition. This method is not transactional.
+     * @param credentialDefinitionName Credential definition name.
+     * @return Credential definition.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     */
+    public CredentialDefinitionEntity findCredentialDefinition(String credentialDefinitionName) throws CredentialDefinitionNotFoundException {
+        Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialDefinitionName);
+        if (!credentialDefinitionOptional.isPresent()) {
+            throw new CredentialDefinitionNotFoundException("Credential definition not found: " + credentialDefinitionName);
+        }
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE) {
+            throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + credentialDefinitionName);
+        }
+        return credentialDefinition;
+    }
+
 }

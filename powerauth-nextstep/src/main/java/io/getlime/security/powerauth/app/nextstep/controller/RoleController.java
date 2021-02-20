@@ -56,7 +56,7 @@ public class RoleController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateRoleResponse> createRole(@RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
-        // TODO - validate request
+        // TODO - request validation
         CreateRoleResponse response = roleService.createRole(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -69,7 +69,7 @@ public class RoleController {
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, RoleCannotBeDeletedException {
-        // TODO - validate request
+        // TODO - request validation
         DeleteRoleResponse response = roleService.deleteRole(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
