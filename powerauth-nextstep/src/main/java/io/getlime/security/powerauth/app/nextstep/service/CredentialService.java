@@ -131,9 +131,13 @@ public class CredentialService {
             if (credential.getStatus() == CredentialStatus.REMOVED) {
                 // Removed credentials have a null username to allow usage of this username by another credential
                 credential.setUsername(null);
-            }
-            if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
+            } else if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
+                // For blocked credentials set timestamp when credential was blocked
                 credential.setTimestampBlocked(new Date());
+            } else if (credential.getStatus() == CredentialStatus.ACTIVE) {
+                // Reset counters for active credentials
+                credential.setFailedAttemptCounterSoft(0L);
+                credential.setFailedAttemptCounterHard(0L);
             }
         }
         credential.setTimestampLastUpdated(new Date());
@@ -152,7 +156,6 @@ public class CredentialService {
      * @param request Validate credential request.
      * @return Validate credential response.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
-     * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
@@ -215,6 +218,7 @@ public class CredentialService {
         credential.setFailedAttemptCounterSoft(0L);
         credential.setFailedAttemptCounterHard(0L);
         credential.setStatus(CredentialStatus.ACTIVE);
+        credential.setTimestampBlocked(null);
         credentialRepository.save(credential);
         ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
@@ -279,6 +283,7 @@ public class CredentialService {
         }
         if (credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT) {
             credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
+            credential.setTimestampBlocked(new Date());
             credentialRepository.save(credential);
         }
         BlockCredentialResponse response = new BlockCredentialResponse();
@@ -309,9 +314,12 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            credential.setStatus(CredentialStatus.ACTIVE);
             credentialRepository.save(credential);
         }
+        credential.setFailedAttemptCounterSoft(0L);
+        credential.setFailedAttemptCounterHard(0L);
+        credential.setStatus(CredentialStatus.ACTIVE);
+        credential.setTimestampBlocked(null);
         UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -423,6 +431,7 @@ public class CredentialService {
         // TODO - generate credential value if credential value is null
         credential.setValue(credentialValue);
         credential.setStatus(CredentialStatus.ACTIVE);
+        credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
         credential.setAttemptCounter(0L);
         credential.setFailedAttemptCounterSoft(0L);

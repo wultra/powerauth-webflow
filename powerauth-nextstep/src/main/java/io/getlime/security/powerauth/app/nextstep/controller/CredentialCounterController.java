@@ -18,12 +18,18 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.CredentialCounterService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialDefinitionNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCounterRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ResetCountersResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCounterResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -40,19 +46,32 @@ public class CredentialCounterController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialCounterController.class);
 
-    @RequestMapping(value = "counter", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCounterResponse> updateCredential(@RequestBody ObjectRequest<UpdateCounterRequest> request) {
-        return new ObjectResponse<>(new UpdateCounterResponse());
+    private final CredentialCounterService credentialCounterService;
+
+    @Autowired
+    public CredentialCounterController(CredentialCounterService credentialCounterService) {
+        this.credentialCounterService = credentialCounterService;
     }
 
-    @RequestMapping(value = "counter/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCounterResponse> updateCredentialPost(@RequestBody ObjectRequest<UpdateCounterRequest> request) {
-        return new ObjectResponse<>(new UpdateCounterResponse());
+    @RequestMapping(method = RequestMethod.PUT)
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException {
+        // TODO - request validation
+        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
-    @RequestMapping(value = "counter/reset-all", method = RequestMethod.PUT)
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException {
+        // TODO - request validation
+        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    @RequestMapping(value = "reset-all", method = RequestMethod.POST)
     public ObjectResponse<ResetCountersResponse> resetAllCounters(@RequestBody ObjectRequest<ResetCountersRequest> request) {
-        return new ObjectResponse<>(new ResetCountersResponse());
+        // TODO - request validation
+        ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

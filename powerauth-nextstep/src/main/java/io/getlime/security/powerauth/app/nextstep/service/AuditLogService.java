@@ -80,7 +80,7 @@ public class AuditLogService {
     public GetAuditListResponse getAuditLogList(GetAuditListRequest request) {
         Date startDate = request.getStartDate();
         Date endDate = request.getEndDate();
-        Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAllByCreatedDate(startDate, endDate);
+        Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAuditLogsByCreatedDate(startDate, endDate);
         GetAuditListResponse response = new GetAuditListResponse();
         for (AuditLogEntity auditLog : auditLogs) {
             AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);

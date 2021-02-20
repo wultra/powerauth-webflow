@@ -151,7 +151,7 @@ public class HashConfigService {
         if (request.isIncludeRemoved()) {
             hashConfigs = hashConfigRepository.findAll();
         } else {
-            hashConfigs = hashConfigRepository.findHashingConfigByStatus(HashConfigStatus.ACTIVE);
+            hashConfigs = hashConfigRepository.findHashConfigByStatus(HashConfigStatus.ACTIVE);
         }
         GetHashConfigListResponse response = new GetHashConfigListResponse();
         for (HashConfigEntity hashConfig : hashConfigs) {

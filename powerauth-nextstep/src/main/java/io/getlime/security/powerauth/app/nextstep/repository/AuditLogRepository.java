@@ -39,6 +39,6 @@ public interface AuditLogRepository extends CrudRepository<AuditLogEntity, Long>
      * @return List of audit logs.
      */
     @Query(value = "from AuditLogEntity a where a.timestampCreated BETWEEN :startDate AND :endDate")
-    List<AuditLogEntity> findAllByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<AuditLogEntity> findAuditLogsByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

@@ -40,7 +40,7 @@ public class HashConfigEntity implements Serializable {
     @SequenceGenerator(name = "ns_hashing_config", sequenceName = "ns_hashing_config_seq")
     @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_hashing_config")
     @Column(name = "hashing_config_id", nullable = false)
-    private Long hashingConfigId;
+    private Long hashConfigId;
 
     @Column(name = "name", nullable = false)
     private String name;

@@ -46,6 +46,6 @@ public interface HashConfigRepository extends CrudRepository<HashConfigEntity, L
      * @return List of hashing configurations.
      */
     @Query(value = "from HashConfigEntity cp where cp.status = :status")
-    List<HashConfigEntity> findHashingConfigByStatus(@Param("status") HashConfigStatus status);
+    List<HashConfigEntity> findHashConfigByStatus(@Param("status") HashConfigStatus status);
 
 }

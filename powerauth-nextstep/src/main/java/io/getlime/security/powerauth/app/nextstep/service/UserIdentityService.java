@@ -360,7 +360,7 @@ public class UserIdentityService {
             }
         } else if (createdStartDate != null && credentialStatus == null) {
             // Lookup the user identities by createdDate, multiple or zero results are found, credentialStatus filter is not allowed
-            lookupResult = userIdentityRepository.findAllByCreatedDate(createdStartDate, createdEndDate);
+            lookupResult = userIdentityRepository.findUserIdentitiesByCreatedDate(createdStartDate, createdEndDate);
             dateFiltered = true;
         } else {
             throw new InvalidRequestException("The lookup query contains an invalid combination of parameters");

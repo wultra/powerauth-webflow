@@ -65,4 +65,11 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, U
      */
     Optional<CredentialEntity> findByCredentialDefinitionAndUsername(CredentialDefinitionEntity credentialDefinition, String username);
 
+    /**
+     * Find all credentials by credential status.
+     * @param status Credential status.
+     * @return Credentials with given status.
+     */
+    List<CredentialEntity> findAllByStatus(CredentialStatus status);
+
 }

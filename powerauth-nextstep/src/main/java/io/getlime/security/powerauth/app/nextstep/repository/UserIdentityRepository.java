@@ -39,6 +39,6 @@ public interface UserIdentityRepository extends CrudRepository<UserIdentityEntit
      * @return List of user identities.
      */
     @Query(value = "from UserIdentityEntity u where u.timestampCreated BETWEEN :startDate AND :endDate")
-    List<UserIdentityEntity> findAllByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<UserIdentityEntity> findUserIdentitiesByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }
