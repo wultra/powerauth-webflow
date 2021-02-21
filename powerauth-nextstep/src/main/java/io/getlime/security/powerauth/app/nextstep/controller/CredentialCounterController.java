@@ -19,10 +19,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.CredentialCounterService;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialDefinitionNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCounterRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ResetCountersResponse;
@@ -54,14 +51,14 @@ public class CredentialCounterController {
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException {
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
         // TODO - request validation
         UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException {
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
         // TODO - request validation
         UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
         return new ObjectResponse<>(response);

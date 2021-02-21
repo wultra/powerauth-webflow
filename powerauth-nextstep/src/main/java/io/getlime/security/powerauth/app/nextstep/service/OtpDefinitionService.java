@@ -227,4 +227,21 @@ public class OtpDefinitionService {
         return response;
     }
 
+    /**
+     * Find an OTP definition. This method is not transactional.
+     * @param otpDefinitionName OTP definition name.
+     * @return OTP definition.
+     * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
+     */
+    public OtpDefinitionEntity findOtpDefinition(String otpDefinitionName) throws OtpDefinitionNotFoundException {
+        Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(otpDefinitionName);
+        if (!otpDefinitionOptional.isPresent()) {
+            throw new OtpDefinitionNotFoundException("OTP definition not found: " + otpDefinitionName);
+        }
+        OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        if (otpDefinition.getStatus() != OtpDefinitionStatus.ACTIVE) {
+            throw new OtpDefinitionNotFoundException("OTP definition is not ACTIVE: " + otpDefinitionName);
+        }
+        return otpDefinition;
+    }
 }

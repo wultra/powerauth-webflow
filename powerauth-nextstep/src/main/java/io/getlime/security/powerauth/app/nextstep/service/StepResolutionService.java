@@ -351,9 +351,7 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            if (failureCount >= authMethodEntity.getMaxAuthorizationFailures()) {
-                return true;
-            }
+            return failureCount >= authMethodEntity.getMaxAuthorizationFailures();
         }
         return false;
     }
@@ -363,7 +361,7 @@ public class StepResolutionService {
      * @param operation Operation.
      * @return Number of remaining authentication attempts. Null value returned for no limit.
      */
-    public Integer getNumberOfRemainingAttempts(OperationEntity operation) {
+    public Long getNumberOfRemainingAttempts(OperationEntity operation) {
         OperationHistoryEntity currentOperationHistory = operation.getCurrentOperationHistoryEntity();
         if (currentOperationHistory == null) {
             return null;
@@ -382,7 +380,7 @@ public class StepResolutionService {
         }
         if (authMethodEntity.getCheckAuthorizationFailures()) {
             // count failures
-            int failureCount = 0;
+            long failureCount = 0L;
             for (OperationHistoryEntity history : operation.getOperationHistory()) {
                 // add all failures from history for this method
                 if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_FAILED) {
@@ -390,9 +388,9 @@ public class StepResolutionService {
                 }
             }
             if (failureCount >= authMethodEntity.getMaxAuthorizationFailures()) {
-                return 0;
+                return 0L;
             }
-            return authMethodEntity.getMaxAuthorizationFailures()-failureCount;
+            return authMethodEntity.getMaxAuthorizationFailures() - failureCount;
         }
         return null;
     }

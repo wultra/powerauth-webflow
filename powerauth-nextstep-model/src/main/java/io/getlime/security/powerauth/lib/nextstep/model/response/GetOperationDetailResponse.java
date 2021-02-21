@@ -58,7 +58,7 @@ public class GetOperationDetailResponse {
     private final List<AfsActionDetail> afsActions = new ArrayList<>();
     private OperationFormData formData;
     private AuthMethod chosenAuthMethod;
-    private Integer remainingAttempts;
+    private Long remainingAttempts;
     private ApplicationContext applicationContext;
 
     public boolean isExpired() {

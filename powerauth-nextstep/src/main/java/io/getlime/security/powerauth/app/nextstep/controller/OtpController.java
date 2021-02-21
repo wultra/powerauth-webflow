@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.OtpService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOtpRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOtpDetailRequest;
@@ -28,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpDetailRes
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -41,24 +44,39 @@ public class OtpController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpController.class);
 
+    private final OtpService otpService;
+
+    @Autowired
+    public OtpController(OtpService otpService) {
+        this.otpService = otpService;
+    }
+
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateOtpResponse> createOtp(@RequestBody ObjectRequest<CreateOtpRequest> request) {
-        return new ObjectResponse<>(new CreateOtpResponse());
+    public ObjectResponse<CreateOtpResponse> createOtp(@RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException {
+        // TODO - request validation
+        CreateOtpResponse response = otpService.createOtp(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpListResponse> getOptList(@RequestBody ObjectRequest<GetOtpListRequest> request) {
-        return new ObjectResponse<>(new GetOtpListResponse());
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException {
+        // TODO - request validation
+        GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestBody ObjectRequest<GetOtpDetailRequest> request) {
-        return new ObjectResponse<>(new GetOtpDetailResponse());
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException {
+        // TODO - request validation
+        GetOtpDetailResponse response = otpService.getOtpDetail(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<DeleteOtpResponse> deleteOtp(@RequestBody ObjectRequest<DeleteOtpRequest> request) {
-        return new ObjectResponse<>(new DeleteOtpResponse());
+    public @ResponseBody ObjectResponse<DeleteOtpResponse> deleteOtp(@RequestBody ObjectRequest<DeleteOtpRequest> request) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
+        // TODO - request validation
+        DeleteOtpResponse response = otpService.deleteOtp(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

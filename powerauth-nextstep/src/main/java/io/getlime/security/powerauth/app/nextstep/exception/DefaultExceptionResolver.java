@@ -117,6 +117,19 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for operation already exist error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationAlreadyExistsException(OperationAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationAlreadyExistsException.CODE, "Operation already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception handler for operation not configured error.
      * @param ex Exception.
      * @return Response with error details.
@@ -520,6 +533,19 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for credential not active error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(CredentialNotActiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleCredentialNotActiveException(CredentialNotActiveException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(CredentialNotActiveException.CODE, "Credential is not active.");
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception handler for username already exists error.
      * @param ex Exception.
      * @return Response with error details.
@@ -531,5 +557,32 @@ public class DefaultExceptionResolver {
         Error error = new Error(UsernameAlreadyExistsException.CODE, "Username already exists.");
         return new ErrorResponse(error);
     }
+
+    /**
+     * Exception handler for OTP generation algorithm not supported.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OtpGenAlgorithmNotSupportedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOtpGenAlgorithmNotSupportedException(OtpGenAlgorithmNotSupportedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OtpGenAlgorithmNotSupportedException.CODE, "OTP generation algorithm is not supported.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for one time password is not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OtpNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOtpNotFoundException(OtpNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OtpNotFoundException.CODE, "One time password not found.");
+        return new ErrorResponse(error);
+    }
+
 
 }

@@ -20,10 +20,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialDefinitionNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCounterRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ResetCountersResponse;
@@ -72,10 +69,11 @@ public class CredentialCounterService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public UpdateCounterResponse updateCredentialCounter(UpdateCounterRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException {
+    public UpdateCounterResponse updateCredentialCounter(UpdateCounterRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -87,7 +85,7 @@ public class CredentialCounterService {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            throw new InvalidRequestException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
+            throw new CredentialNotActiveException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
         Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();

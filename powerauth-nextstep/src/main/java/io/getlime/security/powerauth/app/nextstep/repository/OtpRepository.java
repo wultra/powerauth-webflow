@@ -15,13 +15,14 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository;
 
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Crud repository for persistence of one time passwords.
@@ -29,7 +30,7 @@ import java.util.UUID;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface OtpRepository extends CrudRepository<OtpEntity, UUID> {
+public interface OtpRepository extends CrudRepository<OtpEntity, String> {
 
     /**
      * Find OTP entities by user identity.
@@ -37,5 +38,20 @@ public interface OtpRepository extends CrudRepository<OtpEntity, UUID> {
      * @return List of OTP entities.
      */
     List<OtpEntity> findAllByUserId(UserIdentityEntity userId);
+
+    /**
+     * Find OTP entities by operation.
+     * @param operationEntity Operation entity.
+     * @return List of OTP entities.
+     */
+    List<OtpEntity> findAllByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
+
+    /**
+     * Find OTP entities by operation and status.
+     * @param operationEntity Operation entity.
+     * @param status OTP status.
+     * @return List of OTP entities.
+     */
+    List<OtpEntity> findAllByOperationAndStatus(OperationEntity operationEntity, OtpStatus status);
 
 }

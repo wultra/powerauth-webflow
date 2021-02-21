@@ -15,40 +15,21 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
-import java.util.Date;
 
 /**
- * Class represents details of a one time password.
+ * Class represents details of a generated OTP value.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@EqualsAndHashCode(of = {"otpName", "userId", "otpId"})
-public class OtpDetail {
+public class OtpValueDetail {
 
     @NotNull
-    private String otpName;
-    private String userId;
-    @NotNull
-    private String otpId;
-    private String operationId;
-    @NotNull
-    private String otpData;
+    private byte[] salt;
     @NotNull
     private String otpValue;
-    private String credentialName;
-    private long attemptCounter;
-    private long failedAttemptCounter;
-    private Long remainingAttempts;
-    @NotNull
-    private OtpStatus otpStatus;
-    @NotNull
-    private Date timestampCreated;
-    private Date timestampExpired;
 
 }

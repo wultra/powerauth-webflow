@@ -24,7 +24,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Crud repository for persistence of credentials.
@@ -32,7 +31,7 @@ import java.util.UUID;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface CredentialRepository extends CrudRepository<CredentialEntity, UUID> {
+public interface CredentialRepository extends CrudRepository<CredentialEntity, String> {
 
     /**
      * Find credentials by user identity.

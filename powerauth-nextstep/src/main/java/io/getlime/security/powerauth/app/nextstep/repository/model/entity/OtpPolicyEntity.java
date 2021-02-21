@@ -51,7 +51,7 @@ public class OtpPolicyEntity implements Serializable {
     @Column(name = "status", nullable = false)
     private OtpPolicyStatus status;
 
-    @Column(name = "length")
+    @Column(name = "length", nullable = false)
     private Integer length;
 
     @Column(name = "attempt_limit")

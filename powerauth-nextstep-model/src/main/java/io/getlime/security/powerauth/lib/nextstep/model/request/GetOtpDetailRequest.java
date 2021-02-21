@@ -20,13 +20,13 @@ import lombok.Data;
 /**
  * Request object used obtaining one time password detail.
  *
- * @author Petr Dvorak, petr@wultra.com
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
 public class GetOtpDetailRequest {
 
-    // Either operationId or otpId should be specified
-    private String operationId;
+    // Either otpId or operationId should be specified
     private String otpId;
+    private String operationId;
 
 }

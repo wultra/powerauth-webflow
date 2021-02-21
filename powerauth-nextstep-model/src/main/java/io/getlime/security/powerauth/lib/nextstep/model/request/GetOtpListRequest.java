@@ -26,5 +26,6 @@ import lombok.Data;
 public class GetOtpListRequest {
 
     private String operationId;
+    private boolean includeRemoved;
 
 }
