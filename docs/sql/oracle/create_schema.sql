@@ -98,7 +98,8 @@ CREATE TABLE ns_operation_config (
   mobile_token_enabled      NUMBER(1) DEFAULT 0 NOT NULL,             -- Flag indicating if the mobile token is enabled for this operation type.
   mobile_token_mode         VARCHAR2(256 CHAR) NOT NULL,              -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.
   afs_enabled               NUMBER(1) DEFAULT 0 NOT NULL,             -- Flag indicating if AFS system is enabled.
-  afs_config_id             VARCHAR2(256 CHAR)                        -- Configuration of AFS system.
+  afs_config_id             VARCHAR2(256 CHAR),                       -- Configuration of AFS system.
+  CONSTRAINT ns_operation_afs_fk FOREIGN KEY (afs_config_id) REFERENCES wf_afs_config (config_id)
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.

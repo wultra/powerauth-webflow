@@ -35,7 +35,9 @@ public class AfsActionDetail {
     @NotNull
     private String afsLabel;
     private boolean afsResponseApplied;
+    @NotNull
     private final Map<String, Object> requestExtras = new LinkedHashMap<>();
+    @NotNull
     private final Map<String, Object> responseExtras = new LinkedHashMap<>();
 
 }

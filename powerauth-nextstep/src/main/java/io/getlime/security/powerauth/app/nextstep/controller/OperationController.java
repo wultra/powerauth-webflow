@@ -423,7 +423,7 @@ public class OperationController {
         return updateApplicationContextImpl(request);
     }
 
-    @RequestMapping(value = "operation/afs/action/create", method = RequestMethod.POST)
+    @RequestMapping(value = "operation/afs/action", method = RequestMethod.POST)
     public Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) {
         CreateAfsActionRequest afsRequest = request.getRequestObject();
         logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());

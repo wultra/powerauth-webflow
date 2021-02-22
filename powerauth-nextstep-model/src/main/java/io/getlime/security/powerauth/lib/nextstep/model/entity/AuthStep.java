@@ -33,6 +33,7 @@ public class AuthStep {
 
     @NotNull
     private AuthMethod authMethod;
+    @NotNull
     private final List<KeyValueParameter> params = new ArrayList<>();
 
 }

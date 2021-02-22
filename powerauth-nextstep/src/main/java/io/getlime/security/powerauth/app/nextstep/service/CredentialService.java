@@ -417,7 +417,10 @@ public class CredentialService {
         if (username != null) {
             Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
             if (existingCredentialOptional.isPresent()) {
-                throw new UsernameAlreadyExistsException("Username already exists: " + username + ", credential name: " + credentialDefinition.getName());
+                CredentialEntity existingCredential = existingCredentialOptional.get();
+                if (!existingCredential.getUserId().equals(user)) {
+                    throw new UsernameAlreadyExistsException("Username already exists: " + username + ", credential name: " + credentialDefinition.getName());
+                }
             }
         }
         credential.setType(credentialType);

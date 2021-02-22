@@ -9,7 +9,7 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class OperationConfigNotFoundException extends NextStepServiceException {
 
-    public static final String CODE = "OPERATION_NOT_CONFIGURED";
+    public static final String CODE = "OPERATION_CONFIG_NOT_FOUND";
 
     private Error error;
 

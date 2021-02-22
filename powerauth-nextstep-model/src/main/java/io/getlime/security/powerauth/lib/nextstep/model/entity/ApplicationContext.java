@@ -36,7 +36,9 @@ public class ApplicationContext {
     @NotNull
     private String name;
     private String description;
+    @NotNull
     private final List<String> originalScopes = new ArrayList<>();
+    @NotNull
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
 }

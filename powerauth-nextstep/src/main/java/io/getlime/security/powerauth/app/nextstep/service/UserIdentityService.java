@@ -190,7 +190,12 @@ public class UserIdentityService {
      */
     @Transactional
     public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("User identity not found: " + request.getUserId());
+        }
+        // The findUser() method is not used to allow update REMOVED -> ACTIVE
+        UserIdentityEntity user = userOptional.get();
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());

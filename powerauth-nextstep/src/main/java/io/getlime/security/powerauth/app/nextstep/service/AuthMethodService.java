@@ -158,12 +158,12 @@ public class AuthMethodService {
                     // user prefs are not set - resolve methods with user prefs by their default value
                     if (authMethodEntity.getUserPrefsDefault()) {
                         // add method in case it is enabled by default
-                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
+                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, Collections.emptyMap()));
                     }
                 }
             } else {
                 // add all methods without user prefs
-                enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
+                enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, Collections.emptyMap()));
             }
         }
         return enabledMethods;
@@ -249,6 +249,7 @@ public class AuthMethodService {
         if (!authMethodOptional.isPresent()) {
             throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
         }
+        // TODO - check authentication method usages
         AuthMethodEntity authMethod = authMethodOptional.get();
         authMethodRepository.delete(authMethod);
         DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();

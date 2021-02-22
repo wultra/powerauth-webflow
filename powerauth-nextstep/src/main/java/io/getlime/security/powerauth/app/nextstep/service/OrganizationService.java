@@ -69,7 +69,7 @@ public class OrganizationService {
     @Transactional
     public CreateOrganizationResponse createOrganization(CreateOrganizationRequest request) throws OrganizationAlreadyExistsException {
         Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
-        if (!organizationOptional.isPresent()) {
+        if (organizationOptional.isPresent()) {
             throw new OrganizationAlreadyExistsException("Organization already exists: " + request.getOrganizationId());
         }
         OrganizationEntity organization = new OrganizationEntity();
@@ -130,6 +130,7 @@ public class OrganizationService {
         if (!organizationOptional.isPresent()) {
             throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
         }
+        // TODO - check organization usages
         OrganizationEntity organization = organizationOptional.get();
         organizationRepository.delete(organization);
         DeleteOrganizationResponse response = new DeleteOrganizationResponse();

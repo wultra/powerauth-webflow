@@ -24,6 +24,7 @@ public class OperationData {
     private final String templateVersion;
     @NotNull
     private final Integer templateId;
+    @NotNull
     private final Map<Integer, OperationDataAttribute> attributes = new LinkedHashMap<>();
 
     /**

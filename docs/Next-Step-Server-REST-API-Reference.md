@@ -2221,7 +2221,7 @@ Store result of an AFS action for an operation.
     </tr>
     <tr>
         <td>Resource URI</td>
-        <td><code>/operation/afs/action/create</code></td>
+        <td><code>/operation/afs/action</code></td>
     </tr>
 </table>
 

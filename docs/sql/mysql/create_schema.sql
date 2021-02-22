@@ -76,7 +76,8 @@ CREATE TABLE ns_operation_config (
   mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,   -- Flag indicating if the mobile token is enabled for this operation type.
   mobile_token_mode         VARCHAR(256) NOT NULL,            -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.
   afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,   -- Flag indicating if AFS system is enabled.
-  afs_config_id             VARCHAR(256)                      -- Configuration of AFS system.
+  afs_config_id             VARCHAR(256),                     -- Configuration of AFS system.
+  FOREIGN KEY ns_operation_afs_fk (afs_config_id) REFERENCES wf_afs_config (config_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -385,15 +386,15 @@ CREATE TABLE ns_operation_history (
 
 -- Table ns_operation_afs stores AFS requests and responses.
 CREATE TABLE ns_operation_afs (
-  afs_action_id               INTEGER PRIMARY KEY NOT NULL,         -- ID of the AFS action.
-  operation_id                VARCHAR(256) NOT NULL,                -- Operation ID.
-  request_afs_action          VARCHAR(256) NOT NULL,                -- Information about requested AFS action.
-  request_step_index          INTEGER NOT NULL,                     -- Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.
-  request_afs_extras          VARCHAR(256),                         -- Additional information about AFS action, typically a cookie values used in AFS system.
-  response_afs_apply          INTEGER DEFAULT 0 NOT NULL,           -- Response information about if AFS was applied.
-  response_afs_label          VARCHAR(256),                         -- Response AFS label (information about what should the application do).
-  response_afs_extras         VARCHAR(256),                         -- Additional information sent in AFS response.
-  timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,  -- Timestamp this AFS action was created.
+  afs_action_id               INTEGER PRIMARY KEY NOT NULL AUTO_INCREMENT, -- ID of the AFS action.
+  operation_id                VARCHAR(256) NOT NULL,                       -- Operation ID.
+  request_afs_action          VARCHAR(256) NOT NULL,                       -- Information about requested AFS action.
+  request_step_index          INTEGER NOT NULL,                            -- Counter within the specific operation step that is associated with AFS action, e.g. to differentiate multiple authentication attempts. Incrementing value, starts with 1.
+  request_afs_extras          VARCHAR(256),                                -- Additional information about AFS action, typically a cookie values used in AFS system.
+  response_afs_apply          INTEGER DEFAULT 0 NOT NULL,                  -- Response information about if AFS was applied.
+  response_afs_label          VARCHAR(256),                                -- Response AFS label (information about what should the application do).
+  response_afs_extras         VARCHAR(256),                                -- Additional information sent in AFS response.
+  timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp this AFS action was created.
   CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
