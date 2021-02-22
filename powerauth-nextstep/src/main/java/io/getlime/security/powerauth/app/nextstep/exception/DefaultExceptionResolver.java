@@ -130,19 +130,6 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for operation not configured error.
-     * @param ex Exception.
-     * @return Response with error details.
-     */
-    @ExceptionHandler(OperationNotConfiguredException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleOperationNotConfiguredException(OperationNotConfiguredException ex) {
-        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(OperationNotFoundException.CODE, "Operation is not configured.");
-        return new ErrorResponse(error);
-    }
-
-    /**
      * Exception handler for organization not found error.
      * @param ex Exception.
      * @return Response with error details.
@@ -152,6 +139,45 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleOrganizationNotFoundException(OrganizationNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         Error error = new Error(OrganizationNotFoundException.CODE, "Organization not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for organization already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OrganizationAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOrganizationAlreadyExistsException(OrganizationAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OrganizationNotFoundException.CODE, "Organization already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for step definition not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(StepDefinitionNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleStepDefinitionNotFoundException(StepDefinitionNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(StepDefinitionNotFoundException.CODE, "Step definition not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for step definition already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(StepDefinitionAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleStepDefinitionAlreadyExistsException(StepDefinitionAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(StepDefinitionAlreadyExistsException.CODE, "Step definition already exists.");
         return new ErrorResponse(error);
     }
 
@@ -191,6 +217,58 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleInvalidConfigurationException(InvalidConfigurationException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         Error error = new Error(InvalidConfigurationException.CODE, "Next Step configuration is invalid.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for authentication method not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(AuthMethodNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleAuthMethodNotFoundException(AuthMethodNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(AuthMethodNotFoundException.CODE, "Authentication method not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for operation config already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationConfigAlreadyExists.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationConfigAlreadyExists(OperationConfigAlreadyExists ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationConfigAlreadyExists.CODE, "Operation config already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for operation config not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationConfigNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationConfigNotFoundException(OperationConfigNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationConfigNotFoundException.CODE, "Operation config not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for authentication method already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(AuthMethodAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleAuthMethodAlreadyExistsException(AuthMethodAlreadyExistsException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(AuthMethodAlreadyExistsException.CODE, "Authentication method already exists.");
         return new ErrorResponse(error);
     }
 

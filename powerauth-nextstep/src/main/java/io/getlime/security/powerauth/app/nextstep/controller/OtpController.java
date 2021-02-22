@@ -52,7 +52,7 @@ public class OtpController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateOtpResponse> createOtp(@RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException {
+    public ObjectResponse<CreateOtpResponse> createOtp(@RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException {
         // TODO - request validation
         CreateOtpResponse response = otpService.createOtp(request.getRequestObject());
         return new ObjectResponse<>(response);

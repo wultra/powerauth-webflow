@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -28,16 +29,16 @@ import javax.validation.constraints.NotNull;
 public class CreateAuthMethodRequest {
 
     @NotNull
-    private String authMethod;
+    private AuthMethod authMethod;
     @NotNull
-    private Integer orderNumber;
-    private boolean checkUserPrefs;
+    private Long orderNumber;
+    private Boolean checkUserPrefs;
     private Integer userPrefsColumn;
-    private boolean userPrefsDefault;
-    private boolean checkAuthFails;
-    private Integer maxAuthFails;
-    private boolean hasUserInterface;
-    private boolean hasMobileToken;
+    private Boolean userPrefsDefault;
+    private Boolean checkAuthFails;
+    private Long maxAuthFails;
+    private Boolean hasUserInterface;
+    private Boolean hasMobileToken;
     private String displayNameKey;
 
 }

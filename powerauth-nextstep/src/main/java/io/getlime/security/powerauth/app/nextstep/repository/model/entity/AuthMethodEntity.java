@@ -53,10 +53,10 @@ public class AuthMethodEntity implements Serializable {
     private Boolean userPrefsDefault;
 
     @Column(name = "check_auth_fails", nullable = false)
-    private Boolean checkAuthorizationFailures;
+    private Boolean checkAuthFails;
 
     @Column(name = "max_auth_fails")
-    private Long maxAuthorizationFailures;
+    private Long maxAuthFails;
 
     @Column(name = "has_user_interface", nullable = false)
     private Boolean hasUserInterface;

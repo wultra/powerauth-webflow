@@ -119,6 +119,7 @@ public class CredentialService {
             credential.setType(request.getCredentialType());
         }
         // TODO - username and credentialValue validation
+        // TODO - check that username is available
         if (request.getUsername() != null) {
             credential.setUsername(request.getUsername());
         }
@@ -128,10 +129,7 @@ public class CredentialService {
         }
         if (request.getCredentialStatus() != null) {
             credential.setStatus(request.getCredentialStatus());
-            if (credential.getStatus() == CredentialStatus.REMOVED) {
-                // Removed credentials have a null username to allow usage of this username by another credential
-                credential.setUsername(null);
-            } else if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
+                if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
                 // For blocked credentials set timestamp when credential was blocked
                 credential.setTimestampBlocked(new Date());
             } else if (credential.getStatus() == CredentialStatus.ACTIVE) {
@@ -251,8 +249,6 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is already REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.REMOVED);
-        // Removed credentials have a null username to allow usage of this username by another credential
-        credential.setUsername(null);
         credentialRepository.save(credential);
         DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
@@ -426,6 +422,7 @@ public class CredentialService {
         }
         credential.setType(credentialType);
         // TODO - username and credentialValue validation
+        // TODO - check that username is available
         // TODO - generate username if username is null
         credential.setUsername(username);
         // TODO - generate credential value if credential value is null

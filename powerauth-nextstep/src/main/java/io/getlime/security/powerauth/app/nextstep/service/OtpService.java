@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOtpRequest;
@@ -90,9 +91,11 @@ public class OtpService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws OtpGenAlgorithmNotSupportedException Thrown when OTP generation algorithm is not supported.
      * @throws InvalidConfigurationException Thrown when OTP policy is not configured properly.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already failed.
      */
     @Transactional
-    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException {
+    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException {
         OtpDefinitionEntity otpDefinition = otpDefinitionService.findOtpDefinition(request.getOtpName());
         UserIdentityEntity user = null;
         if (request.getUserId() != null) {
@@ -110,6 +113,12 @@ public class OtpService {
             for (OtpEntity otp : existingOtps) {
                 otp.setStatus(OtpStatus.REMOVED);
                 otpRepository.save(otp);
+            }
+            if (operation.getResult() == AuthResult.DONE) {
+                throw new OperationAlreadyFinishedException("Cannot create OTP, because operation is already finished: " + operation.getOperationId());
+            }
+            if (operation.getResult() == AuthResult.FAILED) {
+                throw new OperationAlreadyFailedException("Cannot create OTP, because operation is already failed: " + operation.getOperationId());
             }
         }
         String otpData;

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -28,6 +29,6 @@ import javax.validation.constraints.NotNull;
 public class DeleteAuthMethodRequest {
 
     @NotNull
-    private String authMethod;
+    private AuthMethod authMethod;
 
 }

@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of authentication methods.
@@ -45,5 +46,5 @@ public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, A
      * @param authMethod Name of authentication method.
      * @return Authentication method.
      */
-    AuthMethodEntity findByAuthMethod(AuthMethod authMethod);
+    Optional<AuthMethodEntity> findByAuthMethod(AuthMethod authMethod);
 }

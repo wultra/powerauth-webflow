@@ -323,7 +323,7 @@ public class StepResolutionService {
      * @param authMethod authentication method
      * @return whether authentication method failed
      */
-    private boolean isAuthMethodFailed(OperationEntity operation, AuthMethod authMethod, AuthStepResult currentAuthStepResult) {
+    private boolean isAuthMethodFailed(OperationEntity operation, AuthMethod authMethod, AuthStepResult currentAuthStepResult) throws AuthMethodNotFoundException {
         if (currentAuthStepResult == AuthStepResult.AUTH_METHOD_FAILED) {
             return true;
         }
@@ -334,11 +334,12 @@ public class StepResolutionService {
             }
         }
         // check whether authMethod supports check of authorization failure count
-        AuthMethodEntity authMethodEntity = authMethodRepository.findByAuthMethod(authMethod);
-        if (authMethodEntity == null) {
-            throw new IllegalStateException("AuthMethod is missing in database: " + authMethod);
+        Optional<AuthMethodEntity> authMethodEntityOptional = authMethodRepository.findByAuthMethod(authMethod);
+        if (!authMethodEntityOptional.isPresent()) {
+            throw new AuthMethodNotFoundException("Authentication method not found: " + authMethod);
         }
-        if (authMethodEntity.getCheckAuthorizationFailures()) {
+        AuthMethodEntity authMethodEntity = authMethodEntityOptional.get();
+        if (authMethodEntity.getCheckAuthFails()) {
             // count failures
             int failureCount = 0;
             if (currentAuthStepResult == AuthStepResult.AUTH_FAILED) {
@@ -351,7 +352,7 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            return failureCount >= authMethodEntity.getMaxAuthorizationFailures();
+            return failureCount >= authMethodEntity.getMaxAuthFails();
         }
         return false;
     }
@@ -374,11 +375,12 @@ public class StepResolutionService {
             }
         }
         // check whether authMethod supports check of authorization failure count
-        AuthMethodEntity authMethodEntity = authMethodRepository.findByAuthMethod(authMethod);
-        if (authMethodEntity == null) {
-            throw new IllegalStateException("AuthMethod is missing in database: " + authMethod);
+        Optional<AuthMethodEntity> authMethodEntityOptional = authMethodRepository.findByAuthMethod(authMethod);
+        if (!authMethodEntityOptional.isPresent()) {
+            return null;
         }
-        if (authMethodEntity.getCheckAuthorizationFailures()) {
+        AuthMethodEntity authMethodEntity = authMethodEntityOptional.get();
+        if (authMethodEntity.getCheckAuthFails()) {
             // count failures
             long failureCount = 0L;
             for (OperationHistoryEntity history : operation.getOperationHistory()) {
@@ -387,10 +389,10 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            if (failureCount >= authMethodEntity.getMaxAuthorizationFailures()) {
+            if (failureCount >= authMethodEntity.getMaxAuthFails()) {
                 return 0L;
             }
-            return authMethodEntity.getMaxAuthorizationFailures() - failureCount;
+            return authMethodEntity.getMaxAuthFails() - failureCount;
         }
         return null;
     }

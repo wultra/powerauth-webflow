@@ -28,10 +28,7 @@ import io.getlime.security.powerauth.app.nextstep.service.StepResolutionService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
@@ -209,10 +206,10 @@ public class OperationController {
      *
      * @param request Get operation configuration request.
      * @return Get operation configuration response.
-     * @throws OperationNotConfiguredException Thrown when operation is not configured.
+     * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
     @RequestMapping(value = "operation/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationNotConfiguredException {
+    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationConfigNotFoundException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigDetail request, operation name: {}", request.getRequestObject().getOperationName());
 
@@ -390,10 +387,9 @@ public class OperationController {
      * Get mobile token configuration.
      * @param request Get mobile token configuration request.
      * @return Get mobile token configuration response.
-     * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws OperationNotFoundException {
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) {
         String userId = request.getRequestObject().getUserId();
         String operationName = request.getRequestObject().getOperationName();
         AuthMethod authMethod = request.getRequestObject().getAuthMethod();
@@ -428,7 +424,7 @@ public class OperationController {
     }
 
     @RequestMapping(value = "operation/afs/action/create", method = RequestMethod.POST)
-    public Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) throws OperationNotFoundException {
+    public Response createAfsAction(@RequestBody ObjectRequest<CreateAfsActionRequest> request) {
         CreateAfsActionRequest afsRequest = request.getRequestObject();
         logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());
         // persist AFS action for operation
@@ -447,13 +443,17 @@ public class OperationController {
     }
 
     @RequestMapping(value = "operation/config", method = RequestMethod.POST)
-    public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@RequestBody ObjectRequest<CreateOperationConfigRequest> request) {
-        return new ObjectResponse<>(new CreateOperationConfigResponse());
+    public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@RequestBody ObjectRequest<CreateOperationConfigRequest> request) throws OperationConfigAlreadyExists {
+        // TODO - request validation
+        CreateOperationConfigResponse response = operationConfigurationService.createOperationConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@RequestBody ObjectRequest<DeleteOperationConfigRequest> request) {
-        return new ObjectResponse<>(new DeleteOperationConfigResponse());
+    public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException {
+        // TODO - request validation
+        DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

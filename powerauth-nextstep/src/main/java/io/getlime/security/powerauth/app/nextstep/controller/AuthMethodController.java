@@ -22,6 +22,8 @@ import io.getlime.security.powerauth.app.nextstep.service.AuthMethodService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
@@ -56,9 +58,17 @@ public class AuthMethodController {
         this.authMethodService = authMethodService;
     }
 
+    /**
+     * Create an authentication method.
+     * @param request Create authentication method request.
+     * @return Create authentication method response.
+     * @throws AuthMethodAlreadyExistsException Thrown when authentication method already exists.
+     */
     @RequestMapping(value = "auth-method", method = RequestMethod.POST)
-    public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@RequestBody ObjectRequest<CreateAuthMethodRequest> request) {
-        return new ObjectResponse<>(new CreateAuthMethodResponse());
+    public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@RequestBody ObjectRequest<CreateAuthMethodRequest> request) throws AuthMethodAlreadyExistsException {
+        // TODO - request validation
+        CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     /**
@@ -165,12 +175,15 @@ public class AuthMethodController {
 
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) {
+        // TODO - implement method
         return new ObjectResponse<>(new GetEnabledMethodListResponse());
     }
 
     @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) {
-        return new ObjectResponse<>(new DeleteAuthMethodResponse());
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException {
+        // TODO - request validation
+        DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

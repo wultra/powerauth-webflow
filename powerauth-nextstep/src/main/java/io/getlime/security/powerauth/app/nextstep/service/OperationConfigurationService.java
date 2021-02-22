@@ -18,16 +18,22 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigAlreadyExists;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationConfigRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOperationConfigRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationConfigResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOperationConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigListResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 /**
- * Service which handles retrieval of operation configuration.
+ * Service which handles persistence of operation configurations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -48,15 +54,48 @@ public class OperationConfigurationService {
     }
 
     /**
+     * Create an operation configuration.
+     * @param request Create operation configuration request.
+     * @return Create operation configuration response.
+     * @throws OperationConfigAlreadyExists Thrown when operation configuration already exists.
+     */
+    @Transactional
+    public CreateOperationConfigResponse createOperationConfig(CreateOperationConfigRequest request) throws OperationConfigAlreadyExists {
+        Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
+        if (operationConfigOptional.isPresent()) {
+            throw new OperationConfigAlreadyExists("Operation configuration already exists for operation: " + request.getOperationName());
+        }
+        OperationConfigEntity operationConfig = new OperationConfigEntity();
+        operationConfig.setOperationName(request.getOperationName());
+        operationConfig.setTemplateVersion(request.getTemplateVersion());
+        operationConfig.setTemplateId(request.getTemplateId());
+        operationConfig.setMobileTokenEnabled(request.isMobileTokenEnabled());
+        operationConfig.setMobileTokenMode(request.getMobileTokenMode());
+        operationConfig.setAfsEnabled(request.isAfsEnabled());
+        operationConfig.setAfsConfigId(request.getAfsConfigId());
+        operationConfigRepository.save(operationConfig);
+        CreateOperationConfigResponse response = new CreateOperationConfigResponse();
+        response.setOperationName(operationConfig.getOperationName());
+        response.setTemplateVersion(operationConfig.getTemplateVersion());
+        response.setTemplateId(operationConfig.getTemplateId());
+        response.setMobileTokenEnabled(operationConfig.isMobileTokenEnabled());
+        response.setMobileTokenMode(operationConfig.getMobileTokenMode());
+        response.setAfsEnabled(operationConfig.isAfsEnabled());
+        response.setAfsConfigId(operationConfig.getAfsConfigId());
+        return response;
+    }
+
+    /**
      * Get operation configuration.
      * @param operationName Operation name.
      * @return Operation configuration.
-     * @throws OperationNotConfiguredException Thrown when operation is not configured.
+     * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
-    public GetOperationConfigDetailResponse getOperationConfig(String operationName) throws OperationNotConfiguredException {
+    @Transactional
+    public GetOperationConfigDetailResponse getOperationConfig(String operationName) throws OperationConfigNotFoundException {
         Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(operationName);
         if (!operationConfigOptional.isPresent()) {
-            throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
+            throw new OperationConfigNotFoundException("Operation not configured, operation name: " + operationName);
         }
         OperationConfigEntity operationConfig = operationConfigOptional.get();
         return configConverter.fromOperationConfigEntity(operationConfig);
@@ -66,6 +105,7 @@ public class OperationConfigurationService {
      * Get all operation configurations.
      * @return All operation configurations.
      */
+    @Transactional
     public GetOperationConfigListResponse getOperationConfigs() {
         GetOperationConfigListResponse configsResponse = new GetOperationConfigListResponse();
         Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
@@ -74,6 +114,25 @@ public class OperationConfigurationService {
             configsResponse.getOperationConfigs().add(config);
         }
         return configsResponse;
+    }
+
+    /**
+     * Delete an operation configuration.
+     * @param request Delete operation configuration request.
+     * @return Delete operation configuration response.
+     * @throws OperationConfigNotFoundException Thrown when operation configuration is not configured.
+     */
+    @Transactional
+    public DeleteOperationConfigResponse deleteOperationConfig(DeleteOperationConfigRequest request) throws OperationConfigNotFoundException {
+        Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
+        if (!operationConfigOptional.isPresent()) {
+            throw new OperationConfigNotFoundException("Operation configuration not found, operation name: " + request.getOperationName());
+        }
+        OperationConfigEntity operationConfig = operationConfigOptional.get();
+        operationConfigRepository.delete(operationConfig);
+        DeleteOperationConfigResponse response = new DeleteOperationConfigResponse();
+        response.setOperationName(operationConfig.getOperationName());
+        return response;
     }
 
 }

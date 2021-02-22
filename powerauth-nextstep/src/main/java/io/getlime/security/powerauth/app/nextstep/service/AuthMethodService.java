@@ -24,19 +24,23 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPr
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateAuthMethodResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteAuthMethodResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
- * This service handles querying of user authentication methods and enabling/disabling them.
+ * This service handles persistence of user authentication methods.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -63,10 +67,49 @@ public class AuthMethodService {
     }
 
     /**
+     * Create an authentication method.
+     * @param request Create authentication method request.
+     * @return Create authentication method response.
+     * @throws AuthMethodAlreadyExistsException Thrown when authentication method already exists.
+     */
+    @Transactional
+    public CreateAuthMethodResponse createAuthMethod(CreateAuthMethodRequest request) throws AuthMethodAlreadyExistsException {
+        Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
+        if (authMethodOptional.isPresent()) {
+            throw new AuthMethodAlreadyExistsException("Authentication method already exists: " + request.getAuthMethod());
+        }
+        AuthMethodEntity authMethod = new AuthMethodEntity();
+        authMethod.setAuthMethod(request.getAuthMethod());
+        authMethod.setOrderNumber(request.getOrderNumber());
+        authMethod.setCheckUserPrefs(request.getCheckUserPrefs());
+        authMethod.setUserPrefsColumn(request.getUserPrefsColumn());
+        authMethod.setUserPrefsDefault(request.getUserPrefsDefault());
+        authMethod.setCheckAuthFails(request.getCheckAuthFails());
+        authMethod.setMaxAuthFails(request.getMaxAuthFails());
+        authMethod.setHasUserInterface(request.getHasUserInterface());
+        authMethod.setDisplayNameKey(request.getDisplayNameKey());
+        authMethod.setHasMobileToken(request.getHasMobileToken());
+        authMethodRepository.save(authMethod);
+        CreateAuthMethodResponse response = new CreateAuthMethodResponse();
+        response.setAuthMethod(authMethod.getAuthMethod());
+        response.setOrderNumber(authMethod.getOrderNumber());
+        response.setCheckUserPrefs(authMethod.getCheckUserPrefs());
+        response.setUserPrefsColumn(authMethod.getUserPrefsColumn());
+        response.setUserPrefsDefault(authMethod.getUserPrefsDefault());
+        response.setCheckAuthFails(authMethod.getCheckAuthFails());
+        response.setMaxAuthFails(authMethod.getMaxAuthFails());
+        response.setHasUserInterface(authMethod.getHasUserInterface());
+        response.setDisplayNameKey(authMethod.getDisplayNameKey());
+        response.setHasMobileToken(authMethod.getHasMobileToken());
+        return response;
+    }
+
+    /**
      * Lists all authentication methods supported by the Next Step server.
      *
      * @return List of all authentication methods.
      */
+    @Transactional
     public List<AuthMethodDetail> listAuthMethods() {
         List<AuthMethodDetail> allMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
@@ -83,6 +126,7 @@ public class AuthMethodService {
      * @param userId User ID
      * @return List of authentication methods enabled for given user.
      */
+    @Transactional
     public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
         List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
@@ -133,6 +177,7 @@ public class AuthMethodService {
      * @param enabled True if enabled, false if disabled, null if unspecified.
      * @param config Authentication method configuration.
      */
+    @Transactional
     public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) {
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
@@ -193,6 +238,26 @@ public class AuthMethodService {
     }
 
     /**
+     * Delete an authentication method.
+     * @param request Delete authentication method request.
+     * @return Delete authentication method response.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     */
+    @Transactional
+    public DeleteAuthMethodResponse deleteAuthMethod(DeleteAuthMethodRequest request) throws AuthMethodNotFoundException {
+        Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
+        if (!authMethodOptional.isPresent()) {
+            throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
+        }
+        AuthMethodEntity authMethod = authMethodOptional.get();
+        authMethodRepository.delete(authMethod);
+        DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();
+        response.setAuthMethod(authMethod.getAuthMethod());
+        return response;
+    }
+
+
+    /**
      * Converts AuthMethodEntity into AuthMethodDetail which contains less fields available for the UI.
      *
      * @param authMethodEntity entity representing the authentication method.
@@ -230,4 +295,5 @@ public class AuthMethodService {
         userAuthMethodDetail.getConfig().putAll(config);
         return userAuthMethodDetail;
     }
+
 }

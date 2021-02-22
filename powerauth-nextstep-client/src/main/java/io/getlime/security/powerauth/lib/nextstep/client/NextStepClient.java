@@ -820,8 +820,8 @@ public class NextStepClient {
                     return new OperationAlreadyCanceledException(error.getMessage());
                 case OperationNotFoundException.CODE:
                     return new OperationNotFoundException(error.getMessage());
-                case OperationNotConfiguredException.CODE:
-                    return new OperationNotConfiguredException(error.getMessage());
+                case OperationConfigNotFoundException.CODE:
+                    return new OperationConfigNotFoundException(error.getMessage());
                 case OperationAlreadyExistsException.CODE:
                     return new OperationAlreadyExistsException(error.getMessage());
                 case InvalidOperationDataException.CODE:

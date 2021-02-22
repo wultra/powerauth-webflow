@@ -167,7 +167,7 @@ CREATE TABLE ns_otp_policy (
   name                   VARCHAR2(255 CHAR) NOT NULL,                       -- One time password policy name used for identification.
   description            VARCHAR2(255 CHAR),                                -- Description of the one time password policy.
   status                 NUMBER(10,0) NOT NULL,                             -- One time password policy status: ACTIVE, REMOVED.
-  length                 NUMBER(10,0),                                      -- One time password length.
+  length                 NUMBER(10,0) NOT NULL,                             -- One time password length.
   attempt_limit          NUMBER(10,0),                                      -- Maximum number of authentication attempts.
   expiration_time        NUMBER(10,0),                                      -- One time password expiration time.
   gen_algorithm          VARCHAR2(255 CHAR) DEFAULT 'DEFAULT' NOT NULL,     -- Algorithm used for generating the one time password.

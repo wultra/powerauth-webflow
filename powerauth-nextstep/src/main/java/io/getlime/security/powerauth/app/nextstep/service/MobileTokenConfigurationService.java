@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,7 +81,7 @@ public class MobileTokenConfigurationService {
                 // Mobile token is not enabled for this operation, skip it
                 return false;
             }
-        } catch (OperationNotConfiguredException e) {
+        } catch (OperationConfigNotFoundException e) {
             // Operation is not configured, skip it
             logger.error(e.getMessage(), e);
             return false;
