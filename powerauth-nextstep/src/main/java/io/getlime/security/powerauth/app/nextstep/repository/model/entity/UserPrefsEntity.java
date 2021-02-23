@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -74,10 +75,11 @@ public class UserPrefsEntity implements Serializable {
     /**
      * Get the status of an authentication method given the column number in user preferences.
      *
-     * @param columnNumber column number with authentication method
-     * @return true if enabled, false if disabled, null if unspecified
+     * @param columnNumber Column number with authentication method.
+     * @return True if enabled, false if disabled, null if unspecified.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public Boolean getAuthMethodEnabled(int columnNumber) {
+    public Boolean getAuthMethodEnabled(int columnNumber) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:
                 return getAuthMethod1Enabled();
@@ -90,7 +92,7 @@ public class UserPrefsEntity implements Serializable {
             case 5:
                 return getAuthMethod5Enabled();
             default:
-                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
     }
 
@@ -99,8 +101,9 @@ public class UserPrefsEntity implements Serializable {
      *
      * @param columnNumber column number with authentication method
      * @param enabled      true if enabled, false if disabled, null if unspecified
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public void setAuthMethodEnabled(int columnNumber, Boolean enabled) {
+    public void setAuthMethodEnabled(int columnNumber, Boolean enabled) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:
                 setAuthMethod1Enabled(enabled);
@@ -118,11 +121,11 @@ public class UserPrefsEntity implements Serializable {
                 setAuthMethod5Enabled(enabled);
                 break;
             default:
-                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
     }
 
-    public String getAuthMethodConfig(int columnNumber) {
+    public String getAuthMethodConfig(int columnNumber) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:
                 return getAuthMethod1Config();
@@ -135,11 +138,11 @@ public class UserPrefsEntity implements Serializable {
             case 5:
                 return getAuthMethod5Config();
             default:
-                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
     }
 
-    public void setAuthMethodConfig(int columnNumber, String config) {
+    public void setAuthMethodConfig(int columnNumber, String config) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:
                 setAuthMethod1Config(config);
@@ -157,7 +160,7 @@ public class UserPrefsEntity implements Serializable {
                 setAuthMethod5Config(config);
                 break;
             default:
-                throw new IllegalStateException("Unexpected column number for authentication method: " + columnNumber);
+                throw new InvalidConfigurationException("Unexpected column number for authentication method: " + columnNumber);
         }
 
     }

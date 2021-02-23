@@ -96,8 +96,9 @@ public class StepResolutionService {
      * @param request request to create a new operation
      * @return response with ordered list of next steps
      * @throws OperationAlreadyExistsException Thrown when operation already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) throws OperationAlreadyExistsException {
+    public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) throws OperationAlreadyExistsException, InvalidConfigurationException {
         CreateOperationResponse response = new CreateOperationResponse();
         if (request.getOperationId() != null && !request.getOperationId().isEmpty()) {
             // operation ID received from the client, verify that it is available
@@ -127,7 +128,7 @@ public class StepResolutionService {
             response.setResult(allResults.iterator().next());
             return response;
         }
-        throw new IllegalStateException("Next step could not be resolved for new operation.");
+        throw new InvalidConfigurationException("Next step could not be resolved for new operation.");
     }
 
     /**
@@ -140,8 +141,11 @@ public class StepResolutionService {
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws InvalidRequestException Thrown when request is not valid.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is not valid.
      */
-    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws OperationNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException {
+    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws OperationNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, InvalidRequestException, OperationNotValidException, InvalidConfigurationException {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         checkLegitimityOfUpdate(operation, request);
         UpdateOperationResponse response = new UpdateOperationResponse();
@@ -238,8 +242,9 @@ public class StepResolutionService {
      * @param authMethod authentication method of previous authentication step
      * @param userId user ID
      * @return filtered list of steps
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    private List<StepDefinitionEntity> filterStepDefinitions(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) {
+    private List<StepDefinitionEntity> filterStepDefinitions(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) throws InvalidConfigurationException {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
         List<AuthMethod> authMethodsAvailableForUser = new ArrayList<>();
         if (userId != null) {
@@ -249,7 +254,7 @@ public class StepResolutionService {
         }
         List<StepDefinitionEntity> filteredStepDefinitions = new ArrayList<>();
         if (stepDefinitions == null) {
-            throw new IllegalStateException("Step definitions are missing in Next Step server.");
+            throw new InvalidConfigurationException("Step definitions are missing in Next Step server.");
         }
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             if (operationType != null && !operationType.equals(stepDef.getOperationType())) {
@@ -287,13 +292,14 @@ public class StepResolutionService {
      * Verifies that each priority is present only once in the list of step definitions.
      *
      * @param stepDefinitions step definitions
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    private void verifyDuplicatePrioritiesAbsent(List<StepDefinitionEntity> stepDefinitions) {
+    private void verifyDuplicatePrioritiesAbsent(List<StepDefinitionEntity> stepDefinitions) throws InvalidConfigurationException {
         Map<Long, List<StepDefinitionEntity>> stepsByPriority = stepDefinitions
                 .stream()
                 .collect(Collectors.groupingBy(StepDefinitionEntity::getResponsePriority));
         if (stepsByPriority.size() != stepDefinitions.size()) {
-            throw new IllegalStateException("Multiple steps with the same priority detected while resolving next step.");
+            throw new InvalidConfigurationException("Multiple steps with the same priority detected while resolving next step.");
         }
     }
 
@@ -302,8 +308,9 @@ public class StepResolutionService {
      *
      * @param stepDefinitions Step definitions to convert and filter.
      * @return Final list of authentication steps.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    private List<AuthStep> filterAuthSteps(List<StepDefinitionEntity> stepDefinitions, String userId, String operationName) {
+    private List<AuthStep> filterAuthSteps(List<StepDefinitionEntity> stepDefinitions, String userId, String operationName) throws InvalidConfigurationException {
         List<AuthStep> authSteps = new ArrayList<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             if (stepDef.getResponseAuthMethod() != null) {
@@ -326,6 +333,7 @@ public class StepResolutionService {
      * @param operation  operation whose history is being checked
      * @param authMethod authentication method
      * @return whether authentication method failed
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      */
     private boolean isAuthMethodFailed(OperationEntity operation, AuthMethod authMethod, AuthStepResult currentAuthStepResult) throws AuthMethodNotFoundException {
         if (currentAuthStepResult == AuthStepResult.AUTH_METHOD_FAILED) {
@@ -409,31 +417,34 @@ public class StepResolutionService {
      * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException {
+    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, OperationNotValidException, InvalidRequestException, OperationNotFoundException {
         if (request == null || request.getOperationId() == null) {
-            throw new IllegalArgumentException("Operation update failed, because request is invalid.");
+            throw new InvalidRequestException("Operation update failed, because request is invalid.");
         }
         if (operationEntity == null) {
-            throw new IllegalArgumentException("Operation update failed, because operation does not exist (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotFoundException("Operation update failed, because operation does not exist (operationId: " + request.getOperationId() + ").");
         }
         if (request.getAuthMethod() == null) {
-            throw new IllegalArgumentException("Operation update failed, because authentication method is missing (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because authentication method is missing (operationId: " + request.getOperationId() + ").");
         }
         // INIT method can cancel other operations due to concurrency check
         if (request.getAuthStepResult() != AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
-            throw new IllegalArgumentException("Operation update failed, because INIT method cannot be updated (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because INIT method cannot be updated (operationId: " + request.getOperationId() + ").");
         }
         if (request.getAuthStepResult() == null) {
-            throw new IllegalArgumentException("Operation update failed, because result of authentication step is missing (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because result of authentication step is missing (operationId: " + request.getOperationId() + ").");
         }
         List<OperationHistoryEntity> operationHistory = operationEntity.getOperationHistory();
         if (operationHistory.isEmpty()) {
-            throw new IllegalStateException("Operation update failed, because operation is missing its history (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotValidException("Operation update failed, because operation is missing its history (operationId: " + request.getOperationId() + ").");
         }
         OperationHistoryEntity initOperationItem = operationHistory.get(0);
         if (initOperationItem.getRequestAuthMethod() != AuthMethod.INIT || initOperationItem.getRequestAuthStepResult() != AuthStepResult.CONFIRMED) {
-            throw new IllegalStateException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotValidException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
         }
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
         // operation can be canceled anytime (e.g. by closed Web Socket) - do not check for step continuation
@@ -459,7 +470,7 @@ public class StepResolutionService {
                 }
             }
             if (!stepAuthMethodValid) {
-                throw new IllegalStateException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
+                throw new InvalidRequestException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
             }
         }
         for (OperationHistoryEntity historyItem : operationHistory) {

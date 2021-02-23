@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.slf4j.Logger;
@@ -57,8 +58,9 @@ public class MobileTokenConfigurationService {
      * @param operationName Operation name.
      * @param authMethod Authentication method.
      * @return Whether mobile token is enabled.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public boolean isMobileTokenEnabled(String userId, String operationName, AuthMethod authMethod) {
+    public boolean isMobileTokenEnabled(String userId, String operationName, AuthMethod authMethod) throws InvalidConfigurationException {
         // Check input parameters
         if (userId == null) {
             logger.debug("Mobile token is disabled because user is unknown for this authentication step");

@@ -77,9 +77,10 @@ public class OperationController {
      * @param request Create operation request.
      * @return Create operation response.
      * @throws OperationAlreadyExistsException Thrown when operation already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation", method = RequestMethod.POST)
-    public ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException {
+    public ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException, InvalidConfigurationException {
         logger.info("Received createOperation request, operation ID: {}, operation name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName());
         // resolve response based on dynamic step definitions
         CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
@@ -99,10 +100,17 @@ public class OperationController {
      *
      * @param request Update operation request.
      * @return Update operation response.
-     * @throws NextStepServiceException Thrown when next step resolution fails.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException {
         return updateOperationImpl(request);
     }
 
@@ -111,14 +119,21 @@ public class OperationController {
      *
      * @param request Update operation request.
      * @return Update operation response.
-     * @throws NextStepServiceException Thrown when next step resolution fails.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException {
         return updateOperationImpl(request);
     }
 
-    private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
+    private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws OperationAlreadyFinishedException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, OperationNotFoundException, InvalidRequestException, OperationAlreadyCanceledException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
 
         UpdateOperationResponse response = operationPersistenceService.updateOperation(request.getRequestObject());
@@ -135,10 +150,10 @@ public class OperationController {
      *
      * @param request Update operation user request.
      * @return Response.
-     * @throws NextStepServiceException Thrown when update fails in Next Step.
+     * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "operation/user", method = RequestMethod.PUT)
-    public Response updateOperationUser(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+    public Response updateOperationUser(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
         return updateOperationUserImpl(request);
     }
 
@@ -147,14 +162,14 @@ public class OperationController {
      *
      * @param request Update operation user request.
      * @return Response.
-     * @throws NextStepServiceException Thrown when update fails in Next Step.
+     * @throws OperationNotFoundException Thrown when operation is not found.
      */
     @RequestMapping(value = "operation/user/update", method = RequestMethod.POST)
-    public Response updateOperationUserPost(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+    public Response updateOperationUserPost(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
         return updateOperationUserImpl(request);
     }
 
-    private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws NextStepServiceException {
+    private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
         String operationId = request.getRequestObject().getOperationId();
         String userId = request.getRequestObject().getUserId();
         String organizationId = request.getRequestObject().getOrganizationId();
@@ -240,9 +255,10 @@ public class OperationController {
      *
      * @param request Get pending operations request.
      * @return List with operation details.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "user/operation/list", method = RequestMethod.POST)
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestBody ObjectRequest<GetPendingOperationsRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getPendingOperations request, user ID: {}", request.getRequestObject().getUserId());
 
@@ -251,10 +267,6 @@ public class OperationController {
         List<GetOperationDetailResponse> responseList = new ArrayList<>();
 
         List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.isMobileTokenOnly());
-        if (operations == null) {
-            logger.error("Invalid query for pending operations, user ID: " + requestObject.getUserId());
-            throw new IllegalArgumentException("Invalid query for pending operations, user ID: " + requestObject.getUserId());
-        }
         for (OperationEntity operation : operations) {
             GetOperationDetailResponse response = operationConverter.fromEntity(operation);
             responseList.add(response);
@@ -325,9 +337,11 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "operation/chosenAuthMethod", method = RequestMethod.PUT)
-    public Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+    public Response updateChosenAuthMethod(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
         return updateChosenAuthMethodImpl(request);
     }
 
@@ -336,13 +350,15 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "operation/chosenAuthMethod/update", method = RequestMethod.POST)
-    public Response updateChosenAuthMethodPost(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+    public Response updateChosenAuthMethodPost(@RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
         return updateChosenAuthMethodImpl(request);
     }
 
-    private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException {
+    private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist chosen auth method update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());
@@ -355,9 +371,10 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
      */
     @RequestMapping(value = "operation/mobileToken/status", method = RequestMethod.PUT)
-    public Response updateMobileToken(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+    public Response updateMobileToken(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
         return updateMobileTokenImpl(request);
     }
 
@@ -366,13 +383,14 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
      */
     @RequestMapping(value = "operation/mobileToken/status/update", method = RequestMethod.POST)
-    public @ResponseBody Response updateMobileTokenPost(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+    public @ResponseBody Response updateMobileTokenPost(@RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
         return updateMobileTokenImpl(request);
     }
 
-    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException {
+    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
         logger.info("Received updateMobileToken request, operation ID: {}, mobile token active: {}", request.getRequestObject().getOperationId(), request.getRequestObject().isMobileTokenActive());
         // persist mobile token update
         operationPersistenceService.updateMobileToken(request.getRequestObject());
@@ -384,9 +402,10 @@ public class OperationController {
      * Get mobile token configuration.
      * @param request Get mobile token configuration request.
      * @return Get mobile token configuration response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) {
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws InvalidConfigurationException {
         String userId = request.getRequestObject().getUserId();
         String operationName = request.getRequestObject().getOperationName();
         AuthMethod authMethod = request.getRequestObject().getAuthMethod();

@@ -99,12 +99,13 @@ public class AuthenticationService {
      * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws UserNotActiveException Thrown when user identity is not active.
      */
     @Transactional
-    public CredentialAuthenticationResponse authenticationWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, UserNotActiveException {
+    public CredentialAuthenticationResponse authenticationWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, UserNotActiveException, OperationNotValidException {
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
@@ -172,12 +173,13 @@ public class AuthenticationService {
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws UserNotActiveException Thrown when user identity is not active.
      */
     @Transactional
-    public OtpAuthenticationResponse authenticationWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException {
+    public OtpAuthenticationResponse authenticationWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException, OperationNotValidException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         UserIdentityEntity user = otp.getUserId();
         if (user != null && user.getStatus() != UserIdentityStatus.ACTIVE) {
@@ -253,12 +255,13 @@ public class AuthenticationService {
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws UserNotActiveException Thrown when user identity is not active.
      */
     @Transactional
-    public CombinedAuthenticationResponse authenticationCombined(CombinedAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException {
+    public CombinedAuthenticationResponse authenticationCombined(CombinedAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException, OperationNotValidException {
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
@@ -395,10 +398,11 @@ public class AuthenticationService {
      * @throws OperationAlreadyCanceledException Thrown in case operation is already canceled.
      * @throws OperationAlreadyFailedException Thrown in case operation is already failed.
      * @throws AuthMethodNotFoundException Thrown in case authentication method is not found.
+     * @throws OperationNotValidException Thrown in case operation is not valid.
      */
     private void updateOperation(UserIdentityEntity user, OperationEntity operation, AuthMethod authMethod,
                                  CredentialEntity credential, AuthenticationResult authenticationResult,
-                                 List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException {
+                                 List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
         UpdateOperationRequest updateRequest = new UpdateOperationRequest();
         if (user != null) {
             // User ID can be null during OTP authentication

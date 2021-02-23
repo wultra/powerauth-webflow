@@ -143,8 +143,11 @@ public class OperationPersistenceService {
      * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException {
+    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException {
         // Resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
 
@@ -248,8 +251,10 @@ public class OperationPersistenceService {
      *
      * @param request Request to update chosen authentication method.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException {
+    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -257,7 +262,7 @@ public class OperationPersistenceService {
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
-            throw new IllegalStateException("Operation is missing history");
+            throw new InvalidConfigurationException("Operation is missing history");
         }
         boolean chosenAuthMethodValid = false;
         for (AuthStep step : getResponseAuthSteps(operation)) {
@@ -267,7 +272,7 @@ public class OperationPersistenceService {
             }
         }
         if (!chosenAuthMethodValid) {
-            throw new IllegalStateException("Invalid chosen authentication method");
+            throw new InvalidRequestException("Invalid chosen authentication method");
         }
         currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
         operationHistoryRepository.save(currentHistory);
@@ -279,7 +284,7 @@ public class OperationPersistenceService {
      * @param request Request to update mobile token status.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException {
+    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -287,7 +292,7 @@ public class OperationPersistenceService {
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
-            throw new IllegalStateException("Operation is missing history");
+            throw new OperationNotValidException("Operation is missing history");
         }
         currentHistory.setMobileTokenActive(request.isMobileTokenActive());
         operationHistoryRepository.save(currentHistory);
@@ -358,8 +363,9 @@ public class OperationPersistenceService {
      * @param userId User ID.
      * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      * @return List of operations which match the query.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) {
+    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) throws InvalidConfigurationException {
         List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
         if (!mobileTokenOnly) {
             // Return all unfinished operations for user

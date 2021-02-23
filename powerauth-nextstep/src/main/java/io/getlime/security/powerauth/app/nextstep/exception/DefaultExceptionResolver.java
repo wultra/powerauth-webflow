@@ -117,6 +117,18 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for operation is not valid.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationNotValidException(OperationNotValidException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationNotValidException.CODE, "Operation is not valid.");
+        return new ErrorResponse(error);
+    }
+    /**
      * Exception handler for operation already exist error.
      * @param ex Exception.
      * @return Response with error details.

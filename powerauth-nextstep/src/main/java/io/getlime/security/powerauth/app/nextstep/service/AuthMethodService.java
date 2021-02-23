@@ -27,9 +27,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPr
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
@@ -141,9 +139,10 @@ public class AuthMethodService {
      *
      * @param userId User ID
      * @return List of authentication methods enabled for given user.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
+    public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) throws InvalidConfigurationException {
         List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = null;
@@ -192,9 +191,11 @@ public class AuthMethodService {
      * @param authMethod Authentication method.
      * @param enabled True if enabled, false if disabled, null if unspecified.
      * @param config Authentication method configuration.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) {
+    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) throws InvalidConfigurationException, InvalidRequestException {
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
         // check whether this method supports modifications at all
@@ -202,12 +203,12 @@ public class AuthMethodService {
             if (authMethodEntity.getAuthMethod() == authMethod) {
                 authMethodFound = true;
                 if (!authMethodEntity.getCheckUserPrefs()) {
-                    throw new IllegalArgumentException("Authentication method " + authMethod + " does not support user preferences.");
+                    throw new InvalidRequestException("Authentication method " + authMethod + " does not support user preferences.");
                 }
             }
         }
         if (!authMethodFound) {
-            throw new IllegalArgumentException("Authentication method " + authMethod + " is not supported.");
+            throw new InvalidRequestException("Authentication method " + authMethod + " is not supported.");
         }
         String configAsStr;
         try {
@@ -257,10 +258,11 @@ public class AuthMethodService {
      * Get list of enabled authentication methods for a user and operation. Check current availability of mobile token.
      * @param request Get enabled method list request.
      * @return Get enabled method list response.
-     * @throws UserNotFoundException Thrown when user identity is not found
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws UserNotFoundException {
+    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws UserNotFoundException, InvalidConfigurationException {
         String userId = request.getUserId();
         String operationName = request.getOperationName();
         // Lookup user identity to obtain its status
