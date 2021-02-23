@@ -29,5 +29,6 @@ public class GetEnabledMethodListRequest {
 
     @NotNull
     private String userId;
-
+    @NotNull
+    private String operationName;
 }

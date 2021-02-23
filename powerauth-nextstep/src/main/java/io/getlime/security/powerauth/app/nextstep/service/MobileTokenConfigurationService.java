@@ -109,6 +109,8 @@ public class MobileTokenConfigurationService {
             return false;
         }
 
+        // TODO - implement PowerAuth server status check for activation
+
         for (UserAuthMethodDetail userAuthMethod : authMethods) {
             // In case the chosen auth method is enabled for user and it supports mobile token,
             // this operation should be added into pending operation list.

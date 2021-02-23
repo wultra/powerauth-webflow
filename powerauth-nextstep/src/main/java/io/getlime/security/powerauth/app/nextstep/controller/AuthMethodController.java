@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDet
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
@@ -174,9 +175,10 @@ public class AuthMethodController {
     }
 
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
-    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) {
-        // TODO - implement method
-        return new ObjectResponse<>(new GetEnabledMethodListResponse());
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)

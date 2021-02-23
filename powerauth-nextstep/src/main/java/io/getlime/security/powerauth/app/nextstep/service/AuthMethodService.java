@@ -18,26 +18,34 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateAuthMethodResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteAuthMethodResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetEnabledMethodListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This service handles persistence of user authentication methods.
@@ -51,19 +59,27 @@ public class AuthMethodService {
 
     private final AuthMethodRepository authMethodRepository;
     private final UserPrefsRepository userPrefsRepository;
-    private final ObjectMapper objectMapper;
+    private final UserIdentityLookupService userIdentityLookupService;
+    private final StepDefinitionRepository stepDefinitionRepository;
+    private final MobileTokenConfigurationService mobileTokenConfigurationService;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Service constructor.
      * @param authMethodRepository Authentication method repository.
      * @param userPrefsRepository User preferences repository.
-     * @param objectMapper Object mapper.
+     * @param userIdentityLookupService User identity lookup service.
+     * @param stepDefinitionRepository Step definition repository.
+     * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
-    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, ObjectMapper objectMapper) {
+    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, UserIdentityLookupService userIdentityLookupService, StepDefinitionRepository stepDefinitionRepository, @Lazy MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.authMethodRepository = authMethodRepository;
         this.userPrefsRepository = userPrefsRepository;
-        this.objectMapper = objectMapper;
+        this.userIdentityLookupService = userIdentityLookupService;
+        this.stepDefinitionRepository = stepDefinitionRepository;
+        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
     /**
@@ -131,7 +147,7 @@ public class AuthMethodService {
         List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
         List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = null;
-        if (userId!=null) {
+        if (userId != null) {
             // read user prefs only when user ID is not null, for some authentication methods user ID is not known
             userPrefs = userPrefsRepository.findUserPrefs(userId);
         }
@@ -235,6 +251,47 @@ public class AuthMethodService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
+    }
+
+    /**
+     * Get list of enabled authentication methods for a user and operation. Check current availability of mobile token.
+     * @param request Get enabled method list request.
+     * @return Get enabled method list response.
+     * @throws UserNotFoundException Thrown when user identity is not found
+     */
+    @Transactional
+    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws UserNotFoundException {
+        String userId = request.getUserId();
+        String operationName = request.getOperationName();
+        // Lookup user identity to obtain its status
+        UserIdentityEntity userIdentity = userIdentityLookupService.findUser(userId);
+        // Get all methods enabled for user
+        List<AuthMethod> enabledAuthMethods = listAuthMethodsEnabledForUser(userId).stream()
+                .map(UserAuthMethodDetail::getAuthMethod)
+                .collect(Collectors.toList());
+        // Filter methods by step definitions for given operation to return only relevant methods for the operation.
+        // Do not return INIT method, it is not used for authentication.
+        List<StepDefinitionEntity> stepDefinitions = stepDefinitionRepository.findStepDefinitionsForOperation(operationName);
+        List<AuthMethod> methodsPerOperation = stepDefinitions.stream()
+                .map(StepDefinitionEntity::getRequestAuthMethod)
+                .filter(authMethod -> authMethod != AuthMethod.INIT)
+                .collect(Collectors.toList());
+        // Merge enabled methods and methods used in the operation
+        List<AuthMethod> filteredMethods = enabledAuthMethods.stream()
+                .filter(methodsPerOperation::contains)
+                .collect(Collectors.toList());
+        // Check mobile token status, remove POWERAUTH_TOKEN method in case it is not currently available
+        if (filteredMethods.contains(AuthMethod.POWERAUTH_TOKEN)) {
+            if (!mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
+                filteredMethods.remove(AuthMethod.POWERAUTH_TOKEN);
+            }
+        }
+        GetEnabledMethodListResponse response = new GetEnabledMethodListResponse();
+        response.setUserId(userId);
+        response.setOperationName(operationName);
+        response.setUserIdentityStatus(userIdentity.getStatus());
+        response.getEnabledAuthMethods().addAll(filteredMethods);
+        return response;
     }
 
     /**
