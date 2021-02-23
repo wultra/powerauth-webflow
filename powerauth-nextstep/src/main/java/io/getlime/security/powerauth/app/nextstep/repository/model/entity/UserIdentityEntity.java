@@ -19,10 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -44,6 +41,7 @@ public class UserIdentityEntity implements Serializable {
     private String userId;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserIdentityStatus status;
 
     @Column(name = "extras")

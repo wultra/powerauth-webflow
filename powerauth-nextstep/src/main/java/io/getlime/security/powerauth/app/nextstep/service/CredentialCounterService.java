@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * This service handles persistence of credential counters.
@@ -47,18 +47,21 @@ public class CredentialCounterService {
 
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
+    private final CredentialService credentialService;
     private final CredentialRepository credentialRepository;
 
     /**
      * Credential counter service constructor.
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialDefinitionService Credential definition service.
+     * @param credentialService Credential service.
      * @param credentialRepository Credential repository.
      */
     @Autowired
-    public CredentialCounterService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository) {
+    public CredentialCounterService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, CredentialRepository credentialRepository) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
+        this.credentialService = credentialService;
         this.credentialRepository = credentialRepository;
     }
 
@@ -76,21 +79,27 @@ public class CredentialCounterService {
     public UpdateCounterResponse updateCredentialCounter(UpdateCounterRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
-        if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
-        }
-        CredentialEntity credential = credentialOptional.get();
-        if (credential.getStatus() == CredentialStatus.REMOVED) {
-            throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
-        }
-        if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            throw new CredentialNotActiveException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
-        }
+        CredentialEntity credential = credentialService.findCredential(credentialDefinition, user);
+        updateCredentialCounter(credential, request.getAuthenticationResult());
+        UpdateCounterResponse response = new UpdateCounterResponse();
+        response.setUserId(user.getUserId());
+        response.setCredentialName(credential.getCredentialDefinition().getName());
+        response.setCredentialStatus(credential.getStatus());
+        return response;
+    }
+
+    /**
+     * Update credential counter. This method is not transactional.
+     * @param credential Credential entity.
+     * @param authenticationResult Authentication result.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     */
+    public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
-        Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
-        Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
-        switch (request.getAuthenticationResult()) {
+        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        Long softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
+        Long hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
+        switch (authenticationResult) {
             case SUCCEEDED:
                 credential.setFailedAttemptCounterSoft(0L);
                 credential.setFailedAttemptCounterHard(0L);
@@ -114,14 +123,10 @@ public class CredentialCounterService {
                 break;
 
             default:
-                throw new InvalidRequestException("Invalid authentication result: " + request.getAuthenticationResult());
+                throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
 
         }
-        UpdateCounterResponse response = new UpdateCounterResponse();
-        response.setUserId(user.getUserId());
-        response.setCredentialName(credential.getCredentialDefinition().getName());
-        response.setCredentialStatus(credential.getStatus());
-        return response;
+        credentialRepository.save(credential);
     }
 
     /**

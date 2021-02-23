@@ -44,6 +44,6 @@ public class OtpAuthenticationResponse {
     @NotNull
     private AuthenticationResult authenticationResult;
     @NotNull
-    private Integer remainingAttempts;
+    private Long remainingAttempts;
 
 }

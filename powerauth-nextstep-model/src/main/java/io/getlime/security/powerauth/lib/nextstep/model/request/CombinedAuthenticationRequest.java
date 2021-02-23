@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -44,6 +45,7 @@ public class CombinedAuthenticationRequest {
     @NotNull
     private String otpValue;
     // Operation ID is extracted from OTP record in case that otpId is sent
+    private AuthMethod authMethod;
     private boolean updateOperation;
 
 }

@@ -63,6 +63,7 @@ public class OtpDefinitionEntity implements Serializable {
     private String encryptionAlgorithm;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private OtpDefinitionStatus status;
 
     @Column(name = "timestamp_created", nullable = false)

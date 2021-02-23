@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -31,12 +32,14 @@ public class CredentialAuthenticationRequest {
 
     @NotNull
     private String credentialName;
-    private String username;
+    @NotNull
+    private String userId;
     @NotNull
     private String credentialValue;
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify;
     private String operationId;
+    private AuthMethod authMethod;
     private boolean updateOperation;
 
 }

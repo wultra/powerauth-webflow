@@ -47,6 +47,7 @@ public class UserIdentityHistoryEntity implements Serializable {
     private UserIdentityEntity userId;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserIdentityStatus status;
 
     @Column(name = "roles")

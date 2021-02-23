@@ -32,7 +32,7 @@ public class CreateOtpPolicyRequest {
     private String description;
     @NotNull
     private Integer length;
-    private Integer attemptLimit;
+    private Long attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
 

@@ -37,8 +37,8 @@ public class UpdateCredentialPolicyResponse {
     private Integer credentialLengthMin;
     private Integer credentialLengthMax;
     private String credentialAllowedChars;
-    private Integer limitSoft;
-    private Integer limitHard;
+    private Long limitSoft;
+    private Long limitHard;
     private int checkHistoryCount;
     private boolean rotationEnabled;
     private Integer rotationDays;

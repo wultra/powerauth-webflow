@@ -49,6 +49,7 @@ public class ApplicationEntity implements Serializable {
     private String description;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
     @ManyToOne

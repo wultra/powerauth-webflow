@@ -63,6 +63,7 @@ public class OtpEntity implements Serializable {
     private byte[] salt;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private OtpStatus status;
 
     @Column(name = "otp_data", nullable = false)

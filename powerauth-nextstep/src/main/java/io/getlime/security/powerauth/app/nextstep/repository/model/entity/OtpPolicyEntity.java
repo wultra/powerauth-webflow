@@ -49,13 +49,14 @@ public class OtpPolicyEntity implements Serializable {
     private String description;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private OtpPolicyStatus status;
 
     @Column(name = "length", nullable = false)
     private Integer length;
 
     @Column(name = "attempt_limit")
-    private Integer attemptLimit;
+    private Long attemptLimit;
 
     @Column(name = "expiration_time")
     private Long expirationTime;

@@ -50,6 +50,7 @@ public class CredentialEntity implements Serializable {
     private UserIdentityEntity userId;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CredentialType type;
 
     @Column(name = "user_name")
@@ -59,6 +60,7 @@ public class CredentialEntity implements Serializable {
     private String value;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CredentialStatus status;
 
     @Column(name = "attempt_counter")

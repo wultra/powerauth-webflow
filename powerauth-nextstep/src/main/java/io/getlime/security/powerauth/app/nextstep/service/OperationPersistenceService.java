@@ -29,13 +29,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -55,12 +56,13 @@ public class OperationPersistenceService {
 
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final StepResolutionService stepResolutionService;
 
     /**
      * Service constructor.
@@ -68,16 +70,18 @@ public class OperationPersistenceService {
      * @param operationRepository             Operation repository.
      * @param operationHistoryRepository      Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param stepResolutionService           Step resolution service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OperationHistoryRepository operationHistoryRepository,
-                                       MobileTokenConfigurationService mobileTokenConfigurationService) {
-        this.objectMapper = new ObjectMapper();
+                                       MobileTokenConfigurationService mobileTokenConfigurationService,
+                                       @Lazy StepResolutionService stepResolutionService) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+        this.stepResolutionService = stepResolutionService;
     }
 
     /**
@@ -131,6 +135,25 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Update an operation.
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException {
+        // Resolve response based on dynamic step definitions
+        UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
+
+        // Persist operation update
+        updateOperation(request, response);
+        return response;
+    }
+
+    /**
      * Convert an UpdateOperationRequest and UpdateOperationResponse into OperationEntity and OperationHistoryEntity.
      * Both entities are persisted to update the status of processed operation as well as update its history.
      *
@@ -138,7 +161,7 @@ public class OperationPersistenceService {
      * @param response create response generated for the client
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
+    private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
@@ -389,8 +412,7 @@ public class OperationPersistenceService {
             return steps;
         }
         try {
-            steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {
-            }));
+            steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {}));
             return steps;
         } catch (IOException e) {
             // in case of an error empty list is returned

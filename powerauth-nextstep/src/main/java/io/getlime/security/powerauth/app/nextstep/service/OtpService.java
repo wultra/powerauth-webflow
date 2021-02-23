@@ -221,6 +221,44 @@ public class OtpService {
     }
 
     /**
+     * Find an OTP by an otp ID and/or operation ID. This method is not transactional.
+     * @param otpId Otp ID.
+     * @param operationId Operation ID.
+     * @return OTP entity.
+     * @throws OtpNotFoundException Thrown when operation is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    public OtpEntity findOtp(String otpId, String operationId) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
+        OtpEntity otp;
+        if (otpId != null) {
+            Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
+            if (!otpOptional.isPresent()) {
+                throw new OtpNotFoundException("OTP not found: " + otpId);
+            }
+            otp = otpOptional.get();
+            if (operationId != null) {
+                if (otp.getOperation() == null) {
+                    throw new InvalidRequestException("OTP was not created within an operation: " + otpId);
+                }
+                if (!operationId.equals(otp.getOperation().getOperationId())) {
+                    throw new InvalidRequestException("Operation ID mismatch for an OTP: " + otpId + ", operation ID: " + operationId);
+                }
+            }
+        } else if (operationId != null) {
+            OperationEntity operation = operationPersistenceService.getOperation(operationId);
+            List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
+            if (otpList.isEmpty()) {
+                throw new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId());
+            }
+            otp = otpList.get(0);
+        } else {
+            throw new InvalidRequestException("Missing otp ID or operation ID");
+        }
+        return otp;
+    }
+
+    /**
      * Get OTP detail for given OTP and operation.
      * @param otp OTP entity.
      * @return Operation detail.
@@ -248,44 +286,6 @@ public class OtpService {
         otpDetail.setTimestampCreated(otp.getTimestampCreated());
         otpDetail.setTimestampExpired(otp.getTimestampExpired());
         return otpDetail;
-    }
-
-    /**
-     * Find an OTP by an otp ID and/or operation ID.
-     * @param otpId Otp ID.
-     * @param operationId Operation ID.
-     * @return OTP entity.
-     * @throws OtpNotFoundException Thrown when operation is not found.
-     * @throws InvalidRequestException Thrown when request is invalid.
-     * @throws OperationNotFoundException Thrown when operation is not found.
-     */
-    private OtpEntity findOtp(String otpId, String operationId) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
-        OtpEntity otp;
-        if (otpId != null) {
-            Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
-            if (!otpOptional.isPresent()) {
-                throw new OtpNotFoundException("OTP not found: " + otpId);
-            }
-            otp = otpOptional.get();
-            if (operationId != null) {
-                if (otp.getOperation() == null) {
-                    throw new InvalidRequestException("OTP was not created within an operation: " + otpId);
-                }
-                if (!operationId.equals(otp.getOperation().getOperationId())) {
-                    throw new InvalidRequestException("Operation ID mismatch for an OTP: " + otpId + ", operation ID: " + operationId);
-                }
-            }
-        } else if (operationId != null) {
-            OperationEntity operation = operationPersistenceService.getOperation(operationId);
-            List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
-            if (otpList.isEmpty()) {
-                throw new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId());
-            }
-            otp = otpList.get(0);
-        } else {
-            throw new InvalidRequestException("Missing otp ID or operation ID");
-        }
-        return otp;
     }
 
     /**

@@ -50,6 +50,7 @@ public class UserContactEntity implements Serializable {
     private String name;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private ContactType type;
 
     @Column(name = "value", nullable = false)

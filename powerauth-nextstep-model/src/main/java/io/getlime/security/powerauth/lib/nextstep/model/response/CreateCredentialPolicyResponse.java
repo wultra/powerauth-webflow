@@ -38,8 +38,8 @@ public class CreateCredentialPolicyResponse {
     private Integer credentialLengthMin;
     private Integer credentialLengthMax;
     private String credentialAllowedChars;
-    private Integer limitSoft;
-    private Integer limitHard;
+    private Long limitSoft;
+    private Long limitHard;
     private long checkHistoryCount;
     private boolean rotationEnabled;
     private Integer rotationDays;

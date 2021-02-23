@@ -120,11 +120,8 @@ public class OperationController {
 
     private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws NextStepServiceException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
-        // resolve response based on dynamic step definitions
-        UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
-        // persist operation update
-        operationPersistenceService.updateOperation(request.getRequestObject(), response);
+        UpdateOperationResponse response = operationPersistenceService.updateOperation(request.getRequestObject());
 
         logger.info("The updateOperation request succeeded, operation ID: {}, result: {}", response.getOperationId(), response.getResult().toString());
         for (AuthStep step: response.getSteps()) {

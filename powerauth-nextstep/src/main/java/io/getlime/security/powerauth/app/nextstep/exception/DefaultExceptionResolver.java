@@ -520,6 +520,18 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for user identity is not active.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(UserNotActiveException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleUserNotActiveException(UserNotActiveException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(UserNotActiveException.CODE, "User identity is not active.");
+        return new ErrorResponse(error);
+    }
+    /**
      * Exception handler for user alias already exists error.
      * @param ex Exception.
      * @return Response with error details.

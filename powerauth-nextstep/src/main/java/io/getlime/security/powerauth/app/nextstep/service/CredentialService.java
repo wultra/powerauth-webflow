@@ -323,6 +323,29 @@ public class CredentialService {
         return response;
     }
 
+    /**
+     * Find a credential. This method is not transactional.
+     * @param credentialDefinition Credential definition.
+     * @param user User identity entity.
+     * @return Credential.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     */
+    public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
+        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
+        if (!credentialOptional.isPresent()) {
+            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+        }
+        CredentialEntity credential = credentialOptional.get();
+        if (credential.getStatus() == CredentialStatus.REMOVED) {
+            throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+        }
+        if (credential.getStatus() != CredentialStatus.ACTIVE) {
+            throw new CredentialNotActiveException("Credential is not ACTIVE: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+        }
+        return credential;
+    }
+
 
     /**
      * Validate a username.

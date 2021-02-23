@@ -49,6 +49,7 @@ public class HashConfigEntity implements Serializable {
     private String algorithm;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private HashConfigStatus status;
 
     @Column(name = "parameters")

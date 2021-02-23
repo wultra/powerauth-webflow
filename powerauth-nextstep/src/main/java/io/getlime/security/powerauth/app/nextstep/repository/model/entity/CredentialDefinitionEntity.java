@@ -58,6 +58,7 @@ public class CredentialDefinitionEntity implements Serializable {
     private CredentialPolicyEntity credentialPolicy;
 
     @Column(name = "category", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CredentialCategory category;
 
     @Column(name = "encryption_enabled")
@@ -74,6 +75,7 @@ public class CredentialDefinitionEntity implements Serializable {
     private boolean e2eEncryptionEnabled;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CredentialDefinitionStatus status;
 
     @Column(name = "timestamp_created", nullable = false)

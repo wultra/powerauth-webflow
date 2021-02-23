@@ -49,6 +49,7 @@ public class CredentialPolicyEntity implements Serializable {
     private String description;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private CredentialPolicyStatus status;
 
     @Column(name = "username_length_min")
@@ -70,10 +71,10 @@ public class CredentialPolicyEntity implements Serializable {
     private String credentialAllowedChars;
 
     @Column(name = "limit_soft")
-    private Integer limitSoft;
+    private Long limitSoft;
 
     @Column(name = "limit_hard")
-    private Integer limitHard;
+    private Long limitHard;
 
     @Column(name = "check_history_count")
     private int checkHistoryCount;

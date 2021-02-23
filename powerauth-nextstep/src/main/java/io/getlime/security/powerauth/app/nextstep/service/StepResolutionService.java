@@ -135,9 +135,13 @@ public class StepResolutionService {
      *
      * @param request Request to update an existing operation.
      * @return Response with ordered list of next steps.
-     * @throws NextStepServiceException Thrown when next step resolution fails.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      */
-    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws NextStepServiceException {
+    public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws OperationNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         checkLegitimityOfUpdate(operation, request);
         UpdateOperationResponse response = new UpdateOperationResponse();
@@ -402,9 +406,11 @@ public class StepResolutionService {
      *
      * @param operationEntity Operation entity.
      * @param request Update request.
-     * @throws NextStepServiceException Thrown when update is not legitimate.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
      */
-    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws NextStepServiceException {
+    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException {
         if (request == null || request.getOperationId() == null) {
             throw new IllegalArgumentException("Operation update failed, because request is invalid.");
         }

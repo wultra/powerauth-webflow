@@ -48,6 +48,7 @@ public class AuthenticationEntity implements Serializable {
     private UserIdentityEntity userId;
 
     @Column(name = "type", nullable = false)
+    @Enumerated(EnumType.STRING)
     private AuthenticationType authenticationType;
 
     @ManyToOne
@@ -63,12 +64,15 @@ public class AuthenticationEntity implements Serializable {
     private OperationEntity operation;
 
     @Column(name = "result", nullable = false)
+    @Enumerated(EnumType.STRING)
     private AuthenticationResult result;
 
     @Column(name = "result_credential")
+    @Enumerated(EnumType.STRING)
     private AuthenticationResult resultCredential;
 
     @Column(name = "result_otp")
+    @Enumerated(EnumType.STRING)
     private AuthenticationResult resultOtp;
 
     @Column(name = "timestamp_created", nullable = false)

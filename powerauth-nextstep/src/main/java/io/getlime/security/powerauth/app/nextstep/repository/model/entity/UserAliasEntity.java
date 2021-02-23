@@ -53,6 +53,7 @@ public class UserAliasEntity implements Serializable {
     private String value;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserAliasStatus status;
 
     @Column(name = "extras")

@@ -51,6 +51,7 @@ public class UserRoleEntity implements Serializable {
     private RoleEntity role;
 
     @Column(name = "status", nullable = false)
+    @Enumerated(EnumType.STRING)
     private UserRoleStatus status;
 
     @Column(name = "timestamp_created", nullable = false)
