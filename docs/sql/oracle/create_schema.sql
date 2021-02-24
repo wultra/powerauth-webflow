@@ -334,7 +334,7 @@ CREATE TABLE ns_credential_storage (
   failed_attempt_counter_soft      NUMBER(19,0) DEFAULT 0 NOT NULL,         -- Soft failed attempt counter.
   failed_attempt_counter_hard      NUMBER(19,0) DEFAULT 0 NOT NULL,         -- Hard failed attempt counter.
   timestamp_created                TIMESTAMP,                               -- Timestamp when credential was created.
-  timestamp_expired                TIMESTAMP,                               -- Timestamp when credential was expired.
+  timestamp_expires                TIMESTAMP,                               -- Timestamp when credential expires.
   timestamp_blocked                TIMESTAMP,                               -- Timestamp when credential was blocked.
   timestamp_last_updated           TIMESTAMP,                               -- Timestamp when credential was last updated.
   timestamp_last_credential_change TIMESTAMP,                               -- Timestamp when credential value was last changed.
@@ -368,7 +368,9 @@ CREATE TABLE ns_otp_storage (
   attempt_counter             NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password attempt counter.
   failed_attempt_counter      NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password failed attempt counter.
   timestamp_created           TIMESTAMP,                                    -- Timestamp when one time password was created.
-  timestamp_expired           TIMESTAMP,                                    -- Timestamp when one time password was expired.
+  timestamp_verified          TIMESTAMP,                                    -- Timestamp when one time password was verified.
+  timestamp_blocked          TIMESTAMP,                                    -- Timestamp when one time password was blocked.
+  timestamp_expires           TIMESTAMP,                                    -- Timestamp when one time password expires.
   CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
   CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );

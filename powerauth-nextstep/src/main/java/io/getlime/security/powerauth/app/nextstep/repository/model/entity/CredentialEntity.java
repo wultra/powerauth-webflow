@@ -75,8 +75,8 @@ public class CredentialEntity implements Serializable {
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 
-    @Column(name = "timestamp_expired")
-    private Date timestampExpired;
+    @Column(name = "timestamp_expires")
+    private Date timestampExpires;
 
     @Column(name = "timestamp_blocked")
     private Date timestampBlocked;

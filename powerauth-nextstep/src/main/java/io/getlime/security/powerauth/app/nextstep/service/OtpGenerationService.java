@@ -48,6 +48,7 @@ public class OtpGenerationService {
         Integer length = otpPolicy.getLength();
         String otpGenAlgorithm = otpPolicy.getGenAlgorithm();
         switch (otpGenAlgorithm) {
+            case "DEFAULT":
             case "OTP_DATA_DIGEST":
                 try {
                     DataDigest dataDigest = new DataDigest(length);

@@ -70,7 +70,7 @@ public class CredentialController {
     }
 
     @RequestMapping(value = "validate", method = RequestMethod.POST)
-    public ObjectResponse<ValidateCredentialResponse> validateCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException {
+    public ObjectResponse<ValidateCredentialResponse> validateCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException {
         // TODO - request validation
         ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
@@ -91,14 +91,14 @@ public class CredentialController {
     }
 
     @RequestMapping(value = "block", method = RequestMethod.POST)
-    public ObjectResponse<BlockCredentialResponse> blockCredential(@RequestBody ObjectRequest<BlockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public ObjectResponse<BlockCredentialResponse> blockCredential(@RequestBody ObjectRequest<BlockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
         // TODO - request validation
         BlockCredentialResponse response = credentialService.blockCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
-    public ObjectResponse<UnblockCredentialResponse> unblockCredential(@RequestBody ObjectRequest<UnblockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public ObjectResponse<UnblockCredentialResponse> unblockCredential(@RequestBody ObjectRequest<UnblockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
         // TODO - request validation
         UnblockCredentialResponse response = credentialService.unblockCredential(request.getRequestObject());
         return new ObjectResponse<>(response);

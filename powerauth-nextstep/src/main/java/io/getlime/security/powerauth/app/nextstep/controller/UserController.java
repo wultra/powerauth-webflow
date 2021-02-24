@@ -213,14 +213,14 @@ public class UserController {
     }
 
     @RequestMapping(value = "block", method = RequestMethod.POST)
-    public ObjectResponse<BlockUserResponse> blockUser(@RequestBody ObjectRequest<BlockUserRequest> request) throws UserNotFoundException {
+    public ObjectResponse<BlockUserResponse> blockUser(@RequestBody ObjectRequest<BlockUserRequest> request) throws UserNotFoundException, UserNotActiveException {
         // TODO - request validation
         BlockUserResponse response = userIdentityService.blockUser(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
-    public ObjectResponse<UnblockUserResponse> unblockUser(@RequestBody ObjectRequest<UnblockUserRequest> request) throws UserNotFoundException {
+    public ObjectResponse<UnblockUserResponse> unblockUser(@RequestBody ObjectRequest<UnblockUserRequest> request) throws UserNotFoundException, UserNotBlockedException {
         // TODO - request validation
         UnblockUserResponse response = userIdentityService.unblockUser(request.getRequestObject());
         return new ObjectResponse<>(response);

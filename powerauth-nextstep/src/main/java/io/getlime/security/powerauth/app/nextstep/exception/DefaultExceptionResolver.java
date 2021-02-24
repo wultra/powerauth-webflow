@@ -648,6 +648,19 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for credential not blocked error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(CredentialNotBlockedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleCredentialNotBlockedException(CredentialNotBlockedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(CredentialNotBlockedException.CODE, "Credential is not blocked.");
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception handler for username already exists error.
      * @param ex Exception.
      * @return Response with error details.

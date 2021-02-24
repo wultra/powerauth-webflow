@@ -78,7 +78,13 @@ public class OtpEntity implements Serializable {
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 
-    @Column(name = "timestamp_expired")
-    private Date timestampExpired;
+    @Column(name = "timestamp_verified")
+    private Date timestampVerified;
+
+    @Column(name = "timestamp_blocked")
+    private Date timestampBlocked;
+
+    @Column(name = "timestamp_expires")
+    private Date timestampExpires;
 
 }

@@ -42,7 +42,7 @@ public class CredentialDetail {
     private boolean credentialChangeRequired;
     @NotNull
     private Date timestampCreated;
-    private Date timestampExpired;
+    private Date timestampExpires;
     private Date timestampBlocked;
     private Date timestampLastUpdated;
     private Date timestampLastCredentialChange;

@@ -290,9 +290,10 @@ public class CredentialService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
      */
     @Transactional
-    public BlockCredentialResponse blockCredential(BlockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public BlockCredentialResponse blockCredential(BlockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -300,14 +301,12 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         CredentialEntity credential = credentialOptional.get();
-        if (credential.getStatus() == CredentialStatus.REMOVED) {
-            throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
+        if (credential.getStatus() != CredentialStatus.ACTIVE) {
+            throw new CredentialNotActiveException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        if (credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT) {
-            credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
-            credential.setTimestampBlocked(new Date());
-            credentialRepository.save(credential);
-        }
+        credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
+        credential.setTimestampBlocked(new Date());
+        credentialRepository.save(credential);
         BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -322,9 +321,10 @@ public class CredentialService {
      * @throws UserNotFoundException Thrown in case user is not found.
      * @throws CredentialDefinitionNotFoundException Thrown in case credential definition is not found.
      * @throws CredentialNotFoundException Thrown in case credential is not found.
+     * @throws CredentialNotBlockedException Thrown in case credential is not blocked.
      */
     @Transactional
-    public UnblockCredentialResponse unblockCredential(UnblockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public UnblockCredentialResponse unblockCredential(UnblockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -335,13 +335,14 @@ public class CredentialService {
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            credentialRepository.save(credential);
+        if (credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT && credential.getStatus() != CredentialStatus.BLOCKED_TEMPORARY) {
+            throw new CredentialNotBlockedException("Credential is not BLOCKED_PERMANENT or BLOCKED_TEMPORARY: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setFailedAttemptCounterSoft(0L);
         credential.setFailedAttemptCounterHard(0L);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
+        credentialRepository.save(credential);
         UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -497,7 +498,7 @@ public class CredentialService {
         }
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
         credentialDetail.setTimestampLastUpdated(credential.getTimestampLastUpdated());
-        credentialDetail.setTimestampExpired(credential.getTimestampExpired());
+        credentialDetail.setTimestampExpired(credential.getTimestampExpires());
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
         return credentialDetail;

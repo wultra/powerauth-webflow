@@ -467,14 +467,16 @@ public class UserIdentityService {
      * @param request Block user identity request.
      * @return Block user identity response.
      * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws UserNotActiveException Thrown when user identity is not active.
      */
     @Transactional
-    public BlockUserResponse blockUser(BlockUserRequest request) throws UserNotFoundException {
+    public BlockUserResponse blockUser(BlockUserRequest request) throws UserNotFoundException, UserNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        if (user.getStatus() != UserIdentityStatus.BLOCKED) {
-            user.setStatus(UserIdentityStatus.BLOCKED);
-            userIdentityRepository.save(user);
+        if (user.getStatus() != UserIdentityStatus.ACTIVE) {
+            throw new UserNotActiveException("User identity is not BLOCKED: " + request.getUserId());
         }
+        user.setStatus(UserIdentityStatus.BLOCKED);
+        userIdentityRepository.save(user);
         BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -486,14 +488,16 @@ public class UserIdentityService {
      * @param request Unblock user identity request.
      * @return Unblock user identity response.
      * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws UserNotBlockedException Thrown when user identity is not blocked.
      */
     @Transactional
-    public UnblockUserResponse unblockUser(UnblockUserRequest request) throws UserNotFoundException {
+    public UnblockUserResponse unblockUser(UnblockUserRequest request) throws UserNotFoundException, UserNotBlockedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        if (user.getStatus() != UserIdentityStatus.ACTIVE) {
-            user.setStatus(UserIdentityStatus.ACTIVE);
-            userIdentityRepository.save(user);
+        if (user.getStatus() != UserIdentityStatus.BLOCKED) {
+            throw new UserNotBlockedException("User identity is not BLOCKED: " + request.getUserId());
         }
+        user.setStatus(UserIdentityStatus.ACTIVE);
+        userIdentityRepository.save(user);
         UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());

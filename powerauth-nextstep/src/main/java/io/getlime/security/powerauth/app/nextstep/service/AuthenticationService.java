@@ -201,10 +201,21 @@ public class AuthenticationService {
             authenticationResult = AuthenticationResult.FAILED;
         }
 
+        if (authenticationResult == AuthenticationResult.SUCCEEDED) {
+            otp.setStatus(OtpStatus.USED);
+            otp.setTimestampVerified(new Date());
+        }
+
         CredentialEntity credential = null;
         if (otp.getCredentialDefinition() != null && otp.getUserId() != null) {
             credential = credentialService.findCredential(otp.getCredentialDefinition(), otp.getUserId());
             credentialCounterService.updateCredentialCounter(credential, authenticationResult);
+        }
+
+        Long remainingAttempts = resolveRemainingAttempts(credential, otp);
+        if (remainingAttempts == 0L && otp.getStatus() == OtpStatus.ACTIVE) {
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
         }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
@@ -225,8 +236,6 @@ public class AuthenticationService {
                     authentication, Collections.singletonList(AuthInstrument.OTP_KEY));
         }
 
-        Long remainingAttempts = resolveRemainingAttempts(credential, otp);
-
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
         if (user != null) {
             response.setUserId(user.getUserId());
@@ -236,8 +245,8 @@ public class AuthenticationService {
         response.setRemainingAttempts(remainingAttempts);
         response.setOtpStatus(otp.getStatus());
         if (credential != null) {
-            response.setTimestampBlocked(credential.getTimestampBlocked());
             response.setCredentialStatus(credential.getStatus());
+            response.setTimestampBlocked(credential.getTimestampBlocked());
         }
         return response;
     }
@@ -307,8 +316,19 @@ public class AuthenticationService {
             authenticationResult = AuthenticationResult.FAILED;
         }
 
+        if (authenticationResult == AuthenticationResult.SUCCEEDED) {
+            otp.setStatus(OtpStatus.USED);
+            otp.setTimestampVerified(new Date());
+        }
+
         // Update counters based on authentication result
         credentialCounterService.updateCredentialCounter(credential, authenticationResult);
+
+        Long remainingAttempts = resolveRemainingAttempts(credential, otp);
+        if (remainingAttempts == 0L && otp.getStatus() == OtpStatus.ACTIVE) {
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
+        }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
@@ -328,8 +348,6 @@ public class AuthenticationService {
             updateOperation(user, operation, request.getAuthMethod(), credential,
                     authentication, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
         }
-
-        Long remainingAttempts = resolveRemainingAttempts(credential, otp);
 
         CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
         response.setUserId(user.getUserId());
@@ -415,6 +433,11 @@ public class AuthenticationService {
      * @return Authentication result.
      */
     private AuthenticationResult verifyOtp(OtpEntity otp, String otpValue) {
+        if (otp.getTimestampExpires() != null && otp.getTimestampExpires().before(new Date())) {
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
+            return AuthenticationResult.FAILED;
+        }
         if (otp.getValue().matches(otpValue)) {
             return AuthenticationResult.SUCCEEDED;
         } else {

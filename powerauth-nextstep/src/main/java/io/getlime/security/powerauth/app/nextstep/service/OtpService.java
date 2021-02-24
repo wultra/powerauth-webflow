@@ -36,10 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * This service handles persistence of one time passwords.
@@ -143,6 +140,12 @@ public class OtpService {
         otp.setAttemptCounter(0);
         otp.setFailedAttemptCounter(0);
         otp.setTimestampCreated(new Date());
+        Long expirationTime = otpDefinition.getOtpPolicy().getExpirationTime();
+        if (expirationTime != null) {
+            Calendar cal = GregorianCalendar.getInstance();
+            cal.add(Calendar.SECOND, expirationTime.intValue());
+            otp.setTimestampExpires(cal.getTime());
+        }
         otpRepository.save(otp);
         CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
@@ -284,7 +287,7 @@ public class OtpService {
         otpDetail.setFailedAttemptCounter(otp.getFailedAttemptCounter());
         otpDetail.setOtpStatus(otp.getStatus());
         otpDetail.setTimestampCreated(otp.getTimestampCreated());
-        otpDetail.setTimestampExpired(otp.getTimestampExpired());
+        otpDetail.setTimestampExpires(otp.getTimestampExpires());
         return otpDetail;
     }
 

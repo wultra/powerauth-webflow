@@ -49,6 +49,6 @@ public class OtpDetail {
     private OtpStatus otpStatus;
     @NotNull
     private Date timestampCreated;
-    private Date timestampExpired;
+    private Date timestampExpires;
 
 }
