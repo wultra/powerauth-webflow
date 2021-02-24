@@ -15,11 +15,13 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
@@ -49,6 +51,8 @@ public class CredentialService {
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
     private final CredentialRepository credentialRepository;
+
+    private final CredentialConverter credentialConverter = new CredentialConverter();
 
     /**
      * Credential service constructor.
@@ -146,6 +150,28 @@ public class CredentialService {
         response.setCredentialType(credential.getType());
         response.setCredentialStatus(credential.getStatus());
         response.setUsername(credential.getUsername());
+        return response;
+    }
+
+    /**
+     * Get credential list for a user identity.
+     * @param request Get credential list request.
+     * @return Get credential list response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     */
+    @Transactional
+    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException {
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        GetUserCredentialListResponse response = new GetUserCredentialListResponse();
+        response.setUserId(user.getUserId());
+        List<CredentialEntity> credentials = credentialRepository.findAllByUserId(user);
+        for (CredentialEntity credential: credentials) {
+            if (credential.getStatus() == CredentialStatus.REMOVED && !request.isIncludeRemoved()) {
+                continue;
+            }
+            CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
+            response.getCredentials().add(credentialDetail);
+        }
         return response;
     }
 

@@ -80,6 +80,9 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "mobile_token_active")
     private boolean mobileTokenActive;
 
+    @Column(name = "authentication_id")
+    private String authenticationId;
+
     @ManyToOne
     @JoinColumn(name = "operation_id", insertable = false, updatable = false, nullable = false)
     private OperationEntity operation;

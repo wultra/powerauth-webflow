@@ -45,5 +45,6 @@ public class UpdateOperationRequest {
     private String authStepResultDescription;
     private final List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
+    private String authenticationId;
 
 }

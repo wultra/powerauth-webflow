@@ -30,7 +30,7 @@ public class GetUserAuthenticationListRequest {
 
     @NotNull
     private String userId;
-    private Date startDate;
-    private Date endDate;
+    private Date createdStartDate;
+    private Date createdEndDate;
 
 }

@@ -18,20 +18,20 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.nextstep.converter.AuthenticationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthenticationDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CombinedAuthenticationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CredentialAuthenticationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.OtpAuthenticationRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CombinedAuthenticationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CredentialAuthenticationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthenticationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.OtpAuthenticationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,10 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * This service handles user authentication.
@@ -61,6 +58,8 @@ public class AuthenticationService {
     private final OperationPersistenceService operationPersistenceService;
     private final CredentialService credentialService;
     private final CredentialCounterService credentialCounterService;
+
+    private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -132,6 +131,7 @@ public class AuthenticationService {
         credentialCounterService.updateCredentialCounter(credential, authenticationResult);
 
         AuthenticationEntity authentication = new AuthenticationEntity();
+        authentication.setAuthenticationId(UUID.randomUUID().toString());
         authentication.setUserId(user);
         authentication.setAuthenticationType(AuthenticationType.CREDENTIAL);
         authentication.setCredential(credential);
@@ -145,7 +145,7 @@ public class AuthenticationService {
 
         if (request.isUpdateOperation() && operation != null) {
             updateOperation(user, operation, request.getAuthMethod(), credential,
-                    authenticationResult, Collections.singletonList(AuthInstrument.CREDENTIAL));
+                    authentication, Collections.singletonList(AuthInstrument.CREDENTIAL));
         }
 
         Long remainingAttempts = resolveRemainingAttempts(credential, null);
@@ -208,6 +208,7 @@ public class AuthenticationService {
         }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
+        authentication.setAuthenticationId(UUID.randomUUID().toString());
         authentication.setUserId(user);
         authentication.setAuthenticationType(AuthenticationType.OTP);
         authentication.setOtp(otp);
@@ -221,7 +222,7 @@ public class AuthenticationService {
 
         if (request.isUpdateOperation() && operation != null) {
             updateOperation(user, operation, request.getAuthMethod(), credential,
-                    authenticationResult, Collections.singletonList(AuthInstrument.OTP_KEY));
+                    authentication, Collections.singletonList(AuthInstrument.OTP_KEY));
         }
 
         Long remainingAttempts = resolveRemainingAttempts(credential, otp);
@@ -310,8 +311,9 @@ public class AuthenticationService {
         credentialCounterService.updateCredentialCounter(credential, authenticationResult);
 
         AuthenticationEntity authentication = new AuthenticationEntity();
+        authentication.setAuthenticationId(UUID.randomUUID().toString());
         authentication.setUserId(user);
-        authentication.setAuthenticationType(AuthenticationType.CREDENTIAL);
+        authentication.setAuthenticationType(AuthenticationType.CREDENTIAL_OTP);
         authentication.setCredential(credential);
         if (operation != null) {
             authentication.setOperation(operation);
@@ -324,7 +326,7 @@ public class AuthenticationService {
 
         if (request.isUpdateOperation() && operation != null) {
             updateOperation(user, operation, request.getAuthMethod(), credential,
-                    authenticationResult, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
+                    authentication, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
         }
 
         Long remainingAttempts = resolveRemainingAttempts(credential, otp);
@@ -339,6 +341,42 @@ public class AuthenticationService {
         response.setCredentialAuthenticationResult(credentialAuthenticationResult);
         response.setOtpAuthenticationResult(otpAuthenticationResult);
         response.setRemainingAttempts(remainingAttempts);
+        return response;
+    }
+
+    /**
+     * Get list of authentications for user.
+     * @param request Get user authentication list request.
+     * @return Get user authentication list response.
+     * @throws UserNotFoundException Thrown when user is not found.
+     */
+    @Transactional
+    public GetUserAuthenticationListResponse getUserAuthenticationList(GetUserAuthenticationListRequest request) throws UserNotFoundException {
+        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        List<AuthenticationEntity> authentications;
+        if (request.getCreatedStartDate() == null && request.getCreatedEndDate() == null) {
+            authentications = authenticationRepository.findAllByUserIdOrderByTimestampCreatedDesc(user);
+        }  else {
+            Date startDate;
+            Date endDate;
+            if (request.getCreatedStartDate() == null) {
+                startDate = new Date(0L);
+            } else {
+                startDate = request.getCreatedStartDate();
+            }
+            if (request.getCreatedEndDate() == null) {
+                endDate = new Date();
+            } else {
+                endDate = request.getCreatedEndDate();
+            }
+            authentications = authenticationRepository.findAuthenticationsByUserIdAndCreatedDate(user, startDate, endDate);
+        }
+        GetUserAuthenticationListResponse response = new GetUserAuthenticationListResponse();
+        response.setUserId(user.getUserId());
+        for (AuthenticationEntity authentication: authentications) {
+            AuthenticationDetail authenticationDetail = authenticationConverter.fromEntity(authentication);
+            response.getAuthentications().add(authenticationDetail);
+        }
         return response;
     }
 
@@ -390,7 +428,7 @@ public class AuthenticationService {
      * @param operation Operation entity.
      * @param authMethod Authentication method performing authentication.
      * @param credential Credential entity.
-     * @param authenticationResult Authentication result.
+     * @param authentication Authentication entity.
      * @throws InvalidRequestException Thrown in case request is invalid.
      * @throws InvalidConfigurationException Thrown in case Next Step configuration is invalid.
      * @throws OperationNotFoundException Thrown in case operation is not found.
@@ -401,7 +439,7 @@ public class AuthenticationService {
      * @throws OperationNotValidException Thrown in case operation is not valid.
      */
     private void updateOperation(UserIdentityEntity user, OperationEntity operation, AuthMethod authMethod,
-                                 CredentialEntity credential, AuthenticationResult authenticationResult,
+                                 CredentialEntity credential, AuthenticationEntity authentication,
                                  List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
         UpdateOperationRequest updateRequest = new UpdateOperationRequest();
         if (user != null) {
@@ -427,6 +465,7 @@ public class AuthenticationService {
                         "during credential authentication, operation ID: " + operation.getOperationId());
             }
         }
+        AuthenticationResult authenticationResult = authentication.getResult();
         if (authenticationResult == AuthenticationResult.SUCCEEDED) {
             updateRequest.setAuthStepResult(AuthStepResult.CONFIRMED);
         } else if (credential == null || credential.getStatus() == CredentialStatus.ACTIVE) {
@@ -434,6 +473,7 @@ public class AuthenticationService {
         } else {
             updateRequest.setAuthStepResult(AuthStepResult.AUTH_METHOD_FAILED);
         }
+        updateRequest.setAuthenticationId(authentication.getAuthenticationId());
         operationPersistenceService.updateOperation(updateRequest);
     }
 
@@ -467,4 +507,5 @@ public class AuthenticationService {
         }
         return remainingAttempts;
     }
+
 }

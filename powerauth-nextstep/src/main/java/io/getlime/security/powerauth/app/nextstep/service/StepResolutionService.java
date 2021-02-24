@@ -426,25 +426,25 @@ public class StepResolutionService {
             throw new InvalidRequestException("Operation update failed, because request is invalid.");
         }
         if (operationEntity == null) {
-            throw new OperationNotFoundException("Operation update failed, because operation does not exist (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotFoundException("Operation update failed, because operation does not exist, operation ID: " + request.getOperationId() + ".");
         }
         if (request.getAuthMethod() == null) {
-            throw new InvalidRequestException("Operation update failed, because authentication method is missing (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because authentication method is missing, operation ID: " + request.getOperationId() + ".");
         }
         // INIT method can cancel other operations due to concurrency check
         if (request.getAuthStepResult() != AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
-            throw new InvalidRequestException("Operation update failed, because INIT method cannot be updated (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because INIT method cannot be updated, operation ID: " + request.getOperationId() + ".");
         }
         if (request.getAuthStepResult() == null) {
-            throw new InvalidRequestException("Operation update failed, because result of authentication step is missing (operationId: " + request.getOperationId() + ").");
+            throw new InvalidRequestException("Operation update failed, because result of authentication step is missing, operation ID: " + request.getOperationId() + ".");
         }
         List<OperationHistoryEntity> operationHistory = operationEntity.getOperationHistory();
         if (operationHistory.isEmpty()) {
-            throw new OperationNotValidException("Operation update failed, because operation is missing its history (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotValidException("Operation update failed, because operation is missing its history, operation ID: " + request.getOperationId() + ".");
         }
         OperationHistoryEntity initOperationItem = operationHistory.get(0);
         if (initOperationItem.getRequestAuthMethod() != AuthMethod.INIT || initOperationItem.getRequestAuthStepResult() != AuthStepResult.CONFIRMED) {
-            throw new OperationNotValidException("Operation update failed, because INIT step for this operation is invalid (operationId: " + request.getOperationId() + ").");
+            throw new OperationNotValidException("Operation update failed, because INIT step for this operation is invalid, operation ID: " + request.getOperationId() + ".");
         }
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
         // operation can be canceled anytime (e.g. by closed Web Socket) - do not check for step continuation
@@ -470,21 +470,21 @@ public class StepResolutionService {
                 }
             }
             if (!stepAuthMethodValid) {
-                throw new InvalidRequestException("Operation update failed, because authentication method is invalid (operationId: " + request.getOperationId() + ").");
+                throw new InvalidRequestException("Operation update failed, because authentication method is invalid, operation ID: " + request.getOperationId() + ".");
             }
         }
         for (OperationHistoryEntity historyItem : operationHistory) {
             if (historyItem.getResponseResult() == AuthResult.DONE) {
-                throw new OperationAlreadyFinishedException("Operation update failed, because operation is already in DONE state (operationId: " + request.getOperationId() + ").");
+                throw new OperationAlreadyFinishedException("Operation update failed, because operation is already in DONE state, operation ID: " + request.getOperationId() + ".");
             }
             if (historyItem.getResponseResult() == AuthResult.FAILED) {
                 // Do not allow to update a canceled operation (e.g. authorize an operation which is canceled),
                 // unless the request is a cancellation request - double cancellation of operations is allowed.
                 if (historyItem.getRequestAuthStepResult() == AuthStepResult.CANCELED && request.getAuthStepResult() != AuthStepResult.CANCELED) {
-                    throw new OperationAlreadyCanceledException("Operation update failed, because operation is canceled (operationId: " + request.getOperationId() + ").");
+                    throw new OperationAlreadyCanceledException("Operation update failed, because operation is canceled, operation ID: " + request.getOperationId() + ".");
                 } else if (request.getAuthStepResult() != AuthStepResult.CANCELED) {
                     // #102 - allow double cancellation requests, cancel requests may come from multiple channels, so this is a supported scenario
-                    throw new OperationAlreadyFailedException("Operation update failed, because operation is already in FAILED state (operationId: " + request.getOperationId() + ").");
+                    throw new OperationAlreadyFailedException("Operation update failed, because operation is already in FAILED state, operation ID: " + request.getOperationId() + ".");
                 }
             }
         }

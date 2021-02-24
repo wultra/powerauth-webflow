@@ -38,10 +38,8 @@ public class AuthenticationEntity implements Serializable {
     private static final long serialVersionUID = 1598100682966462736L;
 
     @Id
-    @SequenceGenerator(name = "ns_authentication", sequenceName = "ns_authentication_seq")
-    @GeneratedValue(strategy = GenerationType.AUTO, generator = "ns_authentication")
     @Column(name = "authentication_id", nullable = false)
-    private Long authenticationId;
+    private String authenticationId;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false)

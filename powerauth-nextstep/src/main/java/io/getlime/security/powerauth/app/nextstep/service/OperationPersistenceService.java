@@ -185,6 +185,7 @@ public class OperationPersistenceService {
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(request.getAuthMethod());
         operationHistory.setRequestAuthStepResult(request.getAuthStepResult());
+        operationHistory.setAuthenticationId(request.getAuthenticationId());
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {

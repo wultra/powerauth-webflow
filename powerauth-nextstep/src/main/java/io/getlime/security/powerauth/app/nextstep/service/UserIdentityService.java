@@ -501,28 +501,6 @@ public class UserIdentityService {
     }
 
     /**
-     * Get credential list for a user identity.
-     * @param request Get credential list request.
-     * @return Get credential list response.
-     * @throws UserNotFoundException Thrown when user identity is not found.
-     */
-    @Transactional
-    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        GetUserCredentialListResponse response = new GetUserCredentialListResponse();
-        response.setUserId(user.getUserId());
-        List<CredentialEntity> credentials = credentialRepository.findAllByUserId(user);
-        for (CredentialEntity credential: credentials) {
-            if (credential.getStatus() == CredentialStatus.REMOVED && !request.isIncludeRemoved()) {
-                continue;
-            }
-            CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
-            response.getCredentials().add(credentialDetail);
-        }
-        return response;
-    }
-
-    /**
      * Collect roles into role entities.
      *
      * @param roles Role names.

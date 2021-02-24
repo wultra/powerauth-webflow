@@ -18,10 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.service.UserAliasService;
-import io.getlime.security.powerauth.app.nextstep.service.UserContactService;
-import io.getlime.security.powerauth.app.nextstep.service.UserIdentityService;
-import io.getlime.security.powerauth.app.nextstep.service.UserRoleService;
+import io.getlime.security.powerauth.app.nextstep.service.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
@@ -48,13 +45,17 @@ public class UserController {
     private final UserRoleService userRoleService;
     private final UserContactService userContactService;
     private final UserAliasService userAliasService;
+    private final CredentialService credentialService;
+    private final AuthenticationService authenticationService;
 
     @Autowired
-    public UserController(UserIdentityService userIdentityService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService) {
+    public UserController(UserIdentityService userIdentityService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService, CredentialService credentialService, AuthenticationService authenticationService) {
         this.userIdentityService = userIdentityService;
         this.userRoleService = userRoleService;
         this.userContactService = userContactService;
         this.userAliasService = userAliasService;
+        this.credentialService = credentialService;
+        this.authenticationService = authenticationService;
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -193,14 +194,15 @@ public class UserController {
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException {
         // TODO - request validation
-        GetUserCredentialListResponse response = userIdentityService.getCredentialList(request.getRequestObject());
+        GetUserCredentialListResponse response = credentialService.getCredentialList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "authentication/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) {
-        // TODO - implement method
-        return new ObjectResponse<>(new GetUserAuthenticationListResponse());
+    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) throws UserNotFoundException {
+        // TODO - request validation
+        GetUserAuthenticationListResponse response = authenticationService.getUserAuthenticationList(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
