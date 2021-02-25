@@ -99,6 +99,7 @@ public class OperationPersistenceService {
         operation.setUserId(request.getUserId());
         operation.setOrganizationId(request.getOrganizationId());
         operation.setOrganizationId(request.getOrganizationId());
+        operation.setExternalOperationName(request.getOperationNameExternal());
         operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {

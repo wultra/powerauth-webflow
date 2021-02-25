@@ -78,6 +78,9 @@ public class OperationEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserAccountStatus userAccountStatus;
 
+    @Column(name = "external_operation_name")
+    private String externalOperationName;
+
     @Column(name = "external_transaction_id")
     private String externalTransactionId;
 
