@@ -361,14 +361,14 @@ public class CredentialService {
     public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
         }
         CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED) {
-            throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+            throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName());
         }
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            throw new CredentialNotActiveException("Credential is not ACTIVE: " + credentialDefinition.getName() + ", user ID: " + user.getUserId());
+            throw new CredentialNotActiveException("Credential is not ACTIVE: " + credentialDefinition.getName());
         }
         return credential;
     }

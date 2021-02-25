@@ -132,7 +132,7 @@ public class AuthenticationService {
 
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
-        authentication.setUserId(user);
+        authentication.setUserId(user.getUserId());
         authentication.setAuthenticationType(AuthenticationType.CREDENTIAL);
         authentication.setCredential(credential);
         if (operation != null) {
@@ -144,7 +144,7 @@ public class AuthenticationService {
         authenticationRepository.save(authentication);
 
         if (request.isUpdateOperation() && operation != null) {
-            updateOperation(user, operation, request.getAuthMethod(), credential,
+            updateOperation(user.getUserId(), operation, request.getAuthMethod(), credential,
                     authentication, Collections.singletonList(AuthInstrument.CREDENTIAL));
         }
 
@@ -181,9 +181,18 @@ public class AuthenticationService {
     @Transactional
     public OtpAuthenticationResponse authenticationWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotActiveException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException, OperationNotValidException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
-        UserIdentityEntity user = otp.getUserId();
-        if (user != null && user.getStatus() != UserIdentityStatus.ACTIVE) {
-            throw new UserNotActiveException("User identity is not ACTIVE, user ID: " + user.getUserId());
+        // User ID uses String reference in entity to allow OTP for users not present in Next Step.
+        // Empty user ID is allowed for unknown identities.
+        String userId = otp.getUserId();
+        UserIdentityEntity user = null;
+        if (userId != null) {
+            Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(userId);
+            if (userOptional.isPresent()) {
+                user = userOptional.get();
+                if (user.getStatus() != UserIdentityStatus.ACTIVE) {
+                    throw new UserNotActiveException("User identity is not ACTIVE, user ID: " + user.getUserId());
+                }
+            }
         }
         OperationEntity operation = null;
         if (request.getOperationId() != null) {
@@ -207,8 +216,8 @@ public class AuthenticationService {
         }
 
         CredentialEntity credential = null;
-        if (otp.getCredentialDefinition() != null && otp.getUserId() != null) {
-            credential = credentialService.findCredential(otp.getCredentialDefinition(), otp.getUserId());
+        if (otp.getCredentialDefinition() != null && user != null) {
+            credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
             credentialCounterService.updateCredentialCounter(credential, authenticationResult);
         }
 
@@ -220,7 +229,7 @@ public class AuthenticationService {
 
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
-        authentication.setUserId(user);
+        authentication.setUserId(userId);
         authentication.setAuthenticationType(AuthenticationType.OTP);
         authentication.setOtp(otp);
         if (operation != null) {
@@ -232,13 +241,15 @@ public class AuthenticationService {
         authenticationRepository.save(authentication);
 
         if (request.isUpdateOperation() && operation != null) {
-            updateOperation(user, operation, request.getAuthMethod(), credential,
+            updateOperation(userId, operation, request.getAuthMethod(), credential,
                     authentication, Collections.singletonList(AuthInstrument.OTP_KEY));
         }
 
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
+        if (userId != null) {
+            response.setUserId(userId);
+        }
         if (user != null) {
-            response.setUserId(user.getUserId());
             response.setUserIdentityStatus(user.getStatus());
         }
         response.setAuthenticationResult(authenticationResult);
@@ -278,7 +289,7 @@ public class AuthenticationService {
             throw new UserNotActiveException("User identity is not ACTIVE, user ID: " + user.getUserId());
         }
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
-        if (!user.equals(otp.getUserId())) {
+        if (!user.getUserId().equals(otp.getUserId())) {
             throw new InvalidRequestException("Invalid user ID for OTP: " + otp.getOtpId());
         }
         OperationEntity operation = null;
@@ -332,7 +343,7 @@ public class AuthenticationService {
 
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
-        authentication.setUserId(user);
+        authentication.setUserId(user.getUserId());
         authentication.setAuthenticationType(AuthenticationType.CREDENTIAL_OTP);
         authentication.setCredential(credential);
         if (operation != null) {
@@ -345,7 +356,7 @@ public class AuthenticationService {
         authenticationRepository.save(authentication);
 
         if (request.isUpdateOperation() && operation != null) {
-            updateOperation(user, operation, request.getAuthMethod(), credential,
+            updateOperation(user.getUserId(), operation, request.getAuthMethod(), credential,
                     authentication, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
         }
 
@@ -436,18 +447,20 @@ public class AuthenticationService {
         if (otp.getTimestampExpires() != null && otp.getTimestampExpires().before(new Date())) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
+            otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);
             return AuthenticationResult.FAILED;
         }
         if (otp.getValue().matches(otpValue)) {
             return AuthenticationResult.SUCCEEDED;
         } else {
+            otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);
             return AuthenticationResult.FAILED;
         }
     }
 
     /**
      * Update operation with authentication result.
-     * @param user User identity entity.
+     * @param userId User ID.
      * @param operation Operation entity.
      * @param authMethod Authentication method performing authentication.
      * @param credential Credential entity.
@@ -461,13 +474,13 @@ public class AuthenticationService {
      * @throws AuthMethodNotFoundException Thrown in case authentication method is not found.
      * @throws OperationNotValidException Thrown in case operation is not valid.
      */
-    private void updateOperation(UserIdentityEntity user, OperationEntity operation, AuthMethod authMethod,
+    private void updateOperation(String userId, OperationEntity operation, AuthMethod authMethod,
                                  CredentialEntity credential, AuthenticationEntity authentication,
                                  List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
         UpdateOperationRequest updateRequest = new UpdateOperationRequest();
-        if (user != null) {
-            // User ID can be null during OTP authentication
-            updateRequest.setUserId(user.getUserId());
+        if (userId != null) {
+            // User ID can be null during OTP authentication with unknown user identity. The referred user ID may not be present in Next Step.
+            updateRequest.setUserId(userId);
         }
         updateRequest.setOperationId(operation.getOperationId());
         updateRequest.getAuthInstruments().addAll(authInstruments);
@@ -518,13 +531,20 @@ public class AuthenticationService {
         }
         if (credential != null) {
             Long softLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitSoft();
+            Long hardLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitHard();
             if (credential.getStatus() != CredentialStatus.ACTIVE) {
                 remainingAttempts = 0L;
             }
             if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null) {
-                long remainingAttemptsCredential = softLimit - credential.getFailedAttemptCounterSoft();
-                if (remainingAttempts == null || remainingAttemptsCredential < remainingAttempts) {
-                    remainingAttempts = remainingAttemptsCredential;
+                long remainingAttemptsSoft = softLimit - credential.getFailedAttemptCounterSoft();
+                if (remainingAttempts == null || remainingAttemptsSoft < remainingAttempts) {
+                    remainingAttempts = remainingAttemptsSoft;
+                }
+            }
+            if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null) {
+                long remainingAttemptsHard = hardLimit - credential.getFailedAttemptCounterHard();
+                if (remainingAttempts == null || remainingAttemptsHard < remainingAttempts) {
+                    remainingAttempts = remainingAttemptsHard;
                 }
             }
         }

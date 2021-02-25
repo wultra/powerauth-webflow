@@ -40,7 +40,7 @@ public class UserIdentityLookupService {
     }
 
     /**
-     * Find a user identity. The method is not transactional and should be used for utility purposes only.
+     * Find a user identity. This method is not transactional and should be used for utility purposes only.
      * @param userId User ID.
      * @return User identity entity.
      * @throws UserNotFoundException Thrown when user identity entity is not found.
@@ -57,4 +57,20 @@ public class UserIdentityLookupService {
         return user;
     }
 
+    /**
+     * Find an optional user identity. This method is not transactional and should be used for utility purposes only.
+     * @param userId User ID.
+     * @return Optional user identity.
+     */
+    public Optional<UserIdentityEntity> findUserOptional(String userId) {
+        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            return Optional.empty();
+        }
+        UserIdentityEntity user = userOptional.get();
+        if (user.getStatus() == UserIdentityStatus.REMOVED) {
+            return Optional.empty();
+        }
+        return Optional.of(user);
+    }
 }

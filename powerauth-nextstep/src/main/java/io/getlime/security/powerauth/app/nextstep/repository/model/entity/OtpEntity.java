@@ -44,9 +44,9 @@ public class OtpEntity implements Serializable {
     @JoinColumn(name = "otp_definition_id", referencedColumnName = "otp_definition_id", updatable = false, nullable = false)
     private OtpDefinitionEntity otpDefinition;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false)
-    private UserIdentityEntity userId;
+    // User identity may not be present in Next Step, foreign key reference is optional
+    @Column(name = "user_id", updatable = false)
+    private String userId;
 
     @ManyToOne
     @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)

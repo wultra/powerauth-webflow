@@ -349,8 +349,7 @@ CREATE TABLE ns_otp_storage (
   timestamp_verified          TIMESTAMP,                           -- Timestamp when one time password was verified.
   timestamp_blocked           TIMESTAMP,                           -- Timestamp when one time password was verified.
   timestamp_expires           TIMESTAMP,                           -- Timestamp when one time password expires.
-  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
-  CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
+  CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id)
 );
 
 -- Table ns_operation stores details of Web Flow operations.
@@ -389,7 +388,6 @@ CREATE TABLE ns_authentication (
   result_credential           VARCHAR(32),                                 -- Authentication result for credential authentication.
   result_otp                  VARCHAR(32),                                 -- Authentication result for one time password authentication.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when authentication record was created.
-  CONSTRAINT ns_auth_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
   CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_id),
   CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_id),
   CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
@@ -576,3 +574,5 @@ CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
 ALTER TABLE ns_user_prefs ADD FOREIGN KEY ns_user_prefs_fk (user_id) REFERENCES ns_user_identity (user_id);
 ALTER TABLE ns_operation ADD FOREIGN KEY ns_operation_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_otp_storage ADD FOREIGN KEY ns_otp_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_authentication ADD FOREIGN KEY ns_auth_user_fk (user_id) REFERENCES ns_user_identity (user_id);

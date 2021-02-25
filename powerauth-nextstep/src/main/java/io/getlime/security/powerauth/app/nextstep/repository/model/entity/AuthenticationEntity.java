@@ -41,9 +41,9 @@ public class AuthenticationEntity implements Serializable {
     @Column(name = "authentication_id", nullable = false)
     private String authenticationId;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false)
-    private UserIdentityEntity userId;
+    // User identity may not be present in Next Step, foreign key reference is optional
+    @Column(name = "user_id", updatable = false)
+    private String userId;
 
     @Column(name = "type", nullable = false)
     @Enumerated(EnumType.STRING)

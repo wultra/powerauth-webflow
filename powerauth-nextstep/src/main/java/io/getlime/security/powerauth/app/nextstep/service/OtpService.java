@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpRequest;
@@ -82,7 +83,7 @@ public class OtpService {
      * @param request Create OTP request.
      * @return Create OTP response.
      * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
-     * @throws UserNotFoundException Thrown when user is not found.
+     * @throws UserNotActiveException Thrown when user is not active.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
@@ -92,11 +93,17 @@ public class OtpService {
      * @throws OperationAlreadyFinishedException Thrown when operation is already failed.
      */
     @Transactional
-    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException {
+    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException {
         OtpDefinitionEntity otpDefinition = otpDefinitionService.findOtpDefinition(request.getOtpName());
-        UserIdentityEntity user = null;
-        if (request.getUserId() != null) {
-            user = userIdentityLookupService.findUser(request.getUserId());
+        String userId = request.getUserId();
+        if (userId != null) {
+            Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(request.getUserId());
+            if (userOptional.isPresent()) {
+                UserIdentityEntity user = userOptional.get();
+                if(user.getStatus() != UserIdentityStatus.ACTIVE) {
+                    throw new UserNotActiveException("User identity is not ACTIVE: " + user.getUserId());
+                }
+            }
         }
         CredentialDefinitionEntity credentialDefinition = null;
         if (request.getCredentialName() != null) {
@@ -130,7 +137,7 @@ public class OtpService {
         OtpEntity otp = new OtpEntity();
         otp.setOtpId(UUID.randomUUID().toString());
         otp.setOtpDefinition(otpDefinition);
-        otp.setUserId(user);
+        otp.setUserId(userId);
         otp.setCredentialDefinition(credentialDefinition);
         otp.setOperation(operation);
         otp.setValue(otpValueDetail.getOtpValue());
@@ -149,9 +156,7 @@ public class OtpService {
         otpRepository.save(otp);
         CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
-        if (user != null) {
-            response.setUserId(user.getUserId());
-        }
+        response.setUserId(userId);
         response.setOtpId(otp.getOtpId());
         response.setOtpValue(otp.getValue());
         response.setOtpStatus(otp.getStatus());
@@ -270,7 +275,7 @@ public class OtpService {
         OtpDetail otpDetail = new OtpDetail();
         otpDetail.setOtpName(otp.getOtpDefinition().getName());
         if (otp.getUserId() != null) {
-            otpDetail.setUserId(otp.getUserId().getUserId());
+            otpDetail.setUserId(otp.getUserId());
         }
         otpDetail.setOtpId(otp.getOtpId());
         if (otp.getOperation() != null) {
