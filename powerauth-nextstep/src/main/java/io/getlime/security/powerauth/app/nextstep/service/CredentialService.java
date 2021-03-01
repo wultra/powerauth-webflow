@@ -558,8 +558,8 @@ public class CredentialService {
                         BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
                         BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
                         String username = randomNumber.toString();
-                        if (username.startsWith("0")) {
-                            // Do not allow 0 as the first digit
+                        if (username.length() < length) {
+                            // This can happen with leading zeros
                             continue;
                         }
                         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
@@ -639,10 +639,16 @@ public class CredentialService {
                     if (!includeSmallLetters && !includeCapitalLetters && !includeDigits && !includeSpecialChars) {
                         throw new InvalidConfigurationException("Invalid configuration of algorithm RANDOM_PASSWORD");
                     }
+                    String paramSpecialCharLimit = param.get("specialCharLimit");
                     int length = Integer.parseInt(paramLength);
+                    int specialCharLimit = length;
+                    if (paramSpecialCharLimit != null) {
+                        specialCharLimit = Integer.parseInt(paramSpecialCharLimit);
+                    }
                     SecureRandom secureRandom = new SecureRandom();
                     StringBuilder credentialBuilder = new StringBuilder();
                     StringBuilder availableCharsBuilder = new StringBuilder();
+                    int specialCharCounter = 0;
                     if (includeSmallLetters) {
                         availableCharsBuilder.append("abcdefghijklmnopqrstuvwyz");
                     }
@@ -658,7 +664,15 @@ public class CredentialService {
                     String availableChars = availableCharsBuilder.toString();
                     while (credentialBuilder.length() < length) {
                         int randomInt = secureRandom.nextInt(availableChars.length());
-                        credentialBuilder.append(availableChars.charAt(randomInt));
+                        char c = availableChars.charAt(randomInt);
+                        if (Character.isAlphabetic(c) || Character.isDigit(c)) {
+                            credentialBuilder.append(c);
+                            continue;
+                        }
+                        if (specialCharCounter < specialCharLimit) {
+                            specialCharCounter++;
+                            credentialBuilder.append(c);
+                        }
                     }
                     return credentialBuilder.toString();
                 } catch (InvalidConfigurationException ex) {
