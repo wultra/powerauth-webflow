@@ -233,7 +233,7 @@ public class OtpDefinitionService {
      * @return OTP definition.
      * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
      */
-    public OtpDefinitionEntity findOtpDefinition(String otpDefinitionName) throws OtpDefinitionNotFoundException {
+    public OtpDefinitionEntity findActiveOtpDefinition(String otpDefinitionName) throws OtpDefinitionNotFoundException {
         Optional<OtpDefinitionEntity> otpDefinitionOptional = otpDefinitionRepository.findByName(otpDefinitionName);
         if (!otpDefinitionOptional.isPresent()) {
             throw new OtpDefinitionNotFoundException("OTP definition not found: " + otpDefinitionName);

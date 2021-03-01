@@ -36,7 +36,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This service handles persistence of credentials.
@@ -51,6 +54,7 @@ public class CredentialService {
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
     private final CredentialRepository credentialRepository;
+    private final IdGeneratorService idGeneratorService;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
 
@@ -59,12 +63,14 @@ public class CredentialService {
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialDefinitionService Credential definition service.
      * @param credentialRepository Credential repository.
+     * @param idGeneratorService ID generator service.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository) {
+    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, IdGeneratorService idGeneratorService) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
         this.credentialRepository = credentialRepository;
+        this.idGeneratorService = idGeneratorService;
     }
 
     /**
@@ -78,7 +84,7 @@ public class CredentialService {
     @Transactional
     public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         CredentialType credentialType = request.getCredentialType();
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
@@ -107,7 +113,7 @@ public class CredentialService {
     @Transactional
     public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
@@ -138,8 +144,8 @@ public class CredentialService {
                 credential.setTimestampBlocked(new Date());
             } else if (credential.getStatus() == CredentialStatus.ACTIVE) {
                 // Reset counters for active credentials
-                credential.setFailedAttemptCounterSoft(0L);
-                credential.setFailedAttemptCounterHard(0L);
+                credential.setFailedAttemptCounterSoft(0);
+                credential.setFailedAttemptCounterHard(0);
             }
         }
         credential.setTimestampLastUpdated(new Date());
@@ -184,7 +190,7 @@ public class CredentialService {
      */
     @Transactional
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException {
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         List<CredentialValidationError> validationErrors = new ArrayList<>();
         switch (request.getValidationMode()) {
             case VALIDATE_USERNAME:
@@ -225,7 +231,7 @@ public class CredentialService {
     @Transactional
     public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
@@ -239,9 +245,10 @@ public class CredentialService {
         credential.setValue("s3cret");
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
-        credential.setFailedAttemptCounterSoft(0L);
-        credential.setFailedAttemptCounterHard(0L);
+        credential.setFailedAttemptCounterSoft(0);
+        credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
+        credential.setType(request.getCredentialType());
         credential.setTimestampBlocked(null);
         credentialRepository.save(credential);
         ResetCredentialResponse response = new ResetCredentialResponse();
@@ -265,7 +272,7 @@ public class CredentialService {
     @Transactional
     public DeleteCredentialResponse deleteCredential(DeleteCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
@@ -295,14 +302,14 @@ public class CredentialService {
     @Transactional
     public BlockCredentialResponse blockCredential(BlockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         CredentialEntity credential = credentialOptional.get();
-        if (credential.getStatus() != CredentialStatus.ACTIVE) {
-            throw new CredentialNotActiveException("Credential is not ACTIVE: " + request.getCredentialName() + ", user ID: " + user.getUserId());
+        if (credential.getStatus() != CredentialStatus.ACTIVE && credential.getStatus() != CredentialStatus.BLOCKED_TEMPORARY) {
+            throw new CredentialNotActiveException("Credential is not ACTIVE or BLOCKED_TEMPORARY: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
         credential.setTimestampBlocked(new Date());
@@ -326,7 +333,7 @@ public class CredentialService {
     @Transactional
     public UnblockCredentialResponse unblockCredential(UnblockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
@@ -338,8 +345,8 @@ public class CredentialService {
         if (credential.getStatus() != CredentialStatus.BLOCKED_PERMANENT && credential.getStatus() != CredentialStatus.BLOCKED_TEMPORARY) {
             throw new CredentialNotBlockedException("Credential is not BLOCKED_PERMANENT or BLOCKED_TEMPORARY: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        credential.setFailedAttemptCounterSoft(0L);
-        credential.setFailedAttemptCounterHard(0L);
+        credential.setFailedAttemptCounterSoft(0);
+        credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         credentialRepository.save(credential);
@@ -358,7 +365,7 @@ public class CredentialService {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws CredentialNotActiveException Thrown when credential is not active.
      */
-    public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
+    public CredentialEntity findActiveCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
@@ -373,6 +380,20 @@ public class CredentialService {
         return credential;
     }
 
+    /**
+     * Find a credential without status check. This method is not transactional.
+     * @param credentialDefinition Credential definition.
+     * @param user User identity entity.
+     * @return Credential.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     */
+    public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException {
+        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
+        if (!credentialOptional.isPresent()) {
+            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
+        }
+        return credentialOptional.get();
+    }
 
     /**
      * Validate a username.
@@ -459,7 +480,7 @@ public class CredentialService {
         }
         if (credential == null) {
             credential = new CredentialEntity();
-            credential.setCredentialId(UUID.randomUUID().toString());
+            credential.setCredentialId(idGeneratorService.generateCredentialId());
             credential.setCredentialDefinition(credentialDefinition);
             credential.setUserId(user);
             credential.setTimestampCreated(new Date());
@@ -483,9 +504,9 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
-        credential.setAttemptCounter(0L);
-        credential.setFailedAttemptCounterSoft(0L);
-        credential.setFailedAttemptCounterHard(0L);
+        credential.setAttemptCounter(0);
+        credential.setFailedAttemptCounterSoft(0);
+        credential.setFailedAttemptCounterHard(0);
         credentialRepository.save(credential);
         CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());

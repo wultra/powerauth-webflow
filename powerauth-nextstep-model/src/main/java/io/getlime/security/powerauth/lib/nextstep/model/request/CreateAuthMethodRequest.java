@@ -36,7 +36,7 @@ public class CreateAuthMethodRequest {
     private Integer userPrefsColumn;
     private Boolean userPrefsDefault;
     private Boolean checkAuthFails;
-    private Long maxAuthFails;
+    private Integer maxAuthFails;
     private Boolean hasUserInterface;
     private Boolean hasMobileToken;
     private String displayNameKey;

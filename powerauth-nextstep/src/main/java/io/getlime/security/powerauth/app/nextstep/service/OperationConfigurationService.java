@@ -106,7 +106,7 @@ public class OperationConfigurationService {
      * @return All operation configurations.
      */
     @Transactional
-    public GetOperationConfigListResponse getOperationConfigs() {
+    public GetOperationConfigListResponse getOperationConfigList() {
         GetOperationConfigListResponse configsResponse = new GetOperationConfigListResponse();
         Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
         for (OperationConfigEntity operationConfig: allConfigs) {

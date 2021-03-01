@@ -49,18 +49,18 @@ public class StepDefinitionEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private OperationRequestType operationType;
 
-    @Column(name = "request_auth_step_result", nullable = false)
+    @Column(name = "request_auth_step_result")
     @Enumerated(EnumType.STRING)
     private AuthStepResult requestAuthStepResult;
 
-    @Column(name = "request_auth_method", nullable = false)
+    @Column(name = "request_auth_method")
     @Enumerated(EnumType.STRING)
     private AuthMethod requestAuthMethod;
 
     @Column(name = "response_priority")
     private long responsePriority;
 
-    @Column(name = "response_auth_method", nullable = false)
+    @Column(name = "response_auth_method")
     @Enumerated(EnumType.STRING)
     private AuthMethod responseAuthMethod;
 

@@ -39,7 +39,7 @@ public class CredentialAuthenticationRequest {
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify;
     private String operationId;
-    private AuthMethod authMethod;
     private boolean updateOperation;
+    private AuthMethod authMethod;
 
 }

@@ -36,7 +36,7 @@ public class OtpPolicyDetail {
     private String description;
     @NotNull
     private Integer length;
-    private Long attemptLimit;
+    private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
     @NotNull

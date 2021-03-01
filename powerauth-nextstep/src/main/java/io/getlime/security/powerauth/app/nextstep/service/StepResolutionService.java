@@ -53,13 +53,14 @@ import java.util.stream.Collectors;
 @Service
 public class StepResolutionService {
 
+    private final StepDefinitionRepository stepDefinitionRepository;
     private final IdGeneratorService idGeneratorService;
     private final OperationPersistenceService operationPersistenceService;
     private final NextStepServerConfiguration nextStepServerConfiguration;
     private final AuthMethodService authMethodService;
     private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
-    private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation;
+    private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
 
     private final OperationConverter operationConverter = new OperationConverter();
 
@@ -77,13 +78,21 @@ public class StepResolutionService {
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
                                  AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
+        this.stepDefinitionRepository = stepDefinitionRepository;
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
         this.authMethodService = authMethodService;
         this.authMethodRepository = authMethodRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
-        stepDefinitionsPerOperation = new HashMap<>();
+        reloadStepDefinitions();
+    }
+
+    /**
+     * Reload step definitions from database.
+     */
+    public synchronized void reloadStepDefinitions() {
+        stepDefinitionsPerOperation.clear();
         List<String> operationNames = stepDefinitionRepository.findDistinctOperationNames();
         for (String operationName : operationNames) {
             stepDefinitionsPerOperation.put(operationName, stepDefinitionRepository.findStepDefinitionsForOperation(operationName));
@@ -247,7 +256,7 @@ public class StepResolutionService {
      * @return filtered list of steps
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    private List<StepDefinitionEntity> filterStepDefinitions(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) throws InvalidConfigurationException {
+    private synchronized List<StepDefinitionEntity> filterStepDefinitions(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) throws InvalidConfigurationException {
         List<StepDefinitionEntity> stepDefinitions = stepDefinitionsPerOperation.get(operationName);
         List<AuthMethod> authMethodsAvailableForUser = new ArrayList<>();
         if (userId != null) {
@@ -377,7 +386,7 @@ public class StepResolutionService {
      * @param operation Operation.
      * @return Number of remaining authentication attempts. Null value returned for no limit.
      */
-    public Long getNumberOfRemainingAttempts(OperationEntity operation) {
+    public Integer getNumberOfRemainingAttempts(OperationEntity operation) {
         OperationHistoryEntity currentOperationHistory = operation.getCurrentOperationHistoryEntity();
         if (currentOperationHistory == null) {
             return null;
@@ -397,7 +406,7 @@ public class StepResolutionService {
         AuthMethodEntity authMethodEntity = authMethodEntityOptional.get();
         if (authMethodEntity.getCheckAuthFails()) {
             // count failures
-            long failureCount = 0L;
+            int failureCount = 0;
             for (OperationHistoryEntity history : operation.getOperationHistory()) {
                 // add all failures from history for this method
                 if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_FAILED) {
@@ -405,7 +414,7 @@ public class StepResolutionService {
                 }
             }
             if (failureCount >= authMethodEntity.getMaxAuthFails()) {
-                return 0L;
+                return 0;
             }
             return authMethodEntity.getMaxAuthFails() - failureCount;
         }

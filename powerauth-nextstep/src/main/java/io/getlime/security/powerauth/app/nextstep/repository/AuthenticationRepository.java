@@ -16,7 +16,6 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthenticationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -31,16 +30,16 @@ import java.util.List;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Repository
-public interface AuthenticationRepository extends CrudRepository<AuthenticationEntity, Long> {
+public interface AuthenticationRepository extends CrudRepository<AuthenticationEntity, String> {
 
     /**
      * Find all authentication entities by user identity.
-     * @param user User identity entity.
+     * @param userId User ID.
      * @return List of authentication entities.
      */
-    List<AuthenticationEntity> findAllByUserIdOrderByTimestampCreatedDesc(UserIdentityEntity user);
+    List<AuthenticationEntity> findAllByUserIdOrderByTimestampCreatedDesc(String userId);
 
     @Query(value = "from AuthenticationEntity a where a.userId = :userId AND a.timestampCreated BETWEEN :startDate AND :endDate ORDER BY a.timestampCreated DESC")
-    List<AuthenticationEntity> findAuthenticationsByUserIdAndCreatedDate(@Param("userId") UserIdentityEntity user, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    List<AuthenticationEntity> findAuthenticationsByUserIdAndCreatedDate(@Param("userId") String userId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

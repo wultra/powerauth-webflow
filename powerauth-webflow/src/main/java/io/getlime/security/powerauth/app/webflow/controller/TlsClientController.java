@@ -18,8 +18,8 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.exception.TlsClientAuthenticationException;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
@@ -116,7 +116,7 @@ public class TlsClientController {
             ObjectResponse<GetOperationDetailResponse> operationResponse = nextStepClient.getOperationDetail(operationId);
             operation = operationResponse.getResponseObject();
             authMethod = operation.getChosenAuthMethod();
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error(ex.getMessage(), ex);
             throw new InsufficientAuthenticationException("Could not retrieve operation");
         }

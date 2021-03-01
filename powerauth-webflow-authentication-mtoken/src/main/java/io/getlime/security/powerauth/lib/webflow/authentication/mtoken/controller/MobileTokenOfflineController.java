@@ -26,13 +26,13 @@ import com.wultra.security.powerauth.client.v3.VerifyOfflineSignatureResponse;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.converter.OperationTextNormalizer;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
@@ -164,8 +164,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             }
             GetOperationDetailResponse updatedOperation = getOperation();
             remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Authorization failed due to communication error");
         }
         OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
@@ -183,12 +183,11 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * Generates the QR code to be displayed to the user.
      * @param request QR code init request.
      * @return Response with QR code as String-based PNG image.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
      * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws NextStepServiceException, AuthStepException {
+    public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
@@ -200,7 +199,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         String userId = operation.getUserId();
 
         // try to get activation from authMethod configuration
-        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+        String configuredActivationId;
+        try {
+            configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+        } catch (NextStepClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new OfflineModeMissingActivationException("Activation configuration is not available");
+        }
 
         if (configuredActivationId == null) {
             // unexpected state - activation is not set or configuration is invalid
@@ -340,8 +345,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             cleanHttpSession();
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             return response;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (CommunicationFailedException ex) {
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");

@@ -27,10 +27,10 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.Certifica
 import io.getlime.security.powerauth.lib.dataadapter.model.response.InitAuthMethodResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
@@ -109,10 +109,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @param request Authentication request.
      * @return SCA approval authentication response.
      * @throws AuthStepException In case SCA approval authentication fails.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public ApprovalScaAuthResponse authenticateScaApproval(@RequestBody ApprovalScaAuthRequest request) throws AuthStepException, NextStepServiceException {
+    public ApprovalScaAuthResponse authenticateScaApproval(@RequestBody ApprovalScaAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         String userId = operation.getUserId();
@@ -133,34 +132,39 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
                 if (userAuthenticatedUsingCertificate) {
                     logger.info("Step authentication succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 }
-            } catch (DataAdapterClientErrorException ex) {
-                logger.error("Error occurred in Data Adapter", ex);
+            } catch (NextStepClientException | DataAdapterClientErrorException ex) {
+                logger.error(ex.getMessage(), ex);
                 // Send error to client
                 ApprovalScaAuthResponse response = new ApprovalScaAuthResponse();
                 response.setResult(AuthStepResult.AUTH_FAILED);
-                response.setRemainingAttempts(ex.getError().getRemainingAttempts());
-                response.setMessage(ex.getError().getMessage());
+                if (ex instanceof DataAdapterClientErrorException) {
+                    DataAdapterClientErrorException ex2 = (DataAdapterClientErrorException) ex;
+                    response.setRemainingAttempts(ex2.getError().getRemainingAttempts());
+                    response.setMessage(ex2.getError().getMessage());
+                } else {
+                    response.setMessage("error.communication");
+                }
                 return response;
             }
         }
 
         ApprovalScaAuthResponse response = new ApprovalScaAuthResponse();
 
-        // Disable bank account choice
-        operation.getFormData().getUserInput().put(FIELD_BANK_ACCOUNT_CHOICE_DISABLED, "true");
-        nextStepClient.updateOperationFormData(operation.getOperationId(), operation.getFormData());
-
-        // Upgrade operation to SCA
-        authenticationManagementService.upgradeToStrongCustomerAuthentication();
-
-        // Find out whether mobile token is enabled
         boolean mobileTokenEnabled = false;
         try {
+            // Disable bank account choice
+            operation.getFormData().getUserInput().put(FIELD_BANK_ACCOUNT_CHOICE_DISABLED, "true");
+            nextStepClient.updateOperationFormData(operation.getOperationId(), operation.getFormData());
+
+            // Upgrade operation to SCA
+            authenticationManagementService.upgradeToStrongCustomerAuthentication();
+
+            // Find out whether mobile token is enabled
             if (authMethodQueryService.isMobileTokenAvailable(userId, operation.getOperationId())) {
                 nextStepClient.updateMobileToken(operation.getOperationId(), true);
                 mobileTokenEnabled = true;
             }
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
         }
         response.setMobileTokenEnabled(mobileTokenEnabled);
@@ -180,10 +184,9 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @param request SCA approval initialization request.
      * @return SCA approval initialization response.
      * @throws AuthStepException In case SCA approval initialization fails.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException, NextStepServiceException {
+    public ApprovalScaInitResponse initScaApproval(@RequestBody ApprovalScaInitRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         try {
             logger.info("Step init started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -209,7 +212,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
                 return new ApprovalScaInitResponse(true, certificateVerificationUrl);
             }
 
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Communication with Next Step service failed");
         } catch (DataAdapterClientErrorException ex) {
@@ -246,8 +249,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
             response.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
-        } catch (NextStepServiceException ex) {
-            logger.error("Error occurred in Next Step server", ex);
+        } catch (CommunicationFailedException ex) {
             final AuthStepResponse response = new AuthStepResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");
@@ -286,10 +288,10 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @param operationContext Operation context.
      * @return Whether authentication using client TLS certificate succeeded.
      * @throws DataAdapterClientErrorException In case communication with Data Adapter fails.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
+     * @throws NextStepClientException In case communication with Next Step service fails.
      * @throws AuthStepException In case step authentication fails.
      */
-    private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepServiceException, AuthStepException {
+    private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
         ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyClientCertificate(userId, organizationId, clientCertificate, getAuthMethodName(), accountStatus, operationContext);
         VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
         CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();

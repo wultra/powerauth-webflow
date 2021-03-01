@@ -43,14 +43,17 @@ public class StepDefinitionService {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
     private final StepDefinitionRepository stepDefinitionRepository;
+    private final StepResolutionService stepResolutionService;
 
     /**
      * Step definition service constructor.
      * @param stepDefinitionRepository Step definition repository.
+     * @param stepResolutionService Step resolution service.
      */
     @Autowired
-    public StepDefinitionService(StepDefinitionRepository stepDefinitionRepository) {
+    public StepDefinitionService(StepDefinitionRepository stepDefinitionRepository, StepResolutionService stepResolutionService) {
         this.stepDefinitionRepository = stepDefinitionRepository;
+        this.stepResolutionService = stepResolutionService;
     }
 
     /**
@@ -68,21 +71,22 @@ public class StepDefinitionService {
         StepDefinitionEntity stepDefinition = new StepDefinitionEntity();
         stepDefinition.setStepDefinitionId(request.getStepDefinitionId());
         stepDefinition.setOperationName(request.getOperationName());
-        stepDefinition.setOperationType(request.getOperationType());
+        stepDefinition.setOperationType(request.getOperationRequestType());
         stepDefinition.setRequestAuthStepResult(request.getRequestAuthStepResult());
         stepDefinition.setRequestAuthMethod(request.getRequestAuthMethod());
         stepDefinition.setResponsePriority(request.getResponsePriority());
-        stepDefinition.setRequestAuthMethod(request.getRequestAuthMethod());
+        stepDefinition.setResponseAuthMethod(request.getResponseAuthMethod());
         stepDefinition.setResponseResult(request.getResponseResult());
         stepDefinitionRepository.save(stepDefinition);
+        stepResolutionService.reloadStepDefinitions();
         CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
         response.setStepDefinitionId(request.getStepDefinitionId());
         response.setOperationName(request.getOperationName());
-        response.setOperationType(request.getOperationType());
+        response.setOperationRequestType(request.getOperationRequestType());
         response.setRequestAuthStepResult(request.getRequestAuthStepResult());
         response.setRequestAuthMethod(request.getRequestAuthMethod());
         response.setResponsePriority(request.getResponsePriority());
-        response.setRequestAuthMethod(request.getRequestAuthMethod());
+        response.setResponseAuthMethod(request.getResponseAuthMethod());
         response.setResponseResult(request.getResponseResult());
         return response;
     }
@@ -101,6 +105,7 @@ public class StepDefinitionService {
         }
         StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
         stepDefinitionRepository.delete(stepDefinition);
+        stepResolutionService.reloadStepDefinitions();
         DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();
         response.setStepDefinitionId(stepDefinition.getStepDefinitionId());
         return response;

@@ -41,6 +41,6 @@ public class CredentialAuthenticationResponse {
     @NotNull
     private AuthenticationResult authenticationResult;
     @NotNull
-    private Long remainingAttempts;
+    private Integer remainingAttempts;
 
 }

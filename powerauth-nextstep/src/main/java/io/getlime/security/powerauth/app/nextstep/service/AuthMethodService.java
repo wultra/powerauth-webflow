@@ -27,7 +27,10 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPr
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
@@ -258,15 +261,14 @@ public class AuthMethodService {
      * Get list of enabled authentication methods for a user and operation. Check current availability of mobile token.
      * @param request Get enabled method list request.
      * @return Get enabled method list response.
-     * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws UserNotFoundException, InvalidConfigurationException {
+    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws InvalidConfigurationException {
         String userId = request.getUserId();
         String operationName = request.getOperationName();
         // Lookup user identity to obtain its status
-        UserIdentityEntity userIdentity = userIdentityLookupService.findUser(userId);
+        Optional<UserIdentityEntity> userIdentityOptional = userIdentityLookupService.findUserOptional(userId);
         // Get all methods enabled for user
         List<AuthMethod> enabledAuthMethods = listAuthMethodsEnabledForUser(userId).stream()
                 .map(UserAuthMethodDetail::getAuthMethod)
@@ -291,7 +293,10 @@ public class AuthMethodService {
         GetEnabledMethodListResponse response = new GetEnabledMethodListResponse();
         response.setUserId(userId);
         response.setOperationName(operationName);
-        response.setUserIdentityStatus(userIdentity.getStatus());
+        if (userIdentityOptional.isPresent()) {
+            UserIdentityEntity user = userIdentityOptional.get();
+            response.setUserIdentityStatus(user.getStatus());
+        }
         response.getEnabledAuthMethods().addAll(filteredMethods);
         return response;
     }

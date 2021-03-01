@@ -71,10 +71,10 @@ public class CredentialPolicyEntity implements Serializable {
     private String credentialAllowedChars;
 
     @Column(name = "limit_soft")
-    private Long limitSoft;
+    private Integer limitSoft;
 
     @Column(name = "limit_hard")
-    private Long limitHard;
+    private Integer limitHard;
 
     @Column(name = "check_history_count")
     private int checkHistoryCount;

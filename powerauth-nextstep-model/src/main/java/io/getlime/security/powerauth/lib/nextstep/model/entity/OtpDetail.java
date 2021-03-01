@@ -42,13 +42,15 @@ public class OtpDetail {
     @NotNull
     private String otpValue;
     private String credentialName;
-    private long attemptCounter;
-    private long failedAttemptCounter;
-    private Long remainingAttempts;
+    private int attemptCounter;
+    private int failedAttemptCounter;
+    private Integer remainingAttempts;
     @NotNull
     private OtpStatus otpStatus;
     @NotNull
     private Date timestampCreated;
+    private Date timestampVerified;
+    private Date timestampBlocked;
     private Date timestampExpires;
 
 }

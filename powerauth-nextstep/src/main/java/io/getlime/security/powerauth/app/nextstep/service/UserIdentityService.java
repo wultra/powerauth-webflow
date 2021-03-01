@@ -647,7 +647,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllOtps(UserIdentityEntity user) {
-        List<OtpEntity> otps = otpRepository.findAllByUserId(user);
+        List<OtpEntity> otps = otpRepository.findAllByUserId(user.getUserId());
         otps.forEach(otp -> {
             if (otp.getStatus() != OtpStatus.REMOVED) {
                 otp.setStatus(OtpStatus.REMOVED);

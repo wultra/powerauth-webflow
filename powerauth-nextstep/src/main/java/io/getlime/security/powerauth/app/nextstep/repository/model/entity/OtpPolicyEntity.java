@@ -56,7 +56,7 @@ public class OtpPolicyEntity implements Serializable {
     private Integer length;
 
     @Column(name = "attempt_limit")
-    private Long attemptLimit;
+    private Integer attemptLimit;
 
     @Column(name = "expiration_time")
     private Long expirationTime;

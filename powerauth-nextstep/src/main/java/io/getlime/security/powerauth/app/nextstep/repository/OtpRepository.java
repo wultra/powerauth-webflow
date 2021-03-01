@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -37,7 +36,7 @@ public interface OtpRepository extends CrudRepository<OtpEntity, String> {
      * @param userId User identity entity.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByUserId(UserIdentityEntity userId);
+    List<OtpEntity> findAllByUserId(String userId);
 
     /**
      * Find OTP entities by operation.

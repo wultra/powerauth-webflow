@@ -281,7 +281,7 @@ public class CredentialDefinitionService {
      * @return Credential definition.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
-    public CredentialDefinitionEntity findCredentialDefinition(String credentialDefinitionName) throws CredentialDefinitionNotFoundException {
+    public CredentialDefinitionEntity findActiveCredentialDefinition(String credentialDefinitionName) throws CredentialDefinitionNotFoundException {
         Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialDefinitionName);
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + credentialDefinitionName);

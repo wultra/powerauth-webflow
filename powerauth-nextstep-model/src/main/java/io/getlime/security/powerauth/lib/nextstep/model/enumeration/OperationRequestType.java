@@ -18,9 +18,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 /**
  * Enum representing an operation request type.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum OperationRequestType {
+
     /**
      * Used when creating an operation.
      */

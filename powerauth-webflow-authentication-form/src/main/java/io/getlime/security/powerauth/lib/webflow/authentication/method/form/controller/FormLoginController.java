@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -34,7 +35,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
@@ -48,10 +48,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
@@ -194,11 +194,11 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 authEx.setAccountStatus(userAccountStatus);
                 throw authEx;
             }
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
-            throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
-        } catch (DataAdapterClientErrorException e) {
-            throw new AuthStepException(e.getError().getMessage(), e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
+            throw new AuthStepException("User authentication failed", ex, "error.communication");
+        } catch (DataAdapterClientErrorException ex) {
+            throw new AuthStepException(ex.getError().getMessage(), ex);
         }
     }
 
@@ -320,8 +320,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             response.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (CommunicationFailedException ex) {
             final UsernamePasswordAuthResponse response = new UsernamePasswordAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");
@@ -337,8 +336,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody
-    UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
+    public @ResponseBody UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request", "error.invalidRequest");
         }
@@ -352,7 +350,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
                 response.addOrganization(organization);
             }
-        } catch (NextStepServiceException e) {
+        } catch (NextStepClientException ex) {
             throw new CommunicationFailedException("Organization is not available");
         }
         logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());

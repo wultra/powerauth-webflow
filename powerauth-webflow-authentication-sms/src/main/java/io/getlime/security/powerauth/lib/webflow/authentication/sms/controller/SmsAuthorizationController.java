@@ -23,11 +23,11 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
@@ -213,12 +213,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 }
                 authEx.setAccountStatus(userAccountStatus);
                 throw authEx;
-            } catch (NextStepServiceException e) {
-                logger.error("Error occurred in Next Step server", e);
-                throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
+            } catch (NextStepClientException ex) {
+                logger.error("Error occurred in Next Step server", ex);
+                throw new AuthStepException("SMS authentication failed", ex, "error.communication");
             }
-        } catch (DataAdapterClientErrorException e) {
-            throw new AuthStepException(e.getError().getMessage(), e);
+        } catch (DataAdapterClientErrorException ex) {
+            throw new AuthStepException(ex.getError().getMessage(), ex);
         }
     }
 
@@ -581,8 +581,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             cancelResponse.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             return cancelResponse;
-        } catch (NextStepServiceException e) {
-            logger.error("Error when canceling SMS message validation.", e);
+        } catch (CommunicationFailedException ex) {
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");
@@ -599,7 +598,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @return Response for sending authorization SMS message.
      * @throws DataAdapterClientErrorException In case SMS delivery fails.
      */
-    private CreateSmsAuthorizationResponse sendAuthorizationSms(GetOperationDetailResponse operation, boolean resend) throws DataAdapterClientErrorException, AuthStepException {
+    private CreateSmsAuthorizationResponse sendAuthorizationSms(GetOperationDetailResponse operation, boolean resend) throws DataAdapterClientErrorException {
         Long lastMessageTimestamp = getLastMessageTimestampFromHttpSession();
         if (lastMessageTimestamp != null && System.currentTimeMillis() - lastMessageTimestamp < configuration.getSmsResendDelay()) {
             CreateSmsAuthorizationResponse response = new CreateSmsAuthorizationResponse();

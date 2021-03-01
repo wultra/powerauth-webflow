@@ -49,7 +49,7 @@ public class OtpEntity implements Serializable {
     private String userId;
 
     @ManyToOne
-    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false, nullable = false)
+    @JoinColumn(name = "credential_definition_id", referencedColumnName = "credential_definition_id", updatable = false)
     private CredentialDefinitionEntity credentialDefinition;
 
     @ManyToOne
@@ -70,10 +70,10 @@ public class OtpEntity implements Serializable {
     private String otpData;
 
     @Column(name = "attempt_counter")
-    private long attemptCounter;
+    private int attemptCounter;
 
     @Column(name = "failed_attempt_counter")
-    private long failedAttemptCounter;
+    private int failedAttemptCounter;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

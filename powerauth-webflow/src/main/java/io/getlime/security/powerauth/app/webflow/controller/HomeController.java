@@ -18,18 +18,17 @@ package io.getlime.security.powerauth.app.webflow.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.webflow.configuration.WebFlowServerConfiguration;
 import io.getlime.security.powerauth.app.webflow.i18n.I18NService;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.AfsConfigRepository;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.AfsConfigEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.security.UserOperationAuthentication;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
@@ -50,7 +49,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.util.*;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 /**
  * Simple controller, redirects to the main HTML page with JavaScript content.
@@ -167,8 +169,8 @@ public class HomeController {
                     }
                 }
 
-            } catch (NextStepServiceException e) {
-                logger.error("Error occurred while retrieving operation with ID: " + operationId, e);
+            } catch (NextStepClientException ex) {
+                logger.error("Error occurred while retrieving operation with ID: " + operationId, ex);
                 return "redirect:/oauth/error";
             }
 
@@ -313,7 +315,12 @@ public class HomeController {
         final UserOperationAuthentication pendingUserAuthentication = authenticationManagementService.getPendingUserAuthentication();
         if (pendingUserAuthentication != null) {
             String operationId = pendingUserAuthentication.getOperationId();
-            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR);
+            try {
+                operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR);
+            } catch (CommunicationFailedException ex) {
+                // Exception is already logged
+                return "redirect:/oauth/error";
+            }
         }
 
         String clearContext = request.getParameter("clearContext");

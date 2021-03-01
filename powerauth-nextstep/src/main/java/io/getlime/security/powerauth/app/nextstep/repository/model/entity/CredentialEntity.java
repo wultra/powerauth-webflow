@@ -64,13 +64,13 @@ public class CredentialEntity implements Serializable {
     private CredentialStatus status;
 
     @Column(name = "attempt_counter")
-    private long attemptCounter;
+    private int attemptCounter;
 
     @Column(name = "failed_attempt_counter_soft")
-    private long failedAttemptCounterSoft;
+    private int failedAttemptCounterSoft;
 
     @Column(name = "failed_attempt_counter_hard")
-    private long failedAttemptCounterHard;
+    private int failedAttemptCounterHard;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

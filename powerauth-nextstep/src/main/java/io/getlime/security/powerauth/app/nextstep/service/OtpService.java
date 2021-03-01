@@ -52,30 +52,36 @@ public class OtpService {
     private final OtpDefinitionService otpDefinitionService;
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
+    private final CredentialService credentialService;
     private final OperationPersistenceService operationPersistenceService;
     private final OtpGenerationService otpGenerationService;
     private final StepResolutionService stepResolutionService;
     private final OtpRepository otpRepository;
+    private final IdGeneratorService idGeneratorService;
 
     /**
      * OTP service constructor.
      * @param otpDefinitionService OTP definition service.
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialDefinitionService Credential definition service.
+     * @param credentialService Credential service.
      * @param operationPersistenceService Operation persistence service.
      * @param otpGenerationService OTP generation service.
      * @param stepResolutionService Step resolution service.
      * @param otpRepository OTP repository.
+     * @param idGeneratorService ID generator service.
      */
     @Autowired
-    public OtpService(OtpDefinitionService otpDefinitionService, UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, OperationPersistenceService operationPersistenceService, OtpGenerationService otpGenerationService, StepResolutionService stepResolutionService, OtpRepository otpRepository) {
+    public OtpService(OtpDefinitionService otpDefinitionService, UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, OperationPersistenceService operationPersistenceService, OtpGenerationService otpGenerationService, StepResolutionService stepResolutionService, OtpRepository otpRepository, IdGeneratorService idGeneratorService) {
         this.otpDefinitionService = otpDefinitionService;
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
+        this.credentialService = credentialService;
         this.operationPersistenceService = operationPersistenceService;
         this.otpGenerationService = otpGenerationService;
         this.stepResolutionService = stepResolutionService;
         this.otpRepository = otpRepository;
+        this.idGeneratorService = idGeneratorService;
     }
 
     /**
@@ -85,6 +91,8 @@ public class OtpService {
      * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
      * @throws UserNotActiveException Thrown when user is not active.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws OtpGenAlgorithmNotSupportedException Thrown when OTP generation algorithm is not supported.
@@ -93,21 +101,24 @@ public class OtpService {
      * @throws OperationAlreadyFinishedException Thrown when operation is already failed.
      */
     @Transactional
-    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException {
-        OtpDefinitionEntity otpDefinition = otpDefinitionService.findOtpDefinition(request.getOtpName());
+    public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException {
+        OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
         String userId = request.getUserId();
+        UserIdentityEntity user = null;
         if (userId != null) {
             Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(request.getUserId());
             if (userOptional.isPresent()) {
-                UserIdentityEntity user = userOptional.get();
+                user = userOptional.get();
                 if(user.getStatus() != UserIdentityStatus.ACTIVE) {
                     throw new UserNotActiveException("User identity is not ACTIVE: " + user.getUserId());
                 }
             }
         }
         CredentialDefinitionEntity credentialDefinition = null;
-        if (request.getCredentialName() != null) {
-            credentialDefinition = credentialDefinitionService.findCredentialDefinition(request.getCredentialName());
+        if (user != null && request.getCredentialName() != null) {
+            credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+            // Make sure the credential exists and it is active
+            credentialService.findActiveCredential(credentialDefinition, user);
         }
         OperationEntity operation = null;
         if (request.getOperationId() != null) {
@@ -135,7 +146,7 @@ public class OtpService {
         }
         OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());
         OtpEntity otp = new OtpEntity();
-        otp.setOtpId(UUID.randomUUID().toString());
+        otp.setOtpId(idGeneratorService.generateOtpId());
         otp.setOtpDefinition(otpDefinition);
         otp.setUserId(userId);
         otp.setCredentialDefinition(credentialDefinition);
@@ -281,7 +292,7 @@ public class OtpService {
         if (otp.getOperation() != null) {
             otpDetail.setOperationId(otp.getOperation().getOperationId());
         }
-        Long remainingAttempts = resolveRemainingAttempts(otp);
+        Integer remainingAttempts = resolveRemainingAttempts(otp);
         otpDetail.setRemainingAttempts(remainingAttempts);
         otpDetail.setOtpData(otp.getOtpData());
         otpDetail.setOtpValue(otp.getValue());
@@ -292,6 +303,8 @@ public class OtpService {
         otpDetail.setFailedAttemptCounter(otp.getFailedAttemptCounter());
         otpDetail.setOtpStatus(otp.getStatus());
         otpDetail.setTimestampCreated(otp.getTimestampCreated());
+        otpDetail.setTimestampVerified(otp.getTimestampVerified());
+        otpDetail.setTimestampBlocked(otp.getTimestampBlocked());
         otpDetail.setTimestampExpires(otp.getTimestampExpires());
         return otpDetail;
     }
@@ -301,15 +314,15 @@ public class OtpService {
      * @param otp OTP entity.
      * @return Remaining attempts.
      */
-    private Long resolveRemainingAttempts(OtpEntity otp) {
+    private Integer resolveRemainingAttempts(OtpEntity otp) {
         OtpPolicyEntity otpPolicy = otp.getOtpDefinition().getOtpPolicy();
-        Long remainingAttempts = null;
+        Integer remainingAttempts = null;
         if (otpPolicy.getAttemptLimit() != null) {
             remainingAttempts = otpPolicy.getAttemptLimit() - otp.getFailedAttemptCounter();
         }
         if (otp.getOperation() != null) {
             OperationEntity operationEntity = otp.getOperation();
-            Long remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operationEntity);
+            Integer remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operationEntity);
             if (remainingAttemptsOperation != null && (remainingAttempts == null || remainingAttemptsOperation < remainingAttempts)) {
                 return remainingAttemptsOperation;
             } else {

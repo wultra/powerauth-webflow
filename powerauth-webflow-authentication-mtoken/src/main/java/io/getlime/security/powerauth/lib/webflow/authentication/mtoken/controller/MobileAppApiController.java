@@ -23,10 +23,10 @@ import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureTyp
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -211,7 +211,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param request Mobile Token authorization request.
      * @param apiAuthentication API authentication.
      * @return Authorization response.
-     * @throws NextStepServiceException Thrown when next step client fails.
      * @throws MobileAppApiException Thrown when signature verification fails.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      * @throws AuthStepException Thrown when operation is invalid.
@@ -222,7 +221,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             PowerAuthSignatureTypes.POSSESSION_KNOWLEDGE,
             PowerAuthSignatureTypes.POSSESSION_BIOMETRY
     })
-    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthApiAuthentication apiAuthentication) throws NextStepServiceException, MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response verifySignature(@RequestBody ObjectRequest<OperationApproveRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (request.getRequestObject() == null) {
             throw new InvalidRequestObjectException();
@@ -251,20 +250,24 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new PowerAuthAuthenticationException();
             }
 
-            if (operation.getOperationData().equals(request.getRequestObject().getData())
-                    && operation.getUserId() != null
-                    && operation.getUserId().equals(apiAuthentication.getUserId())) {
-                final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
-                final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
-                webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
-                return new Response();
-            } else {
+            try {
+                if (operation.getOperationData().equals(request.getRequestObject().getData())
+                        && operation.getUserId() != null
+                        && operation.getUserId().equals(apiAuthentication.getUserId())) {
+                    final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
+                    final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
+                    webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+                    return new Response();
+                } else {
+                    throw new PowerAuthAuthenticationException();
+                }
+            } catch (NextStepClientException ex) {
+                logger.error(ex.getMessage(), ex);
                 throw new PowerAuthAuthenticationException();
             }
         } else {
             throw new PowerAuthAuthenticationException();
         }
-
     }
 
     /**
@@ -273,13 +276,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param apiAuthentication API authentication.
      * @return Cancel response.
      * @throws MobileAppApiException Thrown when operation could not be canceled.
-     * @throws NextStepServiceException Thrown when next step client fails.
      * @throws PowerAuthAuthenticationException Thrown in case PowerAuth authentication fails.
      * @throws AuthStepException Thrown when operation is invalid.
      */
     @RequestMapping(value = "/operation/cancel", method = RequestMethod.POST)
     @PowerAuth(resourceId = "/operation/cancel", signatureType = {PowerAuthSignatureTypes.POSSESSION})
-    public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, NextStepServiceException, PowerAuthAuthenticationException, AuthStepException {
+    public @ResponseBody Response cancelOperation(@RequestBody ObjectRequest<OperationRejectRequest> request, PowerAuthApiAuthentication apiAuthentication) throws MobileAppApiException, PowerAuthAuthenticationException, AuthStepException {
 
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
@@ -315,7 +317,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             if (configuredActivationId != null && configuredActivationId.equals(activationId)) {
                 return true;
             }
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Could not verify activationId", ex);
         }
         return false;

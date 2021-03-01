@@ -16,6 +16,7 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.controller;
 
+import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
@@ -25,9 +26,9 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationConte
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyCanceledException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationAlreadyFinishedException;
@@ -169,8 +170,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             filterStepsBasedOnActiveAuthMethods(operation.getSteps(), operation.getUserId(), operationId);
             messageTranslationService.translateFormData(operation.getFormData());
             return operation;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Operation is not available");
         }
     }
@@ -205,8 +206,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         try {
             final ObjectResponse<GetOperationConfigDetailResponse> operationConfigResponse = nextStepClient.getOperationConfigDetail(operationName);
             return operationConfigResponse.getResponseObject();
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Operation configuration is not available");
         }
     }
@@ -220,8 +221,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         try {
             final ObjectResponse<GetOperationConfigListResponse> operationConfigsResponse = nextStepClient.getOperationConfigList();
             return operationConfigsResponse.getResponseObject();
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Operation configuration is not available");
         }
     }
@@ -269,8 +270,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 messageTranslationService.translateFormData(operation.getFormData());
             }
             return operations.getResponseObject();
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Operations are not available");
         }
     }
@@ -295,10 +296,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param authInstruments    Used authentication / authorization instruments.
      * @param params             Custom parameters.
      * @return Response with information about operation update result.
-     * @throws NextStepServiceException In case communication fails.
+     * @throws NextStepClientException In case communication with Next step service fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
+    protected UpdateOperationResponse authorize(String operationId, String userId, String organizationId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
         AuthMethod authMethod = getAuthMethodName(operation);
@@ -332,10 +333,10 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param authInstruments Used authentication instruments.
      * @param params          Custom parameters.
      * @return Response with information about operation update result.
-     * @throws NextStepServiceException In case communication fails.
+     * @throws NextStepClientException In case communication with Next Step service fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
+    protected UpdateOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
@@ -364,10 +365,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
      * @param params       Custom parameters.
      * @param cancelReason Reason for cancellation of the operation.
      * @return Response with information about operation update result.
-     * @throws NextStepServiceException In case communication fails.
      * @throws AuthStepException In case authorization fails.
      */
-    protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws NextStepServiceException, AuthStepException {
+    protected UpdateOperationResponse cancelAuthorization(String operationId, String userId, OperationCancelReason cancelReason, List<KeyValueParameter> params) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
         UpdateOperationResponse updateOperationResponse = operationCancellationService.cancelOperation(operation, authMethod, cancelReason);
@@ -410,8 +410,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             R initResponse = provider.continueAuthentication(operationId, null, responseObject.getSteps());
             logger.info("Operation initiate succeeded, operation name: {}", operationName);
             return initResponse;
-        } catch (NextStepServiceException e) {
-            logger.error("Error while initiating operation", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error while initiating operation", ex);
             return provider.failedAuthentication(null, "error.communication");
         }
     }
@@ -487,7 +487,11 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // At first cancel operations within same HTTP session in the operation to session mapping
         List<OperationSessionEntity> operationsToCancel = operationSessionService.cancelOperationsInHttpSession(httpSessionId);
         for (OperationSessionEntity operationToCancel: operationsToCancel) {
-            operationCancellationService.cancelOperation(operationToCancel.getOperationId(), getAuthMethodName(), OperationCancelReason.INTERRUPTED_OPERATION);
+            try {
+                operationCancellationService.cancelOperation(operationToCancel.getOperationId(), getAuthMethodName(), OperationCancelReason.INTERRUPTED_OPERATION);
+            } catch (CommunicationFailedException ex) {
+                // Exception is already logged
+            }
         }
     }
 
@@ -534,16 +538,21 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                     return provider.failedAuthentication(userId, "error.unknown");
                 }
             }
-        } catch (OperationAlreadyFinishedException ex) {
-            // Translate Next Step exception for update of a finished operation
-            throw new OperationIsAlreadyFinished(ex.getMessage());
-        } catch (OperationAlreadyCanceledException ex) {
-            // Translate Next Step exception for update of a canceled operation
-            throw new OperationIsAlreadyCanceledException(ex.getMessage());
-        } catch (OperationAlreadyFailedException ex) {
-            // Translate Next Step exception for update of a failed operation
-            throw new OperationIsAlreadyFailedException(ex.getMessage());
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
+            Error nextStepError = ex.getNextStepError();
+            if (nextStepError != null) {
+                switch (nextStepError.getCode()) {
+                    case OperationAlreadyFinishedException.CODE:
+                        // Translate Next Step exception for update of a finished operation
+                        throw new OperationIsAlreadyFinished(ex.getMessage());
+                    case OperationAlreadyCanceledException.CODE:
+                        // Translate Next Step exception for update of a canceled operation
+                        throw new OperationIsAlreadyCanceledException(ex.getMessage());
+                    case OperationAlreadyFailedException.CODE:
+                        // Translate Next Step exception for update of a failed operation
+                        throw new OperationIsAlreadyFailedException(ex.getMessage());
+                }
+            }
             // Generic Next Step error
             logger.error("Error while building authorization response", ex);
             throw new CommunicationFailedException("Step authorization failed");

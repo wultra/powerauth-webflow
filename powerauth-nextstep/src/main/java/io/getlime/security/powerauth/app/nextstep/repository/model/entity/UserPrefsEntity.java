@@ -125,6 +125,12 @@ public class UserPrefsEntity implements Serializable {
         }
     }
 
+    /**
+     * Get authentication method configuration.
+     * @param columnNumber Column number with authentication method.
+     * @return Authentication method configuration.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
     public String getAuthMethodConfig(int columnNumber) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:
@@ -142,6 +148,12 @@ public class UserPrefsEntity implements Serializable {
         }
     }
 
+    /**
+     * Set authentication method configuration.
+     * @param columnNumber Column number with authentication method.
+     * @param config Authentication method configuration.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
     public void setAuthMethodConfig(int columnNumber, String config) throws InvalidConfigurationException {
         switch (columnNumber) {
             case 1:

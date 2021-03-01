@@ -244,7 +244,7 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigList request");
 
-        GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigs();
+        GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigList();
 
         logger.debug("The getOperationConfigList request succeeded");
         return new ObjectResponse<>(response);

@@ -40,8 +40,8 @@ public class CredentialPolicyDetail {
     private Integer credentialLengthMin;
     private Integer credentialLengthMax;
     private String credentialAllowedChars;
-    private Long limitSoft;
-    private Long limitHard;
+    private Integer limitSoft;
+    private Integer limitHard;
     private int checkHistoryCount;
     private boolean rotationEnabled;
     private Integer rotationDays;

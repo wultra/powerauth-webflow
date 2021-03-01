@@ -27,10 +27,10 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.InitAuthMeth
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertificateResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
@@ -112,10 +112,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @param request Initialization request.
      * @return SCA login initialization response.
      * @throws AuthStepException In case SCA login initialization fails.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public LoginScaAuthResponse authenticateScaLogin(@Valid @RequestBody LoginScaAuthRequest request) throws AuthStepException, NextStepServiceException {
+    public LoginScaAuthResponse authenticateScaLogin(@Valid @RequestBody LoginScaAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         try {
@@ -177,7 +176,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                         nextStepClient.updateMobileToken(operation.getOperationId(), true);
                         mobileTokenEnabled = true;
                     }
-                } catch (NextStepServiceException ex) {
+                } catch (NextStepClientException ex) {
                     logger.error("Error occurred in Next Step server", ex);
                 }
                 response.setMobileTokenEnabled(mobileTokenEnabled);
@@ -189,13 +188,18 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 }
             }
             return response;
-        } catch (DataAdapterClientErrorException ex) {
+        } catch (NextStepClientException | DataAdapterClientErrorException ex) {
             logger.error(ex.getMessage(), ex);
             // Send error to client
             LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            response.setRemainingAttempts(ex.getError().getRemainingAttempts());
-            response.setMessage(ex.getError().getMessage());
+            if (ex instanceof DataAdapterClientErrorException) {
+                DataAdapterClientErrorException ex2 = (DataAdapterClientErrorException) ex;
+                response.setRemainingAttempts(ex2.getError().getRemainingAttempts());
+                response.setMessage(ex2.getError().getMessage());
+            } else {
+                response.setMessage("error.communication");
+            }
             return response;
         }
     }
@@ -244,7 +248,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                     if (authMethodQueryService.isMobileTokenAvailable(operation.getUserId(), operation.getOperationId())) {
                         mobileTokenEnabled = true;
                     }
-                } catch (NextStepServiceException ex) {
+                } catch (NextStepClientException ex) {
                     logger.error("Error occurred in Next Step server", ex);
                 }
                 response.setMobileTokenEnabled(mobileTokenEnabled);
@@ -257,7 +261,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
                 response.addOrganization(organization);
             }
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Communication with Next Step service failed");
         } catch (DataAdapterClientErrorException ex) {
@@ -312,8 +316,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             response.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
-        } catch (NextStepServiceException ex) {
-            logger.error("Error occurred in Next Step server", ex);
+        } catch (CommunicationFailedException ex) {
             final AuthStepResponse response = new AuthStepResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");
@@ -332,10 +335,10 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @param operationContext Operation context.
      * @return Whether authentication using client TLS certificate succeeded.
      * @throws DataAdapterClientErrorException In case communication with Data Adapter fails.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
+     * @throws NextStepClientException In case communication with Next Step service fails.
      * @throws AuthStepException In case step authentication fails.
      */
-    private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepServiceException, AuthStepException {
+    private boolean verifyClientCertificate(String operationId, String userId, String organizationId, String clientCertificate, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException, NextStepClientException, AuthStepException {
         ObjectResponse<VerifyCertificateResponse> objectResponseCert = dataAdapterClient.verifyClientCertificate(userId, organizationId, clientCertificate, getAuthMethodName(), accountStatus, operationContext);
         VerifyCertificateResponse certResponse = objectResponseCert.getResponseObject();
         CertificateVerificationResult verificationResult = certResponse.getCertificateVerificationResult();
@@ -385,7 +388,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("authentication.fail");
             return response;
-        } catch (NextStepServiceException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Error while communicating with Next Step service", ex);
             final LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);

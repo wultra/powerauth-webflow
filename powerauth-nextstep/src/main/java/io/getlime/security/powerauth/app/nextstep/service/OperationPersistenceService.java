@@ -18,8 +18,10 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthenticationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
@@ -63,6 +65,7 @@ public class OperationPersistenceService {
     private final OperationHistoryRepository operationHistoryRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final StepResolutionService stepResolutionService;
+    private final AuthenticationRepository authenticationRepository;
 
     /**
      * Service constructor.
@@ -71,17 +74,19 @@ public class OperationPersistenceService {
      * @param operationHistoryRepository      Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
      * @param stepResolutionService           Step resolution service.
+     * @param authenticationRepository        Authentication repository.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OperationHistoryRepository operationHistoryRepository,
                                        MobileTokenConfigurationService mobileTokenConfigurationService,
-                                       @Lazy StepResolutionService stepResolutionService) {
+                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
         this.stepResolutionService = stepResolutionService;
+        this.authenticationRepository = authenticationRepository;
     }
 
     /**
@@ -186,7 +191,10 @@ public class OperationPersistenceService {
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(request.getAuthMethod());
         operationHistory.setRequestAuthStepResult(request.getAuthStepResult());
-        operationHistory.setAuthenticationId(request.getAuthenticationId());
+        if (request.getAuthenticationId() != null) {
+            Optional<AuthenticationEntity> authenticationOptional = authenticationRepository.findById(request.getAuthenticationId());
+            authenticationOptional.ifPresent(operationHistory::setAuthentication);
+        }
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
@@ -196,10 +204,7 @@ public class OperationPersistenceService {
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
-            logger.error(
-                    "Error occurred while serializing operation history",
-                    e
-            );
+            logger.error("Error occurred while serializing operation history", e);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
@@ -240,10 +245,7 @@ public class OperationPersistenceService {
             formData.getUserInput().putAll(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
         } catch (IOException e) {
-            logger.error(
-                    "Error occurred while serializing operation form data",
-                    e
-            );
+            logger.error("Error occurred while serializing operation form data", e);
         }
         operationRepository.save(operation);
     }
@@ -424,10 +426,7 @@ public class OperationPersistenceService {
             return steps;
         } catch (IOException e) {
             // in case of an error empty list is returned
-            logger.error(
-                    "Error occurred while deserializing response steps",
-                    e
-            );
+            logger.error("Error occurred while deserializing response steps", e);
         }
         return steps;
     }

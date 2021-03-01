@@ -48,6 +48,6 @@ public class CombinedAuthenticationResponse {
     @NotNull
     private AuthenticationResult otpAuthenticationResult;
     @NotNull
-    private Long remainingAttempts;
+    private Integer remainingAttempts;
 
 }
