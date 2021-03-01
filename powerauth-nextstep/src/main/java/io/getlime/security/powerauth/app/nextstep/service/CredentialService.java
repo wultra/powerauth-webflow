@@ -570,6 +570,8 @@ public class CredentialService {
                         return username;
                     }
                     throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
+                } catch (InvalidConfigurationException ex) {
+                    throw ex;
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
@@ -598,6 +600,8 @@ public class CredentialService {
                         return username;
                     }
                     throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
+                } catch (InvalidConfigurationException ex) {
+                    throw ex;
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
@@ -646,7 +650,7 @@ public class CredentialService {
                         availableCharsBuilder.append("ABCDEFGHIJKLMNOPQRSTUVWYZ");
                     }
                     if (includeDigits) {
-                        availableCharsBuilder.append("01234567890");
+                        availableCharsBuilder.append("0123456789");
                     }
                     if (includeSpecialChars) {
                         availableCharsBuilder.append("^<>{}|;:.,~!?@#$%^=&*[]()");
@@ -654,9 +658,32 @@ public class CredentialService {
                     String availableChars = availableCharsBuilder.toString();
                     while (credentialBuilder.length() < length) {
                         int randomInt = secureRandom.nextInt(availableChars.length());
-                        credentialBuilder.append(availableCharsBuilder.charAt(randomInt));
+                        credentialBuilder.append(availableChars.charAt(randomInt));
                     }
                     return credentialBuilder.toString();
+                } catch (InvalidConfigurationException ex) {
+                    throw ex;
+                } catch (Exception ex) {
+                    throw new InvalidConfigurationException(ex);
+                }
+
+            case "RANDOM_PIN":
+                try {
+                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
+                    String paramLength = param.get("length");
+                    if (paramLength == null) {
+                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PIN");
+                    }
+                    int length = Integer.parseInt(paramLength);
+                    SecureRandom secureRandom = new SecureRandom();
+                    StringBuilder credentialBuilder = new StringBuilder();
+                    while (credentialBuilder.length() < length) {
+                        int randomInt = secureRandom.nextInt(10);
+                        credentialBuilder.append(randomInt);
+                    }
+                    return credentialBuilder.toString();
+                } catch (InvalidConfigurationException ex) {
+                    throw ex;
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
