@@ -15,13 +15,17 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialPolicyConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetCredentialPolicyListRequest;
@@ -52,6 +56,7 @@ public class CredentialPolicyService {
     private final CredentialPolicyRepository credentialPolicyRepository;
 
     private final CredentialPolicyConverter credentialPolicyConverter = new CredentialPolicyConverter();
+    private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Credential policy service constructor.
@@ -67,9 +72,10 @@ public class CredentialPolicyService {
      * @param request Create credential policy request.
      * @return Create credential policy response.
      * @throws CredentialPolicyAlreadyExistsException Thrown when credential policy already exists.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public CreateCredentialPolicyResponse createCredentialPolicy(CreateCredentialPolicyRequest request) throws CredentialPolicyAlreadyExistsException {
+    public CreateCredentialPolicyResponse createCredentialPolicy(CreateCredentialPolicyRequest request) throws CredentialPolicyAlreadyExistsException, InvalidRequestException {
         Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
         if (credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyAlreadyExistsException("Credential policy already exists: " + request.getCredentialPolicyName());
@@ -90,7 +96,17 @@ public class CredentialPolicyService {
         credentialPolicy.setRotationEnabled(request.isRotationEnabled());
         credentialPolicy.setRotationDays(request.getRotationDays());
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
+        try {
+            credentialPolicy.setUsernameGenParam(parameterConverter.fromMap(request.getUsernameGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidRequestException(ex);
+        }
         credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
+        try {
+            credentialPolicy.setCredentialGenParam(parameterConverter.fromMap(request.getCredentialGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidRequestException(ex);
+        }
         credentialPolicy.setTimestampCreated(new Date());
         credentialPolicyRepository.save(credentialPolicy);
         CreateCredentialPolicyResponse response = new CreateCredentialPolicyResponse();
@@ -109,7 +125,9 @@ public class CredentialPolicyService {
         response.setRotationEnabled(request.isRotationEnabled());
         response.setRotationDays(request.getRotationDays());
         response.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
+        response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
+        response.setCredentialGenParam(request.getCredentialGenParam());
         return response;
     }
 
@@ -118,9 +136,10 @@ public class CredentialPolicyService {
      * @param request Update credential policy request.
      * @return Update credential policy response.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public UpdateCredentialPolicyResponse updateCredentialPolicy(UpdateCredentialPolicyRequest request) throws CredentialPolicyNotFoundException {
+    public UpdateCredentialPolicyResponse updateCredentialPolicy(UpdateCredentialPolicyRequest request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
         if (!credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
@@ -146,7 +165,21 @@ public class CredentialPolicyService {
         credentialPolicy.setRotationEnabled(request.isRotationEnabled());
         credentialPolicy.setRotationDays(request.getRotationDays());
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
+        if (request.getUsernameGenParam() != null) {
+            try {
+                credentialPolicy.setUsernameGenParam(parameterConverter.fromMap(request.getUsernameGenParam()));
+            } catch (JsonProcessingException ex) {
+                throw new InvalidRequestException(ex);
+            }
+        }
         credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
+        if (request.getCredentialGenParam() != null) {
+            try {
+                credentialPolicy.setCredentialGenParam(parameterConverter.fromMap(request.getCredentialGenParam()));
+            } catch (JsonProcessingException ex) {
+                throw new InvalidRequestException(ex);
+            }
+        }
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicyRepository.save(credentialPolicy);
         UpdateCredentialPolicyResponse response  = new UpdateCredentialPolicyResponse();
@@ -165,7 +198,9 @@ public class CredentialPolicyService {
         response.setRotationEnabled(credentialPolicy.isRotationEnabled());
         response.setRotationDays(credentialPolicy.getRotationDays());
         response.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
+        response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
+        response.setCredentialGenParam(request.getCredentialGenParam());
         return response;
     }
 
@@ -173,9 +208,10 @@ public class CredentialPolicyService {
      * Get credential policy list.
      * @param request Credential policy list request.
      * @return Credential policy list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetCredentialPolicyListResponse getCredentialPolicyList(GetCredentialPolicyListRequest request) {
+    public GetCredentialPolicyListResponse getCredentialPolicyList(GetCredentialPolicyListRequest request) throws InvalidConfigurationException {
         Iterable<CredentialPolicyEntity> credentialPolicies;
         if (request.isIncludeRemoved()) {
             credentialPolicies = credentialPolicyRepository.findAll();

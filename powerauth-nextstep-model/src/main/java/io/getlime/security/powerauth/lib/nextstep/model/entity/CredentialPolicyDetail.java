@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Class represents details of a credential policy.
@@ -45,8 +47,14 @@ public class CredentialPolicyDetail {
     private int checkHistoryCount;
     private boolean rotationEnabled;
     private Integer rotationDays;
+    @NotNull
     private String usernameGenAlgorithm;
+    @NotNull
+    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    @NotNull
     private String credentialGenAlgorithm;
+    @NotNull
+    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
     @NotNull
     private CredentialPolicyStatus credentialPolicyStatus;
     @NotNull

@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.OtpPolicyService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpPolicyAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpPolicyNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpPolicyRequest;
@@ -56,28 +58,28 @@ public class OtpPolicyController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateOtpPolicyResponse> createOtpPolicy(@RequestBody ObjectRequest<CreateOtpPolicyRequest> request) throws OtpPolicyAlreadyExistsException {
+    public ObjectResponse<CreateOtpPolicyResponse> createOtpPolicy(@RequestBody ObjectRequest<CreateOtpPolicyRequest> request) throws OtpPolicyAlreadyExistsException, InvalidRequestException {
         // TODO - request validation
         CreateOtpPolicyResponse response = otpPolicyService.createOtpPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicy(@RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException {
+    public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicy(@RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         // TODO - request validation
         UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicyPost(@RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException {
+    public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicyPost(@RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         // TODO - request validation
         UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpPolicyListResponse> listOtpPolicies(@RequestBody ObjectRequest<GetOtpPolicyListRequest> request) {
+    public ObjectResponse<GetOtpPolicyListResponse> listOtpPolicies(@RequestBody ObjectRequest<GetOtpPolicyListRequest> request) throws InvalidConfigurationException {
         GetOtpPolicyListResponse response = otpPolicyService.getOtpPolicyList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

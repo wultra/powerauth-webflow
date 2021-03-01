@@ -88,8 +88,14 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "username_gen_algorithm", nullable = false)
     private String usernameGenAlgorithm;
 
+    @Column(name = "username_gen_param")
+    private String usernameGenParam;
+
     @Column(name = "credential_gen_algorithm", nullable = false)
     private String credentialGenAlgorithm;
+
+    @Column(name = "credential_gen_param")
+    private String credentialGenParam;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

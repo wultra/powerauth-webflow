@@ -188,7 +188,9 @@ CREATE TABLE ns_credential_policy (
   rotation_enabled           NUMBER(1) DEFAULT 0 NOT NULL,                  -- Whether credential rotation is enabled.
   rotation_days              NUMBER(10,0),                                  -- Number of days for credential rotation.
   username_gen_algorithm     VARCHAR2(256 CHAR) DEFAULT 'DEFAULT' NOT NULL, -- Algorithm used for generating the username.
+  username_gen_param         VARCHAR2(256 CHAR),                            -- Parameters used when generating the username.
   credential_gen_algorithm   VARCHAR2(256 CHAR) DEFAULT 'DEFAULT' NOT NULL, -- Algorithm used for generating the credential.
+  credential_gen_param       VARCHAR2(256 CHAR),                            -- Parameters used when generating the credential.
   timestamp_created          TIMESTAMP,                                     -- Timestamp when policy was created.
   timestamp_last_updated     TIMESTAMP                                      -- Timestamp when policy was last updated.
 );
@@ -203,6 +205,7 @@ CREATE TABLE ns_otp_policy (
   attempt_limit          NUMBER(10,0),                                      -- Maximum number of authentication attempts.
   expiration_time        NUMBER(10,0),                                      -- One time password expiration time.
   gen_algorithm          VARCHAR2(256 CHAR) DEFAULT 'DEFAULT' NOT NULL,     -- Algorithm used for generating the one time password.
+  gen_param              VARCHAR2(256 CHAR),                                -- Parameters used when generating the OTP.
   timestamp_created      TIMESTAMP,                                         -- Timestamp when policy was created.
   timestamp_last_updated TIMESTAMP                                          -- Timestamp when policy was last updated.
 );
@@ -583,7 +586,7 @@ CREATE INDEX ns_credential_storage_user_id ON ns_credential_storage (user_id);
 CREATE INDEX ns_credential_storage_user_name ON ns_credential_storage (user_name);
 CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (credential_definition_id, user_name);
 CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_id, credential_definition_id);
-CREATE UNIQUE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
+CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
 CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
 CREATE INDEX ns_otp_storage_user_id ON ns_otp_storage (user_id);
 CREATE INDEX ns_otp_storage_operation_id ON ns_otp_storage (operation_id);

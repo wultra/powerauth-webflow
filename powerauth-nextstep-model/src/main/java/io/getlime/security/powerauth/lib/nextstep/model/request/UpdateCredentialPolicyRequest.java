@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Request object used for updating a credential policy.
@@ -43,7 +45,9 @@ public class UpdateCredentialPolicyRequest {
     private boolean rotationEnabled;
     private Integer rotationDays;
     private String usernameGenAlgorithm;
+    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
     private String credentialGenAlgorithm;
+    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
     private CredentialPolicyStatus credentialPolicyStatus;
 
 }

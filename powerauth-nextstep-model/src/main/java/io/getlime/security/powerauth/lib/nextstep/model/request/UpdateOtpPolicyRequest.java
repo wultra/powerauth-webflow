@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPo
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Request object used for updating a credential policy.
@@ -36,6 +38,7 @@ public class UpdateOtpPolicyRequest {
     private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    private Map<String, String> genParam = new LinkedHashMap<>();
     private OtpPolicyStatus otpPolicyStatus;
 
 }

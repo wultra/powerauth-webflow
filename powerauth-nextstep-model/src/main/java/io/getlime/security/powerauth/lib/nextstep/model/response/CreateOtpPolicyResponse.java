@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPo
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Response object used for creating an OTP policy.
@@ -35,7 +37,10 @@ public class CreateOtpPolicyResponse {
     private Integer length;
     private Integer attemptLimit;
     private Long expirationTime;
+    @NotNull
     private String genAlgorithm;
+    @NotNull
+    private Map<String, String> genParam = new LinkedHashMap<>();
     @NotNull
     private OtpPolicyStatus otpPolicyStatus;
 

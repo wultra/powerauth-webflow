@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Request object used for creating a credential policy.
@@ -41,8 +43,14 @@ public class CreateCredentialPolicyRequest {
     private int checkHistoryCount;
     private boolean rotationEnabled;
     private Integer rotationDays;
+    @NotNull
     private String usernameGenAlgorithm;
+    @NotNull
+    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    @NotNull
     private String credentialGenAlgorithm;
+    @NotNull
+    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
 
 }
 

@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteHashConfigRequest;
@@ -143,10 +144,10 @@ public class HashConfigService {
      * Get hashing configuration list.
      * @param request Get hashing configuration list request.
      * @return Get hashing configuration list response.
-     * @throws InvalidRequestException Thrown when request deserialization fails.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetHashConfigListResponse getHashConfigList(GetHashConfigListRequest request) throws InvalidRequestException {
+    public GetHashConfigListResponse getHashConfigList(GetHashConfigListRequest request) throws InvalidConfigurationException {
         Iterable<HashConfigEntity> hashConfigs;
         if (request.isIncludeRemoved()) {
             hashConfigs = hashConfigRepository.findAll();

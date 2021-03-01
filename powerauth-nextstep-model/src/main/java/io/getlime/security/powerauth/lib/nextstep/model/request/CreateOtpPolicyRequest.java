@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Request object used for creating an OTP policy.
@@ -35,5 +37,6 @@ public class CreateOtpPolicyRequest {
     private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    private Map<String, String> genParam = new LinkedHashMap<>();
 
 }

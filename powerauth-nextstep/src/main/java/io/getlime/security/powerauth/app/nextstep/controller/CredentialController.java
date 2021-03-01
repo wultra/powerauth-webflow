@@ -49,7 +49,7 @@ public class CredentialController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialResponse> createCredential(@RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
+    public ObjectResponse<CreateCredentialResponse> createCredential(@RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
         // TODO - request validation
         CreateCredentialResponse response = credentialService.createCredential(request.getRequestObject());
         return new ObjectResponse<>(response);

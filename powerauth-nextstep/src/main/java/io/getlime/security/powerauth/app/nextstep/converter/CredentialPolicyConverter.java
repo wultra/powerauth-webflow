@@ -15,8 +15,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 
 /**
  * Converter for credential policies.
@@ -25,12 +27,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyD
  */
 public class CredentialPolicyConverter {
 
+    private final ParameterConverter parameterConverter = new ParameterConverter();
+
     /**
      * Convert credential policy from entity to detail.
      * @param credentialPolicy Credential policy entity.
      * @return Credential policy detail.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public CredentialPolicyDetail fromEntity(CredentialPolicyEntity credentialPolicy) {
+    public CredentialPolicyDetail fromEntity(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
         CredentialPolicyDetail credentialPolicyDetail = new CredentialPolicyDetail();
         credentialPolicyDetail.setCredentialPolicyName(credentialPolicy.getName());
         credentialPolicyDetail.setDescription(credentialPolicy.getDescription());
@@ -47,7 +52,17 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setRotationEnabled(credentialPolicy.isRotationEnabled());
         credentialPolicyDetail.setRotationDays(credentialPolicy.getRotationDays());
         credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
+        try {
+            credentialPolicyDetail.setUsernameGenParam(parameterConverter.fromString(credentialPolicy.getUsernameGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidConfigurationException(ex);
+        }
         credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
+        try {
+            credentialPolicyDetail.setCredentialGenParam(parameterConverter.fromString(credentialPolicy.getCredentialGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidConfigurationException(ex);
+        }
         credentialPolicyDetail.setTimestampCreated(credentialPolicy.getTimestampCreated());
         credentialPolicyDetail.setTimestampLastUpdated(credentialPolicy.getTimestampLastUpdated());
         return credentialPolicyDetail;

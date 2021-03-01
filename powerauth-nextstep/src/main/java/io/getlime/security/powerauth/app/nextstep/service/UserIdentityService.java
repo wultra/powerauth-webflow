@@ -94,9 +94,10 @@ public class UserIdentityService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @Transactional
-    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
+    @Transactional(rollbackOn = Throwable.class)
+    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
         // TODO - finish support for more complex use cases (generate credentials)
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
@@ -147,6 +148,18 @@ public class UserIdentityService {
         response.setUserIdentityStatus(user.getStatus());
         response.getExtras().putAll(request.getExtras());
 
+        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
+        if (request.getCredentials() != null) {
+            for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
+                CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
+                        credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
+                newCredentials.add(credentialDetail);
+            }
+        }
+        // Remove inactive credentials, in case no credentials are sent in request, all credentials are removed
+        removeInactiveCredentials(user, newCredentials);
+        response.getCredentials().addAll(newCredentials);
         if (request.getRoles() != null) {
             updateRoles(user, request.getRoles(), roleEntities);
             response.getRoles().addAll(request.getRoles());
@@ -164,18 +177,6 @@ public class UserIdentityService {
             List<UserContactDetail> addedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(addedContacts);
         }
-        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
-        if (request.getCredentials() != null) {
-            for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
-                newCredentials.add(credentialDetail);
-            }
-        }
-        // Remove inactive credentials, in case no credentials are sent in request, all credentials are removed
-        removeInactiveCredentials(user, newCredentials);
-        response.getCredentials().addAll(newCredentials);
         return response;
     }
 
@@ -187,9 +188,10 @@ public class UserIdentityService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @Transactional
-    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
+    @Transactional(rollbackOn = Throwable.class)
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
@@ -226,11 +228,27 @@ public class UserIdentityService {
             }
         }
 
+        userIdentityRepository.save(user);
+
         UpdateUserResponse response = new UpdateUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         response.getExtras().putAll(request.getExtras());
-
+        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
+        if (request.getCredentials() != null) {
+            if (request.getUserIdentityStatus() != UserIdentityStatus.REMOVED) {
+                // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
+                for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
+                    CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                    CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
+                            credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
+                    newCredentials.add(credentialDetail);
+                }
+            }
+            // Remove inactive credentials, when requested status is REMOVED, all credentials are removed
+            removeInactiveCredentials(user, newCredentials);
+        }
+        response.getCredentials().addAll(newCredentials);
         if (request.getRoles() != null) {
             // Roles from the request are set, obsolete roles are removed
             updateRoles(user, request.getRoles(), roleEntities);
@@ -250,21 +268,6 @@ public class UserIdentityService {
             List<UserContactDetail> updatedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(updatedContacts);
         }
-        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
-        if (request.getCredentials() != null) {
-            if (request.getUserIdentityStatus() != UserIdentityStatus.REMOVED) {
-                // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
-                for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
-                    CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                    CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
-                    newCredentials.add(credentialDetail);
-                }
-            }
-            // Remove inactive credentials, when requested status is REMOVED, all credentials are removed
-            removeInactiveCredentials(user, newCredentials);
-        }
-        response.getCredentials().addAll(newCredentials);
         return response;
     }
 

@@ -15,11 +15,15 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpPolicyConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpPolicyAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpPolicyNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpPolicyRequest;
@@ -52,6 +56,7 @@ public class OtpPolicyService {
     private final OtpPolicyRepository otpPolicyRepository;
 
     private final OtpPolicyConverter otpPolicyConverter = new OtpPolicyConverter();
+    private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Constructor for OTP policy service.
@@ -67,9 +72,10 @@ public class OtpPolicyService {
      * @param request Create OTP policy request.
      * @return Create OTP policy response.
      * @throws OtpPolicyAlreadyExistsException Thrown when OTP policy already exists.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public CreateOtpPolicyResponse createOtpPolicy(CreateOtpPolicyRequest request) throws OtpPolicyAlreadyExistsException {
+    public CreateOtpPolicyResponse createOtpPolicy(CreateOtpPolicyRequest request) throws OtpPolicyAlreadyExistsException, InvalidRequestException {
         Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
         if (otpPolicyOptional.isPresent()) {
             throw new OtpPolicyAlreadyExistsException("One time password policy already exists: " + request.getOtpPolicyName());
@@ -81,6 +87,11 @@ public class OtpPolicyService {
         otpPolicy.setLength(request.getLength());
         otpPolicy.setAttemptLimit(request.getAttemptLimit());
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
+        try {
+            otpPolicy.setGenParam(parameterConverter.fromMap(request.getGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidRequestException(ex);
+        }
         otpPolicy.setExpirationTime(request.getExpirationTime());
         otpPolicy.setTimestampCreated(new Date());
         otpPolicyRepository.save(otpPolicy);
@@ -91,6 +102,7 @@ public class OtpPolicyService {
         response.setLength(request.getLength());
         response.setAttemptLimit(request.getAttemptLimit());
         response.setGenAlgorithm(request.getGenAlgorithm());
+        response.setGenParam(request.getGenParam());
         response.setExpirationTime(request.getExpirationTime());
         return response;
     }
@@ -100,9 +112,10 @@ public class OtpPolicyService {
      * @param request Update OTP policy request.
      * @return Update OTP policy response.
      * @throws OtpPolicyNotFoundException Thrown when OTP policy does not exist.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public UpdateOtpPolicyResponse updateOtpPolicy(UpdateOtpPolicyRequest request) throws OtpPolicyNotFoundException {
+    public UpdateOtpPolicyResponse updateOtpPolicy(UpdateOtpPolicyRequest request) throws OtpPolicyNotFoundException, InvalidRequestException {
         Optional<OtpPolicyEntity> otpPolicyOptional = otpPolicyRepository.findByName(request.getOtpPolicyName());
         if (!otpPolicyOptional.isPresent()) {
             throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
@@ -119,6 +132,13 @@ public class OtpPolicyService {
         otpPolicy.setLength(request.getLength());
         otpPolicy.setAttemptLimit(request.getAttemptLimit());
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
+        if (request.getGenParam() != null) {
+            try {
+                otpPolicy.setGenParam(parameterConverter.fromMap(request.getGenParam()));
+            } catch (JsonProcessingException ex) {
+                throw new InvalidRequestException(ex);
+            }
+        }
         otpPolicy.setExpirationTime(request.getExpirationTime());
         otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicyRepository.save(otpPolicy);
@@ -129,6 +149,7 @@ public class OtpPolicyService {
         response.setLength(otpPolicy.getLength());
         response.setAttemptLimit(otpPolicy.getAttemptLimit());
         response.setGenAlgorithm(otpPolicy.getGenAlgorithm());
+        response.setGenParam(request.getGenParam());
         response.setExpirationTime(otpPolicy.getExpirationTime());
         return response;
     }
@@ -137,9 +158,10 @@ public class OtpPolicyService {
      * Get OTP policy list.
      * @param request Get OTP policy list request.
      * @return Get OTP policy list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetOtpPolicyListResponse getOtpPolicyList(GetOtpPolicyListRequest request) {
+    public GetOtpPolicyListResponse getOtpPolicyList(GetOtpPolicyListRequest request) throws InvalidConfigurationException {
         Iterable<OtpPolicyEntity> otpPolicies;
         if (request.isIncludeRemoved()) {
             otpPolicies = otpPolicyRepository.findAll();

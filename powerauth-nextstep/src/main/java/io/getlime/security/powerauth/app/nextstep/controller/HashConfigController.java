@@ -21,6 +21,7 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.HashConfigService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateHashConfigRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteHashConfigRequest;
@@ -78,7 +79,7 @@ public class HashConfigController {
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetHashConfigListResponse> listHashConfigs(@RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidRequestException {
+    public ObjectResponse<GetHashConfigListResponse> listHashConfigs(@RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidConfigurationException {
         GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

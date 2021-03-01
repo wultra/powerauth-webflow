@@ -15,8 +15,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 
 /**
  * Converter for OTP policies.
@@ -25,12 +27,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
  */
 public class OtpPolicyConverter {
 
+    private final ParameterConverter parameterConverter = new ParameterConverter();
+
     /**
      * Convert OTP policy entity to detail.
      * @param otpPolicy OTP policy entity.
      * @return OTP policy detail.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public OtpPolicyDetail fromEntity(OtpPolicyEntity otpPolicy) {
+    public OtpPolicyDetail fromEntity(OtpPolicyEntity otpPolicy) throws InvalidConfigurationException {
         OtpPolicyDetail otpPolicyDetail = new OtpPolicyDetail();
         otpPolicyDetail.setOtpPolicyName(otpPolicy.getName());
         otpPolicyDetail.setDescription(otpPolicy.getDescription());
@@ -38,6 +43,11 @@ public class OtpPolicyConverter {
         otpPolicyDetail.setLength(otpPolicy.getLength());
         otpPolicyDetail.setAttemptLimit(otpPolicy.getAttemptLimit());
         otpPolicyDetail.setGenAlgorithm(otpPolicy.getGenAlgorithm());
+        try {
+            otpPolicyDetail.setGenParam(parameterConverter.fromString(otpPolicy.getGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidConfigurationException(ex);
+        }
         otpPolicyDetail.setExpirationTime(otpPolicy.getExpirationTime());
         otpPolicyDetail.setTimestampCreated(otpPolicy.getTimestampCreated());
         otpPolicyDetail.setTimestampLastUpdated(otpPolicy.getTimestampLastUpdated());

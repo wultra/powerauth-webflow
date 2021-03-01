@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
@@ -36,10 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.math.BigInteger;
+import java.security.SecureRandom;
+import java.util.*;
 
 /**
  * This service handles persistence of credentials.
@@ -51,12 +51,15 @@ public class CredentialService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialService.class);
 
+    private static final int GENERATE_USERNAME_MAX_ATTEMPTS = 100;
+
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
     private final CredentialRepository credentialRepository;
     private final IdGeneratorService idGeneratorService;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
+    private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Credential service constructor.
@@ -80,9 +83,10 @@ public class CredentialService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException {
+    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         CredentialType credentialType = request.getCredentialType();
@@ -466,9 +470,10 @@ public class CredentialService {
      * @param username Username, use null for generated username.
      * @param credentialValue Credential value, use null for generated credential value.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                                   CredentialType credentialType, String username, String credentialValue) throws UsernameAlreadyExistsException {
+                                                   CredentialType credentialType, String username, String credentialValue) throws UsernameAlreadyExistsException, InvalidConfigurationException {
         // Lookup credential in case it already exists
         CredentialEntity credential = null;
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -495,9 +500,10 @@ public class CredentialService {
             }
         }
         credential.setType(credentialType);
+        if (username == null) {
+            username = generateUsername(credentialDefinition);
+        }
         // TODO - username and credentialValue validation
-        // TODO - check that username is available
-        // TODO - generate username if username is null
         credential.setUsername(username);
         // TODO - generate credential value if credential value is null
         credential.setValue(credentialValue);
@@ -523,6 +529,50 @@ public class CredentialService {
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
         return credentialDetail;
+    }
+
+    /**
+     * Generate a username as defined in credential policy.
+     * @param credentialDefinition Credential definition.
+     * @return Generated username.
+     * @throws InvalidConfigurationException Thrown in case username could not be generated.
+     */
+    private String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        switch (credentialPolicy.getUsernameGenAlgorithm()) {
+            case "DEFAULT":
+            case "RANDOM_DIGITS":
+                try {
+                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
+                    String paramLength = param.get("length");
+                    if (paramLength == null) {
+                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_DIGITS");
+                    }
+                    int length = Integer.parseInt(paramLength);
+                    SecureRandom secureRandom = new SecureRandom();
+                    for (int i = 0; i < GENERATE_USERNAME_MAX_ATTEMPTS; i++) {
+                        BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
+                        BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
+                        String username = randomNumber.toString();
+                        if (username.startsWith("0")) {
+                            // Do not allow 0 as the first digit
+                            continue;
+                        }
+                        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                        if (credentialOptional.isPresent()) {
+                            // Username is already taken
+                            continue;
+                        }
+                        return username;
+                    }
+                    throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
+                } catch (Exception ex) {
+                    throw new InvalidConfigurationException(ex);
+                }
+
+            default:
+                throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
+        }
     }
 
 }

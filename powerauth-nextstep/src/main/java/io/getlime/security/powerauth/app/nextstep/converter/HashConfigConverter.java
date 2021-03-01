@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ public class HashConfigConverter {
      * @param hashConfig Hashing configuration entity.
      * @return Hashing configuration detail.
      */
-    public HashConfigDetail fromEntity(HashConfigEntity hashConfig) throws InvalidRequestException {
+    public HashConfigDetail fromEntity(HashConfigEntity hashConfig) throws InvalidConfigurationException {
         HashConfigDetail hashConfigDetail = new HashConfigDetail();
         hashConfigDetail.setHashConfigName(hashConfig.getName());
         hashConfigDetail.setAlgorithm(hashConfig.getAlgorithm());
@@ -46,7 +46,7 @@ public class HashConfigConverter {
             Map<String, String> parameters = parameterConverter.fromString(hashConfig.getParameters());
             hashConfigDetail.getParameters().putAll(parameters);
         } catch (JsonProcessingException ex) {
-            throw new InvalidRequestException(ex);
+            throw new InvalidConfigurationException(ex);
         }
         return hashConfigDetail;
     }

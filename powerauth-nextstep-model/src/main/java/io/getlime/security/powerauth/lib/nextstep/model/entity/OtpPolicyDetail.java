@@ -21,6 +21,8 @@ import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Class represents details of an OTP policy.
@@ -39,6 +41,8 @@ public class OtpPolicyDetail {
     private Integer attemptLimit;
     private Long expirationTime;
     private String genAlgorithm;
+    @NotNull
+    private Map<String, String> genParam = new LinkedHashMap<>();
     @NotNull
     private OtpPolicyStatus otpPolicyStatus;
     @NotNull

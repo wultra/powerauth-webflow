@@ -21,6 +21,8 @@ import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.CredentialPolicyService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialPolicyNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetCredentialPolicyListRequest;
@@ -56,28 +58,28 @@ public class CredentialPolicyController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) throws CredentialPolicyAlreadyExistsException {
+    public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) throws CredentialPolicyAlreadyExistsException, InvalidRequestException {
         // TODO - request validation
         CreateCredentialPolicyResponse response = credentialPolicyService.createCredentialPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         // TODO - request validation
         UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         // TODO - request validation
         UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetCredentialPolicyListResponse> listCredentialPolicies(@RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) {
+    public ObjectResponse<GetCredentialPolicyListResponse> listCredentialPolicies(@RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) throws InvalidConfigurationException {
         GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
