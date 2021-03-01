@@ -98,7 +98,6 @@ public class UserIdentityService {
      */
     @Transactional(rollbackOn = Throwable.class)
     public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
-        // TODO - finish support for more complex use cases (generate credentials)
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();

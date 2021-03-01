@@ -113,9 +113,10 @@ public class CredentialService {
      * @throws UserNotFoundException Thrown when user is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      */
     @Transactional
-    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -133,8 +134,11 @@ public class CredentialService {
             credential.setType(request.getCredentialType());
         }
         // TODO - username and credentialValue validation
-        // TODO - check that username is available
         if (request.getUsername() != null) {
+            Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, request.getUsername());
+            if (existingCredentialOptional.isPresent()) {
+                throw new UsernameAlreadyExistsException("Username already exists");
+            }
             credential.setUsername(request.getUsername());
         }
         if (request.getCredentialValue() != null) {
@@ -509,7 +513,6 @@ public class CredentialService {
         if (credentialValue == null) {
             credentialValue = generateCredentialValue(credentialDefinition);
         }
-        // TODO - generate credential value if credential value is null
         credential.setValue(credentialValue);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
@@ -524,7 +527,6 @@ public class CredentialService {
         credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
         credentialDetail.setUsername(credential.getUsername());
         if (credentialValueRequest == null) {
-            // TODO - generated credential will be set here
             credentialDetail.setCredentialValue(credential.getValue());
         }
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
