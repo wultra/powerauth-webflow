@@ -284,19 +284,44 @@ public class NextStepAuthenticationTest {
     }
 
     @Test
-    public void testCredentialAndOtpFailNoOperation() throws NextStepClientException {
+    public void testCredentialAndOtpFailNoOperation1() throws NextStepClientException {
         CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
         CombinedAuthenticationResponse r2 = nextStepClient.authenticationCombined("TEST_CREDENTIAL", "test_user_1", "secret", r1.getOtpId(), r1.getOtpValue()).getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
+        assertEquals(AuthenticationResult.FAILED, r2.getCredentialAuthenticationResult());
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getOtpAuthenticationResult());
     }
 
     @Test
-    public void testCredentialAndOtpFailWithOperation() throws NextStepClientException {
-        nextStepClient.createOperation("auth_otp", "test_operation_9", "A1", null, null);
-        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_9").getResponseObject();
-        CombinedAuthenticationResponse r2 = nextStepClient.authenticationCombined("TEST_CREDENTIAL", "test_user_1", "secret", r1.getOtpId(), "test_operation_9", r1.getOtpValue(), true, null).getResponseObject();
+    public void testCredentialAndOtpFailNoOperation2() throws NextStepClientException {
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticationCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), "0000000000").getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
-        GetOperationDetailResponse r3 = nextStepClient.getOperationDetail("test_operation_9").getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getCredentialAuthenticationResult());
+        assertEquals(AuthenticationResult.FAILED, r2.getOtpAuthenticationResult());
+    }
+
+    @Test
+    public void testCredentialAndOtpFailWithOperation1() throws NextStepClientException {
+        nextStepClient.createOperation("auth_otp", "test_operation_9a", "A1", null, null);
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_9a").getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticationCombined("TEST_CREDENTIAL", "test_user_1", "secret", r1.getOtpId(), "test_operation_9a", r1.getOtpValue(), true, null).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
+        assertEquals(AuthenticationResult.FAILED, r2.getCredentialAuthenticationResult());
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getOtpAuthenticationResult());
+        GetOperationDetailResponse r3 = nextStepClient.getOperationDetail("test_operation_9a").getResponseObject();
+        assertEquals(AuthResult.CONTINUE, r3.getResult());
+    }
+
+    @Test
+    public void testCredentialAndOtpFailWithOperation2() throws NextStepClientException {
+        nextStepClient.createOperation("auth_otp", "test_operation_9b", "A1", null, null);
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA", "test_operation_9b").getResponseObject();
+        CombinedAuthenticationResponse r2 = nextStepClient.authenticationCombined("TEST_CREDENTIAL", "test_user_1", "s3cret", r1.getOtpId(), "test_operation_9b", "0000000000", true, null).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getCredentialAuthenticationResult());
+        assertEquals(AuthenticationResult.FAILED, r2.getOtpAuthenticationResult());
+        GetOperationDetailResponse r3 = nextStepClient.getOperationDetail("test_operation_9b").getResponseObject();
         assertEquals(AuthResult.CONTINUE, r3.getResult());
     }
 

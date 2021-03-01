@@ -646,11 +646,13 @@ public class NextStepClient {
     /**
      * Delete an authentication method.
      *
+     * @param authMethod Authentication method.
      * @return Delete authentication method response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod() throws NextStepClientException {
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(AuthMethod authMethod) throws NextStepClientException {
         DeleteAuthMethodRequest request = new DeleteAuthMethodRequest();
+        request.setAuthMethod(authMethod);
         return postObjectImpl("/auth-method/delete", new ObjectRequest<>(request), DeleteAuthMethodResponse.class);
     }
 
@@ -1286,6 +1288,7 @@ public class NextStepClient {
      */
     public ObjectResponse<DeleteUserResponse> deleteUser(@NotNull String userId) throws NextStepClientException {
         DeleteUserRequest request = new DeleteUserRequest();
+        request.setUserId(userId);
         return postObjectImpl("/user/delete", new ObjectRequest<>(request), DeleteUserResponse.class);
     }
 
