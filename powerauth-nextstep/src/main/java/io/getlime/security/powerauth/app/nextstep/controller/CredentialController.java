@@ -77,7 +77,7 @@ public class CredentialController {
     }
 
     @RequestMapping(value = "reset", method = RequestMethod.POST)
-    public ObjectResponse<ResetCredentialResponse> resetCredential(@RequestBody ObjectRequest<ResetCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public ObjectResponse<ResetCredentialResponse> resetCredential(@RequestBody ObjectRequest<ResetCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException {
         // TODO - request validation
         ResetCredentialResponse response = credentialService.resetCredential(request.getRequestObject());
         return new ObjectResponse<>(response);

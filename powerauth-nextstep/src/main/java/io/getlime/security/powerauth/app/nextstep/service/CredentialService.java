@@ -230,10 +230,11 @@ public class CredentialService {
      * @return Reset credential response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
-     * @throws CredentialNotFoundException Thrown when credential isnot found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws InvalidConfigurationException Thrown in case Next Step configuration is invalid.
      */
     @Transactional
-    public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+    public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUserId(credentialDefinition, user);
@@ -245,8 +246,7 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setType(request.getCredentialType());
-        // TODO - implement password generation algorithm
-        credential.setValue("s3cret");
+        credential.setValue(generateCredentialValue(credentialDefinition));
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);
@@ -505,6 +505,10 @@ public class CredentialService {
         }
         // TODO - username and credentialValue validation
         credential.setUsername(username);
+        String credentialValueRequest = credentialValue;
+        if (credentialValue == null) {
+            credentialValue = generateCredentialValue(credentialDefinition);
+        }
         // TODO - generate credential value if credential value is null
         credential.setValue(credentialValue);
         credential.setStatus(CredentialStatus.ACTIVE);
@@ -519,7 +523,7 @@ public class CredentialService {
         credentialDetail.setCredentialType(credential.getType());
         credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
         credentialDetail.setUsername(credential.getUsername());
-        if (credentialValue == null) {
+        if (credentialValueRequest == null) {
             // TODO - generated credential will be set here
             credentialDetail.setCredentialValue(credential.getValue());
         }
@@ -570,8 +574,95 @@ public class CredentialService {
                     throw new InvalidConfigurationException(ex);
                 }
 
+            case "RANDOM_LETTERS":
+                try {
+                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
+                    String paramLength = param.get("length");
+                    if (paramLength == null) {
+                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_LETTERS");
+                    }
+                    int length = Integer.parseInt(paramLength);
+                    SecureRandom secureRandom = new SecureRandom();
+                    for (int i = 0; i < GENERATE_USERNAME_MAX_ATTEMPTS; i++) {
+                        StringBuilder usernameBuilder = new StringBuilder();
+                        for (int j = 0; j < length; j++) {
+                            char c = (char) (secureRandom.nextInt(26) + 'a');
+                            usernameBuilder.append(c);
+                        }
+                        String username = usernameBuilder.toString();
+                        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                        if (credentialOptional.isPresent()) {
+                            // Username is already taken
+                            continue;
+                        }
+                        return username;
+                    }
+                    throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
+                } catch (Exception ex) {
+                    throw new InvalidConfigurationException(ex);
+                }
+
             default:
                 throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
+        }
+    }
+
+    /**
+     * Generate a credential value as defined in credential policy.
+     * @param credentialDefinition Credential definition.
+     * @return Generated credential value.
+     * @throws InvalidConfigurationException Thrown in case credential value could not be generated.
+     */
+    private String generateCredentialValue(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        switch (credentialPolicy.getCredentialGenAlgorithm()) {
+            case "DEFAULT":
+            case "RANDOM_PASSWORD":
+                try {
+                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
+                    String paramLength = param.get("length");
+                    if (paramLength == null) {
+                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PASSWORD");
+                    }
+                    String paramSmallLetters = param.get("includeSmallLetters");
+                    boolean includeSmallLetters = "true".equals(paramSmallLetters);
+                    String paramCapitalLetters = param.get("includeCapitalLetters");
+                    boolean includeCapitalLetters = "true".equals(paramCapitalLetters);
+                    String paramDigits = param.get("includeDigits");
+                    boolean includeDigits = "true".equals(paramDigits);
+                    String paramSpecialChars = param.get("includeSpecialChars");
+                    boolean includeSpecialChars = "true".equals(paramSpecialChars);
+                    if (!includeSmallLetters && !includeCapitalLetters && !includeDigits && !includeSpecialChars) {
+                        throw new InvalidConfigurationException("Invalid configuration of algorithm RANDOM_PASSWORD");
+                    }
+                    int length = Integer.parseInt(paramLength);
+                    SecureRandom secureRandom = new SecureRandom();
+                    StringBuilder credentialBuilder = new StringBuilder();
+                    StringBuilder availableCharsBuilder = new StringBuilder();
+                    if (includeSmallLetters) {
+                        availableCharsBuilder.append("abcdefghijklmnopqrstuvwyz");
+                    }
+                    if (includeCapitalLetters) {
+                        availableCharsBuilder.append("ABCDEFGHIJKLMNOPQRSTUVWYZ");
+                    }
+                    if (includeDigits) {
+                        availableCharsBuilder.append("01234567890");
+                    }
+                    if (includeSpecialChars) {
+                        availableCharsBuilder.append("^<>{}|;:.,~!?@#$%^=&*[]()");
+                    }
+                    String availableChars = availableCharsBuilder.toString();
+                    while (credentialBuilder.length() < length) {
+                        int randomInt = secureRandom.nextInt(availableChars.length());
+                        credentialBuilder.append(availableCharsBuilder.charAt(randomInt));
+                    }
+                    return credentialBuilder.toString();
+                } catch (Exception ex) {
+                    throw new InvalidConfigurationException(ex);
+                }
+
+            default:
+                throw new InvalidConfigurationException("Unsupported credential value generation algorithm: " + credentialPolicy.getCredentialGenAlgorithm());
         }
     }
 
