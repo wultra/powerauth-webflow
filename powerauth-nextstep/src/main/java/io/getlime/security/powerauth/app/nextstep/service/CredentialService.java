@@ -147,14 +147,17 @@ public class CredentialService {
             credential.setType(request.getCredentialType());
         }
         String username;
+        CredentialValidationMode validationMode;
         if (request.getUsername() != null) {
             username = request.getUsername();
             credential.setUsername(username);
+            validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         } else {
             username = credential.getUsername();
+            validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
         }
         if (request.getCredentialValue() != null) {
-            List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, request.getCredentialValue(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+            List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, request.getCredentialValue(), validationMode);
             if (!validationErrors.isEmpty()) {
                 CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
