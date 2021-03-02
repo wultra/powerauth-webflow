@@ -1567,6 +1567,40 @@ public class NextStepClient {
     }
 
     /**
+     * Create a credential with credential history import.
+     *
+     * @param userId User ID.
+     * @param credentialName Credential name.
+     * @param credentialType Credential type.
+     * @param username Username.
+     * @param credentialValue Credential value.
+     * @param validationMode Credential validation mode.
+     * @param credentialHistory List with pairs of username -> credentialValue for credential history.
+     * @return Create credential response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateCredentialResponse> createCredential(@NotNull String userId, @NotNull String credentialName, @NotNull CredentialType credentialType,
+                                                                     String username, String credentialValue, CredentialValidationMode validationMode,
+                                                                     List<KeyValueParameter> credentialHistory) throws NextStepClientException {
+        CreateCredentialRequest request = new CreateCredentialRequest();
+        request.setUserId(userId);
+        request.setCredentialName(credentialName);
+        request.setCredentialType(credentialType);
+        request.setUsername(username);
+        request.setCredentialValue(credentialValue);
+        request.setValidationMode(validationMode);
+        if (credentialHistory != null) {
+            credentialHistory.forEach(pair -> {
+                CreateCredentialRequest.CredentialHistory h = new CreateCredentialRequest.CredentialHistory();
+                h.setUsername(pair.getKey());
+                h.setCredentialValue(pair.getValue());
+                request.getCredentialHistory().add(h);
+            });
+        }
+        return postObjectImpl("/credential", new ObjectRequest<>(request), CreateCredentialResponse.class);
+    }
+
+    /**
      * Update a credential via PUT method.
      *
      * @param userId User ID.

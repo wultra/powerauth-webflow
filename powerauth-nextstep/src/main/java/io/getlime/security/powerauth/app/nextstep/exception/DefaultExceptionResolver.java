@@ -661,19 +661,6 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for username already exists error.
-     * @param ex Exception.
-     * @return Response with error details.
-     */
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleUsernameAlreadyExistsException(UsernameAlreadyExistsException ex) {
-        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(UsernameAlreadyExistsException.CODE, "Username already exists.");
-        return new ErrorResponse(error);
-    }
-
-    /**
      * Exception handler for OTP generation algorithm not supported.
      * @param ex Exception.
      * @return Response with error details.
@@ -700,16 +687,15 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for credential history check fail error.
+     * Exception handler for credential validation failed error.
      * @param ex Exception.
      * @return Response with error details.
      */
-    @ExceptionHandler(CredentialHistoryCheckFailedException.class)
+    @ExceptionHandler(CredentialValidationFailedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleCredentialHistoryCheckFailedException(CredentialHistoryCheckFailedException ex) {
+    public @ResponseBody ErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(CredentialHistoryCheckFailedException.CODE, "Credential history check failed for the credential.");
-        return new ErrorResponse(error);
+        return new ErrorResponse(ex.getError());
     }
 
 }

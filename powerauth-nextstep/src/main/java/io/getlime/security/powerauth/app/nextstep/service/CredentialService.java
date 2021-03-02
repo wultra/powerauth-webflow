@@ -24,10 +24,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationError;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
@@ -85,18 +83,28 @@ public class CredentialService {
      * @return Create credential response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
-     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
-     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
      */
     @Transactional
-    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
+    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         CredentialType credentialType = request.getCredentialType();
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
-        CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue);
+        CredentialValidationMode validationMode = request.getValidationMode();
+        List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
+        if (validationMode == null) {
+            validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
+        }
+        CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
+        if (credentialHistory != null && !credentialHistory.isEmpty()) {
+            for (CreateCredentialRequest.CredentialHistory h : credentialHistory) {
+                importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue());
+            }
+        }
         CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
@@ -117,11 +125,11 @@ public class CredentialService {
      * @throws UserNotFoundException Thrown when user is not found.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws CredentialNotFoundException Thrown when credential is not found.
-     * @throws UsernameAlreadyExistsException Thrown when username already exists.
-     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException, CredentialHistoryCheckFailedException {
+    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -138,21 +146,18 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        // TODO - username and credentialValue validation
+        String username;
         if (request.getUsername() != null) {
-            Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, request.getUsername());
-            if (existingCredentialOptional.isPresent()) {
-                CredentialEntity existingCredential = existingCredentialOptional.get();
-                if (!existingCredential.getUser().equals(user)) {
-                    throw new UsernameAlreadyExistsException("Username already exists");
-                }
-            }
-            credential.setUsername(request.getUsername());
+            username = request.getUsername();
+            credential.setUsername(username);
+        } else {
+            username = credential.getUsername();
         }
         if (request.getCredentialValue() != null) {
-            // Check credential history
-            if (!credentialHistoryService.checkCredentialHistory(user, request.getCredentialValue(), credentialDefinition)) {
-                throw new CredentialHistoryCheckFailedException("Credential history check failed for user: " + user.getUserId());
+            List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, request.getCredentialValue(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+            if (!validationErrors.isEmpty()) {
+                CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
+                throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
             credential.setValue(request.getCredentialValue());
             credential.setTimestampLastCredentialChange(new Date());
@@ -215,25 +220,7 @@ public class CredentialService {
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        List<CredentialValidationError> validationErrors = new ArrayList<>();
-        switch (request.getValidationMode()) {
-            case VALIDATE_USERNAME:
-                validationErrors.addAll(validateUsername(request.getUsername(), credentialDefinition));
-                break;
-
-            case VALIDATE_CREDENTIAL:
-                validationErrors.addAll(validateCredentialValue(user, request.getCredentialValue(), credentialDefinition));
-                break;
-
-            case VALIDATE_USERNAME_AND_CREDENTIAL:
-                validationErrors.addAll(validateUsername(request.getUsername(), credentialDefinition));
-                validationErrors.addAll(validateCredentialValue(user, request.getCredentialValue(), credentialDefinition));
-                break;
-
-            default:
-                throw new InvalidRequestException("Invalid validation mode: " + request.getValidationMode());
-
-        }
+        List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, request.getUsername(), request.getCredentialValue(), request.getValidationMode());
         ValidateCredentialResponse response = new ValidateCredentialResponse();
         if (validationErrors.isEmpty()) {
             response.setValidationResult(CredentialValidationResult.SUCCEEDED);
@@ -242,6 +229,44 @@ public class CredentialService {
         }
         response.getValidationErrors().addAll(validationErrors);
         return response;
+    }
+
+    /**
+     * Validate credential.
+     * @param user User identity entity.
+     * @param credentialDefinition Credential definition entity.
+     * @param username Username.
+     * @param credentialValue Credential value.
+     * @param validationMode Validation mode.
+     * @return List of validation errors.
+     * @throws InvalidRequestException Thrown in case request is invalid.
+     */
+    private List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
+                                                                String username, String credentialValue,
+                                                                CredentialValidationMode validationMode) throws InvalidRequestException {
+        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
+        switch (validationMode) {
+            case NO_VALIDATION:
+                break;
+
+            case VALIDATE_USERNAME:
+                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
+                break;
+
+            case VALIDATE_CREDENTIAL:
+                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition));
+                break;
+
+            case VALIDATE_USERNAME_AND_CREDENTIAL:
+                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
+                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition));
+                break;
+
+            default:
+                throw new InvalidRequestException("Invalid validation mode: " + validationMode);
+
+        }
+        return validationErrors;
     }
 
     /**
@@ -429,30 +454,33 @@ public class CredentialService {
      * @param credentialDefinition Credential definition.
      * @return List of validation errors.
      */
-    private List<CredentialValidationError> validateUsername(String username, CredentialDefinitionEntity credentialDefinition) {
-        List<CredentialValidationError> validationErrors = new ArrayList<>();
+    private List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
+        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (username == null || username.isEmpty()) {
-            validationErrors.add(CredentialValidationError.USERNAME_EMPTY);
-            return validationErrors;
+            validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
+            return validationFailures;
         }
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         Integer minLength = credentialPolicy.getUsernameLengthMin();
         Integer maxLength = credentialPolicy.getUsernameLengthMax();
         String allowedChars = credentialPolicy.getUsernameAllowedChars();
         if (minLength != null && username.length() < minLength) {
-            validationErrors.add(CredentialValidationError.USERNAME_TOO_SHORT);
+            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_SHORT);
         }
-        if (minLength != null && username.length() > maxLength) {
-            validationErrors.add(CredentialValidationError.USERNAME_TOO_LONG);
+        if (maxLength != null && username.length() > maxLength) {
+            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_LONG);
         }
         if (allowedChars != null && !username.matches(allowedChars)) {
-            validationErrors.add(CredentialValidationError.USERNAME_CONTAINS_INVALID_CHARACTERS);
+            validationFailures.add(CredentialValidationFailure.USERNAME_PATTERN_MATCH_FAILED);
         }
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
         if (credentialOptional.isPresent()) {
-            validationErrors.add(CredentialValidationError.USERNAME_ALREADY_EXISTS);
+            CredentialEntity credential = credentialOptional.get();
+            if (!credential.getUser().equals(user)) {
+                validationFailures.add(CredentialValidationFailure.USERNAME_ALREADY_EXISTS);
+            }
         }
-        return validationErrors;
+        return validationFailures;
     }
 
     /**
@@ -461,10 +489,10 @@ public class CredentialService {
      * @param credentialDefinition Credential definition.
      * @return List of validation errors.
      */
-    private List<CredentialValidationError> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) {
-        List<CredentialValidationError> validationErrors = new ArrayList<>();
+    private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) {
+        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         if (credentialValue == null || credentialValue.isEmpty()) {
-            validationErrors.add(CredentialValidationError.CREDENTIAL_EMPTY);
+            validationErrors.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
             return validationErrors;
         }
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
@@ -472,16 +500,16 @@ public class CredentialService {
         Integer maxLength = credentialPolicy.getCredentialLengthMax();
         String allowedChars = credentialPolicy.getCredentialAllowedChars();
         if (minLength != null && credentialValue.length() < minLength) {
-            validationErrors.add(CredentialValidationError.CREDENTIAL_TOO_SHORT);
+            validationErrors.add(CredentialValidationFailure.CREDENTIAL_TOO_SHORT);
         }
-        if (minLength != null && credentialValue.length() > maxLength) {
-            validationErrors.add(CredentialValidationError.CREDENTIAL_TOO_LONG);
+        if (maxLength != null && credentialValue.length() > maxLength) {
+            validationErrors.add(CredentialValidationFailure.CREDENTIAL_TOO_LONG);
         }
         if (allowedChars != null && !credentialValue.matches(allowedChars)) {
-            validationErrors.add(CredentialValidationError.CREDENTIAL_CONTAINS_INVALID_CHARACTERS);
+            validationErrors.add(CredentialValidationFailure.CREDENTIAL_PATTERN_MATCH_FAILED);
         }
         if (!credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
-            validationErrors.add(CredentialValidationError.CREDENTIAL_HISTORY_CHECK_FAILED);
+            validationErrors.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
         }
         return validationErrors;
     }
@@ -495,12 +523,14 @@ public class CredentialService {
      * @param credentialType Credential type.
      * @param username Username, use null for generated username.
      * @param credentialValue Credential value, use null for generated credential value.
-     * @throws UsernameAlreadyExistsException Thrown when username already exists.
+     * @param validationMode Credential validation mode.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
-     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                                   CredentialType credentialType, String username, String credentialValue) throws UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
+                                                   CredentialType credentialType, String username, String credentialValue,
+                                                   CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException {
         // Lookup credential in case it already exists
         CredentialEntity credential = null;
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -518,28 +548,31 @@ public class CredentialService {
             credential.setTimestampCreated(new Date());
         }
         if (username != null) {
-            Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-            if (existingCredentialOptional.isPresent()) {
-                CredentialEntity existingCredential = existingCredentialOptional.get();
-                if (!existingCredential.getUser().equals(user)) {
-                    throw new UsernameAlreadyExistsException("Username already exists: " + username + ", credential name: " + credentialDefinition.getName());
+            // Username has to be checked for duplicates even when username validation is disabled
+            if (validationMode == CredentialValidationMode.NO_VALIDATION || validationMode == CredentialValidationMode.VALIDATE_CREDENTIAL) {
+                Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                if (existingCredentialOptional.isPresent()) {
+                    CredentialEntity existingCredential = existingCredentialOptional.get();
+                    if (!existingCredential.getUser().equals(user)) {
+                        CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE,
+                                "Username validation failed", Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS));
+                        throw new CredentialValidationFailedException("Username validation failed for user ID: " + user.getUserId(), error);
+                    }
                 }
             }
-        }
-        credential.setType(credentialType);
-        if (username == null) {
+        } else {
             username = generateUsername(credentialDefinition);
         }
-        // TODO - username and credentialValue validation
+        credential.setType(credentialType);
         credential.setUsername(username);
         String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
             credentialValue = generateCredentialValue(credentialDefinition);
-        } else {
-            // Check credential history
-            if (!credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
-                throw new CredentialHistoryCheckFailedException("Credential history check failed for user: " + user.getUserId());
-            }
+        }
+        List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, credentialValue, validationMode);
+        if (!validationErrors.isEmpty()) {
+            CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
+            throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
         credential.setValue(credentialValue);
         credential.setStatus(CredentialStatus.ACTIVE);
@@ -565,6 +598,23 @@ public class CredentialService {
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
         return credentialDetail;
+    }
+
+    /**
+     * Import credential history record.
+     * @param user User identity entity.
+     * @param credentialDefinition Credential definition.
+     * @param username Username.
+     * @param credentialValue Credential value.
+     */
+    public void importCredentialHistory(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
+                                        String username, String credentialValue) {
+        CredentialEntity credential = new CredentialEntity();
+        credential.setUser(user);
+        credential.setCredentialDefinition(credentialDefinition);
+        credential.setUsername(username);
+        credential.setValue(credentialValue);
+        credentialHistoryService.createCredentialHistory(credential);
     }
 
     /**

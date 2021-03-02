@@ -25,8 +25,6 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class NextStepServiceException extends Exception {
 
-    public static final String COMMUNICATION_ERROR = "COMMUNICATION_ERROR";
-
     private Error error;
 
     /**

@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -66,7 +67,16 @@ public class CreateUserRequest {
         private CredentialType credentialType;
         private String username;
         private String credentialValue;
+        // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
+        private CredentialValidationMode validationMode;
+        private List<CredentialHistory> credentialHistory;
+    }
 
+    @Data
+    public static class CredentialHistory {
+        private String username;
+        @NotNull
+        private String credentialValue;
     }
 
 }

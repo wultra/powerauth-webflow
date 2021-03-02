@@ -146,8 +146,8 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
         credentialPolicyRequest.setUsernameGenAlgorithm("DEFAULT");
-        credentialPolicyRequest.setCredentialLengthMin(8);
-        credentialPolicyRequest.setCredentialLengthMin(30);
+        credentialPolicyRequest.setCredentialLengthMin(6);
+        credentialPolicyRequest.setCredentialLengthMax(30);
         credentialPolicyRequest.setCredentialGenAlgorithm("DEFAULT");
         nextStepClient.createCredentialPolicy(credentialPolicyRequest);
 

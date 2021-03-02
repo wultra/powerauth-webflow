@@ -93,12 +93,11 @@ public class UserIdentityService {
      * @throws UserAlreadyExistsException Thrown when user identity already exists.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
-     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
-     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
+    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
@@ -151,9 +150,19 @@ public class UserIdentityService {
         List<CredentialSecretDetail> newCredentials = new ArrayList<>();
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
+                List<CreateUserRequest.CredentialHistory> credentialHistory = credential.getCredentialHistory();
+                CredentialValidationMode validationMode = credential.getValidationMode();
+                if (validationMode == null) {
+                    validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
+                }
                 CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
                 CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
+                        credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue(), validationMode);
+                if (credentialHistory != null && !credentialHistory.isEmpty()) {
+                    for (CreateUserRequest.CredentialHistory h : credentialHistory) {
+                        credentialService.importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue());
+                    }
+                }
                 newCredentials.add(credentialDetail);
             }
         }
@@ -187,12 +196,11 @@ public class UserIdentityService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
-     * @throws UsernameAlreadyExistsException Thrown when username already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
-     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
@@ -242,7 +250,7 @@ public class UserIdentityService {
                 for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
                     CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
                     CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue());
+                            credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
                     newCredentials.add(credentialDetail);
                 }
             }

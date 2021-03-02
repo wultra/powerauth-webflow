@@ -16,11 +16,11 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Enum representing a credential validation error.
+ * Enum representing a credential validation failure.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum CredentialValidationError {
+public enum CredentialValidationFailure {
 
     /**
      * Credential is empty.
@@ -38,9 +38,9 @@ public enum CredentialValidationError {
     CREDENTIAL_TOO_LONG,
 
     /**
-     * Credential contains invalid characters.
+     * Credential pattern match failed.
      */
-    CREDENTIAL_CONTAINS_INVALID_CHARACTERS,
+    CREDENTIAL_PATTERN_MATCH_FAILED,
 
     /**
      * Credential history check failed.
@@ -63,9 +63,9 @@ public enum CredentialValidationError {
     USERNAME_TOO_LONG,
 
     /**
-     * Username contains invalid characters.
+     * Username pattern match failed.
      */
-    USERNAME_CONTAINS_INVALID_CHARACTERS,
+    USERNAME_PATTERN_MATCH_FAILED,
 
     /**
      * Username already exists.
