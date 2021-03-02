@@ -508,6 +508,7 @@ public class CredentialService {
      * @return List of validation errors.
      */
     private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) {
+        // TODO - switch credential validation to Passay library with more advanced rules
         List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         if (credentialValue == null || credentialValue.isEmpty()) {
             validationErrors.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
@@ -724,6 +725,7 @@ public class CredentialService {
             case "DEFAULT":
             case "RANDOM_PASSWORD":
                 try {
+                    // TODO - switch password generation to Passay library with more advanced rules
                     Map<String, String> param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
                     String paramLength = param.get("length");
                     if (paramLength == null) {

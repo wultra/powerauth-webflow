@@ -130,7 +130,7 @@ public class AuthenticationService {
         // Verify credential value
         AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue());
+            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue(), request.getCredentialPositionsToVerify());
         } else {
             authenticationResult = AuthenticationResult.FAILED;
         }
@@ -354,7 +354,7 @@ public class AuthenticationService {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
         } else {
-            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue());
+            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue(), request.getCredentialPositionsToVerify());
 
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
@@ -467,7 +467,8 @@ public class AuthenticationService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     private AuthenticationResult verifyCredential(CredentialAuthenticationMode authenticationMode,
-                                                  CredentialEntity credential, String credentialValue) throws InvalidRequestException {
+                                                  CredentialEntity credential, String credentialValue,
+                                                  List<Integer> credentialPositionsToVerify) throws InvalidRequestException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             return AuthenticationResult.FAILED;
         }
@@ -487,8 +488,24 @@ public class AuthenticationService {
                 }
 
             case MATCH_ONLY_SPECIFIED_POSITIONS:
-                // TODO - implement matching of specified positions
-                return AuthenticationResult.FAILED;
+                if (credentialPositionsToVerify.isEmpty()) {
+                    throw new InvalidRequestException("No positions specified for authentication mode MATCH_ONLY_SPECIFIED_POSITIONS");
+                }
+                int counter = 0;
+                for (Integer position : credentialPositionsToVerify) {
+                    try {
+                        char c1 = credentialValue.charAt(counter);
+                        char c2 = credential.getValue().charAt(position);
+                        if (c1 != c2) {
+                            return AuthenticationResult.FAILED;
+                        }
+                        counter++;
+                    } catch (StringIndexOutOfBoundsException ex) {
+                        // Index is out of bounds
+                        return AuthenticationResult.FAILED;
+                    }
+                }
+                return AuthenticationResult.SUCCEEDED;
 
             default:
                 throw new InvalidRequestException("Invalid authentication mode: " + authenticationMode);
