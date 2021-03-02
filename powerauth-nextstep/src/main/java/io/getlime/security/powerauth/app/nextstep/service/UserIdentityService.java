@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.ValueListConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.*;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
@@ -48,6 +49,7 @@ public class UserIdentityService {
     private final Logger logger = LoggerFactory.getLogger(UserIdentityService.class);
 
     private final UserIdentityRepository userIdentityRepository;
+    private final UserIdentityHistoryRepository userIdentityHistoryRepository;
     private final UserContactRepository userContactRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
@@ -60,10 +62,12 @@ public class UserIdentityService {
     private final UserContactConverter userContactConverter = new UserContactConverter();
     private final CredentialConverter credentialConverter = new CredentialConverter();
     private final ExtrasConverter extrasConverter = new ExtrasConverter();
+    private final ValueListConverter valueListConverter = new ValueListConverter();
 
     /**
      * Service constructor.
      * @param userIdentityRepository User identity repository.
+     * @param userIdentityHistoryRepository User identity history repository.
      * @param userContactRepository User contact repository.
      * @param roleRepository Role repository.
      * @param userRoleRepository User role repository.
@@ -74,8 +78,9 @@ public class UserIdentityService {
      * @param credentialService Credential service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
         this.userIdentityRepository = userIdentityRepository;
+        this.userIdentityHistoryRepository = userIdentityHistoryRepository;
         this.userContactRepository = userContactRepository;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
@@ -186,6 +191,8 @@ public class UserIdentityService {
             List<UserContactDetail> addedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(addedContacts);
         }
+        // Save user identity snapshot to the history table
+        saveUserIdentityHistory(user);
         return response;
     }
 
@@ -236,7 +243,6 @@ public class UserIdentityService {
                 throw new InvalidRequestException(ex);
             }
         }
-
         userIdentityRepository.save(user);
 
         UpdateUserResponse response = new UpdateUserResponse();
@@ -277,6 +283,8 @@ public class UserIdentityService {
             List<UserContactDetail> updatedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(updatedContacts);
         }
+        // Save user identity snapshot to the history table
+        saveUserIdentityHistory(user);
         return response;
     }
 
@@ -443,7 +451,9 @@ public class UserIdentityService {
         for (UserIdentityEntity user: users) {
             if (user.getStatus() != request.getUserIdentityStatus()) {
                 user.setStatus(request.getUserIdentityStatus());
+                // Save user identity and a snapshot to the history table
                 userIdentityRepository.save(user);
+                saveUserIdentityHistory(user);
             }
             updatedUserIds.add(user.getUserId());
         }
@@ -466,7 +476,9 @@ public class UserIdentityService {
     public DeleteUserResponse deleteUser(DeleteUserRequest request) throws UserNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         user.setStatus(UserIdentityStatus.REMOVED);
+        // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
+        saveUserIdentityHistory(user);
         removeAllCredentials(user);
         removeAllOtps(user);
         DeleteUserResponse response = new DeleteUserResponse();
@@ -489,7 +501,9 @@ public class UserIdentityService {
             throw new UserNotActiveException("User identity is not BLOCKED: " + request.getUserId());
         }
         user.setStatus(UserIdentityStatus.BLOCKED);
+        // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
+        saveUserIdentityHistory(user);
         BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -510,11 +524,36 @@ public class UserIdentityService {
             throw new UserNotBlockedException("User identity is not BLOCKED: " + request.getUserId());
         }
         user.setStatus(UserIdentityStatus.ACTIVE);
+        // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
+        saveUserIdentityHistory(user);
         UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         return response;
+    }
+
+    /**
+     * Save snapshot of user identity into user identity history. This method is not transactional.
+     * @param user User identity entity.
+     */
+    public void saveUserIdentityHistory(UserIdentityEntity user) {
+        UserIdentityHistoryEntity history = new UserIdentityHistoryEntity();
+        history.setUser(user);
+        history.setStatus(user.getStatus());
+        List<UserRoleEntity> userRoles = userRoleRepository.findAllByUser(user);
+        List<String> roles = userRoles.stream()
+                .filter(role -> role.getStatus() == UserRoleStatus.ACTIVE)
+                .map(role -> role.getRole().getName())
+                .collect(Collectors.toList());
+        try {
+            history.setRoles(valueListConverter.fromList(roles));
+        } catch (JsonProcessingException ex) {
+            // Ignore
+        }
+        history.setExtras(user.getExtras());
+        history.setTimestampCreated(new Date());
+        userIdentityHistoryRepository.save(history);
     }
 
     /**

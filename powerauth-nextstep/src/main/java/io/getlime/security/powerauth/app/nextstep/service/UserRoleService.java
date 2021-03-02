@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -48,18 +48,21 @@ public class UserRoleService {
 
     private final Logger logger = LoggerFactory.getLogger(UserRoleService.class);
 
+    private final UserIdentityService userIdentityService;
     private final UserIdentityLookupService userIdentityLookupService;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
 
     /**
      * Service constructor.
+     * @param userIdentityService User identity service.
      * @param userIdentityLookupService User identity lookup service.
      * @param roleRepository Role repository.
      * @param userRoleRepository User role repository.
      */
     @Autowired
-    public UserRoleService(UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
+    public UserRoleService(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
+        this.userIdentityService = userIdentityService;
         this.userIdentityLookupService = userIdentityLookupService;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
@@ -97,6 +100,8 @@ public class UserRoleService {
         }
         userRole.setStatus(UserRoleStatus.ACTIVE);
         userRoleRepository.save(userRole);
+        // Save user identity and a snapshot to the history table
+        userIdentityService.saveUserIdentityHistory(user);
         AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
@@ -133,6 +138,8 @@ public class UserRoleService {
             throw new UserRoleNotAssignedException("Role is not assigned: " + request.getRoleName() + ", user ID: " + user.getUserId());
         }
         userRoleRepository.save(userRole);
+        // Save user identity and a snapshot to the history table
+        userIdentityService.saveUserIdentityHistory(user);
         RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
