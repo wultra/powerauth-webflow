@@ -115,6 +115,7 @@ public class CredentialService {
             // Return generated credential value
             response.setCredentialValue(credentialDetail.getCredentialValue());
         }
+        response.setCredentialChangeRequired(credentialDetail.isCredentialChangeRequired());
         return response;
     }
 
@@ -186,6 +187,8 @@ public class CredentialService {
         response.setCredentialType(credential.getType());
         response.setCredentialStatus(credential.getStatus());
         response.setUsername(credential.getUsername());
+        boolean credentialChangeRequired = isCredentialChangeRequired(credential);
+        response.setCredentialChangeRequired(credentialChangeRequired);
         return response;
     }
 
@@ -206,6 +209,7 @@ public class CredentialService {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
+            credentialDetail.setCredentialChangeRequired(isCredentialChangeRequired(credential));
             response.getCredentials().add(credentialDetail);
         }
         return response;
@@ -257,12 +261,12 @@ public class CredentialService {
                 break;
 
             case VALIDATE_CREDENTIAL:
-                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition));
+                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition, true));
                 break;
 
             case VALIDATE_USERNAME_AND_CREDENTIAL:
                 validationErrors.addAll(validateUsername(user, username, credentialDefinition));
-                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition));
+                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition, true));
                 break;
 
             default:
@@ -270,6 +274,17 @@ public class CredentialService {
 
         }
         return validationErrors;
+    }
+
+    /**
+     * Check whether credential change is required.
+     * @param credential Credential entity.
+     * @return Whether credential change is required.
+     */
+    public boolean isCredentialChangeRequired(CredentialEntity credential) {
+        // TODO - implement credential expiration
+        List<CredentialValidationFailure> validationFailures = validateCredentialValue(credential.getUser(), credential.getValue(), credential.getCredentialDefinition(), false);
+        return !validationFailures.isEmpty();
     }
 
     /**
@@ -492,7 +507,7 @@ public class CredentialService {
      * @param credentialDefinition Credential definition.
      * @return List of validation errors.
      */
-    private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) {
+    private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) {
         List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         if (credentialValue == null || credentialValue.isEmpty()) {
             validationErrors.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
@@ -511,7 +526,7 @@ public class CredentialService {
         if (allowedChars != null && !credentialValue.matches(allowedChars)) {
             validationErrors.add(CredentialValidationFailure.CREDENTIAL_PATTERN_MATCH_FAILED);
         }
-        if (!credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
+        if (checkHistory && !credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
             validationErrors.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
         }
         return validationErrors;
@@ -595,6 +610,7 @@ public class CredentialService {
         if (credentialValueRequest == null) {
             credentialDetail.setCredentialValue(credential.getValue());
         }
+        credentialDetail.setCredentialChangeRequired(isCredentialChangeRequired(credential));
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
         credentialDetail.setTimestampLastUpdated(credential.getTimestampLastUpdated());
         credentialDetail.setTimestampExpired(credential.getTimestampExpires());

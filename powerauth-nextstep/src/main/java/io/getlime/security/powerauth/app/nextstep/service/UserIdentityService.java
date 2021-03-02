@@ -316,6 +316,7 @@ public class UserIdentityService {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
+            credentialDetail.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential));
             response.getCredentials().add(credentialDetail);
         }
         return response;

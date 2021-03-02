@@ -39,5 +39,6 @@ public class CreateCredentialResponse {
     private CredentialStatus credentialStatus;
     private String username;
     private String credentialValue;
+    private boolean credentialChangeRequired;
 
 }
