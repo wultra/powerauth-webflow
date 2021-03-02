@@ -30,7 +30,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ns_credential_history")
 @Data
-@EqualsAndHashCode(of = {"credentialDefinition", "userId", "username", "timestampCreated"})
+@EqualsAndHashCode(of = {"credentialDefinition", "user", "username", "timestampCreated"})
 public class CredentialHistoryEntity implements Serializable {
 
     private static final long serialVersionUID = -3222892995455956072L;
@@ -47,7 +47,7 @@ public class CredentialHistoryEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, nullable = false)
-    private UserIdentityEntity userId;
+    private UserIdentityEntity user;
 
     @Column(name = "user_name")
     private String username;

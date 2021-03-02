@@ -699,5 +699,17 @@ public class DefaultExceptionResolver {
         return new ErrorResponse(error);
     }
 
+    /**
+     * Exception handler for credential history check fail error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(CredentialHistoryCheckFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleCredentialHistoryCheckFailedException(CredentialHistoryCheckFailedException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(CredentialHistoryCheckFailedException.CODE, "Credential history check failed for the credential.");
+        return new ErrorResponse(error);
+    }
 
 }

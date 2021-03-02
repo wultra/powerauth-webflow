@@ -31,7 +31,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ns_user_contact")
 @Data
-@EqualsAndHashCode(of = {"name", "userId"})
+@EqualsAndHashCode(of = {"name", "user"})
 public class UserContactEntity implements Serializable {
 
     private static final long serialVersionUID = 7530081244465987786L;
@@ -44,7 +44,7 @@ public class UserContactEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-    private UserIdentityEntity userId;
+    private UserIdentityEntity user;
 
     @Column(name = "name", nullable = false)
     private String name;

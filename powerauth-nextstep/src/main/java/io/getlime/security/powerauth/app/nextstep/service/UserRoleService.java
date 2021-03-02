@@ -81,7 +81,7 @@ public class UserRoleService {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
         RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserIdAndRole(user, role);
+        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserAndRole(user, role);
         UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();
@@ -91,7 +91,7 @@ public class UserRoleService {
             userRole.setTimestampLastUpdated(new Date());
         } else {
             userRole = new UserRoleEntity();
-            userRole.setUserId(user);
+            userRole.setUser(user);
             userRole.setRole(role);
             userRole.setTimestampCreated(new Date());
         }
@@ -120,7 +120,7 @@ public class UserRoleService {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
         RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserIdAndRole(user, role);
+        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserAndRole(user, role);
         UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();

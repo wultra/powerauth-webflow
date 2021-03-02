@@ -33,17 +33,17 @@ public interface UserContactRepository extends CrudRepository<UserContactEntity,
 
     /**
      * Find user contacts for a user identity.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @return List of user contacts.
      */
-    List<UserContactEntity> findAllByUserId(UserIdentityEntity userId);
+    List<UserContactEntity> findAllByUser(UserIdentityEntity user);
 
     /**
      * Find user contact for a user identity with given name.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @param name User contact name.
      * @return User contact.
      */
-    Optional<UserContactEntity> findByUserIdAndName(UserIdentityEntity userId, String name);
+    Optional<UserContactEntity> findByUserAndName(UserIdentityEntity user, String name);
 
 }

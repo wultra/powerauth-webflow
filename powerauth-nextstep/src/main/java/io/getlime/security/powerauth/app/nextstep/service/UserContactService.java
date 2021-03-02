@@ -77,12 +77,12 @@ public class UserContactService {
     @Transactional
     public CreateUserContactResponse createUserContact(CreateUserContactRequest request) throws UserNotFoundException, UserContactAlreadyExistsException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserIdAndName(user, request.getContactName());
+        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserAndName(user, request.getContactName());
         if (contactOptional.isPresent()) {
             throw new UserContactAlreadyExistsException("User contact already exists: " + request.getContactName() + ", user ID: " + user.getUserId());
         }
         UserContactEntity contact = new UserContactEntity();
-        contact.setUserId(user);
+        contact.setUser(user);
         contact.setName(request.getContactName());
         contact.setType(request.getContactType());
         contact.setValue(request.getContactValue());
@@ -107,7 +107,7 @@ public class UserContactService {
     @Transactional
     public GetUserContactListResponse getUserContactList(GetUserContactListRequest request) throws UserNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        List<UserContactEntity> contacts = userContactRepository.findAllByUserId(user);
+        List<UserContactEntity> contacts = userContactRepository.findAllByUser(user);
         GetUserContactListResponse response = new GetUserContactListResponse();
         response.setUserId(user.getUserId());
         for (UserContactEntity contact : contacts) {
@@ -127,12 +127,12 @@ public class UserContactService {
     @Transactional
     public UpdateUserContactResponse updateUserContact(UpdateUserContactRequest request) throws UserNotFoundException, UserContactNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserIdAndName(user, request.getContactName());
+        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserAndName(user, request.getContactName());
         if (!contactOptional.isPresent()) {
             throw new UserContactNotFoundException("User contact not found: " + request.getContactName() + ", user ID: " + user.getUserId());
         }
         UserContactEntity contact = contactOptional.get();
-        contact.setUserId(user);
+        contact.setUser(user);
         contact.setName(request.getContactName());
         contact.setType(request.getContactType());
         contact.setValue(request.getContactValue());
@@ -158,7 +158,7 @@ public class UserContactService {
     @Transactional
     public DeleteUserContactResponse deleteUserContact(DeleteUserContactRequest request) throws UserNotFoundException, UserContactNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserIdAndName(user, request.getContactName());
+        Optional<UserContactEntity> contactOptional = userContactRepository.findByUserAndName(user, request.getContactName());
         if (!contactOptional.isPresent()) {
             throw new UserContactNotFoundException("User contact not found: " + request.getContactName() + ", user ID: " + user.getUserId());
         }

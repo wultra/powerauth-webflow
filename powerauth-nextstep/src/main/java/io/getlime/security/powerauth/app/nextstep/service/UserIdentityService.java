@@ -95,9 +95,10 @@ public class UserIdentityService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
+    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
@@ -188,9 +189,10 @@ public class UserIdentityService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws UsernameAlreadyExistsException Thrown when username already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws CredentialHistoryCheckFailedException Thrown when credential history check fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
@@ -293,14 +295,14 @@ public class UserIdentityService {
                 throw new InvalidRequestException(ex);
             }
         }
-        List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserIdAndStatus(user, UserRoleStatus.ACTIVE);
+        List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserAndStatus(user, UserRoleStatus.ACTIVE);
         userRoles.forEach(userRole -> response.getRoles().add(userRole.getRole().getName()));
-        List<UserContactEntity> userContacts = userContactRepository.findAllByUserId(user);
+        List<UserContactEntity> userContacts = userContactRepository.findAllByUser(user);
         for (UserContactEntity userContact: userContacts) {
             UserContactDetail contactDetail = userContactConverter.fromEntity(userContact);
             response.getContacts().add(contactDetail);
         }
-        List<CredentialEntity> credentials = credentialRepository.findAllByUserId(user);
+        List<CredentialEntity> credentials = credentialRepository.findAllByUser(user);
         for (CredentialEntity credential: credentials) {
             if (credential.getStatus() == CredentialStatus.REMOVED && !request.isIncludeRemoved()) {
                 continue;
@@ -356,14 +358,14 @@ public class UserIdentityService {
             CredentialEntity credential = credentialOptional.get();
             if (credentialStatus == null || credential.getStatus() == credentialStatus) {
                 // Filter by credentialStatus in case it is also specified
-                UserIdentityEntity user = credential.getUserId();
+                UserIdentityEntity user = credential.getUser();
                 lookupResult = Collections.singletonList(user);
             }
         } else if (credentialName != null && credentialStatus != null) {
             // When credentialName and credentialStatus are present, lookup the user identities, multiple or zero results are found
             List<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus);
             for (CredentialEntity credential: credentialEntities) {
-                lookupResult.add(credential.getUserId());
+                lookupResult.add(credential.getUser());
             }
         } else if (createdStartDate != null && credentialStatus == null) {
             // Lookup the user identities by createdDate, multiple or zero results are found, credentialStatus filter is not allowed
@@ -398,7 +400,7 @@ public class UserIdentityService {
             // Filter by roles
             List<UserIdentityEntity> filteredList = new ArrayList<>();
             for (UserIdentityEntity user: lookupResult) {
-                List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserIdAndStatus(user, UserRoleStatus.ACTIVE);
+                List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserAndStatus(user, UserRoleStatus.ACTIVE);
                 List<String> roleNames = userRoles.stream()
                     .map(roleEntity -> roleEntity.getRole().getName())
                     .collect(Collectors.toList());
@@ -533,7 +535,7 @@ public class UserIdentityService {
      * @param roleEntities Role entities present in the database.
      */
     private void updateRoles(UserIdentityEntity user, List<String> roles, Map<String, RoleEntity> roleEntities) {
-        List<UserRoleEntity> existingRoles = userRoleRepository.findAllByUserId(user);
+        List<UserRoleEntity> existingRoles = userRoleRepository.findAllByUser(user);
         Map<String, UserRoleEntity> existingRoleMap = new HashMap<>();
         existingRoles.forEach(userRole -> existingRoleMap.put(userRole.getRole().getName(), userRole));
         for (String roleToAdd : roles) {
@@ -541,7 +543,7 @@ public class UserIdentityService {
             if (existingRole == null) {
                 // Persist new role
                 UserRoleEntity userRole = new UserRoleEntity();
-                userRole.setUserId(user);
+                userRole.setUser(user);
                 userRole.setRole(roleEntities.get(roleToAdd));
                 userRole.setStatus(UserRoleStatus.ACTIVE);
                 userRole.setTimestampCreated(new Date());
@@ -574,7 +576,7 @@ public class UserIdentityService {
      */
     private List<UserContactDetail> updateContacts(UserIdentityEntity user, List<UserContactDetail> contacts) {
         List<UserContactDetail> contactListResponse = new ArrayList<>();
-        List<UserContactEntity> existingContacts = userContactRepository.findAllByUserId(user);
+        List<UserContactEntity> existingContacts = userContactRepository.findAllByUser(user);
         Map<String, UserContactEntity> existingContactMap = new HashMap<>();
         existingContacts.forEach(userContact -> existingContactMap.put(userContact.getName(), userContact));
         // Persist new or update existing contacts
@@ -583,7 +585,7 @@ public class UserIdentityService {
             if (userContact == null) {
                 userContact = new UserContactEntity();
                 userContact.setName(contactToAdd.getContactName());
-                userContact.setUserId(user);
+                userContact.setUser(user);
                 userContact.setTimestampCreated(new Date());
             } else {
                 userContact.setTimestampLastUpdated(new Date());
@@ -616,7 +618,7 @@ public class UserIdentityService {
      * @param activeCredentials Credentials which should remain active.
      */
     private void removeInactiveCredentials(UserIdentityEntity user, List<CredentialSecretDetail> activeCredentials) {
-        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUserId(user);
+        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUser(user);
         List<String> credentialsToKeep = activeCredentials
                 .stream()
                 .map(CredentialSecretDetail::getCredentialName)
@@ -635,7 +637,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllCredentials(UserIdentityEntity user) {
-        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUserId(user);
+        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUser(user);
         existingCredentials.forEach(credential -> {
             if (credential.getStatus() != CredentialStatus.REMOVED) {
                 credential.setStatus(CredentialStatus.REMOVED);

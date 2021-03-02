@@ -16,8 +16,11 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 /**
  * Crud repository for persistence of credential history.
@@ -26,5 +29,12 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CredentialHistoryRepository extends CrudRepository<CredentialHistoryEntity, Long> {
+
+    /**
+     * Find credential history for user.
+     * @param user User identity entity.
+     * @return Credential history.
+     */
+    List<CredentialHistoryEntity> findAllByUserOrderByTimestampCreatedDesc(UserIdentityEntity user);
 
 }

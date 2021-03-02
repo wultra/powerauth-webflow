@@ -35,10 +35,10 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, S
 
     /**
      * Find credentials by user identity.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @return All credentials for a user identity.
      */
-    List<CredentialEntity> findAllByUserId(UserIdentityEntity userId);
+    List<CredentialEntity> findAllByUser(UserIdentityEntity user);
 
     /**
      * Find credentials by credential definition and credential status.
@@ -51,10 +51,10 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, S
     /**
      * Find credential by credential definition and user identity.
      * @param credentialDefinition Credential definition.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @return Credential matching query criteria.
      */
-    Optional<CredentialEntity> findByCredentialDefinitionAndUserId(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity userId);
+    Optional<CredentialEntity> findByCredentialDefinitionAndUser(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user);
 
     /**
      * Find credential by credential name and username.

@@ -35,10 +35,10 @@ public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long>
 
     /**
      * Find roles for a user identity.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @return List of user roles.
      */
-    List<UserRoleEntity> findAllByUserId(UserIdentityEntity userId);
+    List<UserRoleEntity> findAllByUser(UserIdentityEntity user);
 
     /**
      * Find user roles by a role.
@@ -49,18 +49,18 @@ public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long>
 
     /**
      * Find roles for a user identity with given status.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @param status User role status.
      * @return List of user roles.
      */
-    List<UserRoleEntity> findAllByUserIdAndStatus(UserIdentityEntity userId, UserRoleStatus status);
+    List<UserRoleEntity> findAllByUserAndStatus(UserIdentityEntity user, UserRoleStatus status);
 
     /**
      * Find role for a user identity.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @param role Role.
      * @return User role.
      */
-    Optional<UserRoleEntity> findByUserIdAndRole(UserIdentityEntity userId, RoleEntity role);
+    Optional<UserRoleEntity> findByUserAndRole(UserIdentityEntity user, RoleEntity role);
 
 }

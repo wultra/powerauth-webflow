@@ -31,7 +31,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ns_user_role")
 @Data
-@EqualsAndHashCode(of = {"userId", "role"})
+@EqualsAndHashCode(of = {"user", "role"})
 public class UserRoleEntity implements Serializable {
 
     private static final long serialVersionUID = -248437038124901685L;
@@ -44,7 +44,7 @@ public class UserRoleEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", nullable = false)
-    private UserIdentityEntity userId;
+    private UserIdentityEntity user;
 
     @ManyToOne
     @JoinColumn(name = "role_id", referencedColumnName = "role_id", nullable = false)

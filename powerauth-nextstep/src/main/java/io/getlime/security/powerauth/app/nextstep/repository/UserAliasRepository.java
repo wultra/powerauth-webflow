@@ -34,25 +34,25 @@ public interface UserAliasRepository extends CrudRepository<UserAliasEntity, Lon
 
     /**
      * Find aliases for a user identity.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @return List of user aliases.
      */
-    List<UserAliasEntity> findAllByUserId(UserIdentityEntity userId);
+    List<UserAliasEntity> findAllByUser(UserIdentityEntity user);
 
     /**
      * Find aliases for a user identity with given status.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @param status User alias status.
      * @return List of user aliases.
      */
-    List<UserAliasEntity> findAllByUserIdAndStatus(UserIdentityEntity userId, UserAliasStatus status);
+    List<UserAliasEntity> findAllByUserAndStatus(UserIdentityEntity user, UserAliasStatus status);
 
     /**
      * Find alias for a user identity with given name.
-     * @param userId User identity entity.
+     * @param user User identity entity.
      * @param name Alias name.
      * @return User alias.
      */
-    Optional<UserAliasEntity> findByUserIdAndName(UserIdentityEntity userId, String name);
+    Optional<UserAliasEntity> findByUserAndName(UserIdentityEntity user, String name);
 
 }

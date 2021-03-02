@@ -31,7 +31,7 @@ import java.util.Date;
 @Entity
 @Table(name = "ns_user_identity_history")
 @Data
-@EqualsAndHashCode(of = {"userId", "timestampCreated"})
+@EqualsAndHashCode(of = {"user", "timestampCreated"})
 public class UserIdentityHistoryEntity implements Serializable {
 
     private static final long serialVersionUID = 2982236221553997424L;
@@ -44,7 +44,7 @@ public class UserIdentityHistoryEntity implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id", updatable = false, nullable = false)
-    private UserIdentityEntity userId;
+    private UserIdentityEntity user;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

@@ -49,28 +49,28 @@ public class CredentialController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialResponse> createCredential(@RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException {
+    public ObjectResponse<CreateCredentialResponse> createCredential(@RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, UsernameAlreadyExistsException, InvalidConfigurationException, CredentialHistoryCheckFailedException {
         // TODO - request validation
         CreateCredentialResponse response = credentialService.createCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialResponse> updateCredential(@RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException {
+    public ObjectResponse<UpdateCredentialResponse> updateCredential(@RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException, CredentialHistoryCheckFailedException {
         // TODO - request validation
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException {
+    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, UsernameAlreadyExistsException, CredentialHistoryCheckFailedException {
         // TODO - request validation
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "validate", method = RequestMethod.POST)
-    public ObjectResponse<ValidateCredentialResponse> validateCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException {
+    public ObjectResponse<ValidateCredentialResponse> validateCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException {
         // TODO - request validation
         ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
