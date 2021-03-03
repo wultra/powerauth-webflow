@@ -18,11 +18,15 @@ package io.getlime.security.powerauth.app.nextstep.exception;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.Violation;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -696,6 +700,25 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         return new ErrorResponse(ex.getError());
+    }
+
+    /**
+     * Exception handler for failed request validations.
+     *
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        final ExtendedError error = new ExtendedError(InvalidRequestException.CODE, "Invalid request");
+        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
+            error.getViolations().add(
+                    new Violation(fieldError.getField(), fieldError.getRejectedValue(), fieldError.getDefaultMessage())
+            );
+        }
+        return new ErrorResponse(error);
     }
 
 }

@@ -21,7 +21,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +37,8 @@ import java.util.Map;
 @Data
 public class UpdateUserRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
 
     private UserIdentityStatus userIdentityStatus;
@@ -51,11 +54,13 @@ public class UpdateUserRequest {
     @Data
     public static class UpdatedContact {
 
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String contactName;
         @NotNull
         private ContactType contactType;
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String contactValue;
         private boolean primary;
 
@@ -64,11 +69,15 @@ public class UpdateUserRequest {
     @Data
     public static class UpdatedCredential {
 
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String credentialName;
         @NotNull
         private CredentialType credentialType;
+        @Size(min = 1, max = 256)
         private String username;
+        @NotBlank
+        @Size(min = 1, max = 256)
         private String credentialValue;
         private CredentialStatus credentialStatus;
 

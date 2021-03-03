@@ -24,8 +24,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
@@ -330,7 +330,9 @@ public class CredentialService {
         }
         // Save original credential into credential history
         credentialHistoryService.createCredentialHistory(credential);
-        credential.setType(request.getCredentialType());
+        if (request.getCredentialType() != null) {
+            credential.setType(request.getCredentialType());
+        }
         credential.setValue(generateCredentialValue(credentialDefinition));
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());

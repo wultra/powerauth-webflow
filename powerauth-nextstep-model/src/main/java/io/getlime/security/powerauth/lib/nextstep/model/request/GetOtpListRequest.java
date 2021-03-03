@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
+import javax.validation.constraints.Size;
+
 /**
  * Request object used obtaining one time password list.
  *
@@ -25,6 +27,7 @@ import lombok.Data;
 @Data
 public class GetOtpListRequest {
 
+    @Size(min = 1, max = 256)
     private String operationId;
     private boolean includeRemoved;
 

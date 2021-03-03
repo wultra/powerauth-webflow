@@ -18,7 +18,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,13 +33,19 @@ import java.util.Map;
 @Data
 public class UpdateOtpPolicyRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
     @NotNull
+    @Positive
     private Integer length;
+    @Positive
     private Integer attemptLimit;
+    @Positive
     private Long expirationTime;
+    @Size(min = 2, max = 256)
     private String genAlgorithm;
     private Map<String, String> genParam = new LinkedHashMap<>();
     private OtpPolicyStatus otpPolicyStatus;

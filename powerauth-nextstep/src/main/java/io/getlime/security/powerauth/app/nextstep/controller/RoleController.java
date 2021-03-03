@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.RoleService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExistsException;
@@ -31,10 +32,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetRoleListResp
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for user roles.
@@ -48,28 +49,60 @@ public class RoleController {
     private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
 
     private final RoleService roleService;
+    private final ObjectRequestValidator requestValidator;
 
+    /**
+     * REST controller constructor.
+     * @param roleService Role service.
+     * @param requestValidator Request validator.
+     */
     @Autowired
-    public RoleController(RoleService roleService) {
+    public RoleController(RoleService roleService, ObjectRequestValidator requestValidator) {
         this.roleService = roleService;
+        this.requestValidator = requestValidator;
     }
 
+    /**
+     * Initialize the request validator.
+     * @param binder Data binder.
+     */
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(requestValidator);
+    }
+
+    /**
+     * Create a role.
+     * @param request Create role request.
+     * @return Create role response.
+     * @throws RoleAlreadyExistsException Thrown when role already exists.
+     */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateRoleResponse> createRole(@RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
-        // TODO - request validation
+    public ObjectResponse<CreateRoleResponse> createRole(@Valid @RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
         CreateRoleResponse response = roleService.createRole(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Get role list.
+     * @param request Get role list request.
+     * @return Get role list response.
+     */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetRoleListResponse> listRoles(@RequestBody ObjectRequest<GetRoleListRequest> request) {
+    public ObjectResponse<GetRoleListResponse> getRoleList(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
         GetRoleListResponse response = roleService.getRoleList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Delete a role.
+     * @param request Delete role request.
+     * @return Delete role response.
+     * @throws RoleNotFoundException Thrown when role is not found.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
+     */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteRoleResponse> deleteRole(@RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, DeleteNotAllowedException {
-        // TODO - request validation
+    public ObjectResponse<DeleteRoleResponse> deleteRole(@Valid @RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, DeleteNotAllowedException {
         DeleteRoleResponse response = roleService.deleteRole(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

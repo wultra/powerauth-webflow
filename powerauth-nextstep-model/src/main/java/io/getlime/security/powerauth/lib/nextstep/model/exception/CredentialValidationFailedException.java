@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 
 /**
  * Exception for case when credential validation fails.

@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.AuthenticationService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CombinedAuthenticationRequest;
@@ -29,10 +30,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.OtpAuthenticati
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for user authentication.
@@ -46,32 +47,91 @@ public class AuthenticationController {
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
 
     private final AuthenticationService authenticationService;
+    private final ObjectRequestValidator requestValidator;
 
+    /**
+     * REST controller constructor.
+     * @param authenticationService Authentication service.
+     * @param requestValidator Request validator.
+     */
     @Autowired
-    public AuthenticationController(AuthenticationService authenticationService) {
+    public AuthenticationController(AuthenticationService authenticationService, ObjectRequestValidator requestValidator) {
         this.authenticationService = authenticationService;
+        this.requestValidator = requestValidator;
     }
 
+    /**
+     * Initialize the request validator.
+     * @param binder Data binder.
+     */
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(requestValidator);
+    }
+
+    /**
+     * Authenticate with a credential.
+     * @param request Credential authentication request.
+     * @return Credential authentication response.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws InvalidConfigurationException Thrown when configuration is not found.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     */
     @RequestMapping(value = "credential", method = RequestMethod.POST)
-    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialNotActiveException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, UserNotActiveException, OperationNotValidException {
-        // TODO - request validation
+    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@Valid @RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
         CredentialAuthenticationResponse response = authenticationService.authenticationWithCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Authenticate with an OTP.
+     * @param request OTP authentication request.
+     * @return OTP authentication response.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws OperationNotFoundException Throw when operation is not found.
+     * @throws OtpNotFoundException Thrown when OTP is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     */
     @RequestMapping(value = "otp", method = RequestMethod.POST)
-    public ObjectResponse<OtpAuthenticationResponse> authenticationWithOtp(@RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws AuthMethodNotFoundException, CredentialNotActiveException, InvalidRequestException, OperationAlreadyFailedException, OperationAlreadyFinishedException, InvalidConfigurationException, OperationAlreadyCanceledException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, UserNotActiveException, OperationNotValidException {
-        // TODO - request validation
+    public ObjectResponse<OtpAuthenticationResponse> authenticationWithOtp(@Valid @RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidRequestException, OperationAlreadyFailedException, OperationAlreadyFinishedException, InvalidConfigurationException, OperationAlreadyCanceledException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException {
         OtpAuthenticationResponse response = authenticationService.authenticationWithOtp(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Authenticate with credential and OTP.
+     * @param request Combined authentication request.
+     * @return Combined authentication response.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OtpNotFoundException Thrown when OTP is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     */
     @RequestMapping(value = "combined", method = RequestMethod.POST)
-    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidConfigurationException, CredentialNotActiveException, InvalidRequestException, UserNotFoundException, OperationAlreadyFinishedException, CredentialDefinitionNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, UserNotActiveException, OperationNotValidException {
-        // TODO - request validation
+    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidConfigurationException, InvalidRequestException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException {
         CombinedAuthenticationResponse response = authenticationService.authenticationCombined(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
-
 
 }

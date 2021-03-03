@@ -22,7 +22,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,17 +35,22 @@ import java.util.List;
 @Data
 public class UpdateOperationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationId;
+    @Size(min = 1, max = 256)
     private String userId;
+    @Size(min = 2, max = 256)
     private String organizationId;
     private AuthMethod authMethod;
     private final List<AuthInstrument> authInstruments = new ArrayList<>();
     private AuthStepResult authStepResult;
     private AuthMethod targetAuthMethod;
+    @Size(min = 2, max = 256)
     private String authStepResultDescription;
     private final List<KeyValueParameter> params = new ArrayList<>();
     private ApplicationContext applicationContext;
+    @Size(min = 36, max = 36)
     private String authenticationId;
 
 }

@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.HashConfigService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.HashConfigNotFoundException;
@@ -34,10 +35,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateHashConfi
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for hashing configurations.
@@ -51,42 +52,87 @@ public class HashConfigController {
     private static final Logger logger = LoggerFactory.getLogger(HashConfigController.class);
 
     private final HashConfigService hashConfigService;
+    private final ObjectRequestValidator requestValidator;
 
+    /**
+     * REST controller constructor.
+     * @param hashConfigService Hashing configuration service.
+     * @param requestValidator Request validator.
+     */
     @Autowired
-    public HashConfigController(HashConfigService hashConfigService) {
+    public HashConfigController(HashConfigService hashConfigService, ObjectRequestValidator requestValidator) {
         this.hashConfigService = hashConfigService;
+        this.requestValidator = requestValidator;
     }
 
+    /**
+     * Initialize the request validator.
+     * @param binder Data binder.
+     */
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(requestValidator);
+    }
+
+    /**
+     * Create a hashing configuration.
+     * @param request Create hashing configuration request.
+     * @return Create hashing configuration response.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws HashConfigAlreadyExistsException Thrown when hashing configuration already exists.
+     */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
-        // TODO - request validation
+    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@Valid @RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
         CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a hashing configuration via PUT method.
+     * @param request Update hashing configuration request.
+     * @return Update hashing configuration response.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
-        // TODO - request validation
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a hashing configuration via POST method.
+     * @param request Update hashing configuration request.
+     * @return Update hashing configuration response.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
-        // TODO - request validation
+    public ObjectResponse<UpdateHashConfigResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Get hashing configuration list.
+     * @param request Get hashing configuration list request.
+     * @return Get hashing configuration list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetHashConfigListResponse> listHashConfigs(@RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidConfigurationException {
+    public ObjectResponse<GetHashConfigListResponse> getHashConfigList(@Valid @RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidConfigurationException {
         GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Delete a hashing configuration.
+     * @param request Delete hashing configuration request.
+     * @return Delete hashing configuration response.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
-        // TODO - request validation
+    public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@Valid @RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
         DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

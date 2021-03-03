@@ -18,7 +18,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,11 +31,14 @@ import java.util.Map;
 @Data
 public class UpdateUserAliasRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String aliasName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String aliasValue;
     private final Map<String, Object> extras = new LinkedHashMap<>();
     private UserAliasStatus userAliasStatus;

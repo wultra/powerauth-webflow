@@ -18,7 +18,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for authenticating using an OTP.
@@ -29,9 +30,12 @@ import javax.validation.constraints.NotNull;
 public class OtpAuthenticationRequest {
 
     // Either otpId or operationId should be present
+    @Size(min = 36, max = 36)
     private String otpId;
+    @Size(min = 1, max = 256)
     private String operationId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String otpValue;
     // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;

@@ -19,7 +19,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for updating a credential definition.
@@ -29,18 +31,24 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateCredentialDefinitionRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
     @NotNull
     private CredentialCategory category;
     private boolean encryptionEnabled;
+    @Size(min = 2, max = 256)
     private String encryptionAlgorithm;
     private boolean hashingEnabled;
+    @Size(min = 2, max = 256)
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
     private CredentialDefinitionStatus credentialDefinitionStatus;

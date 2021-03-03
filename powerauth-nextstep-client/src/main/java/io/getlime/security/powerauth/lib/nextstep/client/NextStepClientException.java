@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.client;
 
 import com.wultra.core.rest.client.base.RestClientException;
 import io.getlime.core.rest.model.base.entity.Error;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.NextStepError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
 
 /**
  * Class representing a Next Step client exception created when calling the Next Step REST API.

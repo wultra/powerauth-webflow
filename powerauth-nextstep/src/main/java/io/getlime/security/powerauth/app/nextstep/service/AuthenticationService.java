@@ -597,7 +597,7 @@ public class AuthenticationService {
     }
 
     /**
-     * Resolve remaining attempts for a credential entity and OTP entity.
+     * Resolve remaining attempts for a credential entity, OTP entity and operation.
      * @param credential Credential entity or null for no credential.
      * @param otp OTP entity or null for no OTP.
      * @param operation Operation entity or null for no operation.

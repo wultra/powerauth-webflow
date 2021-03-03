@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,22 +32,35 @@ import java.util.Map;
 @Data
 public class UpdateCredentialPolicyRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
+    @Positive
     private Integer usernameLengthMin;
+    @Positive
     private Integer usernameLengthMax;
+    @Size(min = 2, max = 256)
     private String usernameAllowedChars;
+    @Positive
     private Integer credentialLengthMin;
+    @Positive
     private Integer credentialLengthMax;
+    @Size(min = 2, max = 256)
     private String credentialAllowedChars;
+    @Positive
     private Integer limitSoft;
+    @Positive
     private Integer limitHard;
     private int checkHistoryCount;
     private boolean rotationEnabled;
+    @Positive
     private Integer rotationDays;
+    @Size(min = 2, max = 256)
     private String usernameGenAlgorithm;
     private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
     private Map<String, String> credentialGenParam = new LinkedHashMap<>();
     private CredentialPolicyStatus credentialPolicyStatus;

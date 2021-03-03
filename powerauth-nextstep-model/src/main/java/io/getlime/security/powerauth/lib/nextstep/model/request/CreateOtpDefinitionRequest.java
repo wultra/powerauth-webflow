@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for creating an OTP definition.
@@ -27,15 +28,19 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateOtpDefinitionRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
-    @NotNull
     private boolean encryptionEnabled;
+    @Size(min = 2, max = 256)
     private String encryptionAlgorithm;
 
 }

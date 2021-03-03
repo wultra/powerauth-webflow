@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.CredentialDefinitionService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialDefinitionRequest;
@@ -31,10 +32,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for credential definitions.
@@ -48,42 +49,92 @@ public class CredentialDefinitionController {
     private static final Logger logger = LoggerFactory.getLogger(CredentialDefinitionController.class);
 
     private final CredentialDefinitionService credentialDefinitionService;
+    private final ObjectRequestValidator requestValidator;
 
+    /**
+     * REST controller constructor.
+     * @param credentialDefinitionService Credential definition service.
+     * @param requestValidator Request validator.
+     */
     @Autowired
-    public CredentialDefinitionController(CredentialDefinitionService credentialDefinitionService) {
+    public CredentialDefinitionController(CredentialDefinitionService credentialDefinitionService, ObjectRequestValidator requestValidator) {
         this.credentialDefinitionService = credentialDefinitionService;
+        this.requestValidator = requestValidator;
     }
 
+    /**
+     * Initialize the request validator.
+     * @param binder Data binder.
+     */
+    @InitBinder
+    private void initBinder(WebDataBinder binder) {
+        binder.setValidator(requestValidator);
+    }
+
+    /**
+     * Create a credential definition.
+     * @param request Create credential definition request.
+     * @return Create credential definition response.
+     * @throws CredentialDefinitionAlreadyExistsException Thrown when credential definition already exists.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
-        // TODO - request validation
+    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@Valid @RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         CreateCredentialDefinitionResponse response = credentialDefinitionService.createCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a credential definition via PUT method.
+     * @param request Update credential definition request.
+     * @return Update credential definition response.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
-        // TODO - request validation
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a credential definition via POST method.
+     * @param request Update credential definition request.
+     * @return Update credential definition response.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws ApplicationNotFoundException Thrown when application is not found.
+     * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
-        // TODO - request validation
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Get credential definition list.
+     * @param request Get credential definition list request.
+     * @return Get credential definition list response.
+     */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetCredentialDefinitionListResponse> listCredentialPolicies(@RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
+    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@Valid @RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
         GetCredentialDefinitionListResponse response = credentialDefinitionService.getCredentialDefinitionList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Delete a credential definition.
+     * @param request Delete credential definition request.
+     * @return Delete credential definition response.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException {
-        // TODO - request validation
+    public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@Valid @RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException {
         DeleteCredentialDefinitionResponse response = credentialDefinitionService.deleteCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

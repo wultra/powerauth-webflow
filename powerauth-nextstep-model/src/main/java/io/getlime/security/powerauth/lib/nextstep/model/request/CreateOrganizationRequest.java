@@ -17,7 +17,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for creating an organization.
@@ -27,11 +30,14 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateOrganizationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String organizationId;
+    @Size(min = 1, max = 256)
     private String displayNameKey;
     private boolean isDefault;
     @NotNull
+    @Positive
     private Integer orderNumber;
 
 }

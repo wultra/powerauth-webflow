@@ -19,7 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for updating a credential.
@@ -29,12 +30,16 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateCredentialRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
     private CredentialType credentialType;
+    @Size(min = 2, max = 256)
     private String username;
+    @Size(min = 1, max = 256)
     private String credentialValue;
     private CredentialStatus credentialStatus;
 

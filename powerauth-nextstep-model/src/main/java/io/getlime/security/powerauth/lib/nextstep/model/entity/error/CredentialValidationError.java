@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.error;
 
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;

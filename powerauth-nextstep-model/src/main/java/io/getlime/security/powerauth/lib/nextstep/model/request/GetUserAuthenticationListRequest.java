@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -28,7 +29,8 @@ import java.util.Date;
 @Data
 public class GetUserAuthenticationListRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     private Date createdStartDate;
     private Date createdEndDate;

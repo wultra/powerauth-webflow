@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
+import javax.validation.constraints.Size;
+
 /**
  * Request object used obtaining one time password detail.
  *
@@ -26,7 +28,9 @@ import lombok.Data;
 public class GetOtpDetailRequest {
 
     // Either otpId or operationId should be specified
+    @Size(min = 36, max = 36)
     private String otpId;
+    @Size(min = 1, max = 256)
     private String operationId;
 
 }

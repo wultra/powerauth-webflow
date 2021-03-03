@@ -19,7 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,18 +32,24 @@ import java.util.List;
 @Data
 public class CombinedAuthenticationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String credentialValue;
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify = new ArrayList<>();
     // Either otpId or operationId should be present
+    @Size(min = 36, max = 36)
     private String otpId;
+    @Size(min = 1, max = 256)
     private String operationId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String otpValue;
     // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;

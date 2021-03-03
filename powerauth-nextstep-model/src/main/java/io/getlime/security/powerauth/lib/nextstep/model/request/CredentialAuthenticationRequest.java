@@ -19,7 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -30,14 +31,18 @@ import java.util.List;
 @Data
 public class CredentialAuthenticationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String credentialValue;
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify;
+    @Size(min = 1, max = 256)
     private String operationId;
     private boolean updateOperation;
     private AuthMethod authMethod;

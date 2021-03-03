@@ -20,7 +20,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +36,8 @@ import java.util.Map;
 @Data
 public class CreateUserRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
 
     private final Map<String, Object> extras = new LinkedHashMap<>();
@@ -48,11 +51,13 @@ public class CreateUserRequest {
     @Data
     public static class NewContact {
 
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String contactName;
         @NotNull
         private ContactType contactType;
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String contactValue;
         private boolean primary;
 
@@ -61,11 +66,15 @@ public class CreateUserRequest {
     @Data
     public static class NewCredential {
 
-        @NotNull
+        @NotBlank
+        @Size(min = 2, max = 256)
         private String credentialName;
         @NotNull
         private CredentialType credentialType;
+        @Size(min = 1, max = 256)
         private String username;
+        @NotBlank
+        @Size(min = 1, max = 256)
         private String credentialValue;
         // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
         private CredentialValidationMode validationMode;
@@ -74,8 +83,10 @@ public class CreateUserRequest {
 
     @Data
     public static class CredentialHistory {
+        @Size(min = 1, max = 256)
         private String username;
-        @NotNull
+        @NotBlank
+        @Size(min = 1, max = 256)
         private String credentialValue;
     }
 
