@@ -76,7 +76,6 @@ public class UpdateUserRequest {
         private CredentialType credentialType;
         @Size(min = 1, max = 256)
         private String username;
-        @NotBlank
         @Size(min = 1, max = 256)
         private String credentialValue;
         private CredentialStatus credentialStatus;

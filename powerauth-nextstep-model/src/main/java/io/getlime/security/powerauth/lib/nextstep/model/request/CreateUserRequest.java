@@ -73,7 +73,6 @@ public class CreateUserRequest {
         private CredentialType credentialType;
         @Size(min = 1, max = 256)
         private String username;
-        @NotBlank
         @Size(min = 1, max = 256)
         private String credentialValue;
         // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL

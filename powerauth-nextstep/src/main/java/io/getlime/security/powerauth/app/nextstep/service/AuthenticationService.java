@@ -262,6 +262,9 @@ public class AuthenticationService {
         authentication.setUserId(userId);
         authentication.setAuthenticationType(AuthenticationType.OTP);
         authentication.setOtp(otp);
+        if (credential != null) {
+            authentication.setCredential(credential);
+        }
         if (operation != null) {
             authentication.setOperation(operation);
         }
