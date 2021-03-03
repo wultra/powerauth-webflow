@@ -604,7 +604,11 @@ public class CredentialService {
                 }
             }
         } else {
-            username = generateUsername(credentialDefinition);
+            if (credential.getUsername() != null) {
+                username = credential.getUsername();
+            } else {
+                username = generateUsername(credentialDefinition);
+            }
         }
         credential.setType(credentialType);
         credential.setUsername(username);
