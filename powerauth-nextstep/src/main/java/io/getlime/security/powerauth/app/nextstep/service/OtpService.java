@@ -42,6 +42,8 @@ import java.util.*;
 /**
  * This service handles persistence of one time passwords.
  *
+ * TODO: OTP encryption in database
+ *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service

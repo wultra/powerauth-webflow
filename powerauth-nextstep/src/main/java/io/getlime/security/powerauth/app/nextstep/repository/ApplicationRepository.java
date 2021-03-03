@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -47,5 +48,12 @@ public interface ApplicationRepository extends CrudRepository<ApplicationEntity,
      */
     @Query(value = "from ApplicationEntity a where a.status = :status")
     List<ApplicationEntity> findApplicationsByStatus(@Param("status") ApplicationStatus status);
+
+    /**
+     * Count number of operations with given organization.
+     * @param organization Organization.
+     * @return Number of operations with given organization.
+     */
+    long countByOrganization(OrganizationEntity organization);
 
 }

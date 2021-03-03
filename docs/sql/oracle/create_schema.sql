@@ -439,6 +439,7 @@ CREATE TABLE ns_operation_history (
   CONSTRAINT ns_history_pk PRIMARY KEY (operation_id, result_id),
   CONSTRAINT ns_history_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id),
   CONSTRAINT ns_history_auth_method_fk FOREIGN KEY (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  CONSTRAINT ns_history_chosen_method_fk FOREIGN KEY (chosen_auth_method) REFERENCES ns_auth_method (auth_method),
   CONSTRAINT ns_history_authentication_fk FOREIGN KEY (authentication_id) REFERENCES ns_authentication (authentication_id)
 );
 

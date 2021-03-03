@@ -363,15 +363,15 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for role cannot be deleted exception.
+     * Exception handler for deleted not allowed exception.
      * @param ex Exception.
      * @return Response with error details.
      */
-    @ExceptionHandler(RoleCannotBeDeletedException.class)
+    @ExceptionHandler(DeleteNotAllowedException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleRoleCannotBeDeletedException(RoleCannotBeDeletedException ex) {
+    public @ResponseBody ErrorResponse handleDeleteNotAllowedException(DeleteNotAllowedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(RoleCannotBeDeletedException.CODE, "Role cannot be deleted.");
+        Error error = new Error(DeleteNotAllowedException.CODE, "Delete action is not allowed.");
         return new ErrorResponse(error);
     }
 

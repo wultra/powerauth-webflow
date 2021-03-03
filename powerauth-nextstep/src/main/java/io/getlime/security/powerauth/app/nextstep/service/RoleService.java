@@ -19,10 +19,9 @@ import io.getlime.security.powerauth.app.nextstep.converter.RoleConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRoleEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.RoleDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleCannotBeDeletedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteRoleRequest;
@@ -37,7 +36,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -112,15 +110,15 @@ public class RoleService {
      * @throws RoleNotFoundException Thrown when role is not found.
      */
     @Transactional
-    public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, RoleCannotBeDeletedException {
+    public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, DeleteNotAllowedException {
         Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new RoleNotFoundException("Role not found: " + request.getRoleName());
         }
         RoleEntity role = roleOptional.get();
-        List<UserRoleEntity> usedRoles = userRoleRepository.findAllByRole(role);
-        if (!usedRoles.isEmpty()) {
-            throw new RoleCannotBeDeletedException("Role cannot be deleted because it is used: " + request.getRoleName());
+        long existingRoleCount = userRoleRepository.countByRole(role);
+        if (existingRoleCount > 0) {
+            throw new DeleteNotAllowedException("Role cannot be deleted because it is used: " + request.getRoleName());
         }
         roleRepository.delete(role);
         DeleteRoleResponse response = new DeleteRoleResponse();

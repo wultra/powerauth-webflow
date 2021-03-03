@@ -78,9 +78,10 @@ public class OperationController {
      * @return Create operation response.
      * @throws OperationAlreadyExistsException Thrown when operation already exists.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "operation", method = RequestMethod.POST)
-    public ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException, InvalidConfigurationException {
+    public ObjectResponse<CreateOperationResponse> createOperation(@RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException, InvalidConfigurationException, OrganizationNotFoundException {
         logger.info("Received createOperation request, operation ID: {}, operation name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName());
         // resolve response based on dynamic step definitions
         CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
@@ -108,9 +109,10 @@ public class OperationController {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "operation", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException, OrganizationNotFoundException {
         return updateOperationImpl(request);
     }
 
@@ -127,13 +129,14 @@ public class OperationController {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "operation/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException {
+    public ObjectResponse<UpdateOperationResponse> updateOperationPost(@RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException, OrganizationNotFoundException {
         return updateOperationImpl(request);
     }
 
-    private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws OperationAlreadyFinishedException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, OperationNotFoundException, InvalidRequestException, OperationAlreadyCanceledException {
+    private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws OperationAlreadyFinishedException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, OperationNotFoundException, InvalidRequestException, OperationAlreadyCanceledException, OrganizationNotFoundException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
 
         UpdateOperationResponse response = operationPersistenceService.updateOperation(request.getRequestObject());
@@ -151,9 +154,10 @@ public class OperationController {
      * @param request Update operation user request.
      * @return Response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "operation/user", method = RequestMethod.PUT)
-    public Response updateOperationUser(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
+    public Response updateOperationUser(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
         return updateOperationUserImpl(request);
     }
 
@@ -163,13 +167,14 @@ public class OperationController {
      * @param request Update operation user request.
      * @return Response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "operation/user/update", method = RequestMethod.POST)
-    public Response updateOperationUserPost(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
+    public Response updateOperationUserPost(@RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
         return updateOperationUserImpl(request);
     }
 
-    private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException {
+    private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
         String operationId = request.getRequestObject().getOperationId();
         String userId = request.getRequestObject().getUserId();
         String organizationId = request.getRequestObject().getOrganizationId();
@@ -466,7 +471,7 @@ public class OperationController {
     }
 
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException {
+    public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
         // TODO - request validation
         DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
         return new ObjectResponse<>(response);

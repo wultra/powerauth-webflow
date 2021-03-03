@@ -17,8 +17,11 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverter;
+import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
@@ -49,15 +52,22 @@ public class OrganizationService {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
     private final OrganizationRepository organizationRepository;
+    private final OperationRepository operationRepository;
+    private final ApplicationRepository applicationRepository;
+
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
     /**
      * Organization service constructor.
      * @param organizationRepository Organization repository.
+     * @param operationRepository Operation repository.
+     * @param applicationRepository Application repository.
      */
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository) {
+    public OrganizationService(OrganizationRepository organizationRepository, OperationRepository operationRepository, ApplicationRepository applicationRepository) {
         this.organizationRepository = organizationRepository;
+        this.operationRepository = operationRepository;
+        this.applicationRepository = applicationRepository;
     }
 
     /**
@@ -123,15 +133,20 @@ public class OrganizationService {
      * @param request Delete organization request.
      * @return Delete organization response.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
+     * @throws DeleteNotAllowedException Thrown when record cannot be deleted.
      */
     @Transactional
-    public DeleteOrganizationResponse deleteOrganization(DeleteOrganizationRequest request) throws OrganizationNotFoundException {
+    public DeleteOrganizationResponse deleteOrganization(DeleteOrganizationRequest request) throws OrganizationNotFoundException, DeleteNotAllowedException {
         Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
         if (!organizationOptional.isPresent()) {
             throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
         }
-        // TODO - check organization usages
         OrganizationEntity organization = organizationOptional.get();
+        long operationCount = operationRepository.countByOrganization(organization);
+        long applicationCount = applicationRepository.countByOrganization(organization);
+        if (operationCount >0 || applicationCount > 0) {
+            throw new DeleteNotAllowedException("Organization cannot be deleted because it is used: " + organization.getOrganizationId());
+        }
         organizationRepository.delete(organization);
         DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());

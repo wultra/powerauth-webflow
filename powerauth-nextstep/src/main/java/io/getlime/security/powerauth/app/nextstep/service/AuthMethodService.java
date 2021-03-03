@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
@@ -27,10 +28,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPr
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodAlreadyExistsException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.AuthMethodNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
@@ -62,6 +60,7 @@ public class AuthMethodService {
     private final UserPrefsRepository userPrefsRepository;
     private final UserIdentityLookupService userIdentityLookupService;
     private final StepDefinitionRepository stepDefinitionRepository;
+    private final OperationHistoryRepository operationHistoryRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -72,14 +71,16 @@ public class AuthMethodService {
      * @param userPrefsRepository User preferences repository.
      * @param userIdentityLookupService User identity lookup service.
      * @param stepDefinitionRepository Step definition repository.
+     * @param operationHistoryRepository Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
      */
     @Autowired
-    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, UserIdentityLookupService userIdentityLookupService, StepDefinitionRepository stepDefinitionRepository, @Lazy MobileTokenConfigurationService mobileTokenConfigurationService) {
+    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, UserIdentityLookupService userIdentityLookupService, StepDefinitionRepository stepDefinitionRepository, OperationHistoryRepository operationHistoryRepository, @Lazy MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.authMethodRepository = authMethodRepository;
         this.userPrefsRepository = userPrefsRepository;
         this.userIdentityLookupService = userIdentityLookupService;
         this.stepDefinitionRepository = stepDefinitionRepository;
+        this.operationHistoryRepository = operationHistoryRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
     }
 
@@ -306,14 +307,21 @@ public class AuthMethodService {
      * @param request Delete authentication method request.
      * @return Delete authentication method response.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
     @Transactional
-    public DeleteAuthMethodResponse deleteAuthMethod(DeleteAuthMethodRequest request) throws AuthMethodNotFoundException {
+    public DeleteAuthMethodResponse deleteAuthMethod(DeleteAuthMethodRequest request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
         Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
         if (!authMethodOptional.isPresent()) {
             throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
         }
-        // TODO - check authentication method usages
+        long requestAuthMethods = stepDefinitionRepository.countByRequestAuthMethod(request.getAuthMethod());
+        long responseAuthMethods = stepDefinitionRepository.countByResponseAuthMethod(request.getAuthMethod());
+        long historyRequestAuthMethods = operationHistoryRepository.countByRequestAuthMethod(request.getAuthMethod());
+        long historyChosenAuthMethods = operationHistoryRepository.countByChosenAuthMethod(request.getAuthMethod());
+        if (requestAuthMethods > 0 || responseAuthMethods > 0 || historyRequestAuthMethods > 0 || historyChosenAuthMethods > 0) {
+            throw new DeleteNotAllowedException("Authentication method cannot be deleted because it is used: " + request.getAuthMethod());
+        }
         AuthMethodEntity authMethod = authMethodOptional.get();
         authMethodRepository.delete(authMethod);
         DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();

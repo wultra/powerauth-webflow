@@ -19,6 +19,7 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.service.OrganizationService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
@@ -99,7 +100,7 @@ public class OrganizationController {
     }
 
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException {
+    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
         // TODO - request validation
         DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
         return new ObjectResponse<>(response);

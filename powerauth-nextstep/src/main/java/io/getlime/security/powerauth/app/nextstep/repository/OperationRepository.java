@@ -16,6 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -46,5 +47,19 @@ public interface OperationRepository extends CrudRepository<OperationEntity, Str
      * @return List of operations matching the query.
      */
     List<OperationEntity> findAllByExternalTransactionId(String externalTransactionId);
+
+    /**
+     * Count number of operations with given organization.
+     * @param organization Organization entity.
+     * @return Number of operations with given organization.
+     */
+    long countByOrganization(OrganizationEntity organization);
+
+    /**
+     * Count number of operations with given operation name.
+     * @param operationName operation name.
+     * @return Number of operations with given operation name.
+     */
+    long countByOperationName(String operationName);
 
 }

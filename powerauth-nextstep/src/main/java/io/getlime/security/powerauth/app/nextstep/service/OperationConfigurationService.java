@@ -17,7 +17,9 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigAlreadyExists;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOperationConfigRequest;
@@ -41,16 +43,20 @@ import java.util.Optional;
 public class OperationConfigurationService {
 
     private final OperationConfigRepository operationConfigRepository;
+    private final OperationRepository operationRepository;
+
     private final OperationConfigConverter configConverter = new OperationConfigConverter();
 
     /**
      * Service constructor.
      *
      * @param operationConfigRepository Operation configuration repository.
+     * @param operationRepository Operation repository.
      */
     @Autowired
-    public OperationConfigurationService(OperationConfigRepository operationConfigRepository) {
+    public OperationConfigurationService(OperationConfigRepository operationConfigRepository, OperationRepository operationRepository) {
         this.operationConfigRepository = operationConfigRepository;
+        this.operationRepository = operationRepository;
     }
 
     /**
@@ -121,12 +127,17 @@ public class OperationConfigurationService {
      * @param request Delete operation configuration request.
      * @return Delete operation configuration response.
      * @throws OperationConfigNotFoundException Thrown when operation configuration is not configured.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
     @Transactional
-    public DeleteOperationConfigResponse deleteOperationConfig(DeleteOperationConfigRequest request) throws OperationConfigNotFoundException {
+    public DeleteOperationConfigResponse deleteOperationConfig(DeleteOperationConfigRequest request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
         Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
         if (!operationConfigOptional.isPresent()) {
             throw new OperationConfigNotFoundException("Operation configuration not found, operation name: " + request.getOperationName());
+        }
+        long existingOperationCount = operationRepository.countByOperationName(request.getOperationName());
+        if (existingOperationCount > 0) {
+            throw new DeleteNotAllowedException("Operation configuration cannot be deleted because it is used: " + request.getOperationName());
         }
         OperationConfigEntity operationConfig = operationConfigOptional.get();
         operationConfigRepository.delete(operationConfig);

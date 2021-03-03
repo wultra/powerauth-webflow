@@ -153,7 +153,7 @@ public class AuthenticationService {
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation,
                     request.getAuthMethod(), credential, authentication, Collections.singletonList(AuthInstrument.CREDENTIAL));
-            if (operationResponse.getResult() == AuthResult.FAILED) {
+            if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
                 authentication.setResultCredential(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
             }
@@ -272,7 +272,7 @@ public class AuthenticationService {
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(userId, operation, request.getAuthMethod(),
                     credential, authentication, Collections.singletonList(AuthInstrument.OTP_KEY));
-            if (operationResponse.getResult() == AuthResult.FAILED) {
+            if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
             }
@@ -401,7 +401,7 @@ public class AuthenticationService {
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation, request.getAuthMethod(), credential,
                     authentication, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
-            if (operationResponse.getResult() == AuthResult.FAILED) {
+            if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
                 authentication.setResult(AuthenticationResult.FAILED);
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
@@ -588,7 +588,12 @@ public class AuthenticationService {
             updateRequest.setAuthStepResult(AuthStepResult.AUTH_METHOD_FAILED);
         }
         updateRequest.setAuthenticationId(authentication.getAuthenticationId());
-        return operationPersistenceService.updateOperation(updateRequest);
+        try {
+            return operationPersistenceService.updateOperation(updateRequest);
+        } catch (OrganizationNotFoundException ex) {
+            // Cannot occur, organization is not changed by the request
+            return null;
+        }
     }
 
     /**

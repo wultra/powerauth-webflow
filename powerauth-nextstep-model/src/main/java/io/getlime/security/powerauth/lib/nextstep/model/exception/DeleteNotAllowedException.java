@@ -16,19 +16,19 @@
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
 /**
- * Exception for case when role is not found.
+ * Exception for case when delete action is not allowed.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class RoleNotFoundException extends NextStepServiceException {
+public class DeleteNotAllowedException extends NextStepServiceException {
 
-    public static final String CODE = "ROLE_NOT_FOUND";
+    public static final String CODE = "DELETE_NOT_ALLOWED";
 
     /**
      * Constructor with error message.
      * @param message Error message.
      */
-    public RoleNotFoundException(String message) {
+    public DeleteNotAllowedException(String message) {
         super(message);
     }
 

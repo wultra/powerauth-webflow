@@ -42,6 +42,11 @@ import java.util.*;
 /**
  * This service handles persistence of credentials.
  *
+ * TODO:
+ * - hashing of credentials using Argon2i
+ * - encryption of credentials stored in database
+ * - end-to-end encryption for credentials
+ *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
@@ -225,6 +230,7 @@ public class CredentialService {
      */
     @Transactional
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException {
+        // TODO - move to a separate service
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, request.getUsername(), request.getCredentialValue(), request.getValidationMode());
@@ -251,6 +257,7 @@ public class CredentialService {
     private List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                                 String username, String credentialValue,
                                                                 CredentialValidationMode validationMode) throws InvalidRequestException {
+        // TODO - move to a separate service
         List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         switch (validationMode) {
             case NO_VALIDATION:
@@ -282,7 +289,20 @@ public class CredentialService {
      * @return Whether credential change is required.
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential) {
-        // TODO - implement credential expiration
+        CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
+        if (credentialPolicy.isRotationEnabled()) {
+            Date lastChange = credential.getTimestampLastCredentialChange();
+            if (lastChange == null) {
+                // Only happens when data in database is manipulated
+                return true;
+            }
+            Calendar c = GregorianCalendar.getInstance();
+            c.add(Calendar.DAY_OF_YEAR, -credentialPolicy.getRotationDays());
+            if (lastChange.before(c.getTime())) {
+                // Last credential change occurred before time calculated by password rotation days
+                return true;
+            }
+        }
         List<CredentialValidationFailure> validationFailures = validateCredentialValue(credential.getUser(), credential.getValue(), credential.getCredentialDefinition(), false);
         return !validationFailures.isEmpty();
     }
@@ -473,6 +493,7 @@ public class CredentialService {
      * @return List of validation errors.
      */
     private List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
+        // TODO - move to a separate service
         List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (username == null || username.isEmpty()) {
             validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
@@ -508,6 +529,7 @@ public class CredentialService {
      * @return List of validation errors.
      */
     private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) {
+        // TODO - move to a separate service
         // TODO - switch credential validation to Passay library with more advanced rules
         List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         if (credentialValue == null || credentialValue.isEmpty()) {
@@ -594,6 +616,7 @@ public class CredentialService {
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
         credential.setValue(credentialValue);
+        credential.setTimestampLastCredentialChange(new Date());
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
@@ -614,7 +637,7 @@ public class CredentialService {
         credentialDetail.setCredentialChangeRequired(isCredentialChangeRequired(credential));
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
         credentialDetail.setTimestampLastUpdated(credential.getTimestampLastUpdated());
-        credentialDetail.setTimestampExpired(credential.getTimestampExpires());
+        credentialDetail.setTimestampExpires(credential.getTimestampExpires());
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
         return credentialDetail;
@@ -644,6 +667,7 @@ public class CredentialService {
      * @throws InvalidConfigurationException Thrown in case username could not be generated.
      */
     private String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+        // TODO - move to a separate service
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getUsernameGenAlgorithm()) {
             case "DEFAULT":

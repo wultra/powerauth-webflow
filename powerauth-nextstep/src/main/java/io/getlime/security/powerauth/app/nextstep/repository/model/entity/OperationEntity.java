@@ -56,8 +56,9 @@ public class OperationEntity implements Serializable {
     @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "organization_id")
-    private String organizationId;
+    @ManyToOne
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
+    private OrganizationEntity organization;
 
     @Column(name = "application_id")
     private String applicationId;

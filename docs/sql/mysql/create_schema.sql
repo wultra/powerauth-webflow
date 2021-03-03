@@ -415,6 +415,7 @@ CREATE TABLE ns_operation_history (
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY ns_history_operation_fk (operation_id) REFERENCES ns_operation (operation_id),
   FOREIGN KEY ns_history_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),
+  FOREIGN KEY ns_history_chosen_method_fk (chosen_auth_method) REFERENCES ns_auth_method (auth_method),
   FOREIGN KEY ns_history_authentication_fk (authentication_id) REFERENCES ns_authentication (authentication_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

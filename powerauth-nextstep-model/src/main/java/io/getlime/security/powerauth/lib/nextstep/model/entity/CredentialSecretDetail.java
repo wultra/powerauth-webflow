@@ -45,7 +45,7 @@ public class CredentialSecretDetail {
     private Date timestampCreated;
     private Date timestampLastUpdated;
     private Date timestampBlocked;
-    private Date timestampExpired;
+    private Date timestampExpires;
     private Date timestampLastCredentialChange;
 
 }

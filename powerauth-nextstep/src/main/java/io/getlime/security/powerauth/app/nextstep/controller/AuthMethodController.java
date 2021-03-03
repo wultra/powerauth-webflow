@@ -179,14 +179,14 @@ public class AuthMethodController {
     }
 
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
-    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws UserNotFoundException, InvalidConfigurationException {
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
         // TODO - request validation
         GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 
     @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException {
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
         // TODO - request validation
         DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
         return new ObjectResponse<>(response);

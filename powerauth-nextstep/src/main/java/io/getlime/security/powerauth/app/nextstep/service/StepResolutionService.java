@@ -48,6 +48,10 @@ import java.util.stream.Collectors;
  * definitions match the request). Step definitions are also filtered by authentication methods available for the user,
  * authentication methods can be enabled or disabled dynamically in user preferences.
  *
+ * TODO:
+ * - Authentication method downgrade
+ * - Authentication method choice for mobile token, handling of operations in PA server (implement as new service)
+ *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service

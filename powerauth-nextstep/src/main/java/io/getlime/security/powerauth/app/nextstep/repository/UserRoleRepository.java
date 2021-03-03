@@ -41,11 +41,11 @@ public interface UserRoleRepository extends CrudRepository<UserRoleEntity, Long>
     List<UserRoleEntity> findAllByUser(UserIdentityEntity user);
 
     /**
-     * Find user roles by a role.
+     * Count number of role records with a specified role.
      * @param role Role
      * @return List of user roles.
      */
-    List<UserRoleEntity> findAllByRole(RoleEntity role);
+    long countByRole(RoleEntity role);
 
     /**
      * Find roles for a user identity with given status.

@@ -55,7 +55,9 @@ public class OperationConverter {
         operationDetail.setOperationId(operation.getOperationId());
         operationDetail.setOperationName(operation.getOperationName());
         operationDetail.setUserId(operation.getUserId());
-        operationDetail.setOrganizationId(operation.getOrganizationId());
+        if (operation.getOrganization() != null) {
+            operationDetail.setOrganizationId(operation.getOrganization().getOrganizationId());
+        }
         operationDetail.setAccountStatus(operation.getUserAccountStatus());
         operationDetail.setExternalTransactionId(operation.getExternalTransactionId());
         operationDetail.setOperationData(operation.getOperationData());

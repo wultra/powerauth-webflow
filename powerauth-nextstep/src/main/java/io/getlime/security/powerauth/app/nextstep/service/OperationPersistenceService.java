@@ -21,10 +21,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthenticationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -62,6 +60,7 @@ public class OperationPersistenceService {
 
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
+    private final OrganizationRepository organizationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final StepResolutionService stepResolutionService;
@@ -71,6 +70,7 @@ public class OperationPersistenceService {
      * Service constructor.
      * @param idGeneratorService              ID generator service.
      * @param operationRepository             Operation repository.
+     * @param organizationRepository          Organization repository.
      * @param operationHistoryRepository      Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
      * @param stepResolutionService           Step resolution service.
@@ -78,11 +78,12 @@ public class OperationPersistenceService {
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository,
+                                       OrganizationRepository organizationRepository, OperationHistoryRepository operationHistoryRepository,
                                        MobileTokenConfigurationService mobileTokenConfigurationService,
                                        @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
+        this.organizationRepository = organizationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
         this.stepResolutionService = stepResolutionService;
@@ -95,15 +96,21 @@ public class OperationPersistenceService {
      *
      * @param request  create request received from the client
      * @param response create response generated for the client
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public void createOperation(CreateOperationRequest request, CreateOperationResponse response) {
+    public void createOperation(CreateOperationRequest request, CreateOperationResponse response) throws OrganizationNotFoundException {
         OperationEntity operation = new OperationEntity();
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
         operation.setUserId(request.getUserId());
-        operation.setOrganizationId(request.getOrganizationId());
-        operation.setOrganizationId(request.getOrganizationId());
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            operation.setOrganization(organizationOptional.get());
+        }
         operation.setExternalOperationName(request.getOperationNameExternal());
         operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
@@ -152,8 +159,9 @@ public class OperationPersistenceService {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException {
+    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException, OrganizationNotFoundException {
         // Resolve response based on dynamic step definitions
         UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
 
@@ -169,15 +177,22 @@ public class OperationPersistenceService {
      * @param request  create request received from the client
      * @param response create response generated for the client
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
+    private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException, OrganizationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
         operation.setUserId(request.getUserId());
-        operation.setOrganizationId(request.getOrganizationId());
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            operation.setOrganization(organizationOptional.get());
+        }
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Do not remove application context in case it was not sent in request
@@ -215,14 +230,19 @@ public class OperationPersistenceService {
      * Update user ID and organization ID for an operation.
      * @param request Update operation user request.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public void updateOperationUser(UpdateOperationUserRequest request) throws OperationNotFoundException {
+    public void updateOperationUser(UpdateOperationUserRequest request) throws OperationNotFoundException, OrganizationNotFoundException {
         String operationId = request.getOperationId();
         String userId = request.getUserId();
         String organizationId = request.getOrganizationId();
         OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
-        operation.setOrganizationId(organizationId);
+        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
+        if (!organizationOptional.isPresent()) {
+            throw new OrganizationNotFoundException("Organization not found: " + organizationId);
+        }
+        operation.setOrganization(organizationOptional.get());
         operation.setUserAccountStatus(request.getAccountStatus());
         operationRepository.save(operation);
     }
