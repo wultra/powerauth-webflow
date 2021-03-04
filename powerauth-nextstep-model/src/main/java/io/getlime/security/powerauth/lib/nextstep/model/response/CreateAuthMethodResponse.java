@@ -32,12 +32,16 @@ public class CreateAuthMethodResponse {
     private AuthMethod authMethod;
     @NotNull
     private Long orderNumber;
+    @NotNull
     private Boolean checkUserPrefs;
     private Integer userPrefsColumn;
     private Boolean userPrefsDefault;
+    @NotNull
     private Boolean checkAuthFails;
     private Integer maxAuthFails;
+    @NotNull
     private Boolean hasUserInterface;
+    @NotNull
     private Boolean hasMobileToken;
     private String displayNameKey;
 

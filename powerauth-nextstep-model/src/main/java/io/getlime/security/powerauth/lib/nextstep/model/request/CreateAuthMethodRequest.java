@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
@@ -31,8 +30,7 @@ import javax.validation.constraints.Size;
 @Data
 public class CreateAuthMethodRequest {
 
-    @NotBlank
-    @Size(min = 2, max = 256)
+    @NotNull
     private AuthMethod authMethod;
     @NotNull
     @Positive
@@ -41,7 +39,6 @@ public class CreateAuthMethodRequest {
     private Boolean checkUserPrefs;
     @Positive
     private Integer userPrefsColumn;
-    @NotNull
     private Boolean userPrefsDefault;
     @NotNull
     private Boolean checkAuthFails;

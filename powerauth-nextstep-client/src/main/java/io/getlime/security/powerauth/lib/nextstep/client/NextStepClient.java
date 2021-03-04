@@ -107,7 +107,7 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
     */
     public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, String operationId, @NotNull String operationData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
-        return createOperation(operationName, operationId, operationData, null, null, null, params, applicationContext);
+        return createOperation(operationName, operationId, operationData, null, null, new OperationFormData(), params, applicationContext);
     }
 
     /**

@@ -37,7 +37,6 @@ public class CreateOperationRequest {
     @NotBlank
     @Size(min = 2, max = 256)
     private String operationName;
-    @NotBlank
     @Size(min = 1, max = 256)
     private String operationId;
     @NotBlank

@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 /**
@@ -28,7 +27,6 @@ import javax.validation.constraints.Size;
 @Data
 public class GetUserAuthMethodsRequest {
 
-    @NotBlank
     @Size(min = 1, max = 256)
     private String userId;
 
