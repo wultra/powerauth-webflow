@@ -36,6 +36,12 @@ public class NextStepServerConfiguration {
     @Value("${powerauth.nextstep.operation.expirationTimeInSeconds}")
     private int operationExpirationTime;
 
+    @Value("${powerauth.nextstep.identity.credential.useOriginalUsername}")
+    private boolean useOriginalUsername;
+
+    @Value("${powerauth.nextstep.identity.credential.generateUsernameMaxAttempts}")
+    private int generateUsernameMaxAttempts;
+
     /**
      * Application name.
      */
@@ -61,6 +67,22 @@ public class NextStepServerConfiguration {
      */
     public int getOperationExpirationTime() {
         return operationExpirationTime;
+    }
+
+    /**
+     * Get whether original username for a removed credential when the credential is recreated.
+     * @return Whether original username for a removed credential when the credential is recreated.
+     */
+    public boolean isUseOriginalUsername() {
+        return useOriginalUsername;
+    }
+
+    /**
+     * Get maximum number of attempts when generating username.
+     * @return Maximum number of attempts when generating username.
+     */
+    public int getGenerateUsernameMaxAttempts() {
+        return generateUsernameMaxAttempts;
     }
 
     /**

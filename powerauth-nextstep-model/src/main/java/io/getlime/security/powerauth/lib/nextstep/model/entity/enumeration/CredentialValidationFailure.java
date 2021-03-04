@@ -63,6 +63,11 @@ public enum CredentialValidationFailure {
     USERNAME_TOO_LONG,
 
     /**
+     * Username contains whitespace.
+     */
+    USERNAME_CONTAINS_WHITESPACE,
+
+    /**
      * Username pattern match failed.
      */
     USERNAME_PATTERN_MATCH_FAILED,

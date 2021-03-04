@@ -43,14 +43,19 @@ public enum AuthMethod {
     USERNAME_PASSWORD_AUTH,
 
     /**
-     * Authenticate user using PowerAuth 2.0 mobile token.
+     * Authorize step using PowerAuth 2.0 mobile token.
      */
     POWERAUTH_TOKEN,
 
     /**
-     * Authenticate user using an SMS key.
+     * Authorize step using an SMS key.
      */
     SMS_KEY,
+
+    /**
+     * Authenticate step using an OTP code.
+     */
+    OTP_CODE,
 
     /**
      * Confirm user consent.

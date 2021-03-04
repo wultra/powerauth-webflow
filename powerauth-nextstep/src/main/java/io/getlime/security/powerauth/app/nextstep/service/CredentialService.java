@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
@@ -54,13 +55,12 @@ public class CredentialService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialService.class);
 
-    private static final int GENERATE_USERNAME_MAX_ATTEMPTS = 100;
-
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialDefinitionService credentialDefinitionService;
     private final CredentialRepository credentialRepository;
     private final CredentialHistoryService credentialHistoryService;
     private final IdGeneratorService idGeneratorService;
+    private final NextStepServerConfiguration nextStepServerConfiguration;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
     private final ParameterConverter parameterConverter = new ParameterConverter();
@@ -72,14 +72,16 @@ public class CredentialService {
      * @param credentialRepository Credential repository.
      * @param credentialHistoryService Credential history service.
      * @param idGeneratorService ID generator service.
+     * @param nextStepServerConfiguration Next Step server configuration.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService) {
+    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
         this.credentialRepository = credentialRepository;
         this.credentialHistoryService = credentialHistoryService;
         this.idGeneratorService = idGeneratorService;
+        this.nextStepServerConfiguration = nextStepServerConfiguration;
     }
 
     /**
@@ -511,6 +513,12 @@ public class CredentialService {
         if (maxLength != null && username.length() > maxLength) {
             validationFailures.add(CredentialValidationFailure.USERNAME_TOO_LONG);
         }
+        for (char c : username.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                validationFailures.add(CredentialValidationFailure.USERNAME_CONTAINS_WHITESPACE);
+                break;
+            }
+        }
         if (allowedChars != null && !username.matches(allowedChars)) {
             validationFailures.add(CredentialValidationFailure.USERNAME_PATTERN_MATCH_FAILED);
         }
@@ -604,7 +612,8 @@ public class CredentialService {
                 }
             }
         } else {
-            if (credential.getUsername() != null) {
+            boolean useOriginalUsername = nextStepServerConfiguration.isUseOriginalUsername();
+            if (useOriginalUsername && credential.getUsername() != null) {
                 username = credential.getUsername();
             } else {
                 username = generateUsername(credentialDefinition);
@@ -686,7 +695,8 @@ public class CredentialService {
                     }
                     int length = Integer.parseInt(paramLength);
                     SecureRandom secureRandom = new SecureRandom();
-                    for (int i = 0; i < GENERATE_USERNAME_MAX_ATTEMPTS; i++) {
+                    int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
+                    for (int i = 0; i < generateUsernameMaxAttempts; i++) {
                         BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
                         BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
                         String username = randomNumber.toString();
@@ -717,7 +727,8 @@ public class CredentialService {
                     }
                     int length = Integer.parseInt(paramLength);
                     SecureRandom secureRandom = new SecureRandom();
-                    for (int i = 0; i < GENERATE_USERNAME_MAX_ATTEMPTS; i++) {
+                    int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
+                    for (int i = 0; i < generateUsernameMaxAttempts; i++) {
                         StringBuilder usernameBuilder = new StringBuilder();
                         for (int j = 0; j < length; j++) {
                             char c = (char) (secureRandom.nextInt(26) + 'a');
