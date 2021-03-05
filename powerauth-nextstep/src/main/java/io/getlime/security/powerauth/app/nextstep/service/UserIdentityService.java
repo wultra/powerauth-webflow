@@ -294,9 +294,10 @@ public class UserIdentityService {
      * @return User identity detail response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException {
+    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
@@ -336,9 +337,10 @@ public class UserIdentityService {
      * @return Lookup user identities response.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException {
+    public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
         String username = request.getUsername();
         String credentialName = request.getCredentialName();
         Date createdStartDate = request.getCreatedStartDate();

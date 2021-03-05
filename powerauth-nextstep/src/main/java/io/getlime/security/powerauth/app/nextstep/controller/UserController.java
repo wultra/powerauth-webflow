@@ -134,9 +134,10 @@ public class UserController {
      * @return Get user detail response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException {
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
         GetUserDetailResponse response = userIdentityService.getUserDetail(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -147,9 +148,10 @@ public class UserController {
      * @return Lookup user response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
-    public ObjectResponse<LookupUserResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException {
+    public ObjectResponse<LookupUserResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
         LookupUserResponse response = userIdentityService.lookupUser(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -341,11 +343,12 @@ public class UserController {
     /**
      * Get credential list for a user identity.
      * @param request Get user credential list request.
-     * @return  Get user credential list response.
+     * @return Get user credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException {
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException {
         GetUserCredentialListResponse response = credentialService.getCredentialList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

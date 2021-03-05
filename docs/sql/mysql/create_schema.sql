@@ -156,19 +156,19 @@ CREATE TABLE ns_credential_policy (
   status                     VARCHAR(32) NOT NULL,                         -- Credential policy status: ACTIVE, REMOVED.
   username_length_min        INTEGER,                                      -- Minimum length of username.
   username_length_max        INTEGER,                                      -- Maximum length of username.
-  username_allowed_chars     VARCHAR(256),                                 -- Allowed characters in username (regular expression).
+  username_allowed_pattern   VARCHAR(256),                                 -- Allowed pattern for username (regular expression).
   credential_length_min      INTEGER,                                      -- Minimum length of credential value.
   credential_length_max      INTEGER,                                      -- Maximum length of credential value.
-  credential_allowed_chars   VARCHAR(256),                                 -- Allowed characters in credential value.
   limit_soft                 INTEGER,                                      -- Soft limit of failed attempts.
   limit_hard                 INTEGER,                                      -- Hard limit of failed attempts.
   check_history_count        INTEGER DEFAULT 0 NOT NULL,                   -- Number of historical credential values to check.
   rotation_enabled           INTEGER DEFAULT 0 NOT NULL,                   -- Whether credential rotation is enabled.
   rotation_days              INTEGER,                                      -- Number of days for credential rotation.
   username_gen_algorithm     VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the username.
-  username_gen_param         VARCHAR(256),                                 -- Parameters used when generating the username.
+  username_gen_param         VARCHAR(4000) NOT NULL,                       -- Parameters used when generating the username.
   credential_gen_algorithm   VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the credential.
-  credential_gen_param       VARCHAR(256),                                 -- Parameters used when generating the credential.
+  credential_gen_param       VARCHAR(4000) NOT NULL,                       -- Parameters used when generating the credential.
+  credential_val_param       VARCHAR(4000) NOT NULL,                       -- Parameters used when validating the credential.
   timestamp_created          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Timestamp when policy was created.
   timestamp_last_updated     TIMESTAMP                                     -- Timestamp when policy was last updated.
 );
@@ -183,7 +183,7 @@ CREATE TABLE ns_otp_policy (
   attempt_limit          INTEGER,                                     -- Maximum number of authentication attempts.
   expiration_time        INTEGER,                                     -- One time password expiration time.
   gen_algorithm          VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,     -- Algorithm used for generating the one time password.
-  gen_param              VARCHAR(256),                                -- Parameters used when generating the OTP.
+  gen_param              VARCHAR(4000) NOT NULL,                       -- Parameters used when generating the OTP.
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when policy was created.
   timestamp_last_updated TIMESTAMP                                    -- Timestamp when policy was last updated.
 );

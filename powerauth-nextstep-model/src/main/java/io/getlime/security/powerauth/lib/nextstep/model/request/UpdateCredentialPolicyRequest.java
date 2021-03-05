@@ -42,13 +42,11 @@ public class UpdateCredentialPolicyRequest {
     @Positive
     private Integer usernameLengthMax;
     @Size(min = 2, max = 256)
-    private String usernameAllowedChars;
+    private String usernameAllowedPattern;
     @Positive
     private Integer credentialLengthMin;
     @Positive
     private Integer credentialLengthMax;
-    @Size(min = 2, max = 256)
-    private String credentialAllowedChars;
     @Positive
     private Integer limitSoft;
     @Positive
@@ -63,6 +61,7 @@ public class UpdateCredentialPolicyRequest {
     @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
     private Map<String, String> credentialGenParam = new LinkedHashMap<>();
+    private Map<String, String> credentialValParam = new LinkedHashMap<>();
     private CredentialPolicyStatus credentialPolicyStatus;
 
 }

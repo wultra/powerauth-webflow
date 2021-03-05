@@ -477,7 +477,7 @@ public class NextStepAuthenticationTest {
                 // 2 attempts for credential
                 assertEquals(2, (int) r1.getRemainingAttempts());
             } else {
-                // Last attempt forr operation
+                // Last attempt for operation
                 assertEquals(1, (int) r1.getRemainingAttempts());
             }
             GetOperationDetailResponse r2 = nextStepClient.getOperationDetail("test_operation_10").getResponseObject();

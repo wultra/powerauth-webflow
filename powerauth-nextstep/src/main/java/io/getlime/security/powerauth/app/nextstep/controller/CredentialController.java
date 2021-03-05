@@ -90,9 +90,10 @@ public class CredentialController {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialResponse> updateCredential(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException {
+    public ObjectResponse<UpdateCredentialResponse> updateCredential(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException {
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -106,9 +107,10 @@ public class CredentialController {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException {
+    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException {
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -122,7 +124,7 @@ public class CredentialController {
      * @throws UserNotFoundException Thrown when user identity is not found.
      */
     @RequestMapping(value = "validate", method = RequestMethod.POST)
-    public ObjectResponse<ValidateCredentialResponse> validateCredential(@Valid @RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException {
+    public ObjectResponse<ValidateCredentialResponse> validateCredential(@Valid @RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
         ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

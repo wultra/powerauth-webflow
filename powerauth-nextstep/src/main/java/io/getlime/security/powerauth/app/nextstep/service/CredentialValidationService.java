@@ -1,0 +1,347 @@
+/*
+ * Copyright 2021 Wultra s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.getlime.security.powerauth.app.nextstep.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
+import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
+import org.passay.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+/**
+ * This service handles validation of credentials.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
+@Service
+public class CredentialValidationService {
+
+    private final Logger logger = LoggerFactory.getLogger(CredentialValidationService.class);
+
+    private final CredentialRepository credentialRepository;
+    private final CredentialHistoryService credentialHistoryService;
+
+    private final ParameterConverter parameterConverter = new ParameterConverter();
+
+    /**
+     * Credential validation service constructor.
+     * @param credentialRepository Credential repository.
+     * @param credentialHistoryService Credential history service.
+     */
+    public CredentialValidationService(CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService) {
+        this.credentialRepository = credentialRepository;
+        this.credentialHistoryService = credentialHistoryService;
+    }
+
+    /**
+     * Validate credential.
+     * @param user User identity entity.
+     * @param credentialDefinition Credential definition entity.
+     * @param username Username.
+     * @param credentialValue Credential value.
+     * @param validationMode Validation mode.
+     * @return List of validation errors.
+     * @throws InvalidRequestException Thrown in case request is invalid.
+     * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
+     */
+    public List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
+                                                                 String username, String credentialValue,
+                                                                 CredentialValidationMode validationMode) throws InvalidRequestException, InvalidConfigurationException {
+        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
+        switch (validationMode) {
+            case NO_VALIDATION:
+                break;
+
+            case VALIDATE_USERNAME:
+                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
+                break;
+
+            case VALIDATE_CREDENTIAL:
+                validationErrors.addAll(validateCredentialValue(user, username, credentialValue, credentialDefinition, true));
+                break;
+
+            case VALIDATE_USERNAME_AND_CREDENTIAL:
+                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
+                validationErrors.addAll(validateCredentialValue(user, username, credentialValue, credentialDefinition, true));
+                break;
+
+            default:
+                throw new InvalidRequestException("Invalid validation mode: " + validationMode);
+
+        }
+        return validationErrors;
+    }
+
+    /**
+     * Validate a username.
+     * @param username Username.
+     * @param credentialDefinition Credential definition.
+     * @return List of validation errors.
+     */
+    public List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
+        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        if (username == null || username.trim().isEmpty()) {
+            validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
+            return validationFailures;
+        }
+        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        Integer minLength = credentialPolicy.getUsernameLengthMin();
+        Integer maxLength = credentialPolicy.getUsernameLengthMax();
+        String allowedPattern = credentialPolicy.getUsernameAllowedPattern();
+        if (minLength != null && username.length() < minLength) {
+            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_SHORT);
+        }
+        if (maxLength != null && username.length() > maxLength) {
+            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_LONG);
+        }
+        for (char c : username.toCharArray()) {
+            if (Character.isWhitespace(c)) {
+                validationFailures.add(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE);
+                break;
+            }
+        }
+        if (allowedPattern != null && !username.matches(allowedPattern)) {
+            validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH);
+        }
+        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        if (credentialOptional.isPresent()) {
+            CredentialEntity credential = credentialOptional.get();
+            if (!credential.getUser().equals(user)) {
+                validationFailures.add(CredentialValidationFailure.USERNAME_ALREADY_EXISTS);
+            }
+        }
+        return validationFailures;
+    }
+
+    /**
+     * Validate a credential value.
+     * @param credentialValue Credential value.
+     * @param credentialDefinition Credential definition.
+     * @return List of validation failures.
+     * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
+     */
+    public List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String username, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) throws InvalidConfigurationException {
+        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        if (credentialValue == null || credentialValue.trim().isEmpty()) {
+            validationFailures.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
+            return validationFailures;
+        }
+        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        Integer minLength = credentialPolicy.getCredentialLengthMin();
+        Integer maxLength = credentialPolicy.getCredentialLengthMax();
+        if (minLength != null && credentialValue.length() < minLength) {
+            validationFailures.add(CredentialValidationFailure.CREDENTIAL_TOO_SHORT);
+        }
+        if (maxLength != null && credentialValue.length() > maxLength) {
+            validationFailures.add(CredentialValidationFailure.CREDENTIAL_TOO_LONG);
+        }
+        if (checkHistory && !credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
+            validationFailures.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
+        }
+        try {
+            Map<String, String> validationRules = parameterConverter.fromString(credentialPolicy.getCredentialValParam());
+            validationFailures.addAll(validateCredentialValueAdvanced(username, credentialValue, validationRules));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidConfigurationException(ex);
+        }
+        return validationFailures;
+    }
+
+    /**
+     * Execute advanced credential validations based on defined validation rules.
+     * @param username Username.
+     * @param credentialValue Credential value.
+     * @param param Credential validation rules.
+     * @return List of validation failures.
+     * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
+     */
+    private List<CredentialValidationFailure> validateCredentialValueAdvanced(String username, String credentialValue, Map<String, String> param) throws InvalidConfigurationException {
+        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        List<Rule> rules = new ArrayList<>();
+        try {
+            if ("true".equals(param.get("includeWhitespaceRule"))) {
+                rules.add(new WhitespaceRule());
+            }
+            if ("true".equals(param.get("includeUsernameRule"))) {
+                rules.add(new UsernameRule(true, true));
+            }
+            if ("true".equals(param.get("includeAllowedCharacterRule"))) {
+                String allowedChars = param.get("allowedChars");
+                rules.add(new AllowedCharacterRule(allowedChars.toCharArray()));
+            }
+            if ("true".equals(param.get("includeAllowedRegexRule"))) {
+                String allowedRegex = param.get("allowedRegex");
+                rules.add(new AllowedRegexRule(allowedRegex));
+            }
+            if ("true".equals(param.get("includeIllegalCharacterRule"))) {
+                String illegalChars = param.get("illegalChars");
+                rules.add(new IllegalCharacterRule(illegalChars.toCharArray()));
+            }
+            if ("true".equals(param.get("includeIllegalRegexRule"))) {
+                String illegalRegex = param.get("illegalRegex");
+                rules.add(new IllegalRegexRule(illegalRegex));
+            }
+            if ("true".equals(param.get("includeCharacterRule"))) {
+                boolean includeSmallLetters = "true".equals(param.get("includeSmallLetters"));
+                String paramMinSmallLetters = param.get("smallLettersMin");
+                Integer smallLettersMin = null;
+                if (paramMinSmallLetters != null) {
+                    smallLettersMin = Integer.parseInt(paramMinSmallLetters);
+                }
+                boolean includeCapitalLetters = "true".equals(param.get("includeCapitalLetters"));
+                String paramMinCapitalLetters = param.get("capitalLettersMin");
+                Integer capitalLettersMin = null;
+                if (paramMinCapitalLetters != null) {
+                    capitalLettersMin = Integer.parseInt(paramMinCapitalLetters);
+                }
+                boolean includeAlphabeticalLetters = "true".equals(param.get("includeAlphabeticalLetters"));
+                String paramMinAlphabeticalLetters = param.get("alphabeticalLettersMin");
+                Integer alphabeticalLettersMin = null;
+                if (paramMinAlphabeticalLetters != null) {
+                    alphabeticalLettersMin = Integer.parseInt(paramMinAlphabeticalLetters);
+                }
+
+                boolean includeDigits = "true".equals(param.get("includeDigits"));
+                String paramDigitsMin = param.get("digitsMin");
+                Integer digitsMin = null;
+                if (paramDigitsMin != null) {
+                    digitsMin = Integer.parseInt(paramDigitsMin);
+                }
+                boolean includeSpecialChars = "true".equals(param.get("includeSpecialChars"));
+                String paramSpecialCharsMin = param.get("specialCharsMin");
+                Integer specialCharsMin = null;
+                if (paramSpecialCharsMin != null) {
+                    specialCharsMin = Integer.parseInt(paramSpecialCharsMin);
+                }
+                if (includeSmallLetters) {
+                    CharacterRule rule;
+                    if (smallLettersMin == null) {
+                        rule = new CharacterRule(EnglishCharacterData.LowerCase);
+                    } else {
+                        rule = new CharacterRule(EnglishCharacterData.LowerCase, smallLettersMin);
+                    }
+                    rules.add(rule);
+                }
+                if (includeCapitalLetters) {
+                    CharacterRule rule;
+                    if (capitalLettersMin == null) {
+                        rule = new CharacterRule(EnglishCharacterData.UpperCase);
+                    } else {
+                        rule = new CharacterRule(EnglishCharacterData.UpperCase, capitalLettersMin);
+                    }
+                    rules.add(rule);
+                }
+                if (includeAlphabeticalLetters) {
+                    CharacterRule rule;
+                    if (alphabeticalLettersMin == null) {
+                        rule = new CharacterRule(EnglishCharacterData.Alphabetical);
+                    } else {
+                        rule = new CharacterRule(EnglishCharacterData.Alphabetical, alphabeticalLettersMin);
+                    }
+                    rules.add(rule);
+                }
+                if (includeDigits) {
+                    CharacterRule rule;
+                    if (digitsMin == null) {
+                        rule = new CharacterRule(EnglishCharacterData.Digit);
+                    } else {
+                        rule = new CharacterRule(EnglishCharacterData.Digit, digitsMin);
+                    }
+                    rules.add(rule);
+                }
+                if (includeSpecialChars) {
+                    CharacterRule rule;
+                    if (specialCharsMin == null) {
+                        rule = new CharacterRule(EnglishCharacterData.Special);
+                    } else {
+                        rule = new CharacterRule(EnglishCharacterData.Special, specialCharsMin);
+                    }
+                    rules.add(rule);
+                }
+            }
+            PasswordData passwordData;
+            if (username != null) {
+                passwordData = new PasswordData(username, credentialValue);
+            } else {
+                passwordData = new PasswordData(credentialValue);
+            }
+
+            PasswordValidator passwordValidator = new PasswordValidator(rules);
+            RuleResult result = passwordValidator.validate(passwordData);
+            for (RuleResultDetail detail : result.getDetails()) {
+                CredentialValidationFailure failure = convertToValidationFailure(detail.getErrorCode());
+                if (!validationFailures.contains(failure)) {
+                    validationFailures.add(failure);
+                }
+            }
+        } catch (Exception ex) {
+            throw new InvalidConfigurationException(ex);
+        }
+        return validationFailures;
+    }
+
+    /**
+     * Convert validation error code to validation failure.
+     * @param errorCode Validation error code.
+     * @return Validation failure.
+     */
+    private CredentialValidationFailure convertToValidationFailure(String errorCode) throws InvalidConfigurationException {
+        switch (errorCode) {
+            case "ILLEGAL_WHITESPACE":
+                return CredentialValidationFailure.CREDENTIAL_ILLEGAL_WHITESPACE;
+            case "ILLEGAL_USERNAME":
+                return CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME;
+            case "ILLEGAL_USERNAME_REVERSED":
+                return CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME_REVERSED;
+            case "ALLOWED_CHAR":
+                return CredentialValidationFailure.CREDENTIAL_ALLOWED_CHAR;
+            case "ALLOWED_MATCH":
+                return CredentialValidationFailure.CREDENTIAL_ALLOWED_MATCH;
+            case "ILLEGAL_CHAR":
+                return CredentialValidationFailure.CREDENTIAL_ILLEGAL_CHAR;
+            case "ILLEGAL_MATCH":
+                return CredentialValidationFailure.CREDENTIAL_ILLEGAL_MATCH;
+            case "INSUFFICIENT_UPPERCASE":
+                return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_UPPERCASE;
+            case "INSUFFICIENT_LOWERCASE":
+                return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_LOWERCASE;
+            case "INSUFFICIENT_ALPHABETICAL":
+                return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_ALPHABETICAL;
+            case "INSUFFICIENT_DIGIT":
+                return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_DIGIT;
+            case "INSUFFICIENT_SPECIAL":
+                return CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_SPECIAL;
+
+        }
+        throw new InvalidConfigurationException("Unknown error code: " + errorCode);
+    }
+
+}

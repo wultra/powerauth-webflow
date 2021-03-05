@@ -86,10 +86,8 @@ public class CredentialPolicyService {
         credentialPolicy.setStatus(CredentialPolicyStatus.ACTIVE);
         credentialPolicy.setUsernameLengthMin(request.getUsernameLengthMin());
         credentialPolicy.setUsernameLengthMax(request.getUsernameLengthMax());
-        credentialPolicy.setUsernameAllowedChars(request.getUsernameAllowedChars());
         credentialPolicy.setCredentialLengthMin(request.getCredentialLengthMin());
         credentialPolicy.setCredentialLengthMax(request.getCredentialLengthMax());
-        credentialPolicy.setCredentialAllowedChars(request.getCredentialAllowedChars());
         credentialPolicy.setLimitSoft(request.getLimitSoft());
         credentialPolicy.setLimitHard(request.getLimitHard());
         credentialPolicy.setCheckHistoryCount(request.getCheckHistoryCount());
@@ -107,6 +105,11 @@ public class CredentialPolicyService {
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
+        try {
+            credentialPolicy.setCredentialValParam(parameterConverter.fromMap(request.getCredentialValParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidRequestException(ex);
+        }
         credentialPolicy.setTimestampCreated(new Date());
         credentialPolicyRepository.save(credentialPolicy);
         CreateCredentialPolicyResponse response = new CreateCredentialPolicyResponse();
@@ -115,10 +118,9 @@ public class CredentialPolicyService {
         response.setCredentialPolicyStatus(credentialPolicy.getStatus());
         response.setUsernameLengthMin(credentialPolicy.getUsernameLengthMin());
         response.setUsernameLengthMax(credentialPolicy.getUsernameLengthMax());
-        response.setUsernameAllowedChars(credentialPolicy.getUsernameAllowedChars());
+        response.setUsernameAllowedPattern(credentialPolicy.getUsernameAllowedPattern());
         response.setCredentialLengthMin(credentialPolicy.getCredentialLengthMin());
         response.setCredentialLengthMax(credentialPolicy.getCredentialLengthMax());
-        response.setCredentialAllowedChars(credentialPolicy.getCredentialAllowedChars());
         response.setLimitSoft(request.getLimitSoft());
         response.setLimitHard(request.getLimitHard());
         response.setCheckHistoryCount(request.getCheckHistoryCount());
@@ -128,6 +130,7 @@ public class CredentialPolicyService {
         response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
         response.setCredentialGenParam(request.getCredentialGenParam());
+        response.setCredentialValParam(request.getCredentialValParam());
         return response;
     }
 
@@ -155,10 +158,9 @@ public class CredentialPolicyService {
         }
         credentialPolicy.setUsernameLengthMin(request.getUsernameLengthMin());
         credentialPolicy.setUsernameLengthMax(request.getUsernameLengthMax());
-        credentialPolicy.setUsernameAllowedChars(request.getUsernameAllowedChars());
+        credentialPolicy.setUsernameAllowedPattern(request.getUsernameAllowedPattern());
         credentialPolicy.setCredentialLengthMin(request.getCredentialLengthMin());
         credentialPolicy.setCredentialLengthMax(request.getCredentialLengthMax());
-        credentialPolicy.setCredentialAllowedChars(request.getCredentialAllowedChars());
         credentialPolicy.setLimitSoft(request.getLimitSoft());
         credentialPolicy.setLimitHard(request.getLimitHard());
         credentialPolicy.setCheckHistoryCount(request.getCheckHistoryCount());
@@ -180,6 +182,13 @@ public class CredentialPolicyService {
                 throw new InvalidRequestException(ex);
             }
         }
+        if (request.getCredentialGenParam() != null) {
+            try {
+                credentialPolicy.setCredentialValParam(parameterConverter.fromMap(request.getCredentialValParam()));
+            } catch (JsonProcessingException ex) {
+                throw new InvalidRequestException(ex);
+            }
+        }
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicyRepository.save(credentialPolicy);
         UpdateCredentialPolicyResponse response  = new UpdateCredentialPolicyResponse();
@@ -188,10 +197,9 @@ public class CredentialPolicyService {
         response.setCredentialPolicyStatus(credentialPolicy.getStatus());
         response.setUsernameLengthMin(credentialPolicy.getUsernameLengthMin());
         response.setUsernameLengthMax(credentialPolicy.getUsernameLengthMax());
-        response.setUsernameAllowedChars(credentialPolicy.getUsernameAllowedChars());
+        response.setUsernameAllowedPattern(credentialPolicy.getUsernameAllowedPattern());
         response.setCredentialLengthMin(credentialPolicy.getCredentialLengthMin());
         response.setCredentialLengthMax(credentialPolicy.getCredentialLengthMax());
-        response.setCredentialAllowedChars(credentialPolicy.getCredentialAllowedChars());
         response.setLimitSoft(credentialPolicy.getLimitSoft());
         response.setLimitHard(credentialPolicy.getLimitHard());
         response.setCheckHistoryCount(credentialPolicy.getCheckHistoryCount());
@@ -201,6 +209,7 @@ public class CredentialPolicyService {
         response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
         response.setCredentialGenParam(request.getCredentialGenParam());
+        response.setCredentialValParam(request.getCredentialValParam());
         return response;
     }
 

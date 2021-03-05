@@ -58,17 +58,14 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "username_length_max")
     private Integer usernameLengthMax;
 
-    @Column(name = "username_allowed_chars")
-    private String usernameAllowedChars;
+    @Column(name = "username_allowed_pattern")
+    private String usernameAllowedPattern;
 
     @Column(name = "credential_length_min")
     private Integer credentialLengthMin;
 
     @Column(name = "credential_length_max")
     private Integer credentialLengthMax;
-
-    @Column(name = "credential_allowed_chars")
-    private String credentialAllowedChars;
 
     @Column(name = "limit_soft")
     private Integer limitSoft;
@@ -96,6 +93,9 @@ public class CredentialPolicyEntity implements Serializable {
 
     @Column(name = "credential_gen_param")
     private String credentialGenParam;
+
+    @Column(name = "credential_val_param")
+    private String credentialValParam;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

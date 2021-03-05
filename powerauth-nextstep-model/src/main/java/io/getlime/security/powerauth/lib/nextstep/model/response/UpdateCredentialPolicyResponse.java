@@ -35,10 +35,9 @@ public class UpdateCredentialPolicyResponse {
     private String description;
     private Integer usernameLengthMin;
     private Integer usernameLengthMax;
-    private String usernameAllowedChars;
+    private String usernameAllowedPattern;
     private Integer credentialLengthMin;
     private Integer credentialLengthMax;
-    private String credentialAllowedChars;
     private Integer limitSoft;
     private Integer limitHard;
     private int checkHistoryCount;
@@ -52,6 +51,8 @@ public class UpdateCredentialPolicyResponse {
     private String credentialGenAlgorithm;
     @NotNull
     private Map<String, String> credentialGenParam = new LinkedHashMap<>();
+    @NotNull
+    private Map<String, String> credentialValParam = new LinkedHashMap<>();
     @NotNull
     private CredentialPolicyStatus credentialPolicyStatus;
 

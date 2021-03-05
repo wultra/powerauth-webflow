@@ -42,10 +42,9 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setCredentialPolicyStatus(credentialPolicy.getStatus());
         credentialPolicyDetail.setUsernameLengthMin(credentialPolicy.getUsernameLengthMin());
         credentialPolicyDetail.setUsernameLengthMax(credentialPolicy.getUsernameLengthMax());
-        credentialPolicyDetail.setUsernameAllowedChars(credentialPolicy.getUsernameAllowedChars());
+        credentialPolicyDetail.setUsernameAllowedPattern(credentialPolicy.getUsernameAllowedPattern());
         credentialPolicyDetail.setCredentialLengthMin(credentialPolicy.getCredentialLengthMin());
         credentialPolicyDetail.setCredentialLengthMax(credentialPolicy.getCredentialLengthMax());
-        credentialPolicyDetail.setCredentialAllowedChars(credentialPolicy.getCredentialAllowedChars());
         credentialPolicyDetail.setLimitSoft(credentialPolicy.getLimitSoft());
         credentialPolicyDetail.setLimitHard(credentialPolicy.getLimitHard());
         credentialPolicyDetail.setCheckHistoryCount(credentialPolicy.getCheckHistoryCount());
@@ -60,6 +59,11 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
         try {
             credentialPolicyDetail.setCredentialGenParam(parameterConverter.fromString(credentialPolicy.getCredentialGenParam()));
+        } catch (JsonProcessingException ex) {
+            throw new InvalidConfigurationException(ex);
+        }
+        try {
+            credentialPolicyDetail.setCredentialValParam(parameterConverter.fromString(credentialPolicy.getCredentialValParam()));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }

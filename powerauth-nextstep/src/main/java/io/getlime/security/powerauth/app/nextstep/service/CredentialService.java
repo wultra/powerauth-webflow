@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
-import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
@@ -36,8 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.math.BigInteger;
-import java.security.SecureRandom;
 import java.util.*;
 
 /**
@@ -61,9 +58,10 @@ public class CredentialService {
     private final CredentialHistoryService credentialHistoryService;
     private final IdGeneratorService idGeneratorService;
     private final NextStepServerConfiguration nextStepServerConfiguration;
+    private final CredentialGenerationService credentialGenerationService;
+    private final CredentialValidationService credentialValidationService;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
-    private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Credential service constructor.
@@ -73,15 +71,19 @@ public class CredentialService {
      * @param credentialHistoryService Credential history service.
      * @param idGeneratorService ID generator service.
      * @param nextStepServerConfiguration Next Step server configuration.
+     * @param credentialGenerationService Credential generation service.
+     * @param credentialValidationService Credential validation service.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration) {
+    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
         this.credentialRepository = credentialRepository;
         this.credentialHistoryService = credentialHistoryService;
         this.idGeneratorService = idGeneratorService;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+        this.credentialGenerationService = credentialGenerationService;
+        this.credentialValidationService = credentialValidationService;
     }
 
     /**
@@ -135,9 +137,10 @@ public class CredentialService {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException {
+    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -165,7 +168,8 @@ public class CredentialService {
             validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
         }
         if (request.getCredentialValue() != null) {
-            List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, request.getCredentialValue(), validationMode);
+            List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+                    credentialDefinition, username, request.getCredentialValue(), validationMode);
             if (!validationErrors.isEmpty()) {
                 CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
@@ -204,9 +208,10 @@ public class CredentialService {
      * @param request Get credential list request.
      * @return Get credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException {
+    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
@@ -229,13 +234,14 @@ public class CredentialService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws UserNotFoundException Thrown when user is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @Transactional
-    public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException {
-        // TODO - move to a separate service
+    public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, request.getUsername(), request.getCredentialValue(), request.getValidationMode());
+        List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+                credentialDefinition, request.getUsername(), request.getCredentialValue(), request.getValidationMode());
         ValidateCredentialResponse response = new ValidateCredentialResponse();
         if (validationErrors.isEmpty()) {
             response.setValidationResult(CredentialValidationResult.SUCCEEDED);
@@ -247,50 +253,12 @@ public class CredentialService {
     }
 
     /**
-     * Validate credential.
-     * @param user User identity entity.
-     * @param credentialDefinition Credential definition entity.
-     * @param username Username.
-     * @param credentialValue Credential value.
-     * @param validationMode Validation mode.
-     * @return List of validation errors.
-     * @throws InvalidRequestException Thrown in case request is invalid.
-     */
-    private List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                                                String username, String credentialValue,
-                                                                CredentialValidationMode validationMode) throws InvalidRequestException {
-        // TODO - move to a separate service
-        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
-        switch (validationMode) {
-            case NO_VALIDATION:
-                break;
-
-            case VALIDATE_USERNAME:
-                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
-                break;
-
-            case VALIDATE_CREDENTIAL:
-                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition, true));
-                break;
-
-            case VALIDATE_USERNAME_AND_CREDENTIAL:
-                validationErrors.addAll(validateUsername(user, username, credentialDefinition));
-                validationErrors.addAll(validateCredentialValue(user, credentialValue, credentialDefinition, true));
-                break;
-
-            default:
-                throw new InvalidRequestException("Invalid validation mode: " + validationMode);
-
-        }
-        return validationErrors;
-    }
-
-    /**
      * Check whether credential change is required.
      * @param credential Credential entity.
      * @return Whether credential change is required.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public boolean isCredentialChangeRequired(CredentialEntity credential) {
+    public boolean isCredentialChangeRequired(CredentialEntity credential) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
         if (credentialPolicy.isRotationEnabled()) {
             Date lastChange = credential.getTimestampLastCredentialChange();
@@ -305,7 +273,8 @@ public class CredentialService {
                 return true;
             }
         }
-        List<CredentialValidationFailure> validationFailures = validateCredentialValue(credential.getUser(), credential.getValue(), credential.getCredentialDefinition(), false);
+        List<CredentialValidationFailure> validationFailures = credentialValidationService.validateCredentialValue(credential.getUser(),
+                credential.getUsername(), credential.getValue(), credential.getCredentialDefinition(), false);
         return !validationFailures.isEmpty();
     }
 
@@ -335,7 +304,8 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        credential.setValue(generateCredentialValue(credentialDefinition));
+        String value = credentialGenerationService.generateCredentialValue(credentialDefinition);
+        credential.setValue(value);
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);
@@ -491,81 +461,6 @@ public class CredentialService {
     }
 
     /**
-     * Validate a username.
-     * @param username Username.
-     * @param credentialDefinition Credential definition.
-     * @return List of validation errors.
-     */
-    private List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
-        // TODO - move to a separate service
-        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
-        if (username == null || username.isEmpty()) {
-            validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
-            return validationFailures;
-        }
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        Integer minLength = credentialPolicy.getUsernameLengthMin();
-        Integer maxLength = credentialPolicy.getUsernameLengthMax();
-        String allowedChars = credentialPolicy.getUsernameAllowedChars();
-        if (minLength != null && username.length() < minLength) {
-            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_SHORT);
-        }
-        if (maxLength != null && username.length() > maxLength) {
-            validationFailures.add(CredentialValidationFailure.USERNAME_TOO_LONG);
-        }
-        for (char c : username.toCharArray()) {
-            if (Character.isWhitespace(c)) {
-                validationFailures.add(CredentialValidationFailure.USERNAME_CONTAINS_WHITESPACE);
-                break;
-            }
-        }
-        if (allowedChars != null && !username.matches(allowedChars)) {
-            validationFailures.add(CredentialValidationFailure.USERNAME_PATTERN_MATCH_FAILED);
-        }
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-        if (credentialOptional.isPresent()) {
-            CredentialEntity credential = credentialOptional.get();
-            if (!credential.getUser().equals(user)) {
-                validationFailures.add(CredentialValidationFailure.USERNAME_ALREADY_EXISTS);
-            }
-        }
-        return validationFailures;
-    }
-
-    /**
-     * Validate a credential value.
-     * @param credentialValue Credential value.
-     * @param credentialDefinition Credential definition.
-     * @return List of validation errors.
-     */
-    private List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) {
-        // TODO - move to a separate service
-        // TODO - switch credential validation to Passay library with more advanced rules
-        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
-        if (credentialValue == null || credentialValue.isEmpty()) {
-            validationErrors.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
-            return validationErrors;
-        }
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        Integer minLength = credentialPolicy.getCredentialLengthMin();
-        Integer maxLength = credentialPolicy.getCredentialLengthMax();
-        String allowedChars = credentialPolicy.getCredentialAllowedChars();
-        if (minLength != null && credentialValue.length() < minLength) {
-            validationErrors.add(CredentialValidationFailure.CREDENTIAL_TOO_SHORT);
-        }
-        if (maxLength != null && credentialValue.length() > maxLength) {
-            validationErrors.add(CredentialValidationFailure.CREDENTIAL_TOO_LONG);
-        }
-        if (allowedChars != null && !credentialValue.matches(allowedChars)) {
-            validationErrors.add(CredentialValidationFailure.CREDENTIAL_PATTERN_MATCH_FAILED);
-        }
-        if (checkHistory && !credentialHistoryService.checkCredentialHistory(user, credentialValue, credentialDefinition)) {
-            validationErrors.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
-        }
-        return validationErrors;
-    }
-
-    /**
      * Create a credential. In case the credential is already defined in the database, reuse the existing record.
      * Method is not transactional.
      *
@@ -616,16 +511,17 @@ public class CredentialService {
             if (useOriginalUsername && credential.getUsername() != null) {
                 username = credential.getUsername();
             } else {
-                username = generateUsername(credentialDefinition);
+                username = credentialGenerationService.generateUsername(credentialDefinition);
             }
         }
         credential.setType(credentialType);
         credential.setUsername(username);
         String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
-            credentialValue = generateCredentialValue(credentialDefinition);
+            credentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
         }
-        List<CredentialValidationFailure> validationErrors = validateCredential(user, credentialDefinition, username, credentialValue, validationMode);
+        List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+                credentialDefinition, username, credentialValue, validationMode);
         if (!validationErrors.isEmpty()) {
             CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
@@ -673,182 +569,6 @@ public class CredentialService {
         credential.setUsername(username);
         credential.setValue(credentialValue);
         credentialHistoryService.createCredentialHistory(credential);
-    }
-
-    /**
-     * Generate a username as defined in credential policy.
-     * @param credentialDefinition Credential definition.
-     * @return Generated username.
-     * @throws InvalidConfigurationException Thrown in case username could not be generated.
-     */
-    private String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        // TODO - move to a separate service
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        switch (credentialPolicy.getUsernameGenAlgorithm()) {
-            case "DEFAULT":
-            case "RANDOM_DIGITS":
-                try {
-                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
-                    String paramLength = param.get("length");
-                    if (paramLength == null) {
-                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_DIGITS");
-                    }
-                    int length = Integer.parseInt(paramLength);
-                    SecureRandom secureRandom = new SecureRandom();
-                    int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
-                    for (int i = 0; i < generateUsernameMaxAttempts; i++) {
-                        BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
-                        BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
-                        String username = randomNumber.toString();
-                        if (username.length() < length) {
-                            // This can happen with leading zeros
-                            continue;
-                        }
-                        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-                        if (credentialOptional.isPresent()) {
-                            // Username is already taken
-                            continue;
-                        }
-                        return username;
-                    }
-                    throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
-                } catch (InvalidConfigurationException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new InvalidConfigurationException(ex);
-                }
-
-            case "RANDOM_LETTERS":
-                try {
-                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
-                    String paramLength = param.get("length");
-                    if (paramLength == null) {
-                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_LETTERS");
-                    }
-                    int length = Integer.parseInt(paramLength);
-                    SecureRandom secureRandom = new SecureRandom();
-                    int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
-                    for (int i = 0; i < generateUsernameMaxAttempts; i++) {
-                        StringBuilder usernameBuilder = new StringBuilder();
-                        for (int j = 0; j < length; j++) {
-                            char c = (char) (secureRandom.nextInt(26) + 'a');
-                            usernameBuilder.append(c);
-                        }
-                        String username = usernameBuilder.toString();
-                        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-                        if (credentialOptional.isPresent()) {
-                            // Username is already taken
-                            continue;
-                        }
-                        return username;
-                    }
-                    throw new InvalidConfigurationException("Username could not be generated, all attempts failed");
-                } catch (InvalidConfigurationException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new InvalidConfigurationException(ex);
-                }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
-        }
-    }
-
-    /**
-     * Generate a credential value as defined in credential policy.
-     * @param credentialDefinition Credential definition.
-     * @return Generated credential value.
-     * @throws InvalidConfigurationException Thrown in case credential value could not be generated.
-     */
-    private String generateCredentialValue(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        switch (credentialPolicy.getCredentialGenAlgorithm()) {
-            case "DEFAULT":
-            case "RANDOM_PASSWORD":
-                try {
-                    // TODO - switch password generation to Passay library with more advanced rules
-                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
-                    String paramLength = param.get("length");
-                    if (paramLength == null) {
-                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PASSWORD");
-                    }
-                    String paramSmallLetters = param.get("includeSmallLetters");
-                    boolean includeSmallLetters = "true".equals(paramSmallLetters);
-                    String paramCapitalLetters = param.get("includeCapitalLetters");
-                    boolean includeCapitalLetters = "true".equals(paramCapitalLetters);
-                    String paramDigits = param.get("includeDigits");
-                    boolean includeDigits = "true".equals(paramDigits);
-                    String paramSpecialChars = param.get("includeSpecialChars");
-                    boolean includeSpecialChars = "true".equals(paramSpecialChars);
-                    if (!includeSmallLetters && !includeCapitalLetters && !includeDigits && !includeSpecialChars) {
-                        throw new InvalidConfigurationException("Invalid configuration of algorithm RANDOM_PASSWORD");
-                    }
-                    String paramSpecialCharLimit = param.get("specialCharLimit");
-                    int length = Integer.parseInt(paramLength);
-                    int specialCharLimit = length;
-                    if (paramSpecialCharLimit != null) {
-                        specialCharLimit = Integer.parseInt(paramSpecialCharLimit);
-                    }
-                    SecureRandom secureRandom = new SecureRandom();
-                    StringBuilder credentialBuilder = new StringBuilder();
-                    StringBuilder availableCharsBuilder = new StringBuilder();
-                    int specialCharCounter = 0;
-                    if (includeSmallLetters) {
-                        availableCharsBuilder.append("abcdefghijklmnopqrstuvwyz");
-                    }
-                    if (includeCapitalLetters) {
-                        availableCharsBuilder.append("ABCDEFGHIJKLMNOPQRSTUVWYZ");
-                    }
-                    if (includeDigits) {
-                        availableCharsBuilder.append("0123456789");
-                    }
-                    if (includeSpecialChars) {
-                        availableCharsBuilder.append("^<>{}|;:.,~!?@#$%^=&*[]()");
-                    }
-                    String availableChars = availableCharsBuilder.toString();
-                    while (credentialBuilder.length() < length) {
-                        int randomInt = secureRandom.nextInt(availableChars.length());
-                        char c = availableChars.charAt(randomInt);
-                        if (Character.isAlphabetic(c) || Character.isDigit(c)) {
-                            credentialBuilder.append(c);
-                            continue;
-                        }
-                        if (specialCharCounter < specialCharLimit) {
-                            specialCharCounter++;
-                            credentialBuilder.append(c);
-                        }
-                    }
-                    return credentialBuilder.toString();
-                } catch (InvalidConfigurationException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new InvalidConfigurationException(ex);
-                }
-
-            case "RANDOM_PIN":
-                try {
-                    Map<String, String> param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
-                    String paramLength = param.get("length");
-                    if (paramLength == null) {
-                        throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PIN");
-                    }
-                    int length = Integer.parseInt(paramLength);
-                    SecureRandom secureRandom = new SecureRandom();
-                    StringBuilder credentialBuilder = new StringBuilder();
-                    while (credentialBuilder.length() < length) {
-                        int randomInt = secureRandom.nextInt(10);
-                        credentialBuilder.append(randomInt);
-                    }
-                    return credentialBuilder.toString();
-                } catch (InvalidConfigurationException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new InvalidConfigurationException(ex);
-                }
-
-            default:
-                throw new InvalidConfigurationException("Unsupported credential value generation algorithm: " + credentialPolicy.getCredentialGenAlgorithm());
-        }
     }
 
 }

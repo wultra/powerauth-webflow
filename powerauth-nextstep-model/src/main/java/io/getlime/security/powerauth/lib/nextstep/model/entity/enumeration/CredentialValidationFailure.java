@@ -38,14 +38,69 @@ public enum CredentialValidationFailure {
     CREDENTIAL_TOO_LONG,
 
     /**
-     * Credential pattern match failed.
-     */
-    CREDENTIAL_PATTERN_MATCH_FAILED,
-
-    /**
      * Credential history check failed.
      */
     CREDENTIAL_HISTORY_CHECK_FAILED,
+
+    /**
+     * Credential contains illegal whitespace.
+     */
+    CREDENTIAL_ILLEGAL_WHITESPACE,
+
+    /**
+     * Credential contains username.
+     */
+    CREDENTIAL_ILLEGAL_USERNAME,
+
+    /**
+     * Credential contains username in reverse.
+     */
+    CREDENTIAL_ILLEGAL_USERNAME_REVERSED,
+
+    /**
+     * Credential is missing an allowed character.
+     */
+    CREDENTIAL_ALLOWED_CHAR,
+
+    /**
+     * Credential allowed match using regular expresion failed.
+     */
+    CREDENTIAL_ALLOWED_MATCH,
+
+    /**
+     * Credential contains an illegal character.
+     */
+    CREDENTIAL_ILLEGAL_CHAR,
+
+    /**
+     * Credential illegal match using regular expresion failed.
+     */
+    CREDENTIAL_ILLEGAL_MATCH,
+
+    /**
+     * Credential contains insufficient number of uppercase characters.
+     */
+    CREDENTIAL_INSUFFICIENT_UPPERCASE,
+
+    /**
+     * Credential contains insufficient number of lowercase characters.
+     */
+    CREDENTIAL_INSUFFICIENT_LOWERCASE,
+
+    /**
+     * Credential contains insufficient number of alphabetical characters.
+     */
+    CREDENTIAL_INSUFFICIENT_ALPHABETICAL,
+
+    /**
+     * Credential contains insufficient number of digits.
+     */
+    CREDENTIAL_INSUFFICIENT_DIGIT,
+
+    /**
+     * Credential contains insufficient number of special characters.
+     */
+    CREDENTIAL_INSUFFICIENT_SPECIAL,
 
     /**
      * Username is empty.
@@ -65,12 +120,12 @@ public enum CredentialValidationFailure {
     /**
      * Username contains whitespace.
      */
-    USERNAME_CONTAINS_WHITESPACE,
+    USERNAME_ILLEGAL_WHITESPACE,
 
     /**
      * Username pattern match failed.
      */
-    USERNAME_PATTERN_MATCH_FAILED,
+    USERNAME_ALLOWED_MATCH,
 
     /**
      * Username already exists.

@@ -69,6 +69,11 @@
             <version>1.18.16</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.passay</groupId>
+            <artifactId>passay</artifactId>
+            <version>1.6.0</version>
+        </dependency>
 
         <!-- JAXB dependency for Java 11 -->
         <dependency>
