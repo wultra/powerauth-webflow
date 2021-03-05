@@ -42,5 +42,6 @@ public class CredentialAuthenticationResponse {
     private AuthenticationResult authenticationResult;
     @NotNull
     private Integer remainingAttempts;
+    private boolean operationFailed;
 
 }

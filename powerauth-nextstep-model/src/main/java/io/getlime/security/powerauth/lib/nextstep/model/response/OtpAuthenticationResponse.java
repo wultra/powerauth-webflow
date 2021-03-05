@@ -45,5 +45,6 @@ public class OtpAuthenticationResponse {
     private AuthenticationResult authenticationResult;
     @NotNull
     private Integer remainingAttempts;
+    private boolean operationFailed;
 
 }

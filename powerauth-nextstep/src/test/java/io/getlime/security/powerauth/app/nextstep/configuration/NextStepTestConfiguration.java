@@ -75,8 +75,8 @@ public class NextStepTestConfiguration {
         nextStepClient.createOperationConfig(requestAuthOtp);
 
         // Configure organizations
-        nextStepClient.createOrganization("RETAIL", null, true, 1);
-        nextStepClient.createOrganization("SME", null, true, 2);
+        nextStepClient.createOrganization("RETAIL", "organization.retail", true, 1);
+        nextStepClient.createOrganization("SME", "organization.sme", true, 2);
 
         // Configure steps
         CreateStepDefinitionRequest step1 = new CreateStepDefinitionRequest();

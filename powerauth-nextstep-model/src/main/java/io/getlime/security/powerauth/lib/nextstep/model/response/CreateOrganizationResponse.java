@@ -29,6 +29,7 @@ public class CreateOrganizationResponse {
 
     @NotNull
     private String organizationId;
+    @NotNull
     private String displayNameKey;
     private boolean isDefault;
     @NotNull

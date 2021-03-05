@@ -150,10 +150,12 @@ public class AuthenticationService {
         authentication.setResultCredential(authenticationResult);
         authentication.setTimestampCreated(new Date());
 
+        boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation,
                     request.getAuthMethod(), credential, authentication, Collections.singletonList(AuthInstrument.CREDENTIAL));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+                operationFailed = true;
                 authentication.setResultCredential(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
             }
@@ -169,6 +171,7 @@ public class AuthenticationService {
         response.setCredentialStatus(credential.getStatus());
         response.setAuthenticationResult(authenticationResult);
         response.setRemainingAttempts(remainingAttempts);
+        response.setOperationFailed(operationFailed);
         return response;
     }
 
@@ -272,10 +275,12 @@ public class AuthenticationService {
         authentication.setResultOtp(authenticationResult);
         authentication.setTimestampCreated(new Date());
 
+        boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(userId, operation, request.getAuthMethod(),
                     credential, authentication, Collections.singletonList(AuthInstrument.OTP_KEY));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+                operationFailed = true;
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
             }
@@ -296,6 +301,7 @@ public class AuthenticationService {
             response.setCredentialStatus(credential.getStatus());
             response.setTimestampBlocked(credential.getTimestampBlocked());
         }
+        response.setOperationFailed(operationFailed);
         return response;
     }
 
@@ -401,10 +407,12 @@ public class AuthenticationService {
         authentication.setResultOtp(otpAuthenticationResult);
         authentication.setTimestampCreated(new Date());
 
+        boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
             UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation, request.getAuthMethod(), credential,
                     authentication, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+                operationFailed = true;
                 authentication.setResult(AuthenticationResult.FAILED);
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
@@ -422,6 +430,7 @@ public class AuthenticationService {
         response.setCredentialAuthenticationResult(credentialAuthenticationResult);
         response.setOtpAuthenticationResult(otpAuthenticationResult);
         response.setRemainingAttempts(remainingAttempts);
+        response.setOperationFailed(operationFailed);
         return response;
     }
 

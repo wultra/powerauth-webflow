@@ -49,5 +49,6 @@ public class CombinedAuthenticationResponse {
     private AuthenticationResult otpAuthenticationResult;
     @NotNull
     private Integer remainingAttempts;
+    private boolean operationFailed;
 
 }
