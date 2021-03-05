@@ -396,16 +396,16 @@ public class StepResolutionService {
             return null;
         }
         AuthMethod authMethod = currentOperationHistory.getRequestAuthMethod();
-        // in case authentication method previously failed, it is already failed
-        for (OperationHistoryEntity history : operation.getOperationHistory()) {
-            if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED) {
-                return null;
-            }
-        }
         // check whether authMethod supports check of authorization failure count
         Optional<AuthMethodEntity> authMethodEntityOptional = authMethodRepository.findByAuthMethod(authMethod);
         if (!authMethodEntityOptional.isPresent()) {
             return null;
+        }
+        // in case authentication method previously failed, it is already failed
+        for (OperationHistoryEntity history : operation.getOperationHistory()) {
+            if (history.getRequestAuthMethod() == authMethod && history.getRequestAuthStepResult() == AuthStepResult.AUTH_METHOD_FAILED) {
+                return 0;
+            }
         }
         AuthMethodEntity authMethodEntity = authMethodEntityOptional.get();
         if (authMethodEntity.getCheckAuthFails()) {

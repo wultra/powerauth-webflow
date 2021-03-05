@@ -200,7 +200,6 @@ public class OperationPersistenceService {
         }
         // operation expiration time matches current response expiration time
         operation.setTimestampExpires(response.getTimestampExpires());
-        operationRepository.save(operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
@@ -223,7 +222,8 @@ public class OperationPersistenceService {
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
-        operationHistoryRepository.save(operationHistory);
+        operation.getOperationHistory().add(operationHistory);
+        operationRepository.save(operation);
     }
 
     /**

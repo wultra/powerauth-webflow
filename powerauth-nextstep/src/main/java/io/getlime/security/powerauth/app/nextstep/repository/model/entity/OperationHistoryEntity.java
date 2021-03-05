@@ -18,10 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -84,6 +81,7 @@ public class OperationHistoryEntity implements Serializable {
     @JoinColumn(name = "authentication_id")
     private AuthenticationEntity authentication;
 
+    @ToString.Exclude
     @ManyToOne
     @JoinColumn(name = "operation_id", insertable = false, updatable = false, nullable = false)
     private OperationEntity operation;

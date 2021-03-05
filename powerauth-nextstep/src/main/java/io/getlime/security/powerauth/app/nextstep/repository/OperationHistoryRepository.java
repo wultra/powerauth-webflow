@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 public interface OperationHistoryRepository extends CrudRepository<OperationHistoryEntity, OperationHistoryEntity.OperationHistoryKey> {
 
     /**
-     * Finds the newest resultId for given operation.
+     * Find the newest resultId for given operation.
      *
      * @param operationId id of an operation
      * @return newest resultId

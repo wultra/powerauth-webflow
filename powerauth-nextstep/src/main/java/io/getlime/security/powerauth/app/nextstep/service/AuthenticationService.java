@@ -254,12 +254,6 @@ public class AuthenticationService {
             }
         }
 
-        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
-            otp.setStatus(OtpStatus.BLOCKED);
-            otp.setTimestampBlocked(new Date());
-        }
-
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
         authentication.setUserId(userId);
@@ -285,6 +279,13 @@ public class AuthenticationService {
                 authentication.setResult(AuthenticationResult.FAILED);
             }
         }
+
+        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
+        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
+        }
+
         authenticationRepository.save(authentication);
 
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
@@ -388,11 +389,6 @@ public class AuthenticationService {
             credentialCounterService.updateCredentialCounter(credential, authenticationResult);
         }
 
-        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
-        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
-            otp.setStatus(OtpStatus.BLOCKED);
-            otp.setTimestampBlocked(new Date());
-        }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
@@ -418,6 +414,13 @@ public class AuthenticationService {
                 authentication.setResult(AuthenticationResult.FAILED);
             }
         }
+
+        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
+        if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
+            otp.setStatus(OtpStatus.BLOCKED);
+            otp.setTimestampBlocked(new Date());
+        }
+
         authenticationRepository.save(authentication);
 
         CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
