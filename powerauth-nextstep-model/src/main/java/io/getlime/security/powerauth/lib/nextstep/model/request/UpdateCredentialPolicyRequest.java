@@ -23,6 +23,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 /**
@@ -52,6 +53,7 @@ public class UpdateCredentialPolicyRequest {
     private Integer limitSoft;
     @Positive
     private Integer limitHard;
+    @PositiveOrZero
     private int checkHistoryCount;
     private boolean rotationEnabled;
     @Positive

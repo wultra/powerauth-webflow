@@ -17,7 +17,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for getting the operation configuration.
@@ -27,15 +30,22 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GetOperationConfigDetailResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String operationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String templateVersion;
     @NotNull
+    @Positive
     private Integer templateId;
+    @NotNull
     private boolean mobileTokenEnabled;
+    @Size(min = 2, max = 256)
     private String mobileTokenMode;
+    @NotNull
     private boolean afsEnabled;
+    @Size(min = 2, max = 256)
     private String afsConfigId;
 
 }

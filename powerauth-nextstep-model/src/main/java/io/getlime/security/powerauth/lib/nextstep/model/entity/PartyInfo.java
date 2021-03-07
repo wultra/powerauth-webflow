@@ -14,7 +14,6 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class PartyInfo {
 
-    @NotNull
     private String logoUrl;
     @NotNull
     private String name;

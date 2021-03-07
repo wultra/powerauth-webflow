@@ -21,7 +21,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpSt
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -32,7 +35,8 @@ import java.util.Date;
 @Data
 public class CombinedAuthenticationResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     @NotNull
     private UserIdentityStatus userIdentityStatus;
@@ -47,8 +51,9 @@ public class CombinedAuthenticationResponse {
     private AuthenticationResult credentialAuthenticationResult;
     @NotNull
     private AuthenticationResult otpAuthenticationResult;
-    @NotNull
+    @PositiveOrZero
     private Integer remainingAttempts;
+    @NotNull
     private boolean operationFailed;
 
 }

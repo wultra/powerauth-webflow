@@ -3,7 +3,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 
 /**
@@ -15,12 +15,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class BankAccountDetail {
 
-    @NotNull
+    @NotBlank
     private String number;
-    @NotNull
     private String accountId;
     private String name;
-    @NotNull
     private BigDecimal balance;
     private String currency;
     private boolean usableForPayment;

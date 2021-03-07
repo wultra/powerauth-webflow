@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for creating an auditing record.
@@ -27,7 +28,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateAuditResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String action;
 
 }

@@ -20,6 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -36,15 +38,23 @@ public class CredentialPolicyDetail {
     @NotNull
     private String credentialPolicyName;
     private String description;
+    @Positive
     private Integer usernameLengthMin;
+    @Positive
     private Integer usernameLengthMax;
     private String usernameAllowedPattern;
+    @Positive
     private Integer credentialLengthMin;
+    @Positive
     private Integer credentialLengthMax;
+    @Positive
     private Integer limitSoft;
+    @Positive
     private Integer limitHard;
+    @PositiveOrZero
     private int checkHistoryCount;
     private boolean rotationEnabled;
+    @Positive
     private Integer rotationDays;
     @NotNull
     private String usernameGenAlgorithm;

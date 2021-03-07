@@ -31,7 +31,6 @@ public class ApplicationExtras {
 
     @NotNull
     private final List<String> requestedScopes = new ArrayList<>();
-    @NotNull
     private String applicationOwner;
 
 }

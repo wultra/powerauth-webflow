@@ -19,7 +19,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserA
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
@@ -36,10 +35,8 @@ public class UpdateOperationUserRequest {
     @NotBlank
     @Size(min = 1, max = 256)
     private String userId;
-    @NotBlank
     @Size(min = 2, max = 256)
     private String organizationId;
-    @NotNull
     private UserAccountStatus accountStatus;
 
 }

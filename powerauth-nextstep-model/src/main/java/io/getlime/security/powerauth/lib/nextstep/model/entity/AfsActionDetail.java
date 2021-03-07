@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -31,8 +32,8 @@ public class AfsActionDetail {
 
     @NotNull
     private String action;
+    @Positive
     private int stepIndex;
-    @NotNull
     private String afsLabel;
     private boolean afsResponseApplied;
     @NotNull

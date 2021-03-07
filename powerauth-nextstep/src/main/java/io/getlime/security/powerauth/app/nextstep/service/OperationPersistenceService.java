@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -118,11 +119,13 @@ public class OperationPersistenceService {
             // Assign operation context to entity in case it was sent in request
             assignApplicationContext(operation, request.getApplicationContext());
         }
-        try {
-            // Store form data as serialized JSON string.
-            operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
-        } catch (JsonProcessingException ex) {
-            logger.error("Error while serializing operation form data", ex);
+        if (request.getFormData() != null) {
+            try {
+                // Store form data as serialized JSON string.
+                operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
+            } catch (JsonProcessingException ex) {
+                logger.error("Error while serializing operation form data", ex);
+            }
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
@@ -185,7 +188,9 @@ public class OperationPersistenceService {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
-        operation.setUserId(request.getUserId());
+        if (request.getUserId() != null) {
+            operation.setUserId(request.getUserId());
+        }
         if (request.getOrganizationId() != null) {
             Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
             if (!organizationOptional.isPresent()) {
@@ -236,14 +241,19 @@ public class OperationPersistenceService {
         String operationId = request.getOperationId();
         String userId = request.getUserId();
         String organizationId = request.getOrganizationId();
+        UserAccountStatus accountStatus = request.getAccountStatus();
         OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
-        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
-        if (!organizationOptional.isPresent()) {
-            throw new OrganizationNotFoundException("Organization not found: " + organizationId);
+        if (organizationId != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + organizationId);
+            }
+            operation.setOrganization(organizationOptional.get());
         }
-        operation.setOrganization(organizationOptional.get());
-        operation.setUserAccountStatus(request.getAccountStatus());
+        if (accountStatus != null) {
+            operation.setUserAccountStatus(accountStatus);
+        }
         operationRepository.save(operation);
     }
 

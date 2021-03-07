@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for deleting a user identity.
@@ -28,7 +30,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DeleteUserResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     @NotNull
     private UserIdentityStatus userIdentityStatus;

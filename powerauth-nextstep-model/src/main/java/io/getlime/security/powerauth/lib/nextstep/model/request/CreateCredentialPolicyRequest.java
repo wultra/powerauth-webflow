@@ -20,10 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 
 /**
  * Request object used for creating a credential policy.
@@ -42,7 +39,7 @@ public class CreateCredentialPolicyRequest {
     private Integer usernameLengthMin;
     @Positive
     private Integer usernameLengthMax;
-    @Size(min = 1, max = 256)
+    @Size(min = 2, max = 256)
     private String usernameAllowedPattern;
     @Positive
     private Integer credentialLengthMin;
@@ -52,6 +49,7 @@ public class CreateCredentialPolicyRequest {
     private Integer limitSoft;
     @Positive
     private Integer limitHard;
+    @PositiveOrZero
     private int checkHistoryCount;
     private boolean rotationEnabled;
     @Positive

@@ -21,7 +21,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGeneratio
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 /**
  * Response object used for updating a credential policy.
@@ -31,24 +31,39 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateCredentialPolicyResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
+    @Positive
     private Integer usernameLengthMin;
+    @Positive
     private Integer usernameLengthMax;
+    @Size(min = 2, max = 256)
     private String usernameAllowedPattern;
+    @Positive
     private Integer credentialLengthMin;
+    @Positive
     private Integer credentialLengthMax;
+    @Positive
     private Integer limitSoft;
+    @Positive
     private Integer limitHard;
-    private int checkHistoryCount;
-    private boolean rotationEnabled;
-    private Integer rotationDays;
     @NotNull
+    @PositiveOrZero
+    private int checkHistoryCount;
+    @NotNull
+    private boolean rotationEnabled;
+    @Positive
+    private Integer rotationDays;
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String usernameGenAlgorithm;
     @NotNull
     private UsernameGenerationParam usernameGenParam;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
     @NotNull
     private CredentialGenerationParam credentialGenParam;

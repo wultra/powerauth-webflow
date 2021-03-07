@@ -43,6 +43,7 @@ public class CreateStepDefinitionRequest {
     private OperationRequestType operationRequestType;
     private AuthMethod requestAuthMethod;
     private AuthStepResult requestAuthStepResult;
+    @Positive
     private long responsePriority;
     private AuthMethod responseAuthMethod;
     @NotNull

@@ -20,6 +20,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 
 /**
@@ -42,8 +43,11 @@ public class OtpDetail {
     @NotNull
     private String otpValue;
     private String credentialName;
+    @PositiveOrZero
     private int attemptCounter;
+    @PositiveOrZero
     private int failedAttemptCounter;
+    @PositiveOrZero
     private Integer remainingAttempts;
     @NotNull
     private OtpStatus otpStatus;

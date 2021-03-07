@@ -37,7 +37,7 @@ public class UpdateCredentialRequest {
     @Size(min = 2, max = 256)
     private String credentialName;
     private CredentialType credentialType;
-    @Size(min = 2, max = 256)
+    @Size(min = 1, max = 256)
     private String username;
     @Size(min = 1, max = 256)
     private String credentialValue;

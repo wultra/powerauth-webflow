@@ -47,7 +47,7 @@ public class OperationEntity implements Serializable {
     @Column(name = "operation_name", nullable = false)
     private String operationName;
 
-    @Column(name = "operation_form_data", nullable = false)
+    @Column(name = "operation_form_data")
     private String operationFormData;
 
     @Column(name = "operation_data", nullable = false)

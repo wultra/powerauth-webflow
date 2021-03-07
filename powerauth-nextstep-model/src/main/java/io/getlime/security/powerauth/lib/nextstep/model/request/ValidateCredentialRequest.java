@@ -33,7 +33,7 @@ public class ValidateCredentialRequest {
     @NotBlank
     @Size(min = 2, max = 256)
     private String credentialName;
-    @Size(min = 2, max = 256)
+    @Size(min = 1, max = 256)
     private String username;
     @Size(min = 1, max = 256)
     private String credentialValue;

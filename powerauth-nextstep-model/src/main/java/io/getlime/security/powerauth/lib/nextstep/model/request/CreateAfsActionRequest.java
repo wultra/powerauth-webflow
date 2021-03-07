@@ -43,7 +43,6 @@ public class CreateAfsActionRequest {
     @Size(min = 2, max = 256)
     private String requestAfsExtras;
     private boolean afsResponseApplied;
-    @NotBlank
     @Size(min = 2, max = 256)
     private String afsLabel;
     @Size(min = 2, max = 256)

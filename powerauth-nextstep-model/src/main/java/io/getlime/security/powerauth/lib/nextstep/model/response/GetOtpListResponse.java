@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,7 @@ import java.util.List;
 @Data
 public class GetOtpListResponse {
 
+    @Size(min = 1, max = 256)
     private String operationId;
     @NotNull
     private final List<OtpDetail> otpDetails = new ArrayList<>();

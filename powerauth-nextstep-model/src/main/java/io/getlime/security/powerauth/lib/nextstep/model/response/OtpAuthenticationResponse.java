@@ -22,6 +22,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -33,6 +35,7 @@ import java.util.Date;
 public class OtpAuthenticationResponse {
 
     // User ID is null in OTP authentication without user ID
+    @Size(min = 1, max = 256)
     private String userId;
     // User identity status is null in OTP authentication without user ID
     private UserIdentityStatus userIdentityStatus;
@@ -43,8 +46,9 @@ public class OtpAuthenticationResponse {
     private OtpStatus otpStatus;
     @NotNull
     private AuthenticationResult authenticationResult;
-    @NotNull
+    @PositiveOrZero
     private Integer remainingAttempts;
+    @NotNull
     private boolean operationFailed;
 
 }

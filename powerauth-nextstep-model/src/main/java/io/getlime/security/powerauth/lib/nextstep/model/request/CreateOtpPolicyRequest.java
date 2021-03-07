@@ -43,7 +43,7 @@ public class CreateOtpPolicyRequest {
     private Integer attemptLimit;
     @Positive
     private Long expirationTime;
-    @NotNull
+    @NotBlank
     @Size(min = 2, max = 256)
     private String genAlgorithm;
     private OtpGenerationParam genParam = new OtpGenerationParam();

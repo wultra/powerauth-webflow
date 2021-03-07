@@ -21,7 +21,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for creating a step definition.
@@ -31,13 +34,18 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateStepDefinitionResponse {
 
-    private long stepDefinitionId;
     @NotNull
+    @Positive
+    private long stepDefinitionId;
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String operationName;
     @NotNull
     private OperationRequestType operationRequestType;
     private AuthMethod requestAuthMethod;
     private AuthStepResult requestAuthStepResult;
+    @NotNull
+    @Positive
     private long responsePriority;
     private AuthMethod responseAuthMethod;
     @NotNull

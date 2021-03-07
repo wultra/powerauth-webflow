@@ -28,12 +28,16 @@ public class CredentialGenerationParam {
     @Positive
     private int length;
     private boolean includeSmallLetters;
+    @Positive
     private Integer smallLettersCount;
     private boolean includeCapitalLetters;
+    @Positive
     private Integer capitalLettersCount;
     private boolean includeDigits;
+    @Positive
     private Integer digitsCount;
     private boolean includeSpecialChars;
+    @Positive
     private Integer specialCharsCount;
 
 }

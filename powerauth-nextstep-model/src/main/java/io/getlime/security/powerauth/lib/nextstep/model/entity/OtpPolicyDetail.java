@@ -20,6 +20,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -37,8 +39,11 @@ public class OtpPolicyDetail {
     private String otpPolicyName;
     private String description;
     @NotNull
+    @Positive
     private Integer length;
+    @PositiveOrZero
     private Integer attemptLimit;
+    @Positive
     private Long expirationTime;
     private String genAlgorithm;
     @NotNull

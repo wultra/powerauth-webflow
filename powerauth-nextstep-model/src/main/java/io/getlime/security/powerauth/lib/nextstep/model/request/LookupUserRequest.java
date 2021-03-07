@@ -43,7 +43,7 @@ public class LookupUserRequest {
     private final List<String> roles = new ArrayList<>();
 
     // Filter by username and credentialName to allow username -> user ID mapping
-    @Size(min = 2, max = 256)
+    @Size(min = 1, max = 256)
     private String username;
     @Size(min = 2, max = 256)
     private String credentialName;

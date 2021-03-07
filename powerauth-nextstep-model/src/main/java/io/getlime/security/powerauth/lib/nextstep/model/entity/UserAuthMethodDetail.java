@@ -21,6 +21,7 @@ public class UserAuthMethodDetail {
     private AuthMethod authMethod;
     @NotNull
     private Boolean hasUserInterface;
+    @NotNull
     private String displayNameKey;
     @NotNull
     private Boolean hasMobileToken;
