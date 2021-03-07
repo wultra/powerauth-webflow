@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Class representing a generic key-value attribute.
@@ -27,7 +28,8 @@ import javax.validation.constraints.NotNull;
 @Data
 public class KeyValueParameter {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String key;
     private String value;
 

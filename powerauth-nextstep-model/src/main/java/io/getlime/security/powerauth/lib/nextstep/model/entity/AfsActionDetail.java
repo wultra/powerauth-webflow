@@ -17,8 +17,10 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -30,11 +32,14 @@ import java.util.Map;
 @Data
 public class AfsActionDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String action;
     @Positive
     private int stepIndex;
+    @Size(min = 2, max = 256)
     private String afsLabel;
+    @NotNull
     private boolean afsResponseApplied;
     @NotNull
     private final Map<String, Object> requestExtras = new LinkedHashMap<>();

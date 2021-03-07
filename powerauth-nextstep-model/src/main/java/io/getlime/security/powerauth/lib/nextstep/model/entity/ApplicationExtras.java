@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,6 +32,7 @@ public class ApplicationExtras {
 
     @NotNull
     private final List<String> requestedScopes = new ArrayList<>();
+    @Size(min = 2, max = 256)
     private String applicationOwner;
 
 }

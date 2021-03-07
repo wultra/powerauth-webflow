@@ -17,7 +17,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Class represents details of a generated OTP value.
@@ -29,7 +31,8 @@ public class OtpValueDetail {
 
     @NotNull
     private byte[] salt;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String otpValue;
 
 }

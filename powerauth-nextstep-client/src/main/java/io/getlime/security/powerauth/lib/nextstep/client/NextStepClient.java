@@ -121,7 +121,7 @@ public class NextStepClient {
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, @NotNull OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         return createOperation(operationName, null, operationData, null, null, formData, params, applicationContext);
     }
 
@@ -139,7 +139,7 @@ public class NextStepClient {
      * @return A Response with CreateOperationResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, String operationId, @NotNull String operationData, String organizationId, String externalTransactionId, @NotNull OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, String operationId, @NotNull String operationData, String organizationId, String externalTransactionId, OperationFormData formData, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         CreateOperationRequest request = new CreateOperationRequest();
         request.setOperationName(operationName);
         request.setOperationId(operationId);
@@ -166,7 +166,7 @@ public class NextStepClient {
      * @return A Response with CreateOperationResponse object.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, @NotNull OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
+    public ObjectResponse<CreateOperationResponse> createOperation(@NotNull String operationName, @NotNull String operationData, OperationFormData formData, String organizationId, List<KeyValueParameter> params, ApplicationContext applicationContext) throws NextStepClientException {
         return createOperation(operationName, null, operationData, organizationId, null, formData, params, applicationContext);
     }
 

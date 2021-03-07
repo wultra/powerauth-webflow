@@ -17,7 +17,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  * Credential validation parameters.
@@ -25,29 +27,45 @@ import javax.validation.constraints.Positive;
 @Data
 public class CredentialValidationParam {
 
+    @NotNull
     private boolean includeWhitespaceRule;
+    @NotNull
     private boolean includeUsernameRule;
+    @NotNull
     private boolean includeAllowedCharacterRule;
+    @Size(min = 1, max = 256)
     private String allowedChars;
+    @NotNull
     private boolean includeAllowedRegexRule;
+    @Size(min = 1, max = 256)
     private String allowedRegex;
+    @NotNull
     private boolean includeIllegalCharacterRule;
+    @Size(min = 1, max = 256)
     private String illegalChars;
+    @NotNull
     private boolean includeIllegalRegexRule;
+    @Size(min = 1, max = 256)
     private String illegalRegex;
+    @NotNull
     private boolean includeCharacterRule;
+    @NotNull
     private boolean includeSmallLetters;
     @Positive
     private Integer smallLettersMin;
+    @NotNull
     private boolean includeCapitalLetters;
     @Positive
     private Integer capitalLettersMin;
+    @NotNull
     private boolean includeAlphabeticalLetters;
     @Positive
     private Integer alphabeticalLettersMin;
+    @NotNull
     private boolean includeDigits;
     @Positive
     private Integer digitsMin;
+    @NotNull
     private boolean includeSpecialChars;
     @Positive
     private Integer specialCharsMin;

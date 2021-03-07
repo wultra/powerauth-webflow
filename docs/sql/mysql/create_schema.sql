@@ -559,7 +559,7 @@ CREATE INDEX ns_user_alias_user_id ON ns_user_alias (user_id);
 CREATE UNIQUE INDEX ns_credential_definition_name ON ns_credential_definition (name);
 CREATE UNIQUE INDEX ns_otp_definition_name ON ns_otp_definition (name);
 CREATE INDEX ns_credential_storage_user_id ON ns_credential_storage (user_id);
-CREATE INDEX ns_credential_storage_user_name ON ns_credential_storage (user_name);
+CREATE INDEX ns_credential_storage_status ON ns_credential_storage (status);
 CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (credential_definition_id, user_name);
 CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_id, credential_definition_id);
 CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);

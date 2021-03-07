@@ -19,8 +19,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpSt
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -32,16 +34,23 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"otpName", "userId", "otpId"})
 public class OtpDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpName;
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 36, max = 36)
     private String otpId;
+    @Size(min = 1, max = 256)
     private String operationId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String otpData;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String otpValue;
+    @Size(min = 2, max = 256)
     private String credentialName;
     @PositiveOrZero
     private int attemptCounter;

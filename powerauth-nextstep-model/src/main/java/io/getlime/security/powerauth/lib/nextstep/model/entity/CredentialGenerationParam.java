@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 
 /**
@@ -27,15 +28,19 @@ public class CredentialGenerationParam {
 
     @Positive
     private int length;
+    @NotNull
     private boolean includeSmallLetters;
     @Positive
     private Integer smallLettersCount;
+    @NotNull
     private boolean includeCapitalLetters;
     @Positive
     private Integer capitalLettersCount;
+    @NotNull
     private boolean includeDigits;
     @Positive
     private Integer digitsCount;
+    @NotNull
     private boolean includeSpecialChars;
     @Positive
     private Integer specialCharsCount;

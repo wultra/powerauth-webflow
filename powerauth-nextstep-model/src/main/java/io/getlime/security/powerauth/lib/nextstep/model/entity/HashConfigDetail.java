@@ -19,7 +19,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashC
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,12 +35,15 @@ import java.util.Map;
 @EqualsAndHashCode(of = "hashConfigName")
 public class HashConfigDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String hashConfigName;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String algorithm;
     @NotNull
     private HashConfigStatus hashConfigStatus;
+    @NotNull
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;

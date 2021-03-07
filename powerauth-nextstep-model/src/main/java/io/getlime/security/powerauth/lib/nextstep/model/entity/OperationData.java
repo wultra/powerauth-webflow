@@ -4,7 +4,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.data.OperationDat
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -20,9 +22,11 @@ public class OperationData {
 
     public static final int OPERATION_DATA_ATTRIBUTE_COUNT = 5;
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private final String templateVersion;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private final Integer templateId;
     @NotNull
     private final Map<Integer, OperationDataAttribute> attributes = new LinkedHashMap<>();

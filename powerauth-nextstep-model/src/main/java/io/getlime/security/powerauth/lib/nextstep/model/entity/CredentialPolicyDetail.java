@@ -19,9 +19,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.*;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,13 +33,16 @@ import java.util.Map;
 @EqualsAndHashCode(of = "credentialPolicyName")
 public class CredentialPolicyDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
     @Positive
     private Integer usernameLengthMin;
     @Positive
     private Integer usernameLengthMax;
+    @Size(min = 2, max = 256)
     private String usernameAllowedPattern;
     @Positive
     private Integer credentialLengthMin;
@@ -53,14 +54,17 @@ public class CredentialPolicyDetail {
     private Integer limitHard;
     @PositiveOrZero
     private int checkHistoryCount;
+    @NotNull
     private boolean rotationEnabled;
     @Positive
     private Integer rotationDays;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String usernameGenAlgorithm;
     @NotNull
     private Map<String, String> usernameGenParam = new LinkedHashMap<>();
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
     @NotNull
     private Map<String, String> credentialGenParam = new LinkedHashMap<>();
