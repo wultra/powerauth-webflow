@@ -15,12 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Response object used for updating a credential policy.
@@ -46,13 +47,13 @@ public class UpdateCredentialPolicyResponse {
     @NotNull
     private String usernameGenAlgorithm;
     @NotNull
-    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    private UsernameGenerationParam usernameGenParam;
     @NotNull
     private String credentialGenAlgorithm;
     @NotNull
-    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
+    private CredentialGenerationParam credentialGenParam;
     @NotNull
-    private Map<String, String> credentialValParam = new LinkedHashMap<>();
+    private CredentialValidationParam credentialValParam;
     @NotNull
     private CredentialPolicyStatus credentialPolicyStatus;
 

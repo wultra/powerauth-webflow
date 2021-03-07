@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -33,7 +34,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -167,8 +167,8 @@ public class CredentialValidationService {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
         }
         try {
-            Map<String, String> validationRules = parameterConverter.fromString(credentialPolicy.getCredentialValParam());
-            validationFailures.addAll(validateCredentialValueAdvanced(username, credentialValue, validationRules));
+            CredentialValidationParam param = parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class);
+            validationFailures.addAll(validateCredentialValueAdvanced(username, credentialValue, param));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
@@ -179,68 +179,47 @@ public class CredentialValidationService {
      * Execute advanced credential validations based on defined validation rules.
      * @param username Username.
      * @param credentialValue Credential value.
-     * @param param Credential validation rules.
+     * @param param Credential validation parameters.
      * @return List of validation failures.
      * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
      */
-    private List<CredentialValidationFailure> validateCredentialValueAdvanced(String username, String credentialValue, Map<String, String> param) throws InvalidConfigurationException {
+    private List<CredentialValidationFailure> validateCredentialValueAdvanced(String username, String credentialValue, CredentialValidationParam param) throws InvalidConfigurationException {
         List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         List<Rule> rules = new ArrayList<>();
         try {
-            if ("true".equals(param.get("includeWhitespaceRule"))) {
+            if (param.isIncludeWhitespaceRule()) {
                 rules.add(new WhitespaceRule());
             }
-            if ("true".equals(param.get("includeUsernameRule"))) {
+            if (param.isIncludeUsernameRule()) {
                 rules.add(new UsernameRule(true, true));
             }
-            if ("true".equals(param.get("includeAllowedCharacterRule"))) {
-                String allowedChars = param.get("allowedChars");
+            if (param.isIncludeAllowedCharacterRule()) {
+                String allowedChars = param.getAllowedChars();
                 rules.add(new AllowedCharacterRule(allowedChars.toCharArray()));
             }
-            if ("true".equals(param.get("includeAllowedRegexRule"))) {
-                String allowedRegex = param.get("allowedRegex");
+            if (param.isIncludeAllowedRegexRule()) {
+                String allowedRegex = param.getAllowedRegex();
                 rules.add(new AllowedRegexRule(allowedRegex));
             }
-            if ("true".equals(param.get("includeIllegalCharacterRule"))) {
-                String illegalChars = param.get("illegalChars");
+            if (param.isIncludeIllegalCharacterRule()) {
+                String illegalChars = param.getIllegalChars();
                 rules.add(new IllegalCharacterRule(illegalChars.toCharArray()));
             }
-            if ("true".equals(param.get("includeIllegalRegexRule"))) {
-                String illegalRegex = param.get("illegalRegex");
+            if (param.isIncludeIllegalRegexRule()) {
+                String illegalRegex = param.getIllegalRegex();
                 rules.add(new IllegalRegexRule(illegalRegex));
             }
-            if ("true".equals(param.get("includeCharacterRule"))) {
-                boolean includeSmallLetters = "true".equals(param.get("includeSmallLetters"));
-                String paramMinSmallLetters = param.get("smallLettersMin");
-                Integer smallLettersMin = null;
-                if (paramMinSmallLetters != null) {
-                    smallLettersMin = Integer.parseInt(paramMinSmallLetters);
-                }
-                boolean includeCapitalLetters = "true".equals(param.get("includeCapitalLetters"));
-                String paramMinCapitalLetters = param.get("capitalLettersMin");
-                Integer capitalLettersMin = null;
-                if (paramMinCapitalLetters != null) {
-                    capitalLettersMin = Integer.parseInt(paramMinCapitalLetters);
-                }
-                boolean includeAlphabeticalLetters = "true".equals(param.get("includeAlphabeticalLetters"));
-                String paramMinAlphabeticalLetters = param.get("alphabeticalLettersMin");
-                Integer alphabeticalLettersMin = null;
-                if (paramMinAlphabeticalLetters != null) {
-                    alphabeticalLettersMin = Integer.parseInt(paramMinAlphabeticalLetters);
-                }
-
-                boolean includeDigits = "true".equals(param.get("includeDigits"));
-                String paramDigitsMin = param.get("digitsMin");
-                Integer digitsMin = null;
-                if (paramDigitsMin != null) {
-                    digitsMin = Integer.parseInt(paramDigitsMin);
-                }
-                boolean includeSpecialChars = "true".equals(param.get("includeSpecialChars"));
-                String paramSpecialCharsMin = param.get("specialCharsMin");
-                Integer specialCharsMin = null;
-                if (paramSpecialCharsMin != null) {
-                    specialCharsMin = Integer.parseInt(paramSpecialCharsMin);
-                }
+            if (param.isIncludeCharacterRule()) {
+                boolean includeSmallLetters = param.isIncludeSmallLetters();
+                Integer smallLettersMin = param.getSmallLettersMin();
+                boolean includeCapitalLetters = param.isIncludeCapitalLetters();
+                Integer capitalLettersMin = param.getCapitalLettersMin();
+                boolean includeAlphabeticalLetters = param.isIncludeAlphabeticalLetters();
+                Integer alphabeticalLettersMin = param.getAlphabeticalLettersMin();
+                boolean includeDigits = param.isIncludeDigits();
+                Integer digitsMin = param.getDigitsMin();
+                boolean includeSpecialChars = param.isIncludeSpecialChars();
+                Integer specialCharsMin = param.getSpecialCharsMin();
                 if (includeSmallLetters) {
                     CharacterRule rule;
                     if (smallLettersMin == null) {

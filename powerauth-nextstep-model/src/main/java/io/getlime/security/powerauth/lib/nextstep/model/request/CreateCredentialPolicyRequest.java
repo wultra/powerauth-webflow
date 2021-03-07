@@ -15,14 +15,15 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Request object used for creating a credential policy.
@@ -59,14 +60,14 @@ public class CreateCredentialPolicyRequest {
     @Size(min = 2, max = 256)
     private String usernameGenAlgorithm;
     @NotNull
-    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    private UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
     @NotBlank
     @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
     @NotNull
-    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
+    private CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
     @NotNull
-    private Map<String, String> credentialValParam = new LinkedHashMap<>();
+    private CredentialValidationParam credentialValParam = new CredentialValidationParam();
 
 }
 

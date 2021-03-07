@@ -17,6 +17,9 @@ package io.getlime.security.powerauth.app.nextstep.configuration;
 
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -146,9 +149,16 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
         credentialPolicyRequest.setUsernameGenAlgorithm("DEFAULT");
+        UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
+        usernameGenParam.setLength(8);
+        credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
         credentialPolicyRequest.setCredentialLengthMin(6);
         credentialPolicyRequest.setCredentialLengthMax(30);
         credentialPolicyRequest.setCredentialGenAlgorithm("DEFAULT");
+        CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
+        credentialGenParam.setLength(10);
+        credentialPolicyRequest.setCredentialGenParam(credentialGenParam);
+        credentialPolicyRequest.setCredentialValParam(new CredentialValidationParam());
         nextStepClient.createCredentialPolicy(credentialPolicyRequest);
 
         // Create credential definition

@@ -15,14 +15,15 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Request object used for updating a credential policy.
@@ -57,11 +58,11 @@ public class UpdateCredentialPolicyRequest {
     private Integer rotationDays;
     @Size(min = 2, max = 256)
     private String usernameGenAlgorithm;
-    private Map<String, String> usernameGenParam = new LinkedHashMap<>();
+    private UsernameGenerationParam usernameGenParam;
     @Size(min = 2, max = 256)
     private String credentialGenAlgorithm;
-    private Map<String, String> credentialGenParam = new LinkedHashMap<>();
-    private Map<String, String> credentialValParam = new LinkedHashMap<>();
+    private CredentialGenerationParam credentialGenParam;
+    private CredentialValidationParam credentialValParam;
     private CredentialPolicyStatus credentialPolicyStatus;
 
 }

@@ -95,18 +95,18 @@ public class CredentialPolicyService {
         credentialPolicy.setRotationDays(request.getRotationDays());
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         try {
-            credentialPolicy.setUsernameGenParam(parameterConverter.fromMap(request.getUsernameGenParam()));
+            credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
         credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
         try {
-            credentialPolicy.setCredentialGenParam(parameterConverter.fromMap(request.getCredentialGenParam()));
+            credentialPolicy.setCredentialGenParam(parameterConverter.fromObject(request.getCredentialGenParam()));
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
         try {
-            credentialPolicy.setCredentialValParam(parameterConverter.fromMap(request.getCredentialValParam()));
+            credentialPolicy.setCredentialValParam(parameterConverter.fromObject(request.getCredentialValParam()));
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
@@ -169,7 +169,7 @@ public class CredentialPolicyService {
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         if (request.getUsernameGenParam() != null) {
             try {
-                credentialPolicy.setUsernameGenParam(parameterConverter.fromMap(request.getUsernameGenParam()));
+                credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
             }
@@ -177,14 +177,14 @@ public class CredentialPolicyService {
         credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
         if (request.getCredentialGenParam() != null) {
             try {
-                credentialPolicy.setCredentialGenParam(parameterConverter.fromMap(request.getCredentialGenParam()));
+                credentialPolicy.setCredentialGenParam(parameterConverter.fromObject(request.getCredentialGenParam()));
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
         if (request.getCredentialGenParam() != null) {
             try {
-                credentialPolicy.setCredentialValParam(parameterConverter.fromMap(request.getCredentialValParam()));
+                credentialPolicy.setCredentialValParam(parameterConverter.fromObject(request.getCredentialValParam()));
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
             }

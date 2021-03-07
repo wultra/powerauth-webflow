@@ -15,12 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Response object used for updating an OTP policy.
@@ -40,7 +39,7 @@ public class UpdateOtpPolicyResponse {
     @NotNull
     private String genAlgorithm;
     @NotNull
-    private Map<String, String> genParam = new LinkedHashMap<>();
+    private OtpGenerationParam genParam;
     @NotNull
     private OtpPolicyStatus otpPolicyStatus;
 

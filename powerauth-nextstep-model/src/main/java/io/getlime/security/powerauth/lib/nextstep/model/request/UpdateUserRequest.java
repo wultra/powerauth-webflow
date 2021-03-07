@@ -24,8 +24,6 @@ import lombok.Data;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -43,13 +41,13 @@ public class UpdateUserRequest {
 
     private UserIdentityStatus userIdentityStatus;
 
-    private final Map<String, Object> extras = new LinkedHashMap<>();
+    private Map<String, Object> extras;
 
-    private final List<String> roles = new ArrayList<>();
+    private List<String> roles;
 
-    private final List<UpdatedContact> contacts = new ArrayList<>();
+    private List<UpdatedContact> contacts;
 
-    private final List<UpdatedCredential> credentials = new ArrayList<>();
+    private List<UpdatedCredential> credentials;
 
     @Data
     public static class UpdatedContact {

@@ -20,7 +20,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -40,7 +39,7 @@ public class UpdateUserAliasRequest {
     @NotBlank
     @Size(min = 2, max = 256)
     private String aliasValue;
-    private final Map<String, Object> extras = new LinkedHashMap<>();
+    private Map<String, Object> extras;
     private UserAliasStatus userAliasStatus;
 
 }

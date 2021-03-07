@@ -22,6 +22,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import org.passay.CharacterData;
 import org.passay.CharacterRule;
@@ -35,7 +37,6 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -137,17 +138,13 @@ public class CredentialGenerationService {
      */
     private String generateRandomUsernameWithDigits(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        Map<String, String> param;
+        UsernameGenerationParam param;
         try {
-            param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
+            param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        String paramLength = param.get("length");
-        if (paramLength == null) {
-            throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_DIGITS");
-        }
-        int length = Integer.parseInt(paramLength);
+        int length = param.getLength();
         SecureRandom secureRandom = new SecureRandom();
         int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
         for (int i = 0; i < generateUsernameMaxAttempts; i++) {
@@ -176,17 +173,13 @@ public class CredentialGenerationService {
      */
     private String generateRandomUsernameWithLetters(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        Map<String, String> param;
+        UsernameGenerationParam param;
         try {
-            param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam());
+            param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        String paramLength = param.get("length");
-        if (paramLength == null) {
-            throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_LETTERS");
-        }
-        int length = Integer.parseInt(paramLength);
+        int length = param.getLength();
         SecureRandom secureRandom = new SecureRandom();
         int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
         for (int i = 0; i < generateUsernameMaxAttempts; i++) {
@@ -213,44 +206,32 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomPassword(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
-        Map<String, String> param;
+        CredentialGenerationParam param;
         try {
-            param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
+            param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        String paramLength = param.get("length");
-        if (paramLength == null) {
-            throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PASSWORD");
-        }
-        int length = Integer.parseInt(paramLength);
+        int length = param.getLength();
         int countFromRules = 0;
-        boolean includeSmallLetters = "true".equals(param.get("includeSmallLetters"));
-        String paramMinSmallLetters = param.get("smallLettersCount");
-        Integer smallLettersCount = null;
-        if (paramMinSmallLetters != null) {
-            smallLettersCount = Integer.parseInt(paramMinSmallLetters);
+        boolean includeSmallLetters = param.isIncludeSmallLetters();
+        Integer smallLettersCount = param.getSmallLettersCount();
+        if (smallLettersCount != null) {
             countFromRules += smallLettersCount;
         }
-        boolean includeCapitalLetters = "true".equals(param.get("includeCapitalLetters"));
-        String paramMinCapitalLetters = param.get("capitalLettersCount");
-        Integer capitalLettersCount = null;
-        if (paramMinCapitalLetters != null) {
-            capitalLettersCount = Integer.parseInt(paramMinCapitalLetters);
+        boolean includeCapitalLetters = param.isIncludeCapitalLetters();
+        Integer capitalLettersCount = param.getCapitalLettersCount();
+        if (capitalLettersCount != null) {
             countFromRules += capitalLettersCount;
         }
-        boolean includeDigits = "true".equals(param.get("includeDigits"));
-        String paramDigitsCount = param.get("digitsCount");
-        Integer digitsCount = null;
-        if (paramDigitsCount != null) {
-            digitsCount = Integer.parseInt(paramDigitsCount);
+        boolean includeDigits = param.isIncludeDigits();
+        Integer digitsCount = param.getDigitsCount();
+        if (digitsCount != null) {
             countFromRules += digitsCount;
         }
-        boolean includeSpecialChars = "true".equals(param.get("includeSpecialChars"));
-        String paramSpecialCharsCount = param.get("specialCharsCount");
-        Integer specialCharsCount = null;
-        if (paramSpecialCharsCount != null) {
-            specialCharsCount = Integer.parseInt(paramSpecialCharsCount);
+        boolean includeSpecialChars = param.isIncludeSpecialChars();
+        Integer specialCharsCount = param.getSpecialCharsCount();
+        if (specialCharsCount != null) {
             countFromRules += specialCharsCount;
         }
         if (!includeSmallLetters && !includeCapitalLetters && !includeDigits && !includeSpecialChars) {
@@ -307,17 +288,13 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomPin(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
-        Map<String, String> param;
+        CredentialGenerationParam param;
         try {
-            param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam());
+            param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        String paramLength = param.get("length");
-        if (paramLength == null) {
-            throw new InvalidConfigurationException("Parameter length is missing for algorithm RANDOM_PIN");
-        }
-        int length = Integer.parseInt(paramLength);
+        int length = param.getLength();
         PasswordGenerator passwordGenerator = new PasswordGenerator();
         return passwordGenerator.generatePassword(length, new CharacterRule(EnglishCharacterData.Digit));
     }

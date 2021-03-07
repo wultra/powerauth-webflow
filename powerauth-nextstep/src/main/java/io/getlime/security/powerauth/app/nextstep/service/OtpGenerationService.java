@@ -60,7 +60,7 @@ public class OtpGenerationService {
                 }
                 break;
 
-            case "OTP_RANDOM_DIGIT_PAIRS":
+            case "OTP_RANDOM_DIGIT_GROUPS":
                 // TODO - implement algorithm
             default:
                 throw new OtpGenAlgorithmNotSupportedException("OTP generation algorithm is not supported: " + otpGenAlgorithm);

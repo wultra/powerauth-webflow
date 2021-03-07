@@ -15,14 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 /**
  * Request object used for creating an OTP policy.
@@ -47,7 +46,6 @@ public class CreateOtpPolicyRequest {
     @NotNull
     @Size(min = 2, max = 256)
     private String genAlgorithm;
-    @NotNull
-    private Map<String, String> genParam = new LinkedHashMap<>();
+    private OtpGenerationParam genParam = new OtpGenerationParam();
 
 }

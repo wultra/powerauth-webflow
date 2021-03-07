@@ -88,7 +88,7 @@ public class OtpPolicyService {
         otpPolicy.setAttemptLimit(request.getAttemptLimit());
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
         try {
-            otpPolicy.setGenParam(parameterConverter.fromMap(request.getGenParam()));
+            otpPolicy.setGenParam(parameterConverter.fromObject(request.getGenParam()));
         } catch (JsonProcessingException ex) {
             throw new InvalidRequestException(ex);
         }
@@ -134,7 +134,7 @@ public class OtpPolicyService {
         otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
         if (request.getGenParam() != null) {
             try {
-                otpPolicy.setGenParam(parameterConverter.fromMap(request.getGenParam()));
+                otpPolicy.setGenParam(parameterConverter.fromObject(request.getGenParam()));
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
             }

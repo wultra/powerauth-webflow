@@ -40,11 +40,31 @@ public class ParameterConverter {
     }
 
     /**
-     * Convert parameters from String to Map.
+     * Convert parameters from String to Object.
+     * @param param Parameters serialized as string.
+     * @param clazz Parameter type.
+     * @return Object with deserialized parameters.
+     */
+    public <T> T fromString(String param, Class<T> clazz) throws JsonProcessingException {
+        return objectMapper.readValue(param, clazz);
+    }
+
+    /**
+     * Convert parameters from Map to String.
      * @param paramMap Parameters map.
      * @return String with serialized parameters.
      */
     public String fromMap(Map<String, String> paramMap) throws JsonProcessingException {
         return objectMapper.writeValueAsString(paramMap);
     }
+
+    /**
+     * Convert parameters from Object to String.
+     * @param object Parameters object.
+     * @return String with serialized parameters.
+     */
+    public String fromObject(Object object) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(object);
+    }
+
 }
