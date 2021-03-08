@@ -40,6 +40,9 @@ public class UpdateUserContactRequest {
     private ContactType contactType;
     @NotBlank
     @Size(min = 2, max = 256)
-    private String contactValue;
+    private String originalContactValue;
+    @NotBlank
+    @Size(min = 2, max = 256)
+    private String newContactValue;
     private boolean primary;
 }

@@ -50,6 +50,7 @@ public class UserIdentityService {
 
     private final UserIdentityRepository userIdentityRepository;
     private final UserIdentityHistoryRepository userIdentityHistoryRepository;
+    private final UserContactService userContactService;
     private final UserContactRepository userContactRepository;
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
@@ -68,6 +69,7 @@ public class UserIdentityService {
      * Service constructor.
      * @param userIdentityRepository User identity repository.
      * @param userIdentityHistoryRepository User identity history repository.
+     * @param userContactService User contact service.
      * @param userContactRepository User contact repository.
      * @param roleRepository Role repository.
      * @param userRoleRepository User role repository.
@@ -78,9 +80,10 @@ public class UserIdentityService {
      * @param credentialService Credential service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactService userContactService, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
         this.userIdentityRepository = userIdentityRepository;
         this.userIdentityHistoryRepository = userIdentityHistoryRepository;
+        this.userContactService = userContactService;
         this.userContactRepository = userContactRepository;
         this.roleRepository = roleRepository;
         this.userRoleRepository = userRoleRepository;
@@ -659,6 +662,8 @@ public class UserIdentityService {
                 userContactRepository.delete(contactEntity);
             }
         });
+        // Ensure primary contacts are unique
+        userContactService.ensurePrimaryContactsAreUnique(user);
         return contactListResponse;
     }
 

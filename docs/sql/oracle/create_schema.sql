@@ -572,6 +572,7 @@ CREATE UNIQUE INDEX ns_application_name ON ns_application (name);
 CREATE UNIQUE INDEX ns_credential_policy_name ON ns_credential_policy (name);
 CREATE UNIQUE INDEX ns_otp_policy_name ON ns_otp_policy (name);
 CREATE INDEX ns_user_contact_user_id ON ns_user_contact (user_id);
+CREATE INDEX ns_user_contact_query ON ns_user_contact (user_id, name, type);
 CREATE INDEX ns_user_identity_status ON ns_user_identity (status);
 CREATE INDEX ns_user_identity_created ON ns_user_identity (timestamp_created);
 CREATE INDEX ns_user_identity_history_user ON ns_user_identity_history (user_id);
@@ -596,7 +597,6 @@ CREATE INDEX ns_authentication_timestamp_created ON ns_authentication (timestamp
 CREATE INDEX ns_audit_log_created ON ns_audit_log (timestamp_created);
 CREATE UNIQUE INDEX ns_hashing_config_name ON ns_hashing_config (name);
 CREATE UNIQUE INDEX ns_user_alias_unique ON ns_user_alias (user_id, name);
-CREATE UNIQUE INDEX ns_user_contact_unique ON ns_user_contact (user_id, name);
 CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
