@@ -17,13 +17,13 @@ import java.util.Map;
 @Data
 public class UserAuthMethodDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     @NotNull
     private AuthMethod authMethod;
     @NotNull
     private Boolean hasUserInterface;
-    @NotBlank
     @Size(min = 1, max = 256)
     private String displayNameKey;
     @NotNull

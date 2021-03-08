@@ -51,7 +51,7 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "request_auth_instruments")
     private String requestAuthInstruments;
 
-    @Column(name = "request_params")
+    @Column(name = "request_params", length = 4096)
     private String requestParams;
 
     @Column(name = "response_result", nullable = false)
@@ -61,7 +61,7 @@ public class OperationHistoryEntity implements Serializable {
     @Column(name = "response_result_description")
     private String responseResultDescription;
 
-    @Column(name = "response_steps")
+    @Column(name = "response_steps", length = 4096)
     private String responseSteps;
 
     @Column(name = "response_timestamp_created", nullable = false)

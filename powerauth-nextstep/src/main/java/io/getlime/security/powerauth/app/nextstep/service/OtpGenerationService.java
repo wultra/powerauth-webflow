@@ -15,9 +15,12 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import io.getlime.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
 import io.getlime.security.powerauth.crypto.server.util.DataDigest;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpGenAlgorithmNotSupportedException;
@@ -25,7 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * This service handles persistence of one time passwords.
@@ -36,6 +42,8 @@ import java.util.Collections;
 public class OtpGenerationService {
 
     private final Logger logger = LoggerFactory.getLogger(OtpGenerationService.class);
+
+    private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Generate an OTP value using algorithm specified in OTP policy.
@@ -58,13 +66,46 @@ public class OtpGenerationService {
                 } catch (GenericCryptoException ex) {
                     throw new InvalidConfigurationException("OTP generation failed, error: " + ex.getMessage());
                 }
-                break;
+                return otpValueDetail;
 
             case "OTP_RANDOM_DIGIT_GROUPS":
-                // TODO - implement algorithm
+                OtpGenerationParam otpGenerationParam;
+                try {
+                    otpGenerationParam = parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class);
+                } catch (JsonProcessingException ex) {
+                    throw new InvalidConfigurationException(ex);
+                }
+                int groupSize = otpGenerationParam.getGroupSize();
+                if (length % groupSize != 0) {
+                    throw new InvalidConfigurationException("Invalid configuration of algorithm OTP_RANDOM_DIGIT_GROUPS, group size does not divide OTP length without remainder");
+                }
+                int groupCount = length / groupSize;
+                SecureRandom secureRandomSeed = new SecureRandom();
+                // Generate random seed
+                byte[] seed = secureRandomSeed.generateSeed(16);
+                SecureRandom secureRandom = new SecureRandom(seed);
+                // Store used seed as salt
+                otpValueDetail.setSalt(seed);
+                int groupLimit = (int) Math.pow(10, groupSize);
+                Set<String> groups = new LinkedHashSet<>();
+                while (groups.size() < groupCount) {
+                    int randomInt = secureRandom.nextInt(groupLimit);
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(randomInt);
+                    while (sb.length() < groupSize) {
+                        sb.insert(0, "0");
+                    }
+                    groups.add(sb.toString());
+                }
+                StringBuilder otpBuilder = new StringBuilder();
+                for (String g : groups) {
+                    otpBuilder.append(g);
+                }
+                otpValueDetail.setOtpValue(otpBuilder.toString());
+                return otpValueDetail;
+
             default:
                 throw new OtpGenAlgorithmNotSupportedException("OTP generation algorithm is not supported: " + otpGenAlgorithm);
         }
-        return otpValueDetail;
     }
 }

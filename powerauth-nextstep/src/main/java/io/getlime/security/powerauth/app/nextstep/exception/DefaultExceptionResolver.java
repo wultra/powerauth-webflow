@@ -51,7 +51,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in Next Step server", t);
-        Error error = new Error(Error.Code.ERROR_GENERIC, "Unknown error occurred");
+        Error error = new Error(Error.Code.ERROR_GENERIC, "Unknown error occurred, cause: " + t.getMessage());
         return new ErrorResponse(error);
     }
 
@@ -64,7 +64,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(InvalidRequestException.CODE, "Invalid request data.");
+        Error error = new Error(InvalidRequestException.CODE, "Invalid request data, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
 
@@ -219,7 +219,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestException(InvalidRequestException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(InvalidRequestException.CODE, "Request data is invalid.");
+        Error error = new Error(InvalidRequestException.CODE, "Request data is invalid, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
 
@@ -232,7 +232,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidConfigurationException(InvalidConfigurationException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(InvalidConfigurationException.CODE, "Next Step configuration is invalid.");
+        Error error = new Error(InvalidConfigurationException.CODE, "Next Step configuration is invalid, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
 
@@ -673,7 +673,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpGenAlgorithmNotSupportedException(OtpGenAlgorithmNotSupportedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(OtpGenAlgorithmNotSupportedException.CODE, "OTP generation algorithm is not supported.");
+        Error error = new Error(OtpGenAlgorithmNotSupportedException.CODE, "One time password generation algorithm is not supported.");
         return new ErrorResponse(error);
     }
 

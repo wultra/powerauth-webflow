@@ -258,8 +258,11 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
             List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
             for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
-                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
-                response.addOrganization(organization);
+                // Show only organizations which have a display name key set to avoid broken UI
+                if (nsResponse.getDisplayNameKey() != null) {
+                    OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
+                    response.addOrganization(organization);
+                }
             }
         } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);

@@ -19,7 +19,7 @@ CREATE TABLE oauth_client_details (
   authorities             VARCHAR(256),
   access_token_validity   INTEGER,
   refresh_token_validity  INTEGER,
-  additional_information  VARCHAR(4000),
+  additional_information  VARCHAR(4096),
   autoapprove             VARCHAR(256)
 );
 
@@ -142,10 +142,10 @@ CREATE TABLE ns_operation_history (
   request_auth_method         VARCHAR(32) NOT NULL,
   request_auth_instruments    VARCHAR(256),
   request_auth_step_result    VARCHAR(32) NOT NULL,
-  request_params              VARCHAR(4000),
+  request_params              VARCHAR(4096),
   response_result             VARCHAR(32) NOT NULL,
   response_result_description VARCHAR(256),
-  response_steps              VARCHAR(4000),
+  response_steps              VARCHAR(4096),
   response_timestamp_created  TIMESTAMP,
   response_timestamp_expires  TIMESTAMP,
   chosen_auth_method          VARCHAR(32),
@@ -207,8 +207,8 @@ CREATE TABLE wf_afs_config (
 CREATE TABLE wf_certificate_verification (
   operation_id               VARCHAR(256) NOT NULL,
   auth_method                VARCHAR(32) NOT NULL,
-  client_certificate_issuer  VARCHAR(4000) NOT NULL,
-  client_certificate_subject VARCHAR(4000) NOT NULL,
+  client_certificate_issuer  VARCHAR(4096) NOT NULL,
+  client_certificate_subject VARCHAR(4096) NOT NULL,
   client_certificate_sn      VARCHAR(256) NOT NULL,
   operation_data             TEXT NOT NULL,
   timestamp_created          TIMESTAMP NOT NULL,

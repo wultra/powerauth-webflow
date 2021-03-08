@@ -15,9 +15,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep;
 
-import io.getlime.security.powerauth.app.nextstep.configuration.NextStepClientFactory;
-import io.getlime.security.powerauth.app.nextstep.configuration.NextStepTestConfiguration;
-import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
@@ -32,32 +29,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.junit.Assert.*;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "classpath:application-test.properties")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class NextStepAuthenticationTest {
-
-    private NextStepClient nextStepClient;
-
-    @Autowired
-    private NextStepClientFactory nextStepClientFactory;
-
-    @Autowired
-    private NextStepTestConfiguration nextStepTestConfiguration;
-
-    @LocalServerPort
-    private int port;
+public class NextStepAuthenticationTest extends NextStepTest {
 
     @Before
     public void setUp() throws Exception {

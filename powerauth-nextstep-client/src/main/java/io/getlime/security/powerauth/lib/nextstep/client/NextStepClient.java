@@ -446,7 +446,7 @@ public class NextStepClient {
      * @return Response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public Response createAfsAction(@NotNull String operationId, @NotNull String afsAction, int stepIndex, String requestAfsExtras, @NotNull String afsLabel,
+    public Response createAfsAction(@NotNull String operationId, @NotNull String afsAction, int stepIndex, String requestAfsExtras, String afsLabel,
                                     boolean afsResponseApplied, String responseAfsExtras) throws NextStepClientException {
         CreateAfsActionRequest request = new CreateAfsActionRequest();
         request.setOperationId(operationId);
@@ -664,7 +664,7 @@ public class NextStepClient {
      * @return List of globally enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsForUser(@NotNull String userId) throws NextStepClientException {
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsForUser(String userId) throws NextStepClientException {
         GetUserAuthMethodsRequest request = new GetUserAuthMethodsRequest();
         request.setUserId(userId);
         return postObjectImpl("/user/auth-method/list", new ObjectRequest<>(request), GetUserAuthMethodsResponse.class);
