@@ -26,16 +26,14 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthorizationOtpResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
@@ -112,13 +110,21 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        if (operation.getUserId() == null) {
-            // Fake OTP authentication
-            logger.info("Step authentication failed with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            throw new AuthenticationFailedException("SMS authorization failed", "login.authenticationFailed");
-        }
-        final String otpId = getOtpIdFromHttpSession();
         try {
+            if (operation.getUserId() == null) {
+                // Fake OTP authentication, pretend 2FA authentication failure
+                logger.info("Step authentication failed with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                List<AuthInstrument> authInstruments = new ArrayList<>();
+                authInstruments.add(AuthInstrument.OTP_KEY);
+                authInstruments.add(AuthInstrument.CREDENTIAL);
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), null, authInstruments, null);
+                if (response.getAuthResult() == AuthResult.FAILED) {
+                    // FAILED result instead of CONTINUE means the authentication method is failed
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                }
+                throw new AuthenticationFailedException("Authentication failed", "login.authenticationFailed");
+            }
+            final String otpId = getOtpIdFromHttpSession();
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
             if (organization.getDefaultOtpName() == null) {
                 logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
