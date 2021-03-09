@@ -118,7 +118,9 @@ CREATE TABLE ns_organization (
   organization_id          VARCHAR(256) PRIMARY KEY NOT NULL, -- ID of organization.
   display_name_key         VARCHAR(256),                      -- Localization key for the organization display name.
   is_default               BOOLEAN NOT NULL,                  -- Flag indicating if this organization is the default.
-  order_number             INTEGER NOT NULL                   -- Ordering column for this organization, incrementing value, starts with 1.
+  order_number             INTEGER NOT NULL,                  -- Ordering column for this organization, incrementing value, starts with 1.
+  default_credential_name  VARCHAR(256),                      -- Default name of credential definition for authentication using Next Step.
+  default_otp_name         VARCHAR(256)                       -- Default name of OTP definition for authentication using Next Step.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.

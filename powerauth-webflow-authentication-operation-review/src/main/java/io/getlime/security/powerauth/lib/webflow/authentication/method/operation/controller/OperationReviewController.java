@@ -42,7 +42,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.request.UpdateOperationFormDataRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
@@ -100,12 +100,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected AuthenticationResult authenticate(OperationReviewRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(OperationReviewRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         //TODO: Check pre-authenticated user here
         logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-        return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
     }
 
     /**
@@ -303,10 +303,10 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      */
     private OperationFormData decorateFormData(GetOperationDetailResponse operation) {
         OperationFormData formDataNS = operation.getFormData();
-        if (formDataNS==null || operation.getUserId()==null) {
-            return formDataNS;
+        if (formDataNS == null) {
+            return null;
         }
-        if (!formDataNS.isDynamicDataLoaded()) {
+        if (!formDataNS.isDynamicDataLoaded() && operation.getUserId() != null) {
             // Dynamic data has not been loaded yet. At this point the user is authenticated, so we can
             // load dynamic data based on user id. For now dynamic data contains the bank account list,
             // however it can be easily extended in the future.

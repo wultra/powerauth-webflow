@@ -139,7 +139,9 @@ CREATE TABLE ns_organization (
   organization_id          VARCHAR2(256 CHAR) PRIMARY KEY NOT NULL,   -- ID of organization.
   display_name_key         VARCHAR2(256 CHAR),                        -- Localization key for the organization display name.
   is_default               NUMBER(1) DEFAULT 0 NOT NULL,              -- Flag indicating if this organization is the default.
-  order_number             INTEGER NOT NULL                           -- Ordering column for this organization, incrementing value, starts with 1.
+  order_number             INTEGER NOT NULL,                          -- Ordering column for this organization, incrementing value, starts with 1.
+  default_credential_name  VARCHAR2(256 CHAR),                        -- Default name of credential definition for authentication using Next Step.
+  default_otp_name         VARCHAR2(256 CHAR)                         -- Default name of OTP definition for authentication using Next Step.
 );
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.

@@ -49,6 +49,10 @@ public class OtpAuthenticationResponse {
     @PositiveOrZero
     private Integer remainingAttempts;
     @NotNull
+    private boolean showRemainingAttempts;
+    @Size(min = 2, max = 256)
+    private String errorMessage;
+    @NotNull
     private boolean operationFailed;
 
 }

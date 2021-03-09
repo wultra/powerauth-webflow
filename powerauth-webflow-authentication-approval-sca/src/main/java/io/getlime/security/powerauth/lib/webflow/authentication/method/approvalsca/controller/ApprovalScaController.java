@@ -32,15 +32,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContex
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.request.ApprovalScaInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.approvalsca.model.response.ApprovalScaInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
@@ -79,9 +78,8 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
     private final AuthenticationManagementService authenticationManagementService;
     private final CertificateVerificationRepository certificateVerificationRepository;
     private final HttpSession httpSession;
-    private final WebFlowServicesConfiguration config;
 
-    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -91,17 +89,15 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
      * @param authenticationManagementService Authentication management service.
      * @param certificateVerificationRepository Certificate verification repository.
      * @param httpSession HTTP session.
-     * @param config Web Flow services configuration.
      */
     @Autowired
-    public ApprovalScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, CertificateVerificationRepository certificateVerificationRepository, HttpSession httpSession, WebFlowServicesConfiguration config) {
+    public ApprovalScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, CertificateVerificationRepository certificateVerificationRepository, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
         this.authenticationManagementService = authenticationManagementService;
         this.certificateVerificationRepository = certificateVerificationRepository;
         this.httpSession = httpSession;
-        this.config = config;
     }
 
     /**
@@ -124,7 +120,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         if (isCertificateUsedForAuthentication(operation.getOperationId())) {
             String clientCertificate = getClientCertificateFromHttpSession();
             FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
+            AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getAccountStatus());
             ApplicationContext applicationContext = operation.getApplicationContext();
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
             try {
@@ -300,15 +296,19 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
         }
         logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        UpdateOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
-        if (response.getResult() == AuthResult.FAILED) {
+        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
+        if (response.getAuthResult() == AuthResult.FAILED) {
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
         Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
         boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
-        String errorMessage = certResponse.getErrorMessage();
-        UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(certResponse.getAccountStatus());
+        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
+
+        String errorMessage = "login.authenticationFailed";
+        if (certResponse.getErrorMessage() != null) {
+            errorMessage = certResponse.getErrorMessage();
+        }
 
         AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
         if (showRemainingAttempts) {

@@ -32,8 +32,12 @@ INSERT INTO ns_operation_config (operation_name, template_version, template_id, 
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, 0, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
 -- organization configuration
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number, default_credential_name, default_otp_name) VALUES ('RETAIL', 'organization.retail', 1, 1, 'RETAIL_CREDENTIAL', 'RETAIL_OTP');
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number, default_credential_name, default_otp_name) VALUES ('SME', 'organization.sme', 0, 2, 'SME_CREDENTIAL', 'SME_OTP');
+
+-- sample Next Step application configuration
+INSERT INTO ns_application (name, description, status, organization_id, timestamp_created) values ('RETAIL_APP', 'Sample retail application', 'ACTIVE', 'RETAIL', CURRENT_TIMESTAMP);
+INSERT INTO ns_application (name, description, status, organization_id, timestamp_created) values ('SME_APP', 'Sample SME application', 'ACTIVE', 'SME', CURRENT_TIMESTAMP);
 
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)

@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidRequestObjectException;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.MobileAppApiException;
@@ -255,8 +256,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                         && operation.getUserId() != null
                         && operation.getUserId().equals(apiAuthentication.getUserId())) {
                     final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
-                    final UpdateOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
-                    webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+                    final AuthOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
+                    webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getAuthResult());
                     return new Response();
                 } else {
                     throw new PowerAuthAuthenticationException();

@@ -50,4 +50,10 @@ public class OrganizationEntity implements Serializable {
     @Column(name = "order_number", nullable = false)
     private int orderNumber;
 
+    @Column(name = "default_credential_name")
+    private String defaultCredentialName;
+
+    @Column(name = "default_otp_name")
+    private String defaultOtpName;
+
 }

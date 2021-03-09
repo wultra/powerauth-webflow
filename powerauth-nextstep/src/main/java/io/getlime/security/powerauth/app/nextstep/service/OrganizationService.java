@@ -87,12 +87,16 @@ public class OrganizationService {
         organization.setDisplayNameKey(request.getDisplayNameKey());
         organization.setDefault(request.isDefault());
         organization.setOrderNumber(request.getOrderNumber());
+        organization.setDefaultCredentialName(request.getDefaultCredentialName());
+        organization.setDefaultOtpName(request.getDefaultOtpName());
         organizationRepository.save(organization);
         CreateOrganizationResponse response = new CreateOrganizationResponse();
-        response.setOrganizationId(request.getOrganizationId());
-        response.setDisplayNameKey(request.getDisplayNameKey());
-        response.setDefault(request.isDefault());
-        response.setOrderNumber(request.getOrderNumber());
+        response.setOrganizationId(organization.getOrganizationId());
+        response.setDisplayNameKey(organization.getDisplayNameKey());
+        response.setDefault(organization.isDefault());
+        response.setOrderNumber(organization.getOrderNumber());
+        response.setDefaultCredentialName(organization.getDefaultCredentialName());
+        response.setDefaultOtpName(organization.getDefaultOtpName());
         return response;
     }
 

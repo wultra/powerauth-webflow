@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.model.converter
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 
 /**
  * Converter for user account status.
@@ -26,16 +27,62 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserA
 public class UserAccountStatusConverter {
 
     /**
-     * Convert of user account status.
-     * @param userAccountStatus User account status in Next Step.
-     * @return User account status in Data Adapter.
+     * Convert user identity status to account status.
+     * @param userIdentityStatus User identity status.
+     * @return Account status in Data Adapter.
      */
-    public AccountStatus fromUserAccountStatus(UserAccountStatus userAccountStatus) {
-        if (userAccountStatus == null) {
+    public AccountStatus toAccountStatus(UserIdentityStatus userIdentityStatus) {
+        if (userIdentityStatus == null) {
             return null;
         }
 
-        switch (userAccountStatus) {
+        switch (userIdentityStatus) {
+            case ACTIVE:
+                return AccountStatus.ACTIVE;
+
+            case BLOCKED:
+            case REMOVED:
+                return AccountStatus.NOT_ACTIVE;
+
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Convert user identity status to user account status.
+     * @param userIdentityStatus User identity status.
+     * @return User account status in Next Step.
+     */
+    public UserAccountStatus toUserAccountStatus(UserIdentityStatus userIdentityStatus) {
+        if (userIdentityStatus == null) {
+            return null;
+        }
+
+        switch (userIdentityStatus) {
+            case ACTIVE:
+                return UserAccountStatus.ACTIVE;
+
+            case BLOCKED:
+            case REMOVED:
+                return UserAccountStatus.NOT_ACTIVE;
+
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Convert user account status in Next Step to account status in Data Adapter.
+     * @param accountStatus User account status.
+     * @return Account status in Data Adapter.
+     */
+    public AccountStatus fromUserAccountStatus(UserAccountStatus accountStatus) {
+        if (accountStatus == null) {
+            return null;
+        }
+
+        switch (accountStatus) {
             case ACTIVE:
                 return AccountStatus.ACTIVE;
 
@@ -47,12 +94,17 @@ public class UserAccountStatusConverter {
         }
     }
 
-    public UserAccountStatus fromAccountStatus(AccountStatus accountStatus) {
-        if (accountStatus == null) {
+    /**
+     * Convert account status in Data Adapter to user account status in Next Step.
+     * @param userAccountStatus User account status in Next Step.
+     * @return User account status in Data Adapter.
+     */
+    public UserAccountStatus fromAccountStatus(AccountStatus userAccountStatus) {
+        if (userAccountStatus == null) {
             return null;
         }
 
-        switch (accountStatus) {
+        switch (userAccountStatus) {
             case ACTIVE:
                 return UserAccountStatus.ACTIVE;
 
@@ -63,4 +115,5 @@ public class UserAccountStatusConverter {
                 return null;
         }
     }
+
 }

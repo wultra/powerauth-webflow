@@ -35,7 +35,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.exception.ConsentValidationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.request.ConsentAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentAuthResponse;
@@ -45,7 +44,8 @@ import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthM
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
@@ -99,14 +99,14 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
      * @throws AuthStepException Exception is thrown when consent validation or persistence fails.
      */
     @Override
-    protected AuthenticationResult authenticate(ConsentAuthRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(ConsentAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         if (getConsentSkippedFromHttpSession()) {
             // Consent form is skipped, step authentication is complete
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             cleanHttpSession();
-            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
         }
         final String userId = operation.getUserId();
         final String organizationId = operation.getOrganizationId();
@@ -127,7 +127,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                 cleanHttpSession();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                    return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
                 }
                 // Validation succeeded, however save failed, allow user to retry the consent confirmation
                 throw new AuthStepException("User consent could not be saved", "error.communication");
@@ -148,8 +148,8 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             Integer remainingAttemptsNS;
             try {
-                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
-                if (response.getResult() == AuthResult.FAILED) {
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+                if (response.getAuthResult() == AuthResult.FAILED) {
                     cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");

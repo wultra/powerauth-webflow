@@ -15,18 +15,25 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.model;
 
-/**
- * Constants for storing attributes in HTTP session by individual steps.
- */
-public class HttpSessionAttributeNames {
+import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 
-    public static final String OTP_ID = "OTP_ID";
-    public static final String LAST_MESSAGE_TIMESTAMP = "LAST_MESSAGE_TIMESTAMP";
-    public static final String INITIAL_MESSAGE_SENT = "INITIAL_MESSAGE_SENT";
-    public static final String AUTH_STEP_OPTIONS = "AUTH_STEP_OPTIONS";
-    public static final String PENDING_AUTH_OBJECT = "PENDING_AUTH_OBJECT";
-    public static final String CONSENT_SKIPPED = "CONSENT_SKIPPED";
-    public static final String USERNAME = "USERNAME";
-    public static final String CLIENT_CERTIFICATE = "CLIENT_CERTIFICATE";
+import java.util.List;
+
+/**
+ * Operation update response after authentication.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
+@Data
+@AllArgsConstructor
+public class AuthOperationResponse {
+
+    private String operationId;
+    private AuthResult authResult;
+    private String resultDescription;
+    private List<AuthStep> steps;
 
 }

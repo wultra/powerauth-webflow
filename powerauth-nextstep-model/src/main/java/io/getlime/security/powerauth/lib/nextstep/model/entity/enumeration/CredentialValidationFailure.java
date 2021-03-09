@@ -60,12 +60,12 @@ public enum CredentialValidationFailure {
     /**
      * Credential is missing an allowed character.
      */
-    CREDENTIAL_ALLOWED_CHAR,
+    CREDENTIAL_ALLOWED_CHAR_FAILED,
 
     /**
      * Credential allowed match using regular expresion failed.
      */
-    CREDENTIAL_ALLOWED_MATCH,
+    CREDENTIAL_ALLOWED_MATCH_FAILED,
 
     /**
      * Credential contains an illegal character.
@@ -125,7 +125,7 @@ public enum CredentialValidationFailure {
     /**
      * Username pattern match failed.
      */
-    USERNAME_ALLOWED_MATCH,
+    USERNAME_ALLOWED_MATCH_FAILED,
 
     /**
      * Username already exists.

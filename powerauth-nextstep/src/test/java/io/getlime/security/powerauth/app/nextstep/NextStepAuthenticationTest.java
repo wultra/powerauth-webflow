@@ -324,7 +324,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     @Test
     public void testUserLookupFail() {
         LookupUserRequest request = new LookupUserRequest();
-        request.setUsername("testuser_uknown");
+        request.setUsername("testuser_unknown");
         request.setCredentialName("TEST_CREDENTIAL");
         try {
             nextStepClient.lookupUser(request);

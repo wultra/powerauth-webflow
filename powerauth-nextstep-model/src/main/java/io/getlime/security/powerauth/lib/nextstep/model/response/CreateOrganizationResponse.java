@@ -40,5 +40,9 @@ public class CreateOrganizationResponse {
     @NotNull
     @Positive
     private Integer orderNumber;
+    @Size(min = 2, max = 256)
+    private String defaultCredentialName;
+    @Size(min = 2, max = 256)
+    private String defaultOtpName;
 
 }

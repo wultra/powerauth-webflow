@@ -30,13 +30,12 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthenticationFailedException;
@@ -46,6 +45,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.
 import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.request.LoginScaInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.LoginScaAuthResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.model.response.LoginScaInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
@@ -83,10 +83,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private final AuthMethodQueryService authMethodQueryService;
     private final AuthenticationManagementService authenticationManagementService;
     private final HttpSession httpSession;
-    private final WebFlowServicesConfiguration config;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
-    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
@@ -95,16 +94,14 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @param authMethodQueryService Service for querying authentication methods.
      * @param authenticationManagementService Authentication management service.
      * @param httpSession HTTP session.
-     * @param config Web Flow services configuration.
      */
     @Autowired
-    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession, WebFlowServicesConfiguration config) {
+    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
         this.authenticationManagementService = authenticationManagementService;
         this.httpSession = httpSession;
-        this.config = config;
     }
 
     /**
@@ -123,9 +120,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
             OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
             String userId = operation.getUserId();
             String organizationId = request.getOrganizationId();
-            AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
             boolean userIdAlreadyAvailable;
             boolean userAuthenticatedUsingCertificate = false;
+            UserIdentityStatus status = null;
             if (userId == null) {
                 // First time invocation, user ID is not available yet
                 userIdAlreadyAvailable = false;
@@ -139,13 +136,40 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                     response.setMessage("login.userNotFound");
                     return response;
                 }
-                ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, clientCertificate, operationContext);
-                UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
-                userId = userDetailResponse.getId();
-                accountStatus = userDetailResponse.getAccountStatus();
+
                 if (clientCertificate != null) {
+                    // Client certificates are implemented in DA, use lookup via DA
+                    ObjectResponse<UserDetailResponse> objectResponse = dataAdapterClient.lookupUser(username, organizationId, clientCertificate, operationContext);
+                    UserDetailResponse userDetailResponse = objectResponse.getResponseObject();
+                    userId = userDetailResponse.getId();
+                    AccountStatus accountStatus = userDetailResponse.getAccountStatus();
                     userAuthenticatedUsingCertificate = verifyClientCertificate(operation.getOperationId(), userId, organizationId, clientCertificate, accountStatus, operationContext);
                 } else {
+                    // Lookup user via NS
+                    GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(organizationId).getResponseObject();
+                    if (organization.getDefaultCredentialName() == null) {
+                        logger.warn("Default credential name is not configured for organization: " + request.getOrganizationId());
+                        throw new AuthStepException("User authentication failed", "error.communication");
+                    }
+                    String credentialName = organization.getDefaultCredentialName();
+                    LookupUserRequest lookupRequest = new LookupUserRequest();
+                    lookupRequest.setCredentialName(credentialName);
+                    lookupRequest.setUsername(username);
+                    LookupUserResponse lookupResponse;
+                    try {
+                        lookupResponse = nextStepClient.lookupUser(lookupRequest).getResponseObject();
+                        if (lookupResponse.getUsers().size() == 1) {
+                            GetUserDetailResponse userDetail = lookupResponse.getUsers().get(0);
+                            userId = userDetail.getUserId();
+                            status = userDetail.getUserIdentityStatus();
+                        }
+                    } catch (NextStepClientException ex) {
+                        if (ex.getNextStepError() == null || !UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
+                            // Unexpected error occurred in Next Step
+                            throw ex;
+                        }
+                        // Expected case when user is not found, continue with authentication to avoid leaking information
+                    }
                     updateUsernameInHttpSession(username);
                 }
             } else {
@@ -157,14 +181,15 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 // User ID lookup succeeded, update user ID in operation so that Push Server can deliver the personal push message
                 authenticationManagementService.updateAuthenticationWithUserDetails(userId, organizationId);
                 authenticationManagementService.upgradeToStrongCustomerAuthentication();
-                nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, userAccountStatusConverter.fromAccountStatus(accountStatus));
+                UserAccountStatus accountStatus = statusConverter.toUserAccountStatus(status);
+                nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, accountStatus);
             }
             if (userAuthenticatedUsingCertificate) {
                 logger.debug("Step authentication succeeded with client certificate, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 return authenticateStepUsingClientCertificate(operation.getOperationId(), userId, organizationId);
             }
-            if (userId == null || accountStatus != AccountStatus.ACTIVE) {
-                // User ID is not available or user account is not ACTIVE, mock SMS and password fallback to avoid fishing for active accounts
+            if (userId == null || status != UserIdentityStatus.ACTIVE) {
+                // User ID is not available or user identity is not ACTIVE, mock SMS and password fallback to avoid fishing for active accounts
                 response.setResult(AuthStepResult.CONFIRMED);
                 response.setMobileTokenEnabled(false);
                 logger.debug("Step authentication succeeded with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
@@ -350,15 +375,19 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
         }
         logger.debug("Step authentication failed with client certificate, operation ID: {}, authentication method: {}", operationId, getAuthMethodName().toString());
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
-        UpdateOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
-        if (response.getResult() == AuthResult.FAILED) {
+        AuthOperationResponse response = failAuthorization(operationId, userId, authInstruments, null);
+        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
+        if (response.getAuthResult() == AuthResult.FAILED || (remainingAttemptsDA != null && remainingAttemptsDA == 0)) {
             // FAILED result instead of CONTINUE means the authentication method is failed
             throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
         }
-        Integer remainingAttemptsDA = certResponse.getRemainingAttempts();
         boolean showRemainingAttempts = certResponse.getShowRemainingAttempts();
-        String errorMessage = certResponse.getErrorMessage();
-        UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(certResponse.getAccountStatus());
+        UserAccountStatus userAccountStatus = statusConverter.fromAccountStatus(certResponse.getAccountStatus());
+
+        String errorMessage = "login.authenticationFailed";
+        if (certResponse.getErrorMessage() != null) {
+            errorMessage = certResponse.getErrorMessage();
+        }
 
         AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
         if (showRemainingAttempts) {
@@ -378,7 +407,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private LoginScaAuthResponse authenticateStepUsingClientCertificate(String operationId, String userId, String organizationId) {
         List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.CLIENT_CERTIFICATE);
         try {
-            UpdateOperationResponse updateResponse = authorize(operationId, userId, organizationId, authInstruments, null);
+            AuthOperationResponse updateResponse = authorize(operationId, userId, organizationId, authInstruments, null);
             final LoginScaAuthResponse response = new LoginScaAuthResponse();
             response.setResult(AuthStepResult.CONFIRMED);
             response.setMessage("authentication.success");

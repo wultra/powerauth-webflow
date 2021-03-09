@@ -35,13 +35,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
@@ -115,7 +115,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @throws AuthStepException Thrown when authorization step fails.
      */
     @Override
-    protected AuthenticationResult authenticate(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
@@ -145,7 +145,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             if (signatureResponse.getUserId().equals(userId)) {
                 cleanHttpSession();
                 logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                return new AuthenticationResult(userId, operation.getOrganizationId());
+                return new AuthResultDetail(userId, operation.getOrganizationId(), false);
             }
         }
         BigInteger remainingAttemptsPAObj = signatureResponse.getRemainingAttempts();
@@ -156,8 +156,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
-            if (response.getResult() == AuthResult.FAILED) {
+            AuthOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
+            if (response.getAuthResult() == AuthResult.FAILED) {
                 // FAILED result instead of CONTINUE means the authentication method is failed
                 cleanHttpSession();
                 throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");

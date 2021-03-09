@@ -27,7 +27,6 @@ import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthe
 public class UserAuthenticationResponse {
 
     private UserAuthenticationResult authenticationResult;
-    private UserDetailResponse userDetail;
     private String errorMessage;
     private Integer remainingAttempts;
     private boolean showRemainingAttempts;
@@ -42,11 +41,9 @@ public class UserAuthenticationResponse {
     /**
      * Parameterized constructor.
      * @param authenticationResult Result of user authentication.
-     * @param userDetail User detail.
      */
-    public UserAuthenticationResponse(UserAuthenticationResult authenticationResult, UserDetailResponse userDetail) {
+    public UserAuthenticationResponse(UserAuthenticationResult authenticationResult) {
         this.authenticationResult = authenticationResult;
-        this.userDetail = userDetail;
     }
 
     /**
@@ -63,22 +60,6 @@ public class UserAuthenticationResponse {
      */
     public void setAuthenticationResult(UserAuthenticationResult authenticationResult) {
         this.authenticationResult = authenticationResult;
-    }
-
-    /**
-     * Get user detail.
-     * @return User detail.
-     */
-    public UserDetailResponse getUserDetail() {
-        return userDetail;
-    }
-
-    /**
-     * Set user detail.
-     * @param userDetail User detail.
-     */
-    public void setUserDetail(UserDetailResponse userDetail) {
-        this.userDetail = userDetail;
     }
 
     /**

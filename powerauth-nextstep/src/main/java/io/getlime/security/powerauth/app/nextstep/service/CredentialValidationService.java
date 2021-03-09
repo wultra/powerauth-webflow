@@ -129,7 +129,7 @@ public class CredentialValidationService {
             }
         }
         if (allowedPattern != null && !username.matches(allowedPattern)) {
-            validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH);
+            validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED);
         }
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
         if (credentialOptional.isPresent()) {
@@ -301,9 +301,9 @@ public class CredentialValidationService {
             case "ILLEGAL_USERNAME_REVERSED":
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME_REVERSED;
             case "ALLOWED_CHAR":
-                return CredentialValidationFailure.CREDENTIAL_ALLOWED_CHAR;
+                return CredentialValidationFailure.CREDENTIAL_ALLOWED_CHAR_FAILED;
             case "ALLOWED_MATCH":
-                return CredentialValidationFailure.CREDENTIAL_ALLOWED_MATCH;
+                return CredentialValidationFailure.CREDENTIAL_ALLOWED_MATCH_FAILED;
             case "ILLEGAL_CHAR":
                 return CredentialValidationFailure.CREDENTIAL_ILLEGAL_CHAR;
             case "ILLEGAL_MATCH":

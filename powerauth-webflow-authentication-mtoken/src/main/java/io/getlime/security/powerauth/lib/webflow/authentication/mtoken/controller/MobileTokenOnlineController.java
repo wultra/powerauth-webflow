@@ -28,7 +28,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.configuration.We
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
@@ -84,13 +84,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected AuthenticationResult authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
                     && !AuthResult.FAILED.equals(h.getAuthResult())) {
-                return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
             }
         }
         return null;

@@ -149,6 +149,8 @@ public class AuthenticationService {
         authentication.setResult(authenticationResult);
         authentication.setResultCredential(authenticationResult);
         authentication.setTimestampCreated(new Date());
+        // Authentication needs to be saved before calling updateOperation
+        authenticationRepository.save(authentication);
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
@@ -158,9 +160,10 @@ public class AuthenticationService {
                 operationFailed = true;
                 authentication.setResultCredential(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
+                // Authentication was updated, save it
+                authenticationRepository.save(authentication);
             }
         }
-        authenticationRepository.save(authentication);
 
         Integer remainingAttempts = resolveRemainingAttempts(credential, null, operation);
 
@@ -268,6 +271,8 @@ public class AuthenticationService {
         authentication.setResult(authenticationResult);
         authentication.setResultOtp(authenticationResult);
         authentication.setTimestampCreated(new Date());
+        // Authentication needs to be saved before calling updateOperation
+        authenticationRepository.save(authentication);
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
@@ -277,6 +282,8 @@ public class AuthenticationService {
                 operationFailed = true;
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
+                // Authentication was updated, save it
+                authenticationRepository.save(authentication);
             }
         }
 
@@ -284,9 +291,9 @@ public class AuthenticationService {
         if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
+            // OTP was updated, save authentication with OTP
+            authenticationRepository.save(authentication);
         }
-
-        authenticationRepository.save(authentication);
 
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
         if (userId != null) {
@@ -395,6 +402,7 @@ public class AuthenticationService {
         authentication.setUserId(user.getUserId());
         authentication.setAuthenticationType(AuthenticationType.CREDENTIAL_OTP);
         authentication.setCredential(credential);
+        authentication.setOtp(otp);
         if (operation != null) {
             authentication.setOperation(operation);
         }
@@ -402,6 +410,8 @@ public class AuthenticationService {
         authentication.setResultCredential(credentialAuthenticationResult);
         authentication.setResultOtp(otpAuthenticationResult);
         authentication.setTimestampCreated(new Date());
+        // Authentication needs to be saved before calling updateOperation
+        authenticationRepository.save(authentication);
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
@@ -412,6 +422,8 @@ public class AuthenticationService {
                 authentication.setResult(AuthenticationResult.FAILED);
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
+                // Authentication was updated, save it
+                authenticationRepository.save(authentication);
             }
         }
 
@@ -419,9 +431,9 @@ public class AuthenticationService {
         if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
+            // OTP was updated, save authentication with OTP
+            authenticationRepository.save(authentication);
         }
-
-        authenticationRepository.save(authentication);
 
         CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
         response.setUserId(user.getUserId());
