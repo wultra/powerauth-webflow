@@ -37,7 +37,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPas
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthorizationOtpResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthorizationOtpDeliveryResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
@@ -50,6 +50,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.sms.model.respon
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -410,9 +411,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     initResponse.setResult(AuthStepResult.CONFIRMED);
                     return initResponse;
                 }
-                AuthorizationOtpResult result = sendAuthorizationSms(operation);
+                AuthorizationOtpDeliveryResult result = sendAuthorizationSms(operation);
                 if (result.isDelivered()) {
                     updateOtpIdInHttpSession(result.getOtpId());
+                    updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
                     updateInitialMessageSentInHttpSession(true);
                     initResponse.setResult(AuthStepResult.CONFIRMED);
                     logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
@@ -453,9 +455,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return resendResponse;
         }
         try {
-            AuthorizationOtpResult response = sendAuthorizationSms(operation);
+            AuthorizationOtpDeliveryResult response = sendAuthorizationSms(operation);
             if (response.isDelivered()) {
                 updateOtpIdInHttpSession(response.getOtpId());
+                updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
                 resendResponse.setResult(AuthStepResult.CONFIRMED);
                 logger.info("Resend step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             } else {
@@ -610,11 +613,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException In case OTP configuration is invalid.
      * @throws NextStepClientException In case SMS delivery fails.
      */
-    private AuthorizationOtpResult sendAuthorizationSms(GetOperationDetailResponse operation) throws NextStepClientException, AuthStepException {
+    private AuthorizationOtpDeliveryResult sendAuthorizationSms(GetOperationDetailResponse operation) throws NextStepClientException, AuthStepException {
         Long lastMessageTimestamp = getLastMessageTimestampFromHttpSession();
         if (lastMessageTimestamp != null && System.currentTimeMillis() - lastMessageTimestamp < configuration.getSmsResendDelay()) {
             // SMS delivery is not allowed
-            AuthorizationOtpResult result = new AuthorizationOtpResult();
+            AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
             result.setDelivered(false);
             result.setErrorMessage("smsAuthorization.deliveryFailed");
             return result;
@@ -629,21 +632,18 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         String userId = operation.getUserId();
         // OTP data is taken from operation
         try {
-            CreateOtpResponse otpResponse = nextStepClient.createOtp(userId, otpName, credentialName, null, operation.getOperationId()).getResponseObject();
-            // TODO - new endpoint - opt/send
-            // TODO - add language into request
-            // TODO - handle resend parameter automatically via operation
-            // TODO - add error message into response
-            updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
-            AuthorizationOtpResult result = new AuthorizationOtpResult();
-            result.setDelivered(true);
+            String language = LocaleContextHolder.getLocale().getLanguage();
+            CreateAndSendOtpResponse otpResponse = nextStepClient.createAndSendOtp(userId, otpName, credentialName, null, operation.getOperationId(), language).getResponseObject();
+            AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
+            result.setDelivered(otpResponse.isDelivered());
             result.setOtpId(otpResponse.getOtpId());
+            result.setErrorMessage(otpResponse.getErrorMessage());
             return result;
         } catch (NextStepClientException ex) {
             if (ex.getNextStepError() != null
                     && (CredentialNotActiveException.CODE.equals(ex.getNextStepError().getCode())
                         || UserNotActiveException.CODE.equals(ex.getNextStepError().getCode()))) {
-                AuthorizationOtpResult result = new AuthorizationOtpResult();
+                AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
                 result.setDelivered(false);
                 result.setErrorMessage("smsAuthorization.deliveryFailed");
                 return result;

@@ -17,20 +17,15 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDeliveryResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
-import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOtpRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOtpDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOtpListRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOtpResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOtpResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpListResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +54,7 @@ public class OtpService {
     private final OtpGenerationService otpGenerationService;
     private final StepResolutionService stepResolutionService;
     private final OtpRepository otpRepository;
+    private final OtpCustomizationService otpCustomizationService;
     private final IdGeneratorService idGeneratorService;
 
     /**
@@ -71,10 +67,11 @@ public class OtpService {
      * @param otpGenerationService OTP generation service.
      * @param stepResolutionService Step resolution service.
      * @param otpRepository OTP repository.
+     * @param otpCustomizationService OTP customization service.
      * @param idGeneratorService ID generator service.
      */
     @Autowired
-    public OtpService(OtpDefinitionService otpDefinitionService, UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, OperationPersistenceService operationPersistenceService, OtpGenerationService otpGenerationService, StepResolutionService stepResolutionService, OtpRepository otpRepository, IdGeneratorService idGeneratorService) {
+    public OtpService(OtpDefinitionService otpDefinitionService, UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, OperationPersistenceService operationPersistenceService, OtpGenerationService otpGenerationService, StepResolutionService stepResolutionService, OtpRepository otpRepository, OtpCustomizationService otpCustomizationService, IdGeneratorService idGeneratorService) {
         this.otpDefinitionService = otpDefinitionService;
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
@@ -83,6 +80,7 @@ public class OtpService {
         this.otpGenerationService = otpGenerationService;
         this.stepResolutionService = stepResolutionService;
         this.otpRepository = otpRepository;
+        this.otpCustomizationService = otpCustomizationService;
         this.idGeneratorService = idGeneratorService;
     }
 
@@ -106,9 +104,99 @@ public class OtpService {
     public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException {
         OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
         String userId = request.getUserId();
+        String credentialName = request.getCredentialName();
+        String otpData = request.getOtpData();
+        String operationId = request.getOperationId();
+        return createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
+    }
+
+    /**
+     * Create and send and OTP. Depending on configuration the OTP is created in Next Step or in Data Adapter.
+     * OTP delivery is always done via Data Adapter.
+     * @param request Create and send an OTP.
+     * @return Create and send OTP response.
+     * @throws OtpDefinitionNotFoundException Thrown when OTP definition is not found.
+     * @throws UserNotActiveException Thrown when user is not active.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OtpGenAlgorithmNotSupportedException Thrown when OTP generation algorithm is not supported.
+     * @throws InvalidConfigurationException Thrown when OTP policy is not configured properly.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already failed.
+     */
+    @Transactional
+    public CreateAndSendOtpResponse createAndSendOtp(CreateAndSendOtpRequest request) throws OtpDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException, InvalidRequestException, InvalidConfigurationException, OtpGenAlgorithmNotSupportedException, CredentialDefinitionNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotFoundException, UserNotActiveException {
+        OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
+        String userId = request.getUserId();
+        String credentialName = request.getCredentialName();
+        String otpData = request.getOtpData();
+        String operationId = request.getOperationId();
+        String language = request.getLanguage();
+        boolean dataAdapterProxyEnabled = otpDefinition.isDataAdapterProxyEnabled();
+        boolean resend = false;
+        // Operation is required, otherwise Data Adapter would not have enough context to generate SMS message
+        OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        List<OtpEntity> existingOtps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
+        if (!existingOtps.isEmpty()) {
+            resend = true;
+        }
+        if (dataAdapterProxyEnabled) {
+            // Create and send OTP code via Data Adapter
+            OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
+            CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
+            response.setOtpName(otpDefinition.getName());
+            response.setUserId(userId);
+            response.setOtpId(result.getOtpId());
+            // Derive status based on whether OTP code was generated and delivered
+            if (result.getOtpId() != null && result.isDelivered()) {
+                response.setOtpStatus(OtpStatus.ACTIVE);
+            } else {
+                response.setOtpStatus(OtpStatus.BLOCKED);
+            }
+            response.setDelivered(result.isDelivered());
+            response.setErrorMessage(result.getErrorMessage());
+            return response;
+        } else {
+            // Create OTP in Next Step and send it via Data Adapter
+            CreateOtpResponse otpResponse = createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
+            OtpDeliveryResult result = otpCustomizationService.sendOtp(userId, operation, otpResponse.getOtpId(), otpResponse.getOtpValue(), language, resend);
+            CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
+            response.setOtpName(otpDefinition.getName());
+            response.setUserId(userId);
+            response.setOtpId(otpResponse.getOtpId());
+            response.setOtpStatus(otpResponse.getOtpStatus());
+            response.setDelivered(result.isDelivered());
+            response.setErrorMessage(result.getErrorMessage());
+            return response;
+        }
+    }
+
+    /**
+     * Create an OTP.
+     * @param otpDefinition OTP definition.
+     * @param userId User ID.
+     * @param credentialName Credential definition name.
+     * @param otpData OTP data.
+     * @param operationId Operation ID.
+     * @return Create OTP response.
+     * @throws UserNotActiveException Thrown when user is not active.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OtpGenAlgorithmNotSupportedException Thrown when OTP generation algorithm is not supported.
+     * @throws InvalidConfigurationException Thrown when OTP policy is not configured properly.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already failed.
+     */
+    private CreateOtpResponse createOtpInternal(OtpDefinitionEntity otpDefinition, String userId, String credentialName, String otpData, String operationId) throws UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException {
         UserIdentityEntity user = null;
         if (userId != null) {
-            Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(request.getUserId());
+            Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(userId);
             if (userOptional.isPresent()) {
                 user = userOptional.get();
                 if(user.getStatus() != UserIdentityStatus.ACTIVE) {
@@ -117,14 +205,14 @@ public class OtpService {
             }
         }
         CredentialDefinitionEntity credentialDefinition = null;
-        if (user != null && request.getCredentialName() != null) {
-            credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        if (user != null && credentialName != null) {
+            credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credentialName);
             // Make sure the credential exists and it is active
             credentialService.findActiveCredential(credentialDefinition, user);
         }
         OperationEntity operation = null;
-        if (request.getOperationId() != null) {
-            operation = operationPersistenceService.getOperation(request.getOperationId());
+        if (operationId != null) {
+            operation = operationPersistenceService.getOperation(operationId);
             // Remove obsolete OTPs for this operation
             List<OtpEntity> existingOtps = otpRepository.findAllByOperationAndStatus(operation, OtpStatus.ACTIVE);
             for (OtpEntity otp : existingOtps) {
@@ -138,11 +226,11 @@ public class OtpService {
                 throw new OperationAlreadyFailedException("Cannot create OTP, because operation is already failed: " + operation.getOperationId());
             }
         }
-        String otpData;
-        if (request.getOtpData() != null) {
-            otpData = request.getOtpData();
+        String otpDataToUse;
+        if (otpData != null) {
+            otpDataToUse = otpData;
         } else if (operation != null) {
-            otpData = operation.getOperationData();
+            otpDataToUse = operation.getOperationData();
         } else {
             throw new InvalidRequestException("OTP data is not available for OTP definition: " + otpDefinition.getName());
         }
@@ -156,7 +244,7 @@ public class OtpService {
         otp.setValue(otpValueDetail.getOtpValue());
         otp.setSalt(otpValueDetail.getSalt());
         otp.setStatus(OtpStatus.ACTIVE);
-        otp.setOtpData(otpData);
+        otp.setOtpData(otpDataToUse);
         otp.setAttemptCounter(0);
         otp.setFailedAttemptCounter(0);
         otp.setTimestampCreated(new Date());

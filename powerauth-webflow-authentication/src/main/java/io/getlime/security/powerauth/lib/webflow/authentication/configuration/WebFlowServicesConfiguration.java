@@ -160,11 +160,11 @@ public class WebFlowServicesConfiguration {
     @Bean
     public DataAdapterClient defaultDataAdapterClient() {
         RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
-        restClientConfiguration.setBaseUrl(nextstepServiceUrl);
+        restClientConfiguration.setBaseUrl(dataAdapterServiceUrl);
         restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
         restClientConfiguration.setObjectMapper(objectMapper());
         try {
-            return new DataAdapterClient(dataAdapterServiceUrl);
+            return new DataAdapterClient(restClientConfiguration);
         } catch (DataAdapterClientErrorException ex) {
             logger.error(ex.getMessage(), ex);
             return null;

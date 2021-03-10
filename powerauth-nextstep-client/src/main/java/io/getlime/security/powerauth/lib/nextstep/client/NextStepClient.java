@@ -1812,6 +1812,29 @@ public class NextStepClient {
     }
 
     /**
+     * Create an OTP with operation and send it.
+     *
+     * @param userId User ID.
+     * @param otpName OTP name.
+     * @param credentialName Credential name.
+     * @param otpData OTP data.
+     * @param operationId Operation ID.
+     * @param language Language as defined in ISO-639 with 2 characters.
+     * @return Create and send OTP response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(String userId, @NotNull String otpName, String credentialName, String otpData, String operationId, String language) throws NextStepClientException {
+        CreateAndSendOtpRequest request = new CreateAndSendOtpRequest();
+        request.setUserId(userId);
+        request.setOtpName(otpName);
+        request.setCredentialName(credentialName);
+        request.setOtpData(otpData);
+        request.setOperationId(operationId);
+        request.setLanguage(language);
+        return postObjectImpl("/otp/send", new ObjectRequest<>(request), CreateAndSendOtpResponse.class);
+    }
+
+    /**
      * Get OTP list.
      *
      * @param operationId Operation ID.

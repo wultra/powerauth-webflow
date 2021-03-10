@@ -62,6 +62,9 @@ public class OtpDefinitionEntity implements Serializable {
     @Column(name = "encryption_algorithm")
     private String encryptionAlgorithm;
 
+    @Column(name = "data_adapter_proxy_enabled")
+    private boolean dataAdapterProxyEnabled;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OtpDefinitionStatus status;

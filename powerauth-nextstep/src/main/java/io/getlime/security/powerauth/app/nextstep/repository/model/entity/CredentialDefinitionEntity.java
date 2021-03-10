@@ -74,6 +74,9 @@ public class CredentialDefinitionEntity implements Serializable {
     @Column(name = "e2e_encryption_enabled")
     private boolean e2eEncryptionEnabled;
 
+    @Column(name = "data_adapter_proxy_enabled")
+    private boolean dataAdapterProxyEnabled;
+
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private CredentialDefinitionStatus status;

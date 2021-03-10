@@ -15,8 +15,13 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -29,6 +34,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("ext")
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class NextStepServerConfiguration {
+
+    private static final Logger logger = LoggerFactory.getLogger(NextStepServerConfiguration.class);
+
+    /**
+     * Data Adapter service URL.
+     */
+    @Value("${powerauth.dataAdapter.service.url}")
+    private String dataAdapterServiceUrl;
 
     /**
      * Operation expiration time in seconds.
@@ -107,6 +120,21 @@ public class NextStepServerConfiguration {
      */
     public String getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    /**
+     * Default data adapter client.
+     *
+     * @return Data adapter client.
+     */
+    @Bean
+    public DataAdapterClient defaultDataAdapterClient() {
+        try {
+            return new DataAdapterClient(dataAdapterServiceUrl);
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
     }
 
 }

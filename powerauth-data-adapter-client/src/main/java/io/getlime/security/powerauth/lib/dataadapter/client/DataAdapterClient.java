@@ -133,7 +133,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create authorization SMS message with OTP authorization code.
+     * Create authorization SMS message with new OTP authorization code.
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
@@ -148,6 +148,26 @@ public class DataAdapterClient {
     public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
         return postObjectImpl("/api/auth/sms/create", new ObjectRequest<>(request), CreateSmsAuthorizationResponse.class);
+    }
+
+    /**
+     * Send authorization SMS message with existing OTP authorization code.
+     *
+     * @param userId            User ID.
+     * @param organizationId    Organization ID.
+     * @param accountStatus     User account status.
+     * @param authMethod        Authentication method.
+     * @param operationContext  Operation context.
+     * @param messageId         Message ID.
+     * @param authorizationCode SMS OTP authorization code.
+     * @param lang              Language for i18n.
+     * @param resend            Whether SMS is being resent.
+     * @return Response with generated messageId.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
+     */
+    public ObjectResponse<SendAuthorizationSmsResponse> sendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) throws DataAdapterClientErrorException {
+        SendAuthorizationSmsRequest request = new SendAuthorizationSmsRequest(userId, organizationId, accountStatus, authMethod, operationContext, messageId, authorizationCode, lang, resend);
+        return postObjectImpl("/api/auth/sms/send", new ObjectRequest<>(request), SendAuthorizationSmsResponse.class);
     }
 
     /**
