@@ -367,15 +367,15 @@ CREATE TABLE ns_otp_storage (
   user_id                     VARCHAR2(256 CHAR),                           -- User identifier.
   credential_definition_id    NUMBER(19,0),                                 -- Credential definition identifier used when updating failed counter.
   operation_id                VARCHAR2(256 CHAR),                           -- Operation identifier.
-  value                       VARCHAR2(256 CHAR) NOT NULL,                  -- One time password value.
-  salt                        BLOB NOT NULL,                                -- Cryptographic salt used when generating one time password.
+  value                       VARCHAR2(256 CHAR),                           -- One time password value.
+  salt                        BLOB,                                         -- Cryptographic salt used when generating one time password.
   status                      VARCHAR2(32 CHAR) NOT NULL,                   -- One time password status: ACTIVE, USED, BLOCKED, REMOVED.
-  otp_data                    CLOB NOT NULL,                                -- Data used for generating one time password.
+  otp_data                    CLOB,                                         -- Data used for generating one time password.
   attempt_counter             NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password attempt counter.
   failed_attempt_counter      NUMBER(19,0) DEFAULT 0 NOT NULL,              -- One time password failed attempt counter.
   timestamp_created           TIMESTAMP,                                    -- Timestamp when one time password was created.
   timestamp_verified          TIMESTAMP,                                    -- Timestamp when one time password was verified.
-  timestamp_blocked          TIMESTAMP,                                     -- Timestamp when one time password was blocked.
+  timestamp_blocked           TIMESTAMP,                                    -- Timestamp when one time password was blocked.
   timestamp_expires           TIMESTAMP,                                    -- Timestamp when one time password expires.
   CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id),
   CONSTRAINT ns_otp_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)

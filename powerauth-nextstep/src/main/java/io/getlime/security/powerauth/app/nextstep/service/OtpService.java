@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.adapter.OtpCustomizationService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDeliveryResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
@@ -146,6 +147,15 @@ public class OtpService {
         if (dataAdapterProxyEnabled) {
             // Create and send OTP code via Data Adapter
             OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
+            // Store a local OTP record so that OTP can be found during authentication
+            OtpEntity otp = new OtpEntity();
+            otp.setOtpId(result.getOtpId());
+            otp.setOtpDefinition(otpDefinition);
+            otp.setUserId(userId);
+            otp.setOperation(operation);
+            otp.setStatus(OtpStatus.EXTERNAL);
+            otp.setTimestampCreated(new Date());
+            otpRepository.save(otp);
             CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
             response.setOtpName(otpDefinition.getName());
             response.setUserId(userId);

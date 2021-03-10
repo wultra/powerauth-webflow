@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
@@ -48,9 +50,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.loginsca.
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthenticationManagementService;
 import org.slf4j.Logger;
@@ -155,14 +155,13 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                     LookupUserRequest lookupRequest = new LookupUserRequest();
                     lookupRequest.setCredentialName(credentialName);
                     lookupRequest.setUsername(username);
+                    lookupRequest.setOperationId(operation.getOperationId());
                     LookupUserResponse lookupResponse;
                     try {
                         lookupResponse = nextStepClient.lookupUser(lookupRequest).getResponseObject();
-                        if (lookupResponse.getUsers().size() == 1) {
-                            GetUserDetailResponse userDetail = lookupResponse.getUsers().get(0);
-                            userId = userDetail.getUserId();
-                            status = userDetail.getUserIdentityStatus();
-                        }
+                        GetUserDetailResponse userDetail = lookupResponse.getUser();
+                        userId = userDetail.getUserId();
+                        status = userDetail.getUserIdentityStatus();
                     } catch (NextStepClientException ex) {
                         if (ex.getNextStepError() == null || !UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
                             // Unexpected error occurred in Next Step

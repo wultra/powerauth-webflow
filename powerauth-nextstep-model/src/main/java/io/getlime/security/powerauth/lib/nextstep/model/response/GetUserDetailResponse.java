@@ -52,7 +52,6 @@ public class GetUserDetailResponse {
     @NotNull
     private final List<CredentialDetail> credentials = new ArrayList<>();
 
-    @NotNull
     private Date timestampCreated;
 
     private Date timestampLastUpdated;

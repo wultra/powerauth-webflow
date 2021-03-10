@@ -15,29 +15,40 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
- * Request object used for looking up a single user identity.
+ * Request object used for looking up a user identity.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-public class LookupUserRequest {
+public class LookupUsersRequest {
 
-    // TODO - add support for lookup using client certificates
+    // Filter by created date
+    private Date createdStartDate;
+    private Date createdEndDate;
 
-    @NotBlank
+    // Filter by user identity status
+    private UserIdentityStatus userIdentityStatus;
+
+    // Filter by roles
+    private final List<String> roles = new ArrayList<>();
+
+    // Filter by username and credentialName to allow username -> user ID mapping
     @Size(min = 1, max = 256)
     private String username;
-    @NotBlank
     @Size(min = 2, max = 256)
     private String credentialName;
-    // Optional operation ID for lookup using Data Adapter
-    @Size(min = 1, max = 256)
-    private String operationId;
+
+    // Filter by credential status to allow lookup of blocked credentials
+    private CredentialStatus credentialStatus;
 
 }

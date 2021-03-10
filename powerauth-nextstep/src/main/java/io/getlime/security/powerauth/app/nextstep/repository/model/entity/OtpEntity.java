@@ -56,17 +56,17 @@ public class OtpEntity implements Serializable {
     @JoinColumn(name = "operation_id", referencedColumnName = "operation_id", updatable = false)
     private OperationEntity operation;
 
-    @Column(name = "value", nullable = false)
+    @Column(name = "value")
     private String value;
 
-    @Column(name = "salt", nullable = false)
+    @Column(name = "salt")
     private byte[] salt;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
     private OtpStatus status;
 
-    @Column(name = "otp_data", nullable = false)
+    @Column(name = "otp_data")
     private String otpData;
 
     @Column(name = "attempt_counter")

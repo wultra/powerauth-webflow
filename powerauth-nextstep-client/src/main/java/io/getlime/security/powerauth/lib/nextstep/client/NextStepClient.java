@@ -711,6 +711,7 @@ public class NextStepClient {
      *
      * @param userId User ID.
      * @param authMethod Authentication method.
+     * @param config Authentication method configuration.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -914,6 +915,7 @@ public class NextStepClient {
     /**
      * Get list of hashing configurations.
      *
+     * @param includeRemoved Whether removed hashing configurations should be included.
      * @return Get hashing configuration list response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -926,6 +928,7 @@ public class NextStepClient {
     /**
      * Delete a hashing configurations.
      *
+     * @param hashConfigName Hashing configuration name.
      * @return Delete hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -1243,14 +1246,25 @@ public class NextStepClient {
     }
 
     /**
-     * Lookup a user identity.
+     * Lookup user identities.
+     *
+     * @param request Lookup users request.
+     * @return Lookup users response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<LookupUsersResponse> lookupUsers(@NotNull LookupUsersRequest request) throws NextStepClientException {
+        return postObjectImpl("/user/lookup", new ObjectRequest<>(request), LookupUsersResponse.class);
+    }
+
+    /**
+     * Lookup a single user identity.
      *
      * @param request Lookup user request.
      * @return Lookup user response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<LookupUserResponse> lookupUser(@NotNull LookupUserRequest request) throws NextStepClientException {
-        return postObjectImpl("/user/lookup", new ObjectRequest<>(request), LookupUserResponse.class);
+        return postObjectImpl("/user/lookup/single", new ObjectRequest<>(request), LookupUserResponse.class);
     }
 
     /**
@@ -1583,7 +1597,7 @@ public class NextStepClient {
      * @param username Username.
      * @param credentialValue Credential value.
      * @param validationMode Credential validation mode.
-     * @param credentialHistory List with pairs of username -> credentialValue for credential history.
+     * @param credentialHistory List with pairs of username : credentialValue for credential history.
      * @return Create credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -1640,6 +1654,7 @@ public class NextStepClient {
      * @param credentialType Credential type.
      * @param username Username.
      * @param credentialValue Credential value.
+     * @param credentialStatus Credential status.
      * @return Update credential response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
@@ -1889,7 +1904,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<OtpAuthenticationResponse> authenticationWithOtp(String otpId, @NotNull String otpValue) throws NextStepClientException {
+    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, @NotNull String otpValue) throws NextStepClientException {
         OtpAuthenticationRequest request = new OtpAuthenticationRequest();
         request.setOtpId(otpId);
         request.setOtpValue(otpValue);
@@ -1907,7 +1922,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<OtpAuthenticationResponse> authenticationWithOtp(String otpId, String operationId, @NotNull String otpValue,
+    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, String operationId, @NotNull String otpValue,
                                                                            boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         OtpAuthenticationRequest request = new OtpAuthenticationRequest();
         request.setOtpId(otpId);
@@ -1927,7 +1942,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue) throws NextStepClientException {
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue) throws NextStepClientException {
         CredentialAuthenticationRequest request = new CredentialAuthenticationRequest();
         request.setCredentialName(credentialName);
         request.setUserId(userId);
@@ -1946,7 +1961,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify) throws NextStepClientException {
         CredentialAuthenticationRequest request = new CredentialAuthenticationRequest();
         request.setCredentialName(credentialName);
@@ -1969,7 +1984,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          String operationId, boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         CredentialAuthenticationRequest request = new CredentialAuthenticationRequest();
         request.setCredentialName(credentialName);
@@ -1995,7 +2010,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CredentialAuthenticationResponse> authenticationWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                          CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                          String operationId, boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         CredentialAuthenticationRequest request = new CredentialAuthenticationRequest();
@@ -2022,7 +2037,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
         request.setCredentialName(credentialName);
@@ -2046,7 +2061,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, @NotNull String otpValue) throws NextStepClientException {
         CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
@@ -2074,7 +2089,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         CombinedAuthenticationRequest request = new CombinedAuthenticationRequest();
@@ -2105,7 +2120,7 @@ public class NextStepClient {
      * @return OTP authentication response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CombinedAuthenticationResponse> authenticationCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@NotNull String credentialName, @NotNull String userId, @NotNull String credentialValue,
                                                                                  CredentialAuthenticationMode authenticationMode, List<Integer> credentialPositionsToVerify,
                                                                                  String otpId, String operationId, @NotNull String otpValue,
                                                                                  boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
@@ -2128,6 +2143,8 @@ public class NextStepClient {
     /**
      * Create an audit log.
      *
+     * @param action Audited action.
+     * @param data Audit log data.
      * @return Create audit log response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */

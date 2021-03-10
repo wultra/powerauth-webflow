@@ -18,11 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Response object used for looking up a user identity.
+ * Response object used for looking up a single user identity.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -30,6 +28,6 @@ import java.util.List;
 public class LookupUserResponse {
 
     @NotNull
-    private final List<GetUserDetailResponse> users = new ArrayList<>();
+    private GetUserDetailResponse user;
 
 }

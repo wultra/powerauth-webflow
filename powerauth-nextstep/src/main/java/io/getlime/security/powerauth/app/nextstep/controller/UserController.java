@@ -43,6 +43,7 @@ public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserIdentityService userIdentityService;
+    private final UserIdentityLookupService userIdentityLookupService;
     private final UserRoleService userRoleService;
     private final UserContactService userContactService;
     private final UserAliasService userAliasService;
@@ -53,6 +54,7 @@ public class UserController {
     /**
      * REST controller constructor.
      * @param userIdentityService User identity service.
+     * @param userIdentityLookupService User identity lookup service.
      * @param userRoleService User role service.
      * @param userContactService User contact service.
      * @param userAliasService User alias service.
@@ -61,8 +63,9 @@ public class UserController {
      * @param requestValidator Request validator.
      */
     @Autowired
-    public UserController(UserIdentityService userIdentityService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService, CredentialService credentialService, AuthenticationService authenticationService, ObjectRequestValidator requestValidator) {
+    public UserController(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService, CredentialService credentialService, AuthenticationService authenticationService, ObjectRequestValidator requestValidator) {
         this.userIdentityService = userIdentityService;
+        this.userIdentityLookupService = userIdentityLookupService;
         this.userRoleService = userRoleService;
         this.userContactService = userContactService;
         this.userAliasService = userAliasService;
@@ -151,8 +154,23 @@ public class UserController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
-    public ObjectResponse<LookupUserResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
-        LookupUserResponse response = userIdentityService.lookupUser(request.getRequestObject());
+    public ObjectResponse<LookupUsersResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+        LookupUsersResponse response = userIdentityLookupService.lookupUsers(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Lookup a single user identity.
+     * @param request Lookup user request.
+     * @return Lookup user response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     */
+    @RequestMapping(value = "lookup/single", method = RequestMethod.POST)
+    public ObjectResponse<LookupUserResponse> lookupSingleUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, OperationNotFoundException {
+        LookupUserResponse response = userIdentityLookupService.lookupUser(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 

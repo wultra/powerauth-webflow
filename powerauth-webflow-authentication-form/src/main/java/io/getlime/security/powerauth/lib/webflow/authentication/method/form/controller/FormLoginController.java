@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
@@ -51,7 +52,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResult
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -121,13 +121,10 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             LookupUserRequest lookupRequest = new LookupUserRequest();
             lookupRequest.setCredentialName(credentialName);
             lookupRequest.setUsername(username);
+            lookupRequest.setOperationId(operation.getOperationId());
             LookupUserResponse lookupResponse;
             try {
                 lookupResponse = nextStepClient.lookupUser(lookupRequest).getResponseObject();
-                if (lookupResponse.getUsers().size() != 1) {
-                    // Invalid response, fail authentication
-                    throw new AuthStepException("User authentication failed", "login.authenticationFailed");
-                }
             } catch (NextStepClientException ex) {
                 if (ex.getNextStepError() != null && UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
                     // User ID not found using lookup
@@ -136,7 +133,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 throw ex;
             }
 
-            GetUserDetailResponse userDetail = lookupResponse.getUsers().get(0);
+            GetUserDetailResponse userDetail = lookupResponse.getUser();
             String userId = userDetail.getUserId();
             UserIdentityStatus status = userDetail.getUserIdentityStatus();
 
@@ -176,7 +173,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 throw new AuthStepException("User authentication failed", "login.authenticationFailed");
             }
 
-            CredentialAuthenticationResponse authResponse = nextStepClient.authenticationWithCredential(credentialName, userId, protectedPassword, operation.getOperationId(), true, AuthMethod.USERNAME_PASSWORD_AUTH).getResponseObject();
+            CredentialAuthenticationResponse authResponse = nextStepClient.authenticateWithCredential(credentialName, userId, protectedPassword, operation.getOperationId(), true, AuthMethod.USERNAME_PASSWORD_AUTH).getResponseObject();
             boolean showRemainingAttempts = authResponse.isShowRemainingAttempts();
             if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                 logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserId(), getAuthMethodName().toString());

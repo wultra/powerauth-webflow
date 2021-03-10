@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Wultra s.r.o.
+ * Copyright 2021 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,38 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
+package io.getlime.security.powerauth.lib.nextstep.model.response;
+
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Enumeration representing OTP status.
+ * Response object used for looking up a user identity.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public enum OtpStatus {
+@Data
+public class LookupUsersResponse {
 
-    /**
-     * OTP is active.
-     */
-    ACTIVE,
-
-    /**
-     * OTP is used.
-     */
-    USED,
-
-    /**
-     * OTP is blocked.
-     */
-    BLOCKED,
-
-    /**
-     * OTP is managed externally.
-     */
-    EXTERNAL,
-
-    /**
-     * OTP is removed.
-     */
-    REMOVED
+    @NotNull
+    private final List<GetUserDetailResponse> users = new ArrayList<>();
 
 }

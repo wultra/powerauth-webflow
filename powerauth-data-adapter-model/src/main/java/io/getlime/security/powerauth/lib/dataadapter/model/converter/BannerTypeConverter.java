@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.converter.dataadapter;
+package io.getlime.security.powerauth.lib.dataadapter.model.converter;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.BannerType;
 

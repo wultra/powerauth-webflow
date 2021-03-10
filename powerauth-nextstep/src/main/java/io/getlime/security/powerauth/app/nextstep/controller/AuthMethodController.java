@@ -163,7 +163,8 @@ public class AuthMethodController {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "user/auth-method/delete", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
+    public ObjectResponse<GetUserAuthMethodsResponse>
+    disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
         return disableAuthMethodForUserImpl(request);
     }
 

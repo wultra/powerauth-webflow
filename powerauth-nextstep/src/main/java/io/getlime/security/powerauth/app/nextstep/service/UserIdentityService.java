@@ -301,7 +301,20 @@ public class UserIdentityService {
      */
     @Transactional
     public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        return getUserDetail(request.getUserId(), request.isIncludeRemoved());
+    }
+
+    /**
+     * Get user identity detail. This method is not transactional.
+     * @param userId User ID.
+     * @param includeRemoved Whether removed data should be returned.
+     * @return User identity detail response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    public GetUserDetailResponse getUserDetail(String userId, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+        UserIdentityEntity user = userIdentityLookupService.findUser(userId);
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -324,121 +337,12 @@ public class UserIdentityService {
         }
         List<CredentialEntity> credentials = credentialRepository.findAllByUser(user);
         for (CredentialEntity credential: credentials) {
-            if (credential.getStatus() == CredentialStatus.REMOVED && !request.isIncludeRemoved()) {
+            if (credential.getStatus() == CredentialStatus.REMOVED && !includeRemoved) {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
             credentialDetail.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential));
             response.getCredentials().add(credentialDetail);
-        }
-        return response;
-    }
-
-    /**
-     * Lookup user identities.
-     * @param request Lookup user identities request.
-     * @return Lookup user identities response.
-     * @throws InvalidRequestException Thrown when request is invalid.
-     * @throws UserNotFoundException Thrown when user identity is not found.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
-     */
-    @Transactional
-    public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
-        String username = request.getUsername();
-        String credentialName = request.getCredentialName();
-        Date createdStartDate = request.getCreatedStartDate();
-        Date createdEndDate = request.getCreatedEndDate();
-        // Convert null dates for simpler queries
-        if (createdStartDate == null && createdEndDate != null) {
-            createdStartDate = new Date(Long.MIN_VALUE);
-        }
-        if (createdStartDate != null && createdEndDate == null) {
-            createdEndDate = new Date();
-        }
-        UserIdentityStatus status = request.getUserIdentityStatus();
-        CredentialStatus credentialStatus = request.getCredentialStatus();
-        List<String> roles = request.getRoles();
-        List<UserIdentityEntity> lookupResult = new ArrayList<>();
-        CredentialDefinitionEntity credentialDefinition = null;
-        boolean dateFiltered = false;
-
-        if (credentialName!= null) {
-            Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
-            if (!credentialDefinitionOptional.isPresent()) {
-                throw new InvalidRequestException("Credential definition not found: " + credentialName);
-            }
-            credentialDefinition = credentialDefinitionOptional.get();
-        }
-
-        // Choose main query based on most exact parameters, filter lookup results in code by additional parameters
-        if (username != null && credentialName != null) {
-            // When username and credentialName are present, lookup the user identity, single result or no result is found
-            Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
-            if (!credentialOptional.isPresent()) {
-                throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
-            }
-            CredentialEntity credential = credentialOptional.get();
-            if (credentialStatus == null || credential.getStatus() == credentialStatus) {
-                // Filter by credentialStatus in case it is also specified
-                UserIdentityEntity user = credential.getUser();
-                lookupResult = Collections.singletonList(user);
-            }
-        } else if (credentialName != null && credentialStatus != null) {
-            // When credentialName and credentialStatus are present, lookup the user identities, multiple or zero results are found
-            List<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus);
-            for (CredentialEntity credential: credentialEntities) {
-                lookupResult.add(credential.getUser());
-            }
-        } else if (createdStartDate != null && credentialStatus == null) {
-            // Lookup the user identities by createdDate, multiple or zero results are found, credentialStatus filter is not allowed
-            lookupResult = userIdentityRepository.findUserIdentitiesByCreatedDate(createdStartDate, createdEndDate);
-            dateFiltered = true;
-        } else {
-            throw new InvalidRequestException("The lookup query contains an invalid combination of parameters");
-        }
-
-        if (createdStartDate != null && !dateFiltered) {
-            // Filter by timestampCreated, but only if filter was not alreast applied
-            Date finalCreatedStartDate = createdStartDate;
-            Date finalCreatedEndDate = createdEndDate;
-            lookupResult = lookupResult.stream()
-                    .filter(user -> (user.getTimestampCreated().after(finalCreatedStartDate) && user.getTimestampCreated().before(finalCreatedEndDate)))
-                    .collect(Collectors.toList());
-        }
-
-        if (status != null) {
-            // Filter by status
-            lookupResult = lookupResult.stream()
-                    .filter(user -> user.getStatus() == status)
-                    .collect(Collectors.toList());
-        } else {
-            // Do not return REMOVED user identities unless requested in lookup request
-            lookupResult = lookupResult.stream()
-                    .filter(user -> user.getStatus() != UserIdentityStatus.REMOVED)
-                    .collect(Collectors.toList());
-        }
-
-        if (roles != null && !roles.isEmpty()) {
-            // Filter by roles
-            List<UserIdentityEntity> filteredList = new ArrayList<>();
-            for (UserIdentityEntity user: lookupResult) {
-                List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserAndStatus(user, UserRoleStatus.ACTIVE);
-                List<String> roleNames = userRoles.stream()
-                    .map(roleEntity -> roleEntity.getRole().getName())
-                    .collect(Collectors.toList());
-                if (roleNames.containsAll(roles)) {
-                    filteredList.add(user);
-                }
-            }
-            lookupResult = filteredList;
-        }
-
-        LookupUserResponse response = new LookupUserResponse();
-        for (UserIdentityEntity user: lookupResult) {
-            GetUserDetailRequest detailRequest = new GetUserDetailRequest();
-            detailRequest.setUserId(user.getUserId());
-            GetUserDetailResponse userDetail = getUserDetail(detailRequest);
-            response.getUsers().add(userDetail);
         }
         return response;
     }

@@ -346,10 +346,10 @@ CREATE TABLE ns_otp_storage (
   user_id                     VARCHAR(256),                        -- User identifier.
   credential_definition_id    INTEGER,                             -- Credential definition identifier used when updating failed counter.
   operation_id                VARCHAR(256),                        -- Operation identifier.
-  value                       VARCHAR(256) NOT NULL,               -- One time password value.
-  salt                        VARBINARY(16) NOT NULL,              -- Cryptographic salt used when generating one time password.
+  value                       VARCHAR(256),                        -- One time password value.
+  salt                        VARBINARY(16),                       -- Cryptographic salt used when generating one time password.
   status                      VARCHAR(32) NOT NULL,                -- One time password status: ACTIVE, USED, BLOCKED, REMOVED.
-  otp_data                    TEXT NOT NULL,                       -- Data used for generating one time password.
+  otp_data                    TEXT,                                -- Data used for generating one time password.
   attempt_counter             INTEGER DEFAULT 0 NOT NULL,          -- One time password attempt counter.
   failed_attempt_counter      INTEGER DEFAULT 0 NOT NULL,          -- One time password failed attempt counter.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when one time password was created.

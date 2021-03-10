@@ -21,6 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -71,6 +74,22 @@ public class OperationConverter {
         operationDetail.setTimestampCreated(operation.getTimestampCreated());
         operationDetail.setTimestampExpires(operation.getTimestampExpires());
         return operationDetail;
+    }
+
+    /**
+     * Convert operation entity to operation context.
+     * @param operation Operation entity.
+     * @return Operation context.
+     */
+    public OperationContext toOperationContext(OperationEntity operation) {
+        String operationId = operation.getOperationId();
+        String operationName = operation.getOperationName();
+        String operationData = operation.getOperationData();
+        GetOperationDetailResponse operationDetail = fromEntity(operation);
+        FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
+        ApplicationContext applicationContext = operationDetail.getApplicationContext();
+        final String externalTransactionId = operation.getExternalTransactionId();
+        return new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
     }
 
     /**

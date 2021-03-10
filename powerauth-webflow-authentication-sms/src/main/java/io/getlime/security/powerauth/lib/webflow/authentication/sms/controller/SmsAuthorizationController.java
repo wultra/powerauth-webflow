@@ -155,7 +155,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
-                    OtpAuthenticationResponse otpResponse = nextStepClient.authenticationWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
+                    OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
                     smsAuthorizationResult = otpResponse.getAuthenticationResult();
                     request.setAuthInstruments(Collections.singletonList(AuthInstrument.OTP_KEY));
                     if (smsAuthorizationResult == AuthenticationResult.SUCCEEDED) {
@@ -197,7 +197,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 }
 
                 String protectedPassword = passwordProtection.protect(request.getPassword());
-                CombinedAuthenticationResponse authResponse = nextStepClient.authenticationCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
+                CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
                 if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                     cleanHttpSession();
                     logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());

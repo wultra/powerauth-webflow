@@ -13,20 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.app.nextstep.service;
+package io.getlime.security.powerauth.app.nextstep.service.adapter;
 
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
-import io.getlime.security.powerauth.app.nextstep.converter.dataadapter.FormDataConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsDeliveryResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateSmsAuthorizationResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.SendAuthorizationSmsResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDeliveryResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
@@ -67,16 +64,10 @@ public class OtpCustomizationService {
     public OtpDeliveryResult createAndSendOtp(String userId, OperationEntity operation, String language, boolean resend) {
         OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         try {
-            String operationId = operation.getOperationId();
-            String operationName = operation.getOperationName();
-            String operationData = operation.getOperationData();
             GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
             String organizationId = operationDetail.getOrganizationId();
             AuthMethod authMethod = operationDetail.getChosenAuthMethod();
-            FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-            ApplicationContext applicationContext = operationDetail.getApplicationContext();
-            final String externalTransactionId = operation.getExternalTransactionId();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
+            OperationContext operationContext = operationConverter.toOperationContext(operation);
             CreateSmsAuthorizationResponse response = dataAdapterClient.createAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
@@ -103,16 +94,10 @@ public class OtpCustomizationService {
         OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         otpDeliveryResult.setOtpId(otpId);
         try {
-            String operationId = operation.getOperationId();
-            String operationName = operation.getOperationName();
-            String operationData = operation.getOperationData();
             GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
             String organizationId = operationDetail.getOrganizationId();
             AuthMethod authMethod = operationDetail.getChosenAuthMethod();
-            FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-            ApplicationContext applicationContext = operationDetail.getApplicationContext();
-            final String externalTransactionId = operation.getExternalTransactionId();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
+            OperationContext operationContext = operationConverter.toOperationContext(operation);
             SendAuthorizationSmsResponse response = dataAdapterClient.sendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, otpId, otpValue, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
