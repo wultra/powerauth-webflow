@@ -27,6 +27,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotActiveException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -626,16 +628,28 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         String credentialName = organization.getDefaultCredentialName();
         String userId = operation.getUserId();
         // OTP data is taken from operation
-        CreateOtpResponse otpResponse = nextStepClient.createOtp(userId, otpName, credentialName, null, operation.getOperationId()).getResponseObject();
-        // TODO - new endpoint - opt/send
-        // TODO - add language into request
-        // TODO - handle resend parameter automatically via operation
-        // TODO - add error message into response
-        updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
-        AuthorizationOtpResult result = new AuthorizationOtpResult();
-        result.setDelivered(true);
-        result.setOtpId(otpResponse.getOtpId());
-        return result;
+        try {
+            CreateOtpResponse otpResponse = nextStepClient.createOtp(userId, otpName, credentialName, null, operation.getOperationId()).getResponseObject();
+            // TODO - new endpoint - opt/send
+            // TODO - add language into request
+            // TODO - handle resend parameter automatically via operation
+            // TODO - add error message into response
+            updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
+            AuthorizationOtpResult result = new AuthorizationOtpResult();
+            result.setDelivered(true);
+            result.setOtpId(otpResponse.getOtpId());
+            return result;
+        } catch (NextStepClientException ex) {
+            if (ex.getNextStepError() != null
+                    && (CredentialNotActiveException.CODE.equals(ex.getNextStepError().getCode())
+                        || UserNotActiveException.CODE.equals(ex.getNextStepError().getCode()))) {
+                AuthorizationOtpResult result = new AuthorizationOtpResult();
+                result.setDelivered(false);
+                result.setErrorMessage("smsAuthorization.deliveryFailed");
+                return result;
+            }
+            throw ex;
+        }
     }
 
     /**

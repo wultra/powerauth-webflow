@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -141,21 +142,6 @@ public class WebFlowServicesConfiguration {
     }
 
     /**
-     * Default data adapter client.
-     *
-     * @return Data adapter client.
-     */
-    @Bean
-    public DataAdapterClient defaultDataAdapterClient() {
-        DataAdapterClient client = new DataAdapterClient(dataAdapterServiceUrl);
-        // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificate) {
-            sslConfigurationService.trustAllCertificates();
-        }
-        return client;
-    }
-
-    /**
      * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
      * @return Constructed object mapper.
      */
@@ -164,6 +150,25 @@ public class WebFlowServicesConfiguration {
         mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
+    }
+
+    /**
+     * Default data adapter client.
+     *
+     * @return Data adapter client.
+     */
+    @Bean
+    public DataAdapterClient defaultDataAdapterClient() {
+        RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
+        restClientConfiguration.setBaseUrl(nextstepServiceUrl);
+        restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
+        restClientConfiguration.setObjectMapper(objectMapper());
+        try {
+            return new DataAdapterClient(dataAdapterServiceUrl);
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
     }
 
     /**
