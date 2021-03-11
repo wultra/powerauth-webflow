@@ -30,7 +30,6 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -286,7 +285,6 @@ public class DataAdapterClient {
         request.setOrganizationId(organizationId);
         request.setOperationContext(operationContext);
         request.setOperationChange(operationChange);
-        HttpEntity<ObjectRequest<OperationChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
         return postObjectImpl("/api/operation/change", new ObjectRequest<>(request));
     }
 

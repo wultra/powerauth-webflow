@@ -20,10 +20,6 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
@@ -308,17 +304,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, authMethod, authInstruments, AuthStepResult.CONFIRMED, null, params, applicationContext);
         AuthResult authResult = response.getResponseObject().getResult();
-        // notify Data Adapter in case operation is in DONE state now
         if (authResult == AuthResult.DONE) {
-            try {
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.DONE, userId, organizationId, operationContext);
-                // notify AFS about logout
-                afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
-            } catch (DataAdapterClientErrorException ex) {
-                logger.error("Error while notifying Data Adapter", ex);
-            }
+            // notify AFS about logout
+            afsIntegrationService.executeLogoutAction(operationId, OperationTerminationReason.DONE);
         }
         // update operation result in operation to HTTP session mapping
         List<AuthStep> steps = response.getResponseObject().getSteps();
@@ -347,15 +335,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, authInstruments, AuthStepResult.AUTH_FAILED, null, params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
         AuthResult authResult = response.getResponseObject().getResult();
-        if (authResult == AuthResult.FAILED) {
-            try {
-                FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.FAILED, userId, operation.getOrganizationId(), operationContext);
-            } catch (DataAdapterClientErrorException ex) {
-                logger.error("Error while notifying Data Adapter", ex);
-            }
-        }
         // update operation result in operation to HTTP session mapping
         List<AuthStep> steps = response.getResponseObject().getSteps();
         operationSessionService.updateOperationResult(operationId, authResult);

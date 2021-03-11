@@ -17,11 +17,6 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
@@ -97,16 +92,12 @@ public class OperationCancellationService {
             if (operationDetail.getResult() == AuthResult.CONTINUE) {
                 final ApplicationContext applicationContext = operationDetail.getApplicationContext();
                 ObjectResponse<UpdateOperationResponse> updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
-                // Notify Data Adapter about cancellation event
-                FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), operationDetail.getExternalTransactionId(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
                 // Notify AFS about logout event
                 OperationTerminationReason terminationReason = operationCancellationConverter.convertCancelReason(cancelReason);
                 afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), terminationReason);
                 return updateOperationResponse.getResponseObject();
             }
-        } catch (NextStepClientException | DataAdapterClientErrorException ex) {
+        } catch (NextStepClientException ex) {
             logger.error("Error occurred while canceling operation", ex);
             throw new CommunicationFailedException("Communication failed while canceling operation");
         }

@@ -23,6 +23,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRep
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.adapter.OperationCustomizationService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -66,6 +67,7 @@ public class OperationPersistenceService {
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final StepResolutionService stepResolutionService;
     private final AuthenticationRepository authenticationRepository;
+    private final OperationCustomizationService operationCustomizationService;
 
     /**
      * Service constructor.
@@ -76,12 +78,13 @@ public class OperationPersistenceService {
      * @param mobileTokenConfigurationService Mobile token configuration service.
      * @param stepResolutionService           Step resolution service.
      * @param authenticationRepository        Authentication repository.
+     * @param operationCustomizationService   Operation customization service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OrganizationRepository organizationRepository, OperationHistoryRepository operationHistoryRepository,
                                        MobileTokenConfigurationService mobileTokenConfigurationService,
-                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository) {
+                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository, OperationCustomizationService operationCustomizationService) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.organizationRepository = organizationRepository;
@@ -89,6 +92,7 @@ public class OperationPersistenceService {
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
         this.stepResolutionService = stepResolutionService;
         this.authenticationRepository = authenticationRepository;
+        this.operationCustomizationService = operationCustomizationService;
     }
 
     /**
@@ -188,6 +192,7 @@ public class OperationPersistenceService {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
+        AuthResult originalResult = operation.getResult();
         if (request.getUserId() != null) {
             operation.setUserId(request.getUserId());
         }
@@ -229,6 +234,10 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operation.getOperationHistory().add(operationHistory);
         operationRepository.save(operation);
+
+        if (!originalResult.equals(operation.getResult())) {
+            operationCustomizationService.notifyOperationChange(operation);
+        }
     }
 
     /**
