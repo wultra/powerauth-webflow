@@ -45,6 +45,7 @@ public class CredentialDefinitionConverter {
             credentialDefinitionDetail.setHashConfigName(credentialDefinition.getHashingConfig().getName());
         }
         credentialDefinitionDetail.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
+        credentialDefinitionDetail.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         credentialDefinitionDetail.setTimestampCreated(credentialDefinition.getTimestampCreated());
         credentialDefinitionDetail.setTimestampLastUpdated(credentialDefinition.getTimestampLastUpdated());
         return credentialDefinitionDetail;

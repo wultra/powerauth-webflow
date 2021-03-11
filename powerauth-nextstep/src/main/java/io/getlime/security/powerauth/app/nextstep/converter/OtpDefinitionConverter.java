@@ -39,6 +39,7 @@ public class OtpDefinitionConverter {
         otpDefinitionDetail.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
         otpDefinitionDetail.setEncryptionEnabled(otpDefinition.isEncryptionEnabled());
         otpDefinitionDetail.setEncryptionAlgorithm(otpDefinition.getEncryptionAlgorithm());
+        otpDefinitionDetail.setDataAdapterProxyEnabled(otpDefinition.isDataAdapterProxyEnabled());
         otpDefinitionDetail.setTimestampCreated(otpDefinition.getTimestampCreated());
         otpDefinitionDetail.setTimestampLastUpdated(otpDefinition.getTimestampLastUpdated());
         return otpDefinitionDetail;
