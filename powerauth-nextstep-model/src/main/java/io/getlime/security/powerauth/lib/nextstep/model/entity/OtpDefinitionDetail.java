@@ -51,6 +51,8 @@ public class OtpDefinitionDetail {
     @NotNull
     private OtpDefinitionStatus otpDefinitionStatus;
     @NotNull
+    private boolean dataAdapterProxyEnabled;
+    @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;
 

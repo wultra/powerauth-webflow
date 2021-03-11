@@ -114,6 +114,7 @@ public class OtpDefinitionService {
         otpDefinition.setEncryptionEnabled(request.isEncryptionEnabled());
         otpDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
         otpDefinition.setStatus(OtpDefinitionStatus.ACTIVE);
+        otpDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         otpDefinition.setTimestampCreated(new Date());
         otpDefinitionRepository.save(otpDefinition);
         CreateOtpDefinitionResponse response = new CreateOtpDefinitionResponse();
@@ -123,6 +124,7 @@ public class OtpDefinitionService {
         response.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
         response.setEncryptionEnabled(otpDefinition.isEncryptionEnabled());
         response.setEncryptionAlgorithm(otpDefinition.getEncryptionAlgorithm());
+        response.setDataAdapterProxyEnabled(otpDefinition.isDataAdapterProxyEnabled());
         return response;
     }
 
@@ -169,6 +171,7 @@ public class OtpDefinitionService {
         otpDefinition.setOtpPolicy(otpPolicy);
         otpDefinition.setEncryptionEnabled(request.isEncryptionEnabled());
         otpDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
+        otpDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinitionRepository.save(otpDefinition);
         UpdateOtpDefinitionResponse response  = new UpdateOtpDefinitionResponse();
@@ -179,6 +182,7 @@ public class OtpDefinitionService {
         response.setOtpPolicyName(otpDefinition.getOtpPolicy().getName());
         response.setEncryptionEnabled(otpDefinition.isEncryptionEnabled());
         response.setEncryptionAlgorithm(otpDefinition.getEncryptionAlgorithm());
+        response.setDataAdapterProxyEnabled(otpDefinition.isDataAdapterProxyEnabled());
         return response;
     }
 

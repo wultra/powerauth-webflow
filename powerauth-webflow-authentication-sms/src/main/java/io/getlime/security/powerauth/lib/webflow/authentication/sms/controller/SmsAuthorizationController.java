@@ -156,6 +156,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
                     OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
+                    if (otpResponse.isOperationFailed()) {
+                        logger.info("Step authentication failed (1FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                    }
                     smsAuthorizationResult = otpResponse.getAuthenticationResult();
                     request.setAuthInstruments(Collections.singletonList(AuthInstrument.OTP_KEY));
                     if (smsAuthorizationResult == AuthenticationResult.SUCCEEDED) {
@@ -198,6 +202,10 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
 
                 String protectedPassword = passwordProtection.protect(request.getPassword());
                 CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
+                if (authResponse.isOperationFailed()) {
+                    logger.info("Step authentication failed (2FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                }
                 if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                     cleanHttpSession();
                     logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());

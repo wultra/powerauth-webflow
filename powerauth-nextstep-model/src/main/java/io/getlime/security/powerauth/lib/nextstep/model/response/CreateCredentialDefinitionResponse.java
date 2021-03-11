@@ -56,5 +56,7 @@ public class CreateCredentialDefinitionResponse {
     private boolean e2eEncryptionEnabled;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
+    @NotNull
+    private boolean dataAdapterProxyEnabled;
 
 }

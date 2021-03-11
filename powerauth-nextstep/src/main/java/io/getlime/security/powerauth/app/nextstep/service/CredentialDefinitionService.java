@@ -134,6 +134,7 @@ public class CredentialDefinitionService {
         }
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
         credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
+        credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampCreated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
         CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
@@ -150,6 +151,7 @@ public class CredentialDefinitionService {
             response.setHashConfigName(credentialDefinition.getHashingConfig().getName());
         }
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
+        response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }
 
@@ -211,6 +213,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
         credentialDefinition.setHashingConfig(hashConfigEntity);
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
+        credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
         UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
@@ -227,6 +230,7 @@ public class CredentialDefinitionService {
             response.setHashConfigName(credentialDefinition.getHashingConfig().getName());
         }
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
+        response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }
 

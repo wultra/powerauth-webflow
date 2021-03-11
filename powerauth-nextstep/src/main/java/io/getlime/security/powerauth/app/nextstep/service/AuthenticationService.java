@@ -227,7 +227,12 @@ public class AuthenticationService {
                 response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
             lastAttempt = true;
         }
-        updateOperation(userId, operation, authMethod, response.getAuthenticationResult(), null, lastAttempt, Collections.singletonList(AuthInstrument.CREDENTIAL));
+        boolean operationFailed = false;
+        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(), null, lastAttempt, Collections.singletonList(AuthInstrument.CREDENTIAL));
+        if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+            operationFailed = true;
+        }
+        response.setOperationFailed(operationFailed);
         return response;
     }
 
@@ -402,8 +407,13 @@ public class AuthenticationService {
                 response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
             lastAttempt = true;
         }
-        updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
+        boolean operationFailed = false;
+        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
                 null, lastAttempt, Collections.singletonList(AuthInstrument.OTP_KEY));
+        if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+            operationFailed = true;
+        }
+        response.setOperationFailed(operationFailed);
         return response;
     }
 
@@ -580,8 +590,13 @@ public class AuthenticationService {
                 response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
             lastAttempt = true;
         }
-        updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
+        boolean operationFailed = false;
+        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
                 null, lastAttempt, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
+        if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
+            operationFailed = true;
+        }
+        response.setOperationFailed(operationFailed);
         return response;
     }
 

@@ -84,7 +84,7 @@ public class AuthenticationCustomizationService {
             } else {
                 response.setAuthenticationResult(AuthenticationResult.FAILED);
                 response.setErrorMessage(authResponse.getErrorMessage());
-                if (authResponse.getAccountStatus() != AccountStatus.ACTIVE) {
+                if (authResponse.getAccountStatus() != null && authResponse.getAccountStatus() != AccountStatus.ACTIVE) {
                     response.setUserIdentityStatus(UserIdentityStatus.BLOCKED);
                 }
             }
@@ -171,7 +171,7 @@ public class AuthenticationCustomizationService {
             } else {
                 response.setAuthenticationResult(AuthenticationResult.FAILED);
             }
-            if (authResponse.getAccountStatus() != AccountStatus.ACTIVE) {
+            if (authResponse.getAccountStatus() != null && authResponse.getAccountStatus() != AccountStatus.ACTIVE) {
                 response.setUserIdentityStatus(UserIdentityStatus.BLOCKED);
             }
             response.setErrorMessage(authResponse.getErrorMessage());

@@ -52,5 +52,6 @@ public class UpdateCredentialDefinitionRequest {
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
     private CredentialDefinitionStatus credentialDefinitionStatus;
+    private boolean dataAdapterProxyEnabled;
 
 }

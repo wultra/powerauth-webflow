@@ -44,4 +44,6 @@ public class UpdateOtpDefinitionRequest {
     @Size(min = 2, max = 256)
     private String encryptionAlgorithm;
     private OtpDefinitionStatus otpDefinitionStatus;
+    private boolean dataAdapterProxyEnabled;
+
 }

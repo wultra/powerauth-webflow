@@ -60,6 +60,8 @@ public class CredentialDefinitionDetail {
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
     @NotNull
+    private boolean dataAdapterProxyEnabled;
+    @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;
 

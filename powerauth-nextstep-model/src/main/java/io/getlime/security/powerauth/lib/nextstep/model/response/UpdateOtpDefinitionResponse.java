@@ -47,5 +47,7 @@ public class UpdateOtpDefinitionResponse {
     private String encryptionAlgorithm;
     @NotNull
     private OtpDefinitionStatus otpDefinitionStatus;
+    @NotNull
+    private boolean dataAdapterProxyEnabled;
 
 }

@@ -50,6 +50,7 @@ public class CreateCredentialDefinitionRequest {
     @Size(min = 2, max = 256)
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
+    private boolean dataAdapterProxyEnabled;
 
 }
 
