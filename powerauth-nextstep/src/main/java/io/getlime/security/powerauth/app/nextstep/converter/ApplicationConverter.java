@@ -35,6 +35,9 @@ public class ApplicationConverter {
         applicationDetail.setApplicationName(application.getName());
         applicationDetail.setDescription(application.getDescription());
         applicationDetail.setApplicationStatus(application.getStatus());
+        if (application.getOrganization() != null) {
+            applicationDetail.setOrganizationId(application.getOrganization().getOrganizationId());
+        }
         applicationDetail.setTimestampCreated(application.getTimestampCreated());
         applicationDetail.setTimestampLastUpdated(application.getTimestampLastUpdated());
         return applicationDetail;

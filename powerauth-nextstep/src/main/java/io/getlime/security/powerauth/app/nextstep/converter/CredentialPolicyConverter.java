@@ -17,7 +17,10 @@ package io.getlime.security.powerauth.app.nextstep.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 
 /**
@@ -52,18 +55,18 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setRotationDays(credentialPolicy.getRotationDays());
         credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
         try {
-            credentialPolicyDetail.setUsernameGenParam(parameterConverter.fromString(credentialPolicy.getUsernameGenParam()));
+            credentialPolicyDetail.setUsernameGenParam(parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
         credentialPolicyDetail.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());
         try {
-            credentialPolicyDetail.setCredentialGenParam(parameterConverter.fromString(credentialPolicy.getCredentialGenParam()));
+            credentialPolicyDetail.setCredentialGenParam(parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
         try {
-            credentialPolicyDetail.setCredentialValParam(parameterConverter.fromString(credentialPolicy.getCredentialValParam()));
+            credentialPolicyDetail.setCredentialValParam(parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }

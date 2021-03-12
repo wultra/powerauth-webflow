@@ -39,6 +39,7 @@ public class OtpAuthenticationRequest {
     private String otpValue;
     // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;
+    // Authentication method is required only in case multiple methods are defined in Next Steps
     private AuthMethod authMethod;
 
 }

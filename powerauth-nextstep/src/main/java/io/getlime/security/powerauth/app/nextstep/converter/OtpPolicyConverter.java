@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 
@@ -44,7 +45,7 @@ public class OtpPolicyConverter {
         otpPolicyDetail.setAttemptLimit(otpPolicy.getAttemptLimit());
         otpPolicyDetail.setGenAlgorithm(otpPolicy.getGenAlgorithm());
         try {
-            otpPolicyDetail.setGenParam(parameterConverter.fromString(otpPolicy.getGenParam()));
+            otpPolicyDetail.setGenParam(parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }

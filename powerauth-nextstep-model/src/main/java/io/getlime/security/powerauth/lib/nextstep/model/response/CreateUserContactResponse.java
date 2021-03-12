@@ -38,6 +38,7 @@ public class CreateUserContactResponse {
     private String contactName;
     @NotNull
     private ContactType contactType;
+    @NotBlank
     @Size(min = 2, max = 256)
     private String contactValue;
     @NotNull

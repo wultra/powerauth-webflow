@@ -311,7 +311,6 @@ public class CredentialService {
         credential.setFailedAttemptCounterSoft(0);
         credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
-        credential.setType(request.getCredentialType());
         credential.setTimestampBlocked(null);
         credentialRepository.save(credential);
         // Save credential into credential history

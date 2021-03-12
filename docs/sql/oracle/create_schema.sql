@@ -226,7 +226,7 @@ CREATE TABLE ns_user_contact (
   user_id                VARCHAR2(256 CHAR) NOT NULL,                       -- User identity identifier.
   name                   VARCHAR2(256 CHAR) NOT NULL,                       -- User contact name used for identification.
   type                   VARCHAR2(32 CHAR) NOT NULL,                        -- User contact type: PHONE, EMAIL, OTHER.
-  value                  VARCHAR2(256 CHAR),                                -- User contact value.
+  value                  VARCHAR2(256 CHAR) NOT NULL,                       -- User contact value.
   is_primary             NUMBER(1) DEFAULT 0 NOT NULL,                      -- Whether contact is primary.
   timestamp_created      TIMESTAMP,                                         -- Timestamp when contact was created.
   timestamp_last_updated TIMESTAMP,                                         -- Timestamp when contact was last updated.

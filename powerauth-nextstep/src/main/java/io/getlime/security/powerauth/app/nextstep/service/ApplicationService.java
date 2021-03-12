@@ -128,8 +128,6 @@ public class ApplicationService {
                 throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
             }
             application.setOrganization(organizationOptional.get());
-        } else {
-            application.setOrganization(null);
         }
         if (request.getApplicationStatus() != null) {
             application.setStatus(request.getApplicationStatus());

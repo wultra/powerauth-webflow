@@ -41,6 +41,7 @@ public class CombinedAuthenticationRequest {
     @NotBlank
     @Size(min = 1, max = 256)
     private String credentialValue;
+    // Null value is allowed, defaults to MATCH_EXACT
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify = new ArrayList<>();
     // Either otpId or operationId should be present
@@ -53,6 +54,7 @@ public class CombinedAuthenticationRequest {
     private String otpValue;
     // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;
+    // Authentication method is required only in case multiple methods are defined in Next Steps
     private AuthMethod authMethod;
 
 }

@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 import lombok.Data;
 
 /**
- * SMS delivery result
+ * SMS OTP delivery result.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

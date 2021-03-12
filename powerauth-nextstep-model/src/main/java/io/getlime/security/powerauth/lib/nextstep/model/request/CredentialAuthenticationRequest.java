@@ -40,11 +40,13 @@ public class CredentialAuthenticationRequest {
     @NotBlank
     @Size(min = 1, max = 256)
     private String credentialValue;
+    // Null value is allowed, defaults to MATCH_EXACT
     private CredentialAuthenticationMode authenticationMode;
     private List<Integer> credentialPositionsToVerify;
     @Size(min = 1, max = 256)
     private String operationId;
     private boolean updateOperation;
+    // Authentication method is required only in case multiple methods are defined in Next Steps
     private AuthMethod authMethod;
 
 }
