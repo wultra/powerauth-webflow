@@ -148,7 +148,7 @@ CREATE TABLE ns_application (
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Timestamp when application was created.
   timestamp_last_updated TIMESTAMP,                                    -- Timestamp when application was last updated.
   CONSTRAINT ns_application_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_credential_policy stores credential policies.
 CREATE TABLE ns_credential_policy (
@@ -173,7 +173,7 @@ CREATE TABLE ns_credential_policy (
   credential_val_param       VARCHAR(4096) NOT NULL,                       -- Parameters used when validating the credential.
   timestamp_created          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Timestamp when policy was created.
   timestamp_last_updated     TIMESTAMP                                     -- Timestamp when policy was last updated.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_credential_policy stores one time password policies.
 CREATE TABLE ns_otp_policy (
@@ -188,7 +188,7 @@ CREATE TABLE ns_otp_policy (
   gen_param              VARCHAR(4096) NOT NULL,                      -- Parameters used when generating the OTP.
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when policy was created.
   timestamp_last_updated TIMESTAMP                                    -- Timestamp when policy was last updated.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_identity stores user identities.
 CREATE TABLE ns_user_identity (
@@ -197,7 +197,7 @@ CREATE TABLE ns_user_identity (
   extras                 VARCHAR(256),                                -- Extra attributes with data related to user identity.
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when user identity was created.
   timestamp_last_updated TIMESTAMP                                    -- Timestamp when user identity was last updated.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_contact stores contact information for user identities.
 CREATE TABLE ns_user_contact (
@@ -210,7 +210,7 @@ CREATE TABLE ns_user_contact (
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when contact was created.
   timestamp_last_updated TIMESTAMP,                                   -- Timestamp when contact was last updated.
   CONSTRAINT ns_user_contact_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_identity stores history for user identities.
 CREATE TABLE ns_user_identity_history (
@@ -221,7 +221,7 @@ CREATE TABLE ns_user_identity_history (
   extras                   VARCHAR(256),                                -- Extra attributes with data related to user identity.
   timestamp_created        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when user identity snapshot was created.
   CONSTRAINT ns_user_identity_history_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_role stores user role definitions.
 CREATE TABLE ns_role (
@@ -230,7 +230,7 @@ CREATE TABLE ns_role (
   description            VARCHAR(256),                                -- Description of role.
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when role was created.
   timestamp_last_updated TIMESTAMP                                    -- Timestamp when role was last updated.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_role stores assignment of roles to user identities.
 CREATE TABLE ns_user_role (
@@ -242,7 +242,7 @@ CREATE TABLE ns_user_role (
   timestamp_last_updated   TIMESTAMP,                                   -- Timestamp when user role was last updated.
   CONSTRAINT ns_role_identity_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id),
   CONSTRAINT ns_user_role_fk FOREIGN KEY (role_id) REFERENCES ns_role (role_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_alias stores user aliases.
 CREATE TABLE ns_user_alias (
@@ -255,7 +255,7 @@ CREATE TABLE ns_user_alias (
   timestamp_created        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when user alias was created.
   timestamp_last_updated   TIMESTAMP,                                   -- Timestamp when user alias was last updated.
   CONSTRAINT ns_user_alias_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_hashing_config stores configuration of hashing algorithms.
 CREATE TABLE ns_hashing_config (
@@ -265,7 +265,7 @@ CREATE TABLE ns_hashing_config (
   status                   VARCHAR(32) NOT NULL,                        -- Hashing configuration status: ACTIVE, REMOVED.
   parameters               VARCHAR(256),                                -- Hashing algorithm parameters.
   timestamp_created        TIMESTAMP                                    -- Timestamp when hashing configuration was created.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_credential_definition stores definitions of credentials with reference to credential policies and applications.
 CREATE TABLE ns_credential_definition (
@@ -287,7 +287,7 @@ CREATE TABLE ns_credential_definition (
   CONSTRAINT ns_credential_application_fk FOREIGN KEY (application_id) REFERENCES ns_application (application_id),
   CONSTRAINT ns_credential_policy_fk FOREIGN KEY (credential_policy_id) REFERENCES ns_credential_policy (credential_policy_id),
   CONSTRAINT ns_credential_hash_fk FOREIGN KEY (hashing_config_id) REFERENCES ns_hashing_config (hashing_config_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_otp_definition stores definitions of one time passwords with reference to credential policies and applications.
 CREATE TABLE ns_otp_definition (
@@ -304,7 +304,7 @@ CREATE TABLE ns_otp_definition (
   timestamp_last_updated     TIMESTAMP,                                   -- Timestamp when one time password definition was last updated.
   CONSTRAINT ns_otp_application_fk FOREIGN KEY (application_id) REFERENCES ns_application (application_id),
   CONSTRAINT ns_otp_policy_fk FOREIGN KEY (otp_policy_id) REFERENCES ns_otp_policy (otp_policy_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_credential_storage stores credential values, counters and other data related to credentials.
 CREATE TABLE ns_credential_storage (
@@ -325,7 +325,7 @@ CREATE TABLE ns_credential_storage (
   timestamp_last_credential_change TIMESTAMP,                           -- Timestamp when credential value was last changed.
   CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
   CONSTRAINT ns_credential_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_credential_history stores historical values of credentials.
 CREATE TABLE ns_credential_history (
@@ -337,7 +337,7 @@ CREATE TABLE ns_credential_history (
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when credential was created.
   CONSTRAINT ns_credential_history_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
   CONSTRAINT ns_credential_history_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_otp_storage stores one time password values, counters and other data related to one time passwords.
 CREATE TABLE ns_otp_storage (
@@ -357,7 +357,7 @@ CREATE TABLE ns_otp_storage (
   timestamp_blocked           TIMESTAMP,                           -- Timestamp when one time password was verified.
   timestamp_expires           TIMESTAMP,                           -- Timestamp when one time password expires.
   CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_operation stores details of Web Flow operations.
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
@@ -398,7 +398,7 @@ CREATE TABLE ns_authentication (
   CONSTRAINT ns_auth_credential_fk FOREIGN KEY (credential_id) REFERENCES ns_credential_storage (credential_id),
   CONSTRAINT ns_auth_otp_fk FOREIGN KEY (otp_id) REFERENCES ns_otp_storage (otp_id),
   CONSTRAINT ns_auth_operation_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_operation_history stores all changes of operations.
 CREATE TABLE ns_operation_history (
@@ -435,7 +435,7 @@ CREATE TABLE ns_operation_afs (
   response_afs_extras         VARCHAR(256),                                -- Additional information sent in AFS response.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp this AFS action was created.
   CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_audit_log stores audit information.
 CREATE TABLE ns_audit_log (
@@ -443,7 +443,7 @@ CREATE TABLE ns_audit_log (
   action                 VARCHAR(256) NOT NULL,                       -- Action which is being audited.
   data                   TEXT,                                        -- Data for the audit record.
   timestamp_created      TIMESTAMP                                    -- Timestamp when audit record was created.
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_user_prefs stores user preferences.
 -- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
