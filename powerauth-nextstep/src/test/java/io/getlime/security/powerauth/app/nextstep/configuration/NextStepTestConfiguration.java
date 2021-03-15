@@ -148,7 +148,7 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setLimitHard(5);
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
-        credentialPolicyRequest.setUsernameAllowedPattern("[a-zA-Z0-9]+");
+        credentialPolicyRequest.setUsernameAllowedPattern("[a-zA-Z0-9_]+");
         credentialPolicyRequest.setUsernameGenAlgorithm("RANDOM_DIGITS");
         UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
         usernameGenParam.setLength(8);
