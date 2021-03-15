@@ -186,7 +186,9 @@ public class UserAliasService {
         response.setAliasName(alias.getName());
         response.setAliasValue(alias.getValue());
         response.setUserAliasStatus(alias.getStatus());
-        response.getExtras().putAll(request.getExtras());
+        if (request.getExtras() != null) {
+            response.getExtras().putAll(request.getExtras());
+        }
         return response;
     }
 

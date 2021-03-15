@@ -246,12 +246,15 @@ public class UserIdentityService {
                 throw new InvalidRequestException(ex);
             }
         }
+        user.setTimestampLastUpdated(new Date());
         userIdentityRepository.save(user);
 
         UpdateUserResponse response = new UpdateUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
-        response.getExtras().putAll(request.getExtras());
+        if (request.getExtras() != null) {
+            response.getExtras().putAll(request.getExtras());
+        }
         List<CredentialSecretDetail> newCredentials = new ArrayList<>();
         if (request.getCredentials() != null) {
             if (request.getUserIdentityStatus() != UserIdentityStatus.REMOVED) {
@@ -314,7 +317,7 @@ public class UserIdentityService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public GetUserDetailResponse getUserDetail(String userId, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(userId);
+        UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());

@@ -86,6 +86,7 @@ public class CredentialPolicyService {
         credentialPolicy.setStatus(CredentialPolicyStatus.ACTIVE);
         credentialPolicy.setUsernameLengthMin(request.getUsernameLengthMin());
         credentialPolicy.setUsernameLengthMax(request.getUsernameLengthMax());
+        credentialPolicy.setUsernameAllowedPattern(request.getUsernameAllowedPattern());
         credentialPolicy.setCredentialLengthMin(request.getCredentialLengthMin());
         credentialPolicy.setCredentialLengthMax(request.getCredentialLengthMax());
         credentialPolicy.setLimitSoft(request.getLimitSoft());

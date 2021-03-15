@@ -263,6 +263,25 @@ public class UserIdentityLookupService {
     }
 
     /**
+     * Find a user identity. This method is not transactional and should be used for utility purposes only.
+     * @param userId User ID.
+     * @param includeRemoved Whether removed user identities should be returned.
+     * @return User identity entity.
+     * @throws UserNotFoundException Thrown when user identity entity is not found.
+     */
+    public UserIdentityEntity findUser(String userId, boolean includeRemoved) throws UserNotFoundException {
+        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            throw new UserNotFoundException("User identity not found: " + userId);
+        }
+        UserIdentityEntity user = userOptional.get();
+        if (!includeRemoved &&  user.getStatus() == UserIdentityStatus.REMOVED) {
+            throw new UserNotFoundException("User identity is REMOVED: " + userId);
+        }
+        return user;
+    }
+
+    /**
      * Find an optional user identity. This method is not transactional and should be used for utility purposes only.
      * @param userId User ID.
      * @return Optional user identity.
@@ -274,6 +293,24 @@ public class UserIdentityLookupService {
         }
         UserIdentityEntity user = userOptional.get();
         if (user.getStatus() == UserIdentityStatus.REMOVED) {
+            return Optional.empty();
+        }
+        return Optional.of(user);
+    }
+
+    /**
+     * Find an optional user identity. This method is not transactional and should be used for utility purposes only.
+     * @param userId User ID.
+     * @param includeRemoved Whether removed user identities should be included.
+     * @return Optional user identity.
+     */
+    public Optional<UserIdentityEntity> findUserOptional(String userId, boolean includeRemoved) {
+        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            return Optional.empty();
+        }
+        UserIdentityEntity user = userOptional.get();
+        if (!includeRemoved && user.getStatus() == UserIdentityStatus.REMOVED) {
             return Optional.empty();
         }
         return Optional.of(user);

@@ -148,15 +148,20 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setLimitHard(5);
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
-        credentialPolicyRequest.setUsernameGenAlgorithm("DEFAULT");
+        credentialPolicyRequest.setUsernameAllowedPattern("[a-zA-Z0-9]+");
+        credentialPolicyRequest.setUsernameGenAlgorithm("RANDOM_DIGITS");
         UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
         usernameGenParam.setLength(8);
         credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
         credentialPolicyRequest.setCredentialLengthMin(6);
         credentialPolicyRequest.setCredentialLengthMax(30);
-        credentialPolicyRequest.setCredentialGenAlgorithm("DEFAULT");
+        credentialPolicyRequest.setCredentialGenAlgorithm("RANDOM_PASSWORD");
         CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
         credentialGenParam.setLength(10);
+        credentialGenParam.setIncludeSmallLetters(true);
+        credentialGenParam.setIncludeCapitalLetters(true);
+        credentialGenParam.setSmallLettersCount(5);
+        credentialGenParam.setCapitalLettersCount(5);
         credentialPolicyRequest.setCredentialGenParam(credentialGenParam);
         credentialPolicyRequest.setCredentialValParam(new CredentialValidationParam());
         nextStepClient.createCredentialPolicy(credentialPolicyRequest);
@@ -168,6 +173,14 @@ public class NextStepTestConfiguration {
         credentialDefinitionRequest.setCredentialPolicyName("TEST_CREDENTIAL_POLICY");
         credentialDefinitionRequest.setCategory(CredentialCategory.PASSWORD);
         nextStepClient.createCredentialDefinition(credentialDefinitionRequest);
+
+        // Create credential definition for testing credential generation
+        CreateCredentialDefinitionRequest credentialDefinitionRequest2 = new CreateCredentialDefinitionRequest();
+        credentialDefinitionRequest2.setCredentialDefinitionName("TEST_CREDENTIAL_GENERATION_VALIDATION");
+        credentialDefinitionRequest2.setApplicationName("TEST_APP");
+        credentialDefinitionRequest2.setCredentialPolicyName("TEST_CREDENTIAL_POLICY");
+        credentialDefinitionRequest2.setCategory(CredentialCategory.PASSWORD);
+        nextStepClient.createCredentialDefinition(credentialDefinitionRequest2);
 
         // Create OTP policy
         CreateOtpPolicyRequest otpPolicyRequest = new CreateOtpPolicyRequest();
@@ -183,6 +196,9 @@ public class NextStepTestConfiguration {
         otpDefinitionRequest.setApplicationName("TEST_APP");
         otpDefinitionRequest.setOtpPolicyName("TEST_OTP_POLICY");
         nextStepClient.createOtpDefinition(otpDefinitionRequest);
+
+        // Create test role
+        nextStepClient.createRole("TEST_ROLE", "Role for tests");
 
         // Create user identity with credentials
         CreateUserRequest createUserRequest = new CreateUserRequest();

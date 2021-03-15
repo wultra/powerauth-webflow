@@ -118,13 +118,9 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             String username = request.getUsername();
 
             // Client certificate is not yet supported in non SCA login method
-            LookupUserRequest lookupRequest = new LookupUserRequest();
-            lookupRequest.setCredentialName(credentialName);
-            lookupRequest.setUsername(username);
-            lookupRequest.setOperationId(operation.getOperationId());
             LookupUserResponse lookupResponse;
             try {
-                lookupResponse = nextStepClient.lookupUser(lookupRequest).getResponseObject();
+                lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();
             } catch (NextStepClientException ex) {
                 if (ex.getNextStepError() != null && UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
                     // User ID not found using lookup

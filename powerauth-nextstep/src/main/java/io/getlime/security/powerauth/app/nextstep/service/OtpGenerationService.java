@@ -75,7 +75,10 @@ public class OtpGenerationService {
                 } catch (JsonProcessingException ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-                int groupSize = otpGenerationParam.getGroupSize();
+                Integer groupSize = otpGenerationParam.getGroupSize();
+                if (groupSize == null) {
+                    throw new InvalidConfigurationException("Invalid configuration of algorithm OTP_RANDOM_DIGIT_GROUPS, group size is not specified");
+                }
                 if (length % groupSize != 0) {
                     throw new InvalidConfigurationException("Invalid configuration of algorithm OTP_RANDOM_DIGIT_GROUPS, group size does not divide OTP length without remainder");
                 }

@@ -1,0 +1,361 @@
+/*
+ * Copyright 2021 Wultra s.r.o.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package io.getlime.security.powerauth.app.nextstep;
+
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateCredentialResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.ValidateCredentialResponse;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+/**
+ * Next Step credential tests.
+ *
+ * @author Roman Strobl, roman.strobl@wulta.com
+ */
+public class NextStepCredentialTest extends NextStepTest {
+
+    @Before
+    public void setUp() throws Exception {
+        nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
+        nextStepTestConfiguration.configure(nextStepClient);
+    }
+
+    @Test
+    public void testGenerateCredential() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        // Create credential policy
+        CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
+        credentialGenParam.setLength(12);
+        credentialGenParam.setIncludeSmallLetters(true);
+        credentialGenParam.setIncludeCapitalLetters(true);
+        credentialGenParam.setIncludeDigits(true);
+        credentialGenParam.setIncludeSpecialChars(true);
+        credentialGenParam.setSmallLettersCount(5);
+        credentialGenParam.setCapitalLettersCount(5);
+        credentialGenParam.setDigitsCount(1);
+        credentialGenParam.setSpecialCharsCount(1);
+        updateCredentialDefinition(name, credentialGenParam, null);
+        CreateCredentialResponse r1 = nextStepClient.createCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION", CredentialType.PERMANENT, null, null).getResponseObject();
+        assertNotNull(r1.getUsername());
+        assertEquals(8, r1.getUsername().length());
+        String credentialValue = r1.getCredentialValue();
+        assertEquals(12, credentialValue.length());
+        int smallLettersCount = 0;
+        int capitalLettersCount = 0;
+        int digitsCount = 0;
+        int specialCharsCount = 0;
+        for (int i = 0; i < 12; i++) {
+            char c = credentialValue.charAt(i);
+            if (Character.isLowerCase(c)) {
+                smallLettersCount++;
+                continue;
+            }
+            if (Character.isUpperCase(c)) {
+                capitalLettersCount++;
+                continue;
+            }
+            if (Character.isDigit(c)) {
+                digitsCount++;
+                continue;
+            }
+            specialCharsCount++;
+        }
+        assertEquals(5, smallLettersCount);
+        assertEquals(5, capitalLettersCount);
+        assertEquals(1, digitsCount);
+        assertEquals(1, specialCharsCount);
+    }
+
+    @Test
+    public void testValidateCredential1() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeCharacterRule(true);
+        credentialValParam.setIncludeDigits(true);
+        credentialValParam.setDigitsMin(10);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_DIGIT), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential2() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeCharacterRule(true);
+        credentialValParam.setIncludeCapitalLetters(true);
+        credentialValParam.setCapitalLettersMin(1);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_UPPERCASE), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential3() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeCharacterRule(true);
+        credentialValParam.setIncludeSmallLetters(true);
+        credentialValParam.setSmallLettersMin(1);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_LOWERCASE), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential4() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeCharacterRule(true);
+        credentialValParam.setIncludeSpecialChars(true);
+        credentialValParam.setSpecialCharsMin(1);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_SPECIAL), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential5() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeAllowedCharacterRule(true);
+        credentialValParam.setAllowedChars("abcdef");
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ALLOWED_CHAR_FAILED), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential6() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeIllegalCharacterRule(true);
+        credentialValParam.setIllegalChars("1");
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ILLEGAL_CHAR), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential7() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeAllowedRegexRule(true);
+        credentialValParam.setAllowedRegex("[a-z]+");
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ALLOWED_MATCH_FAILED), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential8() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeIllegalRegexRule(true);
+        credentialValParam.setIllegalRegex("[0-9]+");
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ILLEGAL_MATCH), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential9() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeWhitespaceRule(true);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "123456789 ", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ILLEGAL_WHITESPACE), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential10() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeUsernameRule(true);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "1234567890", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential11() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeUsernameRule(true);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "0987654321", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_ILLEGAL_USERNAME_REVERSED), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential12() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        credentialValParam.setIncludeCharacterRule(true);
+        credentialValParam.setIncludeAlphabeticalLetters(true);
+        credentialValParam.setAlphabeticalLettersMin(1);
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "12345678", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_INSUFFICIENT_ALPHABETICAL), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential13() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "1", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_TOO_SHORT), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential14() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", "12345678901234567890123456789012345678901234567890", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_TOO_LONG), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateCredential15() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialValidationParam credentialValParam = new CredentialValidationParam();
+        updateCredentialDefinition(name, null, credentialValParam);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1234567890", " ", CredentialValidationMode.VALIDATE_CREDENTIAL).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername1() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                " ", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_EMPTY), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername2() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "1", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_TOO_SHORT), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername3() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "12345678901234567890123456789012345678901234567890", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_TOO_LONG), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername5() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "12345 67890", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername6() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(name);
+        nextStepClient.createUser(createUserRequest);
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential(name, "TEST_CREDENTIAL",
+                "testuser", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), r1.getValidationErrors());
+    }
+
+    @Test
+    public void testValidateUsername7() throws NextStepClientException {
+        ValidateCredentialResponse r1 = nextStepClient.validateCredential("test_user_1", "TEST_CREDENTIAL_GENERATION_VALIDATION",
+                "testuser$", null, CredentialValidationMode.VALIDATE_USERNAME).getResponseObject();
+        assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), r1.getValidationErrors());
+    }
+
+    private void updateCredentialDefinition(String name, CredentialGenerationParam credentialGenParam, CredentialValidationParam credentialValParam) throws NextStepClientException {
+        // Create credential policy
+        createCredentialPolicy(name, credentialGenParam, credentialValParam);
+        UpdateCredentialDefinitionRequest credentialDefinitionRequest = new UpdateCredentialDefinitionRequest();
+        credentialDefinitionRequest.setCredentialDefinitionName("TEST_CREDENTIAL_GENERATION_VALIDATION");
+        credentialDefinitionRequest.setApplicationName("TEST_APP");
+        credentialDefinitionRequest.setCredentialPolicyName(name);
+        credentialDefinitionRequest.setCategory(CredentialCategory.PASSWORD);
+        nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
+    }
+
+    private void createCredentialPolicy(String name, CredentialGenerationParam genParam, CredentialValidationParam valParam) throws NextStepClientException {
+        CreateCredentialPolicyRequest credentialPolicyRequest = new CreateCredentialPolicyRequest();
+        credentialPolicyRequest.setCredentialPolicyName(name);
+        credentialPolicyRequest.setLimitSoft(3);
+        credentialPolicyRequest.setLimitHard(5);
+        credentialPolicyRequest.setUsernameLengthMin(8);
+        credentialPolicyRequest.setUsernameLengthMax(30);
+        credentialPolicyRequest.setUsernameAllowedPattern("[0-9]+");
+        credentialPolicyRequest.setUsernameGenAlgorithm("RANDOM_DIGITS");
+        UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
+        usernameGenParam.setLength(8);
+        credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
+        credentialPolicyRequest.setCredentialLengthMin(6);
+        credentialPolicyRequest.setCredentialLengthMax(30);
+        credentialPolicyRequest.setCredentialGenAlgorithm("RANDOM_PASSWORD");
+        if (genParam != null) {
+            credentialPolicyRequest.setCredentialGenParam(genParam);
+        }
+        if (valParam != null) {
+            credentialPolicyRequest.setCredentialValParam(valParam);
+        }
+        nextStepClient.createCredentialPolicy(credentialPolicyRequest);
+    }
+
+}

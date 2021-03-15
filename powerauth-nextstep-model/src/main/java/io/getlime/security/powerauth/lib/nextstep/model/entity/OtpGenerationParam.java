@@ -26,6 +26,6 @@ import javax.validation.constraints.Positive;
 public class OtpGenerationParam {
 
     @Positive
-    private int groupSize;
+    private Integer groupSize;
 
 }

@@ -33,6 +33,11 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
+/**
+ * Next Step authentication tests.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
 public class NextStepAuthenticationTest extends NextStepTest {
 
     @Before
@@ -338,20 +343,14 @@ public class NextStepAuthenticationTest extends NextStepTest {
 
     @Test
     public void testUserLookupSuccess() throws NextStepClientException {
-        LookupUserRequest request = new LookupUserRequest();
-        request.setUsername("testuser");
-        request.setCredentialName("TEST_CREDENTIAL");
-        LookupUserResponse r1 = nextStepClient.lookupUser(request).getResponseObject();
+        LookupUserResponse r1 = nextStepClient.lookupUser("testuser", "TEST_CREDENTIAL").getResponseObject();
         assertEquals("test_user_1", r1.getUser().getUserId());
     }
 
     @Test
     public void testUserLookupFail() {
-        LookupUserRequest request = new LookupUserRequest();
-        request.setUsername("testuser_unknown");
-        request.setCredentialName("TEST_CREDENTIAL");
         try {
-            nextStepClient.lookupUser(request);
+            nextStepClient.lookupUser("testuser_unknown", "TEST_CREDENTIAL");
         } catch (NextStepClientException ex) {
             assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
             return;

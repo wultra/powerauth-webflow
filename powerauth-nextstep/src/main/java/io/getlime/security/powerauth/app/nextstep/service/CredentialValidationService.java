@@ -195,18 +195,30 @@ public class CredentialValidationService {
             }
             if (param.isIncludeAllowedCharacterRule()) {
                 String allowedChars = param.getAllowedChars();
+                if (allowedChars == null) {
+                    throw new InvalidConfigurationException("The allowedChars value is missing");
+                }
                 rules.add(new AllowedCharacterRule(allowedChars.toCharArray()));
             }
             if (param.isIncludeAllowedRegexRule()) {
                 String allowedRegex = param.getAllowedRegex();
+                if (allowedRegex == null) {
+                    throw new InvalidConfigurationException("The allowedRegex value is missing");
+                }
                 rules.add(new AllowedRegexRule(allowedRegex));
             }
             if (param.isIncludeIllegalCharacterRule()) {
                 String illegalChars = param.getIllegalChars();
+                if (illegalChars == null) {
+                    throw new InvalidConfigurationException("The illegalChars value is missing");
+                }
                 rules.add(new IllegalCharacterRule(illegalChars.toCharArray()));
             }
             if (param.isIncludeIllegalRegexRule()) {
                 String illegalRegex = param.getIllegalRegex();
+                if (illegalRegex == null) {
+                    throw new InvalidConfigurationException("The illegalRegex value is missing");
+                }
                 rules.add(new IllegalRegexRule(illegalRegex));
             }
             if (param.isIncludeCharacterRule()) {

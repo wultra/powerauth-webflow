@@ -600,19 +600,6 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for user identity already blocked error.
-     * @param ex Exception.
-     * @return Response with error details.
-     */
-    @ExceptionHandler(UserAlreadyBlockedException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleUserAlreadyBlockedException(UserAlreadyBlockedException ex) {
-        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(UserAlreadyBlockedException.CODE, "User identity is already blocked.");
-        return new ErrorResponse(error);
-    }
-
-    /**
      * Exception handler for user identity not blocked error.
      * @param ex Exception.
      * @return Response with error details.

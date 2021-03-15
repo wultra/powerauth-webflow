@@ -152,13 +152,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                         throw new AuthStepException("User authentication failed", "error.communication");
                     }
                     String credentialName = organization.getDefaultCredentialName();
-                    LookupUserRequest lookupRequest = new LookupUserRequest();
-                    lookupRequest.setCredentialName(credentialName);
-                    lookupRequest.setUsername(username);
-                    lookupRequest.setOperationId(operation.getOperationId());
                     LookupUserResponse lookupResponse;
                     try {
-                        lookupResponse = nextStepClient.lookupUser(lookupRequest).getResponseObject();
+                        lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();
                         GetUserDetailResponse userDetail = lookupResponse.getUser();
                         userId = userDetail.getUserId();
                         status = userDetail.getUserIdentityStatus();

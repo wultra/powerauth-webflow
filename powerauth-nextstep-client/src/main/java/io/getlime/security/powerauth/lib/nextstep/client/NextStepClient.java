@@ -1246,6 +1246,21 @@ public class NextStepClient {
     }
 
     /**
+     * Get user detail with includeRemoved option.
+     *
+     * @param userId User ID.
+     * @param includeRemoved Whether removed user identities should be returned.
+     * @return Get user detail response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
+        GetUserDetailRequest request = new GetUserDetailRequest();
+        request.setUserId(userId);
+        request.setIncludeRemoved(includeRemoved);
+        return postObjectImpl("/user/detail", new ObjectRequest<>(request), GetUserDetailResponse.class);
+    }
+
+    /**
      * Lookup user identities.
      *
      * @param request Lookup users request.
@@ -1257,13 +1272,34 @@ public class NextStepClient {
     }
 
     /**
-     * Lookup a single user identity.
+     * Lookup a single user identity without operation.
      *
-     * @param request Lookup user request.
+     * @param username Username.
+     * @param credentialName Credential name.
      * @return Lookup user response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<LookupUserResponse> lookupUser(@NotNull LookupUserRequest request) throws NextStepClientException {
+    public ObjectResponse<LookupUserResponse> lookupUser(@NotNull String username, @NotNull String credentialName) throws NextStepClientException {
+        LookupUserRequest request = new LookupUserRequest();
+        request.setUsername(username);
+        request.setCredentialName(credentialName);
+        return postObjectImpl("/user/lookup/single", new ObjectRequest<>(request), LookupUserResponse.class);
+    }
+
+    /**
+     * Lookup a single user identity with operation.
+     *
+     * @param username Username.
+     * @param credentialName Credential name.
+     * @param operationId Operation ID.
+     * @return Lookup user response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<LookupUserResponse> lookupUser(@NotNull String username, @NotNull String credentialName, String operationId) throws NextStepClientException {
+        LookupUserRequest request = new LookupUserRequest();
+        request.setUsername(username);
+        request.setCredentialName(credentialName);
+        request.setOperationId(operationId);
         return postObjectImpl("/user/lookup/single", new ObjectRequest<>(request), LookupUserResponse.class);
     }
 
@@ -1427,14 +1463,16 @@ public class NextStepClient {
      * @param userId User ID.
      * @param contactName Contact name.
      * @param contactType Contact type.
+     * @param contactValue Contact value.
      * @return Delete user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType) throws NextStepClientException {
+    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType, @NotNull String contactValue) throws NextStepClientException {
         DeleteUserContactRequest request = new DeleteUserContactRequest();
         request.setUserId(userId);
         request.setContactName(contactName);
         request.setContactType(contactType);
+        request.setContactValue(contactValue);
         return postObjectImpl("/user/contact/delete", new ObjectRequest<>(request), DeleteUserContactResponse.class);
     }
 

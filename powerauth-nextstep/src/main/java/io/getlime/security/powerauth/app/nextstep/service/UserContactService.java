@@ -152,7 +152,7 @@ public class UserContactService {
         contact.setType(request.getContactType());
         contact.setValue(request.getNewContactValue());
         contact.setPrimary(request.isPrimary());
-        contact.setTimestampCreated(new Date());
+        contact.setTimestampLastUpdated(new Date());
         userContactRepository.save(contact);
         // Ensure primary contacts are unique
         ensurePrimaryContactsAreUnique(user);
