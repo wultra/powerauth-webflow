@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -82,14 +84,16 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "rotation_days")
     private Integer rotationDays;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "username_gen_algorithm", nullable = false)
-    private String usernameGenAlgorithm;
+    private UsernameGenerationAlgorithm usernameGenAlgorithm;
 
     @Column(name = "username_gen_param", length = 4096)
     private String usernameGenParam;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "credential_gen_algorithm", nullable = false)
-    private String credentialGenAlgorithm;
+    private CredentialGenerationAlgorithm credentialGenAlgorithm;
 
     @Column(name = "credential_gen_param", length = 4096)
     private String credentialGenParam;

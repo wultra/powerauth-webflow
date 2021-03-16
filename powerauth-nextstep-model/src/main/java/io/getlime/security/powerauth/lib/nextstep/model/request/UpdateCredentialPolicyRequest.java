@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -58,11 +60,9 @@ public class UpdateCredentialPolicyRequest {
     private boolean rotationEnabled;
     @Positive
     private Integer rotationDays;
-    @Size(min = 2, max = 256)
-    private String usernameGenAlgorithm;
+    private UsernameGenerationAlgorithm usernameGenAlgorithm;
     private UsernameGenerationParam usernameGenParam;
-    @Size(min = 2, max = 256)
-    private String credentialGenAlgorithm;
+    private CredentialGenerationAlgorithm credentialGenAlgorithm;
     private CredentialGenerationParam credentialGenParam;
     private CredentialValidationParam credentialValParam;
     private CredentialPolicyStatus credentialPolicyStatus;

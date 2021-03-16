@@ -73,8 +73,7 @@ public class CredentialGenerationService {
     public String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getUsernameGenAlgorithm()) {
-            case "DEFAULT":
-            case "RANDOM_DIGITS":
+            case RANDOM_DIGITS:
                 try {
                     return generateRandomUsernameWithDigits(credentialDefinition);
                 } catch (InvalidConfigurationException ex) {
@@ -83,7 +82,7 @@ public class CredentialGenerationService {
                     throw new InvalidConfigurationException(ex);
                 }
 
-            case "RANDOM_LETTERS":
+            case RANDOM_LETTERS:
                 try {
                     return generateRandomUsernameWithLetters(credentialDefinition);
                 } catch (InvalidConfigurationException ex) {
@@ -91,6 +90,9 @@ public class CredentialGenerationService {
                 } catch (Exception ex) {
                     throw new InvalidConfigurationException(ex);
                 }
+
+            case NO_USERNAME:
+                return "";
 
             default:
                 throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());
@@ -106,8 +108,7 @@ public class CredentialGenerationService {
     public String generateCredentialValue(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getCredentialGenAlgorithm()) {
-            case "DEFAULT":
-            case "RANDOM_PASSWORD":
+            case RANDOM_PASSWORD:
                 try {
                     return generateRandomPassword(credentialPolicy);
                 } catch (InvalidConfigurationException ex) {
@@ -116,7 +117,7 @@ public class CredentialGenerationService {
                     throw new InvalidConfigurationException(ex);
                 }
 
-            case "RANDOM_PIN":
+            case RANDOM_PIN:
                 try {
                     return generateRandomPin(credentialPolicy);
                 } catch (InvalidConfigurationException ex) {

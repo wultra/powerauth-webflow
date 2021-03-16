@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -44,9 +45,8 @@ public class CreateOtpPolicyResponse {
     private Integer attemptLimit;
     @Positive
     private Long expirationTime;
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String genAlgorithm;
+    @NotNull
+    private OtpGenerationAlgorithm genAlgorithm;
     @NotNull
     private OtpGenerationParam genParam;
     @NotNull

@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserId
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import org.passay.*;
@@ -107,12 +108,15 @@ public class CredentialValidationService {
      * @return List of validation errors.
      */
     public List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
+        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        if (credentialPolicy.getUsernameGenAlgorithm() == UsernameGenerationAlgorithm.NO_USERNAME) {
+            return validationFailures;
+        }
         if (username == null || username.trim().isEmpty()) {
             validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
             return validationFailures;
         }
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         Integer minLength = credentialPolicy.getUsernameLengthMin();
         Integer maxLength = credentialPolicy.getUsernameLengthMax();
         String allowedPattern = credentialPolicy.getUsernameAllowedPattern();

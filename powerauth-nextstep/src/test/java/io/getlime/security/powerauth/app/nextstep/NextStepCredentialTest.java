@@ -21,6 +21,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialValidationFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
@@ -507,7 +509,7 @@ public class NextStepCredentialTest extends NextStepTest {
         updateRequest.setUsernameLengthMin(8);
         updateRequest.setUsernameLengthMax(30);
         updateRequest.setUsernameAllowedPattern("[a-z]{10}");
-        updateRequest.setUsernameGenAlgorithm("RANDOM_LETTERS");
+        updateRequest.setUsernameGenAlgorithm(UsernameGenerationAlgorithm.RANDOM_LETTERS);
         updateRequest.setCredentialPolicyName(name);
         UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
         usernameGenParam.setLength(10);
@@ -519,6 +521,42 @@ public class NextStepCredentialTest extends NextStepTest {
         nextStepClient.createUser(userRequest);
         CreateCredentialResponse r1 = nextStepClient.createCredential(userId, "TEST_CREDENTIAL_GENERATION_VALIDATION", CredentialType.PERMANENT,  null, null).getResponseObject();
         assertTrue(r1.getUsername().matches("[a-z]{10}"));
+    }
+
+    @Test
+    public void testGenerateRandomPin() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CreateCredentialPolicyRequest credentialPolicyRequest = new CreateCredentialPolicyRequest();
+        credentialPolicyRequest.setUsernameGenAlgorithm(UsernameGenerationAlgorithm.NO_USERNAME);
+        credentialPolicyRequest.setCredentialPolicyName(name);
+        credentialPolicyRequest.setLimitSoft(3);
+        credentialPolicyRequest.setLimitHard(5);
+        credentialPolicyRequest.setCredentialLengthMin(4);
+        credentialPolicyRequest.setCredentialLengthMax(8);
+        credentialPolicyRequest.setCredentialGenAlgorithm(CredentialGenerationAlgorithm.RANDOM_PIN);
+        CredentialGenerationParam genParam = new CredentialGenerationParam();
+        genParam.setLength(6);
+        credentialPolicyRequest.setCredentialGenParam(genParam);
+        CredentialValidationParam valParam = new CredentialValidationParam();
+        valParam.setIncludeCharacterRule(true);
+        valParam.setIncludeDigits(true);
+        valParam.setDigitsMin(4);
+        valParam.setIncludeAllowedRegexRule(true);
+        valParam.setAllowedRegex("[0-9]{4,8}");
+        credentialPolicyRequest.setCredentialValParam(valParam);
+        nextStepClient.createCredentialPolicy(credentialPolicyRequest);
+        UpdateCredentialDefinitionRequest credentialDefinitionRequest = new UpdateCredentialDefinitionRequest();
+        credentialDefinitionRequest.setCredentialDefinitionName("TEST_CREDENTIAL_GENERATION_VALIDATION");
+        credentialDefinitionRequest.setApplicationName("TEST_APP");
+        credentialDefinitionRequest.setCredentialPolicyName(name);
+        credentialDefinitionRequest.setCategory(CredentialCategory.PIN);
+        nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest userRequest = new CreateUserRequest();
+        userRequest.setUserId(userId);
+        nextStepClient.createUser(userRequest);
+        CreateCredentialResponse r1 = nextStepClient.createCredential(userId, "TEST_CREDENTIAL_GENERATION_VALIDATION", CredentialType.PERMANENT,  null, null).getResponseObject();
+        assertTrue(r1.getCredentialValue().matches("[0-9]{4,8}"));
     }
 
     private void updateCredentialDefinition(String name, CredentialGenerationParam credentialGenParam, CredentialValidationParam credentialValParam) throws NextStepClientException {
@@ -540,13 +578,13 @@ public class NextStepCredentialTest extends NextStepTest {
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
         credentialPolicyRequest.setUsernameAllowedPattern("[0-9]+");
-        credentialPolicyRequest.setUsernameGenAlgorithm("RANDOM_DIGITS");
+        credentialPolicyRequest.setUsernameGenAlgorithm(UsernameGenerationAlgorithm.RANDOM_DIGITS);
         UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
         usernameGenParam.setLength(8);
         credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
         credentialPolicyRequest.setCredentialLengthMin(6);
         credentialPolicyRequest.setCredentialLengthMax(30);
-        credentialPolicyRequest.setCredentialGenAlgorithm("RANDOM_PASSWORD");
+        credentialPolicyRequest.setCredentialGenAlgorithm(CredentialGenerationAlgorithm.RANDOM_PASSWORD);
         if (genParam != null) {
             credentialPolicyRequest.setCredentialGenParam(genParam);
         }

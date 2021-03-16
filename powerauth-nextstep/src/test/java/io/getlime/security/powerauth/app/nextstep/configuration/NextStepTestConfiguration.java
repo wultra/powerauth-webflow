@@ -22,10 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetApplicationListResponse;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -149,13 +146,13 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setUsernameLengthMin(8);
         credentialPolicyRequest.setUsernameLengthMax(30);
         credentialPolicyRequest.setUsernameAllowedPattern("[a-zA-Z0-9_]+");
-        credentialPolicyRequest.setUsernameGenAlgorithm("RANDOM_DIGITS");
+        credentialPolicyRequest.setUsernameGenAlgorithm(UsernameGenerationAlgorithm.RANDOM_DIGITS);
         UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
         usernameGenParam.setLength(8);
         credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
         credentialPolicyRequest.setCredentialLengthMin(6);
         credentialPolicyRequest.setCredentialLengthMax(30);
-        credentialPolicyRequest.setCredentialGenAlgorithm("RANDOM_PASSWORD");
+        credentialPolicyRequest.setCredentialGenAlgorithm(CredentialGenerationAlgorithm.RANDOM_PASSWORD);
         CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
         credentialGenParam.setLength(10);
         credentialGenParam.setIncludeSmallLetters(true);
@@ -187,7 +184,7 @@ public class NextStepTestConfiguration {
         otpPolicyRequest.setOtpPolicyName("TEST_OTP_POLICY");
         otpPolicyRequest.setAttemptLimit(3);
         otpPolicyRequest.setLength(8);
-        otpPolicyRequest.setGenAlgorithm("OTP_DATA_DIGEST");
+        otpPolicyRequest.setGenAlgorithm(OtpGenerationAlgorithm.OTP_DATA_DIGEST);
         nextStepClient.createOtpPolicy(otpPolicyRequest);
 
         // Create OTP definition

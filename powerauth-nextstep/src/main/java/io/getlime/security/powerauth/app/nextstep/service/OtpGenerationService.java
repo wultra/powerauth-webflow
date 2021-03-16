@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.crypto.lib.model.exception.GenericCryptoExc
 import io.getlime.security.powerauth.crypto.server.util.DataDigest;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OtpGenAlgorithmNotSupportedException;
 import org.slf4j.Logger;
@@ -54,10 +55,9 @@ public class OtpGenerationService {
     public OtpValueDetail generateOtpValue(String otpData, OtpPolicyEntity otpPolicy) throws OtpGenAlgorithmNotSupportedException, InvalidConfigurationException {
         OtpValueDetail otpValueDetail = new OtpValueDetail();
         Integer length = otpPolicy.getLength();
-        String otpGenAlgorithm = otpPolicy.getGenAlgorithm();
+        OtpGenerationAlgorithm otpGenAlgorithm = otpPolicy.getGenAlgorithm();
         switch (otpGenAlgorithm) {
-            case "DEFAULT":
-            case "OTP_DATA_DIGEST":
+            case OTP_DATA_DIGEST:
                 try {
                     DataDigest dataDigest = new DataDigest(length);
                     DataDigest.Result result = dataDigest.generateDigest(Collections.singletonList(otpData));
@@ -68,7 +68,7 @@ public class OtpGenerationService {
                 }
                 return otpValueDetail;
 
-            case "OTP_RANDOM_DIGIT_GROUPS":
+            case OTP_RANDOM_DIGIT_GROUPS:
                 OtpGenerationParam otpGenerationParam;
                 try {
                     otpGenerationParam = parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class);
