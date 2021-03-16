@@ -958,7 +958,7 @@ public class NextStepClient {
      * @return Update credential policy response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@NotNull UpdateCredentialRequest request) throws NextStepClientException {
+    public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@NotNull UpdateCredentialPolicyRequest request) throws NextStepClientException {
         return putObjectImpl("/credential/policy", new ObjectRequest<>(request), UpdateCredentialPolicyResponse.class);
     }
 

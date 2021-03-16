@@ -131,7 +131,9 @@ public class OtpPolicyService {
         }
         otpPolicy.setLength(request.getLength());
         otpPolicy.setAttemptLimit(request.getAttemptLimit());
-        otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
+        if (request.getGenAlgorithm() != null) {
+            otpPolicy.setGenAlgorithm(request.getGenAlgorithm());
+        }
         if (request.getGenParam() != null) {
             try {
                 otpPolicy.setGenParam(parameterConverter.fromObject(request.getGenParam()));

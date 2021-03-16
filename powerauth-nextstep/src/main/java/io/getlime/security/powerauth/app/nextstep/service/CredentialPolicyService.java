@@ -167,7 +167,9 @@ public class CredentialPolicyService {
         credentialPolicy.setCheckHistoryCount(request.getCheckHistoryCount());
         credentialPolicy.setRotationEnabled(request.isRotationEnabled());
         credentialPolicy.setRotationDays(request.getRotationDays());
-        credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
+        if (request.getUsernameGenAlgorithm() != null) {
+            credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
+        }
         if (request.getUsernameGenParam() != null) {
             try {
                 credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
@@ -175,7 +177,9 @@ public class CredentialPolicyService {
                 throw new InvalidRequestException(ex);
             }
         }
-        credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
+        if (request.getCredentialGenAlgorithm() != null) {
+            credentialPolicy.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
+        }
         if (request.getCredentialGenParam() != null) {
             try {
                 credentialPolicy.setCredentialGenParam(parameterConverter.fromObject(request.getCredentialGenParam()));
@@ -183,7 +187,7 @@ public class CredentialPolicyService {
                 throw new InvalidRequestException(ex);
             }
         }
-        if (request.getCredentialGenParam() != null) {
+        if (request.getCredentialValParam() != null) {
             try {
                 credentialPolicy.setCredentialValParam(parameterConverter.fromObject(request.getCredentialValParam()));
             } catch (JsonProcessingException ex) {

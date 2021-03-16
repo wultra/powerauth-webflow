@@ -157,23 +157,17 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        String username;
+        String username = null;
         String credentialValue = request.getCredentialValue();
-        CredentialValidationMode validationMode;
+        CredentialValidationMode validationMode = CredentialValidationMode.NO_VALIDATION;
         if (request.getUsername() != null && request.getCredentialValue() != null) {
             username = request.getUsername();
-            credential.setUsername(username);
-            credential.setValue(credentialValue);
-            credential.setTimestampLastCredentialChange(new Date());
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         } else if (request.getCredentialValue() != null) {
             username = credential.getUsername();
-            credential.setValue(credentialValue);
-            credential.setTimestampLastCredentialChange(new Date());
             validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
-        } else {
+        } else if (request.getUsername() != null) {
             username = request.getUsername();
-            credential.setUsername(username);
             validationMode = CredentialValidationMode.VALIDATE_USERNAME;
         }
         if (request.getUsername() != null || request.getCredentialValue() != null) {
@@ -184,6 +178,17 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
+        if (request.getUsername() != null && request.getCredentialValue() != null) {
+            credential.setUsername(request.getUsername());
+            credential.setValue(credentialValue);
+            credential.setTimestampLastCredentialChange(new Date());
+        } else if (request.getCredentialValue() != null) {
+            credential.setValue(credentialValue);
+            credential.setTimestampLastCredentialChange(new Date());
+        } else if (request.getUsername() != null) {
+            credential.setUsername(request.getUsername());
+        }
+
         if (request.getCredentialStatus() != null) {
             credential.setStatus(request.getCredentialStatus());
                 if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){

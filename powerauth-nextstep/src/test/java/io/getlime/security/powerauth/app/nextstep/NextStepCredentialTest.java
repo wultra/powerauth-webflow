@@ -20,10 +20,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialValidationFailedException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -370,6 +372,109 @@ public class NextStepCredentialTest extends NextStepTest {
             nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new username", null, null);
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+        }
+    }
+
+    @Test
+    public void testChangeUsernameAndCredential() throws NextStepClientException {
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        UpdateCredentialResponse r2 = nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new_username2", "rg^24jG2sk", null).getResponseObject();
+        assertEquals("new_username2", r2.getUsername());
+        // Try lookup with new username and authentication with old credential value, it should not change
+        LookupUserResponse r3 = nextStepClient.lookupUser("new_username2", "TEST_CREDENTIAL").getResponseObject();
+        String userIdLookup = r3.getUser().getUserId();
+        CredentialAuthenticationResponse r4 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", userIdLookup, "rg^24jG2sk").getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r4.getAuthenticationResult());
+    }
+
+    @Test
+    public void testChangeUsernameAndCredentialValidation() throws NextStepClientException {
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        try {
+            nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, "x", " ", null);
+        } catch (NextStepClientException ex) {
+            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_TOO_SHORT, CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+        }
+    }
+
+    @Test
+    public void testChangeCredential() throws NextStepClientException {
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest.getCredentials().add(credential);
+        CreateUserResponse r1 = nextStepClient.createUser(createUserRequest).getResponseObject();
+        String username = r1.getCredentials().get(0).getUsername();
+        UpdateCredentialResponse r2 = nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "rg^24jG2sk", null).getResponseObject();
+        // Try lookup with new username and authentication with old credential value, it should not change
+        LookupUserResponse r3 = nextStepClient.lookupUser(username, "TEST_CREDENTIAL").getResponseObject();
+        String userIdLookup = r3.getUser().getUserId();
+        CredentialAuthenticationResponse r4 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", userIdLookup, "rg^24jG2sk").getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r4.getAuthenticationResult());
+    }
+
+    @Test
+    public void testChangeCredentialValidation() throws NextStepClientException {
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        try {
+            nextStepClient.updateCredential(userId, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, " ", null);
+        } catch (NextStepClientException ex) {
+            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+        }
+    }
+
+    @Test
+    public void testChangeUsernameAlreadyExists() throws NextStepClientException {
+        String userId1 = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest1 = new CreateUserRequest();
+        createUserRequest1.setUserId(userId1);
+        CreateUserRequest.NewCredential credential1 = new CreateUserRequest.NewCredential();
+        credential1.setCredentialName("TEST_CREDENTIAL");
+        credential1.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest1.getCredentials().add(credential1);
+        nextStepClient.createUser(createUserRequest1);
+        UpdateCredentialResponse r2 = nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new_username_conflict", null, null).getResponseObject();
+        assertEquals("new_username_conflict", r2.getUsername());
+        String userId2 = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest2 = new CreateUserRequest();
+        createUserRequest2.setUserId(userId2);
+        CreateUserRequest.NewCredential credential2 = new CreateUserRequest.NewCredential();
+        credential2.setCredentialName("TEST_CREDENTIAL");
+        credential2.setCredentialType(CredentialType.PERMANENT);
+        createUserRequest2.getCredentials().add(credential2);
+        nextStepClient.createUser(createUserRequest2);
+        try {
+            nextStepClient.updateCredential(userId2, "TEST_CREDENTIAL", CredentialType.PERMANENT, "new_username_conflict", "rg^24jG2sk", null);
+        } catch (NextStepClientException ex) {
+            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
         }
     }
 
@@ -388,6 +493,32 @@ public class NextStepCredentialTest extends NextStepTest {
         assertEquals(CredentialStatus.REMOVED, r2.getCredentialStatus());
         CredentialAuthenticationResponse r3 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", userId, credentialValue).getResponseObject();
         assertEquals(AuthenticationResult.FAILED, r3.getAuthenticationResult());
+    }
+
+    @Test
+    public void testGenerateUsernameRandomLetters() throws NextStepClientException {
+        String name = UUID.randomUUID().toString();
+        CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
+        credentialGenParam.setLength(10);
+        credentialGenParam.setIncludeSmallLetters(true);
+        credentialGenParam.setSmallLettersCount(10);
+        updateCredentialDefinition(name, credentialGenParam, new CredentialValidationParam());
+        UpdateCredentialPolicyRequest updateRequest = new UpdateCredentialPolicyRequest();
+        updateRequest.setUsernameLengthMin(8);
+        updateRequest.setUsernameLengthMax(30);
+        updateRequest.setUsernameAllowedPattern("[a-z]{10}");
+        updateRequest.setUsernameGenAlgorithm("RANDOM_LETTERS");
+        updateRequest.setCredentialPolicyName(name);
+        UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
+        usernameGenParam.setLength(10);
+        updateRequest.setUsernameGenParam(usernameGenParam);
+        nextStepClient.updateCredentialPolicy(updateRequest);
+        String userId = UUID.randomUUID().toString();
+        CreateUserRequest userRequest = new CreateUserRequest();
+        userRequest.setUserId(userId);
+        nextStepClient.createUser(userRequest);
+        CreateCredentialResponse r1 = nextStepClient.createCredential(userId, "TEST_CREDENTIAL_GENERATION_VALIDATION", CredentialType.PERMANENT,  null, null).getResponseObject();
+        assertTrue(r1.getUsername().matches("[a-z]{10}"));
     }
 
     private void updateCredentialDefinition(String name, CredentialGenerationParam credentialGenParam, CredentialValidationParam credentialValParam) throws NextStepClientException {

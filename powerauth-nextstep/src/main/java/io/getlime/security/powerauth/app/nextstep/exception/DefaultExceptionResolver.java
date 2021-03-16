@@ -687,6 +687,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        logger.warn("Validation errors: {}", ex.getError().getValidationFailures());
         CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Credential validation failed.", ex.getError().getValidationFailures());
         return new ErrorResponse(error);
     }
