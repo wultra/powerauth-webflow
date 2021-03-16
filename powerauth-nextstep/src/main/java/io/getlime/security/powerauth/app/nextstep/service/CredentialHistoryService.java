@@ -46,13 +46,13 @@ public class CredentialHistoryService {
      * Create a credential history record.
      * @param credential Credential entity.
      */
-    public void createCredentialHistory(CredentialEntity credential) {
+    public void createCredentialHistory(CredentialEntity credential, Date createdDate) {
         CredentialHistoryEntity credentialHistory = new CredentialHistoryEntity();
         credentialHistory.setCredentialDefinition(credential.getCredentialDefinition());
         credentialHistory.setUser(credential.getUser());
         credentialHistory.setUsername(credential.getUsername());
         credentialHistory.setValue(credential.getValue());
-        credentialHistory.setTimestampCreated(new Date());
+        credentialHistory.setTimestampCreated(createdDate);
         credentialHistoryRepository.save(credentialHistory);
     }
 

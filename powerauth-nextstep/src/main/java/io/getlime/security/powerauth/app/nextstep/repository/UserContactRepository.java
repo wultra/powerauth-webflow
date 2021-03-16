@@ -22,6 +22,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of user contacts.
@@ -45,6 +46,6 @@ public interface UserContactRepository extends CrudRepository<UserContactEntity,
      * @param type Contact type.
      * @return User contact.
      */
-    List<UserContactEntity> findAllByUserAndNameAndType(UserIdentityEntity user, String name, ContactType type);
+    Optional<UserContactEntity> findByUserAndNameAndType(UserIdentityEntity user, String name, ContactType type);
 
 }

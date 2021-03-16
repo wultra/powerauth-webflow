@@ -1400,21 +1400,18 @@ public class NextStepClient {
      * @param userId User ID.
      * @param contactName Contact name.
      * @param contactType Contact type.
-     * @param originalContactValue Original contact value.
-     * @param newContactValue New contact value.
+     * @param contactValue Contact value.
      * @param primary Whether contact is primary.
      * @return Update user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<UpdateUserContactResponse> updateUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType,
-                                                                       @NotNull String originalContactValue, @NotNull String newContactValue,
-                                                                       boolean primary) throws NextStepClientException {
+                                                                       @NotNull String contactValue, boolean primary) throws NextStepClientException {
         UpdateUserContactRequest request = new UpdateUserContactRequest();
         request.setUserId(userId);
         request.setContactName(contactName);
         request.setContactType(contactType);
-        request.setOriginalContactValue(originalContactValue);
-        request.setNewContactValue(newContactValue);
+        request.setContactValue(contactValue);
         request.setPrimary(primary);
         return putObjectImpl("/user/contact", new ObjectRequest<>(request), UpdateUserContactResponse.class);
     }
@@ -1425,21 +1422,18 @@ public class NextStepClient {
      * @param userId User ID.
      * @param contactName Contact name.
      * @param contactType Contact type.
-     * @param originalContactValue Original contact value.
-     * @param newContactValue New contact value.
+     * @param contactValue Contact value.
      * @param primary Whether contact is primary.
      * @return Update user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType,
-                                                                           @NotNull String originalContactValue, @NotNull String newContactValue,
-                                                                           boolean primary) throws NextStepClientException {
+                                                                           @NotNull String contactValue, boolean primary) throws NextStepClientException {
         UpdateUserContactRequest request = new UpdateUserContactRequest();
         request.setUserId(userId);
         request.setContactName(contactName);
         request.setContactType(contactType);
-        request.setOriginalContactValue(originalContactValue);
-        request.setNewContactValue(newContactValue);
+        request.setContactValue(contactValue);
         request.setPrimary(primary);
         return postObjectImpl("/user/contact/update", new ObjectRequest<>(request), UpdateUserContactResponse.class);
     }
@@ -1463,16 +1457,14 @@ public class NextStepClient {
      * @param userId User ID.
      * @param contactName Contact name.
      * @param contactType Contact type.
-     * @param contactValue Contact value.
      * @return Delete user contact response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType, @NotNull String contactValue) throws NextStepClientException {
+    public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@NotNull String userId, @NotNull String contactName, @NotNull ContactType contactType) throws NextStepClientException {
         DeleteUserContactRequest request = new DeleteUserContactRequest();
         request.setUserId(userId);
         request.setContactName(contactName);
         request.setContactType(contactType);
-        request.setContactValue(contactValue);
         return postObjectImpl("/user/contact/delete", new ObjectRequest<>(request), DeleteUserContactResponse.class);
     }
 

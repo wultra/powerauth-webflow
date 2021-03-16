@@ -152,6 +152,7 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setUsernameGenParam(usernameGenParam);
         credentialPolicyRequest.setCredentialLengthMin(6);
         credentialPolicyRequest.setCredentialLengthMax(30);
+        credentialPolicyRequest.setCheckHistoryCount(3);
         credentialPolicyRequest.setCredentialGenAlgorithm(CredentialGenerationAlgorithm.RANDOM_PASSWORD);
         CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
         credentialGenParam.setLength(10);

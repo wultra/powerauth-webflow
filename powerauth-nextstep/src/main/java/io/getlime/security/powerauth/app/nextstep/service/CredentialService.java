@@ -110,8 +110,13 @@ public class CredentialService {
         }
         CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
         if (credentialHistory != null && !credentialHistory.isEmpty()) {
+            int dateCount = credentialHistory.size();
+            // Use unique timestamps in seconds to keep order of credential history
+            long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
             for (CreateCredentialRequest.CredentialHistory h : credentialHistory) {
-                importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue());
+                Date createdDate = new Date(createdTimestamp);
+                importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue(), createdDate);
+                createdTimestamp += 1000;
             }
         }
         CreateCredentialResponse response = new CreateCredentialResponse();
@@ -203,7 +208,7 @@ public class CredentialService {
         credential.setTimestampLastUpdated(new Date());
         credentialRepository.save(credential);
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(credential);
+        credentialHistoryService.createCredentialHistory(credential, new Date());
         UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -312,7 +317,7 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         // Save original credential into credential history
-        credentialHistoryService.createCredentialHistory(credential);
+        credentialHistoryService.createCredentialHistory(credential, new Date());
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
@@ -326,7 +331,7 @@ public class CredentialService {
         credential.setTimestampBlocked(null);
         credentialRepository.save(credential);
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(credential);
+        credentialHistoryService.createCredentialHistory(credential, new Date());
         ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -547,7 +552,7 @@ public class CredentialService {
         credential.setFailedAttemptCounterHard(0);
         credentialRepository.save(credential);
         // Save original credential into credential history
-        credentialHistoryService.createCredentialHistory(credential);
+        credentialHistoryService.createCredentialHistory(credential, new Date());
         CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());
@@ -573,13 +578,13 @@ public class CredentialService {
      * @param credentialValue Credential value.
      */
     public void importCredentialHistory(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                        String username, String credentialValue) {
+                                        String username, String credentialValue, Date createdDate) {
         CredentialEntity credential = new CredentialEntity();
         credential.setUser(user);
         credential.setCredentialDefinition(credentialDefinition);
         credential.setUsername(username);
         credential.setValue(credentialValue);
-        credentialHistoryService.createCredentialHistory(credential);
+        credentialHistoryService.createCredentialHistory(credential, createdDate);
     }
 
 }

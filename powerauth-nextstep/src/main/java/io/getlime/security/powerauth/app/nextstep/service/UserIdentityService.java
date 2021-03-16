@@ -167,8 +167,13 @@ public class UserIdentityService {
                 CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
                         credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue(), validationMode);
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
+                    int dateCount = credentialHistory.size();
+                    // Use unique timestamps in seconds to keep order of credential history
+                    long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
                     for (CreateUserRequest.CredentialHistory h : credentialHistory) {
-                        credentialService.importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue());
+                        Date createdDate = new Date(createdTimestamp);
+                        credentialService.importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue(), createdDate);
+                        createdTimestamp += 1000;
                     }
                 }
                 newCredentials.add(credentialDetail);
