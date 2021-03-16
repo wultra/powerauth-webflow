@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValueDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
@@ -236,12 +237,12 @@ public class OtpService {
                 throw new OperationAlreadyFailedException("Cannot create OTP, because operation is already failed: " + operation.getOperationId());
             }
         }
-        String otpDataToUse;
+        String otpDataToUse = null;
         if (otpData != null) {
             otpDataToUse = otpData;
         } else if (operation != null) {
             otpDataToUse = operation.getOperationData();
-        } else {
+        } else if (otpDefinition.getOtpPolicy().getGenAlgorithm() == OtpGenerationAlgorithm.OTP_DATA_DIGEST) {
             throw new InvalidRequestException("OTP data is not available for OTP definition: " + otpDefinition.getName());
         }
         OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());

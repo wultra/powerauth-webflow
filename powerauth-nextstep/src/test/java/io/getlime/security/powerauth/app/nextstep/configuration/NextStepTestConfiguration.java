@@ -194,6 +194,13 @@ public class NextStepTestConfiguration {
         otpDefinitionRequest.setOtpPolicyName("TEST_OTP_POLICY");
         nextStepClient.createOtpDefinition(otpDefinitionRequest);
 
+        // Create OTP definition for testing OTP generation
+        CreateOtpDefinitionRequest otpDefinitionRequest2 = new CreateOtpDefinitionRequest();
+        otpDefinitionRequest2.setOtpDefinitionName("TEST_OTP_GENERATION");
+        otpDefinitionRequest2.setApplicationName("TEST_APP");
+        otpDefinitionRequest2.setOtpPolicyName("TEST_OTP_POLICY");
+        nextStepClient.createOtpDefinition(otpDefinitionRequest2);
+
         // Create test role
         nextStepClient.createRole("TEST_ROLE", "Role for tests");
 
