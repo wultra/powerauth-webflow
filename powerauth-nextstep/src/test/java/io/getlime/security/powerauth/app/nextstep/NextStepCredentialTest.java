@@ -559,6 +559,87 @@ public class NextStepCredentialTest extends NextStepTest {
         assertTrue(r1.getCredentialValue().matches("[0-9]{4,8}"));
     }
 
+    @Test
+    public void testCredentialHistory1() throws NextStepClientException {
+        String userId1 = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId1);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        CreateUserRequest.CredentialHistory credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("je&qd8P1");
+        credential.getCredentialHistory().add(credentialHistory);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        try {
+            nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "je&qd8P1", null);
+        } catch (NextStepClientException ex) {
+            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+        }
+    }
+
+    @Test
+    public void testCredentialHistory2() throws NextStepClientException {
+        String userId1 = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId1);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        CreateUserRequest.CredentialHistory credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("je&qd8P1");
+        credential.getCredentialHistory().add(credentialHistory);
+        credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("Xl34Hn1s@");
+        credential.getCredentialHistory().add(credentialHistory);
+        credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("Oqw*2kd6M");
+        credential.getCredentialHistory().add(credentialHistory);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        try {
+            nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "je&qd8P1", null);
+        } catch (NextStepClientException ex) {
+            assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
+            assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+        }
+    }
+
+    @Test
+    public void testCredentialHistory3() throws NextStepClientException {
+        String userId1 = UUID.randomUUID().toString();
+        CreateUserRequest createUserRequest = new CreateUserRequest();
+        createUserRequest.setUserId(userId1);
+        CreateUserRequest.NewCredential credential = new CreateUserRequest.NewCredential();
+        credential.setCredentialName("TEST_CREDENTIAL");
+        credential.setCredentialType(CredentialType.PERMANENT);
+        CreateUserRequest.CredentialHistory credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("je&qd8P1");
+        credential.getCredentialHistory().add(credentialHistory);
+        credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("Xl34Hn1s@");
+        credential.getCredentialHistory().add(credentialHistory);
+        credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("Oqw*2kd6M");
+        credential.getCredentialHistory().add(credentialHistory);
+        credentialHistory = new CreateUserRequest.CredentialHistory();
+        credentialHistory.setUsername("test_history_1");
+        credentialHistory.setCredentialValue("rJ2Dmx8&1");
+        credential.getCredentialHistory().add(credentialHistory);
+        createUserRequest.getCredentials().add(credential);
+        nextStepClient.createUser(createUserRequest);
+        nextStepClient.updateCredential(userId1, "TEST_CREDENTIAL", CredentialType.PERMANENT, null, "je&qd8P1", null);
+    }
+
     private void updateCredentialDefinition(String name, CredentialGenerationParam credentialGenParam, CredentialValidationParam credentialValParam) throws NextStepClientException {
         // Create credential policy
         createCredentialPolicy(name, credentialGenParam, credentialValParam);

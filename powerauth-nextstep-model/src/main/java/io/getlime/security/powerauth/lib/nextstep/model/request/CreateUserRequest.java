@@ -81,7 +81,7 @@ public class CreateUserRequest {
         // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
         private CredentialValidationMode validationMode;
         @Valid
-        private List<CredentialHistory> credentialHistory;
+        private final List<CredentialHistory> credentialHistory = new ArrayList<>();
 
     }
 
