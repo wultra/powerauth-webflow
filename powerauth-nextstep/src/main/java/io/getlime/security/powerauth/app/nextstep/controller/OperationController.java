@@ -20,7 +20,6 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
-import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.service.MobileTokenConfigurationService;
 import io.getlime.security.powerauth.app.nextstep.service.OperationConfigurationService;
@@ -35,7 +34,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -56,7 +54,6 @@ public class OperationController {
     private final OperationConfigurationService operationConfigurationService;
     private final StepResolutionService stepResolutionService;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
-    private final ObjectRequestValidator requestValidator;
 
     private final OperationConverter operationConverter = new OperationConverter();
 
@@ -66,25 +63,14 @@ public class OperationController {
      * @param operationConfigurationService Operation configuration service.
      * @param stepResolutionService Step resolution service.
      * @param mobileTokenConfigurationService Mobile token configuration service.
-     * @param requestValidator Object request validator.
      */
     @Autowired
     public OperationController(OperationPersistenceService operationPersistenceService, OperationConfigurationService operationConfigurationService,
-                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService, ObjectRequestValidator requestValidator) {
+                               StepResolutionService stepResolutionService, MobileTokenConfigurationService mobileTokenConfigurationService) {
         this.operationPersistenceService = operationPersistenceService;
         this.operationConfigurationService = operationConfigurationService;
         this.stepResolutionService = stepResolutionService;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
-        this.requestValidator = requestValidator;
-    }
-
-    /**
-     * Initialize the request validator.
-     * @param binder Data binder.
-     */
-    @InitBinder
-    private void initBinder(WebDataBinder binder) {
-        binder.setValidator(requestValidator);
     }
 
     /**

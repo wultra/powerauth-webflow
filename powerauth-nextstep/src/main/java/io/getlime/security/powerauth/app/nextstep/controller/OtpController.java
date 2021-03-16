@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.OtpService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -26,7 +25,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -43,26 +41,14 @@ public class OtpController {
     private static final Logger logger = LoggerFactory.getLogger(OtpController.class);
 
     private final OtpService otpService;
-    private final ObjectRequestValidator requestValidator;
 
     /**
      * REST controller constructor.
      * @param otpService OTP service.
-     * @param requestValidator Request validator.
      */
     @Autowired
-    public OtpController(OtpService otpService, ObjectRequestValidator requestValidator) {
+    public OtpController(OtpService otpService) {
         this.otpService = otpService;
-        this.requestValidator = requestValidator;
-    }
-
-    /**
-     * Initialize the request validator.
-     * @param binder Data binder.
-     */
-    @InitBinder
-    private void initBinder(WebDataBinder binder) {
-        binder.setValidator(requestValidator);
     }
 
     /**

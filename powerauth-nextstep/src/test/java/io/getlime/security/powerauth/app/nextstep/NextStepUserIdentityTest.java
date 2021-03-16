@@ -20,7 +20,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretD
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotBlockedException;
-import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -144,7 +145,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals(userId, r13.getUserId());
         assertEquals(UserIdentityStatus.BLOCKED, r13.getUserIdentityStatus());
         try {
-            nextStepClient.blockUser(userId).getResponseObject();
+            nextStepClient.blockUser(userId);
         } catch (NextStepClientException ex) {
             assertEquals(UserNotActiveException.CODE, ex.getNextStepError().getCode());
         }
@@ -152,7 +153,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals(userId, r15.getUserId());
         assertEquals(UserIdentityStatus.ACTIVE, r15.getUserIdentityStatus());
         try {
-            nextStepClient.unblockUser(userId).getResponseObject();
+            nextStepClient.unblockUser(userId);
         } catch (NextStepClientException ex) {
             assertEquals(UserNotBlockedException.CODE, ex.getNextStepError().getCode());
         }

@@ -24,7 +24,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUsersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Assert;

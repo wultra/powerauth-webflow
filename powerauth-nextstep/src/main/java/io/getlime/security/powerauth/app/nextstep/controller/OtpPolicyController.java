@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.OtpPolicyService;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
@@ -35,8 +34,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpPolicy
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -52,26 +53,14 @@ public class OtpPolicyController {
     private static final Logger logger = LoggerFactory.getLogger(OtpPolicyController.class);
 
     private final OtpPolicyService otpPolicyService;
-    private final ObjectRequestValidator requestValidator;
 
     /**
      * REST controller constructor.
      * @param otpPolicyService OTP policy service.
-     * @param requestValidator Request validator.
      */
     @Autowired
-    public OtpPolicyController(OtpPolicyService otpPolicyService, ObjectRequestValidator requestValidator) {
+    public OtpPolicyController(OtpPolicyService otpPolicyService) {
         this.otpPolicyService = otpPolicyService;
-        this.requestValidator = requestValidator;
-    }
-
-    /**
-     * Initialize the request validator.
-     * @param binder Data binder.
-     */
-    @InitBinder
-    private void initBinder(WebDataBinder binder) {
-        binder.setValidator(requestValidator);
     }
 
     /**

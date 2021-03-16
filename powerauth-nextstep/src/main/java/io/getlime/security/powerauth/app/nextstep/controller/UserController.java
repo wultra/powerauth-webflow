@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.exception.ObjectRequestValidator;
 import io.getlime.security.powerauth.app.nextstep.service.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -26,8 +25,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 
@@ -49,7 +50,6 @@ public class UserController {
     private final UserAliasService userAliasService;
     private final CredentialService credentialService;
     private final AuthenticationService authenticationService;
-    private final ObjectRequestValidator requestValidator;
 
     /**
      * REST controller constructor.
@@ -60,10 +60,9 @@ public class UserController {
      * @param userAliasService User alias service.
      * @param credentialService Credential service.
      * @param authenticationService Authentication service.
-     * @param requestValidator Request validator.
      */
     @Autowired
-    public UserController(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService, CredentialService credentialService, AuthenticationService authenticationService, ObjectRequestValidator requestValidator) {
+    public UserController(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, UserRoleService userRoleService, UserContactService userContactService, UserAliasService userAliasService, CredentialService credentialService, AuthenticationService authenticationService) {
         this.userIdentityService = userIdentityService;
         this.userIdentityLookupService = userIdentityLookupService;
         this.userRoleService = userRoleService;
@@ -71,16 +70,6 @@ public class UserController {
         this.userAliasService = userAliasService;
         this.credentialService = credentialService;
         this.authenticationService = authenticationService;
-        this.requestValidator = requestValidator;
-    }
-
-    /**
-     * Initialize the request validator.
-     * @param binder Data binder.
-     */
-    @InitBinder
-    private void initBinder(WebDataBinder binder) {
-        binder.setValidator(requestValidator);
     }
 
     /**

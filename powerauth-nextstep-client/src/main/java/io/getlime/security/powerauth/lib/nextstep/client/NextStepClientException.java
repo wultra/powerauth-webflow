@@ -16,8 +16,16 @@
 
 package io.getlime.security.powerauth.lib.nextstep.client;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wultra.core.rest.client.base.RestClientException;
 import io.getlime.core.rest.model.base.entity.Error;
+import io.getlime.core.rest.model.base.response.ErrorResponse;
+import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.error.ExtendedError;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.NextStepError;
 
 /**
@@ -117,6 +125,26 @@ public class NextStepClientException extends Exception {
         }
         RestClientException ex = (RestClientException) cause;
         if (ex.getErrorResponse() == null) {
+            try {
+                ErrorResponse errorResponse = new ObjectMapper().disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES).readValue(ex.getResponse(), ErrorResponse.class);
+                if (errorResponse != null && errorResponse.getResponseObject() != null) {
+                    switch (errorResponse.getResponseObject().getCode()) {
+                        case "CREDENTIAL_VALIDATION_FAILED":
+                            ObjectResponse<CredentialValidationError> validationErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<CredentialValidationError>>(){});
+                            return validationErrorResponse.getResponseObject();
+
+                        case "REQUEST_VALIDATION_FAILED":
+                            ObjectResponse<ExtendedError> extendedErrorResponse = new ObjectMapper().readValue(ex.getResponse(), new TypeReference<ObjectResponse<ExtendedError>>(){});
+                            return extendedErrorResponse.getResponseObject();
+
+                        default:
+                            return null;
+                    }
+                }
+            } catch (JsonProcessingException ex2) {
+                // Ignore unknown responses
+                return null;
+            }
             return null;
         }
         return ex.getErrorResponse().getResponseObject();

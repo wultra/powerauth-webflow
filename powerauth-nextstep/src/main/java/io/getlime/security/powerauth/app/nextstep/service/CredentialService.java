@@ -158,24 +158,31 @@ public class CredentialService {
             credential.setType(request.getCredentialType());
         }
         String username;
+        String credentialValue = request.getCredentialValue();
         CredentialValidationMode validationMode;
-        if (request.getUsername() != null) {
+        if (request.getUsername() != null && request.getCredentialValue() != null) {
             username = request.getUsername();
             credential.setUsername(username);
+            credential.setValue(credentialValue);
+            credential.setTimestampLastCredentialChange(new Date());
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
-        } else {
+        } else if (request.getCredentialValue() != null) {
             username = credential.getUsername();
+            credential.setValue(credentialValue);
+            credential.setTimestampLastCredentialChange(new Date());
             validationMode = CredentialValidationMode.VALIDATE_CREDENTIAL;
+        } else {
+            username = request.getUsername();
+            credential.setUsername(username);
+            validationMode = CredentialValidationMode.VALIDATE_USERNAME;
         }
-        if (request.getCredentialValue() != null) {
+        if (request.getUsername() != null || request.getCredentialValue() != null) {
             List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
-                    credentialDefinition, username, request.getCredentialValue(), validationMode);
+                    credentialDefinition, username, credentialValue, validationMode);
             if (!validationErrors.isEmpty()) {
                 CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
-            credential.setValue(request.getCredentialValue());
-            credential.setTimestampLastCredentialChange(new Date());
         }
         if (request.getCredentialStatus() != null) {
             credential.setStatus(request.getCredentialStatus());
