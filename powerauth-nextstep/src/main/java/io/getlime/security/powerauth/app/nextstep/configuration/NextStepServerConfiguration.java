@@ -55,6 +55,9 @@ public class NextStepServerConfiguration {
     @Value("${powerauth.nextstep.identity.credential.generateUsernameMaxAttempts}")
     private int generateUsernameMaxAttempts;
 
+    @Value("${powerauth.nextstep.e2eEncryption.key}")
+    private String e2eEncryptionKey;
+
     /**
      * Application name.
      */
@@ -96,6 +99,14 @@ public class NextStepServerConfiguration {
      */
     public int getGenerateUsernameMaxAttempts() {
         return generateUsernameMaxAttempts;
+    }
+
+    /**
+     * Get end-to-end encryption key.
+     * @return End-to-end encryption key
+     */
+    public String getE2eEncryptionKey() {
+        return e2eEncryptionKey;
     }
 
     /**

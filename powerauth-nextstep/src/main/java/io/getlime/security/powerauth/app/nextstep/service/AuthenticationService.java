@@ -61,6 +61,7 @@ public class AuthenticationService {
     private final IdGeneratorService idGeneratorService;
     private final AuthenticationCustomizationService authenticationCustomizationService;
     private final CredentialProtectionService credentialProtectionService;
+    private final EndToEndEncryptionService endToEndEncryptionService;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
@@ -68,7 +69,6 @@ public class AuthenticationService {
 
     /**
      * Authentication service constructor.
-     *
      * @param authenticationRepository Authentication repository.
      * @param credentialDefinitionService Credential definition service.
      * @param userIdentityLookupService User identity lookup service.
@@ -80,9 +80,10 @@ public class AuthenticationService {
      * @param idGeneratorService ID generator service.
      * @param authenticationCustomizationService Authentication customization service.
      * @param credentialProtectionService Credential protection service.
+     * @param endToEndEncryptionService End-to-end encryption service.
      */
     @Autowired
-    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService) {
+    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService) {
         this.authenticationRepository = authenticationRepository;
         this.credentialDefinitionService = credentialDefinitionService;
         this.userIdentityLookupService = userIdentityLookupService;
@@ -94,6 +95,7 @@ public class AuthenticationService {
         this.idGeneratorService = idGeneratorService;
         this.authenticationCustomizationService = authenticationCustomizationService;
         this.credentialProtectionService = credentialProtectionService;
+        this.endToEndEncryptionService = endToEndEncryptionService;
     }
 
     /**
@@ -119,6 +121,10 @@ public class AuthenticationService {
         if (credentialDefinition.isDataAdapterProxyEnabled()) {
             return authenticateWithCredentialCustom(credentialDefinition, request.getCredentialValue(), request.getOperationId(), request.getUserId(), request.getAuthMethod());
         }
+        String credentialValue = request.getCredentialValue();
+        if (credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+        }
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
             CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
@@ -141,7 +147,7 @@ public class AuthenticationService {
         // Verify credential value
         AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue(), request.getCredentialPositionsToVerify());
+            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
         } else {
             authenticationResult = AuthenticationResult.FAILED;
         }
@@ -192,7 +198,7 @@ public class AuthenticationService {
         response.setAuthenticationResult(authenticationResult);
         response.setRemainingAttempts(remainingAttempts);
         response.setOperationFailed(operationFailed);
-        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, request.getCredentialValue()));
+        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, credentialValue));
         return response;
     }
 
@@ -470,6 +476,11 @@ public class AuthenticationService {
             throw new InvalidRequestException("Operation ID mismatch for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
         }
         CredentialEntity credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
+        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        String credentialValue = request.getCredentialValue();
+        if (credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+        }
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
         AuthenticationResult credentialAuthenticationResult;
         AuthenticationResult otpAuthenticationResult;
@@ -482,7 +493,7 @@ public class AuthenticationService {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
         } else {
-            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, request.getCredentialValue(), request.getCredentialPositionsToVerify());
+            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
 
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
@@ -565,7 +576,7 @@ public class AuthenticationService {
         response.setOtpAuthenticationResult(otpAuthenticationResult);
         response.setRemainingAttempts(remainingAttempts);
         response.setOperationFailed(operationFailed);
-        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, request.getCredentialValue()));
+        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, credentialValue));
         return response;
     }
 

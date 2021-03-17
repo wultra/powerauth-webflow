@@ -41,9 +41,7 @@ import java.util.*;
  * This service handles persistence of credentials.
  *
  * TODO:
- * - hashing of credentials using Argon2i
  * - encryption of credentials stored in database
- * - end-to-end encryption for credentials
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -61,6 +59,7 @@ public class CredentialService {
     private final CredentialGenerationService credentialGenerationService;
     private final CredentialValidationService credentialValidationService;
     private final CredentialProtectionService credentialProtectionService;
+    private final EndToEndEncryptionService endToEndEncryptionService;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
 
@@ -75,9 +74,10 @@ public class CredentialService {
      * @param credentialGenerationService Credential generation service.
      * @param credentialValidationService Credential validation service.
      * @param credentialProtectionService Credential protection service.
+     * @param endToEndEncryptionService End-to-end encryption service.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService, CredentialProtectionService credentialProtectionService) {
+    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
         this.credentialRepository = credentialRepository;
@@ -87,6 +87,7 @@ public class CredentialService {
         this.credentialGenerationService = credentialGenerationService;
         this.credentialValidationService = credentialValidationService;
         this.credentialProtectionService = credentialProtectionService;
+        this.endToEndEncryptionService = endToEndEncryptionService;
     }
 
     /**
@@ -106,6 +107,9 @@ public class CredentialService {
         CredentialType credentialType = request.getCredentialType();
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
+        if (credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+        }
         CredentialValidationMode validationMode = request.getValidationMode();
         List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
         if (validationMode == null) {
@@ -118,7 +122,11 @@ public class CredentialService {
             long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
             for (CreateCredentialRequest.CredentialHistory h : credentialHistory) {
                 Date createdDate = new Date(createdTimestamp);
-                importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue(), createdDate);
+                String credentialValueHistory = h.getCredentialValue();
+                if (credentialDefinition.isE2eEncryptionEnabled()) {
+                    credentialValueHistory = endToEndEncryptionService.decryptCredential(credentialValueHistory, credentialDefinition);
+                }
+                importCredentialHistory(user, credentialDefinition, h.getUsername(), credentialValueHistory, createdDate);
                 createdTimestamp += 1000;
             }
         }
@@ -130,7 +138,11 @@ public class CredentialService {
         response.setUsername(credentialDetail.getUsername());
         if (request.getCredentialValue() == null) {
             // Return generated credential value
-            response.setCredentialValue(credentialDetail.getCredentialValue());
+            String credentialValueResponse = credentialDetail.getCredentialValue();
+            if (credentialDefinition.isE2eEncryptionEnabled()) {
+                credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
+            }
+            response.setCredentialValue(credentialValueResponse);
         }
         response.setCredentialChangeRequired(credentialDetail.isCredentialChangeRequired());
         return response;
@@ -167,6 +179,9 @@ public class CredentialService {
         }
         String username = null;
         String credentialValue = request.getCredentialValue();
+        if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+        }
         CredentialValidationMode validationMode = CredentialValidationMode.NO_VALIDATION;
         if (request.getUsername() != null && request.getCredentialValue() != null) {
             username = request.getUsername();
@@ -218,7 +233,7 @@ public class CredentialService {
         response.setUsername(credential.getUsername());
         boolean credentialChangeRequired;
         if (request.getCredentialValue() != null) {
-            credentialChangeRequired = isCredentialChangeRequired(credential, request.getCredentialValue());
+            credentialChangeRequired = isCredentialChangeRequired(credential, credentialValue);
         } else {
             if (credentialDefinition.getHashingConfig() == null) {
                 credentialChangeRequired = isCredentialChangeRequired(credential, credential.getValue());
@@ -273,8 +288,14 @@ public class CredentialService {
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        String username = request.getUsername();
+        String credentialValue = request.getCredentialValue();
+        CredentialValidationMode validationMode = request.getValidationMode();
+        if (credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+        }
         List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
-                credentialDefinition, request.getUsername(), request.getCredentialValue(), request.getValidationMode());
+                credentialDefinition, username, credentialValue, validationMode);
         ValidateCredentialResponse response = new ValidateCredentialResponse();
         if (validationErrors.isEmpty()) {
             response.setValidationResult(CredentialValidationResult.SUCCEEDED);
@@ -358,7 +379,11 @@ public class CredentialService {
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setUsername(credential.getUsername());
         // Generated password must be returned in unprotected form
-        response.setCredentialValue(unprotectedCredentialValue);
+        String credentialValueResponse = unprotectedCredentialValue;
+        if (credentialDefinition.isE2eEncryptionEnabled()) {
+            credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
+        }
+        response.setCredentialValue(credentialValueResponse);
         response.setCredentialStatus(credential.getStatus());
         return response;
     }
@@ -584,9 +609,13 @@ public class CredentialService {
         credentialDetail.setUsername(credential.getUsername());
         boolean credentialChangeRequired;
         if (credentialValueRequest == null) {
-            // Generated credential value must be returned in unprotected form
-            credentialDetail.setCredentialValue(unprotectedCredentialValue);
+            // Generated credential value is returned in unprotected form, with possible e2e-encryption
             credentialChangeRequired = isCredentialChangeRequired(credential, unprotectedCredentialValue);
+            String credentialValueResponse = unprotectedCredentialValue;
+            if (credentialDefinition.isE2eEncryptionEnabled()) {
+                credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
+            }
+            credentialDetail.setCredentialValue(credentialValueResponse);
         } else {
             credentialChangeRequired = isCredentialChangeRequired(credential, credentialValueRequest);
         }

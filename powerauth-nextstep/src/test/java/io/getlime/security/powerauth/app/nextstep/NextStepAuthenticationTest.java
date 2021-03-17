@@ -15,20 +15,30 @@
  */
 package io.getlime.security.powerauth.app.nextstep;
 
+import com.google.common.io.BaseEncoding;
+import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
+import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
+import io.getlime.security.powerauth.crypto.lib.model.exception.CryptoProviderException;
+import io.getlime.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
+import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
+import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUsersRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
 
 import static org.junit.Assert.*;
 
@@ -38,6 +48,13 @@ import static org.junit.Assert.*;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class NextStepAuthenticationTest extends NextStepTest {
+
+    private final KeyGenerator keyGenerator = new KeyGenerator();
+    private final KeyConvertor keyConvertor = new KeyConvertor();
+    private final AESEncryptionUtils aes = new AESEncryptionUtils();
+
+    @Autowired
+    private NextStepServerConfiguration nextStepServerConfiguration;
 
     @Before
     public void setUp() throws Exception {
@@ -518,5 +535,47 @@ public class NextStepAuthenticationTest extends NextStepTest {
         GetOperationDetailResponse r2 = nextStepClient.getOperationDetail("test_operation_11").getResponseObject();
         assertEquals(AuthResult.FAILED, r2.getResult());
     }
+
+    @Test
+    public void testCredentialSuccessE2EEncryption() throws NextStepClientException, CryptoProviderException, GenericCryptoException, InvalidKeyException {
+        String credentialValue = "s3cret";
+        String secretKeyBase64 = nextStepServerConfiguration.getE2eEncryptionKey();
+        byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
+        SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
+        byte[] ivBytes = keyGenerator.generateRandomBytes(16);
+        // Encrypt password bytes using random IV, secret key and transformation
+        byte[] passwordBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
+        byte[] encryptedPasswordBytes = aes.encrypt(passwordBytes, ivBytes, secretKey, "AES/CBC/PKCS7Padding");
+        String encryptedPasswordBase64 = BaseEncoding.base64().encode(encryptedPasswordBytes);
+        String ivBase64 = BaseEncoding.base64().encode(ivBytes);
+        String encryptedCredentialValue = ivBase64 + ":" + encryptedPasswordBase64;
+        // Enable end-to-end encryption
+        UpdateCredentialDefinitionRequest credentialDefinitionRequest = new UpdateCredentialDefinitionRequest();
+        credentialDefinitionRequest.setCredentialDefinitionName("TEST_CREDENTIAL");
+        credentialDefinitionRequest.setApplicationName("TEST_APP");
+        credentialDefinitionRequest.setCredentialPolicyName("TEST_CREDENTIAL_POLICY");
+        credentialDefinitionRequest.setCategory(CredentialCategory.PASSWORD);
+        credentialDefinitionRequest.setHashingEnabled(true);
+        credentialDefinitionRequest.setHashConfigName("ARGON2_TEST");
+        credentialDefinitionRequest.setE2eEncryptionEnabled(true);
+        credentialDefinitionRequest.setE2eEncryptionAlgorithm("AES");
+        credentialDefinitionRequest.setE2eEncryptionCipherTransformation("AES/CBC/PKCS7Padding");
+        nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
+
+        System.out.println(encryptedCredentialValue);
+
+        // Test authentication
+        CredentialAuthenticationResponse r1 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", encryptedCredentialValue).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r1.getAuthenticationResult());
+        // Disable end-to-end encryption
+        credentialDefinitionRequest.setE2eEncryptionEnabled(false);
+        credentialDefinitionRequest.setE2eEncryptionAlgorithm(null);
+        credentialDefinitionRequest.setE2eEncryptionCipherTransformation(null);
+        nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
+        // Test authentication
+        CredentialAuthenticationResponse r2 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", credentialValue).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
+    }
+
 
 }

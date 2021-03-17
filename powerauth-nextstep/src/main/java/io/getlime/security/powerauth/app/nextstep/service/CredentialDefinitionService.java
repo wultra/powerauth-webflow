@@ -133,6 +133,8 @@ public class CredentialDefinitionService {
             credentialDefinition.setHashingConfig(hashConfigEntity);
         }
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
+        credentialDefinition.setE2eEncryptionAlgorithm(request.getE2eEncryptionAlgorithm());
+        credentialDefinition.setE2eEncryptionCipherTransformation(request.getE2eEncryptionCipherTransformation());
         credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampCreated(new Date());
@@ -151,6 +153,8 @@ public class CredentialDefinitionService {
             response.setHashConfigName(credentialDefinition.getHashingConfig().getName());
         }
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
+        response.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
+        response.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
         response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }
@@ -213,6 +217,8 @@ public class CredentialDefinitionService {
         credentialDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
         credentialDefinition.setHashingConfig(hashConfigEntity);
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
+        credentialDefinition.setE2eEncryptionAlgorithm(request.getE2eEncryptionAlgorithm());
+        credentialDefinition.setE2eEncryptionCipherTransformation(request.getE2eEncryptionCipherTransformation());
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
@@ -230,6 +236,8 @@ public class CredentialDefinitionService {
             response.setHashConfigName(credentialDefinition.getHashingConfig().getName());
         }
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
+        response.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
+        response.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
         response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }

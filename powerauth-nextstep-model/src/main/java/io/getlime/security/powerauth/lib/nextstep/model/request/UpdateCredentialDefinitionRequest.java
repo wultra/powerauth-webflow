@@ -51,6 +51,8 @@ public class UpdateCredentialDefinitionRequest {
     @Size(min = 2, max = 256)
     private String hashConfigName;
     private boolean e2eEncryptionEnabled;
+    private String e2eEncryptionAlgorithm;
+    private String e2eEncryptionCipherTransformation;
     private CredentialDefinitionStatus credentialDefinitionStatus;
     private boolean dataAdapterProxyEnabled;
 

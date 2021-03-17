@@ -59,6 +59,7 @@ public class UserIdentityService {
     private final OtpRepository otpRepository;
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialService credentialService;
+    private final EndToEndEncryptionService endToEndEncryptionService;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
     private final CredentialConverter credentialConverter = new CredentialConverter();
@@ -78,9 +79,10 @@ public class UserIdentityService {
      * @param otpRepository OTP repository.
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialService Credential service.
+     * @param endToEndEncryptionService End-to-end encryption service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactService userContactService, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactService userContactService, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
         this.userIdentityRepository = userIdentityRepository;
         this.userIdentityHistoryRepository = userIdentityHistoryRepository;
         this.userContactService = userContactService;
@@ -92,6 +94,7 @@ public class UserIdentityService {
         this.otpRepository = otpRepository;
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialService = credentialService;
+        this.endToEndEncryptionService = endToEndEncryptionService;
     }
 
     /**
@@ -159,22 +162,34 @@ public class UserIdentityService {
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
                 List<CreateUserRequest.CredentialHistory> credentialHistory = credential.getCredentialHistory();
+                CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                String credentialValue = credential.getCredentialValue();
+                if (credentialDefinition.isE2eEncryptionEnabled()) {
+                    credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+                }
                 CredentialValidationMode validationMode = credential.getValidationMode();
                 if (validationMode == null) {
                     validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
                 }
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
                 CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue(), validationMode);
+                        credential.getCredentialType(), credential.getUsername(), credentialValue, validationMode);
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
                     int dateCount = credentialHistory.size();
                     // Use unique timestamps in seconds to keep order of credential history
                     long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
                     for (CreateUserRequest.CredentialHistory h : credentialHistory) {
                         Date createdDate = new Date(createdTimestamp);
-                        credentialService.importCredentialHistory(user, credentialDefinition, h.getUsername(), h.getCredentialValue(), createdDate);
+                        String credentialValueHistory = h.getCredentialValue();
+                        if (credentialDefinition.isE2eEncryptionEnabled()) {
+                            credentialValueHistory = endToEndEncryptionService.decryptCredential(credentialValueHistory, credentialDefinition);
+                        }
+                        credentialService.importCredentialHistory(user, credentialDefinition, h.getUsername(), credentialValueHistory, createdDate);
                         createdTimestamp += 1000;
                     }
+                }
+                if (credentialDefinition.isE2eEncryptionEnabled()) {
+                    String credentialValueResponse = credentialDetail.getCredentialValue();
+                    credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
                 }
                 newCredentials.add(credentialDetail);
             }
@@ -266,8 +281,16 @@ public class UserIdentityService {
                 // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
                 for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
                     CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                    String credentialValue = credential.getCredentialValue();
+                    if (credentialDefinition.isE2eEncryptionEnabled()) {
+                        credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+                    }
                     CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credential.getCredentialValue(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+                            credential.getCredentialType(), credential.getUsername(), credentialValue, CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+                    if (credentialDefinition.isE2eEncryptionEnabled()) {
+                        String credentialValueResponse = credentialDetail.getCredentialValue();
+                        credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
+                    }
                     newCredentials.add(credentialDetail);
                 }
             }

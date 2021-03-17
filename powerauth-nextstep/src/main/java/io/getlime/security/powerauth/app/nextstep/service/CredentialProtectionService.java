@@ -35,6 +35,8 @@ import java.util.Map;
 
 /**
  * Service which secures credentials.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Service
 public class CredentialProtectionService {
@@ -93,7 +95,6 @@ public class CredentialProtectionService {
             default:
                 throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
-
     }
 
     /**
@@ -134,7 +135,7 @@ public class CredentialProtectionService {
      * @param credentialValue Credential value.
      * @param algorithm Algorithm name.
      * @param param Algorithm parameters.
-     * @return Argon2 hash in Modular Crypto Format.
+     * @return Argon2 hash in Modular Crypt Format.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String hashCredentialUsingArgon2(String credentialValue, String algorithm, Map<String, String> param) throws InvalidConfigurationException {
@@ -189,7 +190,7 @@ public class CredentialProtectionService {
      * @param algorithm Algorithm name.
      * @param parameters Algorithm parameters.
      * @param outputLength Expected output length.
-     * @return Argon2 hash in Modular Crypto Format.
+     * @return Argon2 hash in Modular Crypt Format.
      */
     private static Argon2Hash createArgon2Hash(byte[] credentialBytes, String algorithm, Argon2Parameters parameters, int outputLength) {
         // Generate password digest
