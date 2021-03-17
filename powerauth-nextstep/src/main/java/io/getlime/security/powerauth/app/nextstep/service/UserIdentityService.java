@@ -349,7 +349,13 @@ public class UserIdentityService {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
-            credentialDetail.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential));
+            boolean credentialChangeRequired;
+            if (credential.getCredentialDefinition().getHashingConfig() == null) {
+                credentialChangeRequired = credentialService.isCredentialChangeRequired(credential, credential.getValue());
+            } else {
+                credentialChangeRequired = credentialService.isCredentialChangeRequired(credential, null);
+            }
+            credentialDetail.setCredentialChangeRequired(credentialChangeRequired);
             response.getCredentials().add(credentialDetail);
         }
         return response;

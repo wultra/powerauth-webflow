@@ -60,6 +60,7 @@ public class AuthenticationService {
     private final StepResolutionService stepResolutionService;
     private final IdGeneratorService idGeneratorService;
     private final AuthenticationCustomizationService authenticationCustomizationService;
+    private final CredentialProtectionService credentialProtectionService;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
@@ -78,9 +79,10 @@ public class AuthenticationService {
      * @param stepResolutionService Step resolution service.
      * @param idGeneratorService ID generator service.
      * @param authenticationCustomizationService Authentication customization service.
+     * @param credentialProtectionService Credential protection service.
      */
     @Autowired
-    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService) {
+    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService) {
         this.authenticationRepository = authenticationRepository;
         this.credentialDefinitionService = credentialDefinitionService;
         this.userIdentityLookupService = userIdentityLookupService;
@@ -91,6 +93,7 @@ public class AuthenticationService {
         this.stepResolutionService = stepResolutionService;
         this.idGeneratorService = idGeneratorService;
         this.authenticationCustomizationService = authenticationCustomizationService;
+        this.credentialProtectionService = credentialProtectionService;
     }
 
     /**
@@ -646,7 +649,7 @@ public class AuthenticationService {
      */
     private AuthenticationResult verifyCredential(CredentialAuthenticationMode authenticationMode,
                                                   CredentialEntity credential, String credentialValue,
-                                                  List<Integer> credentialPositionsToVerify) throws InvalidRequestException {
+                                                  List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             return AuthenticationResult.FAILED;
         }
@@ -658,7 +661,7 @@ public class AuthenticationService {
         }
         switch (authModeResolved) {
             case MATCH_EXACT:
-                boolean credentialMatched = credential.getValue().equals(credentialValue);
+                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential.getValue(), credential.getCredentialDefinition());
                 if (credentialMatched) {
                     return AuthenticationResult.SUCCEEDED;
                 } else {

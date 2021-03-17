@@ -15,9 +15,11 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,9 +35,8 @@ public class CreateHashConfigRequest {
     @NotBlank
     @Size(min = 2, max = 256)
     private String hashConfigName;
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String algorithm;
+    @NotNull
+    private HashAlgorithm algorithm;
     private final Map<String, String> parameters = new LinkedHashMap<>();
 
 }

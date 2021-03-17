@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -38,9 +39,8 @@ public class HashConfigDetail {
     @NotBlank
     @Size(min = 1, max = 256)
     private String hashConfigName;
-    @NotBlank
-    @Size(min = 1, max = 256)
-    private String algorithm;
+    @NotNull
+    private HashAlgorithm algorithm;
     @NotNull
     private HashConfigStatus hashConfigStatus;
     @NotNull

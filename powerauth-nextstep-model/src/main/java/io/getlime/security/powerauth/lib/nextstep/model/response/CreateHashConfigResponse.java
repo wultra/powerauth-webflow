@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 
@@ -35,9 +36,8 @@ public class CreateHashConfigResponse {
     @NotBlank
     @Size(min = 2, max = 256)
     private String hashConfigName;
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String algorithm;
+    @NotNull
+    private HashAlgorithm algorithm;
     @NotNull
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull

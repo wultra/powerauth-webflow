@@ -60,6 +60,7 @@ public class CredentialService {
     private final NextStepServerConfiguration nextStepServerConfiguration;
     private final CredentialGenerationService credentialGenerationService;
     private final CredentialValidationService credentialValidationService;
+    private final CredentialProtectionService credentialProtectionService;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
 
@@ -73,9 +74,10 @@ public class CredentialService {
      * @param nextStepServerConfiguration Next Step server configuration.
      * @param credentialGenerationService Credential generation service.
      * @param credentialValidationService Credential validation service.
+     * @param credentialProtectionService Credential protection service.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService) {
+    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService, CredentialProtectionService credentialProtectionService) {
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialDefinitionService = credentialDefinitionService;
         this.credentialRepository = credentialRepository;
@@ -84,6 +86,7 @@ public class CredentialService {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
         this.credentialGenerationService = credentialGenerationService;
         this.credentialValidationService = credentialValidationService;
+        this.credentialProtectionService = credentialProtectionService;
     }
 
     /**
@@ -183,15 +186,13 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
-        if (request.getUsername() != null && request.getCredentialValue() != null) {
-            credential.setUsername(request.getUsername());
-            credential.setValue(credentialValue);
+        if (request.getUsername() != null) {
+            credential.setUsername(username);
+        }
+        if (request.getCredentialValue() != null) {
+            String protectedValue = credentialProtectionService.protectCredential(credentialValue, credentialDefinition);
+            credential.setValue(protectedValue);
             credential.setTimestampLastCredentialChange(new Date());
-        } else if (request.getCredentialValue() != null) {
-            credential.setValue(credentialValue);
-            credential.setTimestampLastCredentialChange(new Date());
-        } else if (request.getUsername() != null) {
-            credential.setUsername(request.getUsername());
         }
 
         if (request.getCredentialStatus() != null) {
@@ -215,7 +216,16 @@ public class CredentialService {
         response.setCredentialType(credential.getType());
         response.setCredentialStatus(credential.getStatus());
         response.setUsername(credential.getUsername());
-        boolean credentialChangeRequired = isCredentialChangeRequired(credential);
+        boolean credentialChangeRequired;
+        if (request.getCredentialValue() != null) {
+            credentialChangeRequired = isCredentialChangeRequired(credential, request.getCredentialValue());
+        } else {
+            if (credentialDefinition.getHashingConfig() == null) {
+                credentialChangeRequired = isCredentialChangeRequired(credential, credential.getValue());
+            } else {
+                credentialChangeRequired = isCredentialChangeRequired(credential, null);
+            }
+        }
         response.setCredentialChangeRequired(credentialChangeRequired);
         return response;
     }
@@ -238,7 +248,13 @@ public class CredentialService {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
-            credentialDetail.setCredentialChangeRequired(isCredentialChangeRequired(credential));
+            boolean credentialChangeRequired;
+            if (credential.getCredentialDefinition().getHashingConfig() == null) {
+                credentialChangeRequired = isCredentialChangeRequired(credential, credential.getValue());
+            } else {
+                credentialChangeRequired = isCredentialChangeRequired(credential, null);
+            }
+            credentialDetail.setCredentialChangeRequired(credentialChangeRequired);
             response.getCredentials().add(credentialDetail);
         }
         return response;
@@ -272,10 +288,11 @@ public class CredentialService {
     /**
      * Check whether credential change is required.
      * @param credential Credential entity.
+     * @param unprotectedCredentialValue Unprotected credential value.
      * @return Whether credential change is required.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public boolean isCredentialChangeRequired(CredentialEntity credential) throws InvalidConfigurationException {
+    public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
         CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
         if (credentialPolicy.isRotationEnabled()) {
             Date lastChange = credential.getTimestampLastCredentialChange();
@@ -290,8 +307,11 @@ public class CredentialService {
                 return true;
             }
         }
+        if (unprotectedCredentialValue == null) {
+            return false;
+        }
         List<CredentialValidationFailure> validationFailures = credentialValidationService.validateCredentialValue(credential.getUser(),
-                credential.getUsername(), credential.getValue(), credential.getCredentialDefinition(), false);
+                credential.getUsername(), unprotectedCredentialValue, credential.getCredentialDefinition(), false);
         return !validationFailures.isEmpty();
     }
 
@@ -321,8 +341,9 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        String value = credentialGenerationService.generateCredentialValue(credentialDefinition);
-        credential.setValue(value);
+        String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
+        String protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credentialDefinition);
+        credential.setValue(protectedCredentialValue);
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);
@@ -336,7 +357,8 @@ public class CredentialService {
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setUsername(credential.getUsername());
-        response.setCredentialValue(credential.getValue());
+        // Generated password must be returned in unprotected form
+        response.setCredentialValue(unprotectedCredentialValue);
         response.setCredentialStatus(credential.getStatus());
         return response;
     }
@@ -542,7 +564,9 @@ public class CredentialService {
             CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
-        credential.setValue(credentialValue);
+        String unprotectedCredentialValue = credentialValue;
+        String protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, credentialDefinition);
+        credential.setValue(protectedCredentialValue);
         credential.setTimestampLastCredentialChange(new Date());
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
@@ -558,10 +582,15 @@ public class CredentialService {
         credentialDetail.setCredentialType(credential.getType());
         credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
         credentialDetail.setUsername(credential.getUsername());
+        boolean credentialChangeRequired;
         if (credentialValueRequest == null) {
-            credentialDetail.setCredentialValue(credential.getValue());
+            // Generated credential value must be returned in unprotected form
+            credentialDetail.setCredentialValue(unprotectedCredentialValue);
+            credentialChangeRequired = isCredentialChangeRequired(credential, unprotectedCredentialValue);
+        } else {
+            credentialChangeRequired = isCredentialChangeRequired(credential, credentialValueRequest);
         }
-        credentialDetail.setCredentialChangeRequired(isCredentialChangeRequired(credential));
+        credentialDetail.setCredentialChangeRequired(credentialChangeRequired);
         credentialDetail.setTimestampCreated(credential.getTimestampCreated());
         credentialDetail.setTimestampLastUpdated(credential.getTimestampLastUpdated());
         credentialDetail.setTimestampExpires(credential.getTimestampExpires());

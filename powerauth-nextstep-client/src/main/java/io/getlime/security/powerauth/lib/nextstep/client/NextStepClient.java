@@ -860,7 +860,7 @@ public class NextStepClient {
      * @return Create hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@NotNull String hashConfigName, @NotNull String algorithm, Map<String, String> parameters) throws NextStepClientException {
+    public ObjectResponse<CreateHashConfigResponse> createHashConfig(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters) throws NextStepClientException {
         CreateHashConfigRequest request = new CreateHashConfigRequest();
         request.setHashConfigName(hashConfigName);
         request.setAlgorithm(algorithm);
@@ -880,7 +880,7 @@ public class NextStepClient {
      * @return Update hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@NotNull String hashConfigName, @NotNull String algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
+    public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
         UpdateHashConfigRequest request = new UpdateHashConfigRequest();
         request.setHashConfigName(hashConfigName);
         request.setAlgorithm(algorithm);
@@ -901,7 +901,7 @@ public class NextStepClient {
      * @return Update hashing configuration response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@NotNull String hashConfigName, @NotNull String algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
+    public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@NotNull String hashConfigName, @NotNull HashAlgorithm algorithm, Map<String, String> parameters, HashConfigStatus status) throws NextStepClientException {
         UpdateHashConfigRequest request = new UpdateHashConfigRequest();
         request.setHashConfigName(hashConfigName);
         request.setAlgorithm(algorithm);

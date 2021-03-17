@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -46,7 +47,8 @@ public class HashConfigEntity implements Serializable {
     private String name;
 
     @Column(name = "algorithm", nullable = false)
-    private String algorithm;
+    @Enumerated(EnumType.STRING)
+    private HashAlgorithm algorithm;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

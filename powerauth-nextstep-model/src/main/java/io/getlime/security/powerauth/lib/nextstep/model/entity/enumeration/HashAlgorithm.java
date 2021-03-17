@@ -13,34 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package io.getlime.security.powerauth.app.nextstep;
-
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.security.Security;
+package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Spring Boot application main class.
+ * Enumeration representing hashing algorithms.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@SpringBootApplication
-public class NextStepApplication {
-
-    static {
-        // Initialize Bouncy Castle provider
-        Security.addProvider(new BouncyCastleProvider());
-    }
+public enum HashAlgorithm {
 
     /**
-     * Spring boot - main method.
-     *
-     * @param args Arguments
+     * Algorithm Argon2i.
      */
-    public static void main(String[] args) {
-        SpringApplication.run(NextStepApplication.class, args);
-    }
+    ARGON_2i,
+
 }

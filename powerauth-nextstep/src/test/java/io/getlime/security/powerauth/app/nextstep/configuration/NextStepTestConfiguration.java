@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetApplicationListResponse;
@@ -29,6 +30,8 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.stereotype.Service;
 
 import java.security.Security;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Configure Next Step service for tests.
@@ -164,12 +167,23 @@ public class NextStepTestConfiguration {
         credentialPolicyRequest.setCredentialValParam(new CredentialValidationParam());
         nextStepClient.createCredentialPolicy(credentialPolicyRequest);
 
+        // Create hashing configuration
+        Map<String, String> param = new LinkedHashMap<>();
+        param.put("version", "19");
+        param.put("iterations", "3");
+        param.put("memory", "15");
+        param.put("parallelism", "16");
+        param.put("outputLength", "32");
+        nextStepClient.createHashConfig("ARGON2_TEST", HashAlgorithm.ARGON_2i, param);
+
         // Create credential definition
         CreateCredentialDefinitionRequest credentialDefinitionRequest = new CreateCredentialDefinitionRequest();
         credentialDefinitionRequest.setCredentialDefinitionName("TEST_CREDENTIAL");
         credentialDefinitionRequest.setApplicationName("TEST_APP");
         credentialDefinitionRequest.setCredentialPolicyName("TEST_CREDENTIAL_POLICY");
         credentialDefinitionRequest.setCategory(CredentialCategory.PASSWORD);
+        credentialDefinitionRequest.setHashingEnabled(true);
+        credentialDefinitionRequest.setHashConfigName("ARGON2_TEST");
         nextStepClient.createCredentialDefinition(credentialDefinitionRequest);
 
         // Create credential definition for testing credential generation
@@ -178,6 +192,8 @@ public class NextStepTestConfiguration {
         credentialDefinitionRequest2.setApplicationName("TEST_APP");
         credentialDefinitionRequest2.setCredentialPolicyName("TEST_CREDENTIAL_POLICY");
         credentialDefinitionRequest2.setCategory(CredentialCategory.PASSWORD);
+        credentialDefinitionRequest2.setHashingEnabled(true);
+        credentialDefinitionRequest2.setHashConfigName("ARGON2_TEST");
         nextStepClient.createCredentialDefinition(credentialDefinitionRequest2);
 
         // Create OTP policy
