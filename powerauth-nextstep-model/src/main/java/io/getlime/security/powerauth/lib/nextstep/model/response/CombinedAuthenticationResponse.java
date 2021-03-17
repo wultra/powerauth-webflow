@@ -44,6 +44,8 @@ public class CombinedAuthenticationResponse {
     @NotNull
     private CredentialStatus credentialStatus;
     @NotNull
+    private boolean credentialChangeRequired;
+    @NotNull
     private OtpStatus otpStatus;
     @NotNull
     private AuthenticationResult authenticationResult;

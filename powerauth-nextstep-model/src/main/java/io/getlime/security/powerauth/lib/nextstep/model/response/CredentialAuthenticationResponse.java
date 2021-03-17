@@ -43,6 +43,8 @@ public class CredentialAuthenticationResponse {
     @NotNull
     private CredentialStatus credentialStatus;
     @NotNull
+    private boolean credentialChangeRequired;
+    @NotNull
     private AuthenticationResult authenticationResult;
     @PositiveOrZero
     private Integer remainingAttempts;

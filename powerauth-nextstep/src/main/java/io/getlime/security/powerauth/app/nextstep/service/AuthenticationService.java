@@ -192,6 +192,7 @@ public class AuthenticationService {
         response.setAuthenticationResult(authenticationResult);
         response.setRemainingAttempts(remainingAttempts);
         response.setOperationFailed(operationFailed);
+        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, request.getCredentialValue()));
         return response;
     }
 
@@ -564,6 +565,7 @@ public class AuthenticationService {
         response.setOtpAuthenticationResult(otpAuthenticationResult);
         response.setRemainingAttempts(remainingAttempts);
         response.setOperationFailed(operationFailed);
+        response.setCredentialChangeRequired(credentialService.isCredentialChangeRequired(credential, request.getCredentialValue()));
         return response;
     }
 
