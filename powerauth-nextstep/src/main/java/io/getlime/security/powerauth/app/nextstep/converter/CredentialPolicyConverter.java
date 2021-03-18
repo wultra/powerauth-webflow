@@ -53,6 +53,7 @@ public class CredentialPolicyConverter {
         credentialPolicyDetail.setCheckHistoryCount(credentialPolicy.getCheckHistoryCount());
         credentialPolicyDetail.setRotationEnabled(credentialPolicy.isRotationEnabled());
         credentialPolicyDetail.setRotationDays(credentialPolicy.getRotationDays());
+        credentialPolicyDetail.setTemporaryCredentialExpirationTime(credentialPolicy.getTemporaryCredentialExpirationTime());
         credentialPolicyDetail.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
         try {
             credentialPolicyDetail.setUsernameGenParam(parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class));

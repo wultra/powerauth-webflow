@@ -92,11 +92,11 @@ public class EndToEndEncryptionService {
 
             byte[] ivBytes = keyGenerator.generateRandomBytes(16);
             // Encrypt password bytes using random IV, secret key and transformation
-            byte[] passwordBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
-            byte[] encryptedPasswordBytes = aes.encrypt(passwordBytes, ivBytes, secretKey, cipherTransformation);
-            String encryptedPasswordBase64 = BaseEncoding.base64().encode(encryptedPasswordBytes);
+            byte[] credentialValueBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
+            byte[] encryptedCredentialBytes = aes.encrypt(credentialValueBytes, ivBytes, secretKey, cipherTransformation);
+            String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
             String ivBase64 = BaseEncoding.base64().encode(ivBytes);
-            return ivBase64 + ":" + encryptedPasswordBase64;
+            return ivBase64 + ":" + encryptedCredentialBase64;
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
             throw new InvalidConfigurationException(ex);
         }

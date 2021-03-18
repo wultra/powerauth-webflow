@@ -543,12 +543,12 @@ public class NextStepAuthenticationTest extends NextStepTest {
         byte[] secretKeyBytes = BaseEncoding.base64().decode(secretKeyBase64);
         SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
         byte[] ivBytes = keyGenerator.generateRandomBytes(16);
-        // Encrypt password bytes using random IV, secret key and transformation
-        byte[] passwordBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
-        byte[] encryptedPasswordBytes = aes.encrypt(passwordBytes, ivBytes, secretKey, "AES/CBC/PKCS7Padding");
-        String encryptedPasswordBase64 = BaseEncoding.base64().encode(encryptedPasswordBytes);
+        // Encrypt credential bytes using random IV, secret key and transformation
+        byte[] credentialBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
+        byte[] encryptedCredentialBytes = aes.encrypt(credentialBytes, ivBytes, secretKey, "AES/CBC/PKCS7Padding");
+        String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
         String ivBase64 = BaseEncoding.base64().encode(ivBytes);
-        String encryptedCredentialValue = ivBase64 + ":" + encryptedPasswordBase64;
+        String encryptedCredentialValue = ivBase64 + ":" + encryptedCredentialBase64;
         // Enable end-to-end encryption
         UpdateCredentialDefinitionRequest credentialDefinitionRequest = new UpdateCredentialDefinitionRequest();
         credentialDefinitionRequest.setCredentialDefinitionName("TEST_CREDENTIAL");
@@ -561,8 +561,6 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setE2eEncryptionAlgorithm("AES");
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation("AES/CBC/PKCS7Padding");
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
-
-        System.out.println(encryptedCredentialValue);
 
         // Test authentication
         CredentialAuthenticationResponse r1 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", encryptedCredentialValue).getResponseObject();
@@ -577,5 +575,5 @@ public class NextStepAuthenticationTest extends NextStepTest {
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
     }
 
-
 }
+

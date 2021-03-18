@@ -94,6 +94,7 @@ public class CredentialPolicyService {
         credentialPolicy.setCheckHistoryCount(request.getCheckHistoryCount());
         credentialPolicy.setRotationEnabled(request.isRotationEnabled());
         credentialPolicy.setRotationDays(request.getRotationDays());
+        credentialPolicy.setTemporaryCredentialExpirationTime(request.getTemporaryCredentialExpirationTime());
         credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         try {
             credentialPolicy.setUsernameGenParam(parameterConverter.fromObject(request.getUsernameGenParam()));
@@ -127,6 +128,7 @@ public class CredentialPolicyService {
         response.setCheckHistoryCount(request.getCheckHistoryCount());
         response.setRotationEnabled(request.isRotationEnabled());
         response.setRotationDays(request.getRotationDays());
+        response.setTemporaryCredentialExpirationTime(request.getTemporaryCredentialExpirationTime());
         response.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(request.getCredentialGenAlgorithm());
@@ -167,6 +169,7 @@ public class CredentialPolicyService {
         credentialPolicy.setCheckHistoryCount(request.getCheckHistoryCount());
         credentialPolicy.setRotationEnabled(request.isRotationEnabled());
         credentialPolicy.setRotationDays(request.getRotationDays());
+        credentialPolicy.setTemporaryCredentialExpirationTime(request.getTemporaryCredentialExpirationTime());
         if (request.getUsernameGenAlgorithm() != null) {
             credentialPolicy.setUsernameGenAlgorithm(request.getUsernameGenAlgorithm());
         }
@@ -210,6 +213,7 @@ public class CredentialPolicyService {
         response.setCheckHistoryCount(credentialPolicy.getCheckHistoryCount());
         response.setRotationEnabled(credentialPolicy.isRotationEnabled());
         response.setRotationDays(credentialPolicy.getRotationDays());
+        response.setTemporaryCredentialExpirationTime(credentialPolicy.getTemporaryCredentialExpirationTime());
         response.setUsernameGenAlgorithm(credentialPolicy.getUsernameGenAlgorithm());
         response.setUsernameGenParam(request.getUsernameGenParam());
         response.setCredentialGenAlgorithm(credentialPolicy.getCredentialGenAlgorithm());

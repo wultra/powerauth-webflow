@@ -84,6 +84,9 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "rotation_days")
     private Integer rotationDays;
 
+    @Column(name = "credential_temp_expiration")
+    private Integer temporaryCredentialExpirationTime;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "username_gen_algorithm", nullable = false)
     private UsernameGenerationAlgorithm usernameGenAlgorithm;

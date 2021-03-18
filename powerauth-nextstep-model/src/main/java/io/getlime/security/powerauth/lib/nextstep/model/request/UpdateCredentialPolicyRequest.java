@@ -60,6 +60,8 @@ public class UpdateCredentialPolicyRequest {
     private boolean rotationEnabled;
     @Positive
     private Integer rotationDays;
+    @Positive
+    private Integer temporaryCredentialExpirationTime;
     private UsernameGenerationAlgorithm usernameGenAlgorithm;
     private UsernameGenerationParam usernameGenParam;
     private CredentialGenerationAlgorithm credentialGenAlgorithm;

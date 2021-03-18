@@ -167,6 +167,7 @@ public class CredentialService {
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
+        boolean updateCredentialExpiration = false;
         CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED && request.getCredentialStatus() == null) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
@@ -176,6 +177,7 @@ public class CredentialService {
         }
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
+            updateCredentialExpiration = true;
         }
         String username = null;
         String credentialValue = request.getCredentialValue();
@@ -208,8 +210,11 @@ public class CredentialService {
             String protectedValue = credentialProtectionService.protectCredential(credentialValue, credentialDefinition);
             credential.setValue(protectedValue);
             credential.setTimestampLastCredentialChange(new Date());
+            updateCredentialExpiration = true;
         }
-
+        if (updateCredentialExpiration) {
+            updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        }
         if (request.getCredentialStatus() != null) {
             credential.setStatus(request.getCredentialStatus());
                 if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
@@ -314,17 +319,24 @@ public class CredentialService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
+        Date expirationTime = credential.getTimestampExpires();
+        if (expirationTime != null && expirationTime.after(new Date())) {
+            return true;
+        }
+        // Perform an actual check of credential expiration for case that credential policy was updated after last credential change
         CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
         if (credentialPolicy.isRotationEnabled()) {
             Date lastChange = credential.getTimestampLastCredentialChange();
             if (lastChange == null) {
                 // Only happens when data in database is manipulated
+                credential.setTimestampExpires(new Date());
                 return true;
             }
             Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, -credentialPolicy.getRotationDays());
             if (lastChange.before(c.getTime())) {
                 // Last credential change occurred before time calculated by password rotation days
+                credential.setTimestampExpires(new Date());
                 return true;
             }
         }
@@ -362,6 +374,7 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
+        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
         String protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credentialDefinition);
         credential.setValue(protectedCredentialValue);
@@ -578,6 +591,7 @@ public class CredentialService {
             }
         }
         credential.setType(credentialType);
+        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         credential.setUsername(username);
         String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
@@ -643,6 +657,28 @@ public class CredentialService {
         credential.setUsername(username);
         credential.setValue(credentialValue);
         credentialHistoryService.createCredentialHistory(credential, createdDate);
+    }
+
+    /**
+     * Update credential expiration time in case credential type is TEMPORARY.
+     * @param credential Credential entity.
+     * @param credentialPolicy Credential policy entity.
+     */
+    private void updateCredentialExpirationTime(CredentialEntity credential, CredentialPolicyEntity credentialPolicy) {
+        if (credential.getType() == CredentialType.TEMPORARY) {
+            Integer expirationTime = credentialPolicy.getTemporaryCredentialExpirationTime();
+            if (expirationTime != null) {
+                Calendar c = Calendar.getInstance();
+                c.add(Calendar.SECOND, expirationTime);
+                credential.setTimestampExpires(c.getTime());
+                return;
+            }
+        }
+        if (credentialPolicy.isRotationEnabled()) {
+            Calendar c = GregorianCalendar.getInstance();
+            c.add(Calendar.DAY_OF_YEAR, credentialPolicy.getRotationDays());
+            credential.setTimestampExpires(c.getTime());
+        }
     }
 
 }

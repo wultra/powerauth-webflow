@@ -166,6 +166,7 @@ CREATE TABLE ns_credential_policy (
   check_history_count        INTEGER DEFAULT 0 NOT NULL,                   -- Number of historical credential values to check.
   rotation_enabled           INTEGER DEFAULT 0 NOT NULL,                   -- Whether credential rotation is enabled.
   rotation_days              INTEGER,                                      -- Number of days for credential rotation.
+  credential_temp_expiration INTEGER,                                      -- Expiration time of TEMPORARY credentials in seconds.
   username_gen_algorithm     VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the username.
   username_gen_param         VARCHAR(4096) NOT NULL,                       -- Parameters used when generating the username.
   credential_gen_algorithm   VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the credential.
