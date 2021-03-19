@@ -23,7 +23,6 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.SmsAuthorizationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.UserAuthenticationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
@@ -69,12 +68,10 @@ public class AuthenticationCustomizationService {
      * @param operation Operation entity.
      * @return Credential authentication response.
      */
-    public CredentialAuthenticationResponse authenticateWithCredential(String userId, String organizationId, String credentialValue, OperationEntity operation) {
+    public CredentialAuthenticationResponse authenticateWithCredential(String userId, String organizationId, String credentialValue, OperationEntity operation,
+                                                                       AuthenticationContext authenticationContext) {
         OperationContext operationContext = operationConverter.toOperationContext(operation);
         try {
-            // TODO - e2e encryption in AuthenticationContext
-            AuthenticationContext authenticationContext = new AuthenticationContext();
-            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
             UserAuthenticationResponse authResponse = dataAdapterClient.authenticateUser(userId, organizationId, credentialValue, authenticationContext, operationContext).getResponseObject();
             CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
             response.setUserId(userId);
@@ -145,13 +142,11 @@ public class AuthenticationCustomizationService {
      * @param operation Operation.
      * @return Combined authentication response.
      */
-    public CombinedAuthenticationResponse authenticateCombined(String otpId, String otpValue, String userId, String organizationId, String credentialValue, OperationEntity operation) {
+    public CombinedAuthenticationResponse authenticateCombined(String otpId, String otpValue, String userId, String organizationId, String credentialValue, OperationEntity operation,
+                                                               AuthenticationContext authenticationContext) {
         OperationContext operationContext = operationConverter.toOperationContext(operation);
         AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getUserAccountStatus());
         try {
-            // TODO - e2e encryption in AuthenticationContext
-            AuthenticationContext authenticationContext = new AuthenticationContext();
-            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
             VerifySmsAndPasswordResponse authResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(otpId, otpValue, userId, organizationId, accountStatus, credentialValue, authenticationContext, operationContext).getResponseObject();
             CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
             response.setUserId(userId);

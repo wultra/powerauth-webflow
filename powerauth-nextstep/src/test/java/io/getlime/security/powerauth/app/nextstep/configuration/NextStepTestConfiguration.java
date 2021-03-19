@@ -22,6 +22,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
@@ -184,6 +185,8 @@ public class NextStepTestConfiguration {
         credentialDefinitionRequest.setCategory(CredentialCategory.PASSWORD);
         credentialDefinitionRequest.setHashingEnabled(true);
         credentialDefinitionRequest.setHashConfigName("ARGON2_TEST");
+        credentialDefinitionRequest.setEncryptionEnabled(true);
+        credentialDefinitionRequest.setEncryptionAlgorithm(EncryptionAlgorithm.AES_HMAC);
         nextStepClient.createCredentialDefinition(credentialDefinitionRequest);
 
         // Create credential definition for testing credential generation
@@ -194,6 +197,8 @@ public class NextStepTestConfiguration {
         credentialDefinitionRequest2.setCategory(CredentialCategory.PASSWORD);
         credentialDefinitionRequest2.setHashingEnabled(true);
         credentialDefinitionRequest2.setHashConfigName("ARGON2_TEST");
+        credentialDefinitionRequest2.setEncryptionEnabled(true);
+        credentialDefinitionRequest2.setEncryptionAlgorithm(EncryptionAlgorithm.AES_HMAC);
         nextStepClient.createCredentialDefinition(credentialDefinitionRequest2);
 
         // Create OTP policy
@@ -209,6 +214,8 @@ public class NextStepTestConfiguration {
         otpDefinitionRequest.setOtpDefinitionName("TEST_OTP");
         otpDefinitionRequest.setApplicationName("TEST_APP");
         otpDefinitionRequest.setOtpPolicyName("TEST_OTP_POLICY");
+        otpDefinitionRequest.setEncryptionEnabled(true);
+        otpDefinitionRequest.setEncryptionAlgorithm(EncryptionAlgorithm.AES_HMAC);
         nextStepClient.createOtpDefinition(otpDefinitionRequest);
 
         // Create OTP definition for testing OTP generation

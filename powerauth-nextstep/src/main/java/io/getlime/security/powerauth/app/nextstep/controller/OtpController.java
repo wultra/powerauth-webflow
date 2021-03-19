@@ -66,9 +66,10 @@ public class OtpController {
      * @throws UserNotActiveException Thrown when user is not active.
      * @throws CredentialNotActiveException Thrown when credential is not active.
      * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws EncryptionException Thrown when encryption fails.
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateOtpResponse> createOtp(@Valid @RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, UserNotActiveException, CredentialNotActiveException, CredentialNotFoundException {
+    public ObjectResponse<CreateOtpResponse> createOtp(@Valid @RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, UserNotActiveException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
         CreateOtpResponse response = otpService.createOtp(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -88,9 +89,10 @@ public class OtpController {
      * @throws UserNotActiveException Thrown when user is not active.
      * @throws CredentialNotActiveException Thrown when credential is not active.
      * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws EncryptionException Thrown when encryption fails.
      */
     @RequestMapping(value = "send", method = RequestMethod.POST)
-    public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(@Valid @RequestBody ObjectRequest<CreateAndSendOtpRequest> request) throws UserNotActiveException, CredentialNotActiveException, InvalidRequestException, CredentialDefinitionNotFoundException, OperationAlreadyFailedException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, CredentialNotFoundException, OtpDefinitionNotFoundException, OperationNotFoundException {
+    public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(@Valid @RequestBody ObjectRequest<CreateAndSendOtpRequest> request) throws UserNotActiveException, CredentialNotActiveException, InvalidRequestException, CredentialDefinitionNotFoundException, OperationAlreadyFailedException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, CredentialNotFoundException, OtpDefinitionNotFoundException, OperationNotFoundException, EncryptionException {
         CreateAndSendOtpResponse response = otpService.createAndSendOtp(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -100,9 +102,10 @@ public class OtpController {
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpListResponse> getOptList(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException {
+    public ObjectResponse<GetOtpListResponse> getOptList(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
         GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -114,9 +117,10 @@ public class OtpController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws OtpNotFoundException Thrown when OTP is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException {
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
         GetOtpDetailResponse response = otpService.getOtpDetail(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

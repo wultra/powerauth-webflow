@@ -16,17 +16,22 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import io.getlime.security.powerauth.app.nextstep.converter.CredentialValueConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.model.Argon2Hash;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -43,20 +48,33 @@ public class CredentialProtectionService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialProtectionService.class);
 
+    private final CredentialValueConverter credentialValueConverter;
+
     private final ParameterConverter parameterConverter = new ParameterConverter();
     private final KeyGenerator keyGenerator = new KeyGenerator();
 
     /**
+     * Credential protection service constructor.
+     * @param credentialValueConverter Credential value converter.
+     */
+    @Autowired
+    public CredentialProtectionService(CredentialValueConverter credentialValueConverter) {
+        this.credentialValueConverter = credentialValueConverter;
+    }
+
+    /**
      * Protect the credential value before persistence.
      * @param credentialValue Credential value.
+     * @param userId User ID.
      * @param credentialDefinition Credential definition.
      * @return Protected credential value.
-     * @throws InvalidConfigurationException Thrown in case Next Step configuration is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption fails.
      */
-    public String protectCredential(String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+    public CredentialValue protectCredential(String credentialValue, String userId, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
         HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
         if (hashingConfig == null) {
-            return credentialValue;
+            return new CredentialValue(EncryptionAlgorithm.NO_ENCRYPTION, credentialValue);
         }
         HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         Map<String, String> param;
@@ -67,7 +85,8 @@ public class CredentialProtectionService {
         }
         switch (algorithm) {
             case ARGON_2i:
-                return hashCredentialUsingArgon2(credentialValue, "argon2i", param);
+                String hashedValue = hashCredentialUsingArgon2(credentialValue, "argon2i", param);
+                return credentialValueConverter.toDBValue(hashedValue, userId, credentialDefinition);
 
             default:
                 throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
@@ -76,25 +95,40 @@ public class CredentialProtectionService {
 
     /**
      * Verify a credential value.
-     * @param credentialValue Credential value, in protected form in case credential protection is configured, unprotected otherwise.
-     * @param expectedCredentialValue Expected credential value in unprotected form.
+     * @param credentialValue Credential value sent by user.
+     * @param expectedCredentialValue Expected credential value, in protected form in case credential protection is configured, unprotected otherwise.
      * @param credentialDefinition Credential definition.
      * @return Whether credential value matches expected credential value.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public boolean verifyCredential(String credentialValue, String expectedCredentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+    public boolean verifyCredential(String credentialValue, CredentialValue expectedCredentialValue, String userId, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
         HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
+        String decryptedCredentialValue = extractCredentialValue(expectedCredentialValue, userId, credentialDefinition);
         if (hashingConfig == null) {
-            return credentialValue.equals(expectedCredentialValue);
+            return credentialValue.equals(decryptedCredentialValue);
         }
         HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         switch (algorithm) {
             case ARGON_2i:
-                return verifyCredentialUsingArgon2(credentialValue, expectedCredentialValue);
+                return verifyCredentialUsingArgon2(credentialValue, decryptedCredentialValue);
 
             default:
                 throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
         }
+    }
+
+    /**
+     * Extract a credential value.
+     * @param credentialValue Optionally encrypted credential value.
+     * @param userId User ID.
+     * @param credentialDefinition Credential definition.
+     * @return Extracted credential value.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    public String extractCredentialValue(CredentialValue credentialValue, String userId, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
+        return credentialValueConverter.fromDBValue(credentialValue, userId, credentialDefinition);
     }
 
     /**

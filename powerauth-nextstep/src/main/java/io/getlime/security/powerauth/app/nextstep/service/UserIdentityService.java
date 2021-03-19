@@ -106,9 +106,10 @@ public class UserIdentityService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
+    public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
@@ -228,9 +229,10 @@ public class UserIdentityService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @Transactional(rollbackOn = Throwable.class)
-    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
+    public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());

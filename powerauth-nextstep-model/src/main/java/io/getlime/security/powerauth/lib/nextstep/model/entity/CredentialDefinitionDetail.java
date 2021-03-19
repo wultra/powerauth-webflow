@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -49,15 +51,14 @@ public class CredentialDefinitionDetail {
     private CredentialCategory category;
     @NotNull
     private boolean encryptionEnabled;
-    @Size(min = 2, max = 256)
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
     @NotNull
     private boolean hashingEnabled;
     @Size(min = 2, max = 256)
     private String hashConfigName;
     @NotNull
     private boolean e2eEncryptionEnabled;
-    private String e2eEncryptionAlgorithm;
+    private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
     private String e2eEncryptionCipherTransformation;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;

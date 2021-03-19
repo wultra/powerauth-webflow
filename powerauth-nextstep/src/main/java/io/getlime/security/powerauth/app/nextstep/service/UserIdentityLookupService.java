@@ -209,15 +209,14 @@ public class UserIdentityLookupService {
             credentialDefinition = credentialDefinitionOptional.get();
             if (credentialDefinition.isDataAdapterProxyEnabled()) {
                 // Lookup is performed using Data Adapter
-                OrganizationEntity organization = credentialDefinition.getApplication().getOrganization();
-                String organizationId = null;
-                if (organization != null) {
-                    organizationId = organization.getOrganizationId();
-                }
                 if (operationId == null) {
                     throw new InvalidRequestException("Operation ID is missing in Data Adapter user lookup request");
                 }
                 OperationEntity operation = operationPersistenceService.getOperation(operationId);
+                String organizationId = null;
+                if (operation.getOrganization() != null) {
+                    organizationId = operation.getOrganization().getOrganizationId();
+                }
                 GetUserDetailResponse userDetail = userLookupCustomizationService.lookupUser(username, organizationId, operation);
                 if (userDetail == null) {
                     throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);

@@ -18,12 +18,17 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.nextstep.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.AuthenticationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.AuthenticationCustomizationService;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthenticationDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -62,6 +67,7 @@ public class AuthenticationService {
     private final AuthenticationCustomizationService authenticationCustomizationService;
     private final CredentialProtectionService credentialProtectionService;
     private final EndToEndEncryptionService endToEndEncryptionService;
+    private final OtpValueConverter otpValueConverter;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
@@ -81,9 +87,10 @@ public class AuthenticationService {
      * @param authenticationCustomizationService Authentication customization service.
      * @param credentialProtectionService Credential protection service.
      * @param endToEndEncryptionService End-to-end encryption service.
+     * @param otpValueConverter OTP value converter.
      */
     @Autowired
-    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService) {
+    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService, OtpValueConverter otpValueConverter) {
         this.authenticationRepository = authenticationRepository;
         this.credentialDefinitionService = credentialDefinitionService;
         this.userIdentityLookupService = userIdentityLookupService;
@@ -96,6 +103,7 @@ public class AuthenticationService {
         this.authenticationCustomizationService = authenticationCustomizationService;
         this.credentialProtectionService = credentialProtectionService;
         this.endToEndEncryptionService = endToEndEncryptionService;
+        this.otpValueConverter = otpValueConverter;
     }
 
     /**
@@ -114,9 +122,10 @@ public class AuthenticationService {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public CredentialAuthenticationResponse authenticateWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException {
+    public CredentialAuthenticationResponse authenticateWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, EncryptionException {
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         if (credentialDefinition.isDataAdapterProxyEnabled()) {
             return authenticateWithCredentialCustom(credentialDefinition, request.getCredentialValue(), request.getOperationId(), request.getUserId(), request.getAuthMethod());
@@ -147,7 +156,7 @@ public class AuthenticationService {
         // Verify credential value
         AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, user.getUserId(), request.getCredentialPositionsToVerify());
         } else {
             authenticationResult = AuthenticationResult.FAILED;
         }
@@ -222,16 +231,19 @@ public class AuthenticationService {
      */
     private CredentialAuthenticationResponse authenticateWithCredentialCustom(CredentialDefinitionEntity credentialDefinition, String credentialValue,
                                                                               String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
-        OrganizationEntity organization = credentialDefinition.getApplication().getOrganization();
-        String organizationId = null;
-        if (organization != null) {
-            organizationId = organization.getOrganizationId();
-        }
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(userId, organizationId, credentialValue, operation);
+        String organizationId = operation.getOperationId();
+        AuthenticationContext authenticationContext = new AuthenticationContext();
+        if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
+            authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        } else {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
+        }
+        CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(userId, organizationId, credentialValue, operation, authenticationContext);
         boolean lastAttempt = false;
         if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
                 response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
@@ -261,9 +273,10 @@ public class AuthenticationService {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public OtpAuthenticationResponse authenticateWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
+    public OtpAuthenticationResponse authenticateWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             return authenticateWithOtpCustom(otp.getOtpDefinition(), otp.getOtpId(), request.getOtpValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
@@ -402,15 +415,11 @@ public class AuthenticationService {
      */
     private OtpAuthenticationResponse authenticateWithOtpCustom(OtpDefinitionEntity otpDefinition, String otpId, String otpValue,
                                                                 String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
-        OrganizationEntity organization = otpDefinition.getApplication().getOrganization();
-        String organizationId = null;
-        if (organization != null) {
-            organizationId = organization.getOrganizationId();
-        }
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        String organizationId = operation.getOperationId();
         OtpAuthenticationResponse response = authenticationCustomizationService.authenticateWithOtp(otpId, otpValue, userId, organizationId, operation);
         boolean lastAttempt = false;
         if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
@@ -442,12 +451,13 @@ public class AuthenticationService {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public CombinedAuthenticationResponse authenticateCombined(CombinedAuthenticationRequest request) throws UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
+    public CombinedAuthenticationResponse authenticateCombined(CombinedAuthenticationRequest request) throws UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
-            return authenticateCombinedCustom(otp.getOtpDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
+            return authenticateCombinedCustom(otp.getOtpDefinition(), otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
         }
         otp.setAttemptCounter(otp.getAttemptCounter() + 1);
 
@@ -493,7 +503,7 @@ public class AuthenticationService {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
         } else {
-            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
+            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, user.getUserId(), request.getCredentialPositionsToVerify());
 
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
@@ -589,18 +599,21 @@ public class AuthenticationService {
      * @param userId User ID.
      * @param authMethod Authentication method.
      */
-    private CombinedAuthenticationResponse authenticateCombinedCustom(OtpDefinitionEntity otpDefinition, String otpId, String otpValue, String credentialValue,
+    private CombinedAuthenticationResponse authenticateCombinedCustom(OtpDefinitionEntity otpDefinition, CredentialDefinitionEntity credentialDefinition, String otpId, String otpValue, String credentialValue,
                                                                     String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
-        OrganizationEntity organization = otpDefinition.getApplication().getOrganization();
-        String organizationId = null;
-        if (organization != null) {
-            organizationId = organization.getOrganizationId();
-        }
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        CombinedAuthenticationResponse response = authenticationCustomizationService.authenticateCombined(otpId, otpValue, userId, organizationId, credentialValue, operation);
+        String organizationId = operation.getOperationId();
+        AuthenticationContext authenticationContext = new AuthenticationContext();
+        if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
+            authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        } else {
+            authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
+        }
+        CombinedAuthenticationResponse response = authenticationCustomizationService.authenticateCombined(otpId, otpValue, userId, organizationId, credentialValue, operation, authenticationContext);
         boolean lastAttempt = false;
         if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
                 response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
@@ -657,12 +670,16 @@ public class AuthenticationService {
      * @param authenticationMode Credential authentication mode.
      * @param credential Credential entity.
      * @param credentialValue Credential value to verify.
+     * @param userId User ID.
+     * @param credentialPositionsToVerify Credential positions to verify for algorithm MATCH_ONLY_SPECIFIED_POSITIONS.
      * @return Authentication result.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     private AuthenticationResult verifyCredential(CredentialAuthenticationMode authenticationMode,
                                                   CredentialEntity credential, String credentialValue,
-                                                  List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException {
+                                                  String userId, List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             return AuthenticationResult.FAILED;
         }
@@ -672,9 +689,10 @@ public class AuthenticationService {
         } else {
             authModeResolved = authenticationMode;
         }
+        CredentialValue credentialValueDb = new CredentialValue(credential.getEncryptionAlgorithm(), credential.getValue());
         switch (authModeResolved) {
             case MATCH_EXACT:
-                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential.getValue(), credential.getCredentialDefinition());
+                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credentialValueDb, userId, credential.getCredentialDefinition());
                 if (credentialMatched) {
                     return AuthenticationResult.SUCCEEDED;
                 } else {
@@ -685,11 +703,16 @@ public class AuthenticationService {
                 if (credentialPositionsToVerify.isEmpty()) {
                     throw new InvalidRequestException("No positions specified for authentication mode MATCH_ONLY_SPECIFIED_POSITIONS");
                 }
+                if (credential.getHashingConfig() != null) {
+                    throw new InvalidConfigurationException("Credential verification is not possible in MATCH_ONLY_SPECIFIED_POSITIONS mode when credential hashing is enabled");
+                }
+
+                String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credentialValueDb, userId, credential.getCredentialDefinition());
                 int counter = 0;
                 for (Integer position : credentialPositionsToVerify) {
                     try {
                         char c1 = credentialValue.charAt(counter);
-                        char c2 = credential.getValue().charAt(position);
+                        char c2 = expectedCredentialValue.charAt(position);
                         if (c1 != c2) {
                             return AuthenticationResult.FAILED;
                         }
@@ -711,8 +734,10 @@ public class AuthenticationService {
      * @param otp OTP entity.
      * @param otpValue OTP value to verify.
      * @return Authentication result.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    private AuthenticationResult verifyOtp(OtpEntity otp, String otpValue) {
+    private AuthenticationResult verifyOtp(OtpEntity otp, String otpValue) throws InvalidConfigurationException, EncryptionException {
         if (otp.getStatus() != OtpStatus.ACTIVE) {
             return AuthenticationResult.FAILED;
         }
@@ -722,7 +747,9 @@ public class AuthenticationService {
             otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);
             return AuthenticationResult.FAILED;
         }
-        if (otp.getValue().matches(otpValue)) {
+        OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
+        String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
+        if (value != null && value.equals(otpValue)) {
             return AuthenticationResult.SUCCEEDED;
         } else {
             otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);

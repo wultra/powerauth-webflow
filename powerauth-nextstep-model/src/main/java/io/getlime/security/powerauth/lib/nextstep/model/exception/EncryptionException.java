@@ -16,20 +16,28 @@
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
 /**
- * Exception for case when credential decryption fails.
+ * Exception for case when encryption or decryption fails.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class CredentialDecryptionFailed extends NextStepServiceException {
+public class EncryptionException extends NextStepServiceException {
 
-    public static final String CODE = "CREDENTIAL_DECRYPTION_FAILED";
+    public static final String CODE = "ENCRYPTION_FAILED";
 
     /**
      * Constructor with error message.
      * @param message Error message.
      */
-    public CredentialDecryptionFailed(String message) {
+    public EncryptionException(String message) {
         super(message);
+    }
+
+    /**
+     * Constructor with cause.
+     * @param cause Original exception.
+     */
+    public EncryptionException(Throwable cause) {
+        super(cause);
     }
 
 }

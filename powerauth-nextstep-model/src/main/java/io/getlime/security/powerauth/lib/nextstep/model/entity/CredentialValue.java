@@ -13,37 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
+package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
-
 /**
- * Request object used for updating an OTP definition.
+ * Credential value stored in database, optionally encrypted.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-public class UpdateOtpDefinitionRequest {
+@AllArgsConstructor
+public class CredentialValue {
 
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String otpDefinitionName;
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String applicationName;
-    @NotBlank
-    @Size(min = 2, max = 256)
-    private String otpPolicyName;
-    @Size(min = 2, max = 256)
-    private String description;
-    private boolean encryptionEnabled;
     private EncryptionAlgorithm encryptionAlgorithm;
-    private OtpDefinitionStatus otpDefinitionStatus;
-    private boolean dataAdapterProxyEnabled;
+    private String value;
 
 }

@@ -321,6 +321,8 @@ CREATE TABLE ns_credential_storage (
   attempt_counter                  INTEGER DEFAULT 0 NOT NULL,          -- Attempt counter for both successful and failed attempts.
   failed_attempt_counter_soft      INTEGER DEFAULT 0 NOT NULL,          -- Soft failed attempt counter.
   failed_attempt_counter_hard      INTEGER DEFAULT 0 NOT NULL,          -- Hard failed attempt counter.
+  encryption_algorithm             VARCHAR(256),                        -- Encryption algorithm used for encrypting credential value.
+  hashing_config_id                INTEGER,                             -- Hashing configuration used when credential value was hashed.
   timestamp_created                TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when credential was created.
   timestamp_expires                TIMESTAMP,                           -- Timestamp when credential expires.
   timestamp_blocked                TIMESTAMP,                           -- Timestamp when credential was blocked.
@@ -337,6 +339,8 @@ CREATE TABLE ns_credential_history (
   user_id                     VARCHAR(256) NOT NULL,                       -- User identity identifier.
   user_name                   VARCHAR(256),                                -- Username.
   value                       VARCHAR(256) NOT NULL,                       -- Credential value.
+  encryption_algorithm        VARCHAR(256),                                -- Encryption algorithm used for encrypting credential value.
+  hashing_config_id           INTEGER,                                     -- Hashing configuration used when credential value was hashed.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when credential was created.
   CONSTRAINT ns_credential_history_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
   CONSTRAINT ns_credential_history_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
@@ -355,6 +359,7 @@ CREATE TABLE ns_otp_storage (
   otp_data                    TEXT,                                -- Data used for generating one time password.
   attempt_counter             INTEGER DEFAULT 0 NOT NULL,          -- One time password attempt counter.
   failed_attempt_counter      INTEGER DEFAULT 0 NOT NULL,          -- One time password failed attempt counter.
+  encryption_algorithm        VARCHAR(256),                        -- Encryption algorithm used for encrypting OTP value.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when one time password was created.
   timestamp_verified          TIMESTAMP,                           -- Timestamp when one time password was verified.
   timestamp_blocked           TIMESTAMP,                           -- Timestamp when one time password was verified.

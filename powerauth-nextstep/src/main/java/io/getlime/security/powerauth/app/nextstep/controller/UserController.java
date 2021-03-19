@@ -81,9 +81,10 @@ public class UserController {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateUserResponse> createUser(@Valid @RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
+    public ObjectResponse<CreateUserResponse> createUser(@Valid @RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         CreateUserResponse response = userIdentityService.createUserIdentity(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -96,10 +97,11 @@ public class UserController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
-     * @throws CredentialValidationFailedException Thrown when credntial validation is failed.s
+     * @throws CredentialValidationFailedException Thrown when credential validation is failed.s
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateUserResponse> updateUser(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
+    public ObjectResponse<UpdateUserResponse> updateUser(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         UpdateUserResponse response = userIdentityService.updateUserIdentity(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -112,10 +114,11 @@ public class UserController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
-     * @throws CredentialValidationFailedException Thrown when credntial validation is failed.s
+     * @throws CredentialValidationFailedException Thrown when credential validation is failed.s
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateUserResponse> updateUserPost(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException {
+    public ObjectResponse<UpdateUserResponse> updateUserPost(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         UpdateUserResponse response = userIdentityService.updateUserIdentity(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

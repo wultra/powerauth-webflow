@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -65,7 +67,8 @@ public class CredentialDefinitionEntity implements Serializable {
     private boolean encryptionEnabled;
 
     @Column(name = "encryption_algorithm")
-    private String encryptionAlgorithm;
+    @Enumerated(EnumType.STRING)
+    private EncryptionAlgorithm encryptionAlgorithm;
 
     @ManyToOne
     @JoinColumn(name = "hashing_config_id", referencedColumnName = "hashing_config_id")
@@ -75,7 +78,8 @@ public class CredentialDefinitionEntity implements Serializable {
     private boolean e2eEncryptionEnabled;
 
     @Column(name = "e2e_encryption_algorithm")
-    private String e2eEncryptionAlgorithm;
+    @Enumerated(EnumType.STRING)
+    private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
 
     @Column(name = "e2e_encryption_transform")
     private String e2eEncryptionCipherTransformation;

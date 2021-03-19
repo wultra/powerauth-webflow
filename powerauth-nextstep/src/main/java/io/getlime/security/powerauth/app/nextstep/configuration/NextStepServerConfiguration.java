@@ -58,6 +58,9 @@ public class NextStepServerConfiguration {
     @Value("${powerauth.nextstep.e2eEncryption.key}")
     private String e2eEncryptionKey;
 
+    @Value("${powerauth.nextstep.db.master.encryption.key}")
+    private String masterDbEncryptionKey;
+
     /**
      * Application name.
      */
@@ -107,6 +110,14 @@ public class NextStepServerConfiguration {
      */
     public String getE2eEncryptionKey() {
         return e2eEncryptionKey;
+    }
+
+    /**
+     * Get master DB encryption key.
+     * @return Master DB encryption key.
+     */
+    public String getMasterDbEncryptionKey() {
+        return masterDbEncryptionKey;
     }
 
     /**

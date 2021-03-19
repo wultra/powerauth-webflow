@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 
@@ -43,8 +44,7 @@ public class CreateOtpDefinitionResponse {
     private String description;
     @NotNull
     private boolean encryptionEnabled;
-    @Size(min = 2, max = 256)
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
     @NotNull
     private OtpDefinitionStatus otpDefinitionStatus;
     @NotNull

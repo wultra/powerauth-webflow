@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -54,6 +55,14 @@ public class CredentialHistoryEntity implements Serializable {
 
     @Column(name = "value", nullable = false)
     private String value;
+
+    @Column(name = "encryption_algorithm")
+    @Enumerated(EnumType.STRING)
+    private EncryptionAlgorithm encryptionAlgorithm;
+
+    @ManyToOne
+    @JoinColumn(name = "hashing_config_id", referencedColumnName = "hashing_config_id")
+    private HashConfigEntity hashingConfig;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -74,6 +75,10 @@ public class OtpEntity implements Serializable {
 
     @Column(name = "failed_attempt_counter")
     private int failedAttemptCounter;
+
+    @Column(name = "encryption_algorithm")
+    @Enumerated(EnumType.STRING)
+    private EncryptionAlgorithm encryptionAlgorithm;
 
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;

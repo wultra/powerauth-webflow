@@ -558,7 +558,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setHashingEnabled(true);
         credentialDefinitionRequest.setHashConfigName("ARGON2_TEST");
         credentialDefinitionRequest.setE2eEncryptionEnabled(true);
-        credentialDefinitionRequest.setE2eEncryptionAlgorithm("AES");
+        credentialDefinitionRequest.setE2eEncryptionAlgorithm(EndToEndEncryptionAlgorithm.AES);
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation("AES/CBC/PKCS7Padding");
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
 

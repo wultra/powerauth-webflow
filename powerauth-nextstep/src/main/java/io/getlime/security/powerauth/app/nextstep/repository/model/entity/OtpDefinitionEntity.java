@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -60,7 +61,7 @@ public class OtpDefinitionEntity implements Serializable {
     private boolean encryptionEnabled;
 
     @Column(name = "encryption_algorithm")
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
 
     @Column(name = "data_adapter_proxy_enabled")
     private boolean dataAdapterProxyEnabled;

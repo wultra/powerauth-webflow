@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -40,8 +41,7 @@ public class CreateOtpDefinitionRequest {
     @Size(min = 2, max = 256)
     private String description;
     private boolean encryptionEnabled;
-    @Size(min = 2, max = 256)
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
     private boolean dataAdapterProxyEnabled;
 
 }

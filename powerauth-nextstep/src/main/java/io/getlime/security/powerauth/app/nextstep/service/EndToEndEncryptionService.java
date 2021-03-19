@@ -23,6 +23,8 @@ import io.getlime.security.powerauth.crypto.lib.model.exception.CryptoProviderEx
 import io.getlime.security.powerauth.crypto.lib.model.exception.GenericCryptoException;
 import io.getlime.security.powerauth.crypto.lib.util.AESEncryptionUtils;
 import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import org.slf4j.Logger;
@@ -65,16 +67,17 @@ public class EndToEndEncryptionService {
      * @param credentialDefinition Credential definition.
      * @return Encrypted credential value.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption fails.
      */
-    public String encryptCredential(String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
+    public String encryptCredential(String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
         if (!credentialDefinition.isE2eEncryptionEnabled()) {
             return credentialValue;
         }
-        String algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
+        EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
         if (algorithm == null) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is missing");
         }
-        if (!algorithm.equals("AES")) {
+        if (algorithm != EndToEndEncryptionAlgorithm.AES) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is not supported: " + algorithm);
         }
         String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
@@ -82,7 +85,7 @@ public class EndToEndEncryptionService {
             throw new InvalidConfigurationException("End-to-end encryption cipher transformation is missing");
         }
         String e2eEncryptionKey = configuration.getE2eEncryptionKey();
-        if (e2eEncryptionKey == null) {
+        if (e2eEncryptionKey == null || e2eEncryptionKey.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption key is missing");
         }
         try {
@@ -98,7 +101,7 @@ public class EndToEndEncryptionService {
             String ivBase64 = BaseEncoding.base64().encode(ivBytes);
             return ivBase64 + ":" + encryptedCredentialBase64;
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
-            throw new InvalidConfigurationException(ex);
+            throw new EncryptionException(ex);
         }
     }
 
@@ -109,19 +112,20 @@ public class EndToEndEncryptionService {
      * @return Decrypted credential value.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public String decryptCredential(String encryptedValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, InvalidRequestException {
+    public String decryptCredential(String encryptedValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, InvalidRequestException, EncryptionException {
         if (!credentialDefinition.isE2eEncryptionEnabled()) {
             return encryptedValue;
         }
         if (!encryptedValue.contains(":")) {
             throw new InvalidRequestException("Invalid format of encrypted credential value");
         }
-        String algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
+        EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
         if (algorithm == null) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is missing");
         }
-        if (!algorithm.equals("AES")) {
+        if (algorithm != EndToEndEncryptionAlgorithm.AES) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is not supported: " + algorithm);
         }
         String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
@@ -129,7 +133,7 @@ public class EndToEndEncryptionService {
             throw new InvalidConfigurationException("End-to-end encryption cipher transformation is missing");
         }
         String e2eEncryptionKey = configuration.getE2eEncryptionKey();
-        if (e2eEncryptionKey == null) {
+        if (e2eEncryptionKey == null || e2eEncryptionKey.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption key is missing");
         }
         try {
@@ -147,7 +151,7 @@ public class EndToEndEncryptionService {
             byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
             return new String(decryptedBytes);
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
-            throw new InvalidConfigurationException(ex);
+            throw new EncryptionException(ex);
         }
     }
 

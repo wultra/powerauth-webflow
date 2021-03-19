@@ -24,6 +24,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Creden
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
@@ -39,9 +40,6 @@ import java.util.*;
 
 /**
  * This service handles persistence of credentials.
- *
- * TODO:
- * - encryption of credentials stored in database
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -99,9 +97,10 @@ public class CredentialService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @Transactional
-    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException {
+    public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         CredentialType credentialType = request.getCredentialType();
@@ -158,9 +157,10 @@ public class CredentialService {
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     @Transactional
-    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException, InvalidConfigurationException {
+    public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -207,8 +207,10 @@ public class CredentialService {
             credential.setUsername(username);
         }
         if (request.getCredentialValue() != null) {
-            String protectedValue = credentialProtectionService.protectCredential(credentialValue, credentialDefinition);
-            credential.setValue(protectedValue);
+            CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+            credential.setValue(protectedValue.getValue());
+            credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
+            credential.setHashingConfig(credentialDefinition.getHashingConfig());
             credential.setTimestampLastCredentialChange(new Date());
             updateCredentialExpiration = true;
         }
@@ -288,9 +290,10 @@ public class CredentialService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws UserNotFoundException Thrown when user is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
+    public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         String username = request.getUsername();
@@ -356,9 +359,10 @@ public class CredentialService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      * @throws CredentialNotFoundException Thrown when credential is not found.
      * @throws InvalidConfigurationException Thrown in case Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption fails.
      */
     @Transactional
-    public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException {
+    public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -376,8 +380,9 @@ public class CredentialService {
         }
         updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
-        String protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credentialDefinition);
-        credential.setValue(protectedCredentialValue);
+        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, user.getUserId(), credentialDefinition);
+        credential.setValue(protectedCredentialValue.getValue());
+        credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);
@@ -549,10 +554,11 @@ public class CredentialService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                    CredentialType credentialType, String username, String credentialValue,
-                                                   CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException {
+                                                   CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
         // Lookup credential in case it already exists
         CredentialEntity credential = null;
         Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
@@ -604,8 +610,10 @@ public class CredentialService {
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
         String unprotectedCredentialValue = credentialValue;
-        String protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, credentialDefinition);
-        credential.setValue(protectedCredentialValue);
+        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+        credential.setValue(protectedCredentialValue.getValue());
+        credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
+        credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
@@ -648,14 +656,19 @@ public class CredentialService {
      * @param credentialDefinition Credential definition.
      * @param username Username.
      * @param credentialValue Credential value.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption fails.
      */
     public void importCredentialHistory(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
-                                        String username, String credentialValue, Date createdDate) {
+                                        String username, String credentialValue, Date createdDate) throws InvalidConfigurationException, EncryptionException {
         CredentialEntity credential = new CredentialEntity();
         credential.setUser(user);
         credential.setCredentialDefinition(credentialDefinition);
         credential.setUsername(username);
-        credential.setValue(credentialValue);
+        CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+        credential.setValue(protectedValue.getValue());
+        credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
+        credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credentialHistoryService.createCredentialHistory(credential, createdDate);
     }
 

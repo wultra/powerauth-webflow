@@ -73,9 +73,10 @@ public class AuthenticationController {
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      * @throws OperationAlreadyFailedException Thrown when operation is already failed.
      * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "credential", method = RequestMethod.POST)
-    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@Valid @RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
+    public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@Valid @RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
         CredentialAuthenticationResponse response = authenticationService.authenticateWithCredential(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -94,9 +95,10 @@ public class AuthenticationController {
      * @throws OperationNotFoundException Throw when operation is not found.
      * @throws OtpNotFoundException Thrown when OTP is not found.
      * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "otp", method = RequestMethod.POST)
-    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(@Valid @RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidRequestException, OperationAlreadyFailedException, OperationAlreadyFinishedException, InvalidConfigurationException, OperationAlreadyCanceledException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException {
+    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(@Valid @RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidRequestException, OperationAlreadyFailedException, OperationAlreadyFinishedException, InvalidConfigurationException, OperationAlreadyCanceledException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
         OtpAuthenticationResponse response = authenticationService.authenticateWithOtp(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -116,9 +118,10 @@ public class AuthenticationController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws OtpNotFoundException Thrown when OTP is not found.
      * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "combined", method = RequestMethod.POST)
-    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidConfigurationException, InvalidRequestException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException {
+    public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidConfigurationException, InvalidRequestException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
         CombinedAuthenticationResponse response = authenticationService.authenticateCombined(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

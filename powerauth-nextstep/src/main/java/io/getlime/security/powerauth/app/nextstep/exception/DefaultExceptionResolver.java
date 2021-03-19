@@ -679,15 +679,15 @@ public class DefaultExceptionResolver {
     }
 
     /**
-     * Exception handler for case when credential decryption fails.
+     * Exception handler for case when encryption or decryption fails.
      * @param ex Exception.
      * @return Response with error details.
      */
-    @ExceptionHandler(CredentialDecryptionFailed.class)
+    @ExceptionHandler(EncryptionException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public @ResponseBody ErrorResponse handleCredentialDecryptionFailed(CredentialDecryptionFailed ex) {
+    public @ResponseBody ErrorResponse handleCredentialDecryptionFailed(EncryptionException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
-        Error error = new Error(CredentialDecryptionFailed.CODE, "Credential decryption failed.");
+        Error error = new Error(EncryptionException.CODE, "Encryption or decryption failed.");
         return new ErrorResponse(error);
     }
 
