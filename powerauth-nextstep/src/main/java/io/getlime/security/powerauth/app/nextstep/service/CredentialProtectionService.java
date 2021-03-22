@@ -303,7 +303,7 @@ public class CredentialProtectionService {
                 updateRequired = true;
             } else {
                 // Check actual argon2 parameters from the hash in the database and compare them with credential definition
-                updateRequired = !argon2ParamMatch(extractCredentialValue(credential), credential.getHashingConfig().getParameters());
+                updateRequired = !argon2ParamMatch(extractCredentialValue(credential), credentialDefinition.getHashingConfig().getAlgorithm(), credential.getHashingConfig().getParameters());
             }
         }
 
@@ -324,19 +324,23 @@ public class CredentialProtectionService {
     /**
      * Check whether Argon2 parameters match the hashed credential value and parameters from credential definition.
      * @param argon2Hash Argon2 hash in Modular Crypt Format.
-     * @param expected Expected parameters from credential definition.
+     * @param algorithm Hashing algorithm.
+     * @param expectedParam Expected parameters from credential definition.
      * @return Whether actual Argon2 parameters match expected values.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    private boolean argon2ParamMatch(String argon2Hash, String expected) throws InvalidConfigurationException {
+    private boolean argon2ParamMatch(String argon2Hash, HashAlgorithm algorithm, String expectedParam) throws InvalidConfigurationException {
         try {
             Argon2Hash hash = Argon2Hash.parse(argon2Hash);
-            Map<String, String> expectedParam = parameterConverter.fromString(expected);
-            String versionParam = expectedParam.get("version");
-            String iterationsParam = expectedParam.get("iterations");
-            String memoryParam = expectedParam.get("memory");
-            String parallelismParam = expectedParam.get("parallelism");
-            String outputLengthParam = expectedParam.get("outputLength");
+            Map<String, String> param = parameterConverter.fromString(expectedParam);
+            if (hash.getAlgorithm().equals(algorithm.getName())) {
+                return false;
+            }
+            String versionParam = param.get("version");
+            String iterationsParam = param.get("iterations");
+            String memoryParam = param.get("memory");
+            String parallelismParam = param.get("parallelism");
+            String outputLengthParam = param.get("outputLength");
             if (versionParam == null) {
                 throw new InvalidConfigurationException("Missing hashing parameter: version");
             }

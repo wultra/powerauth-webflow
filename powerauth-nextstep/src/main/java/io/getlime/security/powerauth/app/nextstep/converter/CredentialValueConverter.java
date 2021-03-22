@@ -76,6 +76,10 @@ public class CredentialValueConverter {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public String fromDBValue(CredentialValue credentialValue, String userId, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
+        if (credentialValue.getEncryptionAlgorithm() == null) {
+            return credentialValue.getValue();
+        }
+
         switch (credentialValue.getEncryptionAlgorithm()) {
 
             case NO_ENCRYPTION:
