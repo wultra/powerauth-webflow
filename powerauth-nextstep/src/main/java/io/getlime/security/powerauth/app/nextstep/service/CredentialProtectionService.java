@@ -362,7 +362,8 @@ public class CredentialProtectionService {
             int memory = (int) Math.pow(2, Integer.parseInt(memoryParam));
             int parallelism = Integer.parseInt(parallelismParam);
             int outputLength = Integer.parseInt(outputLengthParam);
-            // Version was added in Argon version 0x10 = 16 decimal, null -> 16 is an upgrade
+            // The version property is missing in Argon version 0x10 = 16 decimal.
+            // Thus, version null -> version 19 is effectively an upgrade from version 0x10 (16 decimal) to 0x13 (19 decimal).
             if ((version > 16 && hash.getVersion() == null) ||
                     (hash.getVersion() != null && hash.getVersion() != version)) {
                 return false;
