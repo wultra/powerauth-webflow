@@ -207,7 +207,7 @@ public class CredentialService {
             credential.setUsername(username);
         }
         if (request.getCredentialValue() != null) {
-            CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+            CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
             credential.setValue(protectedValue.getValue());
             credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -380,7 +380,7 @@ public class CredentialService {
         }
         updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
-        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, user.getUserId(), credentialDefinition);
+        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setTimestampLastUpdated(new Date());
@@ -610,7 +610,7 @@ public class CredentialService {
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
         String unprotectedCredentialValue = credentialValue;
-        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -665,7 +665,7 @@ public class CredentialService {
         credential.setUser(user);
         credential.setCredentialDefinition(credentialDefinition);
         credential.setUsername(username);
-        CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, user.getUserId(), credentialDefinition);
+        CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
         credential.setValue(protectedValue.getValue());
         credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());

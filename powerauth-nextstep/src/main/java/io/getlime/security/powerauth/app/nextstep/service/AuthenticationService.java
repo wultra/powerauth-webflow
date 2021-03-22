@@ -27,7 +27,6 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.Authentication
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthenticationDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
@@ -156,7 +155,7 @@ public class AuthenticationService {
         // Verify credential value
         AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
-            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, user.getUserId(), request.getCredentialPositionsToVerify());
+            authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
         } else {
             authenticationResult = AuthenticationResult.FAILED;
         }
@@ -503,7 +502,7 @@ public class AuthenticationService {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
         } else {
-            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, user.getUserId(), request.getCredentialPositionsToVerify());
+            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
 
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
@@ -670,7 +669,6 @@ public class AuthenticationService {
      * @param authenticationMode Credential authentication mode.
      * @param credential Credential entity.
      * @param credentialValue Credential value to verify.
-     * @param userId User ID.
      * @param credentialPositionsToVerify Credential positions to verify for algorithm MATCH_ONLY_SPECIFIED_POSITIONS.
      * @return Authentication result.
      * @throws InvalidRequestException Thrown when request is invalid.
@@ -679,7 +677,7 @@ public class AuthenticationService {
      */
     private AuthenticationResult verifyCredential(CredentialAuthenticationMode authenticationMode,
                                                   CredentialEntity credential, String credentialValue,
-                                                  String userId, List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
+                                                  List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             return AuthenticationResult.FAILED;
         }
@@ -689,10 +687,9 @@ public class AuthenticationService {
         } else {
             authModeResolved = authenticationMode;
         }
-        CredentialValue credentialValueDb = new CredentialValue(credential.getEncryptionAlgorithm(), credential.getValue());
         switch (authModeResolved) {
             case MATCH_EXACT:
-                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credentialValueDb, userId, credential.getCredentialDefinition());
+                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
                 if (credentialMatched) {
                     return AuthenticationResult.SUCCEEDED;
                 } else {
@@ -707,7 +704,7 @@ public class AuthenticationService {
                     throw new InvalidConfigurationException("Credential verification is not possible in MATCH_ONLY_SPECIFIED_POSITIONS mode when credential hashing is enabled");
                 }
 
-                String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credentialValueDb, userId, credential.getCredentialDefinition());
+                String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credential);
                 int counter = 0;
                 for (Integer position : credentialPositionsToVerify) {
                     try {

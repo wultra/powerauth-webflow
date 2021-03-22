@@ -175,7 +175,7 @@ public class NextStepTestConfiguration {
         param.put("memory", "15");
         param.put("parallelism", "16");
         param.put("outputLength", "32");
-        nextStepClient.createHashConfig("ARGON2_TEST", HashAlgorithm.ARGON_2i, param);
+        nextStepClient.createHashConfig("ARGON2_TEST", HashAlgorithm.ARGON_2ID, param);
 
         // Create credential definition
         CreateCredentialDefinitionRequest credentialDefinitionRequest = new CreateCredentialDefinitionRequest();
