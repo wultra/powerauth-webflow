@@ -673,7 +673,7 @@ public class CredentialService {
     }
 
     /**
-     * Update credential expiration time in case credential type is TEMPORARY.
+     * Update credential expiration time in case credential type is TEMPORARY or rotation is enabled.
      * @param credential Credential entity.
      * @param credentialPolicy Credential policy entity.
      */
@@ -691,7 +691,9 @@ public class CredentialService {
             Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, credentialPolicy.getRotationDays());
             credential.setTimestampExpires(c.getTime());
+            return;
         }
+        credential.setTimestampExpires(null);
     }
 
 }
