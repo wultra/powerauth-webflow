@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
-import io.getlime.security.powerauth.app.nextstep.OtpValueConverter;
+import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.OtpCustomizationService;

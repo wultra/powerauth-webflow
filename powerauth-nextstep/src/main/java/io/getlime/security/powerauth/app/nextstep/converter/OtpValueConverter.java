@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package io.getlime.security.powerauth.app.nextstep;
+package io.getlime.security.powerauth.app.nextstep.converter;
 
 import com.google.common.io.BaseEncoding;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;

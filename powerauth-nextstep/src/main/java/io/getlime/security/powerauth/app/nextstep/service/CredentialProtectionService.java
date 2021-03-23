@@ -282,7 +282,7 @@ public class CredentialProtectionService {
             // Encryption is not expected but credential is encrypted
             updateRequired = true;
         }
-        if (credential.getEncryptionAlgorithm() != credentialDefinition.getEncryptionAlgorithm()) {
+        if (credentialDefinition.isEncryptionEnabled() && credential.getEncryptionAlgorithm() != credentialDefinition.getEncryptionAlgorithm()) {
             // Encryption algorithm differs
             updateRequired = true;
         }
@@ -303,7 +303,7 @@ public class CredentialProtectionService {
                 updateRequired = true;
             } else {
                 // Check actual argon2 parameters from the hash in the database and compare them with credential definition
-                updateRequired = !argon2ParamMatch(extractCredentialValue(credential), credentialDefinition.getHashingConfig().getAlgorithm(), credential.getHashingConfig().getParameters());
+                updateRequired = updateRequired || !argon2ParamMatch(extractCredentialValue(credential), credentialDefinition.getHashingConfig().getAlgorithm(), credential.getHashingConfig().getParameters());
             }
         }
 
@@ -333,7 +333,7 @@ public class CredentialProtectionService {
         try {
             Argon2Hash hash = Argon2Hash.parse(argon2Hash);
             Map<String, String> param = parameterConverter.fromString(expectedParam);
-            if (hash.getAlgorithm().equals(algorithm.getName())) {
+            if (!hash.getAlgorithm().equals(algorithm.getName())) {
                 return false;
             }
             String versionParam = param.get("version");

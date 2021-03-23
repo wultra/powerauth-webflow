@@ -61,6 +61,7 @@ public class OtpDefinitionEntity implements Serializable {
     private boolean encryptionEnabled;
 
     @Column(name = "encryption_algorithm")
+    @Enumerated(EnumType.STRING)
     private EncryptionAlgorithm encryptionAlgorithm;
 
     @Column(name = "data_adapter_proxy_enabled")

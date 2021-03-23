@@ -323,7 +323,7 @@ public class CredentialService {
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
         Date expirationTime = credential.getTimestampExpires();
-        if (expirationTime != null && expirationTime.after(new Date())) {
+        if (expirationTime != null && new Date().after(expirationTime)) {
             return true;
         }
         // Perform an actual check of credential expiration for case that credential policy was updated after last credential change
