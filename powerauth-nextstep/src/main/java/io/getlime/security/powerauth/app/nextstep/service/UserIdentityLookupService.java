@@ -216,6 +216,12 @@ public class UserIdentityLookupService {
                 String organizationId = null;
                 if (operation.getOrganization() != null) {
                     organizationId = operation.getOrganization().getOrganizationId();
+                } else {
+                    // Organization is not set for the operation yet, use organization from application if available
+                    OrganizationEntity organization = credentialDefinition.getApplication().getOrganization();
+                    if (organization != null) {
+                        organizationId = organization.getOrganizationId();
+                    }
                 }
                 GetUserDetailResponse userDetail = userLookupCustomizationService.lookupUser(username, organizationId, operation);
                 if (userDetail == null) {
