@@ -56,7 +56,7 @@ VALUES (2, 'login', 'CREATE', NULL, NULL, 2, 'USERNAME_PASSWORD_AUTH', 'CONTINUE
 
 -- login - update operation - CANCELED -> FAILED
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
-VALUES (3, 'login', 'UPDATE', 'INIT', 'CANCELED', 1, 'INIT', 'FAILED');
+VALUES (3, 'login', 'UPDATE', 'INIT', 'CANCELED', 1, NULL , 'FAILED');
 
 -- login - update operation - CONFIRMED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
@@ -106,7 +106,7 @@ VALUES (18, 'authorize_payment', 'CREATE', NULL, NULL, 2, 'USERNAME_PASSWORD_AUT
 
 -- authorize_payment - update operation - CANCELED -> FAILED
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
-VALUES (19, 'authorize_payment', 'UPDATE', 'INIT', 'CANCELED', 1, 'INIT', 'FAILED');
+VALUES (19, 'authorize_payment', 'UPDATE', 'INIT', 'CANCELED', 1, NULL, 'FAILED');
 
 -- authorize_payment - update operation (login) - CONFIRMED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
