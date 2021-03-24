@@ -732,15 +732,13 @@ public class NextStepClient {
      *
      * @param applicationName Application name.
      * @param description Application description.
-     * @param organizationId Organization ID.
      * @return Create application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<CreateApplicationResponse> createApplication(@NotNull String applicationName, String description, String organizationId) throws NextStepClientException {
+    public ObjectResponse<CreateApplicationResponse> createApplication(@NotNull String applicationName, String description) throws NextStepClientException {
         CreateApplicationRequest request = new CreateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
-        request.setOrganizationId(organizationId);
         return postObjectImpl("/application", new ObjectRequest<>(request), CreateApplicationResponse.class);
     }
 
@@ -749,16 +747,14 @@ public class NextStepClient {
      *
      * @param applicationName Application name.
      * @param description Application description.
-     * @param organizationId Organization ID.
      * @param status Application status.
      * @return Update application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateApplicationResponse> updateApplication(@NotNull String applicationName, String description, String organizationId, ApplicationStatus status) throws NextStepClientException {
+    public ObjectResponse<UpdateApplicationResponse> updateApplication(@NotNull String applicationName, String description, ApplicationStatus status) throws NextStepClientException {
         UpdateApplicationRequest request = new UpdateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
-        request.setOrganizationId(organizationId);
         request.setApplicationStatus(status);
         return putObjectImpl("/application", new ObjectRequest<>(request), UpdateApplicationResponse.class);
     }
@@ -768,16 +764,14 @@ public class NextStepClient {
      *
      * @param applicationName Application name.
      * @param description Application description.
-     * @param organizationId Organization ID.
      * @param status Application status.
      * @return Update application response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@NotNull String applicationName, String description, String organizationId, ApplicationStatus status) throws NextStepClientException {
+    public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@NotNull String applicationName, String description, ApplicationStatus status) throws NextStepClientException {
         UpdateApplicationRequest request = new UpdateApplicationRequest();
         request.setApplicationName(applicationName);
         request.setDescription(description);
-        request.setOrganizationId(organizationId);
         request.setApplicationStatus(status);
         return postObjectImpl("/application/update", new ObjectRequest<>(request), UpdateApplicationResponse.class);
     }
