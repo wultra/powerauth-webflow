@@ -56,6 +56,10 @@ public class CredentialDefinitionEntity implements Serializable {
     private ApplicationEntity application;
 
     @ManyToOne
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
+    private OrganizationEntity organization;
+
+    @ManyToOne
     @JoinColumn(name = "credential_policy_id", referencedColumnName = "credential_policy_id", nullable = false)
     private CredentialPolicyEntity credentialPolicy;
 

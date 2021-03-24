@@ -40,8 +40,6 @@ public class ApplicationDetail {
     private ApplicationStatus applicationStatus;
     @Size(min = 2, max = 256)
     private String description;
-    @Size(min = 2, max = 256)
-    private String organizationId;
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

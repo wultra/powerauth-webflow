@@ -16,14 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialDefinitionConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.HashConfigRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.*;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDefinitionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
@@ -61,6 +55,7 @@ public class CredentialDefinitionService {
     private final CredentialPolicyRepository credentialPolicyRepository;
     private final ApplicationRepository applicationRepository;
     private final HashConfigRepository hashConfigRepository;
+    private final OrganizationRepository organizationRepository;
 
     private final CredentialDefinitionConverter credentialDefinitionConverter = new CredentialDefinitionConverter();
 
@@ -70,13 +65,15 @@ public class CredentialDefinitionService {
      * @param credentialPolicyRepository Credential policy repository.
      * @param applicationRepository Application repository.
      * @param hashConfigRepository Hashing configuration repository.
+     * @param organizationRepository Organization repository.
      */
     @Autowired
-    public CredentialDefinitionService(CredentialDefinitionRepository credentialDefinitionRepository, CredentialPolicyRepository credentialPolicyRepository, ApplicationRepository applicationRepository, HashConfigRepository hashConfigRepository) {
+    public CredentialDefinitionService(CredentialDefinitionRepository credentialDefinitionRepository, CredentialPolicyRepository credentialPolicyRepository, ApplicationRepository applicationRepository, HashConfigRepository hashConfigRepository, OrganizationRepository organizationRepository) {
         this.credentialDefinitionRepository = credentialDefinitionRepository;
         this.credentialPolicyRepository = credentialPolicyRepository;
         this.applicationRepository = applicationRepository;
         this.hashConfigRepository = hashConfigRepository;
+        this.organizationRepository = organizationRepository;
     }
 
     /**
@@ -87,9 +84,10 @@ public class CredentialDefinitionService {
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
      * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @Transactional
-    public CreateCredentialDefinitionResponse createCredentialDefinition(CreateCredentialDefinitionRequest request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException {
+    public CreateCredentialDefinitionResponse createCredentialDefinition(CreateCredentialDefinitionRequest request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException, OrganizationNotFoundException {
         Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionAlreadyExistsException("Credential definition already exists: " + request.getCredentialDefinitionName());
@@ -125,6 +123,13 @@ public class CredentialDefinitionService {
         credentialDefinition.setName(request.getCredentialDefinitionName());
         credentialDefinition.setDescription(request.getDescription());
         credentialDefinition.setApplication(application);
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            credentialDefinition.setOrganization(organizationOptional.get());
+        }
         credentialDefinition.setCredentialPolicy(credentialPolicy);
         credentialDefinition.setCategory(request.getCategory());
         credentialDefinition.setEncryptionEnabled(request.isEncryptionEnabled());
@@ -167,9 +172,10 @@ public class CredentialDefinitionService {
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
      * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @Transactional
-    public UpdateCredentialDefinitionResponse updateCredentialDefinition(UpdateCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException {
+    public UpdateCredentialDefinitionResponse updateCredentialDefinition(UpdateCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException, OrganizationNotFoundException {
         Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
@@ -211,6 +217,15 @@ public class CredentialDefinitionService {
             credentialDefinition.setStatus(request.getCredentialDefinitionStatus());
         }
         credentialDefinition.setApplication(application);
+        OrganizationEntity organization = null;
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            organization = organizationOptional.get();
+            credentialDefinition.setOrganization(organization);
+        }
         credentialDefinition.setCredentialPolicy(credentialPolicy);
         credentialDefinition.setCategory(request.getCategory());
         credentialDefinition.setEncryptionEnabled(request.isEncryptionEnabled());
@@ -227,6 +242,9 @@ public class CredentialDefinitionService {
         response.setDescription(credentialDefinition.getDescription());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         response.setApplicationName(credentialDefinition.getApplication().getName());
+        if (organization != null) {
+            response.setOrganizationId(organization.getOrganizationId());
+        }
         response.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());
         response.setCategory(credentialDefinition.getCategory());
         response.setEncryptionEnabled(credentialDefinition.isEncryptionEnabled());

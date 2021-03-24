@@ -36,18 +36,17 @@ INSERT INTO ns_organization (organization_id, display_name_key, is_default, orde
 INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number, default_credential_name, default_otp_name) VALUES ('SME', 'organization.sme', FALSE, 2, 'SME_CREDENTIAL', 'SME_OTP');
 
 -- Next Step application configuration
-INSERT INTO ns_application (name, description, status, organization_id, timestamp_created) values ('RETAIL_APP', 'Sample retail application', 'ACTIVE', 'RETAIL', CURRENT_TIMESTAMP);
-INSERT INTO ns_application (name, description, status, organization_id, timestamp_created) values ('SME_APP', 'Sample SME application', 'ACTIVE', 'SME', CURRENT_TIMESTAMP);
+INSERT INTO ns_application (name, description, status, timestamp_created) values ('APP', 'Sample application', 'ACTIVE', CURRENT_TIMESTAMP);
 
 -- credential and OTP policy configuration
 INSERT INTO ns_credential_policy (name, description, status, username_length_min, username_length_max, username_allowed_pattern, credential_length_min, credential_length_max, limit_soft, limit_hard, check_history_count, rotation_enabled, username_gen_algorithm, username_gen_param, credential_gen_algorithm, credential_gen_param, credential_val_param, timestamp_created) values ('CREDENTIAL_POLICY', 'Sample credential policy', 'ACTIVE', 8, 20, '[0-9]+', 8, 40, 3, 5, 3, FALSE, 'RANDOM_DIGITS', '{"length": 8}', 'RANDOM_PASSWORD', '{"length": 12, "includeSmallLetters": true, "smallLettersCount": 5, "includeCapitalLetters": true, "capitalLettersCount": 5, "includeDigits": true, "digitsCount": 1, "includeSpecialChars": true, "specialCharsCount": 1}', '{"includeWhitespaceRule": true, "includeUsernameRule": true, "includeAllowedCharacterRule": false, "allowedChars": "", "includeAllowedRegexRule": false, "allowedRegex": ".*", "includeIllegalCharacterRule": false, "illegalChars": "", "includeIllegalRegexRule": false, "illegalRegex": "", "includeCharacterRule": true, "includeSmallLetters": "true", "smallLettersMin": 1, "includeCapitalLetters": true, "capitalLettersMin": 1, "includeAlphabeticalLetters": true, "alphabeticalLettersMin": 2, "includeDigits": true, "digitsMin": 1, "includeSpecialChars": true, "specialCharsMin": 1}', CURRENT_TIMESTAMP);
 INSERT INTO ns_otp_policy (name, description, status, length, attempt_limit, expiration_time, gen_algorithm, gen_param) values ('OTP_POLICY', 'Sample OTP policy', 'ACTIVE', 8, 3, 300, 'OTP_DATA_DIGEST', '{}');
 
 -- credential and OTP definition configuration
-INSERT INTO ns_credential_definition (name, description, application_id, credential_policy_id, category, status, timestamp_created) values ('RETAIL_CREDENTIAL', 'Sample credential definition for retail', 1, 1, 'PASSWORD', 'ACTIVE', CURRENT_TIMESTAMP);
-INSERT INTO ns_credential_definition (name, description, application_id, credential_policy_id, category, status, timestamp_created) values ('SME_CREDENTIAL', 'Sample credential definition for SME', 2, 1, 'PASSWORD', 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, status, timestamp_created) values ('RETAIL_CREDENTIAL', 'Sample credential definition for retail', 1, 'RETAIL', 1, 'PASSWORD', 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, status, timestamp_created) values ('SME_CREDENTIAL', 'Sample credential definition for SME', 1, 'SME', 1, 'PASSWORD', 'ACTIVE', CURRENT_TIMESTAMP);
 INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, status, timestamp_created) values ('RETAIL_OTP', 'Sample OTP definition for retail', 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
-INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, status, timestamp_created) values ('SME_OTP', 'Sample OTP definition for SME', 2, 1, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, status, timestamp_created) values ('SME_OTP', 'Sample OTP definition for SME', 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
 
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)

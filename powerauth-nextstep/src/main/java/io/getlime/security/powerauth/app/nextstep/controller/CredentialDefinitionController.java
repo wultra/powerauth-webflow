@@ -68,9 +68,10 @@ public class CredentialDefinitionController {
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@Valid @RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@Valid @RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         CreateCredentialDefinitionResponse response = credentialDefinitionService.createCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -83,9 +84,10 @@ public class CredentialDefinitionController {
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -98,9 +100,10 @@ public class CredentialDefinitionController {
      * @throws ApplicationNotFoundException Thrown when application is not found.
      * @throws HashConfigNotFoundException Thrown when hashing configuration is not found.
      * @throws CredentialPolicyNotFoundException Thrown when credential policy is not found.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException {
+    public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
         UpdateCredentialDefinitionResponse response = credentialDefinitionService.updateCredentialDefinition(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

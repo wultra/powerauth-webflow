@@ -36,6 +36,9 @@ public class CredentialDefinitionConverter {
         credentialDefinitionDetail.setDescription(credentialDefinition.getDescription());
         credentialDefinitionDetail.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         credentialDefinitionDetail.setApplicationName(credentialDefinition.getApplication().getName());
+        if (credentialDefinition.getOrganization() != null) {
+            credentialDefinitionDetail.setOrganizationId(credentialDefinition.getOrganization().getOrganizationId());
+        }
         credentialDefinitionDetail.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());
         credentialDefinitionDetail.setCategory(credentialDefinition.getCategory());
         credentialDefinitionDetail.setEncryptionEnabled(credentialDefinition.isEncryptionEnabled());

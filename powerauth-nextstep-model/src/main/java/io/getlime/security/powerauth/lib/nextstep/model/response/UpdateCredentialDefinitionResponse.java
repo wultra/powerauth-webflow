@@ -38,6 +38,8 @@ public class UpdateCredentialDefinitionResponse {
     @NotBlank
     @Size(min = 2, max = 256)
     private String applicationName;
+    @Size(min = 2, max = 256)
+    private String organizationId;
     @NotBlank
     @Size(min = 2, max = 256)
     private String credentialPolicyName;

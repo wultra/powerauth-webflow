@@ -165,10 +165,8 @@ CREATE TABLE ns_application (
   name                   VARCHAR2(256 CHAR) NOT NULL,             -- Application name used for identification.
   description            VARCHAR2(256 CHAR),                      -- Description of the application.
   status                 VARCHAR2(32 CHAR) NOT NULL,              -- Application status: ACTIVE, REMOVED.
-  organization_id        VARCHAR2(256 CHAR),                      -- Organization this application belongs to.
   timestamp_created      TIMESTAMP,                               -- Timestamp when application was created.
-  timestamp_last_updated TIMESTAMP,                               -- Timestamp when application was last updated.
-  CONSTRAINT ns_application_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
+  timestamp_last_updated TIMESTAMP                                -- Timestamp when application was last updated.
 );
 
 -- Table ns_credential_policy stores credential policies.
@@ -295,6 +293,7 @@ CREATE TABLE ns_credential_definition (
   name                       VARCHAR2(256 CHAR) NOT NULL,                     -- Credential definition name used for identification.
   description                VARCHAR2(256 CHAR),                              -- Description of the credential definition.
   application_id             NUMBER(19,0) NOT NULL,                           -- Application identifier.
+  organization_id            VARCHAR2(256 CHAR),                              -- Organization this credential belongs to.
   credential_policy_id       NUMBER(19,0) NOT NULL,                           -- Credential policy identifier.
   category                   VARCHAR2(32 CHAR) NOT NULL,                      -- Credential category: PASSWORD, PIN, OTHER.
   encryption_enabled         NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether encryption of stored credentials is enabled.
@@ -310,7 +309,8 @@ CREATE TABLE ns_credential_definition (
   timestamp_last_updated     TIMESTAMP,                                       -- Timestamp when credential definition was last updated.
   CONSTRAINT ns_credential_application_fk FOREIGN KEY (application_id) REFERENCES ns_application (application_id),
   CONSTRAINT ns_credential_policy_fk FOREIGN KEY (credential_policy_id) REFERENCES ns_credential_policy (credential_policy_id),
-  CONSTRAINT ns_credential_hash_fk FOREIGN KEY (hashing_config_id) REFERENCES ns_hashing_config (hashing_config_id)
+  CONSTRAINT ns_credential_hash_fk FOREIGN KEY (hashing_config_id) REFERENCES ns_hashing_config (hashing_config_id),
+  CONSTRAINT ns_application_organization_fk FOREIGN KEY (organization_id) REFERENCES ns_organization (organization_id)
 );
 
 -- Table ns_otp_definition stores definitions of one time passwords with reference to credential policies and applications.

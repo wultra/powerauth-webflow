@@ -217,8 +217,8 @@ public class UserIdentityLookupService {
                 if (operation.getOrganization() != null) {
                     organizationId = operation.getOrganization().getOrganizationId();
                 } else {
-                    // Organization is not set for the operation yet, use organization from application if available
-                    OrganizationEntity organization = credentialDefinition.getApplication().getOrganization();
+                    // Organization is not set for the operation yet, use organization from credential if available
+                    OrganizationEntity organization = credentialDefinition.getOrganization();
                     if (organization != null) {
                         organizationId = organization.getOrganizationId();
                     }
