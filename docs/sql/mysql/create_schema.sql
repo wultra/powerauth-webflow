@@ -11,7 +11,7 @@ CREATE TABLE oauth_client_details (
   authorities             VARCHAR(256),             -- OAuth 2.0 resource grant authorities.
   access_token_validity   INTEGER,                  -- Validity of the OAuth 2.0 access tokens, in seconds.
   refresh_token_validity  INTEGER,                  -- Validity of the OAuth 2.0 refresh tokens, in seconds.
-  additional_information  VARCHAR(4096),            -- Field reserved for additional information about the client.
+  additional_information  VARCHAR(4000),            -- Field reserved for additional information about the client.
   autoapprove             VARCHAR(256)              -- Flag indicating if scopes should be automatically approved.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -75,8 +75,8 @@ CREATE TABLE wf_afs_config (
 CREATE TABLE wf_certificate_verification (
   operation_id               VARCHAR(256) NOT NULL,                        -- Operation ID associated with the certificate verification.
   auth_method                VARCHAR(32) NOT NULL,                         -- Authentication method in which the certificate authentication was used.
-  client_certificate_issuer  VARCHAR(4096) NOT NULL,                       -- Certificate attribute representing the certificate issuer.
-  client_certificate_subject VARCHAR(4096) NOT NULL,                       -- Certificate attribute representing the certificate subject.
+  client_certificate_issuer  VARCHAR(4000) NOT NULL,                       -- Certificate attribute representing the certificate issuer.
+  client_certificate_subject VARCHAR(4000) NOT NULL,                       -- Certificate attribute representing the certificate subject.
   client_certificate_sn      VARCHAR(256) NOT NULL,                        -- Certificate attribute representing the certificate serial number.
   operation_data             TEXT NOT NULL,                                -- Operation data that were included in the certificate authentication request.
   timestamp_verified         TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Timestamp of the certificate verification.
@@ -108,7 +108,7 @@ CREATE TABLE ns_operation_config (
   mobile_token_mode         VARCHAR(256) NOT NULL,            -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.
   afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,   -- Flag indicating if AFS system is enabled.
   afs_config_id             VARCHAR(256),                     -- Configuration of AFS system.
-  FOREIGN KEY ns_operation_afs_fk (afs_config_id) REFERENCES wf_afs_config (config_id)
+  FOREIGN KEY ns_operation_config_afs_fk (afs_config_id) REFERENCES wf_afs_config (config_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -166,10 +166,10 @@ CREATE TABLE ns_credential_policy (
   rotation_days              INTEGER,                                      -- Number of days for credential rotation.
   credential_temp_expiration INTEGER,                                      -- Expiration time of TEMPORARY credentials in seconds.
   username_gen_algorithm     VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the username.
-  username_gen_param         VARCHAR(4096) NOT NULL,                       -- Parameters used when generating the username.
+  username_gen_param         VARCHAR(4000) NOT NULL,                       -- Parameters used when generating the username.
   credential_gen_algorithm   VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,      -- Algorithm used for generating the credential.
-  credential_gen_param       VARCHAR(4096) NOT NULL,                       -- Parameters used when generating the credential.
-  credential_val_param       VARCHAR(4096) NOT NULL,                       -- Parameters used when validating the credential.
+  credential_gen_param       VARCHAR(4000) NOT NULL,                       -- Parameters used when generating the credential.
+  credential_val_param       VARCHAR(4000) NOT NULL,                       -- Parameters used when validating the credential.
   timestamp_created          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,          -- Timestamp when policy was created.
   timestamp_last_updated     TIMESTAMP                                     -- Timestamp when policy was last updated.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -184,7 +184,7 @@ CREATE TABLE ns_otp_policy (
   attempt_limit          INTEGER,                                     -- Maximum number of authentication attempts.
   expiration_time        INTEGER,                                     -- One time password expiration time.
   gen_algorithm          VARCHAR(256) DEFAULT 'DEFAULT' NOT NULL,     -- Algorithm used for generating the one time password.
-  gen_param              VARCHAR(4096) NOT NULL,                      -- Parameters used when generating the OTP.
+  gen_param              VARCHAR(4000) NOT NULL,                      -- Parameters used when generating the OTP.
   timestamp_created      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when policy was created.
   timestamp_last_updated TIMESTAMP                                    -- Timestamp when policy was last updated.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -415,10 +415,10 @@ CREATE TABLE ns_operation_history (
   request_auth_method         VARCHAR(32) NOT NULL,                -- Authentication method used for the step.
   request_auth_instruments    VARCHAR(256),                        -- Which specific instruments were used for the step. Supported values are: PASSWORD, OTP_KEY, POWERAUTH_TOKEN, HW_TOKEN. There can be multiple supported instruments, they are stored encoded in JSON format.
   request_auth_step_result    VARCHAR(32) NOT NULL,                -- Authentication result: CANCELED, AUTH_METHOD_FAILED, AUTH_FAILED, CONFIRMED, AUTH_METHOD_CHOSEN, AUTH_METHOD_DOWNGRADE
-  request_params              VARCHAR(4096),                       -- Additional request parameters.
+  request_params              VARCHAR(4000),                       -- Additional request parameters.
   response_result             VARCHAR(32) NOT NULL,                -- Authentication step result: FAILED, CONTINUE, DONE.
   response_result_description VARCHAR(256),                        -- Additional information about the authentication step result.
-  response_steps              VARCHAR(4096),                       -- Information about which methods are allowed in the next step.
+  response_steps              VARCHAR(4000),                       -- Information about which methods are allowed in the next step.
   response_timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when the record was created.
   response_timestamp_expires  TIMESTAMP,                           -- Timestamp when the operation step should expire.
   chosen_auth_method          VARCHAR(32),                         -- Information about which authentication method was chosen, in case user can chose the authentication method.
