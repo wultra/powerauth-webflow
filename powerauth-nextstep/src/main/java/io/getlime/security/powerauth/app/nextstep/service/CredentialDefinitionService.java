@@ -140,6 +140,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
         credentialDefinition.setE2eEncryptionAlgorithm(request.getE2eEncryptionAlgorithm());
         credentialDefinition.setE2eEncryptionCipherTransformation(request.getE2eEncryptionCipherTransformation());
+        credentialDefinition.setE2eEncryptionForTemporaryCredentialEnabled(request.isE2eEncryptionForTemporaryCredentialEnabled());
         credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampCreated(new Date());
@@ -160,6 +161,7 @@ public class CredentialDefinitionService {
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
         response.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
         response.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        response.setE2eEncryptionForTemporaryCredentialEnabled(credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled());
         response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }
@@ -234,6 +236,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setE2eEncryptionEnabled(request.isE2eEncryptionEnabled());
         credentialDefinition.setE2eEncryptionAlgorithm(request.getE2eEncryptionAlgorithm());
         credentialDefinition.setE2eEncryptionCipherTransformation(request.getE2eEncryptionCipherTransformation());
+        credentialDefinition.setE2eEncryptionForTemporaryCredentialEnabled(request.isE2eEncryptionForTemporaryCredentialEnabled());
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
@@ -256,6 +259,7 @@ public class CredentialDefinitionService {
         response.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
         response.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
         response.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        response.setE2eEncryptionForTemporaryCredentialEnabled(credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled());
         response.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         return response;
     }

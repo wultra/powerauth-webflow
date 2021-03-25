@@ -300,9 +300,10 @@ CREATE TABLE ns_credential_definition (
   encryption_algorithm       VARCHAR2(256 CHAR),                              -- Algorithm used for stored credential encryption.
   hashing_enabled            NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether credential hashing is enabled.
   hashing_config_id          NUMBER(19,0),                                    -- Algorithm used for credential hashing.
-  e2e_encryption_enabled     NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether end to end encryption of credential is enabled.
+  e2e_encryption_enabled     NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether end to end encryption of credential values is enabled.
   e2e_encryption_algorithm   VARCHAR2(256 CHAR),                              -- Algorithm used for end to end encryption of credential.
   e2e_encryption_transform   VARCHAR2(256 CHAR),                              -- Cipher transformation used for end to end encryption of credential.
+  e2e_encryption_temporary   UMBER(1) DEFAULT 0 NOT NULL,                     -- Whether end to end encryption of temporary credential values is enabled.
   data_adapter_proxy_enabled NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether credential API calls should be proxied through Data Adapter.
   status                     VARCHAR2(32 CHAR) NOT NULL,                      -- Credential definition status: ACTIVE, REMOVED.
   timestamp_created          TIMESTAMP,                                       -- Timestamp when credential definition was created.

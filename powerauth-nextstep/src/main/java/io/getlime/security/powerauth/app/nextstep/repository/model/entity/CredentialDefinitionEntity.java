@@ -88,6 +88,9 @@ public class CredentialDefinitionEntity implements Serializable {
     @Column(name = "e2e_encryption_transform")
     private String e2eEncryptionCipherTransformation;
 
+    @Column(name = "e2e_encryption_temporary")
+    private boolean e2eEncryptionForTemporaryCredentialEnabled;
+
     @Column(name = "data_adapter_proxy_enabled")
     private boolean dataAdapterProxyEnabled;
 

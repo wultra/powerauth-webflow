@@ -50,6 +50,7 @@ public class CredentialDefinitionConverter {
         credentialDefinitionDetail.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
         credentialDefinitionDetail.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
         credentialDefinitionDetail.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        credentialDefinitionDetail.setE2eEncryptionForTemporaryCredentialEnabled(credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled());
         credentialDefinitionDetail.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         credentialDefinitionDetail.setTimestampCreated(credentialDefinition.getTimestampCreated());
         credentialDefinitionDetail.setTimestampLastUpdated(credentialDefinition.getTimestampLastUpdated());

@@ -106,7 +106,7 @@ public class CredentialService {
         CredentialType credentialType = request.getCredentialType();
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         CredentialValidationMode validationMode = request.getValidationMode();
@@ -136,9 +136,10 @@ public class CredentialService {
         response.setCredentialStatus(credentialDetail.getCredentialStatus());
         response.setUsername(credentialDetail.getUsername());
         if (request.getCredentialValue() == null) {
-            // Return generated credential value
+            // Return generated credential value, with possible end2end encryption
             String credentialValueResponse = credentialDetail.getCredentialValue();
-            if (credentialDefinition.isE2eEncryptionEnabled()) {
+            if (credentialDefinition.isE2eEncryptionEnabled() &&
+                    (credentialDetail.getCredentialType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
                 credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
             }
             response.setCredentialValue(credentialValueResponse);
@@ -299,7 +300,7 @@ public class CredentialService {
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
         CredentialValidationMode validationMode = request.getValidationMode();
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
@@ -398,7 +399,8 @@ public class CredentialService {
         response.setUsername(credential.getUsername());
         // Generated password must be returned in unprotected form
         String credentialValueResponse = unprotectedCredentialValue;
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialDefinition.isE2eEncryptionEnabled() &&
+                (credential.getType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
             credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
         }
         response.setCredentialValue(credentialValueResponse);
@@ -634,7 +636,8 @@ public class CredentialService {
             // Generated credential value is returned in unprotected form, with possible e2e-encryption
             credentialChangeRequired = isCredentialChangeRequired(credential, unprotectedCredentialValue);
             String credentialValueResponse = unprotectedCredentialValue;
-            if (credentialDefinition.isE2eEncryptionEnabled()) {
+            if (credentialDefinition.isE2eEncryptionEnabled() &&
+                    (credential.getType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
                 credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
             }
             credentialDetail.setCredentialValue(credentialValueResponse);

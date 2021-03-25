@@ -164,16 +164,16 @@ public class UserIdentityService {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
                 List<CreateUserRequest.CredentialHistory> credentialHistory = credential.getCredentialHistory();
                 CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                String credentialValue = credential.getCredentialValue();
-                if (credentialDefinition.isE2eEncryptionEnabled()) {
-                    credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+                String credentialValueRequest = credential.getCredentialValue();
+                if (credentialValueRequest != null && credentialDefinition.isE2eEncryptionEnabled()) {
+                    credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
                 }
                 CredentialValidationMode validationMode = credential.getValidationMode();
                 if (validationMode == null) {
                     validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
                 }
                 CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credentialValue, validationMode);
+                        credential.getCredentialType(), credential.getUsername(), credentialValueRequest, validationMode);
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
                     int dateCount = credentialHistory.size();
                     // Use unique timestamps in seconds to keep order of credential history
@@ -188,7 +188,10 @@ public class UserIdentityService {
                         createdTimestamp += 1000;
                     }
                 }
-                if (credentialDefinition.isE2eEncryptionEnabled()) {
+                // Return generated credential value, with possible end2end encryption
+                if (credentialValueRequest == null
+                        && credentialDefinition.isE2eEncryptionEnabled()
+                        && (credentialDetail.getCredentialType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
                     String credentialValueResponse = credentialDetail.getCredentialValue();
                     credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
                 }
@@ -283,13 +286,14 @@ public class UserIdentityService {
                 // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
                 for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
                     CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
-                    String credentialValue = credential.getCredentialValue();
-                    if (credentialDefinition.isE2eEncryptionEnabled()) {
-                        credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
+                    String credentialValueRequest = credential.getCredentialValue();
+                    if (credentialValueRequest != null && credentialDefinition.isE2eEncryptionEnabled()) {
+                        credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
                     }
                     CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credentialValue, CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
-                    if (credentialDefinition.isE2eEncryptionEnabled()) {
+                            credential.getCredentialType(), credential.getUsername(), credentialValueRequest, CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+                    // Return generated credential value, with possible end2end encryption
+                    if (credentialValueRequest == null && credentialDefinition.isE2eEncryptionEnabled()) {
                         String credentialValueResponse = credentialDetail.getCredentialValue();
                         credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
                     }

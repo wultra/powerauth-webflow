@@ -62,6 +62,7 @@ public class CredentialDefinitionDetail {
     private boolean e2eEncryptionEnabled;
     private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
     private String e2eEncryptionCipherTransformation;
+    private boolean e2eEncryptionForTemporaryCredentialEnabled;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
     @NotNull

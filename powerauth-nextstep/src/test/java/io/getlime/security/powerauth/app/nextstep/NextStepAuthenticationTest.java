@@ -560,6 +560,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setE2eEncryptionEnabled(true);
         credentialDefinitionRequest.setE2eEncryptionAlgorithm(EndToEndEncryptionAlgorithm.AES);
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation("AES/CBC/PKCS7Padding");
+        credentialDefinitionRequest.setE2eEncryptionForTemporaryCredentialEnabled(true);
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
 
         // Test authentication
@@ -569,6 +570,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setE2eEncryptionEnabled(false);
         credentialDefinitionRequest.setE2eEncryptionAlgorithm(null);
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation(null);
+        credentialDefinitionRequest.setE2eEncryptionForTemporaryCredentialEnabled(false);
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
         // Test authentication
         CredentialAuthenticationResponse r2 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", credentialValue).getResponseObject();
