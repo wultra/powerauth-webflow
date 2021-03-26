@@ -59,4 +59,7 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "afs_config_id")
     private String afsConfigId;
 
+    @Column(name = "expiration_time")
+    private Integer expirationTime;
+
 }

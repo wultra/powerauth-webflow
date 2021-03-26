@@ -18,11 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -64,6 +62,7 @@ public class StepResolutionService {
     private final AuthMethodService authMethodService;
     private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final OperationConfigRepository operationConfigRepository;
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
 
     private final OperationConverter operationConverter = new OperationConverter();
@@ -77,11 +76,12 @@ public class StepResolutionService {
      * @param authMethodService Authentication method service.
      * @param authMethodRepository Authentication method repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param operationConfigRepository Operation configuration repository.
      */
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
+                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConfigRepository operationConfigRepository) {
         this.stepDefinitionRepository = stepDefinitionRepository;
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
@@ -89,6 +89,7 @@ public class StepResolutionService {
         this.authMethodService = authMethodService;
         this.authMethodRepository = authMethodRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+        this.operationConfigRepository = operationConfigRepository;
         reloadStepDefinitions();
     }
 
@@ -132,7 +133,8 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = filterStepDefinitions(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
         response.getSteps().addAll(filterAuthSteps(stepDefinitions, null, request.getOperationName()));
         response.setTimestampCreated(new Date());
-        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        int expirationTime = getExpirationTime(request.getOperationName());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(expirationTime);
         response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         response.setFormData(request.getFormData());
         Set<AuthResult> allResults = new HashSet<>();
@@ -189,7 +191,8 @@ public class StepResolutionService {
             response.setResultDescription("operation.timeout");
             return response;
         }
-        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        int expirationTime = getExpirationTime(operation.getOperationName());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(expirationTime);
         response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         AuthStepResult authStepResult = request.getAuthStepResult();
         if (isAuthMethodFailed(operation, request.getAuthMethod(), authStepResult)) {
@@ -504,6 +507,24 @@ public class StepResolutionService {
                 }
             }
         }
+    }
+
+    /**
+     * Get expiration time for the operation in seconds.
+     * @param operationName Operation name.
+     * @return Expiration time in seconds.
+     */
+    private int getExpirationTime(String operationName) {
+        Integer expirationTime = null;
+        Optional<OperationConfigEntity> configOptional = operationConfigRepository.findById(operationName);
+        if (configOptional.isPresent()) {
+            OperationConfigEntity config = configOptional.get();
+            expirationTime = config.getExpirationTime();
+        }
+        if (expirationTime == null) {
+            expirationTime = nextStepServerConfiguration.getOperationExpirationTime();
+        }
+        return expirationTime;
     }
 
 }

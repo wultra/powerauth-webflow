@@ -108,6 +108,7 @@ CREATE TABLE ns_operation_config (
   mobile_token_mode         VARCHAR(256) NOT NULL,            -- Configuration of mobile token for this operation, for example, if 1FA or 2FA is supported, and which 2FA variants. The field contains a serialized JSON with configuration.
   afs_enabled               BOOLEAN NOT NULL DEFAULT FALSE,   -- Flag indicating if AFS system is enabled.
   afs_config_id             VARCHAR(256),                     -- Configuration of AFS system.
+  expiration_time           INTEGER,                          -- Expiration time in seconds, which overrides global Next Step configuration.
   FOREIGN KEY ns_operation_config_afs_fk (afs_config_id) REFERENCES wf_afs_config (config_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

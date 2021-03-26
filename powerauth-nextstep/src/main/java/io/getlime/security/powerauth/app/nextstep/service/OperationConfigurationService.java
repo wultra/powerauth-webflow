@@ -79,6 +79,7 @@ public class OperationConfigurationService {
         operationConfig.setMobileTokenMode(request.getMobileTokenMode());
         operationConfig.setAfsEnabled(request.isAfsEnabled());
         operationConfig.setAfsConfigId(request.getAfsConfigId());
+        operationConfig.setExpirationTime(request.getExpirationTime());
         operationConfigRepository.save(operationConfig);
         CreateOperationConfigResponse response = new CreateOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
@@ -88,6 +89,7 @@ public class OperationConfigurationService {
         response.setMobileTokenMode(operationConfig.getMobileTokenMode());
         response.setAfsEnabled(operationConfig.isAfsEnabled());
         response.setAfsConfigId(operationConfig.getAfsConfigId());
+        response.setExpirationTime(operationConfig.getExpirationTime());
         return response;
     }
 
