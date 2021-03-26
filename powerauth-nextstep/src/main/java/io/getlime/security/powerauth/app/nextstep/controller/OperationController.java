@@ -469,7 +469,7 @@ public class OperationController {
      * Create an operation configuration.
      * @param request Create operation configuration request.
      * @return Create operation configuration response.
-     * @throws OperationConfigAlreadyExists THrown when operation configuration already exists.
+     * @throws OperationConfigAlreadyExists Thrown when operation configuration already exists.
      */
     @RequestMapping(value = "operation/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@Valid @RequestBody ObjectRequest<CreateOperationConfigRequest> request) throws OperationConfigAlreadyExists {
@@ -487,6 +487,44 @@ public class OperationController {
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@Valid @RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
         DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Create a configuration for authentication method by operation name.
+     * @param request Create operation and authentication method configuration request.
+     * @return Create operation and authentication method configuration response.
+     * @throws OperationMethodConfigAlreadyExists Thrown when operation and authentication method configuration already exists.
+     * @throws OperationConfigNotFoundException Thrown when operation configuration is not found.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     */
+    @RequestMapping(value = "operation/auth-method/config", method = RequestMethod.POST)
+    public ObjectResponse<CreateOperationMethodConfigResponse> createOperationMethodConfig(@Valid @RequestBody ObjectRequest<CreateOperationMethodConfigRequest> request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
+        CreateOperationMethodConfigResponse response = operationConfigurationService.createOperationMethodConfig(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Delete a configuration for authentication method by operation name.
+     * @param request Delete operation and authentication method configuration request.
+     * @return Delete operation and authentication method configuration response.
+     * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
+     */
+    @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
+    public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
+        GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Delete a configuration for authentication method by operation name.
+     * @param request Delete operation and authentication method configuration request.
+     * @return Delete operation and authentication method configuration response.
+     * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
+     */
+    @RequestMapping(value = "operation/auth-method/config/delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteOperationMethodConfigResponse> deleteOperationMethodConfig(@Valid @RequestBody ObjectRequest<DeleteOperationMethodConfigRequest> request) throws OperationMethodConfigNotFoundException {
+        DeleteOperationMethodConfigResponse response = operationConfigurationService.deleteOperationMethodConfig(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
 

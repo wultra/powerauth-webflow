@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Wultra s.r.o.
+ * Copyright 2017 Wultra s.r.o.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.exception;
+package io.getlime.security.powerauth.app.nextstep.repository;
+
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationMethodConfigEntity;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 /**
- * Exception for case when operation config is not configured.
+ * Crud repository for configuration of authentication methods by operation name.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OperationConfigNotFoundException extends NextStepServiceException {
-
-    public static final String CODE = "OPERATION_CONFIG_NOT_FOUND";
-
-    /**
-     * Constructor with error message.
-     * @param message Error message.
-     */
-    public OperationConfigNotFoundException(String message) {
-        super(message);
-    }
-
+@Repository
+public interface OperationMethodConfigRepository extends CrudRepository<OperationMethodConfigEntity, OperationMethodConfigEntity.OperationAuthMethodKey> {
 }

@@ -342,6 +342,12 @@ public class AuthMethodService {
         }
         AuthMethodDetail authMethodDetail = new AuthMethodDetail();
         authMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
+        authMethodDetail.setOrderNumber(authMethodDetail.getOrderNumber());
+        authMethodDetail.setCheckUserPrefs(authMethodDetail.getCheckUserPrefs());
+        authMethodDetail.setUserPrefsColumn(authMethodDetail.getUserPrefsColumn());
+        authMethodDetail.setUserPrefsDefault(authMethodDetail.getUserPrefsDefault());
+        authMethodDetail.setCheckAuthFails(authMethodDetail.getCheckAuthFails());
+        authMethodDetail.setMaxAuthFails(authMethodDetail.getMaxAuthFails());
         authMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         authMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
         authMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());

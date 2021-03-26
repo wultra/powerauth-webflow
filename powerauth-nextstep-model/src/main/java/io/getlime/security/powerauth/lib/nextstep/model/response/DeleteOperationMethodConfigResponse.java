@@ -13,23 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.exception;
+package io.getlime.security.powerauth.lib.nextstep.model.response;
+
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
- * Exception for case when operation config is not configured.
+ * Response object used for deleting a configuration for authentication method by operation name.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OperationConfigNotFoundException extends NextStepServiceException {
+@Data
+public class DeleteOperationMethodConfigResponse {
 
-    public static final String CODE = "OPERATION_CONFIG_NOT_FOUND";
-
-    /**
-     * Constructor with error message.
-     * @param message Error message.
-     */
-    public OperationConfigNotFoundException(String message) {
-        super(message);
-    }
+    @NotBlank
+    @Size(min = 2, max = 256)
+    private String operationName;
+    @NotNull
+    private AuthMethod authMethod;
 
 }

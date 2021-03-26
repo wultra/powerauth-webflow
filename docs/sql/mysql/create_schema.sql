@@ -86,7 +86,7 @@ CREATE TABLE wf_certificate_verification (
 -- Table ns_auth_method stores configuration of authentication methods.
 -- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_auth_method (
-  auth_method        VARCHAR(32) PRIMARY KEY NOT NULL, -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH
+  auth_method        VARCHAR(32) PRIMARY KEY NOT NULL, -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
   order_number       INTEGER NOT NULL,                 -- Order of the authentication method, incrementing value, starts with 1.
   check_user_prefs   BOOLEAN NOT NULL,                 -- Indication if the authentication method requires checking the user preference first.
   user_prefs_column  INTEGER,                          -- In case the previous column is 'true', this is pointer to the user preferences configuration column index.
@@ -110,6 +110,16 @@ CREATE TABLE ns_operation_config (
   afs_config_id             VARCHAR(256),                     -- Configuration of AFS system.
   expiration_time           INTEGER,                          -- Expiration time in seconds, which overrides global Next Step configuration.
   FOREIGN KEY ns_operation_config_afs_fk (afs_config_id) REFERENCES wf_afs_config (config_id)
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- Table ns_operation_method_config stores configuration of authentication methods per operation name.
+CREATE TABLE ns_operation_method_config (
+  operation_name     VARCHAR(32) NOT NULL,             -- Name of the operation, for example "login" or "approve_payment".
+  auth_method        VARCHAR(32) NOT NULL,             -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
+  max_auth_fails     INTEGER NOT NULL,                 -- Maximum allowed number of authentication fails.
+  PRIMARY KEY (operation_name, auth_method),
+  FOREIGN KEY ns_operation_method_fk1 (operation_name) REFERENCES ns_operation_config (operation_name),
+  FOREIGN KEY ns_operation_method_fk2 (auth_method) REFERENCES ns_auth_method (auth_method)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_organization stores definitions of organizations related to the operations.

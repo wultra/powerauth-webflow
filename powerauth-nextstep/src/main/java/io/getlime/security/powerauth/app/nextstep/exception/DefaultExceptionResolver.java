@@ -277,6 +277,32 @@ public class DefaultExceptionResolver {
     }
 
     /**
+     * Exception handler for operation and authentication method config already exists error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationMethodConfigAlreadyExists.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationMethodConfigAlreadyExists(OperationMethodConfigAlreadyExists ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationMethodConfigAlreadyExists.CODE, "Operation and authentication config already exists.");
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for operation and authentication method config not found error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(OperationMethodConfigNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleOperationMethodConfigNotFoundException(OperationMethodConfigNotFoundException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        Error error = new Error(OperationMethodConfigNotFoundException.CODE, "Operation and authentication config not found.");
+        return new ErrorResponse(error);
+    }
+
+    /**
      * Exception handler for authentication method already exists error.
      * @param ex Exception.
      * @return Response with error details.

@@ -107,7 +107,7 @@ CREATE TABLE wf_certificate_verification (
 -- Table ns_auth_method stores configuration of authentication methods.
 -- Data in this table needs to be loaded before Web Flow is started.
 CREATE TABLE ns_auth_method (
-  auth_method        VARCHAR2(32 CHAR) PRIMARY KEY NOT NULL,  -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH
+  auth_method        VARCHAR2(32 CHAR) PRIMARY KEY NOT NULL,  -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
   order_number       INTEGER NOT NULL,                        -- Order of the authentication method, incrementing value, starts with 1.
   check_user_prefs   NUMBER(1) DEFAULT 0 NOT NULL,            -- Indication if the authentication method requires checking the user preference first.
   user_prefs_column  INTEGER,                                 -- In case the previous column is 'true', this is pointer to the user preferences configuration column index.
@@ -131,6 +131,16 @@ CREATE TABLE ns_operation_config (
   afs_config_id             VARCHAR2(256 CHAR),                       -- Configuration of AFS system.
   expiration_time           INTEGER,                                  -- Expiration time in seconds, which overrides global Next Step configuration.
   CONSTRAINT ns_operation_config_afs_fk FOREIGN KEY (afs_config_id) REFERENCES wf_afs_config (config_id)
+);
+
+-- Table ns_operation_method_config stores configuration of authentication methods per operation name.
+CREATE TABLE ns_operation_method_config (
+  operation_name     VARCHAR2(32 CHAR) NOT NULL,             -- Name of the operation, for example "login" or "approve_payment".
+  auth_method        VARCHAR2(32 CHAR) NOT NULL,             -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
+  max_auth_fails     INTEGER NOT NULL,                       -- Maximum allowed number of authentication fails.
+  PRIMARY KEY (operation_name, auth_method),
+  CONSTRAINT ns_operation_method_fk1 FOREIGN KEY (operation_name) REFERENCES ns_operation_config (operation_name),
+  CONSTRAINT ns_operation_method_fk2 FOREIGN KEY (auth_method) REFERENCES ns_auth_method (auth_method)
 );
 
 -- Table ns_organization stores definitions of organizations related to the operations.
@@ -304,7 +314,7 @@ CREATE TABLE ns_credential_definition (
   e2e_encryption_enabled     NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether end to end encryption of credential values is enabled.
   e2e_encryption_algorithm   VARCHAR2(256 CHAR),                              -- Algorithm used for end to end encryption of credential.
   e2e_encryption_transform   VARCHAR2(256 CHAR),                              -- Cipher transformation used for end to end encryption of credential.
-  e2e_encryption_temporary   UMBER(1) DEFAULT 0 NOT NULL,                     -- Whether end to end encryption of temporary credential values is enabled.
+  e2e_encryption_temporary   NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether end to end encryption of temporary credential values is enabled.
   data_adapter_proxy_enabled NUMBER(1) DEFAULT 0 NOT NULL,                    -- Whether credential API calls should be proxied through Data Adapter.
   status                     VARCHAR2(32 CHAR) NOT NULL,                      -- Credential definition status: ACTIVE, REMOVED.
   timestamp_created          TIMESTAMP,                                       -- Timestamp when credential definition was created.

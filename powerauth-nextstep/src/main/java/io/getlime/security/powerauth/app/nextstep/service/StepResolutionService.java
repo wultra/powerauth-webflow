@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerCo
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationMethodConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -63,6 +64,7 @@ public class StepResolutionService {
     private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final OperationConfigRepository operationConfigRepository;
+    private final OperationMethodConfigRepository operationMethodConfigRepository;
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
 
     private final OperationConverter operationConverter = new OperationConverter();
@@ -77,11 +79,12 @@ public class StepResolutionService {
      * @param authMethodRepository Authentication method repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
      * @param operationConfigRepository Operation configuration repository.
+     * @param operationMethodConfigRepository Operation and authentication method config repository.
      */
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConfigRepository operationConfigRepository) {
+                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConfigRepository operationConfigRepository, OperationMethodConfigRepository operationMethodConfigRepository) {
         this.stepDefinitionRepository = stepDefinitionRepository;
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
@@ -90,6 +93,7 @@ public class StepResolutionService {
         this.authMethodRepository = authMethodRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
         this.operationConfigRepository = operationConfigRepository;
+        this.operationMethodConfigRepository = operationMethodConfigRepository;
         reloadStepDefinitions();
     }
 
@@ -383,7 +387,8 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            return failureCount >= authMethodEntity.getMaxAuthFails();
+            int maxAuthFails = getMaxAuthFails(operation, authMethodEntity);
+            return failureCount >= maxAuthFails;
         }
         return false;
     }
@@ -420,10 +425,11 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            if (failureCount >= authMethodEntity.getMaxAuthFails()) {
+            int maxAuthFails = getMaxAuthFails(operation, authMethodEntity);
+            if (failureCount >= maxAuthFails) {
                 return 0;
             }
-            return authMethodEntity.getMaxAuthFails() - failureCount;
+            return maxAuthFails - failureCount;
         }
         return null;
     }
@@ -525,6 +531,22 @@ public class StepResolutionService {
             expirationTime = nextStepServerConfiguration.getOperationExpirationTime();
         }
         return expirationTime;
+    }
+
+    /**
+     * Get maximum number of authentication failures for given operation and authentication method.
+     * @param operation Operation entity.
+     * @param authMethod Authentication method.
+     * @return Maximum number of authentication failures.
+     */
+    private int getMaxAuthFails(OperationEntity operation, AuthMethodEntity authMethod) {
+        OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(operation.getOperationName(), authMethod.getAuthMethod());
+        Optional<OperationMethodConfigEntity> configOptional = operationMethodConfigRepository.findById(primaryKey);
+        if (configOptional.isPresent()) {
+            OperationMethodConfigEntity config = configOptional.get();
+            return config.getMaxAuthFails();
+        }
+        return authMethod.getMaxAuthFails();
     }
 
 }

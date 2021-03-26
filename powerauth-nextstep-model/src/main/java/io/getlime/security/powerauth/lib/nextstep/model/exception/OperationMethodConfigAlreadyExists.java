@@ -16,19 +16,19 @@
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
 /**
- * Exception for case when operation config is not configured.
+ * Exception for case when operation and authentication method config already exists.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class OperationConfigNotFoundException extends NextStepServiceException {
+public class OperationMethodConfigAlreadyExists extends NextStepServiceException {
 
-    public static final String CODE = "OPERATION_CONFIG_NOT_FOUND";
+    public static final String CODE = "OPERATION_METHOD_CONFIG_ALREADY_EXISTS";
 
     /**
      * Constructor with error message.
      * @param message Error message.
      */
-    public OperationConfigNotFoundException(String message) {
+    public OperationMethodConfigAlreadyExists(String message) {
         super(message);
     }
 
