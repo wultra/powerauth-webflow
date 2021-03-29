@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service for retrieving mobile token configuration.
+ * Service for managing mobile token configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -125,5 +126,27 @@ public class MobileTokenConfigurationService {
         // Mobile token is disabled for this authentication method
         logger.debug("Mobile token is disabled because authentication method {} does not support mobile token", authMethod);
         return false;
+    }
+
+    /**
+     * Enable mobile token authentication method.
+     *
+     * @param operation Operation entity.
+     * @return Whether mobile token was enabled.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    public boolean enableMobileToken(OperationEntity operation) throws InvalidConfigurationException {
+        if (operation == null || operation.getUserId() == null || operation.getOperationName() == null) {
+            return false;
+        }
+        String userId = operation.getUserId();
+        String operationName = operation.getOperationName();
+        if (!isMobileTokenEnabled(userId, operationName, AuthMethod.POWERAUTH_TOKEN)){
+            return false;
+        }
+
+        // TODO - create an operation in PowerAuth server
+
+        return true;
     }
 }

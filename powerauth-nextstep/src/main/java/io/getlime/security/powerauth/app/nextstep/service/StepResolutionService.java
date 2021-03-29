@@ -469,8 +469,10 @@ public class StepResolutionService {
         if (request.getAuthMethod() == null) {
             throw new InvalidRequestException("Operation update failed, because authentication method is missing, operation ID: " + request.getOperationId() + ".");
         }
-        // INIT method can cancel other operations due to concurrency check
-        if (request.getAuthStepResult() != AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
+        // INIT method can cancel other operations due to concurrency check and can set chosen authentication method
+        if (request.getAuthMethod() == AuthMethod.INIT &&
+                (request.getAuthStepResult() != AuthStepResult.CANCELED
+                        && request.getAuthStepResult() != AuthStepResult.AUTH_METHOD_CHOSEN)) {
             throw new InvalidRequestException("Operation update failed, because INIT method cannot be updated, operation ID: " + request.getOperationId() + ".");
         }
         if (request.getAuthStepResult() == null) {
@@ -487,20 +489,30 @@ public class StepResolutionService {
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
         // operation can be canceled anytime (e.g. by closed Web Socket) - do not check for step continuation
         if (currentOperationHistory != null && currentOperationHistory.getResponseResult() == AuthResult.CONTINUE
-                && request.getAuthStepResult() != AuthStepResult.CANCELED ) {
+                && request.getAuthStepResult() != AuthStepResult.CANCELED) {
             boolean stepAuthMethodValid = false;
+            List<AuthStep> authSteps = operationPersistenceService.getResponseAuthSteps(operationEntity);
             // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
             if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
                 // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                for (AuthStep step : authSteps) {
                     if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                        stepAuthMethodValid = true;
+                        break;
+                    }
+                }
+            } if (request.getAuthStepResult() == AuthStepResult.AUTH_METHOD_CHOSEN) {
+                // verification of operation continuity for chosen authentication method
+                for (AuthStep step : authSteps) {
+                    if (currentOperationHistory.getRequestAuthMethod() == request.getAuthMethod()
+                            && step.getAuthMethod() == request.getTargetAuthMethod()) {
                         stepAuthMethodValid = true;
                         break;
                     }
                 }
             } else {
                 // verification of operation continuity for all other authentication methods
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                for (AuthStep step : authSteps) {
                     if (step.getAuthMethod() == request.getAuthMethod()) {
                         stepAuthMethodValid = true;
                         break;

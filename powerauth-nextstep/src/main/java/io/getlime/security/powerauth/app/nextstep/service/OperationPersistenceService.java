@@ -221,6 +221,8 @@ public class OperationPersistenceService {
         }
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
+        operationHistory.setChosenAuthMethod(response.getChosenAuthMethod());
+        operationHistory.setMobileTokenActive(response.isMobileTokenActive());
         try {
             // Params, steps and auth instruments are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
@@ -303,13 +305,25 @@ public class OperationPersistenceService {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
+        updateChosenAuthMethod(operation, request.getChosenAuthMethod());
+    }
+
+    /**
+     * Update chosen authentication method.
+     *
+     * @param operation Operation.
+     * @param chosenAuthMethod Chosen authentication method.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     */
+    public void updateChosenAuthMethod(OperationEntity operation, AuthMethod chosenAuthMethod) throws InvalidConfigurationException, InvalidRequestException {
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
             throw new InvalidConfigurationException("Operation is missing history");
         }
         boolean chosenAuthMethodValid = false;
         for (AuthStep step : getResponseAuthSteps(operation)) {
-            if (step.getAuthMethod() == request.getChosenAuthMethod()) {
+            if (step.getAuthMethod() == chosenAuthMethod) {
                 chosenAuthMethodValid = true;
                 break;
             }
@@ -317,7 +331,7 @@ public class OperationPersistenceService {
         if (!chosenAuthMethodValid) {
             throw new InvalidRequestException("Invalid chosen authentication method");
         }
-        currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
+        currentHistory.setChosenAuthMethod(chosenAuthMethod);
         operationHistoryRepository.save(currentHistory);
     }
 
@@ -416,10 +430,9 @@ public class OperationPersistenceService {
         }
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            // Add operations whose last step is CONFIRMED with CONTINUE result and chosen authentication method supports mobile token
+            // Add operations whose last step has CONTINUE result and chosen authentication method supports mobile token
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
-            if (currentHistoryEntity != null && currentHistoryEntity.getRequestAuthStepResult() == AuthStepResult.CONFIRMED
-                    && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
+            if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
                 if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
                     filteredList.add(operation);
