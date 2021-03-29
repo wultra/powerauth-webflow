@@ -323,6 +323,11 @@ public class CredentialService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
+        // Temporary credentials always require change so that they can become permanent as soon as possible
+        if (credential.getType() == CredentialType.TEMPORARY) {
+            return true;
+        }
+        // Check expiration time
         Date expirationTime = credential.getTimestampExpires();
         if (expirationTime != null && new Date().after(expirationTime)) {
             return true;
