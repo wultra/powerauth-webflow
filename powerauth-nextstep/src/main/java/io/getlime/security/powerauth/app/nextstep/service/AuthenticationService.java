@@ -685,7 +685,7 @@ public class AuthenticationService {
         // Temporary credentials cannot be used for authentication after their expiration
         if (credential.getType() == CredentialType.TEMPORARY
             && credential.getTimestampExpires() != null
-            && credential.getTimestampExpires().after(new Date())) {
+            && new Date().after(credential.getTimestampExpires())) {
             return AuthenticationResult.FAILED;
         }
         CredentialAuthenticationMode authModeResolved;
