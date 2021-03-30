@@ -36,10 +36,10 @@ public class CertificateVerificationEntity implements Serializable {
     @EmbeddedId
     private CertificateVerificationKey certificateVerificationKey;
 
-    @Column(name = "client_certificate_issuer", nullable = false, length = 4096)
+    @Column(name = "client_certificate_issuer", nullable = false, length = 4000)
     private String certificateIssuer;
 
-    @Column(name = "client_certificate_subject", nullable = false, length = 4096)
+    @Column(name = "client_certificate_subject", nullable = false, length = 4000)
     private String certificateSubject;
 
     @Column(name = "client_certificate_sn", nullable = false)

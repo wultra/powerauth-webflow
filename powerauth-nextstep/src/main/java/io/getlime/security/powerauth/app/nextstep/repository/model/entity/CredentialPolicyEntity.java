@@ -91,17 +91,17 @@ public class CredentialPolicyEntity implements Serializable {
     @Column(name = "username_gen_algorithm", nullable = false)
     private UsernameGenerationAlgorithm usernameGenAlgorithm;
 
-    @Column(name = "username_gen_param", length = 4096)
+    @Column(name = "username_gen_param", length = 4000)
     private String usernameGenParam;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "credential_gen_algorithm", nullable = false)
     private CredentialGenerationAlgorithm credentialGenAlgorithm;
 
-    @Column(name = "credential_gen_param", length = 4096)
+    @Column(name = "credential_gen_param", length = 4000)
     private String credentialGenParam;
 
-    @Column(name = "credential_val_param", length = 4096)
+    @Column(name = "credential_val_param", length = 4000)
     private String credentialValParam;
 
     @Column(name = "timestamp_created", nullable = false)
