@@ -311,9 +311,9 @@ public class StepResolutionService {
                 // dynamically via user preferences
                 continue;
             }
-            // filter out POWERAUTH_TOKEN method in case it is not enabled for given operation and authentication method
+            // filter out POWERAUTH_TOKEN method in case it is not enabled for given operation and authentication method and active
             if (userId != null && stepDef.getResponseAuthMethod() == AuthMethod.POWERAUTH_TOKEN
-                    && !mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
+                    && !mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
                 continue;
             }
             filteredStepDefinitions.add(stepDef);

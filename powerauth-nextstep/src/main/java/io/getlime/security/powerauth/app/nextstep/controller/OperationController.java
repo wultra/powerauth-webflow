@@ -417,7 +417,7 @@ public class OperationController {
         String operationName = request.getRequestObject().getOperationName();
         AuthMethod authMethod = request.getRequestObject().getAuthMethod();
         logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
-        boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, authMethod);
+        boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, authMethod);
         GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
         response.setMobileTokenEnabled(isMobileTokenEnabled);
         logger.debug("The getMobileTokenConfig request succeeded");

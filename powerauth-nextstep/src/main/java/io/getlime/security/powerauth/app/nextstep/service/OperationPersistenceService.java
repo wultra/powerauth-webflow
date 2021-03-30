@@ -430,11 +430,11 @@ public class OperationPersistenceService {
         }
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            // Add operations whose last step has CONTINUE result and chosen authentication method supports mobile token
+            // Add operations whose last step has CONTINUE result and chosen authentication method supports mobile token and it is active
             OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
             if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
                 AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
-                if (mobileTokenConfigurationService.isMobileTokenEnabled(userId, operation.getOperationName(), chosenAuthMethod)) {
+                if (mobileTokenConfigurationService.isMobileTokenActive(userId, operation.getOperationName(), chosenAuthMethod)) {
                     filteredList.add(operation);
                 }
             }

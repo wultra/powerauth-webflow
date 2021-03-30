@@ -15,6 +15,10 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
+import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import org.slf4j.Logger;
@@ -42,6 +46,18 @@ public class NextStepServerConfiguration {
      */
     @Value("${powerauth.dataAdapter.service.url}")
     private String dataAdapterServiceUrl;
+
+    @Value("${powerauth.service.url}")
+    private String powerAuthRestUrl;
+
+    @Value("${powerauth.service.security.clientToken}")
+    private String powerAuthClientToken;
+
+    @Value("${powerauth.service.security.clientSecret}")
+    private String powerAuthClientSecret;
+
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean powerAuthAcceptInvalidSslCertificate;
 
     /**
      * Operation expiration time in seconds.
@@ -154,6 +170,24 @@ public class NextStepServerConfiguration {
         try {
             return new DataAdapterClient(dataAdapterServiceUrl);
         } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+
+    /**
+     * Initialize PowerAuth REST client.
+     * @return PowerAuth REST client.
+     */
+    @Bean
+    public PowerAuthClient powerAuthClient() {
+        PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
+        config.setPowerAuthClientToken(powerAuthClientToken);
+        config.setPowerAuthClientSecret(powerAuthClientSecret);
+        config.setAcceptInvalidSslCertificate(powerAuthAcceptInvalidSslCertificate);
+        try {
+            return new PowerAuthRestClient(powerAuthRestUrl, config);
+        } catch (PowerAuthClientException ex) {
             logger.error(ex.getMessage(), ex);
             return null;
         }

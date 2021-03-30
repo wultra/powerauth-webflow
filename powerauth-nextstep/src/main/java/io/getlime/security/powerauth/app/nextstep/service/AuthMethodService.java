@@ -287,7 +287,7 @@ public class AuthMethodService {
                 .collect(Collectors.toList());
         // Check mobile token status, remove POWERAUTH_TOKEN method in case it is not currently available
         if (filteredMethods.contains(AuthMethod.POWERAUTH_TOKEN)) {
-            if (!mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
+            if (!mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
                 filteredMethods.remove(AuthMethod.POWERAUTH_TOKEN);
             }
         }
