@@ -19,11 +19,18 @@ import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.GetPAOperationMappingResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationApproveRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.request.OperationRejectRequest;
 import io.getlime.security.powerauth.lib.mtoken.model.response.OperationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthInstrument;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
@@ -42,7 +49,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.con
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
@@ -76,19 +82,21 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
-    private final AuthMethodResolutionService authMethodResolutionService;
+    private final DataAdapterClient dataAdapterClient;
+
+    private final FormDataConverter formDataConverter = new FormDataConverter();
 
     /**
      * Controller constructor.
      * @param webSocketMessageService Web Socket message service.
      * @param authMethodQueryService Authentication method query service.
-     * @param authMethodResolutionService Authentication method resolution service.
+     * @param dataAdapterClient Data Adapter client.
      */
     @Autowired
-    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, AuthMethodResolutionService authMethodResolutionService) {
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, DataAdapterClient dataAdapterClient) {
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
-        this.authMethodResolutionService = authMethodResolutionService;
+        this.dataAdapterClient = dataAdapterClient;
     }
 
     /**
@@ -238,20 +246,22 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new InvalidActivationException(activationId);
             }
 
-            final GetOperationDetailResponse operation = getOperation(operationId);
-            // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
-            // In case of an approval operation the data would be incorrect, because it is related to the payment.
-            // This is a workaround until Web Flow supports multiple types of operation data within an operation.
-            if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
-                authMethodResolutionService.updateOperationForScaLogin(operation);
-            }
-
-            // Check if signature type is allowed
-            if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
-                throw new PowerAuthAuthenticationException();
-            }
-
             try {
+
+                final GetOperationDetailResponse operation = getOperation(operationId);
+                FormData formData = formDataConverter.fromOperationFormData(operation.getFormData());
+                ApplicationContext applicationContext = operation.getApplicationContext();
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+                GetPAOperationMappingResponse response = dataAdapterClient.getPAOperationMapping(userId, operation.getOrganizationId(), getAuthMethodName(operation), operationContext).getResponseObject();
+                operation.setOperationName(response.getOperationName());
+                operation.setOperationData(response.getOperationData());
+                operation.setFormData(formDataConverter.fromFormData(response.getFormData()));
+
+                // Check if signature type is allowed
+                if (!isSignatureTypeAllowedForOperation(operation.getOperationName(), apiAuthentication.getSignatureFactors())) {
+                    throw new PowerAuthAuthenticationException();
+                }
+
                 if (operation.getOperationData().equals(request.getRequestObject().getData())
                         && operation.getUserId() != null
                         && operation.getUserId().equals(apiAuthentication.getUserId())) {
@@ -262,7 +272,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 } else {
                     throw new PowerAuthAuthenticationException();
                 }
-            } catch (NextStepClientException ex) {
+            } catch (NextStepClientException | DataAdapterClientErrorException ex) {
                 logger.error(ex.getMessage(), ex);
                 throw new PowerAuthAuthenticationException();
             }

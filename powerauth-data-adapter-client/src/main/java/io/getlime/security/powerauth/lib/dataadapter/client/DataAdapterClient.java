@@ -219,6 +219,25 @@ public class DataAdapterClient {
     }
 
     /**
+     * Get the operation mapping from Next Step operation to PowerAuth operation.
+     *
+     * @param userId User ID of the user for this request.
+     * @param organizationId Organization ID for this request.
+     * @param authMethod Authentication method.
+     * @param operationContext Operation context.
+     * @return Operation mapping from Next Step operation to PowerAuth operation.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<GetPAOperationMappingResponse> getPAOperationMapping(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
+        GetPAOperationMappingRequest request = new GetPAOperationMappingRequest();
+        request.setUserId(userId);
+        request.setOrganizationId(organizationId);
+        request.setAuthMethod(authMethod);
+        request.setOperationContext(operationContext);
+        return postObjectImpl("/api/operation/mapping", new ObjectRequest<>(request), GetPAOperationMappingResponse.class);
+    }
+
+    /**
      * Verify client TLS certificate.
      *
      * @param userId User ID for this authentication request.

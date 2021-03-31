@@ -71,6 +71,9 @@ public class NextStepServerConfiguration {
     @Value("${powerauth.nextstep.identity.credential.generateUsernameMaxAttempts}")
     private int generateUsernameMaxAttempts;
 
+    @Value("${powerauth.nextstep.pa.operations.enabled}")
+    private boolean powerAuthOperationSupportEnabled;
+
     @Value("${powerauth.nextstep.e2eEncryption.key}")
     private String e2eEncryptionKey;
 
@@ -118,6 +121,14 @@ public class NextStepServerConfiguration {
      */
     public int getGenerateUsernameMaxAttempts() {
         return generateUsernameMaxAttempts;
+    }
+
+    /**
+     * Get whether PowerAuth operations support is enabled.
+     * @return Whether PowerAuth operations support is enabled.
+     */
+    public boolean isPowerAuthOperationSupportEnabled() {
+        return powerAuthOperationSupportEnabled;
     }
 
     /**

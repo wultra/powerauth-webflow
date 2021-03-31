@@ -41,7 +41,7 @@ public class InitAuthMethodRequest {
     private AuthMethod authMethod;
 
     /**
-     * Operation context which provides context for creating the consent form.
+     * Operation context.
      */
     private OperationContext operationContext;
 
@@ -56,7 +56,7 @@ public class InitAuthMethodRequest {
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param authMethod Authentication method.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * @param operationContext Operation context.
      */
     public InitAuthMethodRequest(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) {
         this.userId = userId;
@@ -114,16 +114,16 @@ public class InitAuthMethodRequest {
     }
 
     /**
-     * Get operation context which provides context for creating the consent form.
-     * @return Operation context which provides context for creating the consent form.
+     * Get operation context.
+     * @return Operation context.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context which provides context for creating the consent form.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * Set operation context.
+     * @param operationContext Operation context.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;

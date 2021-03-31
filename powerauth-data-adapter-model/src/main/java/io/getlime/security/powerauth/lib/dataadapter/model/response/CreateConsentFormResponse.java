@@ -29,7 +29,7 @@ import java.util.List;
 public class CreateConsentFormResponse {
 
     private String consentHtml;
-    private List<ConsentOption> options;
+    private final List<ConsentOption> options;
 
     /**
      * Default constructor.
