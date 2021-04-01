@@ -261,6 +261,7 @@ public class CredentialPolicyService {
             throw new CredentialPolicyNotFoundException("Credential policy is already REMOVED: " + request.getCredentialPolicyName());
         }
         credentialPolicy.setStatus(CredentialPolicyStatus.REMOVED);
+        credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicyRepository.save(credentialPolicy);
         DeleteCredentialPolicyResponse response = new DeleteCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());

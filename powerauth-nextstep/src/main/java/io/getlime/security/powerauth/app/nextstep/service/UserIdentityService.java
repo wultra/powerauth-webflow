@@ -405,6 +405,7 @@ public class UserIdentityService {
         for (UserIdentityEntity user: users) {
             if (user.getStatus() != request.getUserIdentityStatus()) {
                 user.setStatus(request.getUserIdentityStatus());
+                user.setTimestampLastUpdated(new Date());
                 // Save user identity and a snapshot to the history table
                 userIdentityRepository.save(user);
                 saveUserIdentityHistory(user);
@@ -430,6 +431,7 @@ public class UserIdentityService {
     public DeleteUserResponse deleteUser(DeleteUserRequest request) throws UserNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         user.setStatus(UserIdentityStatus.REMOVED);
+        user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
         saveUserIdentityHistory(user);
@@ -452,9 +454,10 @@ public class UserIdentityService {
     public BlockUserResponse blockUser(BlockUserRequest request) throws UserNotFoundException, UserNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
-            throw new UserNotActiveException("User identity is not BLOCKED: " + request.getUserId());
+            throw new UserNotActiveException("User identity is not ACTIVE: " + request.getUserId());
         }
         user.setStatus(UserIdentityStatus.BLOCKED);
+        user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
         saveUserIdentityHistory(user);
@@ -478,6 +481,7 @@ public class UserIdentityService {
             throw new UserNotBlockedException("User identity is not BLOCKED: " + request.getUserId());
         }
         user.setStatus(UserIdentityStatus.ACTIVE);
+        user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
         saveUserIdentityHistory(user);

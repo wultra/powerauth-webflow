@@ -151,6 +151,7 @@ public class ApplicationService {
         }
         ApplicationEntity application = applicationOptional.get();
         application.setStatus(ApplicationStatus.REMOVED);
+        application.setTimestampLastUpdated(new Date());
         applicationRepository.save(application);
         DeleteApplicationResponse response = new DeleteApplicationResponse();
         response.setApplicationName(application.getName());

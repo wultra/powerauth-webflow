@@ -224,6 +224,7 @@ public class OtpDefinitionService {
             throw new OtpDefinitionNotFoundException("One time password definition is already REMOVED: " + request.getOtpDefinitionName());
         }
         otpDefinition.setStatus(OtpDefinitionStatus.REMOVED);
+        otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinitionRepository.save(otpDefinition);
         DeleteOtpDefinitionResponse response = new DeleteOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());

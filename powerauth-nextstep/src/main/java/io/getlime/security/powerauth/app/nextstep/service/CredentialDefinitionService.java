@@ -302,6 +302,7 @@ public class CredentialDefinitionService {
             throw new CredentialDefinitionNotFoundException("Credential definition is already REMOVED: " + request.getCredentialDefinitionName());
         }
         credentialDefinition.setStatus(CredentialDefinitionStatus.REMOVED);
+        credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
         DeleteCredentialDefinitionResponse response = new DeleteCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());

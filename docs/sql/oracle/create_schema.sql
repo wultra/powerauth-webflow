@@ -295,7 +295,8 @@ CREATE TABLE ns_hashing_config (
   algorithm                VARCHAR2(256 CHAR) NOT NULL,                     -- Hashing algorithm name.
   status                   VARCHAR2(32 CHAR) NOT NULL,                      -- Hashing configuration status: ACTIVE, REMOVED.
   parameters               VARCHAR2(256 CHAR),                              -- Hashing algorithm parameters.
-  timestamp_created        TIMESTAMP                                        -- Timestamp when hashing configuration was created.
+  timestamp_created        TIMESTAMP,                                       -- Timestamp when hashing configuration was created.
+  timestamp_last_updated   TIMESTAMP                                        -- Timestamp when hashing configuration was last updated.
 );
 
 -- Table ns_credential_definition stores definitions of credentials with reference to credential policies and applications.

@@ -129,7 +129,7 @@ public class HashConfigService {
                 throw new InvalidRequestException(ex);
             }
         }
-        hashConfig.setTimestampCreated(new Date());
+        hashConfig.setTimestampLastUpdated(new Date());
         hashConfigRepository.save(hashConfig);
         UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
@@ -176,6 +176,7 @@ public class HashConfigService {
         HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.REMOVED) {
             hashConfig.setStatus(HashConfigStatus.REMOVED);
+            hashConfig.setTimestampLastUpdated(new Date());
             hashConfigRepository.save(hashConfig);
         }
         DeleteHashConfigResponse response = new DeleteHashConfigResponse();

@@ -60,4 +60,7 @@ public class HashConfigEntity implements Serializable {
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 
+    @Column(name = "timestamp_last_updated")
+    private Date timestampLastUpdated;
+
 }
