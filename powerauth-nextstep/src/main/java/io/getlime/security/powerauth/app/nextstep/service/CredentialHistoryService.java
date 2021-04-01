@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +38,12 @@ public class CredentialHistoryService {
     private final Logger logger = LoggerFactory.getLogger(CredentialHistoryService.class);
 
     private final CredentialHistoryRepository credentialHistoryRepository;
+    private final CredentialProtectionService credentialProtectionService;
 
     @Autowired
-    public CredentialHistoryService(CredentialHistoryRepository credentialHistoryRepository) {
+    public CredentialHistoryService(CredentialHistoryRepository credentialHistoryRepository, CredentialProtectionService credentialProtectionService) {
         this.credentialHistoryRepository = credentialHistoryRepository;
+        this.credentialProtectionService = credentialProtectionService;
     }
 
     /**
@@ -52,6 +56,10 @@ public class CredentialHistoryService {
         credentialHistory.setUser(credential.getUser());
         credentialHistory.setUsername(credential.getUsername());
         credentialHistory.setValue(credential.getValue());
+        credentialHistory.setHashingConfig(credential.getHashingConfig());
+        if (credential.getCredentialDefinition().isEncryptionEnabled()) {
+            credentialHistory.setEncryptionAlgorithm(credential.getEncryptionAlgorithm());
+        }
         credentialHistory.setTimestampCreated(createdDate);
         credentialHistoryRepository.save(credentialHistory);
     }
@@ -62,22 +70,24 @@ public class CredentialHistoryService {
      * @param credentialValue Credential value to check.
      * @param credentialDefinition Credential definition.
      * @return True if credential check succeeded, false when credential check failed.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public boolean checkCredentialHistory(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) {
+    public boolean checkCredentialHistory(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
         CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         int credentialHistoryCount = credentialPolicy.getCheckHistoryCount();
         if (credentialHistoryCount == 0) {
             return true;
         }
-        int historyPassCount = 0;
+        int historyPassCounter = 0;
         List<CredentialHistoryEntity> history = credentialHistoryRepository.findAllByUserOrderByTimestampCreatedDesc(user);
         for (CredentialHistoryEntity h : history) {
-            String originalValue = h.getValue();
-            if (credentialValue.equals(originalValue)) {
+            boolean matchFound = credentialProtectionService.verifyCredentialHistory(credentialValue, h);
+            if (matchFound) {
                 return false;
             }
-            historyPassCount++;
-            if (historyPassCount == credentialHistoryCount) {
+            historyPassCounter++;
+            if (historyPassCounter == credentialHistoryCount) {
                 // Check is complete
                 break;
             }

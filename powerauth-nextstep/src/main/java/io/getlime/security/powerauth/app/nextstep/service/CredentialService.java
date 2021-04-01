@@ -259,9 +259,10 @@ public class CredentialService {
      * @return Get credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException {
+    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
@@ -321,8 +322,9 @@ public class CredentialService {
      * @param unprotectedCredentialValue Unprotected credential value.
      * @return Whether credential change is required.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
+    public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException, EncryptionException {
         // Check expiration time
         Date expirationTime = credential.getTimestampExpires();
         if (expirationTime != null && new Date().after(expirationTime)) {
@@ -375,8 +377,6 @@ public class CredentialService {
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        // Save original credential into credential history
-        credentialHistoryService.createCredentialHistory(credential, new Date());
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
@@ -385,6 +385,7 @@ public class CredentialService {
         CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
+        credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);

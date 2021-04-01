@@ -335,9 +335,10 @@ public class UserIdentityService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         return getUserDetail(request.getUserId(), request.isIncludeRemoved());
     }
 
@@ -349,8 +350,9 @@ public class UserIdentityService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public GetUserDetailResponse getUserDetail(String userId, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+    public GetUserDetailResponse getUserDetail(String userId, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());

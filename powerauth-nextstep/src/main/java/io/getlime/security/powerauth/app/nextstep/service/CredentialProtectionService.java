@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialHistoryEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.model.Argon2Hash;
@@ -140,7 +141,34 @@ public class CredentialProtectionService {
     }
 
     /**
-     * Extract a credential value.
+     * Verify a credential value.
+     * @param credentialValue Credential value sent by user.
+     * @param history Credential history entity.
+     * @return Whether credential value matches expected credential value.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    public boolean verifyCredentialHistory(String credentialValue, CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
+        CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
+        HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
+        String decryptedCredentialValue = extractCredentialValue(history);
+        if (hashingConfig == null) {
+            return credentialValue.equals(decryptedCredentialValue);
+        }
+        HashAlgorithm algorithm = hashingConfig.getAlgorithm();
+        switch (algorithm) {
+            case ARGON_2I:
+            case ARGON_2D:
+            case ARGON_2ID:
+                return verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
+
+            default:
+                throw new InvalidConfigurationException("Unsupported hashing algorithm: " + algorithm);
+        }
+    }
+
+    /**
+     * Extract a credential value from credential.
      * @param credential Credential entity.
      * @return Extracted credential value.
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
@@ -150,6 +178,20 @@ public class CredentialProtectionService {
         CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         String userId = credential.getUser().getUserId();
         CredentialValue credentialValueStored = new CredentialValue(credential.getEncryptionAlgorithm(), credential.getValue());
+        return credentialValueConverter.fromDBValue(credentialValueStored, userId, credentialDefinition);
+    }
+
+    /**
+     * Extract a credential value from credential history.
+     * @param history Credential history entity.
+     * @return Extracted credential value.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    public String extractCredentialValue(CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
+        CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
+        String userId = history.getUser().getUserId();
+        CredentialValue credentialValueStored = new CredentialValue(history.getEncryptionAlgorithm(), history.getValue());
         return credentialValueConverter.fromDBValue(credentialValueStored, userId, credentialDefinition);
     }
 

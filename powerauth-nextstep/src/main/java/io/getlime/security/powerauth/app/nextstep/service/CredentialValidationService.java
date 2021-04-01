@@ -26,6 +26,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidat
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import org.passay.*;
@@ -72,10 +73,11 @@ public class CredentialValidationService {
      * @return List of validation errors.
      * @throws InvalidRequestException Thrown in case request is invalid.
      * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     public List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                                  String username, String credentialValue,
-                                                                 CredentialValidationMode validationMode) throws InvalidRequestException, InvalidConfigurationException {
+                                                                 CredentialValidationMode validationMode) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
         List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         switch (validationMode) {
             case NO_VALIDATION:
@@ -151,8 +153,9 @@ public class CredentialValidationService {
      * @param credentialDefinition Credential definition.
      * @return List of validation failures.
      * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String username, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) throws InvalidConfigurationException {
+    public List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String username, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) throws InvalidConfigurationException, EncryptionException {
         List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (credentialValue == null || credentialValue.trim().isEmpty()) {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_EMPTY);

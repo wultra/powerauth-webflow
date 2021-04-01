@@ -29,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserReques
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -375,7 +376,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -412,7 +415,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_TOO_SHORT, CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -449,7 +454,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -477,7 +484,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -578,7 +587,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -597,10 +608,6 @@ public class NextStepCredentialTest extends NextStepTest {
         credentialHistory.setUsername("test_history_1");
         credentialHistory.setCredentialValue("Xl34Hn1s@");
         credential.getCredentialHistory().add(credentialHistory);
-        credentialHistory = new CreateUserRequest.CredentialHistory();
-        credentialHistory.setUsername("test_history_1");
-        credentialHistory.setCredentialValue("Oqw*2kd6M");
-        credential.getCredentialHistory().add(credentialHistory);
         createUserRequest.getCredentials().add(credential);
         nextStepClient.createUser(createUserRequest);
         try {
@@ -608,7 +615,9 @@ public class NextStepCredentialTest extends NextStepTest {
         } catch (NextStepClientException ex) {
             assertEquals(CredentialValidationFailedException.CODE, ex.getNextStepError().getCode());
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
+            return;
         }
+        Assert.fail();
     }
 
     @Test
@@ -630,10 +639,6 @@ public class NextStepCredentialTest extends NextStepTest {
         credentialHistory = new CreateUserRequest.CredentialHistory();
         credentialHistory.setUsername("test_history_1");
         credentialHistory.setCredentialValue("Oqw*2kd6M");
-        credential.getCredentialHistory().add(credentialHistory);
-        credentialHistory = new CreateUserRequest.CredentialHistory();
-        credentialHistory.setUsername("test_history_1");
-        credentialHistory.setCredentialValue("rJ2Dmx8&1");
         credential.getCredentialHistory().add(credentialHistory);
         createUserRequest.getCredentials().add(credential);
         nextStepClient.createUser(createUserRequest);

@@ -130,9 +130,10 @@ public class UserController {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         GetUserDetailResponse response = userIdentityService.getUserDetail(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -144,9 +145,10 @@ public class UserController {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
-    public ObjectResponse<LookupUsersResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException {
+    public ObjectResponse<LookupUsersResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         LookupUsersResponse response = userIdentityLookupService.lookupUsers(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -159,9 +161,10 @@ public class UserController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "lookup/single", method = RequestMethod.POST)
-    public ObjectResponse<LookupUserResponse> lookupSingleUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, OperationNotFoundException {
+    public ObjectResponse<LookupUserResponse> lookupSingleUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, EncryptionException {
         LookupUserResponse response = userIdentityLookupService.lookupUser(request.getRequestObject());
         return new ObjectResponse<>(response);
     }
@@ -356,9 +359,10 @@ public class UserController {
      * @return Get user credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException {
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
         GetUserCredentialListResponse response = credentialService.getCredentialList(request.getRequestObject());
         return new ObjectResponse<>(response);
     }

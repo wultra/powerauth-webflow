@@ -24,10 +24,7 @@ import io.getlime.security.powerauth.app.nextstep.service.adapter.UserLookupCust
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserRoleStatus;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUsersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserDetailResponse;
@@ -85,9 +82,10 @@ public class UserIdentityLookupService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public LookupUsersResponse lookupUsers(LookupUsersRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException {
+    public LookupUsersResponse lookupUsers(LookupUsersRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
         String username = request.getUsername();
         String credentialName = request.getCredentialName();
         Date createdStartDate = request.getCreatedStartDate();
@@ -193,9 +191,10 @@ public class UserIdentityLookupService {
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, OperationNotFoundException {
+    public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, OperationNotFoundException, EncryptionException {
         String username = request.getUsername();
         String credentialName = request.getCredentialName();
         String operationId = request.getOperationId();
