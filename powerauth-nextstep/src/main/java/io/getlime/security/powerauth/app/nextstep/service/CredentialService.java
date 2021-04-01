@@ -227,12 +227,15 @@ public class CredentialService {
                 // Reset counters for active credentials
                 credential.setFailedAttemptCounterSoft(0);
                 credential.setFailedAttemptCounterHard(0);
+                credential.setTimestampBlocked(null);
             }
         }
         credential.setTimestampLastUpdated(new Date());
         credentialRepository.save(credential);
-        // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(credential, new Date());
+        if (request.getCredentialValue() != null) {
+            // Save credential into credential history
+            credentialHistoryService.createCredentialHistory(credential, new Date());
+        }
         UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -516,11 +519,7 @@ public class CredentialService {
      * @throws CredentialNotActiveException Thrown when credential is not active.
      */
     public CredentialEntity findActiveCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
-        if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
-        }
-        CredentialEntity credential = credentialOptional.get();
+        CredentialEntity credential = findCredential(credentialDefinition, user);
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName());
         }
@@ -626,7 +625,7 @@ public class CredentialService {
         credential.setFailedAttemptCounterSoft(0);
         credential.setFailedAttemptCounterHard(0);
         credentialRepository.save(credential);
-        // Save original credential into credential history
+        // Save credential into credential history
         credentialHistoryService.createCredentialHistory(credential, new Date());
         CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
