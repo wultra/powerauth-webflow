@@ -107,7 +107,7 @@ public class OtpValueConverter {
                 // Decrypt credential value
                 try {
                     byte[] decryptedCredentialValue = aes.decrypt(encryptedCredentialValue, iv, secretKey);
-                    return new String(decryptedCredentialValue);
+                    return new String(decryptedCredentialValue, StandardCharsets.UTF_8);
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
                 }

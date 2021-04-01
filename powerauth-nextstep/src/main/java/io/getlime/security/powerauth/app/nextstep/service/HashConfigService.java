@@ -119,7 +119,6 @@ public class HashConfigService {
         if (hashConfig.getStatus() != HashConfigStatus.ACTIVE && request.getHashConfigStatus() != HashConfigStatus.ACTIVE) {
             throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
         }
-        hashConfig.setName(request.getHashConfigName());
         hashConfig.setAlgorithm(request.getAlgorithm());
         hashConfig.setStatus(HashConfigStatus.ACTIVE);
         if (request.getParameters() != null) {

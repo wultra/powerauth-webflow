@@ -132,7 +132,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create authorization SMS message with new OTP authorization code.
+     * Create and send authorization SMS message with new OTP authorization code.
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
@@ -144,7 +144,7 @@ public class DataAdapterClient {
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAndSendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
         return postObjectImpl("/api/auth/sms/create", new ObjectRequest<>(request), CreateSmsAuthorizationResponse.class);
     }

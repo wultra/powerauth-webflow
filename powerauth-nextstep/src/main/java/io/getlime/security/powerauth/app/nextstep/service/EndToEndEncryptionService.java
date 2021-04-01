@@ -149,7 +149,7 @@ public class EndToEndEncryptionService {
             byte[] iv = BaseEncoding.base64().decode(parts[0]);
             byte[] encryptedBytes = BaseEncoding.base64().decode(parts[1]);
             byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
-            return new String(decryptedBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
             throw new EncryptionException(ex);
         }
