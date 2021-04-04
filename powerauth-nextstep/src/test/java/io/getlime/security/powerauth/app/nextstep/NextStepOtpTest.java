@@ -33,7 +33,7 @@ import java.util.UUID;
 import static org.junit.Assert.*;
 
 /**
- * Next Step credential tests.
+ * Next Step OTP tests.
  *
  * @author Roman Strobl, roman.strobl@wulta.com
  */

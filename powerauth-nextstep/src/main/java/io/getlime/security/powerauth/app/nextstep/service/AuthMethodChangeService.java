@@ -138,7 +138,7 @@ public class AuthMethodChangeService {
      * @return Update operation response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public UpdateOperationResponse enableMobileToken(UpdateOperationResponse response, OperationEntity operation) throws InvalidConfigurationException {
+    private UpdateOperationResponse enableMobileToken(UpdateOperationResponse response, OperationEntity operation) throws InvalidConfigurationException {
         String userId = operation.getUserId();
         if (userId == null) {
             // User ID must be set before mobile token is enabled

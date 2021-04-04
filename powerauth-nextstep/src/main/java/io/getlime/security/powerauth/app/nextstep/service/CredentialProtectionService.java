@@ -151,7 +151,7 @@ public class CredentialProtectionService {
     public boolean verifyCredentialHistory(String credentialValue, CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
         CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
         HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
-        String decryptedCredentialValue = extractCredentialValue(history);
+        String decryptedCredentialValue = extractCredentialValueForHistory(history);
         if (hashingConfig == null) {
             return credentialValue.equals(decryptedCredentialValue);
         }
@@ -188,7 +188,7 @@ public class CredentialProtectionService {
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
      * @throws EncryptionException Thrown when decryption fails.
      */
-    public String extractCredentialValue(CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
+    private String extractCredentialValueForHistory(CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
         CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
         String userId = history.getUser().getUserId();
         CredentialValue credentialValueStored = new CredentialValue(history.getEncryptionAlgorithm(), history.getValue());
