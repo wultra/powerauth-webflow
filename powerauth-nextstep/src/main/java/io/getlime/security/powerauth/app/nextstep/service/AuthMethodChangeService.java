@@ -145,9 +145,12 @@ public class AuthMethodChangeService {
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
         }
-        boolean enabled = mobileTokenConfigurationService.enableMobileToken(operation);
+        String paOperationId = mobileTokenConfigurationService.enableMobileToken(operation);
+        boolean enabled = paOperationId != null;
         response.setMobileTokenActive(enabled);
-        if (!enabled) {
+        if (enabled) {
+            response.setPowerAuthOperationId(paOperationId);
+        } else {
             // Mobile token is not available, return failed result
             response.getSteps().clear();
             response.setResult(AuthResult.FAILED);

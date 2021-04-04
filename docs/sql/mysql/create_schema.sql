@@ -437,6 +437,7 @@ CREATE TABLE ns_operation_history (
   chosen_auth_method          VARCHAR(32),                         -- Information about which authentication method was chosen, in case user can chose the authentication method.
   mobile_token_active         BOOLEAN NOT NULL DEFAULT FALSE,      -- Information about if mobile token is active during the particular authentication step, in order to show the mobile token operation at the right time.
   authentication_id           VARCHAR(256),                        -- Reference to the authentication record.
+  pa_operation_id             VARCHAR(256),                        -- PowerAuth operation ID for PowerAuth operations.
   PRIMARY KEY (operation_id, result_id),
   FOREIGN KEY ns_history_operation_fk (operation_id) REFERENCES ns_operation (operation_id),
   FOREIGN KEY ns_history_auth_method_fk (request_auth_method) REFERENCES ns_auth_method (auth_method),

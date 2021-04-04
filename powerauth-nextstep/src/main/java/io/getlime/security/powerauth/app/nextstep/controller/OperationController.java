@@ -379,9 +379,10 @@ public class OperationController {
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation/mobileToken/status", method = RequestMethod.PUT)
-    public Response updateMobileToken(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
+    public Response updateMobileToken(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         return updateMobileTokenImpl(request);
     }
 
@@ -391,13 +392,14 @@ public class OperationController {
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "operation/mobileToken/status/update", method = RequestMethod.POST)
-    public @ResponseBody Response updateMobileTokenPost(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
+    public @ResponseBody Response updateMobileTokenPost(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         return updateMobileTokenImpl(request);
     }
 
-    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException {
+    private Response updateMobileTokenImpl(ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         logger.info("Received updateMobileToken request, operation ID: {}, mobile token active: {}", request.getRequestObject().getOperationId(), request.getRequestObject().isMobileTokenActive());
         // persist mobile token update
         operationPersistenceService.updateMobileToken(request.getRequestObject());

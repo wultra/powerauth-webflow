@@ -223,6 +223,7 @@ public class OperationPersistenceService {
         operationHistory.setResponseResultDescription(response.getResultDescription());
         operationHistory.setChosenAuthMethod(response.getChosenAuthMethod());
         operationHistory.setMobileTokenActive(response.isMobileTokenActive());
+        operationHistory.setPowerAuthOperationId(response.getPowerAuthOperationId());
         try {
             // Params, steps and auth instruments are saved as JSON for now - new entities would be required to store this data.
             // We can add these entities later in case they are needed.
@@ -340,8 +341,10 @@ public class OperationPersistenceService {
      *
      * @param request Request to update mobile token status.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException {
+    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -351,7 +354,15 @@ public class OperationPersistenceService {
         if (currentHistory == null) {
             throw new OperationNotValidException("Operation is missing history");
         }
-        currentHistory.setMobileTokenActive(request.isMobileTokenActive());
+        if (request.isMobileTokenActive()) {
+            String paOperationId = mobileTokenConfigurationService.enableMobileToken(operation);
+            boolean enabled = paOperationId != null;
+            currentHistory.setMobileTokenActive(enabled);
+            currentHistory.setPowerAuthOperationId(paOperationId);
+        } else {
+            currentHistory.setMobileTokenActive(false);
+            currentHistory.setPowerAuthOperationId(null);
+        }
         operationHistoryRepository.save(currentHistory);
     }
 

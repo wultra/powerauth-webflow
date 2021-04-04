@@ -64,6 +64,7 @@ public class UpdateOperationResponse {
     private final List<AuthStep> steps = new ArrayList<>();
     private AuthMethod chosenAuthMethod;
     private boolean mobileTokenActive;
+    private String powerAuthOperationId;
     private OperationFormData formData;
 
 }
