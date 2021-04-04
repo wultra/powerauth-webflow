@@ -22,9 +22,11 @@ public class OperationHistory {
     private AuthResult authResult;
     @NotNull
     private AuthStepResult requestAuthStepResult;
+    @Size(min = 2, max = 256)
+    private String authStepResultDescription;
     @NotNull
     private boolean mobileTokenActive;
     @Size(min = 1, max = 256)
-    private String paOperationId;
+    private String powerAuthOperationId;
 
 }

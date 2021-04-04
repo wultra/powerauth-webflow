@@ -16,7 +16,6 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.controller;
 
-import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
@@ -49,7 +48,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -267,14 +265,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         try {
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
-            List<GetOperationDetailResponse> canceledOperations = new ArrayList<>();
             for (GetOperationDetailResponse operation: responseObject) {
-                OperationStatus status = powerAuthOperationService.getOperationStatus(operation);
-                if (status != null && status != OperationStatus.PENDING) {
-                    handlePowerAuthOperationStatusChange(operation, status);
-                    canceledOperations.add(operation);
-                    continue;
-                }
                 FormData formData = formDataConverter.fromOperationFormData(operation.getFormData());
                 ApplicationContext applicationContext = operation.getApplicationContext();
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
@@ -285,7 +276,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }
-            responseObject.removeAll(canceledOperations);
             return responseObject;
         } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
@@ -294,30 +284,6 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             logger.error("Error occurred in Data Adapter server", ex);
             throw new CommunicationFailedException("Operation mapping is not available");
         }
-    }
-
-    /**
-     * Handle status change of PowerAuth operation when it does not correspond to Next Step operation status.
-     * @param operation Operation detail.
-     * @param status Operation status.
-     * @throws CommunicationFailedException Throw when communication with Next Step fails.
-     */
-    private void handlePowerAuthOperationStatusChange(GetOperationDetailResponse operation, OperationStatus status) throws CommunicationFailedException {
-        OperationCancelReason reason;
-        AuthMethod authMethod = getAuthMethodName(operation);
-        switch (status) {
-            case EXPIRED:
-                reason = OperationCancelReason.TIMED_OUT_OPERATION;
-                break;
-            case CANCELED:
-                reason = OperationCancelReason.INTERRUPTED_OPERATION;
-                break;
-            default:
-                reason = OperationCancelReason.UNEXPECTED_ERROR;
-                break;
-        }
-        // Operation is no longer pending in PowerAuth server, cancel Next Step operation
-        operationCancellationService.cancelOperation(operation, authMethod, reason, false);
     }
 
     /**

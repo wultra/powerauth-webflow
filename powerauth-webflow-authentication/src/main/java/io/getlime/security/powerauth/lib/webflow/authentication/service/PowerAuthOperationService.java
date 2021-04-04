@@ -88,7 +88,7 @@ public class PowerAuthOperationService {
         }
         OperationHistory currentHistory = history.get(history.size() - 1);
         boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPaOperationId();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return true;
         }
@@ -144,7 +144,7 @@ public class PowerAuthOperationService {
         }
         OperationHistory currentHistory = history.get(history.size() - 1);
         boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPaOperationId();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return true;
         }
@@ -185,7 +185,7 @@ public class PowerAuthOperationService {
         }
         OperationHistory currentHistory = history.get(history.size() - 1);
         boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPaOperationId();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return true;
         }
@@ -237,7 +237,7 @@ public class PowerAuthOperationService {
         }
         OperationHistory currentHistory = history.get(history.size() - 1);
         boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPaOperationId();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return true;
         }
@@ -261,7 +261,7 @@ public class PowerAuthOperationService {
     }
 
     /**
-     * Cancel a PowerAuth operation.
+     * Get PowerAuth operation status.
      * @param operation Operation detail.
      * @return PowerAuth operation status.
      */
@@ -276,7 +276,7 @@ public class PowerAuthOperationService {
         }
         OperationHistory currentHistory = history.get(history.size() - 1);
         boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPaOperationId();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return null;
         }

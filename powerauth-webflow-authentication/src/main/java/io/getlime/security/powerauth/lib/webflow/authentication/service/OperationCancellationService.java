@@ -95,7 +95,7 @@ public class OperationCancellationService {
                 List<OperationHistory> history = operationDetail.getHistory();
                 if (!history.isEmpty()) {
                     OperationHistory h = history.get(history.size() - 1);
-                    if (h.isMobileTokenActive() && h.getPaOperationId() != null) {
+                    if (h.isMobileTokenActive() && h.getPowerAuthOperationId() != null) {
                         paCancelSucceeded = powerAuthOperationService.cancelOperation(operationDetail);
                     }
                 }

@@ -16,14 +16,17 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.model.request.OperationCreateRequest;
+import com.wultra.security.powerauth.client.model.request.OperationDetailRequest;
 import com.wultra.security.powerauth.client.model.response.OperationDetailResponse;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
@@ -107,6 +110,35 @@ public class PowerAuthOperationService {
             OperationDetailResponse paResponse = powerAuthClient.createOperation(request);
             return paResponse.getId();
         } catch (PowerAuthClientException | DataAdapterClientErrorException ex) {
+            logger.warn(ex.getMessage(), ex);
+        }
+        return null;
+    }
+
+    /**
+     * Get PowerAuth operation status.
+     * @param operation Operation entity.
+     * @return PowerAuth operation status.
+     */
+    public OperationStatus getOperationStatus(OperationEntity operation) {
+        boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
+        if (!operationEnabled) {
+            return null;
+        }
+        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        boolean mobileTokenActive = currentHistory.isMobileTokenActive();
+        String paOperationId = currentHistory.getPowerAuthOperationId();
+        if (!mobileTokenActive || paOperationId == null) {
+            return null;
+        }
+
+        try {
+            OperationDetailRequest request = new OperationDetailRequest();
+            request.setOperationId(paOperationId);
+
+            OperationDetailResponse paResponse = powerAuthClient.operationDetail(request);
+            return paResponse.getStatus();
+        } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
         }
         return null;

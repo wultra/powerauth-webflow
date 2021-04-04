@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
@@ -31,6 +32,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserA
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
@@ -68,6 +70,7 @@ public class OperationPersistenceService {
     private final StepResolutionService stepResolutionService;
     private final AuthenticationRepository authenticationRepository;
     private final OperationCustomizationService operationCustomizationService;
+    private final PowerAuthOperationService powerAuthOperationService;
 
     /**
      * Service constructor.
@@ -79,12 +82,13 @@ public class OperationPersistenceService {
      * @param stepResolutionService           Step resolution service.
      * @param authenticationRepository        Authentication repository.
      * @param operationCustomizationService   Operation customization service.
+     * @param powerAuthOperationService       PowerAuth operation service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
                                        OrganizationRepository organizationRepository, OperationHistoryRepository operationHistoryRepository,
                                        MobileTokenConfigurationService mobileTokenConfigurationService,
-                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository, OperationCustomizationService operationCustomizationService) {
+                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository, OperationCustomizationService operationCustomizationService, PowerAuthOperationService powerAuthOperationService) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
         this.organizationRepository = organizationRepository;
@@ -93,6 +97,7 @@ public class OperationPersistenceService {
         this.stepResolutionService = stepResolutionService;
         this.authenticationRepository = authenticationRepository;
         this.operationCustomizationService = operationCustomizationService;
+        this.powerAuthOperationService = powerAuthOperationService;
     }
 
     /**
@@ -254,7 +259,7 @@ public class OperationPersistenceService {
         String userId = request.getUserId();
         String organizationId = request.getOrganizationId();
         UserAccountStatus accountStatus = request.getAccountStatus();
-        OperationEntity operation = getOperation(operationId);
+        OperationEntity operation = getOperation(operationId, false);
         operation.setUserId(userId);
         if (organizationId != null) {
             Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
@@ -402,16 +407,32 @@ public class OperationPersistenceService {
     /**
      * Retrieve an OperationEntity for given operationId from database.
      *
-     * @param operationId id of an operation
-     * @return OperationEntity loaded from database
+     * @param operationId ID of an operation.
+     * @return OperationEntity loaded from database.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public OperationEntity getOperation(String operationId) throws OperationNotFoundException {
+        return getOperation(operationId, false);
+    }
+
+    /**
+     * Retrieve an OperationEntity for given operationId from database.
+     *
+     * @param operationId ID of an operation.
+     * @param validateOperation Whether operation should be validated.
+     * @return OperationEntity loaded from database.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
+     */
+    public OperationEntity getOperation(String operationId, boolean validateOperation) throws OperationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
         }
-        return operationOptional.get();
+        OperationEntity operation = operationOptional.get();
+        if (validateOperation) {
+            validateMobileTokenOperationStatus(operation);
+        }
+        return operation;
     }
 
     /**
@@ -441,16 +462,63 @@ public class OperationPersistenceService {
         }
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            // Add operations whose last step has CONTINUE result and chosen authentication method supports mobile token and it is active
-            OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
-            if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
-                AuthMethod chosenAuthMethod = currentHistoryEntity.getChosenAuthMethod();
-                if (mobileTokenConfigurationService.isMobileTokenActive(userId, operation.getOperationName(), chosenAuthMethod)) {
-                    filteredList.add(operation);
-                }
+            boolean mobileTokenActive = validateMobileTokenOperationStatus(operation);
+            if (mobileTokenActive) {
+                filteredList.add(operation);
             }
         }
         return filteredList;
+    }
+
+    /**
+     * Validate a mobile token operation status.
+     * @param operation Operation entity.
+     * @return Whether operation is a pending operation with an active PowerAuth token.
+     */
+    private boolean validateMobileTokenOperationStatus(OperationEntity operation) {
+        OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
+        if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
+            OperationStatus status = powerAuthOperationService.getOperationStatus(operation);
+            if (status != null && status != OperationStatus.PENDING) {
+                handlePowerAuthOperationStatusChange(operation, status);
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Handle status change of PowerAuth operation when it does not correspond to Next Step operation status.
+     * @param operation Operation entity.
+     * @param status Operation status.
+     */
+    private void handlePowerAuthOperationStatusChange(OperationEntity operation, OperationStatus status) {
+        OperationCancelReason reason;
+        switch (status) {
+            case EXPIRED:
+                reason = OperationCancelReason.TIMED_OUT_OPERATION;
+                break;
+            case CANCELED:
+                reason = OperationCancelReason.INTERRUPTED_OPERATION;
+                break;
+            default:
+                reason = OperationCancelReason.UNEXPECTED_ERROR;
+                break;
+        }
+        // Operation is no longer pending in PowerAuth server, cancel Next Step operation
+        UpdateOperationRequest request = new UpdateOperationRequest();
+        request.setOperationId(operation.getOperationId());
+        request.setUserId(operation.getUserId());
+        request.setOperationId(operation.getOperationId());
+        request.setAuthMethod(operation.getCurrentOperationHistoryEntity().getChosenAuthMethod());
+        request.setAuthStepResult(AuthStepResult.CANCELED);
+        request.setAuthStepResultDescription(reason.toString());
+        try {
+            updateOperation(request);
+        } catch (Exception ex) {
+            logger.warn(ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -501,7 +569,7 @@ public class OperationPersistenceService {
     public void createAfsAction(CreateAfsActionRequest request) {
         try {
             OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
-            OperationEntity operation = getOperation(request.getOperationId());
+            OperationEntity operation = getOperation(request.getOperationId(), false);
             afsEntity.setOperation(operation);
             afsEntity.setAfsAction(request.getAfsAction());
             afsEntity.setStepIndex(request.getStepIndex());

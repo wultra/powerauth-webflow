@@ -217,7 +217,12 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 clearCurrentBrowserSession();
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CANCELED);
-                response.setMessage("operation.canceled");
+                String reasonTimeout = "canceled." + OperationCancelReason.TIMED_OUT_OPERATION.toString().toLowerCase();
+                if (reasonTimeout.equals(h.getAuthStepResultDescription())) {
+                    response.setMessage("operation.timeout");
+                } else {
+                    response.setMessage("operation.alreadyFailed");
+                }
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                 cleanHttpSession();
                 logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
