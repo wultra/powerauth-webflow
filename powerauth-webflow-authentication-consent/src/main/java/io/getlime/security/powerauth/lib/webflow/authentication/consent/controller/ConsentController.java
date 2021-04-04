@@ -341,7 +341,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     public ConsentAuthResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, false);
             final ConsentAuthResponse cancelResponse = new ConsentAuthResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");

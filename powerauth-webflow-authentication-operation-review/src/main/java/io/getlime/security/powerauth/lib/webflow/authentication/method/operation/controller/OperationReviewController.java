@@ -208,7 +208,7 @@ public class OperationReviewController extends AuthMethodController<OperationRev
     public @ResponseBody OperationReviewResponse cancelAuthentication() throws AuthStepException {
         try {
             GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, false);
             final OperationReviewResponse response = new OperationReviewResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

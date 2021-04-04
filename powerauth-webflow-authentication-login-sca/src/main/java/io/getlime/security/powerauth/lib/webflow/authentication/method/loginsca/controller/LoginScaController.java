@@ -35,7 +35,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserA
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -333,7 +332,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     public AuthStepResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final AuthStepResponse response = new AuthStepResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

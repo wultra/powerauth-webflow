@@ -71,6 +71,12 @@ public class WebFlowServicesConfiguration {
     private boolean offlineModeAvailable;
 
     /**
+     * Whether PowerAuth operations support is enabled.
+     */
+    @Value("${powerauth.webflow.pa.operations.enabled}")
+    private boolean powerAuthOperationSupportEnabled;
+
+    /**
      * Authentication type which configures how username and password is transferred for verification.
      */
     @Value("${powerauth.webflow.password.protection.type:NO_PROTECTION}")
@@ -196,6 +202,14 @@ public class WebFlowServicesConfiguration {
      */
     public boolean isOfflineModeAvailable() {
         return offlineModeAvailable;
+    }
+
+    /**
+     * Whether PowerAuth operations support is enabled.
+     * @return Whether PowerAuth operations support is enabled.
+     */
+    public boolean isPowerAuthOperationSupportEnabled() {
+        return powerAuthOperationSupportEnabled;
     }
 
     /**

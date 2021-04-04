@@ -239,7 +239,7 @@ public class ApprovalScaController extends AuthMethodController<ApprovalScaAuthR
     public AuthStepResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final AuthStepResponse response = new AuthStepResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

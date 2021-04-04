@@ -40,6 +40,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDet
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationIsAlreadyFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationNotConfiguredException;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.InvalidActivationException;
@@ -49,6 +50,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.con
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.WebSocketMessageService;
 import io.getlime.security.powerauth.rest.api.base.authentication.PowerAuthApiAuthentication;
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
@@ -83,6 +85,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
     private final WebSocketMessageService webSocketMessageService;
     private final AuthMethodQueryService authMethodQueryService;
     private final DataAdapterClient dataAdapterClient;
+    private final PowerAuthOperationService powerAuthOperationService;
 
     private final FormDataConverter formDataConverter = new FormDataConverter();
 
@@ -91,12 +94,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
      * @param webSocketMessageService Web Socket message service.
      * @param authMethodQueryService Authentication method query service.
      * @param dataAdapterClient Data Adapter client.
+     * @param powerAuthOperationService PowerAuth operation service.
      */
     @Autowired
-    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, DataAdapterClient dataAdapterClient) {
+    public MobileAppApiController(WebSocketMessageService webSocketMessageService, AuthMethodQueryService authMethodQueryService, DataAdapterClient dataAdapterClient, PowerAuthOperationService powerAuthOperationService) {
         this.webSocketMessageService = webSocketMessageService;
         this.authMethodQueryService = authMethodQueryService;
         this.dataAdapterClient = dataAdapterClient;
+        this.powerAuthOperationService = powerAuthOperationService;
     }
 
     /**
@@ -168,7 +173,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 return new ObjectResponse<>(new OperationListResponse());
             }
 
-
             // Prepare converter
             final OperationConverter converter = new OperationConverter();
 
@@ -236,10 +240,12 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
             throw new InvalidRequestObjectException();
         }
 
+        String operationId = request.getRequestObject().getId();
+        final GetOperationDetailResponse operation = getOperation(operationId);
+
         if (apiAuthentication != null && apiAuthentication.getUserId() != null) {
             String activationId = apiAuthentication.getActivationId();
             String userId = apiAuthentication.getUserId();
-            String operationId = request.getRequestObject().getId();
 
             // Verify that the activation ID from context matches configured activation ID for given user.
             if (!verifyActivationId(activationId, userId)) {
@@ -248,7 +254,6 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
 
             try {
 
-                final GetOperationDetailResponse operation = getOperation(operationId);
                 FormData formData = formDataConverter.fromOperationFormData(operation.getFormData());
                 ApplicationContext applicationContext = operation.getApplicationContext();
                 OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
@@ -266,10 +271,18 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                         && operation.getUserId() != null
                         && operation.getUserId().equals(apiAuthentication.getUserId())) {
                     final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
+                    boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, activationId, apiAuthentication.getSignatureFactors().toString());
+                    if (!approvalSucceeded) {
+                        throw new OperationIsAlreadyFailedException("Operation approval has failed");
+                    }
                     final AuthOperationResponse updateOperationResponse = authorize(operationId, userId, operation.getOrganizationId(), authInstruments, null);
                     webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getAuthResult());
                     return new Response();
                 } else {
+                    boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
+                    if (!approvalFailSucceeded) {
+                        throw new OperationIsAlreadyFailedException("Operation failed approval has failed");
+                    }
                     throw new PowerAuthAuthenticationException();
                 }
             } catch (NextStepClientException | DataAdapterClientErrorException ex) {
@@ -277,6 +290,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new PowerAuthAuthenticationException();
             }
         } else {
+            powerAuthOperationService.failApprovalForOperation(operation);
             throw new PowerAuthAuthenticationException();
         }
     }
@@ -304,9 +318,14 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 throw new InvalidActivationException(activationId);
             }
 
-            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null);
+            final GetOperationDetailResponse operation = getOperation(operationId);
+            boolean rejectSucceeded = powerAuthOperationService.rejectOperation(operation, activationId);
+            final UpdateOperationResponse updateOperationResponse = cancelAuthorization(operationId, userId, OperationCancelReason.fromString(request.getRequestObject().getReason()), null, false);
             if (updateOperationResponse != null) {
                 webSocketMessageService.notifyAuthorizationComplete(operationId, updateOperationResponse.getResult());
+            }
+            if (!rejectSucceeded) {
+                throw new OperationIsAlreadyFailedException("Operation reject has failed");
             }
             return new Response();
 

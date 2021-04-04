@@ -310,7 +310,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
     UsernamePasswordAuthResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, false);
             final UsernamePasswordAuthResponse response = new UsernamePasswordAuthResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");

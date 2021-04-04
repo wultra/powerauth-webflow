@@ -316,7 +316,7 @@ public class HomeController {
         if (pendingUserAuthentication != null) {
             String operationId = pendingUserAuthentication.getOperationId();
             try {
-                operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR);
+                operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.UNEXPECTED_ERROR, true);
             } catch (CommunicationFailedException ex) {
                 // Exception is already logged
                 return "redirect:/oauth/error";

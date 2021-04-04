@@ -16,11 +16,11 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Service which centralizes logic for cancellation of operations.
@@ -45,20 +46,20 @@ public class OperationCancellationService {
     private static final Logger logger = LoggerFactory.getLogger(OperationCancellationService.class);
 
     private final NextStepClient nextStepClient;
-    private final DataAdapterClient dataAdapterClient;
     private final AfsIntegrationService afsIntegrationService;
+    private final PowerAuthOperationService powerAuthOperationService;
     private final OperationCancellationConverter operationCancellationConverter = new OperationCancellationConverter();
 
     /**
      * Service constructor.
      * @param nextStepClient Next Step client.
-     * @param dataAdapterClient Data Adapter client.
      * @param afsIntegrationService AFS integration service.
+     * @param powerAuthOperationService PowerAuth operation service.
      */
-    public OperationCancellationService(NextStepClient nextStepClient, DataAdapterClient dataAdapterClient, AfsIntegrationService afsIntegrationService) {
+    public OperationCancellationService(NextStepClient nextStepClient, AfsIntegrationService afsIntegrationService, PowerAuthOperationService powerAuthOperationService) {
         this.nextStepClient = nextStepClient;
-        this.dataAdapterClient = dataAdapterClient;
         this.afsIntegrationService = afsIntegrationService;
+        this.powerAuthOperationService = powerAuthOperationService;
     }
 
     /**
@@ -68,11 +69,11 @@ public class OperationCancellationService {
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
      */
-    public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason) throws CommunicationFailedException {
+    public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason, boolean cancelPowerAuthOperation) throws CommunicationFailedException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationResponse = nextStepClient.getOperationDetail(operationId);
             final GetOperationDetailResponse operationDetail = operationResponse.getResponseObject();
-            return cancelOperation(operationDetail, authMethod, cancelReason);
+            return cancelOperation(operationDetail, authMethod, cancelReason, cancelPowerAuthOperation);
         } catch (NextStepClientException ex) {
             logger.error("Error occurred while canceling operation", ex);
             throw new CommunicationFailedException("Communication failed while canceling operation");
@@ -86,15 +87,31 @@ public class OperationCancellationService {
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
      */
-    public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason) throws CommunicationFailedException {
+    public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason, boolean cancelPowerAuthOperation) throws CommunicationFailedException {
         try {
+            boolean paCancelSucceeded = true;
+            if (cancelPowerAuthOperation) {
+                // In case a PowerAuth operation is available, cancel it
+                List<OperationHistory> history = operationDetail.getHistory();
+                if (!history.isEmpty()) {
+                    OperationHistory h = history.get(history.size() - 1);
+                    if (h.isMobileTokenActive() && h.getPaOperationId() != null) {
+                        paCancelSucceeded = powerAuthOperationService.cancelOperation(operationDetail);
+                    }
+                }
+            }
             // Cancel operation only in case it is still active
             if (operationDetail.getResult() == AuthResult.CONTINUE) {
-                final ApplicationContext applicationContext = operationDetail.getApplicationContext();
-                ObjectResponse<UpdateOperationResponse> updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
                 // Notify AFS about logout event
                 OperationTerminationReason terminationReason = operationCancellationConverter.convertCancelReason(cancelReason);
                 afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), terminationReason);
+                ObjectResponse<UpdateOperationResponse> updateOperationResponse;
+                // Avoid canceling operation when it already failed due to PowerAuth operation cancellation error
+                if (!paCancelSucceeded) {
+                    return null;
+                }
+                final ApplicationContext applicationContext = operationDetail.getApplicationContext();
+                updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
                 return updateOperationResponse.getResponseObject();
             }
         } catch (NextStepClientException ex) {

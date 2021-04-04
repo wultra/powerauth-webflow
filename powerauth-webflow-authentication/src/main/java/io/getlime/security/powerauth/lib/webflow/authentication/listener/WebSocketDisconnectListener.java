@@ -61,7 +61,7 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
         }
         // Cancel operation due to interrupted operation
         try {
-            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.INTERRUPTED_OPERATION);
+            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.INTERRUPTED_OPERATION, true);
         } catch (CommunicationFailedException ex) {
             // Exception is already logged
         }

@@ -6,6 +6,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Class representing operation history entities.
@@ -21,5 +22,9 @@ public class OperationHistory {
     private AuthResult authResult;
     @NotNull
     private AuthStepResult requestAuthStepResult;
+    @NotNull
+    private boolean mobileTokenActive;
+    @Size(min = 1, max = 256)
+    private String paOperationId;
 
 }

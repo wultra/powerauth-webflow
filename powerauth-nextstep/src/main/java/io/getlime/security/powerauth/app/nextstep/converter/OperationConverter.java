@@ -156,6 +156,8 @@ public class OperationConverter {
             h.setAuthMethod(history.getRequestAuthMethod());
             h.setRequestAuthStepResult(history.getRequestAuthStepResult());
             h.setAuthResult(history.getResponseResult());
+            h.setMobileTokenActive(history.isMobileTokenActive());
+            h.setPaOperationId(history.getPowerAuthOperationId());
             response.getHistory().add(h);
         }
         // set chosen authentication method

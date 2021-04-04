@@ -161,7 +161,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
             // Handle operation expiration
             try {
-                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null, true);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -231,7 +231,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             // when AuthMethod is disabled, operation should fail
             try {
                 logger.info("Operation will be canceled because authentication method is no longer available, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null);
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null, true);
             } catch (CommunicationFailedException ex) {
                 // Exception is already logged
             }
@@ -265,7 +265,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         try {
             GetOperationDetailResponse operation = getOperation();
             AuthMethod authMethod = getAuthMethodName(operation);
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
