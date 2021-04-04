@@ -259,7 +259,7 @@ public class OperationPersistenceService {
         String userId = request.getUserId();
         String organizationId = request.getOrganizationId();
         UserAccountStatus accountStatus = request.getAccountStatus();
-        OperationEntity operation = getOperation(operationId, false);
+        OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
         if (organizationId != null) {
             Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
@@ -569,7 +569,7 @@ public class OperationPersistenceService {
     public void createAfsAction(CreateAfsActionRequest request) {
         try {
             OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
-            OperationEntity operation = getOperation(request.getOperationId(), false);
+            OperationEntity operation = getOperation(request.getOperationId());
             afsEntity.setOperation(operation);
             afsEntity.setAfsAction(request.getAfsAction());
             afsEntity.setStepIndex(request.getStepIndex());

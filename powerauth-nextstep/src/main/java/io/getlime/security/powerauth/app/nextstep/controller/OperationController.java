@@ -204,7 +204,7 @@ public class OperationController {
 
         GetOperationDetailRequest requestObject = request.getRequestObject();
 
-        OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId());
+        OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId(), true);
         GetOperationDetailResponse response = operationConverter.fromEntity(operation);
 
         // add steps from current response
