@@ -362,8 +362,7 @@ public class OperationPersistenceService {
         }
         if (request.isMobileTokenActive()) {
             String paOperationId = mobileTokenConfigurationService.enableMobileToken(operation);
-            boolean enabled = paOperationId != null;
-            currentHistory.setMobileTokenActive(enabled);
+            currentHistory.setMobileTokenActive(true);
             currentHistory.setPowerAuthOperationId(paOperationId);
         } else {
             currentHistory.setMobileTokenActive(false);
@@ -478,6 +477,11 @@ public class OperationPersistenceService {
     private boolean validateMobileTokenOperation(OperationEntity operation) {
         OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
+            if (currentHistoryEntity.getPowerAuthOperationId() == null) {
+                // PowerAuth operation was not created, but mobile token is active
+                return true;
+            }
+            // PowerAuth operation was created, reconcile states of both operations
             OperationDetailResponse detail = powerAuthOperationService.getOperationDetail(operation);
             // PowerAuth operation expired, cancel Next Step operation
             if (detail.getStatus() == OperationStatus.EXPIRED) {
