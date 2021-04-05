@@ -281,7 +281,7 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                 } else {
                     boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
                     if (!approvalFailSucceeded) {
-                        throw new OperationIsAlreadyFailedException("Operation failed approval has failed");
+                        throw new OperationIsAlreadyFailedException("Operation fail approval has failed");
                     }
                     throw new PowerAuthAuthenticationException();
                 }

@@ -159,7 +159,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         } else {
             boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
             if (!approvalFailSucceeded) {
-                throw new OperationIsAlreadyFailedException("Operation failed approval has failed");
+                throw new OperationIsAlreadyFailedException("Operation fail approval has failed");
             }
         }
         BigInteger remainingAttemptsPAObj = signatureResponse.getRemainingAttempts();
@@ -170,9 +170,13 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            AuthOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
-            if (response.getAuthResult() == AuthResult.FAILED) {
-                // FAILED result instead of CONTINUE means the authentication method is failed
+            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+            if (response.getAuthResult() == AuthResult.FAILED || signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+                if (signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+                    // Activation was blocked or removed, cancel the operation
+                    cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null, false);
+                }
+                // FAILED result instead of CONTINUE or non-active activation means the authentication method is failed
                 cleanHttpSession();
                 throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
             }
