@@ -94,7 +94,7 @@ public class PowerAuthOperationService {
 
             // Get operation mapping from Data Adapter
             OperationContext operationContext = operationConverter.toOperationContext(operation);
-            AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getRequestAuthMethod();
+            AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getChosenAuthMethod();
             GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(userId, organizationId, authMethod, operationContext).getResponseObject();
             OperationCreateRequest request = new OperationCreateRequest();
             request.setUserId(operation.getUserId());
@@ -102,7 +102,7 @@ public class PowerAuthOperationService {
             request.setExternalId(operation.getOperationId());
             request.setTemplateName(mappingResponse.getTemplateName());
             Map<String, String> parameters = new LinkedHashMap<>();
-            parameters.put(PARAMETER_OPERATION_DATA, operation.getOperationData());
+            parameters.put(PARAMETER_OPERATION_DATA, mappingResponse.getOperationData());
             request.setParameters(parameters);
 
             // Create PowerAuth operation and store PA operation ID
