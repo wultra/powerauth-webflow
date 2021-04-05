@@ -142,7 +142,7 @@ export function authenticateOffline(activationId, authCode, nonce) {
 /**
  * Update operation form data on the server.
  * @param formData Operation form data.
- * @packag callback Callback function to execute.
+ * @param callback Callback function to execute.
  * @returns {Function} No response in case of OK status, otherwise error is dispatched.
  */
 export function updateFormData(formData, callback) {
