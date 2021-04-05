@@ -106,7 +106,8 @@ export function authenticateOffline(activationId, authCode, nonce) {
                     dispatchAction(dispatch, response);
                     break;
                 }
-                case 'CANCELED': {
+                case 'CANCELED':
+                case 'AUTH_METHOD_FAILED': {
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {
@@ -141,6 +142,7 @@ export function authenticateOffline(activationId, authCode, nonce) {
 /**
  * Update operation form data on the server.
  * @param formData Operation form data.
+ * @packag callback Callback function to execute.
  * @returns {Function} No response in case of OK status, otherwise error is dispatched.
  */
 export function updateFormData(formData, callback) {

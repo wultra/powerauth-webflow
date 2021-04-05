@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
+import com.wultra.security.powerauth.client.model.response.OperationDetailResponse;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
@@ -430,7 +431,7 @@ public class OperationPersistenceService {
         }
         OperationEntity operation = operationOptional.get();
         if (validateOperation) {
-            validateMobileTokenOperationStatus(operation);
+            validateMobileTokenOperation(operation);
         }
         return operation;
     }
@@ -461,7 +462,7 @@ public class OperationPersistenceService {
         }
         List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            boolean mobileTokenActive = validateMobileTokenOperationStatus(operation);
+            boolean mobileTokenActive = validateMobileTokenOperation(operation);
             if (mobileTokenActive) {
                 filteredList.add(operation);
             }
@@ -474,13 +475,18 @@ public class OperationPersistenceService {
      * @param operation Operation entity.
      * @return Whether operation is a pending operation with an active PowerAuth token.
      */
-    private boolean validateMobileTokenOperationStatus(OperationEntity operation) {
+    private boolean validateMobileTokenOperation(OperationEntity operation) {
         OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
-            OperationStatus status = powerAuthOperationService.getOperationStatus(operation);
-            if (status == OperationStatus.EXPIRED) {
+            OperationDetailResponse detail = powerAuthOperationService.getOperationDetail(operation);
+            // PowerAuth operation expired, cancel Next Step operation
+            if (detail.getStatus() == OperationStatus.EXPIRED) {
                 handlePowerAuthOperationExpiration(operation);
                 return false;
+            }
+            // PowerAuth operation expires before Next Step operation, update expiration time
+            if (detail.getTimestampExpires() != null && detail.getTimestampExpires().before(operation.getTimestampExpires())) {
+                operation.setTimestampExpires(detail.getTimestampExpires());
             }
             return true;
         }

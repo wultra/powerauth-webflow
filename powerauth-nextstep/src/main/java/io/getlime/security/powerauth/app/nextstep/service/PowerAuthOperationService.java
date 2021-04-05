@@ -16,7 +16,6 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
-import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.model.request.OperationCreateRequest;
 import com.wultra.security.powerauth.client.model.request.OperationDetailRequest;
@@ -116,11 +115,11 @@ public class PowerAuthOperationService {
     }
 
     /**
-     * Get PowerAuth operation status.
+     * Get PowerAuth operation detail.
      * @param operation Operation entity.
-     * @return PowerAuth operation status.
+     * @return PowerAuth operation detail.
      */
-    public OperationStatus getOperationStatus(OperationEntity operation) {
+    public OperationDetailResponse getOperationDetail(OperationEntity operation) {
         boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
         if (!operationEnabled) {
             return null;
@@ -136,8 +135,7 @@ public class PowerAuthOperationService {
             OperationDetailRequest request = new OperationDetailRequest();
             request.setOperationId(paOperationId);
 
-            OperationDetailResponse paResponse = powerAuthClient.operationDetail(request);
-            return paResponse.getStatus();
+            return powerAuthClient.operationDetail(request);
         } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
         }
