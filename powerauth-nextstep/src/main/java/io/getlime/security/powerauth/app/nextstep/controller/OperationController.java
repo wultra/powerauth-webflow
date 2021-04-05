@@ -262,10 +262,9 @@ public class OperationController {
      *
      * @param request Get pending operations request.
      * @return List with operation details.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "user/operation/list", method = RequestMethod.POST)
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@Valid @RequestBody ObjectRequest<GetPendingOperationsRequest> request) throws InvalidConfigurationException {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@Valid @RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getPendingOperations request, user ID: {}", request.getRequestObject().getUserId());
 

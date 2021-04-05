@@ -452,9 +452,8 @@ public class OperationPersistenceService {
      * @param userId User ID.
      * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      * @return List of operations which match the query.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) throws InvalidConfigurationException {
+    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) {
         List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
         if (!mobileTokenOnly) {
             // Return all unfinished operations for user
@@ -479,8 +478,8 @@ public class OperationPersistenceService {
         OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
             OperationStatus status = powerAuthOperationService.getOperationStatus(operation);
-            if (status != null && status != OperationStatus.PENDING) {
-                handlePowerAuthOperationStatusChange(operation, status);
+            if (status == OperationStatus.EXPIRED) {
+                handlePowerAuthOperationExpiration(operation);
                 return false;
             }
             return true;
@@ -489,31 +488,18 @@ public class OperationPersistenceService {
     }
 
     /**
-     * Handle status change of PowerAuth operation when it does not correspond to Next Step operation status.
+     * Handle status change of PowerAuth operation when it expires in PowerAuth server.
      * @param operation Operation entity.
-     * @param status Operation status.
      */
-    private void handlePowerAuthOperationStatusChange(OperationEntity operation, OperationStatus status) {
-        OperationCancelReason reason;
-        switch (status) {
-            case EXPIRED:
-                reason = OperationCancelReason.TIMED_OUT_OPERATION;
-                break;
-            case CANCELED:
-                reason = OperationCancelReason.INTERRUPTED_OPERATION;
-                break;
-            default:
-                reason = OperationCancelReason.UNEXPECTED_ERROR;
-                break;
-        }
-        // Operation is no longer pending in PowerAuth server, cancel Next Step operation
+    private void handlePowerAuthOperationExpiration(OperationEntity operation) {
+        // Operation expired in PowerAuth server, cancel Next Step operation
         UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operation.getOperationId());
         request.setUserId(operation.getUserId());
         request.setOperationId(operation.getOperationId());
         request.setAuthMethod(operation.getCurrentOperationHistoryEntity().getChosenAuthMethod());
         request.setAuthStepResult(AuthStepResult.CANCELED);
-        request.setAuthStepResultDescription(reason.toString());
+        request.setAuthStepResultDescription(OperationCancelReason.TIMED_OUT_OPERATION.toString());
         try {
             updateOperation(request);
         } catch (Exception ex) {
