@@ -140,7 +140,7 @@ public class UserIdentityLookupService {
         }
 
         if (createdStartDate != null && !dateFiltered) {
-            // Filter by timestampCreated, but only if filter was not alreast applied
+            // Filter by timestampCreated, but only if filter was not already applied
             Date finalCreatedStartDate = createdStartDate;
             Date finalCreatedEndDate = createdEndDate;
             lookupResult = lookupResult.stream()
