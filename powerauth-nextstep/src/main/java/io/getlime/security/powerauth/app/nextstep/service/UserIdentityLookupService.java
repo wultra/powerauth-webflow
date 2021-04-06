@@ -164,7 +164,7 @@ public class UserIdentityLookupService {
             // Filter by roles
             List<UserIdentityEntity> filteredList = new ArrayList<>();
             for (UserIdentityEntity user: lookupResult) {
-                List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserAndStatus(user, UserRoleStatus.ACTIVE);
+                List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
                 List<String> roleNames = userRoles.stream()
                         .map(roleEntity -> roleEntity.getRole().getName())
                         .collect(Collectors.toList());

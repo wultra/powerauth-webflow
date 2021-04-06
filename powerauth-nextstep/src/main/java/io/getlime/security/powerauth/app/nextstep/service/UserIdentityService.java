@@ -20,7 +20,10 @@ import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ValueListConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.*;
+import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
@@ -49,13 +52,9 @@ public class UserIdentityService {
     private final Logger logger = LoggerFactory.getLogger(UserIdentityService.class);
 
     private final UserIdentityRepository userIdentityRepository;
-    private final UserIdentityHistoryRepository userIdentityHistoryRepository;
     private final UserContactService userContactService;
-    private final UserContactRepository userContactRepository;
     private final RoleRepository roleRepository;
-    private final UserRoleRepository userRoleRepository;
     private final CredentialDefinitionRepository credentialDefinitionRepository;
-    private final CredentialRepository credentialRepository;
     private final OtpRepository otpRepository;
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialService credentialService;
@@ -69,28 +68,20 @@ public class UserIdentityService {
     /**
      * Service constructor.
      * @param userIdentityRepository User identity repository.
-     * @param userIdentityHistoryRepository User identity history repository.
      * @param userContactService User contact service.
-     * @param userContactRepository User contact repository.
      * @param roleRepository Role repository.
-     * @param userRoleRepository User role repository.
      * @param credentialDefinitionRepository Credential definition repository.
-     * @param credentialRepository Credential repository.
      * @param otpRepository OTP repository.
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialService Credential service.
      * @param endToEndEncryptionService End-to-end encryption service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserIdentityHistoryRepository userIdentityHistoryRepository, UserContactService userContactService, UserContactRepository userContactRepository, RoleRepository roleRepository, UserRoleRepository userRoleRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactService userContactService, RoleRepository roleRepository, CredentialDefinitionRepository credentialDefinitionRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
         this.userIdentityRepository = userIdentityRepository;
-        this.userIdentityHistoryRepository = userIdentityHistoryRepository;
         this.userContactService = userContactService;
-        this.userContactRepository = userContactRepository;
         this.roleRepository = roleRepository;
-        this.userRoleRepository = userRoleRepository;
         this.credentialDefinitionRepository = credentialDefinitionRepository;
-        this.credentialRepository = credentialRepository;
         this.otpRepository = otpRepository;
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialService = credentialService;
@@ -152,7 +143,6 @@ public class UserIdentityService {
         user.setUserId(request.getUserId());
         user.setStatus(UserIdentityStatus.ACTIVE);
         user.setTimestampCreated(new Date());
-        userIdentityRepository.save(user);
 
         CreateUserResponse response = new CreateUserResponse();
         response.setUserId(user.getUserId());
@@ -219,7 +209,9 @@ public class UserIdentityService {
             response.getContacts().addAll(addedContacts);
         }
         // Save user identity snapshot to the history table
-        saveUserIdentityHistory(user);
+        updateUserIdentityHistory(user);
+        // Save user identity
+        userIdentityRepository.save(user);
         return response;
     }
 
@@ -324,7 +316,7 @@ public class UserIdentityService {
             response.getContacts().addAll(updatedContacts);
         }
         // Save user identity snapshot to the history table
-        saveUserIdentityHistory(user);
+        updateUserIdentityHistory(user);
         return response;
     }
 
@@ -367,14 +359,14 @@ public class UserIdentityService {
                 throw new InvalidRequestException(ex);
             }
         }
-        List<UserRoleEntity> userRoles = userRoleRepository.findAllByUserAndStatus(user, UserRoleStatus.ACTIVE);
+        List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
         userRoles.forEach(userRole -> response.getRoles().add(userRole.getRole().getName()));
-        List<UserContactEntity> userContacts = userContactRepository.findAllByUser(user);
+        Set<UserContactEntity> userContacts = user.getContacts();
         for (UserContactEntity userContact: userContacts) {
             UserContactDetail contactDetail = userContactConverter.fromEntity(userContact);
             response.getContacts().add(contactDetail);
         }
-        List<CredentialEntity> credentials = credentialRepository.findAllByUser(user);
+        Set<CredentialEntity> credentials = user.getCredentials();
         for (CredentialEntity credential: credentials) {
             if (credential.getStatus() == CredentialStatus.REMOVED && !includeRemoved) {
                 continue;
@@ -408,7 +400,7 @@ public class UserIdentityService {
                 user.setTimestampLastUpdated(new Date());
                 // Save user identity and a snapshot to the history table
                 userIdentityRepository.save(user);
-                saveUserIdentityHistory(user);
+                updateUserIdentityHistory(user);
             }
             updatedUserIds.add(user.getUserId());
         }
@@ -434,7 +426,7 @@ public class UserIdentityService {
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
-        saveUserIdentityHistory(user);
+        updateUserIdentityHistory(user);
         removeAllCredentials(user);
         removeAllOtps(user);
         DeleteUserResponse response = new DeleteUserResponse();
@@ -460,7 +452,7 @@ public class UserIdentityService {
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
-        saveUserIdentityHistory(user);
+        updateUserIdentityHistory(user);
         BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -484,7 +476,7 @@ public class UserIdentityService {
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         userIdentityRepository.save(user);
-        saveUserIdentityHistory(user);
+        updateUserIdentityHistory(user);
         UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -495,11 +487,11 @@ public class UserIdentityService {
      * Save snapshot of user identity into user identity history. This method is not transactional.
      * @param user User identity entity.
      */
-    public void saveUserIdentityHistory(UserIdentityEntity user) {
+    public void updateUserIdentityHistory(UserIdentityEntity user) {
         UserIdentityHistoryEntity history = new UserIdentityHistoryEntity();
         history.setUser(user);
         history.setStatus(user.getStatus());
-        List<UserRoleEntity> userRoles = userRoleRepository.findAllByUser(user);
+        Set<UserRoleEntity> userRoles = user.getRoles();
         List<String> roles = userRoles.stream()
                 .filter(role -> role.getStatus() == UserRoleStatus.ACTIVE)
                 .map(role -> role.getRole().getName())
@@ -511,7 +503,7 @@ public class UserIdentityService {
         }
         history.setExtras(user.getExtras());
         history.setTimestampCreated(new Date());
-        userIdentityHistoryRepository.save(history);
+        user.getUserIdentityHistory().add(history);
     }
 
     /**
@@ -541,7 +533,7 @@ public class UserIdentityService {
      * @param roleEntities Role entities present in the database.
      */
     private void updateRoles(UserIdentityEntity user, List<String> roles, Map<String, RoleEntity> roleEntities) {
-        List<UserRoleEntity> existingRoles = userRoleRepository.findAllByUser(user);
+        Set<UserRoleEntity> existingRoles = user.getRoles();
         Map<String, UserRoleEntity> existingRoleMap = new HashMap<>();
         existingRoles.forEach(userRole -> existingRoleMap.put(userRole.getRole().getName(), userRole));
         for (String roleToAdd : roles) {
@@ -553,12 +545,11 @@ public class UserIdentityService {
                 userRole.setRole(roleEntities.get(roleToAdd));
                 userRole.setStatus(UserRoleStatus.ACTIVE);
                 userRole.setTimestampCreated(new Date());
-                userRoleRepository.save(userRole);
+                user.getRoles().add(userRole);
             } else if (existingRole.getStatus() == UserRoleStatus.REMOVED) {
                 // Make removed role active
                 existingRole.setStatus(UserRoleStatus.ACTIVE);
                 existingRole.setTimestampLastUpdated(new Date());
-                userRoleRepository.save(existingRole);
             }
         }
         existingRoleMap.keySet().forEach(roleName -> {
@@ -567,7 +558,6 @@ public class UserIdentityService {
                 UserRoleEntity existingRole = existingRoleMap.get(roleName);
                 if (existingRole.getStatus() != UserRoleStatus.REMOVED) {
                     existingRole.setStatus(UserRoleStatus.REMOVED);
-                    userRoleRepository.save(existingRole);
                 }
             }
         });
@@ -582,7 +572,7 @@ public class UserIdentityService {
      */
     private List<UserContactDetail> updateContacts(UserIdentityEntity user, List<UserContactDetail> contacts) {
         List<UserContactDetail> contactListResponse = new ArrayList<>();
-        List<UserContactEntity> existingContacts = userContactRepository.findAllByUser(user);
+        Set<UserContactEntity> existingContacts = user.getContacts();
         Map<String, UserContactEntity> existingContactMap = new HashMap<>();
         existingContacts.forEach(userContact -> existingContactMap.put(userContact.getName(), userContact));
         // Persist new or update existing contacts
@@ -593,13 +583,13 @@ public class UserIdentityService {
                 userContact.setName(contactToAdd.getContactName());
                 userContact.setUser(user);
                 userContact.setTimestampCreated(new Date());
+                user.getContacts().add(userContact);
             } else {
                 userContact.setTimestampLastUpdated(new Date());
             }
             userContact.setType(contactToAdd.getContactType());
             userContact.setValue(contactToAdd.getContactValue());
             userContact.setPrimary(contactToAdd.isPrimary());
-            userContactRepository.save(userContact);
             UserContactDetail contactDetail = new UserContactDetail();
             contactDetail.setContactName(userContact.getName());
             contactDetail.setContactType(userContact.getType());
@@ -612,7 +602,7 @@ public class UserIdentityService {
         // Remove obsolete contacts
         existingContactMap.forEach((contactName, contactEntity) -> {
             if (contacts.stream().noneMatch(c -> c.getContactName().equals(contactName))) {
-                userContactRepository.delete(contactEntity);
+                user.getContacts().remove(contactEntity);
             }
         });
         // Ensure primary contacts are unique
@@ -626,7 +616,7 @@ public class UserIdentityService {
      * @param activeCredentials Credentials which should remain active.
      */
     private void removeInactiveCredentials(UserIdentityEntity user, List<CredentialSecretDetail> activeCredentials) {
-        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUser(user);
+        Set<CredentialEntity> existingCredentials = user.getCredentials();
         List<String> credentialsToKeep = activeCredentials
                 .stream()
                 .map(CredentialSecretDetail::getCredentialName)
@@ -635,7 +625,6 @@ public class UserIdentityService {
             if (!credentialsToKeep.contains(credential.getCredentialDefinition().getName())
                     && credential.getStatus() != CredentialStatus.REMOVED) {
                 credential.setStatus(CredentialStatus.REMOVED);
-                credentialRepository.save(credential);
             }
         });
     }
@@ -645,11 +634,10 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllCredentials(UserIdentityEntity user) {
-        List<CredentialEntity> existingCredentials = credentialRepository.findAllByUser(user);
+        Set<CredentialEntity> existingCredentials = user.getCredentials();
         existingCredentials.forEach(credential -> {
             if (credential.getStatus() != CredentialStatus.REMOVED) {
                 credential.setStatus(CredentialStatus.REMOVED);
-                credentialRepository.save(credential);
             }
         });
     }

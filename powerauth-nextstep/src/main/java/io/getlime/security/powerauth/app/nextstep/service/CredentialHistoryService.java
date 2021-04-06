@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
-import io.getlime.security.powerauth.app.nextstep.repository.CredentialHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -25,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 /**
  * This service handles persistence of credential history.
@@ -37,12 +36,14 @@ public class CredentialHistoryService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialHistoryService.class);
 
-    private final CredentialHistoryRepository credentialHistoryRepository;
     private final CredentialProtectionService credentialProtectionService;
 
+    /**
+     * Service constructor.
+     * @param credentialProtectionService Credential protection service.
+     */
     @Autowired
-    public CredentialHistoryService(CredentialHistoryRepository credentialHistoryRepository, CredentialProtectionService credentialProtectionService) {
-        this.credentialHistoryRepository = credentialHistoryRepository;
+    public CredentialHistoryService(CredentialProtectionService credentialProtectionService) {
         this.credentialProtectionService = credentialProtectionService;
     }
 
@@ -50,7 +51,7 @@ public class CredentialHistoryService {
      * Create a credential history record.
      * @param credential Credential entity.
      */
-    public void createCredentialHistory(CredentialEntity credential, Date createdDate) {
+    public void createCredentialHistory(UserIdentityEntity user, CredentialEntity credential, Date createdDate) {
         CredentialHistoryEntity credentialHistory = new CredentialHistoryEntity();
         credentialHistory.setCredentialDefinition(credential.getCredentialDefinition());
         credentialHistory.setUser(credential.getUser());
@@ -61,7 +62,7 @@ public class CredentialHistoryService {
             credentialHistory.setEncryptionAlgorithm(credential.getEncryptionAlgorithm());
         }
         credentialHistory.setTimestampCreated(createdDate);
-        credentialHistoryRepository.save(credentialHistory);
+        user.getCredentialHistory().add(credentialHistory);
     }
 
     /**
@@ -80,7 +81,7 @@ public class CredentialHistoryService {
             return true;
         }
         int historyPassCounter = 0;
-        List<CredentialHistoryEntity> history = credentialHistoryRepository.findAllByUserOrderByTimestampCreatedDesc(user);
+        Set<CredentialHistoryEntity> history = user.getCredentialHistory();
         for (CredentialHistoryEntity h : history) {
             boolean matchFound = credentialProtectionService.verifyCredentialHistory(credentialValue, h);
             if (matchFound) {

@@ -17,7 +17,6 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -34,27 +33,12 @@ import java.util.Optional;
 public interface CredentialRepository extends CrudRepository<CredentialEntity, String> {
 
     /**
-     * Find credentials by user identity.
-     * @param user User identity entity.
-     * @return All credentials for a user identity.
-     */
-    List<CredentialEntity> findAllByUser(UserIdentityEntity user);
-
-    /**
      * Find credentials by credential definition and credential status.
      * @param credentialDefinition Credential definition.
      * @param status Credential status.
      * @return Credentials matching query criteria.
      */
     List<CredentialEntity> findAllByCredentialDefinitionAndStatus(CredentialDefinitionEntity credentialDefinition, CredentialStatus status);
-
-    /**
-     * Find credential by credential definition and user identity.
-     * @param credentialDefinition Credential definition.
-     * @param user User identity entity.
-     * @return Credential matching query criteria.
-     */
-    Optional<CredentialEntity> findByCredentialDefinitionAndUser(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user);
 
     /**
      * Find credential by credential name and username.

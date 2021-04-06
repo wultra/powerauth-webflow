@@ -18,7 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserAliasConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.UserAliasRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserAliasEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAliasDetail;
@@ -42,8 +42,9 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * This service handles persistence of user aliases.
@@ -56,7 +57,7 @@ public class UserAliasService {
     private final Logger logger = LoggerFactory.getLogger(UserAliasService.class);
 
     private final UserIdentityLookupService userIdentityLookupService;
-    private final UserAliasRepository userAliasRepository;
+    private final UserIdentityRepository userIdentityRepository;
 
     private final UserAliasConverter userAliasConverter = new UserAliasConverter();
     private final ExtrasConverter extrasConverter = new ExtrasConverter();
@@ -64,12 +65,12 @@ public class UserAliasService {
     /**
      * User alias service constructor.
      * @param userIdentityLookupService User identity lookup service.
-     * @param userAliasRepository User alias repository.
+     * @param userIdentityRepository User identity repository.
      */
     @Autowired
-    public UserAliasService(UserIdentityLookupService userIdentityLookupService, UserAliasRepository userAliasRepository) {
+    public UserAliasService(UserIdentityLookupService userIdentityLookupService, UserIdentityRepository userIdentityRepository) {
         this.userIdentityLookupService = userIdentityLookupService;
-        this.userAliasRepository = userAliasRepository;
+        this.userIdentityRepository = userIdentityRepository;
     }
 
     /**
@@ -83,7 +84,7 @@ public class UserAliasService {
     @Transactional
     public CreateUserAliasResponse createUserAlias(CreateUserAliasRequest request) throws UserNotFoundException, UserAliasAlreadyExistsException, InvalidRequestException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserAliasEntity> aliasOptional = userAliasRepository.findByUserAndName(user, request.getAliasName());
+        Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         UserAliasEntity alias;
         if (aliasOptional.isPresent()) {
             alias = aliasOptional.get();
@@ -96,6 +97,7 @@ public class UserAliasService {
             alias.setUser(user);
             alias.setName(request.getAliasName());
             alias.setTimestampCreated(new Date());
+            user.getAliases().add(alias);
         }
         alias.setValue(request.getAliasValue());
         alias.setStatus(UserAliasStatus.ACTIVE);
@@ -107,7 +109,7 @@ public class UserAliasService {
                 throw new InvalidRequestException(ex);
             }
         }
-        userAliasRepository.save(alias);
+        userIdentityRepository.save(user);
         CreateUserAliasResponse response = new CreateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -127,11 +129,11 @@ public class UserAliasService {
     @Transactional
     public GetUserAliasListResponse getUserAliasList(GetUserAliasListRequest request) throws UserNotFoundException, InvalidRequestException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        List<UserAliasEntity> aliases;
+        Set<UserAliasEntity> aliases;
         if (request.isIncludeRemoved()) {
-            aliases = userAliasRepository.findAllByUser(user);
+            aliases = user.getAliases();
         } else {
-            aliases = userAliasRepository.findAllByUserAndStatus(user, UserAliasStatus.ACTIVE);
+            aliases = user.getAliases().stream().filter(alias -> alias.getStatus() == UserAliasStatus.ACTIVE).collect(Collectors.toSet());
         }
         GetUserAliasListResponse response = new GetUserAliasListResponse();
         response.setUserId(user.getUserId());
@@ -157,7 +159,7 @@ public class UserAliasService {
     @Transactional
     public UpdateUserAliasResponse updateUserAlias(UpdateUserAliasRequest request) throws UserNotFoundException, InvalidRequestException, UserAliasNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserAliasEntity> aliasOptional = userAliasRepository.findByUserAndName(user, request.getAliasName());
+        Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         UserAliasEntity alias;
         if (!aliasOptional.isPresent()) {
             throw new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId());
@@ -180,7 +182,7 @@ public class UserAliasService {
                 throw new InvalidRequestException(ex);
             }
         }
-        userAliasRepository.save(alias);
+        userIdentityRepository.save(user);
         UpdateUserAliasResponse response = new UpdateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -202,7 +204,7 @@ public class UserAliasService {
     @Transactional
     public DeleteUserAliasResponse deleteUserAlias(DeleteUserAliasRequest request) throws UserNotFoundException, UserAliasNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<UserAliasEntity> aliasOptional = userAliasRepository.findByUserAndName(user, request.getAliasName());
+        Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         UserAliasEntity alias;
         if (!aliasOptional.isPresent()) {
             throw new UserAliasNotFoundException("User alias not found: " + request.getAliasName() + ", user ID: " + request.getUserId());
@@ -214,7 +216,7 @@ public class UserAliasService {
         }
         alias.setStatus(UserAliasStatus.REMOVED);
         alias.setTimestampLastUpdated(new Date());
-        userAliasRepository.save(alias);
+        userIdentityRepository.save(user);
         DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());

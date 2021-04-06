@@ -18,10 +18,13 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 /**
  * Entity which stores user identities.
@@ -52,5 +55,35 @@ public class UserIdentityEntity implements Serializable {
 
     @Column(name = "timestamp_last_updated")
     private Date timestampLastUpdated;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated")
+    @ToString.Exclude
+    private Set<UserContactEntity> contacts = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated")
+    @ToString.Exclude
+    private Set<CredentialEntity> credentials = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated")
+    @ToString.Exclude
+    private Set<UserAliasEntity> aliases = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated")
+    @ToString.Exclude
+    private Set<UserRoleEntity> roles = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated DESC")
+    @ToString.Exclude
+    private Set<CredentialHistoryEntity> credentialHistory = new LinkedHashSet<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OrderBy("timestampCreated DESC")
+    @ToString.Exclude
+    private Set<UserIdentityHistoryEntity> userIdentityHistory = new LinkedHashSet<>();
 
 }

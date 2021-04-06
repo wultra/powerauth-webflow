@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRoleEntity;
@@ -51,21 +51,21 @@ public class UserRoleService {
     private final UserIdentityService userIdentityService;
     private final UserIdentityLookupService userIdentityLookupService;
     private final RoleRepository roleRepository;
-    private final UserRoleRepository userRoleRepository;
+    private final UserIdentityRepository userIdentityRepository;
 
     /**
      * Service constructor.
      * @param userIdentityService User identity service.
      * @param userIdentityLookupService User identity lookup service.
      * @param roleRepository Role repository.
-     * @param userRoleRepository User role repository.
+     * @param userIdentityRepository User identity repository.
      */
     @Autowired
-    public UserRoleService(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
+    public UserRoleService(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserIdentityRepository userIdentityRepository) {
         this.userIdentityService = userIdentityService;
         this.userIdentityLookupService = userIdentityLookupService;
         this.roleRepository = roleRepository;
-        this.userRoleRepository = userRoleRepository;
+        this.userIdentityRepository = userIdentityRepository;
     }
 
     /**
@@ -84,7 +84,7 @@ public class UserRoleService {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
         RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserAndRole(user, role);
+        Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
         UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();
@@ -97,11 +97,12 @@ public class UserRoleService {
             userRole.setUser(user);
             userRole.setRole(role);
             userRole.setTimestampCreated(new Date());
+            user.getRoles().add(userRole);
         }
         userRole.setStatus(UserRoleStatus.ACTIVE);
-        userRoleRepository.save(userRole);
         // Save user identity and a snapshot to the history table
-        userIdentityService.saveUserIdentityHistory(user);
+        userIdentityService.updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
@@ -125,7 +126,7 @@ public class UserRoleService {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
         RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = userRoleRepository.findByUserAndRole(user, role);
+        Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
         UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();
@@ -137,9 +138,10 @@ public class UserRoleService {
         } else {
             throw new UserRoleNotAssignedException("Role is not assigned: " + request.getRoleName() + ", user ID: " + user.getUserId());
         }
-        userRoleRepository.save(userRole);
+        user.getRoles().remove(userRole);
         // Save user identity and a snapshot to the history table
-        userIdentityService.saveUserIdentityHistory(user);
+        userIdentityService.updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
