@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -69,11 +70,13 @@ public class AuthMethodChangeService {
      * @return Update operation response.
      */
     public UpdateOperationResponse downgradeAuthMethod(UpdateOperationRequest request, UpdateOperationResponse response, List<StepDefinitionEntity> stepDefinitions) {
+        logger.info("Authentication downgrade started for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         AuthMethod targetAuthMethod = request.getTargetAuthMethod();
         if (targetAuthMethod == null) {
             // Invalid request - authentication method downgrade expects a target authentication method
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
+            logger.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
         for (StepDefinitionEntity stepDef : stepDefinitions) {
@@ -82,12 +85,14 @@ public class AuthMethodChangeService {
                 authStep.setAuthMethod(targetAuthMethod);
                 response.getSteps().add(authStep);
                 response.setResult(AuthResult.CONTINUE);
+                logger.info("Authentication downgrade succeeded for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
                 return response;
             }
         }
         // Target authentication method set for downgrade is not available
         response.setResult(AuthResult.FAILED);
         response.setResultDescription("error.noAuthMethod");
+        logger.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         return response;
     }
 
@@ -100,12 +105,14 @@ public class AuthMethodChangeService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public UpdateOperationResponse setChosenAuthMethod(UpdateOperationRequest request, UpdateOperationResponse response) throws InvalidConfigurationException, OperationNotFoundException {
+        logger.info("Set chosen authentication method started for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         String operationId = request.getOperationId();
         AuthMethod targetAuthMethod = request.getTargetAuthMethod();
         if (targetAuthMethod == null) {
             // Invalid request - authentication method choice expects a target authentication method
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
+            logger.info("Set chosen authentication method failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
         Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
@@ -117,6 +124,7 @@ public class AuthMethodChangeService {
             // Invalid request - authentication method choice expects a CONTINUE operation result
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
+            logger.info("Set chosen authentication method failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
         response.setChosenAuthMethod(targetAuthMethod);
@@ -124,8 +132,10 @@ public class AuthMethodChangeService {
         response.setResult(AuthResult.CONTINUE);
         if (targetAuthMethod == AuthMethod.POWERAUTH_TOKEN) {
             // Specific logic for enabling POWERAUTH_TOKEN authentication method
+            logger.info("Set chosen authentication method succeeded for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return enableMobileToken(response, operation);
         }
+        logger.info("Set chosen authentication method succeeded for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         // Other methods do not have any extra steps
         return response;
     }
@@ -139,22 +149,24 @@ public class AuthMethodChangeService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private UpdateOperationResponse enableMobileToken(UpdateOperationResponse response, OperationEntity operation) throws InvalidConfigurationException {
+        logger.info("Enable mobile token started for operation ID: {}", operation.getOperationId());
         String userId = operation.getUserId();
         if (userId == null) {
             // User ID must be set before mobile token is enabled
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
         }
-        String paOperationId = mobileTokenConfigurationService.enableMobileToken(operation);
-        boolean enabled = paOperationId != null;
-        response.setMobileTokenActive(enabled);
-        if (enabled) {
-            response.setPowerAuthOperationId(paOperationId);
+        EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
+        response.setMobileTokenActive(result.isEnabled());
+        if (result.isEnabled()) {
+            response.setPowerAuthOperationId(result.getPowerAuthOperationId());
+            logger.info("Enable mobile token succeeded for operation ID: {}", operation.getOperationId());
         } else {
             // Mobile token is not available, return failed result
             response.getSteps().clear();
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("operation.methodNotAvailable");
+            logger.info("Enable mobile token failed for operation ID: {}", operation.getOperationId());
         }
         return response;
     }

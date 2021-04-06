@@ -253,7 +253,7 @@ public class OperationController {
 
         GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigList();
 
-        logger.debug("The getOperationConfigList request succeeded");
+        logger.debug("The getOperationConfigList request succeeded, operation config list size: {}", response.getOperationConfigs().size());
         return new ObjectResponse<>(response);
     }
 
@@ -474,7 +474,9 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@Valid @RequestBody ObjectRequest<CreateOperationConfigRequest> request) throws OperationConfigAlreadyExists {
+        logger.info("Received createOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
         CreateOperationConfigResponse response = operationConfigurationService.createOperationConfig(request.getRequestObject());
+        logger.info("The createOperationConfig request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
 
@@ -487,7 +489,9 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@Valid @RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
+        logger.info("Received deleteOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
         DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
+        logger.info("The deleteOperationConfig request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
 
@@ -501,7 +505,9 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/auth-method/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationMethodConfigResponse> createOperationMethodConfig(@Valid @RequestBody ObjectRequest<CreateOperationMethodConfigRequest> request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
+        logger.info("Received createOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         CreateOperationMethodConfigResponse response = operationConfigurationService.createOperationMethodConfig(request.getRequestObject());
+        logger.info("The createOperationMethodConfig request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 
@@ -513,7 +519,9 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
+        logger.info("Received getOperationMethodConfigDetail request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
+        logger.info("The getOperationMethodConfigDetail request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 
@@ -525,7 +533,9 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/auth-method/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationMethodConfigResponse> deleteOperationMethodConfig(@Valid @RequestBody ObjectRequest<DeleteOperationMethodConfigRequest> request) throws OperationMethodConfigNotFoundException {
+        logger.info("Received deleteOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         DeleteOperationMethodConfigResponse response = operationConfigurationService.deleteOperationMethodConfig(request.getRequestObject());
+        logger.info("The deleteOperationMethodConfig request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 

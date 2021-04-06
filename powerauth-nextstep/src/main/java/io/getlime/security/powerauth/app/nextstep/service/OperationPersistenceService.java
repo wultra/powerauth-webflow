@@ -28,6 +28,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.OperationCustomizationService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -361,9 +362,9 @@ public class OperationPersistenceService {
             throw new OperationNotValidException("Operation is missing history");
         }
         if (request.isMobileTokenActive()) {
-            String paOperationId = mobileTokenConfigurationService.enableMobileToken(operation);
-            currentHistory.setMobileTokenActive(true);
-            currentHistory.setPowerAuthOperationId(paOperationId);
+            EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
+            currentHistory.setMobileTokenActive(result.isEnabled());
+            currentHistory.setPowerAuthOperationId(result.getPowerAuthOperationId());
         } else {
             currentHistory.setMobileTokenActive(false);
             currentHistory.setPowerAuthOperationId(null);

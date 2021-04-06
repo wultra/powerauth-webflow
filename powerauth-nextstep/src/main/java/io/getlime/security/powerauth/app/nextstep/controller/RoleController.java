@@ -68,7 +68,9 @@ public class RoleController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateRoleResponse> createRole(@Valid @RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
+        logger.info("Received createRole request, role name: {}", request.getRequestObject().getRoleName());
         CreateRoleResponse response = roleService.createRole(request.getRequestObject());
+        logger.info("The createRole request succeeded, role name: {}", request.getRequestObject().getRoleName());
         return new ObjectResponse<>(response);
     }
 
@@ -79,7 +81,9 @@ public class RoleController {
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetRoleListResponse> getRoleList(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
+        logger.info("Received getRoleList request");
         GetRoleListResponse response = roleService.getRoleList(request.getRequestObject());
+        logger.info("The getRoleList request succeeded");
         return new ObjectResponse<>(response);
     }
 
@@ -92,7 +96,9 @@ public class RoleController {
      */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteRoleResponse> deleteRole(@Valid @RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, DeleteNotAllowedException {
+        logger.info("Received deleteRole request, role name: {}", request.getRequestObject().getRoleName());
         DeleteRoleResponse response = roleService.deleteRole(request.getRequestObject());
+        logger.info("The deleteRole request succeeded, role name: {}", request.getRequestObject().getRoleName());
         return new ObjectResponse<>(response);
     }
 

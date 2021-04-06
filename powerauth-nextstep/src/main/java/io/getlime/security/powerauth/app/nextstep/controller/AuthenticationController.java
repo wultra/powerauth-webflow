@@ -77,7 +77,9 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "credential", method = RequestMethod.POST)
     public ObjectResponse<CredentialAuthenticationResponse> authenticateWithCredential(@Valid @RequestBody ObjectRequest<CredentialAuthenticationRequest> request) throws InvalidRequestException, UserNotFoundException, OperationNotFoundException, CredentialNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
+        logger.info("Received authenticateWithCredential request, user ID: {}, operation ID: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId());
         CredentialAuthenticationResponse response = authenticationService.authenticateWithCredential(request.getRequestObject());
+        logger.info("The authenticateWithCredential request succeeded, user ID: {}, operation ID: {}, result: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), response.getAuthenticationResult());
         return new ObjectResponse<>(response);
     }
 
@@ -99,7 +101,9 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "otp", method = RequestMethod.POST)
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(@Valid @RequestBody ObjectRequest<OtpAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidRequestException, OperationAlreadyFailedException, OperationAlreadyFinishedException, InvalidConfigurationException, OperationAlreadyCanceledException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
+        logger.info("Received authenticateWithOtp request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         OtpAuthenticationResponse response = authenticationService.authenticateWithOtp(request.getRequestObject());
+        logger.info("The authenticateWithOtp succeeded, OTP ID: {}, operation ID: {}, result: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId(), response.getAuthenticationResult());
         return new ObjectResponse<>(response);
     }
 
@@ -122,7 +126,9 @@ public class AuthenticationController {
      */
     @RequestMapping(value = "combined", method = RequestMethod.POST)
     public ObjectResponse<CombinedAuthenticationResponse> authenticateCombined(@Valid @RequestBody ObjectRequest<CombinedAuthenticationRequest> request) throws AuthMethodNotFoundException, InvalidConfigurationException, InvalidRequestException, UserNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, CredentialNotFoundException, OperationNotFoundException, OtpNotFoundException, OperationNotValidException, EncryptionException {
+        logger.info("Received authenticateCombined request, user ID: {}, OTP ID: {}, operation ID: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), request.getRequestObject().getOtpId());
         CombinedAuthenticationResponse response = authenticationService.authenticateCombined(request.getRequestObject());
+        logger.info("The authenticateCombined request succeeded, user ID: {}, OTP ID: {}, operation ID: {}, result: {}", request.getRequestObject().getUserId(), request.getRequestObject().getOperationId(), request.getRequestObject().getOtpId(), response.getAuthenticationResult());
         return new ObjectResponse<>(response);
     }
 

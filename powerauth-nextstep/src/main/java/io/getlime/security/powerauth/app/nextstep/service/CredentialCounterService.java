@@ -95,7 +95,6 @@ public class CredentialCounterService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
-        credential.setAttemptCounter(credential.getAttemptCounter() + 1);
         CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
         Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
@@ -124,6 +123,10 @@ public class CredentialCounterService {
 
         }
         credentialRepository.save(credential);
+        logger.info("Credential counter updated, user ID: {}, credential name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
+                credential.getUser().getUserId(), credential.getCredentialDefinition().getName(),
+                credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(),
+                credential.getFailedAttemptCounterHard(), credential.getStatus());
     }
 
     /**

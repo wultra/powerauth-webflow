@@ -20,6 +20,7 @@ import com.wultra.security.powerauth.client.model.error.PowerAuthClientException
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -148,26 +149,27 @@ public class MobileTokenConfigurationService {
      * Enable mobile token authentication method.
      *
      * @param operation Operation entity.
-     * @return PowerAuth operation ID or null when operation was not created.
+     * @return Enable mobile token result.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public String enableMobileToken(OperationEntity operation) throws InvalidConfigurationException {
+    public EnableMobileTokenResult enableMobileToken(OperationEntity operation) throws InvalidConfigurationException {
         if (operation == null || operation.getUserId() == null || operation.getOperationName() == null) {
-            return null;
+            return new EnableMobileTokenResult(false, null);
         }
         String userId = operation.getUserId();
         String operationName = operation.getOperationName();
         if (!isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)){
-            return null;
+            return new EnableMobileTokenResult(false, null);
         }
 
         String activationId = getActivationId(userId);
         if (activationId == null || activationId.isEmpty()) {
-            return null;
+            return new EnableMobileTokenResult(false, null);
         }
 
         // Create operation in PowerAuth server
-        return powerAuthOperationService.createOperation(operation, activationId);
+        String paOperationId = powerAuthOperationService.createOperation(operation, activationId);
+        return new EnableMobileTokenResult(true, paOperationId);
     }
 
     /**

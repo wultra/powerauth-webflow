@@ -127,6 +127,7 @@ public class AuthenticationService {
     public CredentialAuthenticationResponse authenticateWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, EncryptionException {
         CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         if (credentialDefinition.isDataAdapterProxyEnabled()) {
+            logger.info("Credential authentication proxied through Data Adapter");
             return authenticateWithCredentialCustom(credentialDefinition, request.getCredentialValue(), request.getOperationId(), request.getUserId(), request.getAuthMethod());
         }
         String credentialValue = request.getCredentialValue();
@@ -197,6 +198,9 @@ public class AuthenticationService {
         }
 
         Integer remainingAttempts = resolveRemainingAttempts(credential, null, operation);
+
+        logger.info("Credential authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, credential status: {}, operation failed: {}",
+                authenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), credential.getStatus(), operationFailed);
 
         CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
         response.setUserId(user.getUserId());
@@ -278,6 +282,7 @@ public class AuthenticationService {
     public OtpAuthenticationResponse authenticateWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
+            logger.info("OTP authentication proxied through Data Adapter");
             return authenticateWithOtpCustom(otp.getOtpDefinition(), otp.getOtpId(), request.getOtpValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
         }
         otp.setAttemptCounter(otp.getAttemptCounter() + 1);
@@ -386,6 +391,9 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
+        logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {},  OTP status: {}, credential status: {}, operation failed: {}",
+                authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
+
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
         if (userId != null) {
             response.setUserId(userId);
@@ -457,7 +465,8 @@ public class AuthenticationService {
     public CombinedAuthenticationResponse authenticateCombined(CombinedAuthenticationRequest request) throws UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
         OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
-            return authenticateCombinedCustom(otp.getOtpDefinition(), otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
+            logger.info("Combined authentication proxied through Data Adapter");
+            return authenticateCombinedCustom(otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
         }
         otp.setAttemptCounter(otp.getAttemptCounter() + 1);
 
@@ -546,7 +555,7 @@ public class AuthenticationService {
         authenticationRepository.save(authentication);
 
         boolean lastAttempt = false;
-        if ( user.getStatus() != UserIdentityStatus.ACTIVE
+        if (user.getStatus() != UserIdentityStatus.ACTIVE
                 || credential.getStatus() != CredentialStatus.ACTIVE
                 || otp.getStatus() != OtpStatus.ACTIVE) {
             lastAttempt = true;
@@ -575,6 +584,9 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
+        logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {},  OTP status: {}, credential status: {}, operation failed: {}",
+                authenticationResult, credentialAuthenticationResult, otpAuthenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), otp.getStatus(), credential.getStatus(), operationFailed);
+
         CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -592,14 +604,13 @@ public class AuthenticationService {
 
     /**
      * Perform custom authentication with OTP and credential.
-     * @param otpDefinition OTP definition.
      * @param otpId OTP ID.
      * @param otpValue OTP value.
      * @param operationId Operation ID.
      * @param userId User ID.
      * @param authMethod Authentication method.
      */
-    private CombinedAuthenticationResponse authenticateCombinedCustom(OtpDefinitionEntity otpDefinition, CredentialDefinitionEntity credentialDefinition, String otpId, String otpValue, String credentialValue,
+    private CombinedAuthenticationResponse authenticateCombinedCustom(CredentialDefinitionEntity credentialDefinition, String otpId, String otpValue, String credentialValue,
                                                                     String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
@@ -680,12 +691,14 @@ public class AuthenticationService {
                                                   CredentialEntity credential, String credentialValue,
                                                   List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
+            logger.info("Credential verification failed, user ID: {}, credential name: {}, status: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getStatus());
             return AuthenticationResult.FAILED;
         }
         // Temporary credentials cannot be used for authentication after their expiration
         if (credential.getType() == CredentialType.TEMPORARY
             && credential.getTimestampExpires() != null
             && new Date().after(credential.getTimestampExpires())) {
+            logger.info("Credential verification failed because temporary credential is expired, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
             return AuthenticationResult.FAILED;
         }
         CredentialAuthenticationMode authModeResolved;
@@ -698,8 +711,10 @@ public class AuthenticationService {
             case MATCH_EXACT:
                 boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
                 if (credentialMatched) {
+                    logger.info("Credential verification succeeded, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                     return AuthenticationResult.SUCCEEDED;
                 } else {
+                    logger.info("Credential verification failed, user ID: {}, credential name: {}, attempt counter: {}, soft counter: {}, hard counter: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(), credential.getFailedAttemptCounterHard());
                     return AuthenticationResult.FAILED;
                 }
 
@@ -718,14 +733,17 @@ public class AuthenticationService {
                         char c1 = credentialValue.charAt(counter);
                         char c2 = expectedCredentialValue.charAt(position);
                         if (c1 != c2) {
+                            logger.info("Credential verification failed for position match, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                             return AuthenticationResult.FAILED;
                         }
                         counter++;
                     } catch (StringIndexOutOfBoundsException ex) {
                         // Index is out of bounds
+                        logger.info("Credential verification failed because position is out of bounds, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                         return AuthenticationResult.FAILED;
                     }
                 }
+                logger.info("Credential verification succeeded for position match, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                 return AuthenticationResult.SUCCEEDED;
 
             default:
@@ -743,20 +761,24 @@ public class AuthenticationService {
      */
     private AuthenticationResult verifyOtp(OtpEntity otp, String otpValue) throws InvalidConfigurationException, EncryptionException {
         if (otp.getStatus() != OtpStatus.ACTIVE) {
+            logger.info("OTP verification failed for OTP ID: {}, status: {}", otp.getOtpId(), otp.getStatus());
             return AuthenticationResult.FAILED;
         }
         if (otp.getTimestampExpires() != null && otp.getTimestampExpires().before(new Date())) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
             otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);
+            logger.info("OTP verification failed because OTP is expired: {}", otp.getOtpId());
             return AuthenticationResult.FAILED;
         }
         OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
         String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
         if (value != null && value.equals(otpValue)) {
+            logger.info("OTP verification succeeded, OTP ID: {}", otp.getOtpId());
             return AuthenticationResult.SUCCEEDED;
         } else {
             otp.setFailedAttemptCounter(otp.getFailedAttemptCounter() + 1);
+            logger.info("OTP verification failed, OTP ID: {}, failed counter: {}", otp.getOtpId(), otp.getFailedAttemptCounter());
             return AuthenticationResult.FAILED;
         }
     }

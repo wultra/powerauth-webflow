@@ -66,7 +66,9 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "auth-method", method = RequestMethod.POST)
     public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@Valid @RequestBody ObjectRequest<CreateAuthMethodRequest> request) throws AuthMethodAlreadyExistsException {
+        logger.info("Received createAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
         CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
+        logger.info("The createAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 
@@ -79,7 +81,7 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
-        logger.info("Received getAuthMethods request");
+        logger.info("Received getAuthMethodList request");
         List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
         if (authMethods == null || authMethods.isEmpty()) {
             logger.error("No authentication method is configured in Next Step server");
@@ -87,7 +89,7 @@ public class AuthMethodController {
         }
         GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.getAuthMethods().addAll(authMethods);
-        logger.debug("The getAuthMethods request succeeded, available authentication method count: {}", authMethods.size());
+        logger.debug("The getAuthMethodList request succeeded, available authentication method list size: {}", authMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -108,7 +110,7 @@ public class AuthMethodController {
         List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.getUserAuthMethods().addAll(userAuthMethods);
-        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication method count: {}", userAuthMethods.size());
+        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication list size: {}", userAuthMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -152,8 +154,7 @@ public class AuthMethodController {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "user/auth-method/delete", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAuthMethodsResponse>
-    disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
+    public ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
         return disableAuthMethodForUserImpl(request);
     }
 
@@ -187,7 +188,10 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getEnabledMethodList request, user ID: {}", request.getRequestObject().getUserId());
         GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
+        logger.debug("The getEnabledMethodList request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
         return new ObjectResponse<>(response);
     }
 
@@ -200,7 +204,9 @@ public class AuthMethodController {
      */
     @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@Valid @RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
+        logger.info("Received deleteAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
         DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
+        logger.info("The deleteAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 

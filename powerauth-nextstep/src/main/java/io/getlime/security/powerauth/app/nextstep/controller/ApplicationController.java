@@ -68,7 +68,9 @@ public class ApplicationController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateApplicationResponse> createApplication(@Valid @RequestBody ObjectRequest<CreateApplicationRequest> request) throws ApplicationAlreadyExistsException {
+        logger.info("Received createApplication request, application name: {}", request.getRequestObject().getApplicationName());
         CreateApplicationResponse response = applicationService.createApplication(request.getRequestObject());
+        logger.info("The createApplication request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 
@@ -80,7 +82,9 @@ public class ApplicationController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateApplicationResponse> updateApplication(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
+        logger.info("Received updateApplication request, application name: {}", request.getRequestObject().getApplicationName());
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
+        logger.info("The createApplication request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 
@@ -92,7 +96,9 @@ public class ApplicationController {
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
+        logger.info("Received updateApplicationPost request, application name: {}", request.getRequestObject().getApplicationName());
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
+        logger.info("The createApplicationPost request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 
@@ -103,7 +109,9 @@ public class ApplicationController {
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetApplicationListResponse> getApplicationList(@Valid @RequestBody ObjectRequest<GetApplicationListRequest> request) {
+        logger.info("Received getApplicationList request");
         GetApplicationListResponse response = applicationService.getApplicationList(request.getRequestObject());
+        logger.info("The getApplicationList request succeeded");
         return new ObjectResponse<>(response);
     }
 
@@ -115,7 +123,9 @@ public class ApplicationController {
      */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteApplicationResponse> deleteApplication(@Valid @RequestBody ObjectRequest<DeleteApplicationRequest> request) throws ApplicationNotFoundException {
+        logger.info("Received deleteApplication request, application name: {}", request.getRequestObject().getApplicationName());
         DeleteApplicationResponse response = applicationService.deleteApplication(request.getRequestObject());
+        logger.info("The deleteApplication request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 

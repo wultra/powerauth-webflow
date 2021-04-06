@@ -67,7 +67,9 @@ public class CredentialController {
      */
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateCredentialResponse> createCredential(@Valid @RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
+        logger.info("Received createCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         CreateCredentialResponse response = credentialService.createCredential(request.getRequestObject());
+        logger.info("The createCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -85,7 +87,9 @@ public class CredentialController {
      */
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateCredentialResponse> updateCredential(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received updateCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
+        logger.info("The updateCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -103,7 +107,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received updateCredentialPost request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
+        logger.info("The updateCredentialPost request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -118,7 +124,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "validate", method = RequestMethod.POST)
     public ObjectResponse<ValidateCredentialResponse> validateCredential(@Valid @RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received validateCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
+        logger.info("The validateCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -134,7 +142,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "reset", method = RequestMethod.POST)
     public ObjectResponse<ResetCredentialResponse> resetCredential(@Valid @RequestBody ObjectRequest<ResetCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received resetCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         ResetCredentialResponse response = credentialService.resetCredential(request.getRequestObject());
+        logger.info("The resetCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -148,7 +158,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteCredentialResponse> deleteCredential(@Valid @RequestBody ObjectRequest<DeleteCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+        logger.info("Received deleteCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         DeleteCredentialResponse response = credentialService.deleteCredential(request.getRequestObject());
+        logger.info("The deleteCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -163,7 +175,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "block", method = RequestMethod.POST)
     public ObjectResponse<BlockCredentialResponse> blockCredential(@Valid @RequestBody ObjectRequest<BlockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
+        logger.info("Received blockCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         BlockCredentialResponse response = credentialService.blockCredential(request.getRequestObject());
+        logger.info("The blockCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
@@ -178,7 +192,9 @@ public class CredentialController {
      */
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
     public ObjectResponse<UnblockCredentialResponse> unblockCredential(@Valid @RequestBody ObjectRequest<UnblockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
+        logger.info("Received unblockCredential request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         UnblockCredentialResponse response = credentialService.unblockCredential(request.getRequestObject());
+        logger.info("The unblockCredential request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
 
