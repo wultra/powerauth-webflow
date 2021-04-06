@@ -391,7 +391,7 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
-        logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {},  OTP status: {}, credential status: {}, operation failed: {}",
+        logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
 
         OtpAuthenticationResponse response = new OtpAuthenticationResponse();
@@ -584,7 +584,7 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
-        logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {},  OTP status: {}, credential status: {}, operation failed: {}",
+        logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, credentialAuthenticationResult, otpAuthenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), otp.getStatus(), credential.getStatus(), operationFailed);
 
         CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
