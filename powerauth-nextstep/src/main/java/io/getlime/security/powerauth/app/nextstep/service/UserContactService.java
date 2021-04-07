@@ -95,7 +95,7 @@ public class UserContactService {
         user.getContacts().add(contact);
         // Ensure primary contacts are unique
         ensurePrimaryContactsAreUnique(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         CreateUserContactResponse response = new CreateUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(contact.getName());
@@ -148,7 +148,7 @@ public class UserContactService {
         contact.setTimestampLastUpdated(new Date());
         // Ensure primary contacts are unique
         ensurePrimaryContactsAreUnique(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         UpdateUserContactResponse response = new UpdateUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(contact.getName());
@@ -175,7 +175,7 @@ public class UserContactService {
         }
         UserContactEntity contact = contactOptional.get();
         user.getContacts().remove(contact);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         DeleteUserContactResponse response = new DeleteUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(request.getContactName());

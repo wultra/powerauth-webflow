@@ -122,7 +122,7 @@ public class CredentialCounterService {
                 throw new InvalidRequestException("Invalid authentication result: " + authenticationResult);
 
         }
-        credentialRepository.save(credential);
+        credential = credentialRepository.save(credential);
         logger.info("Credential counter updated, user ID: {}, credential name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
                 credential.getUser().getUserId(), credential.getCredentialDefinition().getName(),
                 credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(),

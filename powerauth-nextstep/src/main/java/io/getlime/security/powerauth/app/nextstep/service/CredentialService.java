@@ -133,7 +133,7 @@ public class CredentialService {
                 createdTimestamp += 1000;
             }
         }
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
@@ -240,7 +240,7 @@ public class CredentialService {
             // Save credential into credential history
             credentialHistoryService.createCredentialHistory(user, credential, new Date());
         }
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -402,7 +402,7 @@ public class CredentialService {
         credential.setTimestampBlocked(null);
         // Save credential into credential history
         credentialHistoryService.createCredentialHistory(user, credential, new Date());
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -440,7 +440,7 @@ public class CredentialService {
             throw new CredentialNotFoundException("Credential is already REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.REMOVED);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -471,7 +471,7 @@ public class CredentialService {
         }
         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
         credential.setTimestampBlocked(new Date());
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -507,7 +507,7 @@ public class CredentialService {
         credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());

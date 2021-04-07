@@ -102,7 +102,7 @@ public class UserRoleService {
         userRole.setStatus(UserRoleStatus.ACTIVE);
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
@@ -141,7 +141,7 @@ public class UserRoleService {
         user.getRoles().remove(userRole);
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());

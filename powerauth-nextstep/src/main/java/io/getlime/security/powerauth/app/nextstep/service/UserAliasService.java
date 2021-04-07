@@ -109,7 +109,7 @@ public class UserAliasService {
                 throw new InvalidRequestException(ex);
             }
         }
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         CreateUserAliasResponse response = new CreateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -182,7 +182,7 @@ public class UserAliasService {
                 throw new InvalidRequestException(ex);
             }
         }
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         UpdateUserAliasResponse response = new UpdateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -216,7 +216,7 @@ public class UserAliasService {
         }
         alias.setStatus(UserAliasStatus.REMOVED);
         alias.setTimestampLastUpdated(new Date());
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());

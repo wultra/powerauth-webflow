@@ -176,7 +176,7 @@ public class AuthenticationService {
         authentication.setResultCredential(authenticationResult);
         authentication.setTimestampCreated(new Date());
         // Authentication needs to be saved before calling updateOperation
-        authenticationRepository.save(authentication);
+        authentication = authenticationRepository.save(authentication);
 
         boolean lastAttempt = false;
         if (user.getStatus() != UserIdentityStatus.ACTIVE || credential.getStatus() != CredentialStatus.ACTIVE) {
@@ -361,7 +361,7 @@ public class AuthenticationService {
         authentication.setResultOtp(authenticationResult);
         authentication.setTimestampCreated(new Date());
         // Authentication needs to be saved before calling updateOperation
-        authenticationRepository.save(authentication);
+        authentication = authenticationRepository.save(authentication);
 
         boolean lastAttempt = false;
         if ((user != null && user.getStatus() != UserIdentityStatus.ACTIVE)
@@ -379,7 +379,7 @@ public class AuthenticationService {
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
                 // Authentication was updated, save it
-                authenticationRepository.save(authentication);
+                authentication = authenticationRepository.save(authentication);
             }
         }
 
@@ -552,7 +552,7 @@ public class AuthenticationService {
         authentication.setResultOtp(otpAuthenticationResult);
         authentication.setTimestampCreated(new Date());
         // Authentication needs to be saved before calling updateOperation
-        authenticationRepository.save(authentication);
+        authentication = authenticationRepository.save(authentication);
 
         boolean lastAttempt = false;
         if (user.getStatus() != UserIdentityStatus.ACTIVE
@@ -572,7 +572,7 @@ public class AuthenticationService {
                 authentication.setResultOtp(AuthenticationResult.FAILED);
                 authentication.setResult(AuthenticationResult.FAILED);
                 // Authentication was updated, save it
-                authenticationRepository.save(authentication);
+                authentication = authenticationRepository.save(authentication);
             }
         }
 

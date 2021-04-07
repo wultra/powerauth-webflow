@@ -17,8 +17,6 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
@@ -52,22 +50,16 @@ public class OrganizationService {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
     private final OrganizationRepository organizationRepository;
-    private final OperationRepository operationRepository;
-    private final ApplicationRepository applicationRepository;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
     /**
      * Organization service constructor.
      * @param organizationRepository Organization repository.
-     * @param operationRepository Operation repository.
-     * @param applicationRepository Application repository.
      */
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository, OperationRepository operationRepository, ApplicationRepository applicationRepository) {
+    public OrganizationService(OrganizationRepository organizationRepository) {
         this.organizationRepository = organizationRepository;
-        this.operationRepository = operationRepository;
-        this.applicationRepository = applicationRepository;
     }
 
     /**

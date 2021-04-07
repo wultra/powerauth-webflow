@@ -399,7 +399,7 @@ public class UserIdentityService {
                 user.setTimestampLastUpdated(new Date());
                 // Save user identity and a snapshot to the history table
                 updateUserIdentityHistory(user);
-                userIdentityRepository.save(user);
+                user = userIdentityRepository.save(user);
             }
             updatedUserIds.add(user.getUserId());
         }
@@ -427,7 +427,7 @@ public class UserIdentityService {
         removeAllOtps(user);
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -451,7 +451,7 @@ public class UserIdentityService {
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -475,7 +475,7 @@ public class UserIdentityService {
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
         UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());

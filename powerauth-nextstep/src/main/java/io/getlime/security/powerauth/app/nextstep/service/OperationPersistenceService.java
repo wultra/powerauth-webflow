@@ -140,7 +140,7 @@ public class OperationPersistenceService {
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
-        operationRepository.save(operation);
+        operation = operationRepository.save(operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
