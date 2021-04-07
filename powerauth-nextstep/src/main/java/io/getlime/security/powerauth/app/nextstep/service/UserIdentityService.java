@@ -208,9 +208,8 @@ public class UserIdentityService {
             List<UserContactDetail> addedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(addedContacts);
         }
-        // Save user identity snapshot to the history table
+        // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        // Save user identity
         userIdentityRepository.save(user);
         return response;
     }
@@ -264,7 +263,6 @@ public class UserIdentityService {
             }
         }
         user.setTimestampLastUpdated(new Date());
-        userIdentityRepository.save(user);
 
         UpdateUserResponse response = new UpdateUserResponse();
         response.setUserId(user.getUserId());
@@ -317,6 +315,7 @@ public class UserIdentityService {
         }
         // Save user identity snapshot to the history table
         updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         return response;
     }
 
@@ -399,8 +398,8 @@ public class UserIdentityService {
                 user.setStatus(request.getUserIdentityStatus());
                 user.setTimestampLastUpdated(new Date());
                 // Save user identity and a snapshot to the history table
-                userIdentityRepository.save(user);
                 updateUserIdentityHistory(user);
+                userIdentityRepository.save(user);
             }
             updatedUserIds.add(user.getUserId());
         }
@@ -424,11 +423,11 @@ public class UserIdentityService {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         user.setStatus(UserIdentityStatus.REMOVED);
         user.setTimestampLastUpdated(new Date());
-        // Save user identity and a snapshot to the history table
-        userIdentityRepository.save(user);
-        updateUserIdentityHistory(user);
         removeAllCredentials(user);
         removeAllOtps(user);
+        // Save user identity and a snapshot to the history table
+        updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -451,8 +450,8 @@ public class UserIdentityService {
         user.setStatus(UserIdentityStatus.BLOCKED);
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
-        userIdentityRepository.save(user);
         updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -475,8 +474,8 @@ public class UserIdentityService {
         user.setStatus(UserIdentityStatus.ACTIVE);
         user.setTimestampLastUpdated(new Date());
         // Save user identity and a snapshot to the history table
-        userIdentityRepository.save(user);
         updateUserIdentityHistory(user);
+        userIdentityRepository.save(user);
         UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
