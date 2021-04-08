@@ -81,7 +81,7 @@ public class OrganizationService {
         organization.setOrderNumber(request.getOrderNumber());
         organization.setDefaultCredentialName(request.getDefaultCredentialName());
         organization.setDefaultOtpName(request.getDefaultOtpName());
-        organizationRepository.save(organization);
+        organization = organizationRepository.save(organization);
         CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());

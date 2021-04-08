@@ -150,6 +150,11 @@ public class OtpService {
         if (!existingOtps.isEmpty()) {
             resend = true;
         }
+        CredentialDefinitionEntity credentialDefinition = null;
+        if (credentialName != null) {
+            credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credentialName);
+        }
+
         if (dataAdapterProxyEnabled) {
             // Create and send OTP code via Data Adapter
             OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
@@ -157,6 +162,7 @@ public class OtpService {
             OtpEntity otp = new OtpEntity();
             otp.setOtpId(result.getOtpId());
             otp.setOtpDefinition(otpDefinition);
+            otp.setCredentialDefinition(credentialDefinition);
             otp.setUserId(userId);
             otp.setOperation(operation);
             otp.setStatus(OtpStatus.EXTERNAL);
