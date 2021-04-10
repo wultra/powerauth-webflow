@@ -108,12 +108,12 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
         try {
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(request.getOrganizationId()).getResponseObject();
-            if (organization.getDefaultCredentialName() == null) {
+            String organizationId = organization.getOrganizationId();
+            String credentialName = organization.getDefaultCredentialName();
+            if (credentialName == null) {
                 logger.warn("Default credential name is not configured for organization: " + request.getOrganizationId());
                 throw new AuthStepException("User authentication failed", "error.communication");
             }
-            String organizationId = organization.getOrganizationId();
-            String credentialName = organization.getDefaultCredentialName();
             String username = request.getUsername();
 
             // Client certificate is not yet supported in non SCA login method

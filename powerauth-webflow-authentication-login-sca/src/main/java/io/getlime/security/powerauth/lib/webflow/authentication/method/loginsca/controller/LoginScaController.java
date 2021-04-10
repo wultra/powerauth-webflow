@@ -146,11 +146,11 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                 } else {
                     // Lookup user via NS
                     GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(organizationId).getResponseObject();
-                    if (organization.getDefaultCredentialName() == null) {
+                    String credentialName = organization.getDefaultCredentialName();
+                    if (credentialName == null) {
                         logger.warn("Default credential name is not configured for organization: " + request.getOrganizationId());
                         throw new AuthStepException("User authentication failed", "error.communication");
                     }
-                    String credentialName = organization.getDefaultCredentialName();
                     LookupUserResponse lookupResponse;
                     try {
                         lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();

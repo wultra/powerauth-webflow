@@ -129,11 +129,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             }
             final String otpId = getOtpIdFromHttpSession();
             GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
-            if (organization.getDefaultOtpName() == null) {
+            String otpName = organization.getDefaultOtpName();
+            String credentialName = organization.getDefaultCredentialName();
+            if (otpName == null) {
                 logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
                 throw new AuthStepException("SMS delivery failed", "error.communication");
             }
-            String credentialName = organization.getDefaultCredentialName();
             String operationId = operation.getOperationId();
             String userId = operation.getUserId();
             UserAccountStatus accountStatus = operation.getAccountStatus();
@@ -151,7 +152,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // No authentication is required, approve step
                     cleanHttpSession();
                     request.setAuthInstruments(Collections.emptyList());
-                    logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                    logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                     return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
@@ -631,12 +632,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             return result;
         }
         GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
-        if (organization.getDefaultOtpName() == null) {
+        String otpName = organization.getDefaultOtpName();
+        String credentialName = organization.getDefaultCredentialName();
+        if (otpName == null) {
             logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
             throw new AuthStepException("SMS delivery failed", "error.communication");
         }
-        String otpName = organization.getDefaultOtpName();
-        String credentialName = organization.getDefaultCredentialName();
         String userId = operation.getUserId();
         // OTP data is taken from operation
         try {
