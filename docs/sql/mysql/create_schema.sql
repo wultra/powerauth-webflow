@@ -101,7 +101,7 @@ CREATE TABLE ns_auth_method (
 -- Table ns_operation_config stores configuration of operations.
 -- Each operation type (defined by operation_name) has a related mobile token template and configuration.
 CREATE TABLE ns_operation_config (
-  operation_name            VARCHAR(32) PRIMARY KEY NOT NULL, -- Name of the operation, for example "login" or "approve_payment".
+  operation_name            VARCHAR(32) PRIMARY KEY NOT NULL, -- Name of the operation, for example "login" or "authorize_payment".
   template_version          CHAR NOT NULL,                    -- Version of the template, used for data signing base.
   template_id               INTEGER NOT NULL,                 -- ID of the template, used for data signing base.
   mobile_token_enabled      BOOLEAN DEFAULT FALSE NOT NULL,   -- Flag indicating if the mobile token is enabled for this operation type.
@@ -114,7 +114,7 @@ CREATE TABLE ns_operation_config (
 
 -- Table ns_operation_method_config stores configuration of authentication methods per operation name.
 CREATE TABLE ns_operation_method_config (
-  operation_name     VARCHAR(32) NOT NULL,             -- Name of the operation, for example "login" or "approve_payment".
+  operation_name     VARCHAR(32) NOT NULL,             -- Name of the operation, for example "login" or "authorize_payment".
   auth_method        VARCHAR(32) NOT NULL,             -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
   max_auth_fails     INTEGER NOT NULL,                 -- Maximum allowed number of authentication fails.
   PRIMARY KEY (operation_name, auth_method),
@@ -130,8 +130,8 @@ CREATE TABLE ns_organization (
   display_name_key         VARCHAR(256),                      -- Localization key for the organization display name.
   is_default               BOOLEAN NOT NULL,                  -- Flag indicating if this organization is the default.
   order_number             INTEGER NOT NULL,                  -- Ordering column for this organization, incrementing value, starts with 1.
-  default_credential_name  VARCHAR(256),                      -- Default name of credential definition for authentication using Next Step.
-  default_otp_name         VARCHAR(256)                       -- Default name of OTP definition for authentication using Next Step.
+  default_credential_name  VARCHAR(256),                      -- Default name of credential definition for authentication using Next Step, used by Web Flow.
+  default_otp_name         VARCHAR(256)                       -- Default name of OTP definition for authentication using Next Step, used by Web Flow.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- Table ns_step_definition stores definitions of authentication/authorization steps.
@@ -384,7 +384,7 @@ CREATE TABLE ns_otp_storage (
 -- Only the last status is stored in this table, changes of operations are stored in table ns_operation_history.
 CREATE TABLE ns_operation (
   operation_id                  VARCHAR(256) PRIMARY KEY NOT NULL,   -- ID of a specific operation instance, random value in the UUID format or any value that external system decides to set as the operation ID when creating the operation.
-  operation_name                VARCHAR(32) NOT NULL,                -- Name of the operation, represents a type of the operation, for example, "login" or "approve_payment".
+  operation_name                VARCHAR(32) NOT NULL,                -- Name of the operation, represents a type of the operation, for example, "login" or "authorize_payment".
   operation_data                TEXT NOT NULL,                       -- Signing data of the operation.
   operation_form_data           TEXT,                                -- Structured data of the operation that are displayed to the end user.
   application_id                VARCHAR(256),                        -- ID of the application that initiated the operation, usually OAuth 2.0 client ID.

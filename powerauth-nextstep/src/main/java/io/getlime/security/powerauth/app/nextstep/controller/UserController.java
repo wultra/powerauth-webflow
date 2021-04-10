@@ -156,7 +156,7 @@ public class UserController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
-    public ObjectResponse<LookupUsersResponse> lookupUser(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<LookupUsersResponse> lookupUsers(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         logger.info("Received lookupUsers request");
         LookupUsersResponse response = userIdentityLookupService.lookupUsers(request.getRequestObject());
         logger.info("The lookupUsers request succeeded");
