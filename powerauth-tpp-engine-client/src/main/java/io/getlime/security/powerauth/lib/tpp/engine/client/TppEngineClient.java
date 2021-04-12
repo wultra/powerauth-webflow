@@ -37,10 +37,10 @@ import io.getlime.security.powerauth.app.tppengine.model.response.UserConsentDet
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -98,8 +98,9 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<ConsentDetailResponse> consentDetail(String id) throws TppEngineClientException {
-        String path = "/consent?id=" + urlEncode(id);
-        return getObjectImpl(path, ConsentDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("id", Collections.singletonList(id));
+        return getObjectImpl("/consent", params, ConsentDetailResponse.class);
     }
 
     /**
@@ -112,8 +113,11 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserConsentDetailResponse> consentStatus(String userId, String consentId, String clientId) throws TppEngineClientException {
-        String path = "/consent?userId=" + urlEncode(userId) + "&consentId=" + urlEncode(consentId) + "&clientId=" + urlEncode(clientId);
-        return getObjectImpl(path, UserConsentDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("consentId", Collections.singletonList(consentId));
+        params.put("clientId", Collections.singletonList(clientId));
+        return getObjectImpl("/consent", params, UserConsentDetailResponse.class);
     }
 
     /**
@@ -135,7 +139,7 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or authentication fails.
      */
     public Response rejectConsent(RemoveConsentRequest request) throws TppEngineClientException {
-        return postObjectImpl("/user/consent", new ObjectRequest<>(request));
+        return postObjectImpl("/user/consent/delete", new ObjectRequest<>(request));
     }
 
     /**
@@ -146,8 +150,9 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> fetchAppInfo(String clientId) throws TppEngineClientException {
-        String path = "/tpp/app?clientId=" + urlEncode(clientId);
-        return getObjectImpl(path, TppAppDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("clientId", Collections.singletonList(clientId));
+        return getObjectImpl("/tpp/app", params, TppAppDetailResponse.class);
     }
 
     /**
@@ -159,8 +164,10 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> fetchAppInfoWithLicenseRestriction(String clientId, String tppLicense) throws TppEngineClientException {
-        String path = "/tpp/app?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
-        return getObjectImpl(path, TppAppDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("clientId", Collections.singletonList(clientId));
+        params.put("tppLicense", Collections.singletonList(tppLicense));
+        return getObjectImpl("/tpp/app", params, TppAppDetailResponse.class);
     }
 
     /**
@@ -171,8 +178,9 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<List<TppAppDetailResponse>> fetchApplicationList(String tppLicense) throws TppEngineClientException {
-        String path = "/tpp/app/list?tppLicense=" + urlEncode(tppLicense);
-        return getImpl(path, new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>(){});
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("tppLicense", Collections.singletonList(tppLicense));
+        return getImpl("/tpp/app/list", params, new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>(){});
     }
 
     /**
@@ -195,8 +203,9 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> updateApplication(String clientId, CreateTppAppRequest request) throws TppEngineClientException {
-        String path = "/tpp/app?clientId=" + urlEncode(clientId);
-        return putObjectImpl(path, new ObjectRequest<>(request), TppAppDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("clientId", Collections.singletonList(clientId));
+        return putObjectImpl("/tpp/app", new ObjectRequest<>(request), params, TppAppDetailResponse.class);
     }
 
     /**
@@ -208,8 +217,10 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> renewClientSecret(String clientId, String tppLicense) throws TppEngineClientException {
-        String path = "/tpp/app/renewSecret?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
-        return putObjectImpl(path, null, TppAppDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("clientId", Collections.singletonList(clientId));
+        params.put("tppLicense", Collections.singletonList(tppLicense));
+        return putObjectImpl("/tpp/app/renewSecret", null, params, TppAppDetailResponse.class);
     }
 
     /**
@@ -221,37 +232,26 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public Response deleteApplication(String clientId, String tppLicense) throws TppEngineClientException {
-        String path = "/tpp/app?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
-        return deleteObjectImpl(path);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("clientId", Collections.singletonList(clientId));
+        params.put("tppLicense", Collections.singletonList(tppLicense));
+        return deleteObjectImpl("/tpp/app", params);
     }
 
     // Generic HTTP client methods
-
-    /**
-     * URL encode a path.
-     * @param path Path.
-     * @return Encoded path.
-     */
-    private String urlEncode(String path) {
-        try {
-            return URLEncoder.encode(path, StandardCharsets.UTF_8.toString());
-        } catch (UnsupportedEncodingException ex) {
-            // UTF-8 is always supported
-            return null;
-        }
-    }
 
     /**
      * Prepare a generic GET response.
      *
      * @param path Resource path.
      * @param typeReference Type reference.
+     * @param queryParams Query parameters.
      * @return Object obtained after processing the response JSON.
      * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private <T> T getImpl(String path, ParameterizedTypeReference<T> typeReference) throws TppEngineClientException {
+    private <T> T getImpl(String path, MultiValueMap<String, String> queryParams, ParameterizedTypeReference<T> typeReference) throws TppEngineClientException {
         try {
-            return restClient.get(path, typeReference).getBody();
+            return restClient.get(path, queryParams, null, typeReference).getBody();
         } catch (RestClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
@@ -262,13 +262,14 @@ public class TppEngineClient {
      * Prepare GET object response.
      *
      * @param path Resource path.
+     * @param queryParams Query parameters.
      * @param responseType Response type.
      * @return Object obtained after processing the response JSON.
      * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private <T> ObjectResponse<T> getObjectImpl(String path, Class<T> responseType) throws TppEngineClientException {
+    private <T> ObjectResponse<T> getObjectImpl(String path, MultiValueMap<String, String> queryParams, Class<T> responseType) throws TppEngineClientException {
         try {
-            return restClient.getObject(path, responseType);
+            return restClient.getObject(path, queryParams, null, responseType);
         } catch (RestClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
@@ -315,13 +316,14 @@ public class TppEngineClient {
      *
      * @param path Resource path.
      * @param request Request body.
+     * @param queryParams Query parameters.
      * @param responseType Response type.
      * @return Object obtained after processing the response JSON.
      * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private <T> ObjectResponse<T> putObjectImpl(String path, ObjectRequest<?> request, Class<T> responseType) throws TppEngineClientException {
+    private <T> ObjectResponse<T> putObjectImpl(String path, ObjectRequest<?> request, MultiValueMap<String, String> queryParams, Class<T> responseType) throws TppEngineClientException {
         try {
-            return restClient.putObject(path, request, responseType);
+            return restClient.putObject(path, request, queryParams, null, responseType);
         } catch (RestClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP PUT request failed."));
@@ -332,12 +334,13 @@ public class TppEngineClient {
      * Prepare a generic DELETE response.
      *
      * @param path Resource path.
+     * @param queryParams Query parameters.
      * @return Object obtained after processing the response JSON.
      * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private Response deleteObjectImpl(String path) throws TppEngineClientException {
+    private Response deleteObjectImpl(String path, MultiValueMap<String, String> queryParams) throws TppEngineClientException {
         try {
-            return restClient.deleteObject(path);
+            return restClient.deleteObject(path, queryParams, null);
         } catch (RestClientException ex) {
             logger.warn(ex.getMessage(), ex);
             throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
