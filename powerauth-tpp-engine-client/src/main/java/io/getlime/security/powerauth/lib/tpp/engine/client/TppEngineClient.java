@@ -16,10 +16,13 @@
 
 package io.getlime.security.powerauth.lib.tpp.engine.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.wultra.core.rest.client.base.DefaultRestClient;
+import com.wultra.core.rest.client.base.RestClient;
+import com.wultra.core.rest.client.base.RestClientConfiguration;
+import com.wultra.core.rest.client.base.RestClientException;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
@@ -31,88 +34,61 @@ import io.getlime.security.powerauth.app.tppengine.model.response.ConsentDetailR
 import io.getlime.security.powerauth.app.tppengine.model.response.GiveConsentResponse;
 import io.getlime.security.powerauth.app.tppengine.model.response.TppAppDetailResponse;
 import io.getlime.security.powerauth.app.tppengine.model.response.UserConsentDetailResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
 
-import java.io.IOException;
-import java.util.*;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * TPP Engine Client provides methods for communication with the TPP registry and consent engine.
- * It uses the RestTemplate class to handle REST API calls. Apache HTTP client is used instead of default client
- * so that error responses contain full response bodies.
+ * It uses the Rest Client to handle REST API calls.
  *
  * @author Petr Dvorak, petr@wultra.com
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class TppEngineClient {
 
-    private final String serviceUrl;
-    private final ObjectMapper objectMapper;
-    private final RestTemplate restTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(TppEngineClient.class);
+
+    private final RestClient restClient;
 
     /**
      * Create a new client with provided base URL.
      *
-     * @param serviceUrl Base URL.
+     * @param serviceUrl Base service URL.
+     * @throws TppEngineClientException Thrown when REST client initialization fails.
      */
-    public TppEngineClient(String serviceUrl) {
-        this(serviceUrl, null);
-    }
-
-    /**
-     * Create a new client with provided base URL and custom object mapper.
-     *
-     * @param serviceUrl Base URL.
-     * @param objectMapper Object mapper.
-     */
-    public TppEngineClient(String serviceUrl, ObjectMapper objectMapper) {
-        this.serviceUrl = serviceUrl;
-        if (objectMapper != null) {
-            this.objectMapper = objectMapper;
-        } else {
-            this.objectMapper = objectMapper();
+    public TppEngineClient(String serviceUrl) throws TppEngineClientException {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+            RestClientConfiguration config = new RestClientConfiguration();
+            config.setBaseUrl(serviceUrl);
+            config.setObjectMapper(objectMapper);
+            restClient = new DefaultRestClient(config);
+        } catch (RestClientException ex) {
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
         }
-        restTemplate = new RestTemplate();
-
-        // Prepare message converters
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(this.objectMapper);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        converters.add(converter);
-        restTemplate.setMessageConverters(converters);
-
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     /**
-     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
+     * Create a new client with detailed configuration of REST client.
      *
-     * @return Constructed object mapper.
+     * @param restClientConfiguration REST service client configuration.
+     * @throws TppEngineClientException Thrown when REST client initialization fails.
      */
-    private ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
+    public TppEngineClient(RestClientConfiguration restClientConfiguration) throws TppEngineClientException {
+        try {
+            restClient = new DefaultRestClient(restClientConfiguration);
+        } catch (RestClientException ex) {
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+        }
     }
-
-    /**
-     * Get default instance of REST client.
-     *
-     * @return RestTemplate with default configuration.
-     */
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
-    }
-
 
     /**
      * Lookup consent details (details of a consent template).
@@ -122,22 +98,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<ConsentDetailResponse> consentDetail(String id) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("id", id);
-            ResponseEntity<ObjectResponse<ConsentDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/consent?id={id}",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<ConsentDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/consent?id=" + urlEncode(id);
+        return getObjectImpl(path, ConsentDetailResponse.class);
     }
 
     /**
@@ -150,24 +112,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserConsentDetailResponse> consentStatus(String userId, String consentId, String clientId) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("userId", userId);
-            params.put("consentId", consentId);
-            params.put("clientId", clientId);
-            ResponseEntity<ObjectResponse<UserConsentDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/user/consent/status?userId={userId}&consentId={consentId}&clientId={clientId}",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<UserConsentDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/consent?userId=" + urlEncode(userId) + "&consentId=" + urlEncode(consentId) + "&clientId=" + urlEncode(clientId);
+        return getObjectImpl(path, UserConsentDetailResponse.class);
     }
 
     /**
@@ -178,19 +124,7 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or authentication fails.
      */
     public ObjectResponse<GiveConsentResponse> giveConsent(GiveConsentRequest request) throws TppEngineClientException {
-        try {
-            HttpEntity<ObjectRequest<GiveConsentRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<GiveConsentResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/user/consent",
-                    HttpMethod.POST,
-                    entity,
-                    new ParameterizedTypeReference<ObjectResponse<GiveConsentResponse>>() {});
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        return postObjectImpl("/user/consent", new ObjectRequest<>(request), GiveConsentResponse.class);
     }
 
     /**
@@ -201,19 +135,7 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or authentication fails.
      */
     public Response rejectConsent(RemoveConsentRequest request) throws TppEngineClientException {
-        try {
-            HttpEntity<ObjectRequest<RemoveConsentRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<Response> response = restTemplate.exchange(
-                    serviceUrl + "/user/consent",
-                    HttpMethod.DELETE,
-                    entity,
-                    new ParameterizedTypeReference<Response>() {});
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        return postObjectImpl("/user/consent", new ObjectRequest<>(request));
     }
 
     /**
@@ -224,22 +146,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> fetchAppInfo(String clientId) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("clientId", clientId);
-            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app?clientId={clientId}",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/tpp/app?clientId=" + urlEncode(clientId);
+        return getObjectImpl(path, TppAppDetailResponse.class);
     }
 
     /**
@@ -251,23 +159,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> fetchAppInfoWithLicenseRestriction(String clientId, String tppLicense) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("clientId", clientId);
-            params.put("tppLicense", tppLicense);
-            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app?clientId={clientId}&tppLicense={tppLicense}",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/tpp/app?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
+        return getObjectImpl(path, TppAppDetailResponse.class);
     }
 
     /**
@@ -278,22 +171,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or app does not exist.
      */
     public ObjectResponse<List<TppAppDetailResponse>> fetchApplicationList(String tppLicense) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("tppLicense", tppLicense);
-            ResponseEntity<ObjectResponse<List<TppAppDetailResponse>>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app/list?tppLicense={tppLicense}",
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/tpp/app/list?tppLicense=" + urlEncode(tppLicense);
+        return getImpl(path, new ParameterizedTypeReference<ObjectResponse<List<TppAppDetailResponse>>>(){});
     }
 
     /**
@@ -304,19 +183,7 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> createApplication(CreateTppAppRequest request) throws TppEngineClientException {
-        try {
-            HttpEntity<ObjectRequest<CreateTppAppRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app",
-                    HttpMethod.POST,
-                    entity,
-                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {});
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        return postObjectImpl("/tpp/app", new ObjectRequest<>(request), TppAppDetailResponse.class);
     }
 
     /**
@@ -328,23 +195,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> updateApplication(String clientId, CreateTppAppRequest request) throws TppEngineClientException {
-        try {
-            HttpEntity<ObjectRequest<CreateTppAppRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            final Map<String, String> params = new HashMap<>();
-            params.put("clientId", clientId);
-            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app?clientId={clientId}",
-                    HttpMethod.PUT,
-                    entity,
-                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/tpp/app?clientId=" + urlEncode(clientId);
+        return putObjectImpl(path, new ObjectRequest<>(request), TppAppDetailResponse.class);
     }
 
     /**
@@ -356,23 +208,8 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<TppAppDetailResponse> renewClientSecret(String clientId, String tppLicense) throws TppEngineClientException {
-        try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("clientId", clientId);
-            params.put("tppLicense", tppLicense);
-            ResponseEntity<ObjectResponse<TppAppDetailResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app/renewSecret?clientId={clientId}&tppLicense={tppLicense}",
-                    HttpMethod.POST,
-                    null,
-                    new ParameterizedTypeReference<ObjectResponse<TppAppDetailResponse>>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        String path = "/tpp/app/renewSecret?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
+        return putObjectImpl(path, null, TppAppDetailResponse.class);
     }
 
     /**
@@ -384,70 +221,147 @@ public class TppEngineClient {
      * @throws TppEngineClientException Thrown when client request fails or user does not exist.
      */
     public Response deleteApplication(String clientId, String tppLicense) throws TppEngineClientException {
+        String path = "/tpp/app?clientId=" + urlEncode(clientId) + "&tppLicense=" + urlEncode(tppLicense);
+        return deleteObjectImpl(path);
+    }
+
+    // Generic HTTP client methods
+
+    /**
+     * URL encode a path.
+     * @param path Path.
+     * @return Encoded path.
+     */
+    private String urlEncode(String path) {
         try {
-            final Map<String, String> params = new HashMap<>();
-            params.put("clientId", clientId);
-            params.put("tppLicense", tppLicense);
-            ResponseEntity<Response> response = restTemplate.exchange(
-                    serviceUrl + "/tpp/app?clientId={clientId}&tppLicense={tppLicense}",
-                    HttpMethod.DELETE,
-                    null,
-                    new ParameterizedTypeReference<Response>() {},
-                    params
-            );
-            return response.getBody();
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
+            return URLEncoder.encode(path, StandardCharsets.UTF_8.toString());
+        } catch (UnsupportedEncodingException ex) {
+            // UTF-8 is always supported
+            return null;
         }
     }
 
     /**
-     * Create new TppEngineClientException from ResourceAccessException.
+     * Prepare a generic GET response.
      *
-     * @param ex Exception used when a resource access error occurs.
-     * @return Data adapter client exception.
+     * @param path Resource path.
+     * @param typeReference Type reference.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private TppEngineClientException resourceAccessException(ResourceAccessException ex) {
-        TppEngineError error = new TppEngineError(TppEngineError.Code.COMMUNICATION_ERROR, ex.getMessage());
-        return new TppEngineClientException(ex, error);
+    private <T> T getImpl(String path, ParameterizedTypeReference<T> typeReference) throws TppEngineClientException {
+        try {
+            return restClient.get(path, typeReference).getBody();
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
     }
 
     /**
-     * Create new {@link TppEngineClientException} from HttpStatusCodeException.
+     * Prepare GET object response.
      *
-     * @param ex Exception used when an HTTP error occurs.
-     * @return Data adapter client exception.
+     * @param path Resource path.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
      */
-    private TppEngineClientException httpStatusException(HttpStatusCodeException ex) {
+    private <T> ObjectResponse<T> getObjectImpl(String path, Class<T> responseType) throws TppEngineClientException {
         try {
-            TypeReference<ObjectResponse<TppEngineError>> typeReference = new TypeReference<ObjectResponse<TppEngineError>>() {
-            };
-            ObjectResponse<TppEngineError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-            if (errorResponse == null) {
-                TppEngineError error = new TppEngineError(TppEngineError.Code.ERROR_GENERIC, "IO error occurred: " + ex.getMessage());
-                return new TppEngineClientException(ex, error);
-            }
-            TppEngineError error = errorResponse.getResponseObject();
-            if (error == null) {
-                error = new TppEngineError();
-            }
-            if (error.getCode() == null) { // process malformed errors with undefined error code
-                error.setCode(TppEngineError.Code.ERROR_GENERIC);
-                error.setMessage(ex.getMessage());
-            }
-            return new TppEngineClientException(ex, error);
-        } catch (IOException ex2) {
-            TppEngineError error;
-            if (ex.getStatusCode() != HttpStatus.OK) {
-                error = new TppEngineError(TppEngineError.Code.COMMUNICATION_ERROR, "HTTP error occurred: " + ex.getMessage());
-                return new TppEngineClientException(ex, error);
-            } else {
-                error = new TppEngineError(TppEngineError.Code.ERROR_GENERIC, "IO error occurred: " + ex2.getMessage());
-                return new TppEngineClientException(ex2, error);
-            }
+            return restClient.getObject(path, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
         }
+    }
+
+    /**
+     * Prepare POST object response. Uses default {@link Response} type reference for response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private Response postObjectImpl(String path, ObjectRequest<?> request) throws TppEngineClientException {
+        try {
+            return restClient.postObject(path, request);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
+
+    /**
+     * Prepare POST object response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> ObjectResponse<T> postObjectImpl(String path, ObjectRequest<?> request, Class<T> responseType) throws TppEngineClientException {
+        try {
+            return restClient.postObject(path, request, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
+
+    /**
+     * Prepare PUT object response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> ObjectResponse<T> putObjectImpl(String path, ObjectRequest<?> request, Class<T> responseType) throws TppEngineClientException {
+        try {
+            return restClient.putObject(path, request, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP PUT request failed."));
+        }
+    }
+
+    /**
+     * Prepare a generic DELETE response.
+     *
+     * @param path Resource path.
+     * @return Object obtained after processing the response JSON.
+     * @throws TppEngineClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private Response deleteObjectImpl(String path) throws TppEngineClientException {
+        try {
+            return restClient.deleteObject(path);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
+
+    /**
+     * Resolve error code based on HTTP status code from REST client exception.
+     */
+    private String resolveErrorCode(RestClientException ex) {
+        if (ex.getStatusCode() == null) {
+            // REST client errors, response not received
+            return TppEngineError.Code.ERROR_GENERIC;
+        }
+        if (ex.getStatusCode().is4xxClientError()) {
+            // Errors caused by invalid TPP engine client requests
+            return TppEngineError.Code.TPP_ENGINE_CLIENT_ERROR;
+        }
+        if (ex.getStatusCode().is5xxServerError()) {
+            // Internal errors in TPP engine
+            return TppEngineError.Code.REMOTE_ERROR;
+        }
+        // Other errors during communication
+        return TppEngineError.Code.COMMUNICATION_ERROR;
     }
 
 }
