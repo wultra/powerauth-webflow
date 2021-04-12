@@ -99,6 +99,7 @@ public class UserProfileController {
             userResponse.getUser().setId(userDetail.getId());
             userResponse.getUser().setGivenName(userDetail.getGivenName());
             userResponse.getUser().setFamilyName(userDetail.getFamilyName());
+            userResponse.getUser().getExtras().putAll(userDetail.getExtras());
             userResponse.getConnection().setLanguage(language);
             userResponse.getConnection().setSca(sca);
 
@@ -139,14 +140,15 @@ public class UserProfileController {
             logger.info("Fetching user details for user with ID: {}, organization ID: {}", usedId, organizationId);
             final ObjectResponse<UserDetailResponse> userDetail = client.fetchUserDetail(usedId, organizationId);
             if (userDetail.getResponseObject().getAccountStatus() != AccountStatus.ACTIVE) {
-                return new UserInfoResponse(ANONYMOUS_USER, null, null, null);
+                return new UserInfoResponse(ANONYMOUS_USER, null, null, null, null);
             }
             final UserDetailResponse user = userDetail.getResponseObject();
             final String id = user.getId();
             final String givenName = user.getGivenName();
             final String familyName = user.getFamilyName();
+            final Map<String, Object> extras = user.getExtras();
             logger.info("Found user with ID: {}, given name: {}, family name: {}", usedId, givenName, familyName);
-            return new UserInfoResponse(id, id, givenName, familyName);
+            return new UserInfoResponse(id, id, givenName, familyName, extras);
         } catch (DataAdapterClientErrorException e) {
             throw new UnauthorizedUserException("Unable to fetch user details from data adapter");
         }
