@@ -26,7 +26,6 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashCo
 import io.getlime.security.powerauth.crypto.lib.generator.KeyGenerator;
 import io.getlime.security.powerauth.crypto.lib.model.Argon2Hash;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
@@ -353,11 +352,7 @@ public class CredentialProtectionService {
             // Protect the credential value and save it into DB
             CredentialValue updatedValue = protectCredential(credentialValue, credential);
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
-            if (updatedValue.getEncryptionAlgorithm() != EncryptionAlgorithm.NO_ENCRYPTION) {
-                credential.setEncryptionAlgorithm(credentialDefinition.getEncryptionAlgorithm());
-            } else {
-                credential.setEncryptionAlgorithm(null);
-            }
+            credential.setEncryptionAlgorithm(credentialDefinition.getEncryptionAlgorithm());
             credential.setValue(updatedValue.getValue());
             credentialRepository.save(credential);
         }
