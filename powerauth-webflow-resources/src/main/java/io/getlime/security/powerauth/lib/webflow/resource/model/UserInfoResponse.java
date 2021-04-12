@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.lib.webflow.resource.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Minimal OIDC UserInfo response, as defined in OpenID Connect specification.
  * See https://openid.net/specs/openid-connect-core-1_0.html#UserInfo for details.
@@ -40,6 +43,9 @@ public class UserInfoResponse {
     @JsonProperty("family_name")
     private String familyName;
 
+    @JsonProperty("extras")
+    private final Map<String, Object> extras = new LinkedHashMap<>();
+
     public UserInfoResponse() {
     }
 
@@ -49,12 +55,16 @@ public class UserInfoResponse {
      * @param sub Identifier of the subject, mapped to sub.
      * @param givenName Given name of the subject.
      * @param familyName Family name of the subject.
+     * @param extras Extra attributes related to user identity.
      */
-    public UserInfoResponse(String id, String sub, String givenName, String familyName) {
+    public UserInfoResponse(String id, String sub, String givenName, String familyName, Map<String, Object> extras) {
         this.id = id;
         this.sub = sub;
         this.givenName = givenName;
         this.familyName = familyName;
+        if (extras != null) {
+            this.extras.putAll(extras);
+        }
     }
 
     /**
@@ -120,4 +130,13 @@ public class UserInfoResponse {
     public void setFamilyName(String familyName) {
         this.familyName = familyName;
     }
+
+    /**
+     * Extra attributes related to user identity.
+     * @return Get extra attributes related to user identity.
+     */
+    public Map<String, Object> getExtras() {
+        return extras;
+    }
+
 }

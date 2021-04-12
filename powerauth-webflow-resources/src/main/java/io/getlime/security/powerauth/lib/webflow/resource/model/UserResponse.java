@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.lib.webflow.resource.model;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Class representing the user profile.
@@ -28,11 +30,12 @@ public class UserResponse {
     /**
      * Information about the user.
      */
-    public class User {
+    public static class User {
 
         private String id;
         private String givenName;
         private String familyName;
+        private final Map<String, Object> extras = new LinkedHashMap<>();
 
         public String getId() {
             return id;
@@ -58,12 +61,15 @@ public class UserResponse {
             this.familyName = familyName;
         }
 
+        public Map<String, Object> getExtras() {
+            return extras;
+        }
     }
 
     /**
      * Information about the connection.
      */
-    public class Connection {
+    public static class Connection {
 
         private String language;
         private boolean sca;
@@ -97,7 +103,7 @@ public class UserResponse {
     /**
      * Information about the service.
      */
-    public class Service {
+    public static class Service {
         private String applicationName;
         private String applicationDisplayName;
         private String applicationEnvironment;

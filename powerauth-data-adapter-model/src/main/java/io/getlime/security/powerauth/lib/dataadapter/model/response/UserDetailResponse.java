@@ -18,6 +18,9 @@ package io.getlime.security.powerauth.lib.dataadapter.model.response;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 /**
  * Response with user details.
  *
@@ -30,6 +33,7 @@ public class UserDetailResponse {
     private String familyName;
     private String organizationId;
     private AccountStatus accountStatus;
+    private final Map<String, Object> extras = new LinkedHashMap<>();
 
     /**
      * Get user ID.
@@ -110,4 +114,13 @@ public class UserDetailResponse {
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
+
+    /**
+     * Extra attributes related to user identity.
+     * @return Get extra attributes related to user identity.
+     */
+    public Map<String, Object> getExtras() {
+        return extras;
+    }
+
 }
