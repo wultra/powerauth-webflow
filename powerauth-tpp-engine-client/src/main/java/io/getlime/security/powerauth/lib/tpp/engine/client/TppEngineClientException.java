@@ -25,6 +25,9 @@ import io.getlime.security.powerauth.app.tppengine.model.entity.TppEngineError;
  */
 public class TppEngineClientException extends Exception {
 
+    /**
+     * TPP engine error.
+     */
     private TppEngineError error;
 
     /**
