@@ -99,9 +99,9 @@ public class CredentialCounterController {
      */
     @RequestMapping(value = "reset-all", method = RequestMethod.POST)
     public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) {
-        logger.info("Received updateCredentialCounterPost request");
+        logger.info("Received resetAllCounters request");
         ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
-        logger.info("The updateCredentialCounterPost request succeeded");
+        logger.info("The resetAllCounters request succeeded");
         return new ObjectResponse<>(response);
     }
 

@@ -84,7 +84,7 @@ public class ApplicationController {
     public ObjectResponse<UpdateApplicationResponse> updateApplication(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplication request, application name: {}", request.getRequestObject().getApplicationName());
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
-        logger.info("The createApplication request succeeded, application name: {}", request.getRequestObject().getApplicationName());
+        logger.info("The updateApplication request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 
@@ -98,7 +98,7 @@ public class ApplicationController {
     public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplicationPost request, application name: {}", request.getRequestObject().getApplicationName());
         UpdateApplicationResponse response = applicationService.updateApplication(request.getRequestObject());
-        logger.info("The createApplicationPost request succeeded, application name: {}", request.getRequestObject().getApplicationName());
+        logger.info("The updateApplicationPost request succeeded, application name: {}", request.getRequestObject().getApplicationName());
         return new ObjectResponse<>(response);
     }
 
