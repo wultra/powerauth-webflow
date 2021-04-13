@@ -40,6 +40,7 @@ public class CreateAndSendOtpRequest {
     private String credentialName;
     // The otpData parameter has priority over data extracted from operation.
     // The otpData can be an empty string, null value indicates data taken from operation.
+    @Size(max = 256)
     private String otpData;
     @NotNull
     @Size(min = 1, max = 256)

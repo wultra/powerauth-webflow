@@ -57,8 +57,8 @@ public class UpdateOperationResponse {
     private Date timestampCreated;
     @NotNull
     private Date timestampExpires;
-    @NotBlank
-    @Size(min = 1, max = 256)
+    @NotNull
+    @Size(max = 256)
     private String operationData;
     @NotNull
     private final List<AuthStep> steps = new ArrayList<>();

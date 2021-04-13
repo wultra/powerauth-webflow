@@ -21,6 +21,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,8 @@ public class CreateOperationRequest {
     private String operationName;
     @Size(min = 1, max = 256)
     private String operationId;
-    @NotBlank
-    @Size(min = 1, max = 256)
+    @NotNull
+    @Size(max = 256)
     private String operationData;
     @Size(min = 2, max = 256)
     private String operationNameExternal;
