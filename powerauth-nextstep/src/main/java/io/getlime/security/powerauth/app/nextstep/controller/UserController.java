@@ -137,9 +137,10 @@ public class UserController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws EncryptionException Thrown when decryption fails.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
         logger.debug("Received getUserDetail request, user ID: {}", request.getRequestObject().getUserId());
         GetUserDetailResponse response = userIdentityService.getUserDetail(request.getRequestObject());
         logger.debug("The getUserDetail request succeeded, user ID: {}", request.getRequestObject().getUserId());

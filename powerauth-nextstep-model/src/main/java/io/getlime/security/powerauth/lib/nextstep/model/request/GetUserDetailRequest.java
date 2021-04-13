@@ -31,6 +31,9 @@ public class GetUserDetailRequest {
     @NotBlank
     @Size(min = 1, max = 256)
     private String userId;
+    // Optional filter of credentials by credential definition name
+    @Size(min = 2, max = 256)
+    private String credentialName;
     private boolean includeRemoved;
 
 }

@@ -18,7 +18,6 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.UserLookupCustomizationService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
@@ -50,7 +49,6 @@ public class UserIdentityLookupService {
     private final UserIdentityRepository userIdentityRepository;
     private final CredentialDefinitionRepository credentialDefinitionRepository;
     private final CredentialRepository credentialRepository;
-    private final UserRoleRepository userRoleRepository;
     private final UserLookupCustomizationService userLookupCustomizationService;
     private final OperationPersistenceService operationPersistenceService;
 
@@ -60,17 +58,15 @@ public class UserIdentityLookupService {
      * @param userIdentityRepository User identity repository.
      * @param credentialDefinitionRepository Credential definition repository.
      * @param credentialRepository Credential repository.
-     * @param userRoleRepository User role repository.
      * @param userLookupCustomizationService User identity customization service.
      * @param operationPersistenceService Operation persistence service.
      */
     @Autowired
-    public UserIdentityLookupService(@Lazy UserIdentityService userIdentityService, UserIdentityRepository userIdentityRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, UserRoleRepository userRoleRepository, UserLookupCustomizationService userLookupCustomizationService, @Lazy OperationPersistenceService operationPersistenceService) {
+    public UserIdentityLookupService(@Lazy UserIdentityService userIdentityService, UserIdentityRepository userIdentityRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, UserLookupCustomizationService userLookupCustomizationService, @Lazy OperationPersistenceService operationPersistenceService) {
         this.userIdentityService = userIdentityService;
         this.userIdentityRepository = userIdentityRepository;
         this.credentialDefinitionRepository = credentialDefinitionRepository;
         this.credentialRepository = credentialRepository;
-        this.userRoleRepository = userRoleRepository;
         this.userLookupCustomizationService = userLookupCustomizationService;
         this.operationPersistenceService = operationPersistenceService;
     }
@@ -177,7 +173,7 @@ public class UserIdentityLookupService {
 
         LookupUsersResponse response = new LookupUsersResponse();
         for (UserIdentityEntity user: lookupResult) {
-            GetUserDetailResponse userDetail = userIdentityService.getUserDetail(user.getUserId(), false);
+            GetUserDetailResponse userDetail = userIdentityService.getUserDetail(user.getUserId(), credentialDefinition, false);
             response.getUsers().add(userDetail);
         }
         return response;
@@ -243,7 +239,7 @@ public class UserIdentityLookupService {
         }
         String userId = credential.getUser().getUserId();
         LookupUserResponse response = new LookupUserResponse();
-        GetUserDetailResponse userDetail = userIdentityService.getUserDetail(userId, false);
+        GetUserDetailResponse userDetail = userIdentityService.getUserDetail(userId, credentialDefinition, false);
         response.setUser(userDetail);
         return response;
     }

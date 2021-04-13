@@ -20,7 +20,6 @@ import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ValueListConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
@@ -54,7 +53,7 @@ public class UserIdentityService {
     private final UserIdentityRepository userIdentityRepository;
     private final UserContactService userContactService;
     private final RoleRepository roleRepository;
-    private final CredentialDefinitionRepository credentialDefinitionRepository;
+    private final CredentialDefinitionService credentialDefinitionService;
     private final OtpRepository otpRepository;
     private final UserIdentityLookupService userIdentityLookupService;
     private final CredentialService credentialService;
@@ -70,18 +69,18 @@ public class UserIdentityService {
      * @param userIdentityRepository User identity repository.
      * @param userContactService User contact service.
      * @param roleRepository Role repository.
-     * @param credentialDefinitionRepository Credential definition repository.
+     * @param credentialDefinitionService Credential definition service.
      * @param otpRepository OTP repository.
      * @param userIdentityLookupService User identity lookup service.
      * @param credentialService Credential service.
      * @param endToEndEncryptionService End-to-end encryption service.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactService userContactService, RoleRepository roleRepository, CredentialDefinitionRepository credentialDefinitionRepository, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
+    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactService userContactService, RoleRepository roleRepository, CredentialDefinitionService credentialDefinitionService, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
         this.userIdentityRepository = userIdentityRepository;
         this.userContactService = userContactService;
         this.roleRepository = roleRepository;
-        this.credentialDefinitionRepository = credentialDefinitionRepository;
+        this.credentialDefinitionService = credentialDefinitionService;
         this.otpRepository = otpRepository;
         this.userIdentityLookupService = userIdentityLookupService;
         this.credentialService = credentialService;
@@ -110,14 +109,7 @@ public class UserIdentityService {
         Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
-                Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credential.getCredentialName());
-                if (!credentialDefinitionOptional.isPresent()) {
-                    throw new CredentialDefinitionNotFoundException("Credential definition not found: " + credential.getCredentialName());
-                }
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
-                if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE) {
-                    throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + credential.getCredentialName());
-                }
+                CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
                 credentialDefinitions.put(credential.getCredentialName(), credentialDefinition);
             }
         }
@@ -240,14 +232,7 @@ public class UserIdentityService {
         Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
         if (request.getCredentials() != null) {
             for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
-                Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credential.getCredentialName());
-                if (!credentialDefinitionOptional.isPresent()) {
-                    throw new CredentialDefinitionNotFoundException("Credential definition not found: " + credential.getCredentialName());
-                }
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
-                if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE) {
-                    throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + credential.getCredentialName());
-                }
+                CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
                 credentialDefinitions.put(credential.getCredentialName(), credentialDefinition);
             }
         }
@@ -327,15 +312,22 @@ public class UserIdentityService {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws EncryptionException Thrown when decryption fails.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
     @Transactional
-    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
-        return getUserDetail(request.getUserId(), request.isIncludeRemoved());
+    public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
+        CredentialDefinitionEntity credentialDefinition = null;
+        String credentialName = request.getCredentialName();
+        if (credentialName != null) {
+            credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        }
+        return getUserDetail(request.getUserId(), credentialDefinition, request.isIncludeRemoved());
     }
 
     /**
      * Get user identity detail. This method is not transactional.
      * @param userId User ID.
+     * @param credentialDefinition Credential definition for optional filter.
      * @param includeRemoved Whether removed data should be returned.
      * @return User identity detail response.
      * @throws UserNotFoundException Thrown when user identity is not found.
@@ -343,7 +335,7 @@ public class UserIdentityService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws EncryptionException Thrown when decryption fails.
      */
-    public GetUserDetailResponse getUserDetail(String userId, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
+    public GetUserDetailResponse getUserDetail(String userId, CredentialDefinitionEntity credentialDefinition, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
         GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
@@ -368,6 +360,10 @@ public class UserIdentityService {
         Set<CredentialEntity> credentials = user.getCredentials();
         for (CredentialEntity credential: credentials) {
             if (credential.getStatus() == CredentialStatus.REMOVED && !includeRemoved) {
+                continue;
+            }
+            // Apply filter by credential definition if requested
+            if (credentialDefinition != null && !credential.getCredentialDefinition().equals(credentialDefinition)) {
                 continue;
             }
             CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
