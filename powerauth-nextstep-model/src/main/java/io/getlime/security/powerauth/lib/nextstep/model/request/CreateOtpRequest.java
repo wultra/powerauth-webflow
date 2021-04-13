@@ -37,8 +37,8 @@ public class CreateOtpRequest {
     // Optional credential name for updating credential counters
     @Size(min = 2, max = 256)
     private String credentialName;
-    // The otpData parameter has priority over data extracted from operation
-    @Size(min = 1, max = 256)
+    // The otpData parameter has priority over data extracted from operation.
+    // The otpData can be an empty string, null value indicates data taken from operation.
     private String otpData;
     @Size(min = 1, max = 256)
     private String operationId;

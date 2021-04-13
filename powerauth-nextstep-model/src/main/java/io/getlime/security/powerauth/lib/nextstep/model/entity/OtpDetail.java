@@ -44,8 +44,7 @@ public class OtpDetail {
     private String otpId;
     @Size(min = 1, max = 256)
     private String operationId;
-    @NotBlank
-    @Size(min = 1, max = 256)
+    @NotNull
     private String otpData;
     @NotBlank
     @Size(min = 1, max = 256)
