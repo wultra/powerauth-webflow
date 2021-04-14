@@ -62,7 +62,7 @@ public class AuditController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateAuditResponse> createAudit(@Valid @RequestBody ObjectRequest<CreateAuditRequest> request) {
         logger.info("Received createAudit request, action: {}", request.getRequestObject().getAction());
-        CreateAuditResponse response = auditLogService.createAuditLog(request.getRequestObject());
+        final CreateAuditResponse response = auditLogService.createAuditLog(request.getRequestObject());
         logger.info("The createAudit request succeeded, action: {}", request.getRequestObject().getAction());
         return new ObjectResponse<>(response);
     }
@@ -75,7 +75,7 @@ public class AuditController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetAuditListResponse> getAuditList(@Valid @RequestBody ObjectRequest<GetAuditListRequest> request) {
         logger.info("Received getAuditList request");
-        GetAuditListResponse response = auditLogService.getAuditLogList(request.getRequestObject());
+        final GetAuditListResponse response = auditLogService.getAuditLogList(request.getRequestObject());
         logger.info("The getAuditList request succeeded");
         return new ObjectResponse<>(response);
     }

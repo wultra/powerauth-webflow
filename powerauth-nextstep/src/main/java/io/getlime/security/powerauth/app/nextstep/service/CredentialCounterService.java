@@ -77,9 +77,9 @@ public class CredentialCounterService {
      */
     @Transactional
     public UpdateCounterResponse updateCredentialCounter(UpdateCounterRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialNotActiveException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        CredentialEntity credential = credentialService.findActiveCredential(credentialDefinition, user);
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final CredentialEntity credential = credentialService.findActiveCredential(credentialDefinition, user);
         updateCredentialCounter(credential, request.getAuthenticationResult());
         UpdateCounterResponse response = new UpdateCounterResponse();
         response.setUserId(user.getUserId());
@@ -95,9 +95,9 @@ public class CredentialCounterService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     public void updateCredentialCounter(CredentialEntity credential, AuthenticationResult authenticationResult) throws InvalidRequestException {
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
-        Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
-        Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final Integer softLimit = credentialDefinition.getCredentialPolicy().getLimitSoft();
+        final Integer hardLimit = credentialDefinition.getCredentialPolicy().getLimitHard();
         switch (authenticationResult) {
             case SUCCEEDED:
                 credential.setFailedAttemptCounterSoft(0);
@@ -136,14 +136,14 @@ public class CredentialCounterService {
      */
     @Transactional
     public ResetCountersResponse resetCounters(ResetCountersRequest request) {
-        List<CredentialEntity> blockedCredentials = credentialRepository.findAllByStatus(CredentialStatus.BLOCKED_TEMPORARY);
+        final List<CredentialEntity> blockedCredentials = credentialRepository.findAllByStatus(CredentialStatus.BLOCKED_TEMPORARY);
         for (CredentialEntity credential: blockedCredentials) {
             credential.setStatus(CredentialStatus.ACTIVE);
             credential.setFailedAttemptCounterSoft(0);
             credential.setTimestampBlocked(null);
         }
         credentialRepository.saveAll(blockedCredentials);
-        ResetCountersResponse response = new ResetCountersResponse();
+        final ResetCountersResponse response = new ResetCountersResponse();
         response.setResetCounterCount(blockedCredentials.size());
         return response;
     }

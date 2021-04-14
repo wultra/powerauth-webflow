@@ -71,7 +71,7 @@ public class OtpController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpResponse> createOtp(@Valid @RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, UserNotActiveException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
         logger.info("Received createOtp request, operation ID: {}, user ID: {}, OTP name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getUserId(), request.getRequestObject().getOtpName());
-        CreateOtpResponse response = otpService.createOtp(request.getRequestObject());
+        final CreateOtpResponse response = otpService.createOtp(request.getRequestObject());
         logger.info("The createOtp request succeeded, operation ID: {}, user ID: {}, OTP name: {}, OTP ID: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getUserId(), request.getRequestObject().getOtpName(), response.getOtpId());
         return new ObjectResponse<>(response);
     }
@@ -96,7 +96,7 @@ public class OtpController {
     @RequestMapping(value = "send", method = RequestMethod.POST)
     public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(@Valid @RequestBody ObjectRequest<CreateAndSendOtpRequest> request) throws UserNotActiveException, CredentialNotActiveException, InvalidRequestException, CredentialDefinitionNotFoundException, OperationAlreadyFailedException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, CredentialNotFoundException, OtpDefinitionNotFoundException, OperationNotFoundException, EncryptionException {
         logger.info("Received createAndSendOtp request, operation ID: {}, user ID: {}, OTP name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getUserId(), request.getRequestObject().getOtpName());
-        CreateAndSendOtpResponse response = otpService.createAndSendOtp(request.getRequestObject());
+        final CreateAndSendOtpResponse response = otpService.createAndSendOtp(request.getRequestObject());
         logger.info("The createAndSendOtp request succeeded, operation ID: {}, user ID: {}, OTP name: {}, OTP ID: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getUserId(), request.getRequestObject().getOtpName(), response.getOtpId());
         return new ObjectResponse<>(response);
     }
@@ -111,7 +111,7 @@ public class OtpController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpListResponse> getOptList(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getOptList request, operation ID: {}", request.getRequestObject().getOperationId());
-        GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
+        final GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
         logger.info("The getOptList request succeeded, operation ID: {}", request.getRequestObject().getOperationId());
         return new ObjectResponse<>(response);
     }
@@ -128,7 +128,7 @@ public class OtpController {
     @RequestMapping(value = "detail", method = RequestMethod.POST)
     public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getOtpDetail request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
-        GetOtpDetailResponse response = otpService.getOtpDetail(request.getRequestObject());
+        final GetOtpDetailResponse response = otpService.getOtpDetail(request.getRequestObject());
         logger.info("The getOtpDetail request succeeded, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         return new ObjectResponse<>(response);
     }
@@ -144,7 +144,7 @@ public class OtpController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<DeleteOtpResponse> deleteOtp(@Valid @RequestBody ObjectRequest<DeleteOtpRequest> request) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
         logger.info("Received deleteOtp request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
-        DeleteOtpResponse response = otpService.deleteOtp(request.getRequestObject());
+        final DeleteOtpResponse response = otpService.deleteOtp(request.getRequestObject());
         logger.info("The deleteOtp request succeeded, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         return new ObjectResponse<>(response);
     }

@@ -67,7 +67,7 @@ public class AuthMethodController {
     @RequestMapping(value = "auth-method", method = RequestMethod.POST)
     public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@Valid @RequestBody ObjectRequest<CreateAuthMethodRequest> request) throws AuthMethodAlreadyExistsException {
         logger.info("Received createAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
-        CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
+        final CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
         logger.info("The createAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
@@ -82,12 +82,12 @@ public class AuthMethodController {
     @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getAuthMethodList request");
-        List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
+        final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
         if (authMethods == null || authMethods.isEmpty()) {
             logger.error("No authentication method is configured in Next Step server");
             throw new InvalidConfigurationException("No authentication method is configured in Next Step server.");
         }
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        final GetAuthMethodsResponse response = new GetAuthMethodsResponse();
         response.getAuthMethods().addAll(authMethods);
         logger.debug("The getAuthMethodList request succeeded, available authentication method list size: {}", authMethods.size());
         return new ObjectResponse<>(response);
@@ -104,11 +104,11 @@ public class AuthMethodController {
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@Valid @RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", request.getRequestObject().getUserId());
-        GetUserAuthMethodsRequest requestObject = request.getRequestObject();
+        final GetUserAuthMethodsRequest requestObject = request.getRequestObject();
         // userId can be null - in this case default setting is returned when user is not known
-        String userId = requestObject.getUserId();
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        final String userId = requestObject.getUserId();
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication list size: {}", userAuthMethods.size());
         return new ObjectResponse<>(response);
@@ -125,21 +125,21 @@ public class AuthMethodController {
     @RequestMapping(value = "user/auth-method", method = RequestMethod.POST)
     public ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
         logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
+        final UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        final String userId = requestObject.getUserId();
         if (userId == null) {
             logger.error("Parameter userId is null in request object when enabling authentication method");
             throw new InvalidRequestException("Parameter userId is null in request object when enabling authentication method");
         }
-        AuthMethod authMethod = requestObject.getAuthMethod();
+        final AuthMethod authMethod = requestObject.getAuthMethod();
         if (authMethod == null) {
             logger.error("Parameter authMethod is null in request object when enabling authentication method");
             throw new InvalidRequestException("Parameter authMethod is null in request object when enabling authentication method");
         }
-        Map<String, String> config = requestObject.getConfig();
+        final Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, true, config);
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The enableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
@@ -160,21 +160,21 @@ public class AuthMethodController {
 
     private ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserImpl(ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
         logger.info("Received disableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
+        final UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        final String userId = requestObject.getUserId();
         if (userId == null) {
             logger.error("Parameter userId is null in request object when disabling authentication method");
             throw new InvalidRequestException("Parameter userId is null in request object when disabling authentication method");
         }
-        AuthMethod authMethod = requestObject.getAuthMethod();
+        final AuthMethod authMethod = requestObject.getAuthMethod();
         if (authMethod == null) {
             logger.error("Parameter authMethod is null in request object when disabling authentication method");
             throw new InvalidRequestException("Parameter authMethod is null in request object when disabling authentication method");
         }
-        Map<String, String> config = requestObject.getConfig();
+        final Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The disableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
@@ -190,7 +190,7 @@ public class AuthMethodController {
     public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getEnabledMethodList request, user ID: {}", request.getRequestObject().getUserId());
-        GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
+        final GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
         logger.debug("The getEnabledMethodList request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
         return new ObjectResponse<>(response);
     }
@@ -205,7 +205,7 @@ public class AuthMethodController {
     @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@Valid @RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
-        DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
+        final DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
         logger.info("The deleteAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }

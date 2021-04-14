@@ -55,11 +55,11 @@ public class OperationCustomizationService {
      * @param operation Operation entity.
      */
     public void notifyOperationChange(OperationEntity operation) {
-        GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
-        String userId = operationDetail.getUserId();
-        String organizationId = operationDetail.getOrganizationId();
-        OperationContext operationContext = operationConverter.toOperationContext(operation);
-        OperationChange operationChange;
+        final GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
+        final String userId = operationDetail.getUserId();
+        final String organizationId = operationDetail.getOrganizationId();
+        final OperationContext operationContext = operationConverter.toOperationContext(operation);
+        final OperationChange operationChange;
         switch (operationDetail.getResult()) {
             case DONE:
                 operationChange = OperationChange.DONE;

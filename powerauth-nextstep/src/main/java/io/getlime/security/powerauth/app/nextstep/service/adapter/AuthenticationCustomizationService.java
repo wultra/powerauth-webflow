@@ -70,10 +70,10 @@ public class AuthenticationCustomizationService {
      */
     public CredentialAuthenticationResponse authenticateWithCredential(String userId, String organizationId, String credentialValue, OperationEntity operation,
                                                                        AuthenticationContext authenticationContext) {
-        OperationContext operationContext = operationConverter.toOperationContext(operation);
+        final OperationContext operationContext = operationConverter.toOperationContext(operation);
         try {
-            UserAuthenticationResponse authResponse = dataAdapterClient.authenticateUser(userId, organizationId, credentialValue, authenticationContext, operationContext).getResponseObject();
-            CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
+            final UserAuthenticationResponse authResponse = dataAdapterClient.authenticateUser(userId, organizationId, credentialValue, authenticationContext, operationContext).getResponseObject();
+            final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
             response.setUserId(userId);
             response.setUserIdentityStatus(UserIdentityStatus.ACTIVE);
             if (authResponse.getAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
@@ -90,7 +90,7 @@ public class AuthenticationCustomizationService {
             return response;
         } catch (DataAdapterClientErrorException ex) {
             logger.warn(ex.getMessage(), ex);
-            CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
+            final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
             response.setUserId(userId);
             response.setAuthenticationResult(AuthenticationResult.FAILED);
             return response;
@@ -107,11 +107,11 @@ public class AuthenticationCustomizationService {
      * @return OTP authentication response.
      */
     public OtpAuthenticationResponse authenticateWithOtp(String otpId, String otpValue, String userId, String organizationId, OperationEntity operation) {
-        OperationContext operationContext = operationConverter.toOperationContext(operation);
-        AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getUserAccountStatus());
+        final OperationContext operationContext = operationConverter.toOperationContext(operation);
+        final AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getUserAccountStatus());
         try {
-            VerifySmsAuthorizationResponse authResponse = dataAdapterClient.verifyAuthorizationSms(otpId, otpValue, userId, organizationId, accountStatus, operationContext).getResponseObject();
-            OtpAuthenticationResponse response = new OtpAuthenticationResponse();
+            final VerifySmsAuthorizationResponse authResponse = dataAdapterClient.verifyAuthorizationSms(otpId, otpValue, userId, organizationId, accountStatus, operationContext).getResponseObject();
+            final OtpAuthenticationResponse response = new OtpAuthenticationResponse();
             response.setUserId(userId);
             response.setUserIdentityStatus(UserIdentityStatus.ACTIVE);
             if (authResponse.getSmsAuthorizationResult() == SmsAuthorizationResult.SUCCEEDED) {
@@ -125,7 +125,7 @@ public class AuthenticationCustomizationService {
             return response;
         } catch (DataAdapterClientErrorException ex) {
             logger.warn(ex.getMessage(), ex);
-            OtpAuthenticationResponse response = new OtpAuthenticationResponse();
+            final OtpAuthenticationResponse response = new OtpAuthenticationResponse();
             response.setUserId(userId);
             response.setAuthenticationResult(AuthenticationResult.FAILED);
             return response;
@@ -144,11 +144,11 @@ public class AuthenticationCustomizationService {
      */
     public CombinedAuthenticationResponse authenticateCombined(String otpId, String otpValue, String userId, String organizationId, String credentialValue, OperationEntity operation,
                                                                AuthenticationContext authenticationContext) {
-        OperationContext operationContext = operationConverter.toOperationContext(operation);
-        AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getUserAccountStatus());
+        final OperationContext operationContext = operationConverter.toOperationContext(operation);
+        final AccountStatus accountStatus = statusConverter.fromUserAccountStatus(operation.getUserAccountStatus());
         try {
-            VerifySmsAndPasswordResponse authResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(otpId, otpValue, userId, organizationId, accountStatus, credentialValue, authenticationContext, operationContext).getResponseObject();
-            CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
+            final VerifySmsAndPasswordResponse authResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(otpId, otpValue, userId, organizationId, accountStatus, credentialValue, authenticationContext, operationContext).getResponseObject();
+            final CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
             response.setUserId(userId);
             response.setUserIdentityStatus(UserIdentityStatus.ACTIVE);
             if (authResponse.getUserAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
@@ -175,7 +175,7 @@ public class AuthenticationCustomizationService {
             return response;
         } catch (DataAdapterClientErrorException ex) {
             logger.warn(ex.getMessage(), ex);
-            CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
+            final CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
             response.setUserId(userId);
             response.setAuthenticationResult(AuthenticationResult.FAILED);
             response.setOtpAuthenticationResult(AuthenticationResult.FAILED);

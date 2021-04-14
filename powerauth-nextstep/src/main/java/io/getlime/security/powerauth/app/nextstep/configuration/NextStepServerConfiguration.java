@@ -192,7 +192,7 @@ public class NextStepServerConfiguration {
      */
     @Bean
     public PowerAuthClient powerAuthClient() {
-        PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
+        final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
         config.setPowerAuthClientToken(powerAuthClientToken);
         config.setPowerAuthClientSecret(powerAuthClientSecret);
         config.setAcceptInvalidSslCertificate(powerAuthAcceptInvalidSslCertificate);

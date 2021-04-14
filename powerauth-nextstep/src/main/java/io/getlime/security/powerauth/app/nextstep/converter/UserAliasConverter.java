@@ -36,14 +36,14 @@ public class UserAliasConverter {
      * @return User alias detail.
      */
     public UserAliasDetail fromEntity(UserAliasEntity alias) throws JsonProcessingException {
-        UserAliasDetail aliasDetail = new UserAliasDetail();
+        final UserAliasDetail aliasDetail = new UserAliasDetail();
         aliasDetail.setAliasName(alias.getName());
         aliasDetail.setAliasValue(alias.getValue());
         aliasDetail.setUserAliasStatus(alias.getStatus());
         aliasDetail.setTimestampCreated(alias.getTimestampCreated());
         aliasDetail.setTimestampLastUpdated(alias.getTimestampLastUpdated());
         if (alias.getExtras() != null) {
-            Map<String, Object> extras = extrasConverter.fromString(alias.getExtras());
+            final Map<String, Object> extras = extrasConverter.fromString(alias.getExtras());
             aliasDetail.getExtras().putAll(extras);
         }
         return aliasDetail;

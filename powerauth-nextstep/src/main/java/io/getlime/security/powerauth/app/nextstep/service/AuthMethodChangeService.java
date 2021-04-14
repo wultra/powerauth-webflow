@@ -71,7 +71,7 @@ public class AuthMethodChangeService {
      */
     public UpdateOperationResponse downgradeAuthMethod(UpdateOperationRequest request, UpdateOperationResponse response, List<StepDefinitionEntity> stepDefinitions) {
         logger.info("Authentication downgrade started for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
-        AuthMethod targetAuthMethod = request.getTargetAuthMethod();
+        final AuthMethod targetAuthMethod = request.getTargetAuthMethod();
         if (targetAuthMethod == null) {
             // Invalid request - authentication method downgrade expects a target authentication method
             response.setResult(AuthResult.FAILED);
@@ -81,7 +81,7 @@ public class AuthMethodChangeService {
         }
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             if (stepDef.getResponseAuthMethod() == targetAuthMethod) {
-                AuthStep authStep = new AuthStep();
+                final AuthStep authStep = new AuthStep();
                 authStep.setAuthMethod(targetAuthMethod);
                 response.getSteps().add(authStep);
                 response.setResult(AuthResult.CONTINUE);
@@ -106,8 +106,8 @@ public class AuthMethodChangeService {
      */
     public UpdateOperationResponse setChosenAuthMethod(UpdateOperationRequest request, UpdateOperationResponse response) throws InvalidConfigurationException, OperationNotFoundException {
         logger.info("Set chosen authentication method started for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
-        String operationId = request.getOperationId();
-        AuthMethod targetAuthMethod = request.getTargetAuthMethod();
+        final String operationId = request.getOperationId();
+        final AuthMethod targetAuthMethod = request.getTargetAuthMethod();
         if (targetAuthMethod == null) {
             // Invalid request - authentication method choice expects a target authentication method
             response.setResult(AuthResult.FAILED);
@@ -115,11 +115,11 @@ public class AuthMethodChangeService {
             logger.info("Set chosen authentication method failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
-        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
         }
-        OperationEntity operation = operationOptional.get();
+        final OperationEntity operation = operationOptional.get();
         if (operation.getResult() != AuthResult.CONTINUE) {
             // Invalid request - authentication method choice expects a CONTINUE operation result
             response.setResult(AuthResult.FAILED);
@@ -150,13 +150,13 @@ public class AuthMethodChangeService {
      */
     private UpdateOperationResponse enableMobileToken(UpdateOperationResponse response, OperationEntity operation) throws InvalidConfigurationException {
         logger.info("Enable mobile token started for operation ID: {}", operation.getOperationId());
-        String userId = operation.getUserId();
+        final String userId = operation.getUserId();
         if (userId == null) {
             // User ID must be set before mobile token is enabled
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
         }
-        EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
+        final EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
         response.setMobileTokenActive(result.isEnabled());
         if (result.isEnabled()) {
             response.setPowerAuthOperationId(result.getPowerAuthOperationId());

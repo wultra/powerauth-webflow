@@ -74,7 +74,7 @@ public class OtpDefinitionController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpDefinitionResponse> createOtpDefinition(@Valid @RequestBody ObjectRequest<CreateOtpDefinitionRequest> request) throws OtpDefinitionAlreadyExistsException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         logger.info("Received createOtpDefinition request, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
-        CreateOtpDefinitionResponse response = otpDefinitionService.createOtpDefinition(request.getRequestObject());
+        final CreateOtpDefinitionResponse response = otpDefinitionService.createOtpDefinition(request.getRequestObject());
         logger.info("The createOtpDefinition request succeeded, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
         return new ObjectResponse<>(response);
     }
@@ -90,7 +90,7 @@ public class OtpDefinitionController {
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateOtpDefinitionResponse> updateOtpDefinition(@Valid @RequestBody ObjectRequest<UpdateOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         logger.info("Received updateOtpDefinition request, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
-        UpdateOtpDefinitionResponse response = otpDefinitionService.updateOtpDefinition(request.getRequestObject());
+        final UpdateOtpDefinitionResponse response = otpDefinitionService.updateOtpDefinition(request.getRequestObject());
         logger.info("The updateOtpDefinition request succeeded, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
         return new ObjectResponse<>(response);
     }
@@ -106,7 +106,7 @@ public class OtpDefinitionController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateOtpDefinitionResponse> updateOtpDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
         logger.info("Received updateOtpDefinitionPost request, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
-        UpdateOtpDefinitionResponse response = otpDefinitionService.updateOtpDefinition(request.getRequestObject());
+        final UpdateOtpDefinitionResponse response = otpDefinitionService.updateOtpDefinition(request.getRequestObject());
         logger.info("The updateOtpDefinitionPost request succeeded, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
         return new ObjectResponse<>(response);
     }
@@ -119,7 +119,7 @@ public class OtpDefinitionController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@Valid @RequestBody ObjectRequest<GetOtpDefinitionListRequest> request) {
         logger.info("Received getOtpDefinitionList request");
-        GetOtpDefinitionListResponse response = otpDefinitionService.getOtpDefinitionList(request.getRequestObject());
+        final GetOtpDefinitionListResponse response = otpDefinitionService.getOtpDefinitionList(request.getRequestObject());
         logger.info("The getOtpDefinitionList request succeeded");
         return new ObjectResponse<>(response);
     }
@@ -133,7 +133,7 @@ public class OtpDefinitionController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOtpDefinitionResponse> deleteOtpDefinition(@Valid @RequestBody ObjectRequest<DeleteOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException {
         logger.info("Received deleteOtpDefinition request, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
-        DeleteOtpDefinitionResponse response = otpDefinitionService.deleteOtpDefinition(request.getRequestObject());
+        final DeleteOtpDefinitionResponse response = otpDefinitionService.deleteOtpDefinition(request.getRequestObject());
         logger.info("The deleteOtpDefinition request succeeded, OTP definition name: {}", request.getRequestObject().getOtpDefinitionName());
         return new ObjectResponse<>(response);
     }

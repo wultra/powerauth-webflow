@@ -71,7 +71,7 @@ public class OrganizationController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOrganizationResponse> createOrganization(@Valid @RequestBody ObjectRequest<CreateOrganizationRequest> request) throws OrganizationAlreadyExistsException {
         logger.info("Received createOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
-        CreateOrganizationResponse response = organizationService.createOrganization(request.getRequestObject());
+        final CreateOrganizationResponse response = organizationService.createOrganization(request.getRequestObject());
         logger.info("The createOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
         return new ObjectResponse<>(response);
     }
@@ -86,7 +86,7 @@ public class OrganizationController {
     @RequestMapping(value = "detail", method = RequestMethod.POST)
     public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@Valid @RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
         logger.info("Received getOrganizationDetail request, organization ID: {}", request.getRequestObject().getOrganizationId());
-        GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request.getRequestObject());
+        final GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request.getRequestObject());
         logger.info("The getOrganizationDetail request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
         return new ObjectResponse<>(response);
     }
@@ -100,7 +100,7 @@ public class OrganizationController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOrganizationListResponse> getOrganizationList(@Valid @RequestBody ObjectRequest<GetOrganizationListRequest> request) {
         logger.info("Received getOrganizationList request");
-        GetOrganizationListResponse response = organizationService.getOrganizationList(request.getRequestObject());
+        final GetOrganizationListResponse response = organizationService.getOrganizationList(request.getRequestObject());
         logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);
     }
@@ -115,7 +115,7 @@ public class OrganizationController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
-        DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
+        final DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
         logger.info("The deleteOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
         return new ObjectResponse<>(response);
     }

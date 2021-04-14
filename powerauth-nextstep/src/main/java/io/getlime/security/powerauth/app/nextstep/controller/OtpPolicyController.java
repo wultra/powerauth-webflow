@@ -73,7 +73,7 @@ public class OtpPolicyController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpPolicyResponse> createOtpPolicy(@Valid @RequestBody ObjectRequest<CreateOtpPolicyRequest> request) throws OtpPolicyAlreadyExistsException, InvalidRequestException {
         logger.info("Received createOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
-        CreateOtpPolicyResponse response = otpPolicyService.createOtpPolicy(request.getRequestObject());
+        final CreateOtpPolicyResponse response = otpPolicyService.createOtpPolicy(request.getRequestObject());
         logger.info("The createOtpPolicy request succeeded, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -88,7 +88,7 @@ public class OtpPolicyController {
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicy(@Valid @RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
-        UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
+        final UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
         logger.info("The updateOtpPolicy request succeeded, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -103,7 +103,7 @@ public class OtpPolicyController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicyPost(@Valid @RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateOtpPolicyPost request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
-        UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
+        final UpdateOtpPolicyResponse response = otpPolicyService.updateOtpPolicy(request.getRequestObject());
         logger.info("The updateOtpPolicyPost request succeeded, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -117,7 +117,7 @@ public class OtpPolicyController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@Valid @RequestBody ObjectRequest<GetOtpPolicyListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getOtpPolicyList request");
-        GetOtpPolicyListResponse response = otpPolicyService.getOtpPolicyList(request.getRequestObject());
+        final GetOtpPolicyListResponse response = otpPolicyService.getOtpPolicyList(request.getRequestObject());
         logger.info("The getOtpPolicyList request succeeded");
         return new ObjectResponse<>(response);
     }
@@ -131,7 +131,7 @@ public class OtpPolicyController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOtpPolicyResponse> deleteOtpPolicy(@Valid @RequestBody ObjectRequest<DeleteOtpPolicyRequest> request) throws OtpPolicyNotFoundException {
         logger.info("Received deleteOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
-        DeleteOtpPolicyResponse response = otpPolicyService.deleteOtpPolicy(request.getRequestObject());
+        final DeleteOtpPolicyResponse response = otpPolicyService.deleteOtpPolicy(request.getRequestObject());
         logger.info("The deleteOtpPolicy request succeeded, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
         return new ObjectResponse<>(response);
     }

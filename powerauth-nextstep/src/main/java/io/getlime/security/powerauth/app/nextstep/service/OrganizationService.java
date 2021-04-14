@@ -70,7 +70,7 @@ public class OrganizationService {
      */
     @Transactional
     public CreateOrganizationResponse createOrganization(CreateOrganizationRequest request) throws OrganizationAlreadyExistsException {
-        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+        final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
         if (organizationOptional.isPresent()) {
             throw new OrganizationAlreadyExistsException("Organization already exists: " + request.getOrganizationId());
         }
@@ -82,7 +82,7 @@ public class OrganizationService {
         organization.setDefaultCredentialName(request.getDefaultCredentialName());
         organization.setDefaultOtpName(request.getDefaultOtpName());
         organization = organizationRepository.save(organization);
-        CreateOrganizationResponse response = new CreateOrganizationResponse();
+        final CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
         response.setDefault(organization.isDefault());
@@ -100,11 +100,11 @@ public class OrganizationService {
      */
     @Transactional
     public GetOrganizationDetailResponse getOrganizationDetail(GetOrganizationDetailRequest request) throws OrganizationNotFoundException {
-        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+        final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
         if (!organizationOptional.isPresent()) {
             throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
         }
-        OrganizationEntity organization = organizationOptional.get();
+        final OrganizationEntity organization = organizationOptional.get();
         return organizationConverter.fromOrganizationEntity(organization);
     }
 
@@ -115,10 +115,10 @@ public class OrganizationService {
      */
     @Transactional
     public GetOrganizationListResponse getOrganizationList(GetOrganizationListRequest requestObject) {
-        GetOrganizationListResponse response = new GetOrganizationListResponse();
-        List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
+        final GetOrganizationListResponse response = new GetOrganizationListResponse();
+        final List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
         for (OrganizationEntity organization: organizations) {
-            GetOrganizationDetailResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
+            final GetOrganizationDetailResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
             response.getOrganizations().add(orgResponse);
         }
         return response;
@@ -133,13 +133,13 @@ public class OrganizationService {
      */
     @Transactional
     public DeleteOrganizationResponse deleteOrganization(DeleteOrganizationRequest request) throws OrganizationNotFoundException, DeleteNotAllowedException {
-        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+        final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
         if (!organizationOptional.isPresent()) {
             throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
         }
-        OrganizationEntity organization = organizationOptional.get();
+        final OrganizationEntity organization = organizationOptional.get();
         organizationRepository.delete(organization);
-        DeleteOrganizationResponse response = new DeleteOrganizationResponse();
+        final DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         return response;
     }

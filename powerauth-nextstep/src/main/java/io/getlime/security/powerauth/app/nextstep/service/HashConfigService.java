@@ -76,17 +76,17 @@ public class HashConfigService {
      */
     @Transactional
     public CreateHashConfigResponse createHashConfig(CreateHashConfigRequest request) throws InvalidRequestException, HashConfigAlreadyExistsException {
-        Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
+        final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
         if (hashConfigOptional.isPresent()) {
             throw new HashConfigAlreadyExistsException("Hashing configuration already exists: " + request.getHashConfigName());
         }
-        HashConfigEntity hashConfig = new HashConfigEntity();
+        final HashConfigEntity hashConfig = new HashConfigEntity();
         hashConfig.setName(request.getHashConfigName());
         hashConfig.setAlgorithm(request.getAlgorithm());
         hashConfig.setStatus(HashConfigStatus.ACTIVE);
         if (request.getParameters() != null) {
             try {
-                String parameters = parameterConverter.fromMap(request.getParameters());
+                final String parameters = parameterConverter.fromMap(request.getParameters());
                 hashConfig.setParameters(parameters);
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
@@ -94,7 +94,7 @@ public class HashConfigService {
         }
         hashConfig.setTimestampCreated(new Date());
         hashConfigRepository.save(hashConfig);
-        CreateHashConfigResponse response = new CreateHashConfigResponse();
+        final CreateHashConfigResponse response = new CreateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
         response.setHashConfigStatus(hashConfig.getStatus());
@@ -111,11 +111,11 @@ public class HashConfigService {
      */
     @Transactional
     public UpdateHashConfigResponse updateHashConfig(UpdateHashConfigRequest request) throws HashConfigNotFoundException, InvalidRequestException {
-        Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
+        final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
         if (!hashConfigOptional.isPresent()) {
             throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
-        HashConfigEntity hashConfig = hashConfigOptional.get();
+        final HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.ACTIVE && request.getHashConfigStatus() != HashConfigStatus.ACTIVE) {
             throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
         }
@@ -123,7 +123,7 @@ public class HashConfigService {
         hashConfig.setStatus(HashConfigStatus.ACTIVE);
         if (request.getParameters() != null) {
             try {
-                String parameters = parameterConverter.fromMap(request.getParameters());
+                final String parameters = parameterConverter.fromMap(request.getParameters());
                 hashConfig.setParameters(parameters);
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
@@ -131,7 +131,7 @@ public class HashConfigService {
         }
         hashConfig.setTimestampLastUpdated(new Date());
         hashConfigRepository.save(hashConfig);
-        UpdateHashConfigResponse response = new UpdateHashConfigResponse();
+        final UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
         response.setHashConfigStatus(hashConfig.getStatus());
@@ -147,15 +147,15 @@ public class HashConfigService {
      */
     @Transactional
     public GetHashConfigListResponse getHashConfigList(GetHashConfigListRequest request) throws InvalidConfigurationException {
-        Iterable<HashConfigEntity> hashConfigs;
+        final Iterable<HashConfigEntity> hashConfigs;
         if (request.isIncludeRemoved()) {
             hashConfigs = hashConfigRepository.findAll();
         } else {
             hashConfigs = hashConfigRepository.findHashConfigByStatus(HashConfigStatus.ACTIVE);
         }
-        GetHashConfigListResponse response = new GetHashConfigListResponse();
+        final GetHashConfigListResponse response = new GetHashConfigListResponse();
         for (HashConfigEntity hashConfig : hashConfigs) {
-            HashConfigDetail hashConfigDetail = hashConfigConverter.fromEntity(hashConfig);
+            final HashConfigDetail hashConfigDetail = hashConfigConverter.fromEntity(hashConfig);
             response.getHashConfigs().add(hashConfigDetail);
         }
         return response;
@@ -169,17 +169,17 @@ public class HashConfigService {
      */
     @Transactional
     public DeleteHashConfigResponse deleteHashConfig(DeleteHashConfigRequest request) throws HashConfigNotFoundException {
-        Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
+        final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
         if (!hashConfigOptional.isPresent()) {
             throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
-        HashConfigEntity hashConfig = hashConfigOptional.get();
+        final HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.REMOVED) {
             hashConfig.setStatus(HashConfigStatus.REMOVED);
             hashConfig.setTimestampLastUpdated(new Date());
             hashConfigRepository.save(hashConfig);
         }
-        DeleteHashConfigResponse response = new DeleteHashConfigResponse();
+        final DeleteHashConfigResponse response = new DeleteHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setHashConfigStatus(HashConfigStatus.REMOVED);
         return response;

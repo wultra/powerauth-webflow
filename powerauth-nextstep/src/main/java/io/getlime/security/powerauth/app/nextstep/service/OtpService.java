@@ -108,11 +108,11 @@ public class OtpService {
      */
     @Transactional
     public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
-        OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
-        String userId = request.getUserId();
-        String credentialName = request.getCredentialName();
-        String otpData = request.getOtpData();
-        String operationId = request.getOperationId();
+        final OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
+        final String userId = request.getUserId();
+        final String credentialName = request.getCredentialName();
+        final String otpData = request.getOtpData();
+        final String operationId = request.getOperationId();
         return createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
     }
 
@@ -136,17 +136,17 @@ public class OtpService {
      */
     @Transactional
     public CreateAndSendOtpResponse createAndSendOtp(CreateAndSendOtpRequest request) throws OtpDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException, InvalidRequestException, InvalidConfigurationException, OtpGenAlgorithmNotSupportedException, CredentialDefinitionNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotFoundException, UserNotActiveException, EncryptionException {
-        OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
-        String userId = request.getUserId();
-        String credentialName = request.getCredentialName();
-        String otpData = request.getOtpData();
-        String operationId = request.getOperationId();
-        String language = request.getLanguage();
-        boolean dataAdapterProxyEnabled = otpDefinition.isDataAdapterProxyEnabled();
+        final OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
+        final String userId = request.getUserId();
+        final String credentialName = request.getCredentialName();
+        final String otpData = request.getOtpData();
+        final String operationId = request.getOperationId();
+        final String language = request.getLanguage();
+        final boolean dataAdapterProxyEnabled = otpDefinition.isDataAdapterProxyEnabled();
         boolean resend = false;
         // Operation is required, otherwise Data Adapter would not have enough context to generate SMS message
-        OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        List<OtpEntity> existingOtps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
+        final OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        final List<OtpEntity> existingOtps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
         if (!existingOtps.isEmpty()) {
             resend = true;
         }
@@ -157,9 +157,9 @@ public class OtpService {
 
         if (dataAdapterProxyEnabled) {
             // Create and send OTP code via Data Adapter
-            OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
+            final OtpDeliveryResult result = otpCustomizationService.createAndSendOtp(userId, operation, language, resend);
             // Store a local OTP record so that OTP can be found during authentication
-            OtpEntity otp = new OtpEntity();
+            final OtpEntity otp = new OtpEntity();
             otp.setOtpId(result.getOtpId());
             otp.setOtpDefinition(otpDefinition);
             otp.setCredentialDefinition(credentialDefinition);
@@ -168,7 +168,7 @@ public class OtpService {
             otp.setStatus(OtpStatus.EXTERNAL);
             otp.setTimestampCreated(new Date());
             otpRepository.save(otp);
-            CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
+            final CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
             response.setOtpName(otpDefinition.getName());
             response.setUserId(userId);
             response.setOtpId(result.getOtpId());
@@ -183,9 +183,9 @@ public class OtpService {
             return response;
         } else {
             // Create OTP in Next Step and send it via Data Adapter
-            CreateOtpResponse otpResponse = createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
-            OtpDeliveryResult result = otpCustomizationService.sendOtp(userId, operation, otpResponse.getOtpId(), otpResponse.getOtpValue(), language, resend);
-            CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
+            final CreateOtpResponse otpResponse = createOtpInternal(otpDefinition, userId, credentialName, otpData, operationId);
+            final OtpDeliveryResult result = otpCustomizationService.sendOtp(userId, operation, otpResponse.getOtpId(), otpResponse.getOtpValue(), language, resend);
+            final CreateAndSendOtpResponse response = new CreateAndSendOtpResponse();
             response.setOtpName(otpDefinition.getName());
             response.setUserId(userId);
             response.setOtpId(otpResponse.getOtpId());
@@ -257,15 +257,15 @@ public class OtpService {
         } else if (otpDefinition.getOtpPolicy().getGenAlgorithm() == OtpGenerationAlgorithm.OTP_DATA_DIGEST) {
             throw new InvalidRequestException("OTP data is not available for OTP definition: " + otpDefinition.getName());
         }
-        OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());
-        String otpId = idGeneratorService.generateOtpId();
-        OtpEntity otp = new OtpEntity();
+        final OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());
+        final String otpId = idGeneratorService.generateOtpId();
+        final OtpEntity otp = new OtpEntity();
         otp.setOtpId(otpId);
         otp.setOtpDefinition(otpDefinition);
         otp.setUserId(userId);
         otp.setCredentialDefinition(credentialDefinition);
         otp.setOperation(operation);
-        OtpValue otpValueDb = otpValueConverter.toDBValue(otpValueDetail.getOtpValue(), otpId, otpDefinition);
+        final OtpValue otpValueDb = otpValueConverter.toDBValue(otpValueDetail.getOtpValue(), otpId, otpDefinition);
         otp.setValue(otpValueDb.getValue());
         otp.setEncryptionAlgorithm(otpValueDb.getEncryptionAlgorithm());
         otp.setSalt(otpValueDetail.getSalt());
@@ -274,14 +274,14 @@ public class OtpService {
         otp.setAttemptCounter(0);
         otp.setFailedAttemptCounter(0);
         otp.setTimestampCreated(new Date());
-        Long expirationTime = otpDefinition.getOtpPolicy().getExpirationTime();
+        final Long expirationTime = otpDefinition.getOtpPolicy().getExpirationTime();
         if (expirationTime != null) {
-            Calendar cal = GregorianCalendar.getInstance();
+            final Calendar cal = GregorianCalendar.getInstance();
             cal.add(Calendar.SECOND, expirationTime.intValue());
             otp.setTimestampExpires(cal.getTime());
         }
         otpRepository.save(otp);
-        CreateOtpResponse response = new CreateOtpResponse();
+        final CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
         response.setUserId(userId);
         response.setOtpId(otp.getOtpId());
@@ -300,15 +300,15 @@ public class OtpService {
      */
     @Transactional
     public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
-        OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
-        List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
-        GetOtpListResponse response = new GetOtpListResponse();
+        final OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
+        final List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
+        final GetOtpListResponse response = new GetOtpListResponse();
         response.setOperationId(operation.getOperationId());
         for (OtpEntity otp : otpList) {
             if (!request.isIncludeRemoved() && otp.getStatus() == OtpStatus.REMOVED) {
                 continue;
             }
-            OtpDetail otpDetail = getOtpDetail(otp);
+            final OtpDetail otpDetail = getOtpDetail(otp);
             response.getOtpDetails().add(otpDetail);
         }
         return response;
@@ -326,9 +326,9 @@ public class OtpService {
      */
     @Transactional
     public GetOtpDetailResponse getOtpDetail(GetOtpDetailRequest request) throws OperationNotFoundException, OtpNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
-        OtpEntity otp = findOtp(request.getOtpId(), request.getOperationId());
-        OtpDetail otpDetail = getOtpDetail(otp);
-        GetOtpDetailResponse response = new GetOtpDetailResponse();
+        final OtpEntity otp = findOtp(request.getOtpId(), request.getOperationId());
+        final OtpDetail otpDetail = getOtpDetail(otp);
+        final GetOtpDetailResponse response = new GetOtpDetailResponse();
         response.setOperationId(request.getOperationId());
         response.setOtpDetail(otpDetail);
         return response;
@@ -344,13 +344,13 @@ public class OtpService {
      */
     @Transactional
     public DeleteOtpResponse deleteOtp(DeleteOtpRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException {
-        OtpEntity otp = findOtp(request.getOtpId(), request.getOperationId());
+        final OtpEntity otp = findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getStatus() == OtpStatus.REMOVED) {
             throw new OtpNotFoundException("OTP is already removed: " + request.getOtpId() + ", operation ID: " + request.getOperationId());
         }
         otp.setStatus(OtpStatus.REMOVED);
         otpRepository.save(otp);
-        DeleteOtpResponse response = new DeleteOtpResponse();
+        final DeleteOtpResponse response = new DeleteOtpResponse();
         response.setOtpId(otp.getOtpId());
         if (otp.getOperation() != null) {
             response.setOperationId(otp.getOperation().getOperationId());
@@ -369,9 +369,9 @@ public class OtpService {
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     public OtpEntity findOtp(String otpId, String operationId) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
-        OtpEntity otp;
+        final OtpEntity otp;
         if (otpId != null) {
-            Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
+            final Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
             if (!otpOptional.isPresent()) {
                 throw new OtpNotFoundException("OTP not found: " + otpId);
             }
@@ -385,8 +385,8 @@ public class OtpService {
                 }
             }
         } else if (operationId != null) {
-            OperationEntity operation = operationPersistenceService.getOperation(operationId);
-            List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
+            final OperationEntity operation = operationPersistenceService.getOperation(operationId);
+            final List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
             if (otpList.isEmpty()) {
                 throw new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId());
             }
@@ -405,7 +405,7 @@ public class OtpService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     private OtpDetail getOtpDetail(OtpEntity otp) throws InvalidConfigurationException, EncryptionException {
-        OtpDetail otpDetail = new OtpDetail();
+        final OtpDetail otpDetail = new OtpDetail();
         otpDetail.setOtpName(otp.getOtpDefinition().getName());
         if (otp.getUserId() != null) {
             otpDetail.setUserId(otp.getUserId());
@@ -414,11 +414,11 @@ public class OtpService {
         if (otp.getOperation() != null) {
             otpDetail.setOperationId(otp.getOperation().getOperationId());
         }
-        Integer remainingAttempts = resolveRemainingAttempts(otp);
+        final Integer remainingAttempts = resolveRemainingAttempts(otp);
         otpDetail.setRemainingAttempts(remainingAttempts);
         otpDetail.setOtpData(otp.getOtpData());
-        OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
-        String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
+        final OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
+        final String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
         otpDetail.setOtpValue(value);
         if (otp.getCredentialDefinition() != null) {
             otpDetail.setCredentialName(otp.getCredentialDefinition().getName());
@@ -439,14 +439,14 @@ public class OtpService {
      * @return Remaining attempts.
      */
     private Integer resolveRemainingAttempts(OtpEntity otp) {
-        OtpPolicyEntity otpPolicy = otp.getOtpDefinition().getOtpPolicy();
+        final OtpPolicyEntity otpPolicy = otp.getOtpDefinition().getOtpPolicy();
         Integer remainingAttempts = null;
         if (otpPolicy.getAttemptLimit() != null) {
             remainingAttempts = otpPolicy.getAttemptLimit() - otp.getFailedAttemptCounter();
         }
         if (otp.getOperation() != null) {
-            OperationEntity operationEntity = otp.getOperation();
-            Integer remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operationEntity);
+            final OperationEntity operationEntity = otp.getOperation();
+            final Integer remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operationEntity);
             if (remainingAttemptsOperation != null && (remainingAttempts == null || remainingAttemptsOperation < remainingAttempts)) {
                 return remainingAttemptsOperation;
             } else {

@@ -125,7 +125,7 @@ public class AuthenticationService {
      */
     @Transactional
     public CredentialAuthenticationResponse authenticateWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         if (credentialDefinition.isDataAdapterProxyEnabled()) {
             logger.info("Credential authentication proxied through Data Adapter");
             return authenticateWithCredentialCustom(credentialDefinition, request.getCredentialValue(), request.getOperationId(), request.getUserId(), request.getAuthMethod());
@@ -134,9 +134,9 @@ public class AuthenticationService {
         if (credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
-            CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
+            final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
             response.setUserId(user.getUserId());
             response.setUserIdentityStatus(user.getStatus());
             response.setAuthenticationResult(AuthenticationResult.FAILED);
@@ -150,11 +150,11 @@ public class AuthenticationService {
         if (request.isUpdateOperation() && operation == null) {
             throw new InvalidRequestException("Operation not found, however operation update requested for credential: " + request.getCredentialName());
         }
-        CredentialEntity credential = credentialService.findCredential(credentialDefinition, user);
+        final CredentialEntity credential = credentialService.findCredential(credentialDefinition, user);
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
 
         // Verify credential value
-        AuthenticationResult authenticationResult;
+        final AuthenticationResult authenticationResult;
         if (credential.getStatus() == CredentialStatus.ACTIVE) {
             authenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
         } else {
@@ -178,14 +178,12 @@ public class AuthenticationService {
         // Authentication needs to be saved before calling updateOperation
         authentication = authenticationRepository.save(authentication);
 
-        boolean lastAttempt = false;
-        if (user.getStatus() != UserIdentityStatus.ACTIVE || credential.getStatus() != CredentialStatus.ACTIVE) {
-            lastAttempt = true;
-        }
+        final boolean lastAttempt = user.getStatus() != UserIdentityStatus.ACTIVE ||
+                credential.getStatus() != CredentialStatus.ACTIVE;
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
-            UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation,
+            final UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation,
                     request.getAuthMethod(), authenticationResult, authentication.getAuthenticationId(),
                     lastAttempt, Collections.singletonList(AuthInstrument.CREDENTIAL));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
@@ -197,12 +195,12 @@ public class AuthenticationService {
             }
         }
 
-        Integer remainingAttempts = resolveRemainingAttempts(credential, null, operation);
+        final Integer remainingAttempts = resolveRemainingAttempts(credential, null, operation);
 
         logger.info("Credential authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), credential.getStatus(), operationFailed);
 
-        CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
+        final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         response.setTimestampBlocked(credential.getTimestampBlocked());
@@ -237,23 +235,20 @@ public class AuthenticationService {
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
-        OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        String organizationId = operation.getOperationId();
-        AuthenticationContext authenticationContext = new AuthenticationContext();
+        final OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        final String organizationId = operation.getOperationId();
+        final AuthenticationContext authenticationContext = new AuthenticationContext();
         if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
             authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
             authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
         } else {
             authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
         }
-        CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(userId, organizationId, credentialValue, operation, authenticationContext);
-        boolean lastAttempt = false;
-        if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
-                response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
-            lastAttempt = true;
-        }
+        final CredentialAuthenticationResponse response = authenticationCustomizationService.authenticateWithCredential(userId, organizationId, credentialValue, operation, authenticationContext);
+        final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
+                (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
         boolean operationFailed = false;
-        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(), null, lastAttempt, Collections.singletonList(AuthInstrument.CREDENTIAL));
+        final UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(), null, lastAttempt, Collections.singletonList(AuthInstrument.CREDENTIAL));
         if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
             operationFailed = true;
         }
@@ -280,7 +275,7 @@ public class AuthenticationService {
      */
     @Transactional
     public OtpAuthenticationResponse authenticateWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
-        OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
+        final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("OTP authentication proxied through Data Adapter");
             return authenticateWithOtpCustom(otp.getOtpDefinition(), otp.getOtpId(), request.getOtpValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
@@ -288,14 +283,14 @@ public class AuthenticationService {
         otp.setAttemptCounter(otp.getAttemptCounter() + 1);
         // User ID uses String reference in entity to allow OTP for users not present in Next Step.
         // Empty user ID is allowed for unknown identities.
-        String userId = otp.getUserId();
+        final String userId = otp.getUserId();
         UserIdentityEntity user = null;
         if (userId != null) {
-            Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(userId);
+            final Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(userId);
             if (userOptional.isPresent()) {
                 user = userOptional.get();
                 if (user.getStatus() != UserIdentityStatus.ACTIVE) {
-                    OtpAuthenticationResponse response = new OtpAuthenticationResponse();
+                    final OtpAuthenticationResponse response = new OtpAuthenticationResponse();
                     response.setUserId(userId);
                     response.setUserIdentityStatus(user.getStatus());
                     response.setAuthenticationResult(AuthenticationResult.FAILED);
@@ -313,7 +308,7 @@ public class AuthenticationService {
             throw new InvalidRequestException("Operation not found, however operation update requested for OTP: " + otp.getOtpDefinition().getName());
         }
 
-        AuthenticationResult authenticationResult;
+        final AuthenticationResult authenticationResult;
         CredentialEntity credential = null;
         boolean credentialActive = true;
 
@@ -364,16 +359,13 @@ public class AuthenticationService {
         // Authentication needs to be saved before calling updateOperation
         authentication = authenticationRepository.save(authentication);
 
-        boolean lastAttempt = false;
-        if ((user != null && user.getStatus() != UserIdentityStatus.ACTIVE)
+        final boolean lastAttempt = (user != null && user.getStatus() != UserIdentityStatus.ACTIVE)
                 || (credential != null && credential.getStatus() != CredentialStatus.ACTIVE)
-                || otp.getStatus() != OtpStatus.ACTIVE) {
-            lastAttempt = true;
-        }
+                || otp.getStatus() != OtpStatus.ACTIVE;
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
-            UpdateOperationResponse operationResponse = updateOperation(userId, operation, request.getAuthMethod(),
+            final UpdateOperationResponse operationResponse = updateOperation(userId, operation, request.getAuthMethod(),
                     authenticationResult, authentication.getAuthenticationId(), lastAttempt, Collections.singletonList(AuthInstrument.OTP_KEY));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
                 operationFailed = true;
@@ -384,7 +376,7 @@ public class AuthenticationService {
             }
         }
 
-        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
+        final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
         if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -395,7 +387,7 @@ public class AuthenticationService {
         logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
 
-        OtpAuthenticationResponse response = new OtpAuthenticationResponse();
+        final OtpAuthenticationResponse response = new OtpAuthenticationResponse();
         if (userId != null) {
             response.setUserId(userId);
         }
@@ -427,16 +419,13 @@ public class AuthenticationService {
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
-        OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        String organizationId = operation.getOperationId();
-        OtpAuthenticationResponse response = authenticationCustomizationService.authenticateWithOtp(otpId, otpValue, userId, organizationId, operation);
-        boolean lastAttempt = false;
-        if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
-                response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
-            lastAttempt = true;
-        }
+        final OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        final String organizationId = operation.getOperationId();
+        final OtpAuthenticationResponse response = authenticationCustomizationService.authenticateWithOtp(otpId, otpValue, userId, organizationId, operation);
+        final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
+                (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
         boolean operationFailed = false;
-        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
+        final UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
                 null, lastAttempt, Collections.singletonList(AuthInstrument.OTP_KEY));
         if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
             operationFailed = true;
@@ -464,16 +453,16 @@ public class AuthenticationService {
      */
     @Transactional
     public CombinedAuthenticationResponse authenticateCombined(CombinedAuthenticationRequest request) throws UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
-        OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
+        final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter");
             return authenticateCombinedCustom(otp.getCredentialDefinition(), otp.getOtpId(), request.getOtpValue(), request.getCredentialValue(), otp.getOperation().getOperationId(), otp.getUserId(), request.getAuthMethod());
         }
         otp.setAttemptCounter(otp.getAttemptCounter() + 1);
 
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
-            CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
+            final CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
             response.setUserId(user.getUserId());
             response.setUserIdentityStatus(user.getStatus());
             response.setAuthenticationResult(AuthenticationResult.FAILED);
@@ -495,16 +484,16 @@ public class AuthenticationService {
         if (request.getOperationId() != null && !request.getOperationId().equals(otp.getOperation().getOperationId())) {
             throw new InvalidRequestException("Operation ID mismatch for credential and OTP: " + request.getCredentialName() + ", " + otp.getOtpDefinition().getName());
         }
-        CredentialEntity credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final CredentialEntity credential = credentialService.findCredential(otp.getCredentialDefinition(), user);
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         String credentialValue = request.getCredentialValue();
         if (credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         credential.setAttemptCounter(credential.getAttemptCounter() + 1);
-        AuthenticationResult credentialAuthenticationResult;
-        AuthenticationResult otpAuthenticationResult;
-        AuthenticationResult authenticationResult;
+        final AuthenticationResult credentialAuthenticationResult;
+        final AuthenticationResult otpAuthenticationResult;
+        final AuthenticationResult authenticationResult;
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             // Fail authentication and block OTP in case credential is not active
             authenticationResult = AuthenticationResult.FAILED;
@@ -538,7 +527,6 @@ public class AuthenticationService {
             credentialCounterService.updateCredentialCounter(credential, authenticationResult);
         }
 
-
         AuthenticationEntity authentication = new AuthenticationEntity();
         authentication.setAuthenticationId(UUID.randomUUID().toString());
         authentication.setUserId(user.getUserId());
@@ -555,16 +543,13 @@ public class AuthenticationService {
         // Authentication needs to be saved before calling updateOperation
         authentication = authenticationRepository.save(authentication);
 
-        boolean lastAttempt = false;
-        if (user.getStatus() != UserIdentityStatus.ACTIVE
+        final boolean lastAttempt = user.getStatus() != UserIdentityStatus.ACTIVE
                 || credential.getStatus() != CredentialStatus.ACTIVE
-                || otp.getStatus() != OtpStatus.ACTIVE) {
-            lastAttempt = true;
-        }
+                || otp.getStatus() != OtpStatus.ACTIVE;
 
         boolean operationFailed = false;
         if (request.isUpdateOperation() && operation != null) {
-            UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation, request.getAuthMethod(),
+            final UpdateOperationResponse operationResponse = updateOperation(user.getUserId(), operation, request.getAuthMethod(),
                     authenticationResult, authentication.getAuthenticationId(), lastAttempt,
                     Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
             if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
@@ -577,7 +562,7 @@ public class AuthenticationService {
             }
         }
 
-        Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
+        final Integer remainingAttempts = resolveRemainingAttempts(credential, otp, operation);
         if (remainingAttempts == 0 && otp.getStatus() == OtpStatus.ACTIVE) {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
@@ -588,7 +573,7 @@ public class AuthenticationService {
         logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, credentialAuthenticationResult, otpAuthenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), otp.getStatus(), credential.getStatus(), operationFailed);
 
-        CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
+        final CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         response.setTimestampBlocked(credential.getTimestampBlocked());
@@ -616,23 +601,20 @@ public class AuthenticationService {
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
-        OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        String organizationId = operation.getOperationId();
-        AuthenticationContext authenticationContext = new AuthenticationContext();
+        final OperationEntity operation = operationPersistenceService.getOperation(operationId);
+        final String organizationId = operation.getOperationId();
+        final AuthenticationContext authenticationContext = new AuthenticationContext();
         if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
             authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
             authenticationContext.setCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
         } else {
             authenticationContext.setPasswordProtection(PasswordProtectionType.NO_PROTECTION);
         }
-        CombinedAuthenticationResponse response = authenticationCustomizationService.authenticateCombined(otpId, otpValue, userId, organizationId, credentialValue, operation, authenticationContext);
-        boolean lastAttempt = false;
-        if (response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
-                response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0) {
-            lastAttempt = true;
-        }
+        final CombinedAuthenticationResponse response = authenticationCustomizationService.authenticateCombined(otpId, otpValue, userId, organizationId, credentialValue, operation, authenticationContext);
+        final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
+                (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
         boolean operationFailed = false;
-        UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
+        final UpdateOperationResponse operationResponse = updateOperation(userId, operation, authMethod, response.getAuthenticationResult(),
                 null, lastAttempt, Arrays.asList(AuthInstrument.CREDENTIAL, AuthInstrument.OTP_KEY));
         if (operationResponse == null || operationResponse.getResult() == AuthResult.FAILED) {
             operationFailed = true;
@@ -649,13 +631,13 @@ public class AuthenticationService {
      */
     @Transactional
     public GetUserAuthenticationListResponse getUserAuthenticationList(GetUserAuthenticationListRequest request) throws UserNotFoundException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        List<AuthenticationEntity> authentications;
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final List<AuthenticationEntity> authentications;
         if (request.getCreatedStartDate() == null && request.getCreatedEndDate() == null) {
             authentications = authenticationRepository.findAllByUserIdOrderByTimestampCreatedDesc(user.getUserId());
         }  else {
-            Date startDate;
-            Date endDate;
+            final Date startDate;
+            final Date endDate;
             if (request.getCreatedStartDate() == null) {
                 startDate = new Date(0L);
             } else {
@@ -668,10 +650,10 @@ public class AuthenticationService {
             }
             authentications = authenticationRepository.findAuthenticationsByUserIdAndCreatedDate(user.getUserId(), startDate, endDate);
         }
-        GetUserAuthenticationListResponse response = new GetUserAuthenticationListResponse();
+        final GetUserAuthenticationListResponse response = new GetUserAuthenticationListResponse();
         response.setUserId(user.getUserId());
         for (AuthenticationEntity authentication: authentications) {
-            AuthenticationDetail authenticationDetail = authenticationConverter.fromEntity(authentication);
+            final AuthenticationDetail authenticationDetail = authenticationConverter.fromEntity(authentication);
             response.getAuthentications().add(authenticationDetail);
         }
         return response;
@@ -702,7 +684,7 @@ public class AuthenticationService {
             logger.info("Credential verification failed because temporary credential is expired, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
             return AuthenticationResult.FAILED;
         }
-        CredentialAuthenticationMode authModeResolved;
+        final CredentialAuthenticationMode authModeResolved;
         if (authenticationMode == null) {
             authModeResolved = CredentialAuthenticationMode.MATCH_EXACT;
         } else {
@@ -710,7 +692,7 @@ public class AuthenticationService {
         }
         switch (authModeResolved) {
             case MATCH_EXACT:
-                boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
+                final boolean credentialMatched = credentialProtectionService.verifyCredential(credentialValue, credential);
                 if (credentialMatched) {
                     logger.info("Credential verification succeeded, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                     return AuthenticationResult.SUCCEEDED;
@@ -727,12 +709,12 @@ public class AuthenticationService {
                     throw new InvalidConfigurationException("Credential verification is not possible in MATCH_ONLY_SPECIFIED_POSITIONS mode when credential hashing is enabled");
                 }
 
-                String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credential);
+                final String expectedCredentialValue = credentialProtectionService.extractCredentialValue(credential);
                 int counter = 0;
                 for (Integer position : credentialPositionsToVerify) {
                     try {
-                        char c1 = credentialValue.charAt(counter);
-                        char c2 = expectedCredentialValue.charAt(position);
+                        final char c1 = credentialValue.charAt(counter);
+                        final char c2 = expectedCredentialValue.charAt(position);
                         if (c1 != c2) {
                             logger.info("Credential verification failed for position match, user ID: {}, credential name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
                             return AuthenticationResult.FAILED;
@@ -772,8 +754,8 @@ public class AuthenticationService {
             logger.info("OTP verification failed because OTP is expired: {}", otp.getOtpId());
             return AuthenticationResult.FAILED;
         }
-        OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
-        String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
+        final OtpValue otpValueDb = new OtpValue(otp.getEncryptionAlgorithm(), otp.getValue());
+        final String value = otpValueConverter.fromDBValue(otpValueDb, otp.getOtpId(), otp.getOtpDefinition());
         if (value != null && value.equals(otpValue)) {
             logger.info("OTP verification succeeded, OTP ID: {}", otp.getOtpId());
             return AuthenticationResult.SUCCEEDED;
@@ -805,7 +787,7 @@ public class AuthenticationService {
     private UpdateOperationResponse updateOperation(String userId, OperationEntity operation, AuthMethod authMethod,
                                                     AuthenticationResult authenticationResult, String authenticationId,
                                                     boolean lastAttempt, List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
-        UpdateOperationRequest updateRequest = new UpdateOperationRequest();
+        final UpdateOperationRequest updateRequest = new UpdateOperationRequest();
         if (userId != null) {
             // User ID can be null during OTP authentication with unknown user identity. The referred user ID may not be present in Next Step.
             updateRequest.setUserId(userId);
@@ -816,9 +798,9 @@ public class AuthenticationService {
             updateRequest.setAuthMethod(authMethod);
         } else {
             // Determine authentication method, this only works when there is a single next method available
-            OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+            final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
             try {
-                List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<List<AuthStep>>() {});
+                final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<List<AuthStep>>() {});
                 if (authSteps.size() != 1) {
                     throw new InvalidRequestException("Authentication method could not be determined " +
                             "during credential authentication, operation ID: " + operation.getOperationId());
@@ -855,7 +837,7 @@ public class AuthenticationService {
     private Integer resolveRemainingAttempts(CredentialEntity credential, OtpEntity otp, OperationEntity operation) {
         Integer remainingAttempts = null;
         if (otp != null) {
-            Integer limitOtp = otp.getOtpDefinition().getOtpPolicy().getAttemptLimit();
+            final Integer limitOtp = otp.getOtpDefinition().getOtpPolicy().getAttemptLimit();
             if (otp.getStatus() != OtpStatus.ACTIVE) {
                 remainingAttempts = 0;
             } else if (limitOtp != null) {
@@ -863,26 +845,26 @@ public class AuthenticationService {
             }
         }
         if (credential != null) {
-            Integer softLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitSoft();
-            Integer hardLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitHard();
+            final Integer softLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitSoft();
+            final Integer hardLimit = credential.getCredentialDefinition().getCredentialPolicy().getLimitHard();
             if (credential.getStatus() != CredentialStatus.ACTIVE) {
                 remainingAttempts = 0;
             }
             if (credential.getStatus() == CredentialStatus.ACTIVE && softLimit != null) {
-                int remainingAttemptsSoft = softLimit - credential.getFailedAttemptCounterSoft();
+                final int remainingAttemptsSoft = softLimit - credential.getFailedAttemptCounterSoft();
                 if (remainingAttempts == null || remainingAttemptsSoft < remainingAttempts) {
                     remainingAttempts = remainingAttemptsSoft;
                 }
             }
             if (credential.getStatus() == CredentialStatus.ACTIVE && hardLimit != null) {
-                int remainingAttemptsHard = hardLimit - credential.getFailedAttemptCounterHard();
+                final int remainingAttemptsHard = hardLimit - credential.getFailedAttemptCounterHard();
                 if (remainingAttempts == null || remainingAttemptsHard < remainingAttempts) {
                     remainingAttempts = remainingAttemptsHard;
                 }
             }
         }
         if (operation != null) {
-            Integer remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operation);
+            final Integer remainingAttemptsOperation = stepResolutionService.getNumberOfRemainingAttempts(operation);
             if (remainingAttemptsOperation != null) {
                 if (remainingAttempts == null || remainingAttemptsOperation < remainingAttempts) {
                     remainingAttempts = remainingAttemptsOperation;

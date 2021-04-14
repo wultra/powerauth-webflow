@@ -86,7 +86,7 @@ public class CredentialValueConverter {
                 return credentialValue.getValue();
 
             case AES_HMAC:
-                String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
+                final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
                 if (masterDbEncryptionKeyBase64 == null || masterDbEncryptionKeyBase64.isEmpty()) {
@@ -94,23 +94,23 @@ public class CredentialValueConverter {
                 }
 
                 // Convert master DB encryption key
-                SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
-                SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
+                final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
 
                 // Base64-decode credential value
-                byte[] credentialValueBytes = BaseEncoding.base64().decode(credentialValue.getValue());
+                final byte[] credentialValueBytes = BaseEncoding.base64().decode(credentialValue.getValue());
 
                 // IV is present in first 16 bytes
-                byte[] iv = Arrays.copyOfRange(credentialValueBytes, 0, 16);
+                final byte[] iv = Arrays.copyOfRange(credentialValueBytes, 0, 16);
 
                 // Encrypted credential value is present after IV
-                byte[] encryptedCredentialValue = Arrays.copyOfRange(credentialValueBytes, 16, credentialValueBytes.length);
+                final byte[] encryptedCredentialValue = Arrays.copyOfRange(credentialValueBytes, 16, credentialValueBytes.length);
 
                 // Decrypt credential value
                 try {
-                    byte[] decryptedCredentialValue = aes.decrypt(encryptedCredentialValue, iv, secretKey);
+                    final byte[] decryptedCredentialValue = aes.decrypt(encryptedCredentialValue, iv, secretKey);
                     return new String(decryptedCredentialValue, StandardCharsets.UTF_8);
                 } catch (Exception ex) {
                     throw new EncryptionException(ex);
@@ -143,7 +143,7 @@ public class CredentialValueConverter {
                 return new CredentialValue(EncryptionAlgorithm.NO_ENCRYPTION, credentialValue);
 
             case AES_HMAC:
-                String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
+                final String masterDbEncryptionKeyBase64 = configuration.getMasterDbEncryptionKey();
 
                 // In case master DB encryption key does not exist, do not encrypt the server private key
                 if (masterDbEncryptionKeyBase64 == null || masterDbEncryptionKeyBase64.isEmpty()) {
@@ -151,26 +151,26 @@ public class CredentialValueConverter {
                 }
 
                 // Convert master DB encryption key
-                SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
+                final SecretKey masterDbEncryptionKey = keyConvertor.convertBytesToSharedSecretKey(BaseEncoding.base64().decode(masterDbEncryptionKeyBase64));
 
                 // Derive secret key from master DB encryption key, userId and activationId
-                SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
+                final SecretKey secretKey = deriveSecretKey(masterDbEncryptionKey, userId, credentialDefinition.getName());
 
                 try {
                     // Generate random IV
-                    byte[] iv = keyGenerator.generateRandomBytes(16);
+                    final byte[] iv = keyGenerator.generateRandomBytes(16);
 
                     // Encrypt serverPrivateKey using secretKey with generated IV
-                    byte[] encrypted = aes.encrypt(credentialValue.getBytes(StandardCharsets.UTF_8), iv, secretKey);
+                    final byte[] encrypted = aes.encrypt(credentialValue.getBytes(StandardCharsets.UTF_8), iv, secretKey);
 
                     // Generate output bytes as encrypted + IV
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     baos.write(iv);
                     baos.write(encrypted);
-                    byte[] record = baos.toByteArray();
+                    final byte[] record = baos.toByteArray();
 
                     // Base64-encode output
-                    String encoded = BaseEncoding.base64().encode(record);
+                    final String encoded = BaseEncoding.base64().encode(record);
 
                     // Return encrypted record including encryption algorithm
                     return new CredentialValue(EncryptionAlgorithm.AES_HMAC, encoded);
@@ -196,7 +196,7 @@ public class CredentialValueConverter {
     private SecretKey deriveSecretKey(SecretKey masterDbEncryptionKey, String userId, String credentialName) throws InvalidConfigurationException {
         try {
             // Use concatenated user ID and credential name bytes as index for KDF_INTERNAL
-            byte[] index = (userId + "&" + credentialName).getBytes(StandardCharsets.UTF_8);
+            final byte[] index = (userId + "&" + credentialName).getBytes(StandardCharsets.UTF_8);
 
             // Derive secretKey from master DB encryption key using KDF_INTERNAL with constructed index
             return keyGenerator.deriveSecretKeyHmac(masterDbEncryptionKey, index);

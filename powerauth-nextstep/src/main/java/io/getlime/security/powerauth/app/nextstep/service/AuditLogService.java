@@ -61,12 +61,12 @@ public class AuditLogService {
      */
     @Transactional
     public CreateAuditResponse createAuditLog(CreateAuditRequest request) {
-        AuditLogEntity auditLog = new AuditLogEntity();
+        final AuditLogEntity auditLog = new AuditLogEntity();
         auditLog.setAction(request.getAction());
         auditLog.setData(request.getData());
         auditLog.setTimestampCreated(new Date());
         auditLogRepository.save(auditLog);
-        CreateAuditResponse response = new CreateAuditResponse();
+        final CreateAuditResponse response = new CreateAuditResponse();
         response.setAction(auditLog.getAction());
         return response;
     }
@@ -78,12 +78,12 @@ public class AuditLogService {
      */
     @Transactional
     public GetAuditListResponse getAuditLogList(GetAuditListRequest request) {
-        Date startDate = request.getStartDate();
-        Date endDate = request.getEndDate();
-        Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAuditLogsByCreatedDate(startDate, endDate);
-        GetAuditListResponse response = new GetAuditListResponse();
+        final Date startDate = request.getStartDate();
+        final Date endDate = request.getEndDate();
+        final Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAuditLogsByCreatedDate(startDate, endDate);
+        final GetAuditListResponse response = new GetAuditListResponse();
         for (AuditLogEntity auditLog : auditLogs) {
-            AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);
+            final AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);
             response.getAudits().add(auditDetail);
         }
         return response;

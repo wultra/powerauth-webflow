@@ -37,7 +37,7 @@ public class HashConfigConverter {
      * @return Hashing configuration detail.
      */
     public HashConfigDetail fromEntity(HashConfigEntity hashConfig) throws InvalidConfigurationException {
-        HashConfigDetail hashConfigDetail = new HashConfigDetail();
+        final HashConfigDetail hashConfigDetail = new HashConfigDetail();
         hashConfigDetail.setHashConfigName(hashConfig.getName());
         hashConfigDetail.setAlgorithm(hashConfig.getAlgorithm());
         hashConfigDetail.setHashConfigStatus(hashConfig.getStatus());

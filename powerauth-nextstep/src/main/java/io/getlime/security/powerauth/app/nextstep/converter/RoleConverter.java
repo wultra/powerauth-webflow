@@ -31,7 +31,7 @@ public class RoleConverter {
      * @return Role detail.
      */
     public RoleDetail fromEntity(RoleEntity role) {
-        RoleDetail roleDetail = new RoleDetail();
+        final RoleDetail roleDetail = new RoleDetail();
         roleDetail.setRoleName(role.getName());
         roleDetail.setDescription(role.getDescription());
         roleDetail.setTimestampCreated(role.getTimestampCreated());

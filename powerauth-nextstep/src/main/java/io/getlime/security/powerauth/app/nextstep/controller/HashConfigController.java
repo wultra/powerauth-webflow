@@ -73,7 +73,7 @@ public class HashConfigController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateHashConfigResponse> createHashConfig(@Valid @RequestBody ObjectRequest<CreateHashConfigRequest> request) throws InvalidRequestException, HashConfigAlreadyExistsException {
         logger.info("Received createHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
-        CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
+        final CreateHashConfigResponse response = hashConfigService.createHashConfig(request.getRequestObject());
         logger.info("The createHashConfig request succeeded, hash config name: {}", request.getRequestObject().getHashConfigName());
         return new ObjectResponse<>(response);
     }
@@ -88,7 +88,7 @@ public class HashConfigController {
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfig(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         logger.info("Received updateHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
-        UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
+        final UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         logger.info("The updateHashConfig request succeeded, hash config name: {}", request.getRequestObject().getHashConfigName());
         return new ObjectResponse<>(response);
     }
@@ -103,7 +103,7 @@ public class HashConfigController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateHashConfigResponse> updateHashConfigPost(@Valid @RequestBody ObjectRequest<UpdateHashConfigRequest> request) throws HashConfigNotFoundException, InvalidRequestException {
         logger.info("Received updateHashConfigPost request, hash config name: {}", request.getRequestObject().getHashConfigName());
-        UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
+        final UpdateHashConfigResponse response = hashConfigService.updateHashConfig(request.getRequestObject());
         logger.info("The updateHashConfigPost request succeeded, hash config name: {}", request.getRequestObject().getHashConfigName());
         return new ObjectResponse<>(response);
     }
@@ -117,7 +117,7 @@ public class HashConfigController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetHashConfigListResponse> getHashConfigList(@Valid @RequestBody ObjectRequest<GetHashConfigListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getHashConfigList request");
-        GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
+        final GetHashConfigListResponse response = hashConfigService.getHashConfigList(request.getRequestObject());
         logger.info("The getHashConfigList request succeeded");
         return new ObjectResponse<>(response);
     }
@@ -131,7 +131,7 @@ public class HashConfigController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteHashConfigResponse> deleteHashConfig(@Valid @RequestBody ObjectRequest<DeleteHashConfigRequest> request) throws HashConfigNotFoundException {
         logger.info("Received deleteHashConfig request, hash config name: {}", request.getRequestObject().getHashConfigName());
-        DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());
+        final DeleteHashConfigResponse response = hashConfigService.deleteHashConfig(request.getRequestObject());
         logger.info("The deleteHashConfig request succeeded, hash config name: {}", request.getRequestObject().getHashConfigName());
         return new ObjectResponse<>(response);
     }

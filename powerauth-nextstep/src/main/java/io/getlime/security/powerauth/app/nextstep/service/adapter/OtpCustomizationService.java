@@ -62,13 +62,13 @@ public class OtpCustomizationService {
      * @return OTP delivery result.
      */
     public OtpDeliveryResult createAndSendOtp(String userId, OperationEntity operation, String language, boolean resend) {
-        OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
+        final OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         try {
-            GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
-            String organizationId = operationDetail.getOrganizationId();
-            AuthMethod authMethod = operationDetail.getChosenAuthMethod();
-            OperationContext operationContext = operationConverter.toOperationContext(operation);
-            CreateSmsAuthorizationResponse response = dataAdapterClient.createAndSendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
+            final GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
+            final String organizationId = operationDetail.getOrganizationId();
+            final AuthMethod authMethod = operationDetail.getChosenAuthMethod();
+            final OperationContext operationContext = operationConverter.toOperationContext(operation);
+            final CreateSmsAuthorizationResponse response = dataAdapterClient.createAndSendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
             otpDeliveryResult.setErrorMessage(response.getErrorMessage());
@@ -91,14 +91,14 @@ public class OtpCustomizationService {
      * @return OTP delivery result.
      */
     public OtpDeliveryResult sendOtp(String userId, OperationEntity operation, String otpId, String otpValue, String language, boolean resend) {
-        OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
+        final OtpDeliveryResult otpDeliveryResult = new OtpDeliveryResult();
         otpDeliveryResult.setOtpId(otpId);
         try {
-            GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
-            String organizationId = operationDetail.getOrganizationId();
-            AuthMethod authMethod = operationDetail.getChosenAuthMethod();
-            OperationContext operationContext = operationConverter.toOperationContext(operation);
-            SendAuthorizationSmsResponse response = dataAdapterClient.sendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, otpId, otpValue, language, resend).getResponseObject();
+            final GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
+            final String organizationId = operationDetail.getOrganizationId();
+            final AuthMethod authMethod = operationDetail.getChosenAuthMethod();
+            final OperationContext operationContext = operationConverter.toOperationContext(operation);
+            final SendAuthorizationSmsResponse response = dataAdapterClient.sendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, otpId, otpValue, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
             otpDeliveryResult.setErrorMessage(response.getErrorMessage());

@@ -64,11 +64,11 @@ public class StepDefinitionService {
      */
     @Transactional
     public CreateStepDefinitionResponse createStepDefinition(CreateStepDefinitionRequest request) throws StepDefinitionAlreadyExistsException {
-        Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
+        final Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
         if (stepDefinitionOptional.isPresent()) {
             throw new StepDefinitionAlreadyExistsException("Step definition already exits, ID: " + request.getStepDefinitionId());
         }
-        StepDefinitionEntity stepDefinition = new StepDefinitionEntity();
+        final StepDefinitionEntity stepDefinition = new StepDefinitionEntity();
         stepDefinition.setStepDefinitionId(request.getStepDefinitionId());
         stepDefinition.setOperationName(request.getOperationName());
         stepDefinition.setOperationType(request.getOperationRequestType());
@@ -79,7 +79,7 @@ public class StepDefinitionService {
         stepDefinition.setResponseResult(request.getResponseResult());
         stepDefinitionRepository.save(stepDefinition);
         stepResolutionService.reloadStepDefinitions();
-        CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
+        final CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
         response.setStepDefinitionId(request.getStepDefinitionId());
         response.setOperationName(request.getOperationName());
         response.setOperationRequestType(request.getOperationRequestType());
@@ -99,14 +99,14 @@ public class StepDefinitionService {
      */
     @Transactional
     public DeleteStepDefinitionResponse deleteStepDefinition(DeleteStepDefinitionRequest request) throws StepDefinitionNotFoundException {
-        Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
+        final Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
         if (!stepDefinitionOptional.isPresent()) {
             throw new StepDefinitionNotFoundException("Step definition not found, ID: " + request.getStepDefinitionId());
         }
-        StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
+        final StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
         stepDefinitionRepository.delete(stepDefinition);
         stepResolutionService.reloadStepDefinitions();
-        DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();
+        final DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();
         response.setStepDefinitionId(stepDefinition.getStepDefinitionId());
         return response;
     }

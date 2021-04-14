@@ -31,7 +31,7 @@ public class UserContactConverter {
      * @return User contact detail.
      */
     public UserContactDetail fromEntity(UserContactEntity contact) {
-        UserContactDetail contactDetail = new UserContactDetail();
+        final UserContactDetail contactDetail = new UserContactDetail();
         contactDetail.setContactName(contact.getName());
         contactDetail.setContactType(contact.getType());
         contactDetail.setContactValue(contact.getValue());

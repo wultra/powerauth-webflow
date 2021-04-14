@@ -73,32 +73,32 @@ public class EndToEndEncryptionService {
         if (!credentialDefinition.isE2eEncryptionEnabled()) {
             return credentialValue;
         }
-        EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
+        final EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
         if (algorithm == null) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is missing");
         }
         if (algorithm != EndToEndEncryptionAlgorithm.AES) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is not supported: " + algorithm);
         }
-        String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
+        final String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
         if (cipherTransformation == null || cipherTransformation.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption cipher transformation is missing");
         }
-        String e2eEncryptionKey = configuration.getE2eEncryptionKey();
+        final String e2eEncryptionKey = configuration.getE2eEncryptionKey();
         if (e2eEncryptionKey == null || e2eEncryptionKey.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption key is missing");
         }
         try {
             // Convert secret key from Base64 String to SecretKey
-            byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
-            SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
+            final byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
+            final SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
 
-            byte[] ivBytes = keyGenerator.generateRandomBytes(16);
+            final byte[] ivBytes = keyGenerator.generateRandomBytes(16);
             // Encrypt password bytes using random IV, secret key and transformation
-            byte[] credentialValueBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
-            byte[] encryptedCredentialBytes = aes.encrypt(credentialValueBytes, ivBytes, secretKey, cipherTransformation);
-            String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
-            String ivBase64 = BaseEncoding.base64().encode(ivBytes);
+            final byte[] credentialValueBytes = credentialValue.getBytes(StandardCharsets.UTF_8);
+            final byte[] encryptedCredentialBytes = aes.encrypt(credentialValueBytes, ivBytes, secretKey, cipherTransformation);
+            final String encryptedCredentialBase64 = BaseEncoding.base64().encode(encryptedCredentialBytes);
+            final String ivBase64 = BaseEncoding.base64().encode(ivBytes);
             return ivBase64 + ":" + encryptedCredentialBase64;
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
             throw new EncryptionException(ex);
@@ -121,34 +121,34 @@ public class EndToEndEncryptionService {
         if (!encryptedValue.contains(":")) {
             throw new InvalidRequestException("Invalid format of encrypted credential value");
         }
-        EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
+        final EndToEndEncryptionAlgorithm algorithm = credentialDefinition.getE2eEncryptionAlgorithm();
         if (algorithm == null) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is missing");
         }
         if (algorithm != EndToEndEncryptionAlgorithm.AES) {
             throw new InvalidConfigurationException("End-to-end encryption algorithm is not supported: " + algorithm);
         }
-        String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
+        final String cipherTransformation = credentialDefinition.getE2eEncryptionCipherTransformation();
         if (cipherTransformation == null || cipherTransformation.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption cipher transformation is missing");
         }
-        String e2eEncryptionKey = configuration.getE2eEncryptionKey();
+        final String e2eEncryptionKey = configuration.getE2eEncryptionKey();
         if (e2eEncryptionKey == null || e2eEncryptionKey.isEmpty()) {
             throw new InvalidConfigurationException("End-to-end encryption key is missing");
         }
         try {
             // Convert secret key from Base64 String to SecretKey
-            byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
-            SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
+            final byte[] secretKeyBytes = BaseEncoding.base64().decode(e2eEncryptionKey);
+            final SecretKey secretKey = keyConvertor.convertBytesToSharedSecretKey(secretKeyBytes);
 
             // Decrypt encrypted credential value
-            String[] parts = encryptedValue.split(":");
+            final String[] parts = encryptedValue.split(":");
             if (parts.length != 2 || parts[0].isEmpty() || parts[1].isEmpty()) {
                 throw new InvalidRequestException("Invalid format of encrypted credential value");
             }
-            byte[] iv = BaseEncoding.base64().decode(parts[0]);
-            byte[] encryptedBytes = BaseEncoding.base64().decode(parts[1]);
-            byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
+            final byte[] iv = BaseEncoding.base64().decode(parts[0]);
+            final byte[] encryptedBytes = BaseEncoding.base64().decode(parts[1]);
+            final byte[] decryptedBytes = aes.decrypt(encryptedBytes, iv, secretKey, cipherTransformation);
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (CryptoProviderException | InvalidKeyException | GenericCryptoException ex) {
             throw new EncryptionException(ex);

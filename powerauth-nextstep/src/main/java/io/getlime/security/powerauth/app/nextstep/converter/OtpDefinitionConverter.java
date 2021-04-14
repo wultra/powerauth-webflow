@@ -31,7 +31,7 @@ public class OtpDefinitionConverter {
      * @return OTP definition detail.
      */
     public OtpDefinitionDetail fromEntity(OtpDefinitionEntity otpDefinition) {
-        OtpDefinitionDetail otpDefinitionDetail = new OtpDefinitionDetail();
+        final OtpDefinitionDetail otpDefinitionDetail = new OtpDefinitionDetail();
         otpDefinitionDetail.setOtpDefinitionName(otpDefinition.getName());
         otpDefinitionDetail.setDescription(otpDefinition.getDescription());
         otpDefinitionDetail.setOtpDefinitionStatus(otpDefinition.getStatus());

@@ -66,7 +66,7 @@ public class StepDefinitionController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateStepDefinitionResponse> createStepDefinition(@Valid @RequestBody ObjectRequest<CreateStepDefinitionRequest> request) throws StepDefinitionAlreadyExistsException {
         logger.info("Received createStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
-        CreateStepDefinitionResponse response = stepDefinitionService.createStepDefinition(request.getRequestObject());
+        final CreateStepDefinitionResponse response = stepDefinitionService.createStepDefinition(request.getRequestObject());
         logger.info("The createStepDefinition request succeeded, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
         return new ObjectResponse<>(response);
     }
@@ -80,7 +80,7 @@ public class StepDefinitionController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteStepDefinitionResponse> deleteStepDefinition(@Valid @RequestBody ObjectRequest<DeleteStepDefinitionRequest> request) throws StepDefinitionNotFoundException {
         logger.info("Received deleteStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
-        DeleteStepDefinitionResponse response = stepDefinitionService.deleteStepDefinition(request.getRequestObject());
+        final DeleteStepDefinitionResponse response = stepDefinitionService.deleteStepDefinition(request.getRequestObject());
         logger.info("The deleteStepDefinition request succeeded, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
         return new ObjectResponse<>(response);
     }

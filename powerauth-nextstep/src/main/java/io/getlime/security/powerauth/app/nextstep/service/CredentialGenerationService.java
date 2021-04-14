@@ -71,7 +71,7 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown in case username could not be generated.
      */
     public String generateUsername(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getUsernameGenAlgorithm()) {
             case RANDOM_DIGITS:
                 try {
@@ -106,7 +106,7 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown in case credential value could not be generated.
      */
     public String generateCredentialValue(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         switch (credentialPolicy.getCredentialGenAlgorithm()) {
             case RANDOM_PASSWORD:
                 try {
@@ -138,25 +138,25 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomUsernameWithDigits(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        UsernameGenerationParam param;
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final UsernameGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        int length = param.getLength();
-        SecureRandom secureRandom = new SecureRandom();
-        int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
+        final int length = param.getLength();
+        final SecureRandom secureRandom = new SecureRandom();
+        final int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
         for (int i = 0; i < generateUsernameMaxAttempts; i++) {
-            BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
-            BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
-            String username = randomNumber.toString();
+            final BigInteger bound = BigInteger.valueOf(Math.round(Math.pow(10, length)));
+            final BigInteger randomNumber = new BigInteger(bound.bitLength(), secureRandom).mod(bound);
+            final String username = randomNumber.toString();
             if (username.length() < length) {
                 // This can happen with leading zeros
                 continue;
             }
-            Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
             if (credentialOptional.isPresent()) {
                 // Username is already taken
                 continue;
@@ -173,24 +173,24 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomUsernameWithLetters(CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        UsernameGenerationParam param;
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final UsernameGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getUsernameGenParam(), UsernameGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        int length = param.getLength();
-        SecureRandom secureRandom = new SecureRandom();
-        int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
+        final int length = param.getLength();
+        final SecureRandom secureRandom = new SecureRandom();
+        final int generateUsernameMaxAttempts = nextStepServerConfiguration.getGenerateUsernameMaxAttempts();
         for (int i = 0; i < generateUsernameMaxAttempts; i++) {
-            StringBuilder usernameBuilder = new StringBuilder();
+            final StringBuilder usernameBuilder = new StringBuilder();
             for (int j = 0; j < length; j++) {
-                char c = (char) (secureRandom.nextInt(26) + 'a');
+                final char c = (char) (secureRandom.nextInt(26) + 'a');
                 usernameBuilder.append(c);
             }
-            String username = usernameBuilder.toString();
-            Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final String username = usernameBuilder.toString();
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
             if (credentialOptional.isPresent()) {
                 // Username is already taken
                 continue;
@@ -207,31 +207,31 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomPassword(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
-        CredentialGenerationParam param;
+        final CredentialGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        int length = param.getLength();
+        final int length = param.getLength();
         int countFromRules = 0;
-        boolean includeSmallLetters = param.isIncludeSmallLetters();
-        Integer smallLettersCount = param.getSmallLettersCount();
+        final boolean includeSmallLetters = param.isIncludeSmallLetters();
+        final Integer smallLettersCount = param.getSmallLettersCount();
         if (smallLettersCount != null) {
             countFromRules += smallLettersCount;
         }
-        boolean includeCapitalLetters = param.isIncludeCapitalLetters();
-        Integer capitalLettersCount = param.getCapitalLettersCount();
+        final boolean includeCapitalLetters = param.isIncludeCapitalLetters();
+        final Integer capitalLettersCount = param.getCapitalLettersCount();
         if (capitalLettersCount != null) {
             countFromRules += capitalLettersCount;
         }
-        boolean includeDigits = param.isIncludeDigits();
-        Integer digitsCount = param.getDigitsCount();
+        final boolean includeDigits = param.isIncludeDigits();
+        final Integer digitsCount = param.getDigitsCount();
         if (digitsCount != null) {
             countFromRules += digitsCount;
         }
-        boolean includeSpecialChars = param.isIncludeSpecialChars();
-        Integer specialCharsCount = param.getSpecialCharsCount();
+        final boolean includeSpecialChars = param.isIncludeSpecialChars();
+        final Integer specialCharsCount = param.getSpecialCharsCount();
         if (specialCharsCount != null) {
             countFromRules += specialCharsCount;
         }
@@ -241,10 +241,10 @@ public class CredentialGenerationService {
         if (countFromRules > 0 && countFromRules != length) {
             throw new InvalidConfigurationException("Invalid configuration of algorithm RANDOM_PASSWORD: credential length does not match rules");
         }
-        PasswordGenerator passwordGenerator = new PasswordGenerator();
-        List<CharacterRule> characterRules = new ArrayList<>();
+        final PasswordGenerator passwordGenerator = new PasswordGenerator();
+        final List<CharacterRule> characterRules = new ArrayList<>();
         if (includeSmallLetters) {
-            CharacterRule rule;
+            final CharacterRule rule;
             if (smallLettersCount == null) {
                 rule = new CharacterRule(EnglishCharacterData.LowerCase);
             } else {
@@ -253,7 +253,7 @@ public class CredentialGenerationService {
             characterRules.add(rule);
         }
         if (includeCapitalLetters) {
-            CharacterRule rule;
+            final CharacterRule rule;
             if (capitalLettersCount == null) {
                 rule = new CharacterRule(EnglishCharacterData.UpperCase);
             } else {
@@ -262,7 +262,7 @@ public class CredentialGenerationService {
             characterRules.add(rule);
         }
         if (includeDigits) {
-            CharacterRule rule;
+            final CharacterRule rule;
             if (digitsCount == null) {
                 rule = new CharacterRule(EnglishCharacterData.Digit);
             } else {
@@ -271,7 +271,7 @@ public class CredentialGenerationService {
             characterRules.add(rule);
         }
         if (includeSpecialChars) {
-            CharacterRule rule;
+            final CharacterRule rule;
             if (specialCharsCount == null) {
                 rule = new CharacterRule(new SpecialCharacters());
             } else {
@@ -289,14 +289,14 @@ public class CredentialGenerationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String generateRandomPin(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
-        CredentialGenerationParam param;
+        final CredentialGenerationParam param;
         try {
             param = parameterConverter.fromString(credentialPolicy.getCredentialGenParam(), CredentialGenerationParam.class);
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
         }
-        int length = param.getLength();
-        PasswordGenerator passwordGenerator = new PasswordGenerator();
+        final int length = param.getLength();
+        final PasswordGenerator passwordGenerator = new PasswordGenerator();
         return passwordGenerator.generatePassword(length, new CharacterRule(EnglishCharacterData.Digit));
     }
 

@@ -73,7 +73,7 @@ public class CredentialPolicyController {
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateCredentialPolicyResponse> createCredentialPolicy(@Valid @RequestBody ObjectRequest<CreateCredentialPolicyRequest> request) throws CredentialPolicyAlreadyExistsException, InvalidRequestException {
         logger.info("Received createCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
-        CreateCredentialPolicyResponse response = credentialPolicyService.createCredentialPolicy(request.getRequestObject());
+        final CreateCredentialPolicyResponse response = credentialPolicyService.createCredentialPolicy(request.getRequestObject());
         logger.info("The createCredentialPolicy request succeeded, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -88,7 +88,7 @@ public class CredentialPolicyController {
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicy(@Valid @RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
-        UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
+        final UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
         logger.info("The updateCredentialPolicy request succeeded, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -103,7 +103,7 @@ public class CredentialPolicyController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateCredentialPolicyResponse> updateCredentialPolicyPost(@Valid @RequestBody ObjectRequest<UpdateCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateCredentialPolicyPost request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
-        UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
+        final UpdateCredentialPolicyResponse response = credentialPolicyService.updateCredentialPolicy(request.getRequestObject());
         logger.info("The updateCredentialPolicyPost request succeeded, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         return new ObjectResponse<>(response);
     }
@@ -117,7 +117,7 @@ public class CredentialPolicyController {
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@Valid @RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getCredentialPolicyList request");
-        GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
+        final GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
         logger.info("The getCredentialPolicyList request succeeded");
         return new ObjectResponse<>(response);
     }
@@ -131,7 +131,7 @@ public class CredentialPolicyController {
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteCredentialPolicyResponse> deleteCredentialPolicy(@Valid @RequestBody ObjectRequest<DeleteCredentialPolicyRequest> request) throws CredentialPolicyNotFoundException {
         logger.info("Received deleteCredentialPolicy request, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
-        DeleteCredentialPolicyResponse response = credentialPolicyService.deleteCredentialPolicy(request.getRequestObject());
+        final DeleteCredentialPolicyResponse response = credentialPolicyService.deleteCredentialPolicy(request.getRequestObject());
         logger.info("The deleteCredentialPolicy request succeeded, credential policy name: {}", request.getRequestObject().getCredentialPolicyName());
         return new ObjectResponse<>(response);
     }

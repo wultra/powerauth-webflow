@@ -68,7 +68,7 @@ public class ServiceController {
     @RequestMapping(value = "status", method = RequestMethod.GET)
     public ObjectResponse<ServiceStatusResponse> getServiceStatus() {
         logger.debug("Received getServiceStatus request");
-        ServiceStatusResponse response = new ServiceStatusResponse();
+        final ServiceStatusResponse response = new ServiceStatusResponse();
         response.setApplicationName(nextStepServerConfiguration.getApplicationName());
         response.setApplicationDisplayName(nextStepServerConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(nextStepServerConfiguration.getApplicationEnvironment());

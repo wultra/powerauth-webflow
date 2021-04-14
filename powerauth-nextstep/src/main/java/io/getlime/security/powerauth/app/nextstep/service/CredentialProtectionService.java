@@ -78,14 +78,14 @@ public class CredentialProtectionService {
      * @throws EncryptionException Thrown when encryption fails.
      */
     public CredentialValue protectCredential(String credentialValue, CredentialEntity credential) throws InvalidConfigurationException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
-        String userId = credential.getUser().getUserId();
-        HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final String userId = credential.getUser().getUserId();
+        final HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
         if (hashingConfig == null) {
             return credentialValueConverter.toDBValue(credentialValue, userId, credentialDefinition);
         }
-        HashAlgorithm algorithm = hashingConfig.getAlgorithm();
-        Map<String, String> param;
+        final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
+        final Map<String, String> param;
         try {
             param = parameterConverter.fromString(hashingConfig.getParameters());
         } catch (JsonProcessingException ex) {
@@ -95,8 +95,8 @@ public class CredentialProtectionService {
             case ARGON_2D:
             case ARGON_2I:
             case ARGON_2ID:
-                Argon2Hash argon2Hash = hashCredentialUsingArgon2(credentialValue, algorithm, param);
-                String hashedValue = argon2Hash.toString();
+                final Argon2Hash argon2Hash = hashCredentialUsingArgon2(credentialValue, algorithm, param);
+                final String hashedValue = argon2Hash.toString();
                 return credentialValueConverter.toDBValue(hashedValue, userId, credentialDefinition);
 
             default:
@@ -113,22 +113,22 @@ public class CredentialProtectionService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public boolean verifyCredential(String credentialValue, CredentialEntity credential) throws InvalidConfigurationException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
-        HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
-        String decryptedCredentialValue = extractCredentialValue(credential);
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
+        final String decryptedCredentialValue = extractCredentialValue(credential);
         if (hashingConfig == null) {
-            boolean succeeded = credentialValue.equals(decryptedCredentialValue);
+            final boolean succeeded = credentialValue.equals(decryptedCredentialValue);
             if (succeeded) {
                 updateStoredCredentialValueIfRequired(credentialValue, credential);
             }
             return succeeded;
         }
-        HashAlgorithm algorithm = hashingConfig.getAlgorithm();
+        final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         switch (algorithm) {
             case ARGON_2I:
             case ARGON_2D:
             case ARGON_2ID:
-                boolean succeeded = verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
+                final boolean succeeded = verifyCredentialUsingArgon2(credentialValue, algorithm, decryptedCredentialValue);
                 if (succeeded) {
                     updateStoredCredentialValueIfRequired(credentialValue, credential);
                 }
@@ -148,13 +148,13 @@ public class CredentialProtectionService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public boolean verifyCredentialHistory(String credentialValue, CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
-        HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
-        String decryptedCredentialValue = extractCredentialValueForHistory(history);
+        final CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
+        final HashConfigEntity hashingConfig = credentialDefinition.getHashingConfig();
+        final String decryptedCredentialValue = extractCredentialValueForHistory(history);
         if (hashingConfig == null) {
             return credentialValue.equals(decryptedCredentialValue);
         }
-        HashAlgorithm algorithm = hashingConfig.getAlgorithm();
+        final HashAlgorithm algorithm = hashingConfig.getAlgorithm();
         switch (algorithm) {
             case ARGON_2I:
             case ARGON_2D:
@@ -174,9 +174,9 @@ public class CredentialProtectionService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public String extractCredentialValue(CredentialEntity credential) throws InvalidConfigurationException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
-        String userId = credential.getUser().getUserId();
-        CredentialValue credentialValueStored = new CredentialValue(credential.getEncryptionAlgorithm(), credential.getValue());
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final String userId = credential.getUser().getUserId();
+        final CredentialValue credentialValueStored = new CredentialValue(credential.getEncryptionAlgorithm(), credential.getValue());
         return credentialValueConverter.fromDBValue(credentialValueStored, userId, credentialDefinition);
     }
 
@@ -188,9 +188,9 @@ public class CredentialProtectionService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     private String extractCredentialValueForHistory(CredentialHistoryEntity history) throws InvalidConfigurationException, EncryptionException {
-        CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
-        String userId = history.getUser().getUserId();
-        CredentialValue credentialValueStored = new CredentialValue(history.getEncryptionAlgorithm(), history.getValue());
+        final CredentialDefinitionEntity credentialDefinition = history.getCredentialDefinition();
+        final String userId = history.getUser().getUserId();
+        final CredentialValue credentialValueStored = new CredentialValue(history.getEncryptionAlgorithm(), history.getValue());
         return credentialValueConverter.fromDBValue(credentialValueStored, userId, credentialDefinition);
     }
 
@@ -203,7 +203,7 @@ public class CredentialProtectionService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private boolean verifyCredentialUsingArgon2(String credentialValue, HashAlgorithm algorithm, String expectedCredentialValue) throws InvalidConfigurationException {
-        Argon2Hash argon2;
+        final Argon2Hash argon2;
         try {
             argon2 = Argon2Hash.parse(expectedCredentialValue);
         } catch (IOException ex) {
@@ -214,16 +214,16 @@ public class CredentialProtectionService {
         if (argon2.getVersion() != null) {
             version = argon2.getVersion();
         }
-        Argon2Parameters.Builder builder = new Argon2Parameters.Builder(algorithm.getId())
+        final Argon2Parameters.Builder builder = new Argon2Parameters.Builder(algorithm.getId())
                 .withVersion(version)
                 .withIterations(argon2.getIterations())
                 .withMemoryAsKB(argon2.getMemory())
                 .withParallelism(argon2.getParallelism())
                 .withSalt(argon2.getSalt());
-        Argon2Parameters parameters = builder.build();
-        int outputLength = argon2.getDigest().length;
+        final Argon2Parameters parameters = builder.build();
+        final int outputLength = argon2.getDigest().length;
         // Compute password hash using provided parameters
-        Argon2Hash expectedHash = createArgon2Hash(credentialValue.getBytes(StandardCharsets.UTF_8), algorithm, parameters, outputLength);
+        final Argon2Hash expectedHash = createArgon2Hash(credentialValue.getBytes(StandardCharsets.UTF_8), algorithm, parameters, outputLength);
         // Compare hash values
         return argon2.hashEquals(expectedHash);
     }
@@ -236,11 +236,11 @@ public class CredentialProtectionService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private Argon2Hash hashCredentialUsingArgon2(String credentialValue, HashAlgorithm algorithm, Map<String, String> param) throws InvalidConfigurationException {
-        String versionParam = param.get("version");
-        String iterationsParam = param.get("iterations");
-        String memoryParam = param.get("memory");
-        String parallelismParam = param.get("parallelism");
-        String outputLengthParam = param.get("outputLength");
+        final String versionParam = param.get("version");
+        final String iterationsParam = param.get("iterations");
+        final String memoryParam = param.get("memory");
+        final String parallelismParam = param.get("parallelism");
+        final String outputLengthParam = param.get("outputLength");
         if (versionParam == null) {
             throw new InvalidConfigurationException("Missing hashing parameter: version");
         }
@@ -256,15 +256,15 @@ public class CredentialProtectionService {
         if (outputLengthParam == null) {
             throw new InvalidConfigurationException("Missing hashing parameter: outputLengthParam");
         }
-        Argon2Parameters argon2Parameters;
+        final Argon2Parameters argon2Parameters;
         try {
-            int version = Integer.parseInt(versionParam);
-            int iterations = Integer.parseInt(iterationsParam);
-            int memory = Integer.parseInt(memoryParam);
-            int parallelism = Integer.parseInt(parallelismParam);
-            int outputLength = Integer.parseInt(outputLengthParam);
+            final int version = Integer.parseInt(versionParam);
+            final int iterations = Integer.parseInt(iterationsParam);
+            final int memory = Integer.parseInt(memoryParam);
+            final int parallelism = Integer.parseInt(parallelismParam);
+            final int outputLength = Integer.parseInt(outputLengthParam);
             // Generate random salt
-            byte[] salt = keyGenerator.generateRandomBytes(SALT_SIZE);
+            final byte[] salt = keyGenerator.generateRandomBytes(SALT_SIZE);
             argon2Parameters = new Argon2Parameters.Builder(algorithm.getId())
                     .withVersion(version)
                     .withIterations(iterations)
@@ -289,13 +289,13 @@ public class CredentialProtectionService {
      */
     private static Argon2Hash createArgon2Hash(byte[] credentialBytes, HashAlgorithm algorithm, Argon2Parameters parameters, int outputLength) {
         // Generate password digest
-        Argon2BytesGenerator gen = new Argon2BytesGenerator();
+        final Argon2BytesGenerator gen = new Argon2BytesGenerator();
         gen.init(parameters);
-        byte[] digest = new byte[outputLength];
+        final byte[] digest = new byte[outputLength];
         gen.generateBytes(credentialBytes, digest);
 
         // Convert algorithm parameters and digest to Argon2 Modular Crypt Format
-        Argon2Hash result = new Argon2Hash(algorithm.getName());
+        final Argon2Hash result = new Argon2Hash(algorithm.getName());
         result.setVersion(parameters.getVersion());
         result.setIterations(parameters.getIterations());
         result.setParallelism(parameters.getLanes());
@@ -314,7 +314,7 @@ public class CredentialProtectionService {
      */
     private void updateStoredCredentialValueIfRequired(String credentialValue, CredentialEntity credential) throws InvalidConfigurationException, EncryptionException {
         boolean updateRequired = false;
-        CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
+        final CredentialDefinitionEntity credentialDefinition = credential.getCredentialDefinition();
         if (credential.getEncryptionAlgorithm() == null && credentialDefinition.isEncryptionEnabled()) {
             // Encryption is expected but credential is not encrypted
             updateRequired = true;
@@ -350,7 +350,7 @@ public class CredentialProtectionService {
 
         if (updateRequired) {
             // Protect the credential value and save it into DB
-            CredentialValue updatedValue = protectCredential(credentialValue, credential);
+            final CredentialValue updatedValue = protectCredential(credentialValue, credential);
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
             credential.setEncryptionAlgorithm(credentialDefinition.getEncryptionAlgorithm());
             credential.setValue(updatedValue.getValue());
@@ -368,16 +368,16 @@ public class CredentialProtectionService {
      */
     private boolean argon2ParamMatch(String argon2Hash, HashAlgorithm algorithm, String expectedParam) throws InvalidConfigurationException {
         try {
-            Argon2Hash hash = Argon2Hash.parse(argon2Hash);
-            Map<String, String> param = parameterConverter.fromString(expectedParam);
+            final Argon2Hash hash = Argon2Hash.parse(argon2Hash);
+            final Map<String, String> param = parameterConverter.fromString(expectedParam);
             if (!hash.getAlgorithm().equals(algorithm.getName())) {
                 return false;
             }
-            String versionParam = param.get("version");
-            String iterationsParam = param.get("iterations");
-            String memoryParam = param.get("memory");
-            String parallelismParam = param.get("parallelism");
-            String outputLengthParam = param.get("outputLength");
+            final String versionParam = param.get("version");
+            final String iterationsParam = param.get("iterations");
+            final String memoryParam = param.get("memory");
+            final String parallelismParam = param.get("parallelism");
+            final String outputLengthParam = param.get("outputLength");
             if (versionParam == null) {
                 throw new InvalidConfigurationException("Missing hashing parameter: version");
             }
@@ -393,12 +393,12 @@ public class CredentialProtectionService {
             if (outputLengthParam == null) {
                 throw new InvalidConfigurationException("Missing hashing parameter: outputLengthParam");
             }
-            int version = Integer.parseInt(versionParam);
-            int iterations = Integer.parseInt(iterationsParam);
+            final int version = Integer.parseInt(versionParam);
+            final int iterations = Integer.parseInt(iterationsParam);
             // Memory is stored in kB in the hash
-            int memory = (int) Math.pow(2, Integer.parseInt(memoryParam));
-            int parallelism = Integer.parseInt(parallelismParam);
-            int outputLength = Integer.parseInt(outputLengthParam);
+            final int memory = (int) Math.pow(2, Integer.parseInt(memoryParam));
+            final int parallelism = Integer.parseInt(parallelismParam);
+            final int outputLength = Integer.parseInt(outputLengthParam);
             // The version property is missing in Argon version 0x10 = 16 decimal.
             // Thus, version null -> version 19 is effectively an upgrade from version 0x10 (16 decimal) to 0x13 (19 decimal).
             if ((version > 16 && hash.getVersion() == null) ||

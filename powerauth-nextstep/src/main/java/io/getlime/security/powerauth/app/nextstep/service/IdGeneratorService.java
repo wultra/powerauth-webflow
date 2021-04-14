@@ -81,7 +81,7 @@ public class IdGeneratorService {
      * @return Generated OperationHistory ID.
      */
     public synchronized Long generateOperationHistoryId(String operationId) {
-        Long maxId = operationHistoryRepository.findMaxResultId(operationId);
+        final Long maxId = operationHistoryRepository.findMaxResultId(operationId);
         if (maxId == null) {
             return 1L;
         } else {

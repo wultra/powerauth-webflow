@@ -37,7 +37,7 @@ public class OtpPolicyConverter {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public OtpPolicyDetail fromEntity(OtpPolicyEntity otpPolicy) throws InvalidConfigurationException {
-        OtpPolicyDetail otpPolicyDetail = new OtpPolicyDetail();
+        final OtpPolicyDetail otpPolicyDetail = new OtpPolicyDetail();
         otpPolicyDetail.setOtpPolicyName(otpPolicy.getName());
         otpPolicyDetail.setDescription(otpPolicy.getDescription());
         otpPolicyDetail.setOtpPolicyStatus(otpPolicy.getStatus());

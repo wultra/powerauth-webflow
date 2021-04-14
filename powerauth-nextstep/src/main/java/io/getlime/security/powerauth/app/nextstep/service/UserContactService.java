@@ -80,12 +80,12 @@ public class UserContactService {
     @Transactional
     public CreateUserContactResponse createUserContact(CreateUserContactRequest request) throws UserNotFoundException, UserContactAlreadyExistsException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Set<UserContactEntity> contacts = user.getContacts();
-        Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
+        final Set<UserContactEntity> contacts = user.getContacts();
+        final Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
         if (contactOptional.isPresent()) {
             throw new UserContactAlreadyExistsException("User contact already exists: " + request.getContactName() + ", user ID: " + user.getUserId() + ", type: " + request.getContactType());
         }
-        UserContactEntity contact = new UserContactEntity();
+        final UserContactEntity contact = new UserContactEntity();
         contact.setUser(user);
         contact.setName(request.getContactName());
         contact.setType(request.getContactType());
@@ -96,7 +96,7 @@ public class UserContactService {
         // Ensure primary contacts are unique
         ensurePrimaryContactsAreUnique(user);
         user = userIdentityRepository.save(user);
-        CreateUserContactResponse response = new CreateUserContactResponse();
+        final CreateUserContactResponse response = new CreateUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(contact.getName());
         response.setContactType(contact.getType());

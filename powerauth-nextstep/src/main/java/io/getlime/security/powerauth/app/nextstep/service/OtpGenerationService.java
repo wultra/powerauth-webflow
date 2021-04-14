@@ -53,14 +53,14 @@ public class OtpGenerationService {
      * @return Generated OTP value.
      */
     public OtpValueDetail generateOtpValue(String otpData, OtpPolicyEntity otpPolicy) throws OtpGenAlgorithmNotSupportedException, InvalidConfigurationException {
-        OtpValueDetail otpValueDetail = new OtpValueDetail();
-        Integer length = otpPolicy.getLength();
-        OtpGenerationAlgorithm otpGenAlgorithm = otpPolicy.getGenAlgorithm();
+        final OtpValueDetail otpValueDetail = new OtpValueDetail();
+        final Integer length = otpPolicy.getLength();
+        final OtpGenerationAlgorithm otpGenAlgorithm = otpPolicy.getGenAlgorithm();
         switch (otpGenAlgorithm) {
             case OTP_DATA_DIGEST:
                 try {
-                    DataDigest dataDigest = new DataDigest(length);
-                    DataDigest.Result result = dataDigest.generateDigest(Collections.singletonList(otpData));
+                    final DataDigest dataDigest = new DataDigest(length);
+                    final DataDigest.Result result = dataDigest.generateDigest(Collections.singletonList(otpData));
                     otpValueDetail.setSalt(result.getSalt());
                     otpValueDetail.setOtpValue(result.getDigest());
                 } catch (GenericCryptoException ex) {
@@ -69,38 +69,38 @@ public class OtpGenerationService {
                 return otpValueDetail;
 
             case OTP_RANDOM_DIGIT_GROUPS:
-                OtpGenerationParam otpGenerationParam;
+                final OtpGenerationParam otpGenerationParam;
                 try {
                     otpGenerationParam = parameterConverter.fromString(otpPolicy.getGenParam(), OtpGenerationParam.class);
                 } catch (JsonProcessingException ex) {
                     throw new InvalidConfigurationException(ex);
                 }
-                Integer groupSize = otpGenerationParam.getGroupSize();
+                final Integer groupSize = otpGenerationParam.getGroupSize();
                 if (groupSize == null) {
                     throw new InvalidConfigurationException("Invalid configuration of algorithm OTP_RANDOM_DIGIT_GROUPS, group size is not specified");
                 }
                 if (length % groupSize != 0) {
                     throw new InvalidConfigurationException("Invalid configuration of algorithm OTP_RANDOM_DIGIT_GROUPS, group size does not divide OTP length without remainder");
                 }
-                int groupCount = length / groupSize;
-                SecureRandom secureRandomSeed = new SecureRandom();
+                final int groupCount = length / groupSize;
+                final SecureRandom secureRandomSeed = new SecureRandom();
                 // Generate random seed
-                byte[] seed = secureRandomSeed.generateSeed(16);
-                SecureRandom secureRandom = new SecureRandom(seed);
+                final byte[] seed = secureRandomSeed.generateSeed(16);
+                final SecureRandom secureRandom = new SecureRandom(seed);
                 // Store used seed as salt
                 otpValueDetail.setSalt(seed);
-                int groupLimit = (int) Math.pow(10, groupSize);
-                Set<String> groups = new LinkedHashSet<>();
+                final int groupLimit = (int) Math.pow(10, groupSize);
+                final Set<String> groups = new LinkedHashSet<>();
                 while (groups.size() < groupCount) {
-                    int randomInt = secureRandom.nextInt(groupLimit);
-                    StringBuilder sb = new StringBuilder();
+                    final int randomInt = secureRandom.nextInt(groupLimit);
+                    final StringBuilder sb = new StringBuilder();
                     sb.append(randomInt);
                     while (sb.length() < groupSize) {
                         sb.insert(0, "0");
                     }
                     groups.add(sb.toString());
                 }
-                StringBuilder otpBuilder = new StringBuilder();
+                final StringBuilder otpBuilder = new StringBuilder();
                 for (String g : groups) {
                     otpBuilder.append(g);
                 }

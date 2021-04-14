@@ -86,7 +86,7 @@ public class OperationController {
     public ObjectResponse<CreateOperationResponse> createOperation(@Valid @RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException, InvalidConfigurationException, OrganizationNotFoundException {
         logger.info("Received createOperation request, operation ID: {}, operation name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName());
         // resolve response based on dynamic step definitions
-        CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
+        final CreateOperationResponse response = stepResolutionService.resolveNextStepResponse(request.getRequestObject());
 
         // persist new operation
         operationPersistenceService.createOperation(request.getRequestObject(), response);
@@ -141,7 +141,7 @@ public class OperationController {
     private ObjectResponse<UpdateOperationResponse> updateOperationImpl(ObjectRequest<UpdateOperationRequest> request) throws OperationAlreadyFinishedException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, OperationNotFoundException, InvalidRequestException, OperationAlreadyCanceledException, OrganizationNotFoundException {
         logger.info("Received updateOperation request, operation ID: {}", request.getRequestObject().getOperationId());
 
-        UpdateOperationResponse response = operationPersistenceService.updateOperation(request.getRequestObject());
+        final UpdateOperationResponse response = operationPersistenceService.updateOperation(request.getRequestObject());
 
         logger.info("The updateOperation request succeeded, operation ID: {}, result: {}", response.getOperationId(), response.getResult().toString());
         for (AuthStep step: response.getSteps()) {
@@ -177,10 +177,10 @@ public class OperationController {
     }
 
     private Response updateOperationUserImpl(ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
-        String operationId = request.getRequestObject().getOperationId();
-        String userId = request.getRequestObject().getUserId();
-        String organizationId = request.getRequestObject().getOrganizationId();
-        UserAccountStatus accountStatus = request.getRequestObject().getAccountStatus();
+        final String operationId = request.getRequestObject().getOperationId();
+        final String userId = request.getRequestObject().getUserId();
+        final String organizationId = request.getRequestObject().getOrganizationId();
+        final UserAccountStatus accountStatus = request.getRequestObject().getAccountStatus();
         logger.info("Received updateOperationUser request, operation ID: {}, user ID: {}, organization ID: {}, account status: {}", operationId, userId, organizationId, accountStatus);
 
         // persist operation user update
@@ -202,10 +202,10 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received operationDetail request, operation ID: {}", request.getRequestObject().getOperationId());
 
-        GetOperationDetailRequest requestObject = request.getRequestObject();
+        final GetOperationDetailRequest requestObject = request.getRequestObject();
 
-        OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId(), true);
-        GetOperationDetailResponse response = operationConverter.fromEntity(operation);
+        final OperationEntity operation = operationPersistenceService.getOperation(requestObject.getOperationId(), true);
+        final GetOperationDetailResponse response = operationConverter.fromEntity(operation);
 
         // add steps from current response
         response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
@@ -232,9 +232,9 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigDetail request, operation name: {}", request.getRequestObject().getOperationName());
 
-        GetOperationConfigDetailRequest requestObject = request.getRequestObject();
+        final GetOperationConfigDetailRequest requestObject = request.getRequestObject();
 
-        GetOperationConfigDetailResponse response = operationConfigurationService.getOperationConfig(requestObject.getOperationName());
+        final GetOperationConfigDetailResponse response = operationConfigurationService.getOperationConfig(requestObject.getOperationName());
 
         logger.debug("The getOperationConfigDetail request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
@@ -251,7 +251,7 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigList request");
 
-        GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigList();
+        final GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigList();
 
         logger.debug("The getOperationConfigList request succeeded, operation config list size: {}", response.getOperationConfigs().size());
         return new ObjectResponse<>(response);
@@ -268,13 +268,13 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getPendingOperations request, user ID: {}", request.getRequestObject().getUserId());
 
-        GetPendingOperationsRequest requestObject = request.getRequestObject();
+        final GetPendingOperationsRequest requestObject = request.getRequestObject();
 
-        List<GetOperationDetailResponse> responseList = new ArrayList<>();
+        final List<GetOperationDetailResponse> responseList = new ArrayList<>();
 
-        List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.isMobileTokenOnly());
+        final List<OperationEntity> operations = operationPersistenceService.getPendingOperations(requestObject.getUserId(), requestObject.isMobileTokenOnly());
         for (OperationEntity operation : operations) {
-            GetOperationDetailResponse response = operationConverter.fromEntity(operation);
+            final GetOperationDetailResponse response = operationConverter.fromEntity(operation);
             responseList.add(response);
         }
 
@@ -293,12 +293,12 @@ public class OperationController {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received lookupOperationsByExternalId request, external transaction ID: {}", request.getRequestObject().getExternalTransactionId());
 
-        LookupOperationsByExternalIdRequest requestObject = request.getRequestObject();
+        final LookupOperationsByExternalIdRequest requestObject = request.getRequestObject();
 
-        LookupOperationsByExternalIdResponse response = new LookupOperationsByExternalIdResponse();
-        List<OperationEntity> operations = operationPersistenceService.findByExternalTransactionId(requestObject.getExternalTransactionId());
+        final LookupOperationsByExternalIdResponse response = new LookupOperationsByExternalIdResponse();
+        final List<OperationEntity> operations = operationPersistenceService.findByExternalTransactionId(requestObject.getExternalTransactionId());
         for (OperationEntity operation : operations) {
-            GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
+            final GetOperationDetailResponse operationDetail = operationConverter.fromEntity(operation);
             response.getOperations().add(operationDetail);
         }
 
@@ -414,12 +414,12 @@ public class OperationController {
      */
     @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@Valid @RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws InvalidConfigurationException {
-        String userId = request.getRequestObject().getUserId();
-        String operationName = request.getRequestObject().getOperationName();
-        AuthMethod authMethod = request.getRequestObject().getAuthMethod();
+        final String userId = request.getRequestObject().getUserId();
+        final String operationName = request.getRequestObject().getOperationName();
+        final AuthMethod authMethod = request.getRequestObject().getAuthMethod();
         logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
-        boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, authMethod);
-        GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
+        final boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, authMethod);
+        final GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
         response.setMobileTokenEnabled(isMobileTokenEnabled);
         logger.debug("The getMobileTokenConfig request succeeded");
         return new ObjectResponse<>(response);
@@ -449,7 +449,7 @@ public class OperationController {
 
     @RequestMapping(value = "operation/afs/action", method = RequestMethod.POST)
     public Response createAfsAction(@Valid @RequestBody ObjectRequest<CreateAfsActionRequest> request) {
-        CreateAfsActionRequest afsRequest = request.getRequestObject();
+        final CreateAfsActionRequest afsRequest = request.getRequestObject();
         logger.info("Received createAfsAction request, operation ID: {}, AFS action: {}", afsRequest.getOperationId(), afsRequest.getAfsAction());
         // persist AFS action for operation
         operationPersistenceService.createAfsAction(afsRequest);
@@ -475,7 +475,7 @@ public class OperationController {
     @RequestMapping(value = "operation/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@Valid @RequestBody ObjectRequest<CreateOperationConfigRequest> request) throws OperationConfigAlreadyExists {
         logger.info("Received createOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
-        CreateOperationConfigResponse response = operationConfigurationService.createOperationConfig(request.getRequestObject());
+        final CreateOperationConfigResponse response = operationConfigurationService.createOperationConfig(request.getRequestObject());
         logger.info("The createOperationConfig request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
@@ -490,7 +490,7 @@ public class OperationController {
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@Valid @RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
-        DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
+        final DeleteOperationConfigResponse response = operationConfigurationService.deleteOperationConfig(request.getRequestObject());
         logger.info("The deleteOperationConfig request succeeded, operation name: {}", request.getRequestObject().getOperationName());
         return new ObjectResponse<>(response);
     }
@@ -506,7 +506,7 @@ public class OperationController {
     @RequestMapping(value = "operation/auth-method/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationMethodConfigResponse> createOperationMethodConfig(@Valid @RequestBody ObjectRequest<CreateOperationMethodConfigRequest> request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
         logger.info("Received createOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
-        CreateOperationMethodConfigResponse response = operationConfigurationService.createOperationMethodConfig(request.getRequestObject());
+        final CreateOperationMethodConfigResponse response = operationConfigurationService.createOperationMethodConfig(request.getRequestObject());
         logger.info("The createOperationMethodConfig request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
@@ -520,7 +520,7 @@ public class OperationController {
     @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
         logger.info("Received getOperationMethodConfigDetail request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
-        GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
+        final GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
         logger.info("The getOperationMethodConfigDetail request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
@@ -534,7 +534,7 @@ public class OperationController {
     @RequestMapping(value = "operation/auth-method/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationMethodConfigResponse> deleteOperationMethodConfig(@Valid @RequestBody ObjectRequest<DeleteOperationMethodConfigRequest> request) throws OperationMethodConfigNotFoundException {
         logger.info("Received deleteOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
-        DeleteOperationMethodConfigResponse response = operationConfigurationService.deleteOperationMethodConfig(request.getRequestObject());
+        final DeleteOperationMethodConfigResponse response = operationConfigurationService.deleteOperationMethodConfig(request.getRequestObject());
         logger.info("The deleteOperationMethodConfig request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }

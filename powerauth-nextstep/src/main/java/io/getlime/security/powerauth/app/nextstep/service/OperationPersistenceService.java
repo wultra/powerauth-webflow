@@ -117,7 +117,7 @@ public class OperationPersistenceService {
         operation.setOperationId(response.getOperationId());
         operation.setUserId(request.getUserId());
         if (request.getOrganizationId() != null) {
-            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
             if (!organizationOptional.isPresent()) {
                 throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
             }
@@ -142,7 +142,7 @@ public class OperationPersistenceService {
         operation.setTimestampExpires(response.getTimestampExpires());
         operation = operationRepository.save(operation);
 
-        OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
+        final OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(AuthMethod.INIT);
         operationHistory.setRequestAuthStepResult(AuthStepResult.CONFIRMED);
@@ -177,7 +177,7 @@ public class OperationPersistenceService {
      */
     public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException, OrganizationNotFoundException {
         // Resolve response based on dynamic step definitions
-        UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
+        final UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
 
         // Persist operation update
         updateOperation(request, response);
@@ -194,17 +194,17 @@ public class OperationPersistenceService {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException, OrganizationNotFoundException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
-        AuthResult originalResult = operation.getResult();
+        final AuthResult originalResult = operation.getResult();
         if (request.getUserId() != null) {
             operation.setUserId(request.getUserId());
         }
         if (request.getOrganizationId() != null) {
-            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
             if (!organizationOptional.isPresent()) {
                 throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
             }
@@ -218,12 +218,12 @@ public class OperationPersistenceService {
         // operation expiration time matches current response expiration time
         operation.setTimestampExpires(response.getTimestampExpires());
 
-        OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
+        final OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(request.getAuthMethod());
         operationHistory.setRequestAuthStepResult(request.getAuthStepResult());
         if (request.getAuthenticationId() != null) {
-            Optional<AuthenticationEntity> authenticationOptional = authenticationRepository.findById(request.getAuthenticationId());
+            final Optional<AuthenticationEntity> authenticationOptional = authenticationRepository.findById(request.getAuthenticationId());
             authenticationOptional.ifPresent(operationHistory::setAuthentication);
         }
         operationHistory.setResponseResult(response.getResult());
@@ -243,7 +243,7 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operation.getOperationHistory().add(operationHistory);
-        operationRepository.save(operation);
+        operation = operationRepository.save(operation);
 
         if (!originalResult.equals(operation.getResult())) {
             operationCustomizationService.notifyOperationChange(operation);
@@ -257,14 +257,14 @@ public class OperationPersistenceService {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     public void updateOperationUser(UpdateOperationUserRequest request) throws OperationNotFoundException, OrganizationNotFoundException {
-        String operationId = request.getOperationId();
-        String userId = request.getUserId();
-        String organizationId = request.getOrganizationId();
-        UserAccountStatus accountStatus = request.getAccountStatus();
-        OperationEntity operation = getOperation(operationId);
+        final String operationId = request.getOperationId();
+        final String userId = request.getUserId();
+        final String organizationId = request.getOrganizationId();
+        final UserAccountStatus accountStatus = request.getAccountStatus();
+        final OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
         if (organizationId != null) {
-            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
+            final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
             if (!organizationOptional.isPresent()) {
                 throw new OrganizationNotFoundException("Organization not found: " + organizationId);
             }
@@ -283,13 +283,13 @@ public class OperationPersistenceService {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public void updateFormData(UpdateFormDataRequest request) throws OperationNotFoundException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
-        OperationEntity operation = operationOptional.get();
+        final OperationEntity operation = operationOptional.get();
         try {
-            OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
+            final OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             // update only formData.userInput which should contain all input from the user
             formData.getUserInput().putAll(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
@@ -308,11 +308,11 @@ public class OperationPersistenceService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
-        OperationEntity operation = operationOptional.get();
+        final OperationEntity operation = operationOptional.get();
         updateChosenAuthMethod(operation, request.getChosenAuthMethod());
     }
 
@@ -325,7 +325,7 @@ public class OperationPersistenceService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     public void updateChosenAuthMethod(OperationEntity operation, AuthMethod chosenAuthMethod) throws InvalidConfigurationException, InvalidRequestException {
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
             throw new InvalidConfigurationException("Operation is missing history");
         }
@@ -352,17 +352,17 @@ public class OperationPersistenceService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
-        OperationEntity operation = operationOptional.get();
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final OperationEntity operation = operationOptional.get();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
             throw new OperationNotValidException("Operation is missing history");
         }
         if (request.isMobileTokenActive()) {
-            EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
+            final EnableMobileTokenResult result = mobileTokenConfigurationService.enableMobileToken(operation);
             currentHistory.setMobileTokenActive(result.isEnabled());
             currentHistory.setPowerAuthOperationId(result.getPowerAuthOperationId());
         } else {
@@ -379,12 +379,12 @@ public class OperationPersistenceService {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public void updateApplicationContext(UpdateApplicationContextRequest request) throws OperationNotFoundException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
         }
-        OperationEntity operation = operationOptional.get();
-        ApplicationContext applicationContext = request.getApplicationContext();
+        final OperationEntity operation = operationOptional.get();
+        final ApplicationContext applicationContext = request.getApplicationContext();
         try {
             if (applicationContext == null) {
                 operation.setApplicationId(null);
@@ -425,11 +425,11 @@ public class OperationPersistenceService {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public OperationEntity getOperation(String operationId, boolean validateOperation) throws OperationNotFoundException {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
         }
-        OperationEntity operation = operationOptional.get();
+        final OperationEntity operation = operationOptional.get();
         if (validateOperation) {
             validateMobileTokenOperation(operation);
         }
@@ -443,7 +443,7 @@ public class OperationPersistenceService {
      * @return Whether operation exists.
      */
     public boolean operationExists(String operationId) {
-        Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
+        final Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         return operationOptional.isPresent();
     }
 
@@ -455,14 +455,14 @@ public class OperationPersistenceService {
      * @return List of operations which match the query.
      */
     public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) {
-        List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
+        final List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
         if (!mobileTokenOnly) {
             // Return all unfinished operations for user
             return entities;
         }
-        List<OperationEntity> filteredList = new ArrayList<>();
+        final List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            boolean mobileTokenActive = validateMobileTokenOperation(operation);
+            final boolean mobileTokenActive = validateMobileTokenOperation(operation);
             if (mobileTokenActive) {
                 filteredList.add(operation);
             }
@@ -476,14 +476,14 @@ public class OperationPersistenceService {
      * @return Whether operation is a pending operation with an active PowerAuth token.
      */
     private boolean validateMobileTokenOperation(OperationEntity operation) {
-        OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
+        final OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
             if (currentHistoryEntity.getPowerAuthOperationId() == null) {
                 // PowerAuth operation was not created, but mobile token is active
                 return true;
             }
             // PowerAuth operation was created, reconcile states of both operations
-            OperationDetailResponse detail = powerAuthOperationService.getOperationDetail(operation);
+            final OperationDetailResponse detail = powerAuthOperationService.getOperationDetail(operation);
             // PowerAuth operation expired, cancel Next Step operation
             if (detail.getStatus() == OperationStatus.EXPIRED) {
                 handlePowerAuthOperationExpiration(operation);
@@ -504,7 +504,7 @@ public class OperationPersistenceService {
      */
     private void handlePowerAuthOperationExpiration(OperationEntity operation) {
         // Operation expired in PowerAuth server, cancel Next Step operation
-        UpdateOperationRequest request = new UpdateOperationRequest();
+        final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operation.getOperationId());
         request.setUserId(operation.getUserId());
         request.setOperationId(operation.getOperationId());
@@ -536,16 +536,16 @@ public class OperationPersistenceService {
      * @return List of {@link AuthStep}.
      */
     public List<AuthStep> getResponseAuthSteps(OperationEntity operation) {
-        List<AuthStep> steps = new ArrayList<>();
+        final List<AuthStep> steps = new ArrayList<>();
         if (operation == null) {
             return steps;
         }
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
             return steps;
         }
         // get steps from the current response
-        String responseSteps = currentHistory.getResponseSteps();
+        final String responseSteps = currentHistory.getResponseSteps();
         if (responseSteps == null) {
             return steps;
         }
@@ -565,8 +565,8 @@ public class OperationPersistenceService {
      */
     public void createAfsAction(CreateAfsActionRequest request) {
         try {
-            OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
-            OperationEntity operation = getOperation(request.getOperationId());
+            final OperationAfsActionEntity afsEntity = new OperationAfsActionEntity();
+            final OperationEntity operation = getOperation(request.getOperationId());
             afsEntity.setOperation(operation);
             afsEntity.setAfsAction(request.getAfsAction());
             afsEntity.setStepIndex(request.getStepIndex());

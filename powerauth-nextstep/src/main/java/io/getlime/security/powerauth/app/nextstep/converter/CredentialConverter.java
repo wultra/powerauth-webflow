@@ -31,7 +31,7 @@ public class CredentialConverter {
      * @return Credential detail.
      */
     public CredentialDetail fromEntity(CredentialEntity credential) {
-        CredentialDetail credentialDetail = new CredentialDetail();
+        final CredentialDetail credentialDetail = new CredentialDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());
         credentialDetail.setCredentialStatus(credential.getStatus());

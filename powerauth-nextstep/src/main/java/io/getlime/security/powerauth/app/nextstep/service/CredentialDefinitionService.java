@@ -88,29 +88,29 @@ public class CredentialDefinitionService {
      */
     @Transactional
     public CreateCredentialDefinitionResponse createCredentialDefinition(CreateCredentialDefinitionRequest request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException, OrganizationNotFoundException {
-        Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
+        final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionAlreadyExistsException("Credential definition already exists: " + request.getCredentialDefinitionName());
         }
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
+        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName());
         }
-        ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationOptional.get();
         if (application.getStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
-        Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
+        final Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
         if (!credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyNotFoundException("Credential policy does not exist: " + request.getCredentialPolicyName());
         }
-        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        final CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
         if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE) {
             throw new CredentialPolicyNotFoundException("Credential policy is not ACTIVE: " + request.getCredentialPolicyName());
         }
         HashConfigEntity hashConfigEntity = null;
         if (request.isHashingEnabled() && request.getHashConfigName() != null) {
-            Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
+            final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
             if (!hashConfigOptional.isPresent()) {
                 throw new HashConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
@@ -119,12 +119,12 @@ public class CredentialDefinitionService {
                 throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
             }
         }
-        CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
+        final CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
         credentialDefinition.setName(request.getCredentialDefinitionName());
         credentialDefinition.setDescription(request.getDescription());
         credentialDefinition.setApplication(application);
         if (request.getOrganizationId() != null) {
-            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            final Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
             if (!organizationOptional.isPresent()) {
                 throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
             }
@@ -145,7 +145,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampCreated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
-        CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
+        final CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
@@ -178,33 +178,33 @@ public class CredentialDefinitionService {
      */
     @Transactional
     public UpdateCredentialDefinitionResponse updateCredentialDefinition(UpdateCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, CredentialPolicyNotFoundException, HashConfigNotFoundException, OrganizationNotFoundException {
-        Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
+        final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
         }
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
         if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE && request.getCredentialDefinitionStatus() != CredentialDefinitionStatus.ACTIVE) {
             throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + request.getCredentialDefinitionName());
         }
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
+        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application does not exist: " + request.getApplicationName());
         }
-        ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationOptional.get();
         if (application.getStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
-        Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
+        final Optional<CredentialPolicyEntity> credentialPolicyOptional = credentialPolicyRepository.findByName(request.getCredentialPolicyName());
         if (!credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyNotFoundException("Credential policy does not exist: " + request.getCredentialPolicyName());
         }
-        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        final CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
         if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE) {
             throw new CredentialPolicyNotFoundException("Credential policy is not ACTIVE: " + request.getCredentialPolicyName());
         }
         HashConfigEntity hashConfigEntity = null;
         if (request.isHashingEnabled() && request.getHashConfigName() != null) {
-            Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
+            final Optional<HashConfigEntity> hashConfigOptional = hashConfigRepository.findByName(request.getHashConfigName());
             if (!hashConfigOptional.isPresent()) {
                 throw new HashConfigNotFoundException("Hashing configuration does not exist: " + request.getHashConfigName());
             }
@@ -240,7 +240,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
-        UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
+        final UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
@@ -271,15 +271,15 @@ public class CredentialDefinitionService {
      */
     @Transactional
     public GetCredentialDefinitionListResponse getCredentialDefinitionList(GetCredentialDefinitionListRequest request) {
-        Iterable<CredentialDefinitionEntity> credentialDefinitions;
+        final Iterable<CredentialDefinitionEntity> credentialDefinitions;
         if (request.isIncludeRemoved()) {
             credentialDefinitions = credentialDefinitionRepository.findAll();
         } else {
             credentialDefinitions = credentialDefinitionRepository.findCredentialDefinitionByStatus(CredentialDefinitionStatus.ACTIVE);
         }
-        GetCredentialDefinitionListResponse response = new GetCredentialDefinitionListResponse();
+        final GetCredentialDefinitionListResponse response = new GetCredentialDefinitionListResponse();
         for (CredentialDefinitionEntity credentialDefinition : credentialDefinitions) {
-            CredentialDefinitionDetail credentialDefinitionDetail = credentialDefinitionConverter.fromEntity(credentialDefinition);
+            final CredentialDefinitionDetail credentialDefinitionDetail = credentialDefinitionConverter.fromEntity(credentialDefinition);
             response.getCredentialDefinitions().add(credentialDefinitionDetail);
         }
         return response;
@@ -293,18 +293,18 @@ public class CredentialDefinitionService {
      */
     @Transactional
     public DeleteCredentialDefinitionResponse deleteCredentialDefinition(DeleteCredentialDefinitionRequest request) throws CredentialDefinitionNotFoundException {
-        Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
+        final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(request.getCredentialDefinitionName());
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
         }
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
         if (credentialDefinition.getStatus() == CredentialDefinitionStatus.REMOVED) {
             throw new CredentialDefinitionNotFoundException("Credential definition is already REMOVED: " + request.getCredentialDefinitionName());
         }
         credentialDefinition.setStatus(CredentialDefinitionStatus.REMOVED);
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinitionRepository.save(credentialDefinition);
-        DeleteCredentialDefinitionResponse response = new DeleteCredentialDefinitionResponse();
+        final DeleteCredentialDefinitionResponse response = new DeleteCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         return response;
@@ -317,11 +317,11 @@ public class CredentialDefinitionService {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
     public CredentialDefinitionEntity findActiveCredentialDefinition(String credentialDefinitionName) throws CredentialDefinitionNotFoundException {
-        Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialDefinitionName);
+        final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialDefinitionName);
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + credentialDefinitionName);
         }
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
         if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE) {
             throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + credentialDefinitionName);
         }

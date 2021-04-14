@@ -31,7 +31,7 @@ public class CredentialDefinitionConverter {
      * @return Credential definition detail.
      */
     public CredentialDefinitionDetail fromEntity(CredentialDefinitionEntity credentialDefinition) {
-        CredentialDefinitionDetail credentialDefinitionDetail = new CredentialDefinitionDetail();
+        final CredentialDefinitionDetail credentialDefinitionDetail = new CredentialDefinitionDetail();
         credentialDefinitionDetail.setCredentialDefinitionName(credentialDefinition.getName());
         credentialDefinitionDetail.setDescription(credentialDefinition.getDescription());
         credentialDefinitionDetail.setCredentialDefinitionStatus(credentialDefinition.getStatus());

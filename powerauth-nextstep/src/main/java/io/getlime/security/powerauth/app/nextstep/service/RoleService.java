@@ -72,7 +72,7 @@ public class RoleService {
      */
     @Transactional
     public CreateRoleResponse createRole(CreateRoleRequest request) throws RoleAlreadyExistsException {
-        Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
+        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (roleOptional.isPresent()) {
             throw new RoleAlreadyExistsException("Role already exists: " + request.getRoleName());
         }
@@ -81,7 +81,7 @@ public class RoleService {
         role.setDescription(request.getDescription());
         role.setTimestampCreated(new Date());
         roleRepository.save(role);
-        CreateRoleResponse response = new CreateRoleResponse();
+        final CreateRoleResponse response = new CreateRoleResponse();
         response.setRoleName(role.getName());
         response.setDescription(role.getDescription());
         return response;
@@ -94,10 +94,10 @@ public class RoleService {
      */
     @Transactional
     public GetRoleListResponse getRoleList(GetRoleListRequest request) {
-        Iterable<RoleEntity> roles = roleRepository.findAll();
-        GetRoleListResponse response = new GetRoleListResponse();
+        final Iterable<RoleEntity> roles = roleRepository.findAll();
+        final GetRoleListResponse response = new GetRoleListResponse();
         for (RoleEntity role : roles) {
-            RoleDetail roleDetail = roleConverter.fromEntity(role);
+            final RoleDetail roleDetail = roleConverter.fromEntity(role);
             response.getRoles().add(roleDetail);
         }
         return response;
@@ -111,17 +111,17 @@ public class RoleService {
      */
     @Transactional
     public DeleteRoleResponse deleteRole(DeleteRoleRequest request) throws RoleNotFoundException, DeleteNotAllowedException {
-        Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
+        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new RoleNotFoundException("Role not found: " + request.getRoleName());
         }
-        RoleEntity role = roleOptional.get();
-        long existingRoleCount = userRoleRepository.countByRole(role);
+        final RoleEntity role = roleOptional.get();
+        final long existingRoleCount = userRoleRepository.countByRole(role);
         if (existingRoleCount > 0) {
             throw new DeleteNotAllowedException("Role cannot be deleted because it is used: " + request.getRoleName());
         }
         roleRepository.delete(role);
-        DeleteRoleResponse response = new DeleteRoleResponse();
+        final DeleteRoleResponse response = new DeleteRoleResponse();
         response.setRoleName(role.getName());
         return response;
     }

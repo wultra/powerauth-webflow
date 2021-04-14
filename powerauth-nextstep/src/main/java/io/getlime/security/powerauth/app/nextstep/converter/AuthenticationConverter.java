@@ -31,7 +31,7 @@ public class AuthenticationConverter {
      * @return Authentication detail.
      */
     public AuthenticationDetail fromEntity(AuthenticationEntity authentication) {
-        AuthenticationDetail authenticationDetail = new AuthenticationDetail();
+        final AuthenticationDetail authenticationDetail = new AuthenticationDetail();
         authenticationDetail.setAuthenticationType(authentication.getAuthenticationType());
         if (authentication.getCredential() != null) {
             authenticationDetail.setCredentialName(authentication.getCredential().getCredentialDefinition().getName());

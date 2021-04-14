@@ -106,25 +106,25 @@ public class CredentialService {
     @Transactional
     public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        CredentialType credentialType = request.getCredentialType();
-        String username = request.getUsername();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final CredentialType credentialType = request.getCredentialType();
+        final String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         CredentialValidationMode validationMode = request.getValidationMode();
-        List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
+        final List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
         if (validationMode == null) {
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         }
-        CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
+        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
         if (credentialHistory != null && !credentialHistory.isEmpty()) {
-            int dateCount = credentialHistory.size();
+            final int dateCount = credentialHistory.size();
             // Use unique timestamps in seconds to keep order of credential history
             long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
             for (CreateCredentialRequest.CredentialHistory h : credentialHistory) {
-                Date createdDate = new Date(createdTimestamp);
+                final Date createdDate = new Date(createdTimestamp);
                 String credentialValueHistory = h.getCredentialValue();
                 if (credentialDefinition.isE2eEncryptionEnabled()) {
                     credentialValueHistory = endToEndEncryptionService.decryptCredential(credentialValueHistory, credentialDefinition);
@@ -134,7 +134,7 @@ public class CredentialService {
             }
         }
         user = userIdentityRepository.save(user);
-        CreateCredentialResponse response = new CreateCredentialResponse();
+        final CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
         response.setUserId(user.getUserId());
@@ -168,13 +168,13 @@ public class CredentialService {
     @Transactional
     public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         boolean updateCredentialExpiration = false;
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED && request.getCredentialStatus() == null) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
@@ -202,7 +202,7 @@ public class CredentialService {
             validationMode = CredentialValidationMode.VALIDATE_USERNAME;
         }
         if (request.getUsername() != null || request.getCredentialValue() != null) {
-            List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+            final List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
                     credentialDefinition, username, credentialValue, validationMode);
             if (!validationErrors.isEmpty()) {
                 CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
@@ -213,7 +213,7 @@ public class CredentialService {
             credential.setUsername(username);
         }
         if (request.getCredentialValue() != null) {
-            CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
+            final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
             credential.setValue(protectedValue.getValue());
             credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -241,13 +241,13 @@ public class CredentialService {
             credentialHistoryService.createCredentialHistory(user, credential, new Date());
         }
         user = userIdentityRepository.save(user);
-        UpdateCredentialResponse response = new UpdateCredentialResponse();
+        final UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setCredentialType(credential.getType());
         response.setCredentialStatus(credential.getStatus());
         response.setUsername(credential.getUsername());
-        boolean credentialChangeRequired;
+        final boolean credentialChangeRequired;
         if (request.getCredentialValue() != null) {
             credentialChangeRequired = isCredentialChangeRequired(credential, credentialValue);
         } else {
@@ -271,16 +271,16 @@ public class CredentialService {
      */
     @Transactional
     public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        GetUserCredentialListResponse response = new GetUserCredentialListResponse();
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
-        Set<CredentialEntity> credentials = user.getCredentials();
+        final Set<CredentialEntity> credentials = user.getCredentials();
         for (CredentialEntity credential: credentials) {
             if (credential.getStatus() == CredentialStatus.REMOVED && !request.isIncludeRemoved()) {
                 continue;
             }
-            CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
-            boolean credentialChangeRequired;
+            final CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
+            final boolean credentialChangeRequired;
             if (credential.getCredentialDefinition().getHashingConfig() == null) {
                 credentialChangeRequired = isCredentialChangeRequired(credential, credential.getValue());
             } else {
@@ -304,17 +304,17 @@ public class CredentialService {
      */
     @Transactional
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        String username = request.getUsername();
+        final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
-        CredentialValidationMode validationMode = request.getValidationMode();
+        final CredentialValidationMode validationMode = request.getValidationMode();
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
-        List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+        final List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
                 credentialDefinition, username, credentialValue, validationMode);
-        ValidateCredentialResponse response = new ValidateCredentialResponse();
+        final ValidateCredentialResponse response = new ValidateCredentialResponse();
         if (validationErrors.isEmpty()) {
             response.setValidationResult(CredentialValidationResult.SUCCEEDED);
         } else {
@@ -334,20 +334,20 @@ public class CredentialService {
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException, EncryptionException {
         // Check expiration time
-        Date expirationTime = credential.getTimestampExpires();
+        final Date expirationTime = credential.getTimestampExpires();
         if (expirationTime != null && new Date().after(expirationTime)) {
             return true;
         }
         // Perform an actual check of credential expiration for case that credential policy was updated after last credential change
-        CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
+        final CredentialPolicyEntity credentialPolicy = credential.getCredentialDefinition().getCredentialPolicy();
         if (credentialPolicy.isRotationEnabled()) {
-            Date lastChange = credential.getTimestampLastCredentialChange();
+            final Date lastChange = credential.getTimestampLastCredentialChange();
             if (lastChange == null) {
                 // Only happens when data in database is manipulated
                 credential.setTimestampExpires(new Date());
                 return true;
             }
-            Calendar c = GregorianCalendar.getInstance();
+            final Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, -credentialPolicy.getRotationDays());
             if (lastChange.before(c.getTime())) {
                 // Last credential change occurred before time calculated by password rotation days
@@ -358,7 +358,7 @@ public class CredentialService {
         if (unprotectedCredentialValue == null) {
             return false;
         }
-        List<CredentialValidationFailure> validationFailures = credentialValidationService.validateCredentialValue(credential.getUser(),
+        final List<CredentialValidationFailure> validationFailures = credentialValidationService.validateCredentialValue(credential.getUser(),
                 credential.getUsername(), unprotectedCredentialValue, credential.getCredentialDefinition(), false);
         return !validationFailures.isEmpty();
     }
@@ -376,12 +376,12 @@ public class CredentialService {
     @Transactional
     public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
@@ -389,8 +389,8 @@ public class CredentialService {
             credential.setType(request.getCredentialType());
         }
         updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
-        String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
-        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
+        final String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
+        final CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -403,7 +403,7 @@ public class CredentialService {
         // Save credential into credential history
         credentialHistoryService.createCredentialHistory(user, credential, new Date());
         user = userIdentityRepository.save(user);
-        ResetCredentialResponse response = new ResetCredentialResponse();
+        final ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setUsername(credential.getUsername());
@@ -430,18 +430,18 @@ public class CredentialService {
     @Transactional
     public DeleteCredentialResponse deleteCredential(DeleteCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is already REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.REMOVED);
         user = userIdentityRepository.save(user);
-        DeleteCredentialResponse response = new DeleteCredentialResponse();
+        final DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setCredentialStatus(credential.getStatus());
@@ -460,19 +460,19 @@ public class CredentialService {
     @Transactional
     public BlockCredentialResponse blockCredential(BlockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() != CredentialStatus.ACTIVE && credential.getStatus() != CredentialStatus.BLOCKED_TEMPORARY) {
             throw new CredentialNotActiveException("Credential is not ACTIVE or BLOCKED_TEMPORARY: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
         credential.setTimestampBlocked(new Date());
         user = userIdentityRepository.save(user);
-        BlockCredentialResponse response = new BlockCredentialResponse();
+        final BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setCredentialStatus(credential.getStatus());
@@ -491,12 +491,12 @@ public class CredentialService {
     @Transactional
     public UnblockCredentialResponse unblockCredential(UnblockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
@@ -508,7 +508,7 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         user = userIdentityRepository.save(user);
-        UnblockCredentialResponse response = new UnblockCredentialResponse();
+        final UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
         response.setCredentialStatus(credential.getStatus());
@@ -524,7 +524,7 @@ public class CredentialService {
      * @throws CredentialNotActiveException Thrown when credential is not active.
      */
     public CredentialEntity findActiveCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
-        CredentialEntity credential = findCredential(credentialDefinition, user);
+        final CredentialEntity credential = findCredential(credentialDefinition, user);
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName());
         }
@@ -542,7 +542,7 @@ public class CredentialService {
      * @throws CredentialNotFoundException Thrown when credential is not found.
      */
     public CredentialEntity findCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException {
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         if (!credentialOptional.isPresent()) {
             throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
         }
@@ -568,9 +568,9 @@ public class CredentialService {
                                                    CredentialType credentialType, String username, String credentialValue,
                                                    CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
         // Lookup credential in case it already exists
-        CredentialEntity credential;
-        Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
-        boolean newCredential;
+        final CredentialEntity credential;
+        final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
+        final boolean newCredential;
         if (credentialOptional.isPresent()) {
             // TODO - auditing
             credential = credentialOptional.get();
@@ -588,18 +588,18 @@ public class CredentialService {
         if (username != null) {
             // Username has to be checked for duplicates even when username validation is disabled
             if (validationMode == CredentialValidationMode.NO_VALIDATION || validationMode == CredentialValidationMode.VALIDATE_CREDENTIAL) {
-                Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+                final Optional<CredentialEntity> existingCredentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
                 if (existingCredentialOptional.isPresent()) {
-                    CredentialEntity existingCredential = existingCredentialOptional.get();
+                    final CredentialEntity existingCredential = existingCredentialOptional.get();
                     if (!existingCredential.getUser().equals(user)) {
-                        CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE,
+                        final CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE,
                                 "Username validation failed", Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS));
                         throw new CredentialValidationFailedException("Username validation failed for user ID: " + user.getUserId(), error);
                     }
                 }
             }
         } else {
-            boolean useOriginalUsername = nextStepServerConfiguration.isUseOriginalUsername();
+            final boolean useOriginalUsername = nextStepServerConfiguration.isUseOriginalUsername();
             if (useOriginalUsername && credential.getUsername() != null) {
                 username = credential.getUsername();
             } else {
@@ -609,18 +609,18 @@ public class CredentialService {
         credential.setType(credentialType);
         updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         credential.setUsername(username);
-        String credentialValueRequest = credentialValue;
+        final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
             credentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
         }
-        List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
+        final List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
                 credentialDefinition, username, credentialValue, validationMode);
         if (!validationErrors.isEmpty()) {
-            CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
+            final CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Validation failed", validationErrors);
             throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
         }
-        String unprotectedCredentialValue = credentialValue;
-        CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, credential);
+        final String unprotectedCredentialValue = credentialValue;
+        final CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(credentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -639,12 +639,12 @@ public class CredentialService {
         // Save credential into credential history
         credentialHistoryService.createCredentialHistory(user, credential, new Date());
         userIdentityRepository.save(user);
-        CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
+        final CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());
         credentialDetail.setCredentialStatus(CredentialStatus.ACTIVE);
         credentialDetail.setUsername(credential.getUsername());
-        boolean credentialChangeRequired;
+        final boolean credentialChangeRequired;
         if (credentialValueRequest == null) {
             // Generated credential value is returned in unprotected form, with possible e2e-encryption
             credentialChangeRequired = isCredentialChangeRequired(credential, unprotectedCredentialValue);
@@ -677,11 +677,11 @@ public class CredentialService {
      */
     public void importCredentialHistory(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                         String username, String credentialValue, Date createdDate) throws InvalidConfigurationException, EncryptionException {
-        CredentialEntity credential = new CredentialEntity();
+        final CredentialEntity credential = new CredentialEntity();
         credential.setUser(user);
         credential.setCredentialDefinition(credentialDefinition);
         credential.setUsername(username);
-        CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
+        final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
         credential.setValue(protectedValue.getValue());
         credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
@@ -695,16 +695,16 @@ public class CredentialService {
      */
     private void updateCredentialExpirationTime(CredentialEntity credential, CredentialPolicyEntity credentialPolicy) {
         if (credential.getType() == CredentialType.TEMPORARY) {
-            Integer expirationTime = credentialPolicy.getTemporaryCredentialExpirationTime();
+            final Integer expirationTime = credentialPolicy.getTemporaryCredentialExpirationTime();
             if (expirationTime != null) {
-                Calendar c = Calendar.getInstance();
+                final Calendar c = Calendar.getInstance();
                 c.add(Calendar.SECOND, expirationTime);
                 credential.setTimestampExpires(c.getTime());
                 return;
             }
         }
         if (credentialPolicy.isRotationEnabled()) {
-            Calendar c = GregorianCalendar.getInstance();
+            final Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, credentialPolicy.getRotationDays());
             credential.setTimestampExpires(c.getTime());
             return;

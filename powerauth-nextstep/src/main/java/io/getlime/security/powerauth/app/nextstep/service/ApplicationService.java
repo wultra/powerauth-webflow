@@ -70,17 +70,17 @@ public class ApplicationService {
      */
     @Transactional
     public CreateApplicationResponse createApplication(CreateApplicationRequest request) throws ApplicationAlreadyExistsException {
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
+        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (applicationOptional.isPresent()) {
             throw new ApplicationAlreadyExistsException("Application already exists: " + request.getApplicationName());
         }
-        ApplicationEntity application = new ApplicationEntity();
+        final ApplicationEntity application = new ApplicationEntity();
         application.setName(request.getApplicationName());
         application.setDescription(request.getDescription());
         application.setStatus(ApplicationStatus.ACTIVE);
         application.setTimestampCreated(new Date());
         applicationRepository.save(application);
-        CreateApplicationResponse response = new CreateApplicationResponse();
+        final CreateApplicationResponse response = new CreateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
         response.setApplicationStatus(application.getStatus());
@@ -95,11 +95,11 @@ public class ApplicationService {
      */
     @Transactional
     public UpdateApplicationResponse updateApplication(UpdateApplicationRequest request) throws ApplicationNotFoundException {
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
+        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
         }
-        ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationOptional.get();
         if (application.getStatus() != ApplicationStatus.ACTIVE && request.getApplicationStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
@@ -109,7 +109,7 @@ public class ApplicationService {
         }
         application.setTimestampLastUpdated(new Date());
         applicationRepository.save(application);
-        UpdateApplicationResponse response = new UpdateApplicationResponse();
+        final UpdateApplicationResponse response = new UpdateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
         response.setApplicationStatus(application.getStatus());
@@ -123,15 +123,15 @@ public class ApplicationService {
      */
     @Transactional
     public GetApplicationListResponse getApplicationList(GetApplicationListRequest request) {
-        Iterable<ApplicationEntity> applications;
+        final Iterable<ApplicationEntity> applications;
         if (request.isIncludeRemoved()) {
             applications = applicationRepository.findAll();
         } else {
             applications = applicationRepository.findApplicationsByStatus(ApplicationStatus.ACTIVE);
         }
-        GetApplicationListResponse response = new GetApplicationListResponse();
+        final GetApplicationListResponse response = new GetApplicationListResponse();
         for (ApplicationEntity application: applications) {
-            ApplicationDetail applicationDetail = applicationConverter.fromEntity(application);
+            final ApplicationDetail applicationDetail = applicationConverter.fromEntity(application);
             response.getApplications().add(applicationDetail);
         }
         return response;
@@ -145,15 +145,15 @@ public class ApplicationService {
      */
     @Transactional
     public DeleteApplicationResponse deleteApplication(DeleteApplicationRequest request) throws ApplicationNotFoundException {
-        Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
+        final Optional<ApplicationEntity> applicationOptional = applicationRepository.findByName(request.getApplicationName());
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
         }
-        ApplicationEntity application = applicationOptional.get();
+        final ApplicationEntity application = applicationOptional.get();
         application.setStatus(ApplicationStatus.REMOVED);
         application.setTimestampLastUpdated(new Date());
         applicationRepository.save(application);
-        DeleteApplicationResponse response = new DeleteApplicationResponse();
+        final DeleteApplicationResponse response = new DeleteApplicationResponse();
         response.setApplicationName(application.getName());
         response.setApplicationStatus(application.getStatus());
         return response;

@@ -78,7 +78,7 @@ public class CredentialValidationService {
     public List<CredentialValidationFailure> validateCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                                  String username, String credentialValue,
                                                                  CredentialValidationMode validationMode) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
-        List<CredentialValidationFailure> validationErrors = new ArrayList<>();
+        final List<CredentialValidationFailure> validationErrors = new ArrayList<>();
         switch (validationMode) {
             case NO_VALIDATION:
                 break;
@@ -110,8 +110,8 @@ public class CredentialValidationService {
      * @return List of validation errors.
      */
     public List<CredentialValidationFailure> validateUsername(UserIdentityEntity user, String username, CredentialDefinitionEntity credentialDefinition) {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (credentialPolicy.getUsernameGenAlgorithm() == UsernameGenerationAlgorithm.NO_USERNAME) {
             return validationFailures;
         }
@@ -119,9 +119,9 @@ public class CredentialValidationService {
             validationFailures.add(CredentialValidationFailure.USERNAME_EMPTY);
             return validationFailures;
         }
-        Integer minLength = credentialPolicy.getUsernameLengthMin();
-        Integer maxLength = credentialPolicy.getUsernameLengthMax();
-        String allowedPattern = credentialPolicy.getUsernameAllowedPattern();
+        final Integer minLength = credentialPolicy.getUsernameLengthMin();
+        final Integer maxLength = credentialPolicy.getUsernameLengthMax();
+        final String allowedPattern = credentialPolicy.getUsernameAllowedPattern();
         if (minLength != null && username.length() < minLength) {
             validationFailures.add(CredentialValidationFailure.USERNAME_TOO_SHORT);
         }
@@ -137,9 +137,9 @@ public class CredentialValidationService {
         if (allowedPattern != null && !username.matches(allowedPattern)) {
             validationFailures.add(CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED);
         }
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
         if (credentialOptional.isPresent()) {
-            CredentialEntity credential = credentialOptional.get();
+            final CredentialEntity credential = credentialOptional.get();
             if (!credential.getUser().equals(user)) {
                 validationFailures.add(CredentialValidationFailure.USERNAME_ALREADY_EXISTS);
             }
@@ -156,14 +156,14 @@ public class CredentialValidationService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String username, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) throws InvalidConfigurationException, EncryptionException {
-        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (credentialValue == null || credentialValue.trim().isEmpty()) {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_EMPTY);
             return validationFailures;
         }
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        Integer minLength = credentialPolicy.getCredentialLengthMin();
-        Integer maxLength = credentialPolicy.getCredentialLengthMax();
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final Integer minLength = credentialPolicy.getCredentialLengthMin();
+        final Integer maxLength = credentialPolicy.getCredentialLengthMax();
         if (minLength != null && credentialValue.length() < minLength) {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_TOO_SHORT);
         }
@@ -174,7 +174,7 @@ public class CredentialValidationService {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED);
         }
         try {
-            CredentialValidationParam param = parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class);
+            final CredentialValidationParam param = parameterConverter.fromString(credentialPolicy.getCredentialValParam(), CredentialValidationParam.class);
             validationFailures.addAll(validateCredentialValueAdvanced(username, credentialValue, param));
         } catch (JsonProcessingException ex) {
             throw new InvalidConfigurationException(ex);
@@ -191,8 +191,8 @@ public class CredentialValidationService {
      * @throws InvalidConfigurationException Thrown when validation configuration is invalid.
      */
     private List<CredentialValidationFailure> validateCredentialValueAdvanced(String username, String credentialValue, CredentialValidationParam param) throws InvalidConfigurationException {
-        List<CredentialValidationFailure> validationFailures = new ArrayList<>();
-        List<Rule> rules = new ArrayList<>();
+        final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
+        final List<Rule> rules = new ArrayList<>();
         try {
             if (param.isIncludeWhitespaceRule()) {
                 rules.add(new WhitespaceRule());
@@ -201,46 +201,46 @@ public class CredentialValidationService {
                 rules.add(new UsernameRule(true, true));
             }
             if (param.isIncludeAllowedCharacterRule()) {
-                String allowedChars = param.getAllowedChars();
+                final String allowedChars = param.getAllowedChars();
                 if (allowedChars == null) {
                     throw new InvalidConfigurationException("The allowedChars value is missing");
                 }
                 rules.add(new AllowedCharacterRule(allowedChars.toCharArray()));
             }
             if (param.isIncludeAllowedRegexRule()) {
-                String allowedRegex = param.getAllowedRegex();
+                final String allowedRegex = param.getAllowedRegex();
                 if (allowedRegex == null) {
                     throw new InvalidConfigurationException("The allowedRegex value is missing");
                 }
                 rules.add(new AllowedRegexRule(allowedRegex));
             }
             if (param.isIncludeIllegalCharacterRule()) {
-                String illegalChars = param.getIllegalChars();
+                final String illegalChars = param.getIllegalChars();
                 if (illegalChars == null) {
                     throw new InvalidConfigurationException("The illegalChars value is missing");
                 }
                 rules.add(new IllegalCharacterRule(illegalChars.toCharArray()));
             }
             if (param.isIncludeIllegalRegexRule()) {
-                String illegalRegex = param.getIllegalRegex();
+                final String illegalRegex = param.getIllegalRegex();
                 if (illegalRegex == null) {
                     throw new InvalidConfigurationException("The illegalRegex value is missing");
                 }
                 rules.add(new IllegalRegexRule(illegalRegex));
             }
             if (param.isIncludeCharacterRule()) {
-                boolean includeSmallLetters = param.isIncludeSmallLetters();
-                Integer smallLettersMin = param.getSmallLettersMin();
-                boolean includeCapitalLetters = param.isIncludeCapitalLetters();
-                Integer capitalLettersMin = param.getCapitalLettersMin();
-                boolean includeAlphabeticalLetters = param.isIncludeAlphabeticalLetters();
-                Integer alphabeticalLettersMin = param.getAlphabeticalLettersMin();
-                boolean includeDigits = param.isIncludeDigits();
-                Integer digitsMin = param.getDigitsMin();
-                boolean includeSpecialChars = param.isIncludeSpecialChars();
-                Integer specialCharsMin = param.getSpecialCharsMin();
+                final boolean includeSmallLetters = param.isIncludeSmallLetters();
+                final Integer smallLettersMin = param.getSmallLettersMin();
+                final boolean includeCapitalLetters = param.isIncludeCapitalLetters();
+                final Integer capitalLettersMin = param.getCapitalLettersMin();
+                final boolean includeAlphabeticalLetters = param.isIncludeAlphabeticalLetters();
+                final Integer alphabeticalLettersMin = param.getAlphabeticalLettersMin();
+                final boolean includeDigits = param.isIncludeDigits();
+                final Integer digitsMin = param.getDigitsMin();
+                final boolean includeSpecialChars = param.isIncludeSpecialChars();
+                final Integer specialCharsMin = param.getSpecialCharsMin();
                 if (includeSmallLetters) {
-                    CharacterRule rule;
+                    final CharacterRule rule;
                     if (smallLettersMin == null) {
                         rule = new CharacterRule(EnglishCharacterData.LowerCase);
                     } else {
@@ -249,7 +249,7 @@ public class CredentialValidationService {
                     rules.add(rule);
                 }
                 if (includeCapitalLetters) {
-                    CharacterRule rule;
+                    final CharacterRule rule;
                     if (capitalLettersMin == null) {
                         rule = new CharacterRule(EnglishCharacterData.UpperCase);
                     } else {
@@ -258,7 +258,7 @@ public class CredentialValidationService {
                     rules.add(rule);
                 }
                 if (includeAlphabeticalLetters) {
-                    CharacterRule rule;
+                    final CharacterRule rule;
                     if (alphabeticalLettersMin == null) {
                         rule = new CharacterRule(EnglishCharacterData.Alphabetical);
                     } else {
@@ -267,7 +267,7 @@ public class CredentialValidationService {
                     rules.add(rule);
                 }
                 if (includeDigits) {
-                    CharacterRule rule;
+                    final CharacterRule rule;
                     if (digitsMin == null) {
                         rule = new CharacterRule(EnglishCharacterData.Digit);
                     } else {
@@ -276,7 +276,7 @@ public class CredentialValidationService {
                     rules.add(rule);
                 }
                 if (includeSpecialChars) {
-                    CharacterRule rule;
+                    final CharacterRule rule;
                     if (specialCharsMin == null) {
                         rule = new CharacterRule(EnglishCharacterData.Special);
                     } else {
@@ -285,17 +285,17 @@ public class CredentialValidationService {
                     rules.add(rule);
                 }
             }
-            PasswordData passwordData;
+            final PasswordData passwordData;
             if (username != null) {
                 passwordData = new PasswordData(username, credentialValue);
             } else {
                 passwordData = new PasswordData(credentialValue);
             }
 
-            PasswordValidator passwordValidator = new PasswordValidator(rules);
-            RuleResult result = passwordValidator.validate(passwordData);
+            final PasswordValidator passwordValidator = new PasswordValidator(rules);
+            final RuleResult result = passwordValidator.validate(passwordData);
             for (RuleResultDetail detail : result.getDetails()) {
-                CredentialValidationFailure failure = convertToValidationFailure(detail.getErrorCode());
+                final CredentialValidationFailure failure = convertToValidationFailure(detail.getErrorCode());
                 if (!validationFailures.contains(failure)) {
                     validationFailures.add(failure);
                 }

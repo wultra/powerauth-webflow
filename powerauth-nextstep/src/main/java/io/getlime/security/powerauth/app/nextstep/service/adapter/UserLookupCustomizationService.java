@@ -59,10 +59,10 @@ public class UserLookupCustomizationService {
      */
     public GetUserDetailResponse lookupUser(String username, String organizationId, OperationEntity operation) {
         try {
-            OperationContext operationContext = operationConverter.toOperationContext(operation);
+            final OperationContext operationContext = operationConverter.toOperationContext(operation);
             // TODO - add support for user lookup using client certificate
-            UserDetailResponse response = dataAdapterClient.lookupUser(username, organizationId, null, operationContext).getResponseObject();
-            GetUserDetailResponse userDetail = new GetUserDetailResponse();
+            final UserDetailResponse response = dataAdapterClient.lookupUser(username, organizationId, null, operationContext).getResponseObject();
+            final GetUserDetailResponse userDetail = new GetUserDetailResponse();
             userDetail.setUserId(response.getId());
             if (response.getAccountStatus() == AccountStatus.ACTIVE) {
                 userDetail.setUserIdentityStatus(UserIdentityStatus.ACTIVE);

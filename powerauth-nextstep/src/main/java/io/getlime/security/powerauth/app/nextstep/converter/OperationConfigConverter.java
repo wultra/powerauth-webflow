@@ -31,7 +31,7 @@ public class OperationConfigConverter {
      * @return Operation config response.
      */
     public GetOperationConfigDetailResponse fromOperationConfigEntity(OperationConfigEntity operationConfig) {
-        GetOperationConfigDetailResponse response = new GetOperationConfigDetailResponse();
+        final GetOperationConfigDetailResponse response = new GetOperationConfigDetailResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
         response.setTemplateId(operationConfig.getTemplateId());

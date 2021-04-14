@@ -100,16 +100,16 @@ public class UserIdentityService {
      */
     @Transactional(rollbackOn = Throwable.class)
     public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
-        UserIdentityEntity user;
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
+        final UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
         }
-        Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
+        final Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
+                final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
                 credentialDefinitions.put(credential.getCredentialName(), credentialDefinition);
             }
         }
@@ -126,7 +126,7 @@ public class UserIdentityService {
         }
         if (request.getExtras() != null) {
             try {
-                String extras = extrasConverter.fromMap(request.getExtras());
+                final String extras = extrasConverter.fromMap(request.getExtras());
                 user.setExtras(extras);
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
@@ -136,16 +136,16 @@ public class UserIdentityService {
         user.setStatus(UserIdentityStatus.ACTIVE);
         user.setTimestampCreated(new Date());
 
-        CreateUserResponse response = new CreateUserResponse();
+        final CreateUserResponse response = new CreateUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         response.getExtras().putAll(request.getExtras());
 
-        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
+        final List<CredentialSecretDetail> newCredentials = new ArrayList<>();
         if (request.getCredentials() != null) {
             for (CreateUserRequest.NewCredential credential : request.getCredentials()) {
-                List<CreateUserRequest.CredentialHistory> credentialHistory = credential.getCredentialHistory();
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                final List<CreateUserRequest.CredentialHistory> credentialHistory = credential.getCredentialHistory();
+                final CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
                 String credentialValueRequest = credential.getCredentialValue();
                 if (credentialValueRequest != null && credentialDefinition.isE2eEncryptionEnabled()) {
                     credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
@@ -154,14 +154,14 @@ public class UserIdentityService {
                 if (validationMode == null) {
                     validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
                 }
-                CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
+                final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
                         credential.getCredentialType(), credential.getUsername(), credentialValueRequest, validationMode);
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
-                    int dateCount = credentialHistory.size();
+                    final int dateCount = credentialHistory.size();
                     // Use unique timestamps in seconds to keep order of credential history
                     long createdTimestamp = new Date().getTime() - (dateCount * 1000L);
                     for (CreateUserRequest.CredentialHistory h : credentialHistory) {
-                        Date createdDate = new Date(createdTimestamp);
+                        final Date createdDate = new Date(createdTimestamp);
                         String credentialValueHistory = h.getCredentialValue();
                         if (credentialDefinition.isE2eEncryptionEnabled()) {
                             credentialValueHistory = endToEndEncryptionService.decryptCredential(credentialValueHistory, credentialDefinition);
@@ -174,7 +174,7 @@ public class UserIdentityService {
                 if (credentialValueRequest == null
                         && credentialDefinition.isE2eEncryptionEnabled()
                         && (credentialDetail.getCredentialType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
-                    String credentialValueResponse = credentialDetail.getCredentialValue();
+                    final String credentialValueResponse = credentialDetail.getCredentialValue();
                     credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
                 }
                 newCredentials.add(credentialDetail);
@@ -188,7 +188,7 @@ public class UserIdentityService {
             response.getRoles().addAll(request.getRoles());
         }
         if (request.getContacts() != null) {
-            List<UserContactDetail> contacts = new ArrayList<>();
+            final List<UserContactDetail> contacts = new ArrayList<>();
             request.getContacts().forEach(newContact -> {
                 UserContactDetail contactDetail = new UserContactDetail();
                 contactDetail.setContactName(newContact.getContactName());
@@ -197,7 +197,7 @@ public class UserIdentityService {
                 contactDetail.setPrimary(newContact.isPrimary());
                 contacts.add(contactDetail);
             });
-            List<UserContactDetail> addedContacts = updateContacts(user, contacts);
+            final List<UserContactDetail> addedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(addedContacts);
         }
         // Save user identity and a snapshot to the history table
@@ -219,20 +219,20 @@ public class UserIdentityService {
      */
     @Transactional(rollbackOn = Throwable.class)
     public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
         }
         // The findUser() method is not used to allow update REMOVED -> ACTIVE
-        UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userOptional.get();
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
         }
-        Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
+        final Map<String, CredentialDefinitionEntity> credentialDefinitions = new HashMap<>();
         if (request.getCredentials() != null) {
             for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
-                CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
+                final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(credential.getCredentialName());
                 credentialDefinitions.put(credential.getCredentialName(), credentialDefinition);
             }
         }
@@ -241,7 +241,7 @@ public class UserIdentityService {
         }
         if (request.getExtras() != null) {
             try {
-                String extras = extrasConverter.fromMap(request.getExtras());
+                final String extras = extrasConverter.fromMap(request.getExtras());
                 user.setExtras(extras);
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
@@ -249,27 +249,27 @@ public class UserIdentityService {
         }
         user.setTimestampLastUpdated(new Date());
 
-        UpdateUserResponse response = new UpdateUserResponse();
+        final UpdateUserResponse response = new UpdateUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         if (request.getExtras() != null) {
             response.getExtras().putAll(request.getExtras());
         }
-        List<CredentialSecretDetail> newCredentials = new ArrayList<>();
+        final List<CredentialSecretDetail> newCredentials = new ArrayList<>();
         if (request.getCredentials() != null) {
             if (request.getUserIdentityStatus() != UserIdentityStatus.REMOVED) {
                 // Update credentials and set their status to ACTIVE but only in case user identity status is not REMOVED
                 for (UpdateUserRequest.UpdatedCredential credential : request.getCredentials()) {
-                    CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
+                    final CredentialDefinitionEntity credentialDefinition = credentialDefinitions.get(credential.getCredentialName());
                     String credentialValueRequest = credential.getCredentialValue();
                     if (credentialValueRequest != null && credentialDefinition.isE2eEncryptionEnabled()) {
                         credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
                     }
-                    CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
+                    final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
                             credential.getCredentialType(), credential.getUsername(), credentialValueRequest, CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
                     // Return generated credential value, with possible end2end encryption
                     if (credentialValueRequest == null && credentialDefinition.isE2eEncryptionEnabled()) {
-                        String credentialValueResponse = credentialDetail.getCredentialValue();
+                        final String credentialValueResponse = credentialDetail.getCredentialValue();
                         credentialDetail.setCredentialValue(endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition));
                     }
                     newCredentials.add(credentialDetail);
@@ -286,7 +286,7 @@ public class UserIdentityService {
         }
         if (request.getContacts() != null) {
             // Contacts from the request are set, obsolete contacts are removed
-            List<UserContactDetail> contacts = new ArrayList<>();
+            final List<UserContactDetail> contacts = new ArrayList<>();
             request.getContacts().forEach(newContact -> {
                 UserContactDetail contactDetail = new UserContactDetail();
                 contactDetail.setContactName(newContact.getContactName());
@@ -295,7 +295,7 @@ public class UserIdentityService {
                 contactDetail.setPrimary(newContact.isPrimary());
                 contacts.add(contactDetail);
             });
-            List<UserContactDetail> updatedContacts = updateContacts(user, contacts);
+            final List<UserContactDetail> updatedContacts = updateContacts(user, contacts);
             response.getContacts().addAll(updatedContacts);
         }
         // Save user identity snapshot to the history table
@@ -317,7 +317,7 @@ public class UserIdentityService {
     @Transactional
     public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
         CredentialDefinitionEntity credentialDefinition = null;
-        String credentialName = request.getCredentialName();
+        final String credentialName = request.getCredentialName();
         if (credentialName != null) {
             credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         }
@@ -336,28 +336,28 @@ public class UserIdentityService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public GetUserDetailResponse getUserDetail(String userId, CredentialDefinitionEntity credentialDefinition, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
-        UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
-        GetUserDetailResponse response = new GetUserDetailResponse();
+        final UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
+        final GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         response.setTimestampCreated(user.getTimestampCreated());
         response.setTimestampLastUpdated(user.getTimestampLastUpdated());
         if (user.getExtras() != null) {
             try {
-                Map<String, Object> extras = extrasConverter.fromString(user.getExtras());
+                final Map<String, Object> extras = extrasConverter.fromString(user.getExtras());
                 response.getExtras().putAll(extras);
             } catch (JsonProcessingException ex) {
                 throw new InvalidRequestException(ex);
             }
         }
-        List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
+        final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
         userRoles.forEach(userRole -> response.getRoles().add(userRole.getRole().getName()));
-        Set<UserContactEntity> userContacts = user.getContacts();
+        final Set<UserContactEntity> userContacts = user.getContacts();
         for (UserContactEntity userContact: userContacts) {
-            UserContactDetail contactDetail = userContactConverter.fromEntity(userContact);
+            final UserContactDetail contactDetail = userContactConverter.fromEntity(userContact);
             response.getContacts().add(contactDetail);
         }
-        Set<CredentialEntity> credentials = user.getCredentials();
+        final Set<CredentialEntity> credentials = user.getCredentials();
         for (CredentialEntity credential: credentials) {
             if (credential.getStatus() == CredentialStatus.REMOVED && !includeRemoved) {
                 continue;
@@ -366,8 +366,8 @@ public class UserIdentityService {
             if (credentialDefinition != null && !credential.getCredentialDefinition().equals(credentialDefinition)) {
                 continue;
             }
-            CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
-            boolean credentialChangeRequired;
+            final CredentialDetail credentialDetail = credentialConverter.fromEntity(credential);
+            final boolean credentialChangeRequired;
             if (credential.getCredentialDefinition().getHashingConfig() == null) {
                 credentialChangeRequired = credentialService.isCredentialChangeRequired(credential, credential.getValue());
             } else {
@@ -387,8 +387,8 @@ public class UserIdentityService {
      */
     @Transactional
     public UpdateUsersResponse updateUsers(UpdateUsersRequest request) throws UserNotFoundException {
-        Iterable<UserIdentityEntity> users = userIdentityRepository.findAllById(request.getUserIds());
-        List<String> updatedUserIds = new ArrayList<>();
+        final Iterable<UserIdentityEntity> users = userIdentityRepository.findAllById(request.getUserIds());
+        final List<String> updatedUserIds = new ArrayList<>();
         for (UserIdentityEntity user: users) {
             if (user.getStatus() != request.getUserIdentityStatus()) {
                 user.setStatus(request.getUserIdentityStatus());
@@ -402,7 +402,7 @@ public class UserIdentityService {
         if (updatedUserIds.isEmpty()) {
             throw new UserNotFoundException("No user identity found for update");
         }
-        UpdateUsersResponse response = new UpdateUsersResponse();
+        final UpdateUsersResponse response = new UpdateUsersResponse();
         response.getUserIds().addAll(updatedUserIds);
         response.setUserIdentityStatus(request.getUserIdentityStatus());
         return response;
@@ -424,7 +424,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
-        DeleteUserResponse response = new DeleteUserResponse();
+        final DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         return response;
@@ -448,7 +448,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
-        BlockUserResponse response = new BlockUserResponse();
+        final BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         return response;
@@ -472,7 +472,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
-        UnblockUserResponse response = new UnblockUserResponse();
+        final UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
         return response;
@@ -483,11 +483,11 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     public void updateUserIdentityHistory(UserIdentityEntity user) {
-        UserIdentityHistoryEntity history = new UserIdentityHistoryEntity();
+        final UserIdentityHistoryEntity history = new UserIdentityHistoryEntity();
         history.setUser(user);
         history.setStatus(user.getStatus());
-        Set<UserRoleEntity> userRoles = user.getRoles();
-        List<String> roles = userRoles.stream()
+        final Set<UserRoleEntity> userRoles = user.getRoles();
+        final List<String> roles = userRoles.stream()
                 .filter(role -> role.getStatus() == UserRoleStatus.ACTIVE)
                 .map(role -> role.getRole().getName())
                 .collect(Collectors.toList());
@@ -509,9 +509,9 @@ public class UserIdentityService {
      * @throws InvalidRequestException Thrown in case any of the roles is not defined.
      */
     private Map<String, RoleEntity> collectRoleEntities(List<String> roles) throws InvalidRequestException {
-        Map<String, RoleEntity> roleEntities = new HashMap<>();
+        final Map<String, RoleEntity> roleEntities = new HashMap<>();
         for (String roleName : roles) {
-            Optional<RoleEntity> roleOptional = roleRepository.findByName(roleName);
+            final Optional<RoleEntity> roleOptional = roleRepository.findByName(roleName);
             if (!roleOptional.isPresent()) {
                 throw new InvalidRequestException("User role not found: " + roleName);
             }
@@ -528,14 +528,14 @@ public class UserIdentityService {
      * @param roleEntities Role entities present in the database.
      */
     private void updateRoles(UserIdentityEntity user, List<String> roles, Map<String, RoleEntity> roleEntities) {
-        Set<UserRoleEntity> existingRoles = user.getRoles();
-        Map<String, UserRoleEntity> existingRoleMap = new HashMap<>();
+        final Set<UserRoleEntity> existingRoles = user.getRoles();
+        final Map<String, UserRoleEntity> existingRoleMap = new HashMap<>();
         existingRoles.forEach(userRole -> existingRoleMap.put(userRole.getRole().getName(), userRole));
         for (String roleToAdd : roles) {
-            UserRoleEntity existingRole = existingRoleMap.get(roleToAdd);
+            final UserRoleEntity existingRole = existingRoleMap.get(roleToAdd);
             if (existingRole == null) {
                 // Persist new role
-                UserRoleEntity userRole = new UserRoleEntity();
+                final UserRoleEntity userRole = new UserRoleEntity();
                 userRole.setUser(user);
                 userRole.setRole(roleEntities.get(roleToAdd));
                 userRole.setStatus(UserRoleStatus.ACTIVE);
@@ -550,7 +550,7 @@ public class UserIdentityService {
         existingRoleMap.keySet().forEach(roleName -> {
             if (!roles.contains(roleName)) {
                 // Remove role if not already removed
-                UserRoleEntity existingRole = existingRoleMap.get(roleName);
+                final UserRoleEntity existingRole = existingRoleMap.get(roleName);
                 if (existingRole.getStatus() != UserRoleStatus.REMOVED) {
                     existingRole.setStatus(UserRoleStatus.REMOVED);
                 }
@@ -566,9 +566,9 @@ public class UserIdentityService {
      * @return Contact details with resolved timestamps after merge with status in the database.
      */
     private List<UserContactDetail> updateContacts(UserIdentityEntity user, List<UserContactDetail> contacts) {
-        List<UserContactDetail> contactListResponse = new ArrayList<>();
-        Set<UserContactEntity> existingContacts = user.getContacts();
-        Map<String, UserContactEntity> existingContactMap = new HashMap<>();
+        final List<UserContactDetail> contactListResponse = new ArrayList<>();
+        final Set<UserContactEntity> existingContacts = user.getContacts();
+        final Map<String, UserContactEntity> existingContactMap = new HashMap<>();
         existingContacts.forEach(userContact -> existingContactMap.put(userContact.getName(), userContact));
         // Persist new or update existing contacts
         for (UserContactDetail contactToAdd : contacts) {
@@ -585,7 +585,7 @@ public class UserIdentityService {
             userContact.setType(contactToAdd.getContactType());
             userContact.setValue(contactToAdd.getContactValue());
             userContact.setPrimary(contactToAdd.isPrimary());
-            UserContactDetail contactDetail = new UserContactDetail();
+            final UserContactDetail contactDetail = new UserContactDetail();
             contactDetail.setContactName(userContact.getName());
             contactDetail.setContactType(userContact.getType());
             contactDetail.setContactValue(userContact.getValue());
@@ -611,8 +611,8 @@ public class UserIdentityService {
      * @param activeCredentials Credentials which should remain active.
      */
     private void removeInactiveCredentials(UserIdentityEntity user, List<CredentialSecretDetail> activeCredentials) {
-        Set<CredentialEntity> existingCredentials = user.getCredentials();
-        List<String> credentialsToKeep = activeCredentials
+        final Set<CredentialEntity> existingCredentials = user.getCredentials();
+        final List<String> credentialsToKeep = activeCredentials
                 .stream()
                 .map(CredentialSecretDetail::getCredentialName)
                 .collect(Collectors.toList());
@@ -629,7 +629,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllCredentials(UserIdentityEntity user) {
-        Set<CredentialEntity> existingCredentials = user.getCredentials();
+        final Set<CredentialEntity> existingCredentials = user.getCredentials();
         existingCredentials.forEach(credential -> {
             if (credential.getStatus() != CredentialStatus.REMOVED) {
                 credential.setStatus(CredentialStatus.REMOVED);
@@ -642,7 +642,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllOtps(UserIdentityEntity user) {
-        List<OtpEntity> otps = otpRepository.findAllByUserId(user.getUserId());
+        final List<OtpEntity> otps = otpRepository.findAllByUserId(user.getUserId());
         otps.forEach(otp -> {
             if (otp.getStatus() != OtpStatus.REMOVED) {
                 otp.setStatus(OtpStatus.REMOVED);

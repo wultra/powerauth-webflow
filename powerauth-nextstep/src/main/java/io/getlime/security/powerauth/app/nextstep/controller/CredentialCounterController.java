@@ -69,7 +69,7 @@ public class CredentialCounterController {
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
         logger.info("Received updateCredentialCounter request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
-        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        final UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
         logger.info("The updateCredentialCounter request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
@@ -87,7 +87,7 @@ public class CredentialCounterController {
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
         logger.info("Received updateCredentialCounterPost request, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
-        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        final UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
         logger.info("The updateCredentialCounterPost request succeeded, user ID: {}, credential name: {}", request.getRequestObject().getUserId(), request.getRequestObject().getCredentialName());
         return new ObjectResponse<>(response);
     }
@@ -100,7 +100,7 @@ public class CredentialCounterController {
     @RequestMapping(value = "reset-all", method = RequestMethod.POST)
     public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) {
         logger.info("Received resetAllCounters request");
-        ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
+        final ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
         logger.info("The resetAllCounters request succeeded");
         return new ObjectResponse<>(response);
     }

@@ -31,7 +31,7 @@ public class ApplicationConverter {
      * @return Application detail.
      */
     public ApplicationDetail fromEntity(ApplicationEntity application) {
-        ApplicationDetail applicationDetail = new ApplicationDetail();
+        final ApplicationDetail applicationDetail = new ApplicationDetail();
         applicationDetail.setApplicationName(application.getName());
         applicationDetail.setDescription(application.getDescription());
         applicationDetail.setApplicationStatus(application.getStatus());

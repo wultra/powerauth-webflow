@@ -82,8 +82,8 @@ public class UserIdentityLookupService {
      */
     @Transactional
     public LookupUsersResponse lookupUsers(LookupUsersRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
-        String username = request.getUsername();
-        String credentialName = request.getCredentialName();
+        final String username = request.getUsername();
+        final String credentialName = request.getCredentialName();
         Date createdStartDate = request.getCreatedStartDate();
         Date createdEndDate = request.getCreatedEndDate();
         // Convert null dates for simpler queries
@@ -93,15 +93,15 @@ public class UserIdentityLookupService {
         if (createdStartDate != null && createdEndDate == null) {
             createdEndDate = new Date();
         }
-        UserIdentityStatus status = request.getUserIdentityStatus();
-        CredentialStatus credentialStatus = request.getCredentialStatus();
-        List<String> roles = request.getRoles();
+        final UserIdentityStatus status = request.getUserIdentityStatus();
+        final CredentialStatus credentialStatus = request.getCredentialStatus();
+        final List<String> roles = request.getRoles();
         List<UserIdentityEntity> lookupResult = new ArrayList<>();
         CredentialDefinitionEntity credentialDefinition = null;
         boolean dateFiltered = false;
 
         if (credentialName!= null) {
-            Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
+            final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
             if (!credentialDefinitionOptional.isPresent()) {
                 throw new InvalidRequestException("Credential definition not found: " + credentialName);
             }
@@ -111,11 +111,11 @@ public class UserIdentityLookupService {
         // Choose main query based on most exact parameters, filter lookup results in code by additional parameters
         if (username != null && credentialName != null) {
             // When username and credentialName are present, lookup the user identity, single result or no result is found
-            Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+            final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
             if (!credentialOptional.isPresent()) {
                 throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
             }
-            CredentialEntity credential = credentialOptional.get();
+            final CredentialEntity credential = credentialOptional.get();
             if (credentialStatus == null || credential.getStatus() == credentialStatus) {
                 // Filter by credentialStatus in case it is also specified
                 UserIdentityEntity user = credential.getUser();
@@ -123,7 +123,7 @@ public class UserIdentityLookupService {
             }
         } else if (credentialName != null && credentialStatus != null) {
             // When credentialName and credentialStatus are present, lookup the user identities, multiple or zero results are found
-            List<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus);
+            final List<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus);
             for (CredentialEntity credential: credentialEntities) {
                 lookupResult.add(credential.getUser());
             }
@@ -137,8 +137,8 @@ public class UserIdentityLookupService {
 
         if (createdStartDate != null && !dateFiltered) {
             // Filter by timestampCreated, but only if filter was not already applied
-            Date finalCreatedStartDate = createdStartDate;
-            Date finalCreatedEndDate = createdEndDate;
+            final Date finalCreatedStartDate = createdStartDate;
+            final Date finalCreatedEndDate = createdEndDate;
             lookupResult = lookupResult.stream()
                     .filter(user -> (user.getTimestampCreated().after(finalCreatedStartDate) && user.getTimestampCreated().before(finalCreatedEndDate)))
                     .collect(Collectors.toList());
@@ -158,10 +158,10 @@ public class UserIdentityLookupService {
 
         if (roles != null && !roles.isEmpty()) {
             // Filter by roles
-            List<UserIdentityEntity> filteredList = new ArrayList<>();
+            final List<UserIdentityEntity> filteredList = new ArrayList<>();
             for (UserIdentityEntity user: lookupResult) {
-                List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
-                List<String> roleNames = userRoles.stream()
+                final List<UserRoleEntity> userRoles = user.getRoles().stream().filter(r -> r.getStatus() == UserRoleStatus.ACTIVE).collect(Collectors.toList());
+                final List<String> roleNames = userRoles.stream()
                         .map(roleEntity -> roleEntity.getRole().getName())
                         .collect(Collectors.toList());
                 if (roleNames.containsAll(roles)) {
@@ -171,9 +171,9 @@ public class UserIdentityLookupService {
             lookupResult = filteredList;
         }
 
-        LookupUsersResponse response = new LookupUsersResponse();
+        final LookupUsersResponse response = new LookupUsersResponse();
         for (UserIdentityEntity user: lookupResult) {
-            GetUserDetailResponse userDetail = userIdentityService.getUserDetail(user.getUserId(), credentialDefinition, false);
+            final GetUserDetailResponse userDetail = userIdentityService.getUserDetail(user.getUserId(), credentialDefinition, false);
             response.getUsers().add(userDetail);
         }
         return response;
@@ -191,13 +191,13 @@ public class UserIdentityLookupService {
      */
     @Transactional
     public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, OperationNotFoundException, EncryptionException {
-        String username = request.getUsername();
-        String credentialName = request.getCredentialName();
-        String operationId = request.getOperationId();
+        final String username = request.getUsername();
+        final String credentialName = request.getCredentialName();
+        final String operationId = request.getOperationId();
         CredentialDefinitionEntity credentialDefinition = null;
 
         if (credentialName!= null) {
-            Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
+            final Optional<CredentialDefinitionEntity> credentialDefinitionOptional = credentialDefinitionRepository.findByName(credentialName);
             if (!credentialDefinitionOptional.isPresent()) {
                 throw new InvalidRequestException("Credential definition not found: " + credentialName);
             }
@@ -207,7 +207,7 @@ public class UserIdentityLookupService {
                 if (operationId == null) {
                     throw new InvalidRequestException("Operation ID is missing in Data Adapter user lookup request");
                 }
-                OperationEntity operation = operationPersistenceService.getOperation(operationId);
+                final OperationEntity operation = operationPersistenceService.getOperation(operationId);
                 String organizationId = null;
                 if (operation.getOrganization() != null) {
                     organizationId = operation.getOrganization().getOrganizationId();
@@ -218,28 +218,28 @@ public class UserIdentityLookupService {
                         organizationId = organization.getOrganizationId();
                     }
                 }
-                GetUserDetailResponse userDetail = userLookupCustomizationService.lookupUser(username, organizationId, operation);
+                final GetUserDetailResponse userDetail = userLookupCustomizationService.lookupUser(username, organizationId, operation);
                 if (userDetail == null) {
                     throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
                 }
-                LookupUserResponse response = new LookupUserResponse();
+                final LookupUserResponse response = new LookupUserResponse();
                 response.setUser(userDetail);
                 return response;
             }
         }
 
         // When username and credentialName are present, lookup the user identity, single result or no result is found
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
+        final Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUsername(credentialDefinition, username);
         if (!credentialOptional.isPresent()) {
             throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
         }
-        CredentialEntity credential = credentialOptional.get();
+        final CredentialEntity credential = credentialOptional.get();
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new UserNotFoundException("User not found, credential definition name: " + credentialName + ", username: " + username);
         }
-        String userId = credential.getUser().getUserId();
-        LookupUserResponse response = new LookupUserResponse();
-        GetUserDetailResponse userDetail = userIdentityService.getUserDetail(userId, credentialDefinition, false);
+        final String userId = credential.getUser().getUserId();
+        final LookupUserResponse response = new LookupUserResponse();
+        final GetUserDetailResponse userDetail = userIdentityService.getUserDetail(userId, credentialDefinition, false);
         response.setUser(userDetail);
         return response;
     }
@@ -251,11 +251,11 @@ public class UserIdentityLookupService {
      * @throws UserNotFoundException Thrown when user identity entity is not found.
      */
     public UserIdentityEntity findUser(String userId) throws UserNotFoundException {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + userId);
         }
-        UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userOptional.get();
         if (user.getStatus() == UserIdentityStatus.REMOVED) {
             throw new UserNotFoundException("User identity is REMOVED: " + userId);
         }
@@ -270,11 +270,11 @@ public class UserIdentityLookupService {
      * @throws UserNotFoundException Thrown when user identity entity is not found.
      */
     public UserIdentityEntity findUser(String userId, boolean includeRemoved) throws UserNotFoundException {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + userId);
         }
-        UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userOptional.get();
         if (!includeRemoved &&  user.getStatus() == UserIdentityStatus.REMOVED) {
             throw new UserNotFoundException("User identity is REMOVED: " + userId);
         }
@@ -287,11 +287,11 @@ public class UserIdentityLookupService {
      * @return Optional user identity.
      */
     public Optional<UserIdentityEntity> findUserOptional(String userId) {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
         if (!userOptional.isPresent()) {
             return Optional.empty();
         }
-        UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userOptional.get();
         if (user.getStatus() == UserIdentityStatus.REMOVED) {
             return Optional.empty();
         }
@@ -305,11 +305,11 @@ public class UserIdentityLookupService {
      * @return Optional user identity.
      */
     public Optional<UserIdentityEntity> findUserOptional(String userId, boolean includeRemoved) {
-        Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
+        final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(userId);
         if (!userOptional.isPresent()) {
             return Optional.empty();
         }
-        UserIdentityEntity user = userOptional.get();
+        final UserIdentityEntity user = userOptional.get();
         if (!includeRemoved && user.getStatus() == UserIdentityStatus.REMOVED) {
             return Optional.empty();
         }

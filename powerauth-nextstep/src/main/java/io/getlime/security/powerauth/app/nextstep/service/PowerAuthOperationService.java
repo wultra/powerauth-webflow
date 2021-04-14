@@ -76,37 +76,37 @@ public class PowerAuthOperationService {
      * @param activationId Activation ID.
      */
     public String createOperation(OperationEntity operation, String activationId) {
-        boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
+        final boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
         if (!operationEnabled) {
             return null;
         }
-        String userId = operation.getUserId();
+        final String userId = operation.getUserId();
         String organizationId = null;
         if (operation.getOrganization() != null) {
             organizationId = operation.getOrganization().getOrganizationId();
         }
         try {
             // Check activation status
-            GetActivationStatusResponse status = powerAuthClient.getActivationStatus(activationId);
+            final GetActivationStatusResponse status = powerAuthClient.getActivationStatus(activationId);
             if (status.getActivationStatus() != ActivationStatus.ACTIVE) {
                 return null;
             }
 
             // Get operation mapping from Data Adapter
-            OperationContext operationContext = operationConverter.toOperationContext(operation);
-            AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getChosenAuthMethod();
-            GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(userId, organizationId, authMethod, operationContext).getResponseObject();
-            OperationCreateRequest request = new OperationCreateRequest();
+            final OperationContext operationContext = operationConverter.toOperationContext(operation);
+            final AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getChosenAuthMethod();
+            final GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(userId, organizationId, authMethod, operationContext).getResponseObject();
+            final OperationCreateRequest request = new OperationCreateRequest();
             request.setUserId(operation.getUserId());
             request.setApplicationId(status.getApplicationId());
             request.setExternalId(operation.getOperationId());
             request.setTemplateName(mappingResponse.getTemplateName());
-            Map<String, String> parameters = new LinkedHashMap<>();
+            final Map<String, String> parameters = new LinkedHashMap<>();
             parameters.put(PARAMETER_OPERATION_DATA, mappingResponse.getOperationData());
             request.setParameters(parameters);
 
             // Create PowerAuth operation and store PA operation ID
-            OperationDetailResponse paResponse = powerAuthClient.createOperation(request);
+            final OperationDetailResponse paResponse = powerAuthClient.createOperation(request);
             return paResponse.getId();
         } catch (PowerAuthClientException | DataAdapterClientErrorException ex) {
             logger.warn(ex.getMessage(), ex);
@@ -120,19 +120,19 @@ public class PowerAuthOperationService {
      * @return PowerAuth operation detail.
      */
     public OperationDetailResponse getOperationDetail(OperationEntity operation) {
-        boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
+        final boolean operationEnabled = nextStepServerConfiguration.isPowerAuthOperationSupportEnabled();
         if (!operationEnabled) {
             return null;
         }
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
-        boolean mobileTokenActive = currentHistory.isMobileTokenActive();
-        String paOperationId = currentHistory.getPowerAuthOperationId();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final boolean mobileTokenActive = currentHistory.isMobileTokenActive();
+        final String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {
             return null;
         }
 
         try {
-            OperationDetailRequest request = new OperationDetailRequest();
+            final OperationDetailRequest request = new OperationDetailRequest();
             request.setOperationId(paOperationId);
 
             return powerAuthClient.operationDetail(request);

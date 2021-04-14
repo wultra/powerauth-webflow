@@ -39,7 +39,7 @@ public class CredentialPolicyConverter {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public CredentialPolicyDetail fromEntity(CredentialPolicyEntity credentialPolicy) throws InvalidConfigurationException {
-        CredentialPolicyDetail credentialPolicyDetail = new CredentialPolicyDetail();
+        final CredentialPolicyDetail credentialPolicyDetail = new CredentialPolicyDetail();
         credentialPolicyDetail.setCredentialPolicyName(credentialPolicy.getName());
         credentialPolicyDetail.setDescription(credentialPolicy.getDescription());
         credentialPolicyDetail.setCredentialPolicyStatus(credentialPolicy.getStatus());

@@ -54,7 +54,7 @@ public class OperationConverter {
      * @return Operation detail.
      */
     public GetOperationDetailResponse fromEntity(OperationEntity operation) {
-        GetOperationDetailResponse operationDetail = new GetOperationDetailResponse();
+        final GetOperationDetailResponse operationDetail = new GetOperationDetailResponse();
         operationDetail.setOperationId(operation.getOperationId());
         operationDetail.setOperationName(operation.getOperationName());
         operationDetail.setUserId(operation.getUserId());
@@ -82,12 +82,12 @@ public class OperationConverter {
      * @return Operation context.
      */
     public OperationContext toOperationContext(OperationEntity operation) {
-        String operationId = operation.getOperationId();
-        String operationName = operation.getOperationName();
-        String operationData = operation.getOperationData();
-        GetOperationDetailResponse operationDetail = fromEntity(operation);
-        FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-        ApplicationContext applicationContext = operationDetail.getApplicationContext();
+        final String operationId = operation.getOperationId();
+        final String operationName = operation.getOperationName();
+        final String operationData = operation.getOperationData();
+        final GetOperationDetailResponse operationDetail = fromEntity(operation);
+        final FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
+        final ApplicationContext applicationContext = operationDetail.getApplicationContext();
         final String externalTransactionId = operation.getExternalTransactionId();
         return new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
     }
@@ -118,14 +118,14 @@ public class OperationConverter {
      */
     private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
         if (operation.getApplicationId() != null) {
-            ApplicationContext applicationContext = new ApplicationContext();
+            final ApplicationContext applicationContext = new ApplicationContext();
             applicationContext.setId(operation.getApplicationId());
             applicationContext.setName(operation.getApplicationName());
             applicationContext.setDescription(operation.getApplicationDescription());
             if (operation.getApplicationOriginalScopes() != null) {
                 try {
-                    JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
-                    List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
+                    final JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
+                    final List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
                     applicationContext.getOriginalScopes().addAll(originalScopes);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application scopes.", ex);
@@ -133,8 +133,8 @@ public class OperationConverter {
             }
             if (operation.getApplicationExtras() != null) {
                 try {
-                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
-                    Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    final JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+                    final Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
                     applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application extras.", ex);
@@ -152,7 +152,7 @@ public class OperationConverter {
     private void assignOperationHistory(GetOperationDetailResponse response, OperationEntity operation) {
         // add operation history
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
-            OperationHistory h = new OperationHistory();
+            final OperationHistory h = new OperationHistory();
             h.setAuthMethod(history.getRequestAuthMethod());
             h.setRequestAuthStepResult(history.getRequestAuthStepResult());
             h.setAuthStepResultDescription(history.getResponseResultDescription());
@@ -162,7 +162,7 @@ public class OperationConverter {
             response.getHistory().add(h);
         }
         // set chosen authentication method
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
         }
@@ -176,7 +176,7 @@ public class OperationConverter {
     private void assignAfsActions(GetOperationDetailResponse response, OperationEntity operation) {
         // add AFS actions
         for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
-            AfsActionDetail action = new AfsActionDetail();
+            final AfsActionDetail action = new AfsActionDetail();
             action.setAction(afsAction.getAfsAction());
             action.setStepIndex(afsAction.getStepIndex());
             action.getRequestExtras().putAll(convertExtrasToMap(afsAction.getRequestAfsExtras()));
@@ -194,7 +194,7 @@ public class OperationConverter {
      */
     private Map<String, Object> convertExtrasToMap(String extras) {
         try {
-            TypeReference<Map<String, Object>> typeRef
+            final TypeReference<Map<String, Object>> typeRef
                     = new TypeReference<Map<String, Object>>() {};
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {

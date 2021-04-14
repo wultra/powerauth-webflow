@@ -31,7 +31,7 @@ public class AuditLogConverter {
      * @return Audit detail.
      */
     public AuditDetail fromEntity(AuditLogEntity auditLog) {
-        AuditDetail auditDetail = new AuditDetail();
+        final AuditDetail auditDetail = new AuditDetail();
         auditDetail.setAction(auditLog.getAction());
         auditDetail.setData(auditLog.getData());
         auditDetail.setTimestampCreated(auditLog.getTimestampCreated());

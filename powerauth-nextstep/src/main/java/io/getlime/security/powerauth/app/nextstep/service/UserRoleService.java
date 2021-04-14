@@ -79,13 +79,13 @@ public class UserRoleService {
     @Transactional
     public AddUserRoleResponse addUserRole(AddUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleAlreadyAssignedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
+        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
-        RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
-        UserRoleEntity userRole;
+        final RoleEntity role = roleOptional.get();
+        final Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
+        final UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();
             if (userRole.getStatus() == UserRoleStatus.ACTIVE) {
@@ -103,7 +103,7 @@ public class UserRoleService {
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
-        AddUserRoleResponse response = new AddUserRoleResponse();
+        final AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
         response.setUserRoleStatus(userRole.getStatus());
@@ -121,13 +121,13 @@ public class UserRoleService {
     @Transactional
     public RemoveUserRoleResponse removeUserRole(RemoveUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleNotAssignedException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
+        final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
             throw new InvalidRequestException("Role not found: " + request.getRoleName());
         }
-        RoleEntity role = roleOptional.get();
-        Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
-        UserRoleEntity userRole;
+        final RoleEntity role = roleOptional.get();
+        final Optional<UserRoleEntity> userRoleOptional = user.getRoles().stream().filter(r -> r.getRole().equals(role)).findFirst();
+        final UserRoleEntity userRole;
         if (userRoleOptional.isPresent()) {
             userRole = userRoleOptional.get();
             if (userRole.getStatus() == UserRoleStatus.REMOVED) {
@@ -142,7 +142,7 @@ public class UserRoleService {
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
-        RemoveUserRoleResponse response = new RemoveUserRoleResponse();
+        final RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
         response.setUserRoleStatus(userRole.getStatus());

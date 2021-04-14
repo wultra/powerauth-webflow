@@ -52,7 +52,7 @@ public class CredentialHistoryService {
      * @param credential Credential entity.
      */
     public void createCredentialHistory(UserIdentityEntity user, CredentialEntity credential, Date createdDate) {
-        CredentialHistoryEntity credentialHistory = new CredentialHistoryEntity();
+        final CredentialHistoryEntity credentialHistory = new CredentialHistoryEntity();
         credentialHistory.setCredentialDefinition(credential.getCredentialDefinition());
         credentialHistory.setUser(credential.getUser());
         credentialHistory.setUsername(credential.getUsername());
@@ -75,15 +75,15 @@ public class CredentialHistoryService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public boolean checkCredentialHistory(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
-        CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
-        int credentialHistoryCount = credentialPolicy.getCheckHistoryCount();
+        final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
+        final int credentialHistoryCount = credentialPolicy.getCheckHistoryCount();
         if (credentialHistoryCount == 0) {
             return true;
         }
         int historyPassCounter = 0;
-        Set<CredentialHistoryEntity> history = user.getCredentialHistory();
+        final Set<CredentialHistoryEntity> history = user.getCredentialHistory();
         for (CredentialHistoryEntity h : history) {
-            boolean matchFound = credentialProtectionService.verifyCredentialHistory(credentialValue, h);
+            final boolean matchFound = credentialProtectionService.verifyCredentialHistory(credentialValue, h);
             if (matchFound) {
                 return false;
             }
