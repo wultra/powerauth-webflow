@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.listener;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationCancellationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.OperationSessionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +60,10 @@ public class WebSocketDisconnectListener implements ApplicationListener<SessionD
             return;
         }
         // Cancel operation due to interrupted operation
-        operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.INTERRUPTED_OPERATION);
+        try {
+            operationCancellationService.cancelOperation(operationId, AuthMethod.INIT, OperationCancelReason.INTERRUPTED_OPERATION, true);
+        } catch (CommunicationFailedException ex) {
+            // Exception is already logged
+        }
     }
 }

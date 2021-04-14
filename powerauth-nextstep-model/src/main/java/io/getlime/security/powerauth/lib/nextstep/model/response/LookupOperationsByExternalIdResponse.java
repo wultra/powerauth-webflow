@@ -16,8 +16,8 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
-import lombok.NonNull;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
 @Data
 public class LookupOperationsByExternalIdResponse {
 
-    @NonNull
+    @NotNull
     private final List<GetOperationDetailResponse> operations = new ArrayList<>();
 
 }

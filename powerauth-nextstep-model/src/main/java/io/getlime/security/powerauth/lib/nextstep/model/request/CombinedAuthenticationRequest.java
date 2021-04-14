@@ -15,9 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Request object used for authenticating using a credential and an OTP.
@@ -27,17 +32,29 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CombinedAuthenticationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String credentialValue;
-    @NotNull
+    // Null value is allowed, defaults to MATCH_EXACT
+    private CredentialAuthenticationMode authenticationMode;
+    private List<Integer> credentialPositionsToVerify = new ArrayList<>();
+    // Either otpId or operationId should be present
+    @Size(min = 36, max = 36)
     private String otpId;
-    @NotNull
-    private String otpValue;
+    @Size(min = 1, max = 256)
     private String operationId;
+    @NotBlank
+    @Size(min = 1, max = 256)
+    private String otpValue;
+    // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;
+    // Authentication method is required only in case multiple methods are defined in Next Steps
+    private AuthMethod authMethod;
 
 }

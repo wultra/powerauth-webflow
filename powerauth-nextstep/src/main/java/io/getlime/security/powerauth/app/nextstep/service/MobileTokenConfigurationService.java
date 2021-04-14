@@ -15,9 +15,16 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.client.v3.ActivationStatus;
+import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,7 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Service for retrieving mobile token configuration.
+ * Service for managing mobile token configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -39,16 +46,22 @@ public class MobileTokenConfigurationService {
 
     private final OperationConfigurationService operationConfigurationService;
     private final AuthMethodService authMethodService;
+    private final PowerAuthOperationService powerAuthOperationService;
+    private final PowerAuthClient powerAuthClient;
 
     /**
      * Service constructor.
      * @param operationConfigurationService Operation configuration service.
      * @param authMethodService Authentication method service.
+     * @param powerAuthOperationService PowerAuth operation service.
+     * @param powerAuthClient PowerAuth service client.
      */
     @Autowired
-    public MobileTokenConfigurationService(OperationConfigurationService operationConfigurationService, AuthMethodService authMethodService) {
+    public MobileTokenConfigurationService(OperationConfigurationService operationConfigurationService, AuthMethodService authMethodService, PowerAuthOperationService powerAuthOperationService, PowerAuthClient powerAuthClient) {
         this.operationConfigurationService = operationConfigurationService;
         this.authMethodService = authMethodService;
+        this.powerAuthOperationService = powerAuthOperationService;
+        this.powerAuthClient = powerAuthClient;
     }
 
     /**
@@ -57,8 +70,9 @@ public class MobileTokenConfigurationService {
      * @param operationName Operation name.
      * @param authMethod Authentication method.
      * @return Whether mobile token is enabled.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public boolean isMobileTokenEnabled(String userId, String operationName, AuthMethod authMethod) {
+    public boolean isMobileTokenActive(String userId, String operationName, AuthMethod authMethod) throws InvalidConfigurationException {
         // Check input parameters
         if (userId == null) {
             logger.debug("Mobile token is disabled because user is unknown for this authentication step");
@@ -75,51 +89,105 @@ public class MobileTokenConfigurationService {
 
         // Check whether mobile token is enabled for operation by operation name
         try {
-            GetOperationConfigDetailResponse config = operationConfigurationService.getOperationConfig(operationName);
+            final GetOperationConfigDetailResponse config = operationConfigurationService.getOperationConfig(operationName);
             if (!config.isMobileTokenEnabled()) {
                 logger.debug("Mobile token is disabled for operation name: {}", operationName);
                 // Mobile token is not enabled for this operation, skip it
                 return false;
             }
-        } catch (OperationNotConfiguredException e) {
+        } catch (OperationConfigNotFoundException e) {
             // Operation is not configured, skip it
             logger.error(e.getMessage(), e);
             return false;
         }
 
-        // Consider only authentication methods which are enabled for user
-        List<UserAuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        boolean activationConfiguredForMobileToken = false;
-        for (UserAuthMethodDetail userAuthMethod : authMethods) {
-            // Check whether activation ID is configured for mobile token, this configuration is set using
-            // POWERAUTH_TOKEN authentication method.
-            if (userAuthMethod.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
-                Map<String, String> config = userAuthMethod.getConfig();
-                if (config != null) {
-                    String activationId = config.get("activationId");
-                    if (activationId != null && !activationId.isEmpty()) {
-                        activationConfiguredForMobileToken = true;
-                    }
-                }
-            }
-        }
+        final String activationId = getActivationId(userId);
+        boolean activationConfiguredForMobileToken = activationId != null && !activationId.isEmpty();
+
         if (!activationConfiguredForMobileToken) {
             // Activation ID is not configured for mobile token, so mobile token cannot be used
             logger.debug("Mobile token is disabled because activation is not configured in user preferences for user: {}", userId);
             return false;
         }
 
+        boolean authMethodSupportsMobileToken = false;
+        List<UserAuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         for (UserAuthMethodDetail userAuthMethod : authMethods) {
             // In case the chosen auth method is enabled for user and it supports mobile token,
             // this operation should be added into pending operation list.
             if (userAuthMethod.getAuthMethod() == authMethod && userAuthMethod.getHasMobileToken()) {
                 logger.debug("Mobile token is enabled for user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
-                return true;
+                authMethodSupportsMobileToken = true;
             }
         }
 
-        // Mobile token is disabled for this authentication method
-        logger.debug("Mobile token is disabled because authentication method {} does not support mobile token", authMethod);
+        if (!authMethodSupportsMobileToken) {
+            logger.debug("Mobile token is disabled because authentication method {} does not support mobile token", authMethod);
+            return false;
+        }
+
+        // Check status of activation in PowerAuth server
+        try {
+            final GetActivationStatusResponse statusResponse = powerAuthClient.getActivationStatus(activationId);
+            final ActivationStatus activationStatus = statusResponse.getActivationStatus();
+            if (activationStatus == ActivationStatus.ACTIVE) {
+                logger.debug("Mobile token is active for user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
+                return true;
+            }
+            logger.debug("Mobile token is disabled because activation status is: {} for user ID: {}", activationStatus, userId);
+            return false;
+        } catch (PowerAuthClientException ex) {
+            logger.warn("Activation status call failed, error: " + ex.getMessage(), ex);
+        }
         return false;
     }
+
+    /**
+     * Enable mobile token authentication method.
+     *
+     * @param operation Operation entity.
+     * @return Enable mobile token result.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    public EnableMobileTokenResult enableMobileToken(OperationEntity operation) throws InvalidConfigurationException {
+        if (operation == null || operation.getUserId() == null || operation.getOperationName() == null) {
+            return new EnableMobileTokenResult(false, null);
+        }
+        final String userId = operation.getUserId();
+        final String operationName = operation.getOperationName();
+        if (!isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)){
+            return new EnableMobileTokenResult(false, null);
+        }
+
+        final String activationId = getActivationId(userId);
+        if (activationId == null || activationId.isEmpty()) {
+            return new EnableMobileTokenResult(false, null);
+        }
+
+        // Create operation in PowerAuth server
+        final String paOperationId = powerAuthOperationService.createOperation(operation, activationId);
+        return new EnableMobileTokenResult(true, paOperationId);
+    }
+
+    /**
+     * Get activation ID for user ID.
+     * @param userId User ID.
+     * @return Activation ID or null in case activation ID is not configured.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    private String getActivationId(String userId) throws InvalidConfigurationException {
+        final List<UserAuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        for (UserAuthMethodDetail userAuthMethod : authMethods) {
+            // Check whether activation ID is configured for mobile token, this configuration is set using
+            // POWERAUTH_TOKEN authentication method.
+            if (userAuthMethod.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                final Map<String, String> config = userAuthMethod.getConfig();
+                if (config != null) {
+                    return config.get("activationId");
+                }
+            }
+        }
+        return null;
+    }
+
 }

@@ -39,7 +39,7 @@ public class SaveConsentFormRequest {
     private String organizationId;
 
     /**
-     * Operation context which provides context for creating the consent form.
+     * Operation context which provides context for saving the consent form.
      */
     private OperationContext operationContext;
 
@@ -59,7 +59,7 @@ public class SaveConsentFormRequest {
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * @param operationContext Operation context which provides context for saving the consent form.
      * @param options Consent options.
      */
     public SaveConsentFormRequest(String userId, String organizationId, OperationContext operationContext, List<ConsentOption> options) {
@@ -102,16 +102,16 @@ public class SaveConsentFormRequest {
     }
 
     /**
-     * Get operation context which provides context for creating the consent form.
-     * @return Operation context which provides context for creating the consent form.
+     * Get operation context which provides context for saving the consent form.
+     * @return Operation context which provides context for saving the consent form.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context which provides context for creating the consent form.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * Set operation context which provides context for saving the consent form.
+     * @param operationContext Operation context which provides context for saving the consent form.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;

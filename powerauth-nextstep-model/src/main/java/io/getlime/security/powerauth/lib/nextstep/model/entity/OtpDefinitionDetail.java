@@ -15,11 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -31,16 +34,24 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"otpDefinitionName", "applicationName", "otpPolicyName"})
 public class OtpDefinitionDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
+    private String description;
+    @NotNull
     private boolean encryptionEnabled;
-    private String encryption;
+    private EncryptionAlgorithm encryptionAlgorithm;
     @NotNull
     private OtpDefinitionStatus otpDefinitionStatus;
+    @NotNull
+    private boolean dataAdapterProxyEnabled;
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

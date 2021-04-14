@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Authe
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -32,7 +33,9 @@ public class AuthenticationDetail {
 
     @NotNull
     private AuthenticationType authenticationType;
+    @Size(min = 2, max = 256)
     private String credentialName;
+    @Size(min = 2, max = 256)
     private String otpName;
     @NotNull
     private AuthenticationResult authenticationResult;

@@ -31,7 +31,7 @@ public class OperationConfigConverter {
      * @return Operation config response.
      */
     public GetOperationConfigDetailResponse fromOperationConfigEntity(OperationConfigEntity operationConfig) {
-        GetOperationConfigDetailResponse response = new GetOperationConfigDetailResponse();
+        final GetOperationConfigDetailResponse response = new GetOperationConfigDetailResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
         response.setTemplateId(operationConfig.getTemplateId());
@@ -39,6 +39,7 @@ public class OperationConfigConverter {
         response.setMobileTokenMode(operationConfig.getMobileTokenMode());
         response.setAfsEnabled(operationConfig.isAfsEnabled());
         response.setAfsConfigId(operationConfig.getAfsConfigId());
+        response.setExpirationTime(operationConfig.getExpirationTime());
         return response;
     }
 }

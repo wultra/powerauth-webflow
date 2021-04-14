@@ -16,18 +16,24 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConfigConverter;
+import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationMethodConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigListResponse;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationMethodConfigEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 /**
- * Service which handles retrieval of operation configuration.
+ * Service which handles persistence of operation configurations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -35,30 +41,74 @@ import java.util.Optional;
 public class OperationConfigurationService {
 
     private final OperationConfigRepository operationConfigRepository;
+    private final OperationMethodConfigRepository operationMethodConfigRepository;
+    private final OperationRepository operationRepository;
+    private final AuthMethodRepository authMethodRepository;
+
     private final OperationConfigConverter configConverter = new OperationConfigConverter();
 
     /**
      * Service constructor.
-     *
      * @param operationConfigRepository Operation configuration repository.
+     * @param operationMethodConfigRepository Operation and authentication method configuration repository.
+     * @param operationRepository Operation repository.
+     * @param authMethodRepository Authentication method repository.
      */
     @Autowired
-    public OperationConfigurationService(OperationConfigRepository operationConfigRepository) {
+    public OperationConfigurationService(OperationConfigRepository operationConfigRepository, OperationMethodConfigRepository operationMethodConfigRepository, OperationRepository operationRepository, AuthMethodRepository authMethodRepository) {
         this.operationConfigRepository = operationConfigRepository;
+        this.operationMethodConfigRepository = operationMethodConfigRepository;
+        this.operationRepository = operationRepository;
+        this.authMethodRepository = authMethodRepository;
+    }
+
+    /**
+     * Create an operation configuration.
+     * @param request Create operation configuration request.
+     * @return Create operation configuration response.
+     * @throws OperationConfigAlreadyExists Thrown when operation configuration already exists.
+     */
+    @Transactional
+    public CreateOperationConfigResponse createOperationConfig(CreateOperationConfigRequest request) throws OperationConfigAlreadyExists {
+        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
+        if (operationConfigOptional.isPresent()) {
+            throw new OperationConfigAlreadyExists("Operation configuration already exists for operation: " + request.getOperationName());
+        }
+        final OperationConfigEntity operationConfig = new OperationConfigEntity();
+        operationConfig.setOperationName(request.getOperationName());
+        operationConfig.setTemplateVersion(request.getTemplateVersion());
+        operationConfig.setTemplateId(request.getTemplateId());
+        operationConfig.setMobileTokenEnabled(request.isMobileTokenEnabled());
+        operationConfig.setMobileTokenMode(request.getMobileTokenMode());
+        operationConfig.setAfsEnabled(request.isAfsEnabled());
+        operationConfig.setAfsConfigId(request.getAfsConfigId());
+        operationConfig.setExpirationTime(request.getExpirationTime());
+        operationConfigRepository.save(operationConfig);
+        final CreateOperationConfigResponse response = new CreateOperationConfigResponse();
+        response.setOperationName(operationConfig.getOperationName());
+        response.setTemplateVersion(operationConfig.getTemplateVersion());
+        response.setTemplateId(operationConfig.getTemplateId());
+        response.setMobileTokenEnabled(operationConfig.isMobileTokenEnabled());
+        response.setMobileTokenMode(operationConfig.getMobileTokenMode());
+        response.setAfsEnabled(operationConfig.isAfsEnabled());
+        response.setAfsConfigId(operationConfig.getAfsConfigId());
+        response.setExpirationTime(operationConfig.getExpirationTime());
+        return response;
     }
 
     /**
      * Get operation configuration.
      * @param operationName Operation name.
      * @return Operation configuration.
-     * @throws OperationNotConfiguredException Thrown when operation is not configured.
+     * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
-    public GetOperationConfigDetailResponse getOperationConfig(String operationName) throws OperationNotConfiguredException {
-        Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(operationName);
+    @Transactional
+    public GetOperationConfigDetailResponse getOperationConfig(String operationName) throws OperationConfigNotFoundException {
+        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(operationName);
         if (!operationConfigOptional.isPresent()) {
-            throw new OperationNotConfiguredException("Operation not configured, operation name: " + operationName);
+            throw new OperationConfigNotFoundException("Operation not configured, operation name: " + operationName);
         }
-        OperationConfigEntity operationConfig = operationConfigOptional.get();
+        final OperationConfigEntity operationConfig = operationConfigOptional.get();
         return configConverter.fromOperationConfigEntity(operationConfig);
     }
 
@@ -66,14 +116,109 @@ public class OperationConfigurationService {
      * Get all operation configurations.
      * @return All operation configurations.
      */
-    public GetOperationConfigListResponse getOperationConfigs() {
-        GetOperationConfigListResponse configsResponse = new GetOperationConfigListResponse();
-        Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
+    @Transactional
+    public GetOperationConfigListResponse getOperationConfigList() {
+        final GetOperationConfigListResponse configsResponse = new GetOperationConfigListResponse();
+        final Iterable<OperationConfigEntity> allConfigs = operationConfigRepository.findAll();
         for (OperationConfigEntity operationConfig: allConfigs) {
-            GetOperationConfigDetailResponse config = configConverter.fromOperationConfigEntity(operationConfig);
+            final GetOperationConfigDetailResponse config = configConverter.fromOperationConfigEntity(operationConfig);
             configsResponse.getOperationConfigs().add(config);
         }
         return configsResponse;
+    }
+
+    /**
+     * Delete an operation configuration.
+     * @param request Delete operation configuration request.
+     * @return Delete operation configuration response.
+     * @throws OperationConfigNotFoundException Thrown when operation configuration is not configured.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
+     */
+    @Transactional
+    public DeleteOperationConfigResponse deleteOperationConfig(DeleteOperationConfigRequest request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
+        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
+        if (!operationConfigOptional.isPresent()) {
+            throw new OperationConfigNotFoundException("Operation configuration not found, operation name: " + request.getOperationName());
+        }
+        final long existingOperationCount = operationRepository.countByOperationName(request.getOperationName());
+        if (existingOperationCount > 0) {
+            throw new DeleteNotAllowedException("Operation configuration cannot be deleted because it is used: " + request.getOperationName());
+        }
+        final OperationConfigEntity operationConfig = operationConfigOptional.get();
+        operationConfigRepository.delete(operationConfig);
+        final DeleteOperationConfigResponse response = new DeleteOperationConfigResponse();
+        response.setOperationName(operationConfig.getOperationName());
+        return response;
+    }
+
+    /**
+     * Create a configuration for operation and authentication method.
+     * @param request Create configuration for operation and authentication method request.
+     * @return Create configuration for operation and authentication method response.
+     * @throws OperationMethodConfigAlreadyExists Thrown when configuration already exists.
+     * @throws OperationConfigNotFoundException Thrown when operation configuration is not found.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     */
+    @Transactional
+    public CreateOperationMethodConfigResponse createOperationMethodConfig(CreateOperationMethodConfigRequest request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
+        final Optional<OperationConfigEntity> operationConfigOptional = operationConfigRepository.findById(request.getOperationName());
+        if (!operationConfigOptional.isPresent()) {
+            throw new OperationConfigNotFoundException("Operation configuration not found, operation: " + request.getOperationName());
+        }
+        final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findById(request.getAuthMethod());
+        if (!authMethodOptional.isPresent()) {
+            throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
+        }
+        final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
+        final Optional<OperationMethodConfigEntity> operationMethodConfigOptional = operationMethodConfigRepository.findById(primaryKey);
+        if (operationMethodConfigOptional.isPresent()) {
+            throw new OperationMethodConfigAlreadyExists("Configuration already exists for operation: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
+        }
+        final OperationMethodConfigEntity operationMethodConfig = new OperationMethodConfigEntity();
+        operationMethodConfig.setPrimaryKey(primaryKey);
+        operationMethodConfig.setMaxAuthFails(request.getMaxAuthFails());
+        operationMethodConfigRepository.save(operationMethodConfig);
+        final CreateOperationMethodConfigResponse response = new CreateOperationMethodConfigResponse();
+        response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
+        response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
+        response.setMaxAuthFails(operationMethodConfig.getMaxAuthFails());
+        return response;
+    }
+
+    @Transactional
+    public GetOperationMethodConfigDetailResponse getOperationMethodConfigDetail(GetOperationMethodConfigDetailRequest request) throws OperationMethodConfigNotFoundException {
+        final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
+        final Optional<OperationMethodConfigEntity> operationMethodConfigOptional = operationMethodConfigRepository.findById(primaryKey);
+        if (!operationMethodConfigOptional.isPresent()) {
+            throw new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
+        }
+        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
+        final GetOperationMethodConfigDetailResponse response = new GetOperationMethodConfigDetailResponse();
+        response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
+        response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
+        response.setMaxAuthFails(operationMethodConfig.getMaxAuthFails());
+        return response;
+    }
+
+    /**
+     * Delete a configuration for operation and authentication method.
+     * @param request Delete configuration for operation and authentication method request.
+     * @return Delete configuration for operation and authentication method response.
+     * @throws OperationMethodConfigNotFoundException Thrown when configuration is not found.
+     */
+    @Transactional
+    public DeleteOperationMethodConfigResponse deleteOperationMethodConfig(DeleteOperationMethodConfigRequest request) throws OperationMethodConfigNotFoundException {
+        final OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(request.getOperationName(), request.getAuthMethod());
+        final Optional<OperationMethodConfigEntity> operationMethodConfigOptional = operationMethodConfigRepository.findById(primaryKey);
+        if (!operationMethodConfigOptional.isPresent()) {
+            throw new OperationMethodConfigNotFoundException("Configuration not found, operation name: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
+        }
+        final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
+        operationMethodConfigRepository.delete(operationMethodConfig);
+        final DeleteOperationMethodConfigResponse response = new DeleteOperationMethodConfigResponse();
+        response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
+        response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
+        return response;
     }
 
 }

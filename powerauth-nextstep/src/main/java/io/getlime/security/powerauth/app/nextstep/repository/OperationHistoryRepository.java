@@ -16,20 +16,21 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
  * Crud repository for persistence of operation history.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface OperationHistoryRepository extends CrudRepository<OperationHistoryEntity, OperationHistoryEntity.OperationHistoryKey> {
 
     /**
-     * Finds the newest resultId for given operation.
+     * Find the newest resultId for given operation.
      *
      * @param operationId id of an operation
      * @return newest resultId
@@ -37,4 +38,17 @@ public interface OperationHistoryRepository extends CrudRepository<OperationHist
     @Query("SELECT max(h.primaryKey.resultId) FROM OperationHistoryEntity h WHERE h.primaryKey.operationId=?1")
     Long findMaxResultId(String operationId);
 
+    /**
+     * Count number of records with given request authentication method.
+     * @param authMethod Authentication method.
+     * @return Number of records with given request authentication method.
+     */
+    long countByRequestAuthMethod(AuthMethod authMethod);
+
+    /**
+     * Count number of records with given chosen authentication method.
+     * @param authMethod Authentication method.
+     * @return Number of records with given chosen authentication method.
+     */
+    long countByChosenAuthMethod(AuthMethod authMethod);
 }

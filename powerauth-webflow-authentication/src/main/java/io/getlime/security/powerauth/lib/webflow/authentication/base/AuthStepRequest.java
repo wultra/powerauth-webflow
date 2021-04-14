@@ -29,7 +29,7 @@ public abstract class AuthStepRequest {
 
     /**
      * Get authentication / authorization instruments used in this step.
-     * @return Authentication / authorization instuments used in this step.
+     * @return Authentication / authorization instruments used in this step.
      */
     public abstract List<AuthInstrument> getAuthInstruments();
 }

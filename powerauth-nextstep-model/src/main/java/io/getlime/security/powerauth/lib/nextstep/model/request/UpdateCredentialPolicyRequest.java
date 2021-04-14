@@ -15,9 +15,18 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for updating a credential policy.
@@ -27,20 +36,37 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateCredentialPolicyRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
-    private Long usernameLengthMin;
-    private Long usernameLengthMax;
-    private String usernameAllowedChars;
-    private Long passwordLengthMin;
-    private Long passwordLengthMax;
-    private String passwordAllowedChars;
-    private Long limitSoft;
-    private Long limitHard;
-    private long checkHistoryCount;
+    @Positive
+    private Integer usernameLengthMin;
+    @Positive
+    private Integer usernameLengthMax;
+    @Size(min = 2, max = 256)
+    private String usernameAllowedPattern;
+    @Positive
+    private Integer credentialLengthMin;
+    @Positive
+    private Integer credentialLengthMax;
+    @Positive
+    private Integer limitSoft;
+    @Positive
+    private Integer limitHard;
+    @PositiveOrZero
+    private int checkHistoryCount;
     private boolean rotationEnabled;
-    private String usernameGenAlgorithm;
-    private String passwordGenAlgorithm;
+    @Positive
+    private Integer rotationDays;
+    @Positive
+    private Integer temporaryCredentialExpirationTime;
+    private UsernameGenerationAlgorithm usernameGenAlgorithm;
+    private UsernameGenerationParam usernameGenParam;
+    private CredentialGenerationAlgorithm credentialGenAlgorithm;
+    private CredentialGenerationParam credentialGenParam;
+    private CredentialValidationParam credentialValParam;
+    private CredentialPolicyStatus credentialPolicyStatus;
 
 }

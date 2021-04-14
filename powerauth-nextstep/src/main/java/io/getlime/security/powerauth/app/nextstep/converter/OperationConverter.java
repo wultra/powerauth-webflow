@@ -21,6 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -50,11 +54,13 @@ public class OperationConverter {
      * @return Operation detail.
      */
     public GetOperationDetailResponse fromEntity(OperationEntity operation) {
-        GetOperationDetailResponse operationDetail = new GetOperationDetailResponse();
+        final GetOperationDetailResponse operationDetail = new GetOperationDetailResponse();
         operationDetail.setOperationId(operation.getOperationId());
         operationDetail.setOperationName(operation.getOperationName());
         operationDetail.setUserId(operation.getUserId());
-        operationDetail.setOrganizationId(operation.getOrganizationId());
+        if (operation.getOrganization() != null) {
+            operationDetail.setOrganizationId(operation.getOrganization().getOrganizationId());
+        }
         operationDetail.setAccountStatus(operation.getUserAccountStatus());
         operationDetail.setExternalTransactionId(operation.getExternalTransactionId());
         operationDetail.setOperationData(operation.getOperationData());
@@ -68,6 +74,22 @@ public class OperationConverter {
         operationDetail.setTimestampCreated(operation.getTimestampCreated());
         operationDetail.setTimestampExpires(operation.getTimestampExpires());
         return operationDetail;
+    }
+
+    /**
+     * Convert operation entity to operation context.
+     * @param operation Operation entity.
+     * @return Operation context.
+     */
+    public OperationContext toOperationContext(OperationEntity operation) {
+        final String operationId = operation.getOperationId();
+        final String operationName = operation.getOperationName();
+        final String operationData = operation.getOperationData();
+        final GetOperationDetailResponse operationDetail = fromEntity(operation);
+        final FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
+        final ApplicationContext applicationContext = operationDetail.getApplicationContext();
+        final String externalTransactionId = operation.getExternalTransactionId();
+        return new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
     }
 
     /**
@@ -96,14 +118,14 @@ public class OperationConverter {
      */
     private void assignApplicationContext(GetOperationDetailResponse response, OperationEntity operation) {
         if (operation.getApplicationId() != null) {
-            ApplicationContext applicationContext = new ApplicationContext();
+            final ApplicationContext applicationContext = new ApplicationContext();
             applicationContext.setId(operation.getApplicationId());
             applicationContext.setName(operation.getApplicationName());
             applicationContext.setDescription(operation.getApplicationDescription());
             if (operation.getApplicationOriginalScopes() != null) {
                 try {
-                    JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
-                    List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
+                    final JavaType listType = objectMapper.getTypeFactory().constructParametricType(List.class, String.class);
+                    final List<String> originalScopes = objectMapper.readValue(operation.getApplicationOriginalScopes(), listType);
                     applicationContext.getOriginalScopes().addAll(originalScopes);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application scopes.", ex);
@@ -111,8 +133,8 @@ public class OperationConverter {
             }
             if (operation.getApplicationExtras() != null) {
                 try {
-                    JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
-                    Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
+                    final JavaType mapType = objectMapper.getTypeFactory().constructParametricType(Map.class, String.class, Object.class);
+                    final Map<String, Object> extras = objectMapper.readValue(operation.getApplicationExtras(), mapType);
                     applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application extras.", ex);
@@ -130,14 +152,17 @@ public class OperationConverter {
     private void assignOperationHistory(GetOperationDetailResponse response, OperationEntity operation) {
         // add operation history
         for (OperationHistoryEntity history: operation.getOperationHistory()) {
-            OperationHistory h = new OperationHistory();
+            final OperationHistory h = new OperationHistory();
             h.setAuthMethod(history.getRequestAuthMethod());
             h.setRequestAuthStepResult(history.getRequestAuthStepResult());
+            h.setAuthStepResultDescription(history.getResponseResultDescription());
             h.setAuthResult(history.getResponseResult());
+            h.setMobileTokenActive(history.isMobileTokenActive());
+            h.setPowerAuthOperationId(history.getPowerAuthOperationId());
             response.getHistory().add(h);
         }
         // set chosen authentication method
-        OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory != null) {
             response.setChosenAuthMethod(currentHistory.getChosenAuthMethod());
         }
@@ -151,13 +176,13 @@ public class OperationConverter {
     private void assignAfsActions(GetOperationDetailResponse response, OperationEntity operation) {
         // add AFS actions
         for (OperationAfsActionEntity afsAction: operation.getAfsActions()) {
-            AfsActionDetail action = new AfsActionDetail();
+            final AfsActionDetail action = new AfsActionDetail();
             action.setAction(afsAction.getAfsAction());
             action.setStepIndex(afsAction.getStepIndex());
-            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
+            action.getRequestExtras().putAll(convertExtrasToMap(afsAction.getRequestAfsExtras()));
             action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
             action.setAfsLabel(afsAction.getAfsLabel());
-            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
+            action.getResponseExtras().putAll(convertExtrasToMap(afsAction.getResponseAfsExtras()));
             response.getAfsActions().add(action);
         }
     }
@@ -169,12 +194,12 @@ public class OperationConverter {
      */
     private Map<String, Object> convertExtrasToMap(String extras) {
         try {
-            TypeReference<Map<String, Object>> typeRef
+            final TypeReference<Map<String, Object>> typeRef
                     = new TypeReference<Map<String, Object>>() {};
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {
             logger.error("Error occurred while deserializing data", e);
-            return null;
+            return new HashMap<>();
         }
     }
 }

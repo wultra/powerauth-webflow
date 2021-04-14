@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for unblocking a credential.
@@ -27,9 +28,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UnblockCredentialRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
 
 }

@@ -17,10 +17,14 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -32,21 +36,37 @@ import java.util.Date;
 @EqualsAndHashCode(of = {"credentialDefinitionName", "applicationName", "credentialPolicyName"})
 public class CredentialDefinitionDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @Size(min = 2, max = 256)
+    private String organizationId;
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
+    private String description;
     @NotNull
     private CredentialCategory category;
+    @NotNull
     private boolean encryptionEnabled;
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
+    @NotNull
     private boolean hashingEnabled;
+    @Size(min = 2, max = 256)
     private String hashConfigName;
+    @NotNull
     private boolean e2eEncryptionEnabled;
+    private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
+    private String e2eEncryptionCipherTransformation;
+    private boolean e2eEncryptionForTemporaryCredentialEnabled;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
+    @NotNull
+    private boolean dataAdapterProxyEnabled;
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

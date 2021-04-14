@@ -15,9 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialAuthenticationMode;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Request object used for authenticating using a credential.
@@ -27,12 +31,22 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CredentialAuthenticationRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
-    private String username;
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
+    private String userId;
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String credentialValue;
+    // Null value is allowed, defaults to MATCH_EXACT
+    private CredentialAuthenticationMode authenticationMode;
+    private List<Integer> credentialPositionsToVerify;
+    @Size(min = 1, max = 256)
     private String operationId;
     private boolean updateOperation;
+    // Authentication method is required only in case multiple methods are defined in Next Steps
+    private AuthMethod authMethod;
 
 }

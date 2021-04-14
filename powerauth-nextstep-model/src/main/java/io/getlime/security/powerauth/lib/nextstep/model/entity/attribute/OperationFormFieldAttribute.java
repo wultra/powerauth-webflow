@@ -28,7 +28,7 @@ import java.util.Objects;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = OperationAmountFieldAttribute.class, name = "AMOUNT"),
         @JsonSubTypes.Type(value = OperationNoteFieldAttribute.class, name = "NOTE"),

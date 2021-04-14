@@ -47,18 +47,6 @@ public class PowerAuthWebServiceConfiguration {
     private boolean acceptInvalidSslCertificate;
 
     /**
-     * Configuration of the total Unirest parallel connections.
-     */
-    @Value("${powerauth.unirest.concurrency.total:500}")
-    private int unirestConcurrencyTotal;
-
-    /**
-     * Configuration of the per-route Unirest parallel connections.
-     */
-    @Value("${powerauth.unirest.concurrency.perRoute:50}")
-    private int unirestConcurrencyPerRoute;
-
-    /**
      * Configuration constructor.
      * @param sslConfigurationService SSL configuration service.
      */

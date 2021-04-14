@@ -20,7 +20,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.model;
  */
 public class HttpSessionAttributeNames {
 
-    public static final String MESSAGE_ID = "MESSAGE_ID";
+    public static final String OTP_ID = "OTP_ID";
     public static final String LAST_MESSAGE_TIMESTAMP = "LAST_MESSAGE_TIMESTAMP";
     public static final String INITIAL_MESSAGE_SENT = "INITIAL_MESSAGE_SENT";
     public static final String AUTH_STEP_OPTIONS = "AUTH_STEP_OPTIONS";

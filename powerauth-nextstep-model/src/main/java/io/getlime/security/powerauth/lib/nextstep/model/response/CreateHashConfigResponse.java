@@ -15,9 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,10 +33,14 @@ import java.util.Map;
 @Data
 public class CreateHashConfigResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String hashConfigName;
     @NotNull
-    private String algorithm;
+    private HashAlgorithm algorithm;
+    @NotNull
     private final Map<String, String> parameters = new LinkedHashMap<>();
+    @NotNull
+    private HashConfigStatus hashConfigStatus;
 
 }

@@ -38,7 +38,7 @@ public enum CredentialStatus {
     BLOCKED_PERMANENT,
 
     /**
-     * User identity is removed.
+     * Credential is removed.
      */
     REMOVED
 

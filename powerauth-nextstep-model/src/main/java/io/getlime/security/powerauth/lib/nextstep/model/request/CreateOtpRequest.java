@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for creating an OTP.
@@ -27,14 +28,20 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateOtpRequest {
 
-    @NotNull
+    // The userId is optional to allow creating OTP codes for users without identity
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpName;
     // Optional credential name for updating credential counters
+    @Size(min = 2, max = 256)
     private String credentialName;
-    // The otpData parameter has priority over data extracted from operation
+    // The otpData parameter has priority over data extracted from operation.
+    // The otpData can be an empty string, null value indicates data taken from operation.
+    @Size(max = 256)
     private String otpData;
+    @Size(min = 1, max = 256)
     private String operationId;
 
 }

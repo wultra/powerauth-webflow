@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
 /**
  * Request object used for deleting a step definition.
@@ -28,6 +29,7 @@ import javax.validation.constraints.NotNull;
 public class DeleteStepDefinitionResponse {
 
     @NotNull
-    private Integer stepDefinitionId;
+    @Positive
+    private long stepDefinitionId;
 
 }

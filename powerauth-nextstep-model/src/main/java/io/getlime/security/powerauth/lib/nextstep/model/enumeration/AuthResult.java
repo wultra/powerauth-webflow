@@ -21,6 +21,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
  * @author Petr Dvorak, petr@wultra.com
  */
 public enum AuthResult {
+
     /**
      * Continue with authentication, send user to the next authentication step.
      */

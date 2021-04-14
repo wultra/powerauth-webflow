@@ -21,10 +21,10 @@ import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationListForUserResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetMobileTokenConfigResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
@@ -70,7 +70,7 @@ public class AuthMethodQueryService {
      */
     public boolean isAuthMethodEnabled(AuthMethod authMethod, String userId, String operationId) {
         try {
-            ObjectResponse<GetUserAuthMethodsResponse> response = nextStepClient.getAuthMethodsEnabledForUser(userId);
+            ObjectResponse<GetUserAuthMethodsResponse> response = nextStepClient.getAuthMethodsForUser(userId);
             List<UserAuthMethodDetail> enabledAuthMethods = response.getResponseObject().getUserAuthMethods();
             for (UserAuthMethodDetail authMethodDetail: enabledAuthMethods) {
                 if (authMethodDetail.getAuthMethod() == authMethod) {
@@ -87,8 +87,8 @@ public class AuthMethodQueryService {
                 }
             }
             return false;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             return false;
         }
     }
@@ -97,11 +97,11 @@ public class AuthMethodQueryService {
      * Get the configured activationId for mobile token. Null value is returned when activationId is not configured or configuration is invalid.
      * @param userId user ID.
      * @return Activation ID.
-     * @throws NextStepServiceException Thrown when Next Step request fails.
+     * @throws NextStepClientException Thrown when Next Step request fails.
      */
-    public String getActivationIdForMobileTokenAuthMethod(String userId) throws NextStepServiceException {
+    public String getActivationIdForMobileTokenAuthMethod(String userId) throws NextStepClientException {
         String configuredActivation = null;
-        ObjectResponse<GetUserAuthMethodsResponse> response = nextStepClient.getAuthMethodsEnabledForUser(userId);
+        ObjectResponse<GetUserAuthMethodsResponse> response = nextStepClient.getAuthMethodsForUser(userId);
         GetUserAuthMethodsResponse userAuthMethods = response.getResponseObject();
         for (UserAuthMethodDetail authMethodDetail : userAuthMethods.getUserAuthMethods()) {
             if (authMethodDetail.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
@@ -129,9 +129,9 @@ public class AuthMethodQueryService {
      * @param userId User ID.
      * @param operationId Operation ID.
      * @return Whether Mobile Token is currently available for given user ID and operation ID.
-     * @throws NextStepServiceException Thrown when Next Step request fails.
+     * @throws NextStepClientException Thrown when Next Step request fails.
      */
-    public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepServiceException {
+    public boolean isMobileTokenAvailable(String userId, String operationId) throws NextStepClientException {
         // Non-SCA usage: check whether POWERAUTH_TOKEN method is available as next step for operation (used in operation review step)
         ObjectResponse<GetOperationDetailResponse> objectResponseOperation = nextStepClient.getOperationDetail(operationId);
         GetOperationDetailResponse operation = objectResponseOperation.getResponseObject();

@@ -23,6 +23,11 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 public enum CredentialValidationMode {
 
     /**
+     * No validation.
+     */
+    NO_VALIDATION,
+
+    /**
      * Validate only the username.
      */
     VALIDATE_USERNAME,

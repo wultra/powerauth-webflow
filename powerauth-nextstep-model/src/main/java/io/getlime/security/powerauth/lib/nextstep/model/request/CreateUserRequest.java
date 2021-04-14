@@ -15,11 +15,15 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -33,15 +37,63 @@ import java.util.Map;
 @Data
 public class CreateUserRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
 
     private final Map<String, Object> extras = new LinkedHashMap<>();
 
     private final List<String> roles = new ArrayList<>();
 
-    private final List<UserContactDetail> contacts = new ArrayList<>();
+    @Valid
+    private final List<NewContact> contacts = new ArrayList<>();
 
-    private final List<CredentialSecretDetail> credentials = new ArrayList<>();
+    @Valid
+    private final List<NewCredential> credentials = new ArrayList<>();
+
+    @Data
+    public static class NewContact {
+
+        @NotBlank
+        @Size(min = 2, max = 256)
+        private String contactName;
+        @NotNull
+        private ContactType contactType;
+        @NotBlank
+        @Size(min = 2, max = 256)
+        private String contactValue;
+        private boolean primary;
+
+    }
+
+    @Data
+    public static class NewCredential {
+
+        @NotBlank
+        @Size(min = 2, max = 256)
+        private String credentialName;
+        @NotNull
+        private CredentialType credentialType;
+        @Size(min = 1, max = 256)
+        private String username;
+        @Size(min = 1, max = 256)
+        private String credentialValue;
+        // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
+        private CredentialValidationMode validationMode;
+        @Valid
+        private final List<CredentialHistory> credentialHistory = new ArrayList<>();
+
+    }
+
+    @Data
+    public static class CredentialHistory {
+
+        @Size(min = 1, max = 256)
+        private String username;
+        @NotBlank
+        @Size(min = 1, max = 256)
+        private String credentialValue;
+
+    }
 
 }

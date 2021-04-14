@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for getting a user identity detail.
@@ -27,7 +28,12 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GetUserDetailRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
+    // Optional filter of credentials by credential definition name
+    @Size(min = 2, max = 256)
+    private String credentialName;
+    private boolean includeRemoved;
 
 }

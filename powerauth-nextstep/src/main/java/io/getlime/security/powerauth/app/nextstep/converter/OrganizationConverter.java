@@ -31,11 +31,13 @@ public class OrganizationConverter {
      * @return Get organization response.
      */
     public GetOrganizationDetailResponse fromOrganizationEntity(OrganizationEntity organization) {
-        GetOrganizationDetailResponse response = new GetOrganizationDetailResponse();
+        final GetOrganizationDetailResponse response = new GetOrganizationDetailResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
         response.setOrderNumber(organization.getOrderNumber());
         response.setDefault(organization.isDefault());
+        response.setDefaultCredentialName(organization.getDefaultCredentialName());
+        response.setDefaultOtpName(organization.getDefaultOtpName());
         return response;
     }
 }

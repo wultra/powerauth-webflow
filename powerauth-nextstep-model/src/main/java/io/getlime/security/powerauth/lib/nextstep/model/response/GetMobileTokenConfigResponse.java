@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Response object used obtaining mobile token configuration.
  *
@@ -25,6 +27,7 @@ import lombok.Data;
 @Data
 public class GetMobileTokenConfigResponse {
 
+    @NotNull
     private boolean mobileTokenEnabled;
 
 }

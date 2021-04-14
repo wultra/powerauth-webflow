@@ -41,10 +41,10 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      * @return A new object mapper.
      */
     private ObjectMapper objectMapper() {
-        Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
+        final Jackson2ObjectMapperFactoryBean bean = new Jackson2ObjectMapperFactoryBean();
         bean.setIndentOutput(true);
         bean.afterPropertiesSet();
-        ObjectMapper objectMapper = bean.getObject();
+        final ObjectMapper objectMapper = bean.getObject();
         objectMapper.registerModule(new JavaTimeModule());
         // replacement for ISO8601DateFormat which is deprecated
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
@@ -57,7 +57,7 @@ public class WebApplicationConfig implements WebMvcConfigurer {
      * @return New custom converter with a correct object mapper.
      */
     private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter() {
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        final MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
         converter.setObjectMapper(objectMapper());
         return converter;
     }

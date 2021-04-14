@@ -15,32 +15,31 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.sms.controller;
 
-import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.AfsResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.AuthStepOptions;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotActiveException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.NoPasswordProtection;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.*;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthorizationOtpDeliveryResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.CertificateVerificationRepository;
 import io.getlime.security.powerauth.lib.webflow.authentication.repository.model.entity.CertificateVerificationEntity;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
@@ -77,26 +76,25 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     private static final Integer OPERATION_CONFIG_TEMPLATE_LOGIN = 2;
     private static final Integer OPERATION_CONFIG_TEMPLATE_APPROVAL = 1;
 
-    private final DataAdapterClient dataAdapterClient;
+    private final NextStepClient nextStepClient;
     private final WebFlowServicesConfiguration configuration;
     private final AfsIntegrationService afsIntegrationService;
     private final HttpSession httpSession;
     private final CertificateVerificationRepository certificateVerificationRepository;
 
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
-    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
-     * @param dataAdapterClient Data Adapter client.
+     * @param nextStepClient Next Step client.
      * @param configuration Web Flow configuration.
      * @param afsIntegrationService Anti-fraud system integration service.
      * @param httpSession HTTP session.
      * @param certificateVerificationRepository Certificate verification repository.
      */
     @Autowired
-    public SmsAuthorizationController(DataAdapterClient dataAdapterClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession, CertificateVerificationRepository certificateVerificationRepository) {
-        this.dataAdapterClient = dataAdapterClient;
+    public SmsAuthorizationController(NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService, HttpSession httpSession, CertificateVerificationRepository certificateVerificationRepository) {
+        this.nextStepClient = nextStepClient;
         this.configuration = configuration;
         this.afsIntegrationService = afsIntegrationService;
         this.httpSession = httpSession;
@@ -111,26 +109,42 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      * @throws AuthStepException Exception is thrown when authorization fails.
      */
     @Override
-    protected AuthenticationResult authenticate(SmsAuthorizationRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(SmsAuthorizationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        final String messageId = getMessageIdFromHttpSession();
         try {
-            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
+            if (operation.getUserId() == null) {
+                // Fake OTP authentication, pretend 2FA authentication failure
+                logger.info("Step authentication failed with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                List<AuthInstrument> authInstruments = new ArrayList<>();
+                authInstruments.add(AuthInstrument.OTP_KEY);
+                authInstruments.add(AuthInstrument.CREDENTIAL);
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), null, authInstruments, null);
+                if (response.getAuthResult() == AuthResult.FAILED) {
+                    // FAILED result instead of CONTINUE means the authentication method is failed
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                }
+                throw new AuthenticationFailedException("Authentication failed", "login.authenticationFailed");
+            }
+            final String otpId = getOtpIdFromHttpSession();
+            GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
+            String otpName = organization.getDefaultOtpName();
+            String credentialName = organization.getDefaultCredentialName();
+            if (otpName == null) {
+                logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
+                throw new AuthStepException("SMS delivery failed", "error.communication");
+            }
             String operationId = operation.getOperationId();
-            String operationName = operation.getOperationName();
-            String operationData = operation.getOperationData();
-            final String externalTransactionId = operation.getExternalTransactionId();
             String userId = operation.getUserId();
-            String organizationId = operation.getOrganizationId();
-            AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
-            ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
-            SmsAuthorizationResult smsAuthorizationResult;
+            UserAccountStatus accountStatus = operation.getAccountStatus();
 
             String authCode = request.getAuthCode();
             AuthStepOptions authStepOptions = getAuthStepOptionsFromHttpSession();
+            AuthenticationResult smsAuthorizationResult = null;
+            Integer remainingAttempts = null;
+            String errorMessage = null;
+            boolean showRemainingAttempts = false;
             if (authStepOptions != null) {
                 // Authentication step options have been derived from AFS response
 
@@ -138,87 +152,88 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     // No authentication is required, approve step
                     cleanHttpSession();
                     request.setAuthInstruments(Collections.emptyList());
-                    logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                    return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                    logger.info("Step authentication succeeded (NO_FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
                 } else if (!authStepOptions.isPasswordRequired()) {
                     // Only SMS authorization is required, skip password verification
-                    ObjectResponse<VerifySmsAuthorizationResponse> objectResponse = dataAdapterClient.verifyAuthorizationSms(messageId, authCode, userId, organizationId, accountStatus, operationContext);
-                    VerifySmsAuthorizationResponse smsResponse = objectResponse.getResponseObject();
-                    smsAuthorizationResult = smsResponse.getSmsAuthorizationResult();
+                    OtpAuthenticationResponse otpResponse = nextStepClient.authenticateWithOtp(otpId, operationId, authCode, true, authMethod).getResponseObject();
+                    if (otpResponse.isOperationFailed()) {
+                        logger.info("Step authentication failed (1FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+                    }
+                    smsAuthorizationResult = otpResponse.getAuthenticationResult();
                     request.setAuthInstruments(Collections.singletonList(AuthInstrument.OTP_KEY));
-                    if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED) {
+                    if (smsAuthorizationResult == AuthenticationResult.SUCCEEDED) {
                         cleanHttpSession();
                         logger.info("Step authentication succeeded (1FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                        return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                        return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true);
                     }
+                    remainingAttempts = otpResponse.getRemainingAttempts();
+                    showRemainingAttempts = otpResponse.isShowRemainingAttempts();
+                    errorMessage = otpResponse.getErrorMessage();
                 }
+            }
+            if (smsAuthorizationResult == null) {
                 // Otherwise 2FA authentication is performed
-            }
+                List<AuthInstrument> authInstruments = new ArrayList<>();
+                authInstruments.add(AuthInstrument.OTP_KEY);
+                authInstruments.add(AuthInstrument.CREDENTIAL);
+                request.setAuthInstruments(authInstruments);
 
-            List<AuthInstrument> authInstruments = new ArrayList<>();
-            authInstruments.add(AuthInstrument.OTP_KEY);
-            authInstruments.add(AuthInstrument.PASSWORD);
-            request.setAuthInstruments(authInstruments);
+                PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
+                String cipherTransformation = configuration.getCipherTransformation();
+                io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection passwordProtection;
+                switch (passwordProtectionType) {
+                    case NO_PROTECTION:
+                        // Password is sent in plain text
+                        passwordProtection = new NoPasswordProtection();
+                        logger.info("No protection is used for protecting user password");
+                        break;
 
-            PasswordProtectionType passwordProtectionType = configuration.getPasswordProtection();
-            String cipherTransformation = configuration.getCipherTransformation();
-            io.getlime.security.powerauth.lib.webflow.authentication.encryption.PasswordProtection passwordProtection;
-            switch (passwordProtectionType) {
-                case NO_PROTECTION:
-                    // Password is sent in plain text
-                    passwordProtection = new NoPasswordProtection();
-                    logger.info("No protection is used for protecting user password");
-                    break;
+                    case PASSWORD_ENCRYPTION_AES:
+                        // Encrypt user password in case password encryption is configured in Web Flow
+                        passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
+                        logger.info("User password is protected using transformation: {}", cipherTransformation);
+                        break;
 
-                case PASSWORD_ENCRYPTION_AES:
-                    // Encrypt user password in case password encryption is configured in Web Flow
-                    passwordProtection = new AesEncryptionPasswordProtection(cipherTransformation, configuration.getPasswordEncryptionKey());
-                    logger.info("User password is protected using transformation: {}", cipherTransformation);
-                    break;
+                    default:
+                        // Unsupported authentication type
+                        throw new InvalidRequestException("Invalid authentication type");
+                }
 
-                default:
-                    // Unsupported authentication type
-                    throw new InvalidRequestException("Invalid authentication type");
-            }
-
-            String protectedPassword = passwordProtection.protect(request.getPassword());
-            AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
-            ObjectResponse<VerifySmsAndPasswordResponse> objectResponse = dataAdapterClient.verifyAuthorizationSmsAndPassword(messageId, authCode, userId, organizationId, accountStatus, protectedPassword, authenticationContext, operationContext);
-            VerifySmsAndPasswordResponse smsAndPasswordResponse = objectResponse.getResponseObject();
-            smsAuthorizationResult = smsAndPasswordResponse.getSmsAuthorizationResult();
-            if (smsAuthorizationResult == SmsAuthorizationResult.SUCCEEDED && smsAndPasswordResponse.getUserAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
-                cleanHttpSession();
-                logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
-            }
-
-            Integer remainingAttemptsDA = smsAndPasswordResponse.getRemainingAttempts();
-            boolean showRemainingAttempts = smsAndPasswordResponse.getShowRemainingAttempts();
-            String errorMessage = smsAndPasswordResponse.getErrorMessage();
-            UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(smsAndPasswordResponse.getAccountStatus());
-
-            try {
-                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
-                if (response.getResult() == AuthResult.FAILED) {
-                    cleanHttpSession();
-                    // FAILED result instead of CONTINUE means the authentication method is failed
+                String protectedPassword = passwordProtection.protect(request.getPassword());
+                CombinedAuthenticationResponse authResponse = nextStepClient.authenticateCombined(credentialName, userId, protectedPassword, otpId, operationId, authCode, true, authMethod).getResponseObject();
+                if (authResponse.isOperationFailed()) {
+                    logger.info("Step authentication failed (2FA) due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }
-                AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
-                if (showRemainingAttempts) {
-                    GetOperationDetailResponse updatedOperation = getOperation();
-                    Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-                    Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
-                    authEx.setRemainingAttempts(remainingAttempts);
+                if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
+                    cleanHttpSession();
+                    logger.info("Step authentication succeeded (2FA), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), true);
                 }
-                authEx.setAccountStatus(userAccountStatus);
-                throw authEx;
-            } catch (NextStepServiceException e) {
-                logger.error("Error occurred in Next Step server", e);
-                throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
+                remainingAttempts = authResponse.getRemainingAttempts();
+                showRemainingAttempts = authResponse.isShowRemainingAttempts();
+                errorMessage = authResponse.getErrorMessage();
             }
-        } catch (DataAdapterClientErrorException e) {
-            throw new AuthStepException(e.getError().getMessage(), e);
+
+            if (errorMessage == null) {
+                errorMessage = "login.authenticationFailed";
+            }
+
+            if (remainingAttempts != null && remainingAttempts == 0) {
+                cleanHttpSession();
+                throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+            }
+            AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
+            if (showRemainingAttempts) {
+                authEx.setRemainingAttempts(remainingAttempts);
+            }
+            authEx.setAccountStatus(accountStatus);
+            throw authEx;
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
+            throw new AuthStepException("SMS authentication failed", ex, "error.communication");
         }
     }
 
@@ -232,12 +247,12 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
-     * Set message ID in HTTP session.
-     * @param messageId Message ID.
+     * Set OTP ID in HTTP session.
+     * @param otpId OTP ID.
      */
-    private void updateMessageIdInHttpSession(String messageId) {
+    private void updateOtpIdInHttpSession(String otpId) {
         synchronized (httpSession.getServletContext()) {
-            httpSession.setAttribute(HttpSessionAttributeNames.MESSAGE_ID, messageId);
+            httpSession.setAttribute(HttpSessionAttributeNames.OTP_ID, otpId);
         }
     }
 
@@ -269,11 +284,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     }
 
     /**
-     * Get message ID from HTTP session.
+     * Get OTP ID from HTTP session.
      */
-    private String getMessageIdFromHttpSession() {
+    private String getOtpIdFromHttpSession() {
         synchronized (httpSession.getServletContext()) {
-            return (String) httpSession.getAttribute(HttpSessionAttributeNames.MESSAGE_ID);
+            return (String) httpSession.getAttribute(HttpSessionAttributeNames.OTP_ID);
         }
     }
 
@@ -318,7 +333,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
      */
     private void cleanHttpSession() {
         synchronized (httpSession.getServletContext()) {
-            httpSession.removeAttribute(HttpSessionAttributeNames.MESSAGE_ID);
+            httpSession.removeAttribute(HttpSessionAttributeNames.OTP_ID);
             httpSession.removeAttribute(HttpSessionAttributeNames.LAST_MESSAGE_TIMESTAMP);
             httpSession.removeAttribute(HttpSessionAttributeNames.INITIAL_MESSAGE_SENT);
             httpSession.removeAttribute(HttpSessionAttributeNames.AUTH_STEP_OPTIONS);
@@ -348,6 +363,13 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             // Add username for LOGIN_SCA method
             username = getUsernameFromHttpSession();
             initResponse.setUsername(username);
+        }
+
+        if (operation.getUserId() == null) {
+            // Operation is anonymous, e.g. for fake SMS authorization, return default response
+            initResponse.setResendDelay(configuration.getSmsResendDelay());
+            initResponse.setResult(AuthStepResult.CONFIRMED);
+            return initResponse;
         }
 
         if (isCertificateUsedForAuthentication(operation.getOperationId())) {
@@ -398,28 +420,26 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                     initResponse.setResult(AuthStepResult.CONFIRMED);
                     return initResponse;
                 }
-                CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, false);
-                String messageId = response.getMessageId();
-                if (messageId != null) {
-                    updateMessageIdInHttpSession(messageId);
+                AuthorizationOtpDeliveryResult result = sendAuthorizationSms(operation);
+                if (result.isDelivered()) {
+                    updateOtpIdInHttpSession(result.getOtpId());
+                    updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
                     updateInitialMessageSentInHttpSession(true);
-                }
-                if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
                     initResponse.setResult(AuthStepResult.CONFIRMED);
                     logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                 } else {
                     initResponse.setResult(AuthStepResult.AUTH_FAILED);
-                    initResponse.setMessage(response.getErrorMessage());
+                    initResponse.setMessage(result.getErrorMessage());
                     logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
                 }
             }
 
             return initResponse;
-        } catch (DataAdapterClientErrorException e) {
-            logger.error("Error when sending SMS message.", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error when sending SMS message.", ex);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            initResponse.setMessage(e.getError().getMessage());
+            initResponse.setMessage("smsAuthorization.deliveryFailed");
             return initResponse;
         }
     }
@@ -437,13 +457,17 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         logger.info("Resend step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
         ResendSmsAuthorizationResponse resendResponse = new ResendSmsAuthorizationResponse();
         resendResponse.setResendDelay(configuration.getSmsResendDelay());
+        if (operation.getUserId() == null) {
+            // Operation is anonymous, e.g. for fake SMS authorization, return default response
+            logger.info("Resend step result: CONFIRMED (fake SMS), operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            resendResponse.setResult(AuthStepResult.CONFIRMED);
+            return resendResponse;
+        }
         try {
-            CreateSmsAuthorizationResponse response = sendAuthorizationSms(operation, true);
-            String messageId = response.getMessageId();
-            if (messageId != null) {
-                updateMessageIdInHttpSession(messageId);
-            }
-            if (SmsDeliveryResult.SUCCEEDED.equals(response.getSmsDeliveryResult())) {
+            AuthorizationOtpDeliveryResult response = sendAuthorizationSms(operation);
+            if (response.isDelivered()) {
+                updateOtpIdInHttpSession(response.getOtpId());
+                updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
                 resendResponse.setResult(AuthStepResult.CONFIRMED);
                 logger.info("Resend step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             } else {
@@ -452,11 +476,11 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
                 logger.info("Resend step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             }
             return resendResponse;
-        } catch (DataAdapterClientErrorException e) {
-            logger.error("Error when sending SMS message.", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error when sending SMS message.", ex);
             resendResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Resend step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-            resendResponse.setMessage(e.getError().getMessage());
+            resendResponse.setMessage("smsAuthorization.deliveryFailed");
             return resendResponse;
         }
     }
@@ -575,14 +599,13 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
             final GetOperationDetailResponse operation = getOperation();
             final AuthMethod authMethod = getAuthMethodName(operation);
             cleanHttpSession();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
             return cancelResponse;
-        } catch (NextStepServiceException e) {
-            logger.error("Error when canceling SMS message validation.", e);
+        } catch (CommunicationFailedException ex) {
             final SmsAuthorizationResponse cancelResponse = new SmsAuthorizationResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");
@@ -595,32 +618,47 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
     /**
      * Send authorization SMS using data adapter. Check SMS resend delay to protect backends from spamming.
      * @param operation Current operation.
-     * @param resend Whether SMS is being resent.
-     * @return Response for sending authorization SMS message.
-     * @throws DataAdapterClientErrorException In case SMS delivery fails.
+     * @return OTP ID for the message.
+     * @throws AuthStepException In case OTP configuration is invalid.
+     * @throws NextStepClientException In case SMS delivery fails.
      */
-    private CreateSmsAuthorizationResponse sendAuthorizationSms(GetOperationDetailResponse operation, boolean resend) throws DataAdapterClientErrorException, AuthStepException {
+    private AuthorizationOtpDeliveryResult sendAuthorizationSms(GetOperationDetailResponse operation) throws NextStepClientException, AuthStepException {
         Long lastMessageTimestamp = getLastMessageTimestampFromHttpSession();
         if (lastMessageTimestamp != null && System.currentTimeMillis() - lastMessageTimestamp < configuration.getSmsResendDelay()) {
-            CreateSmsAuthorizationResponse response = new CreateSmsAuthorizationResponse();
-            response.setSmsDeliveryResult(SmsDeliveryResult.FAILED);
-            response.setErrorMessage("smsAuthorization.deliveryFailed");
-            return response;
+            // SMS delivery is not allowed
+            AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
+            result.setDelivered(false);
+            result.setErrorMessage("smsAuthorization.deliveryFailed");
+            return result;
+        }
+        GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(operation.getOrganizationId()).getResponseObject();
+        String otpName = organization.getDefaultOtpName();
+        String credentialName = organization.getDefaultCredentialName();
+        if (otpName == null) {
+            logger.warn("Default OTP name is not configured for organization: " + operation.getOrganizationId());
+            throw new AuthStepException("SMS delivery failed", "error.communication");
         }
         String userId = operation.getUserId();
-        String organizationId = operation.getOrganizationId();
-        AccountStatus accountStatus = userAccountStatusConverter.fromUserAccountStatus(operation.getAccountStatus());
-        FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-        ApplicationContext applicationContext = operation.getApplicationContext();
-        String operationId = operation.getOperationId();
-        String operationName = operation.getOperationName();
-        String operationData = operation.getOperationData();
-        final AuthMethod authMethod = getAuthMethodName(operation);
-        final String externalTransactionId = operation.getExternalTransactionId();
-        OperationContext operationContext = new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
-        ObjectResponse<CreateSmsAuthorizationResponse> daResponse = dataAdapterClient.createAuthorizationSms(userId, organizationId, accountStatus, authMethod, operationContext, LocaleContextHolder.getLocale().getLanguage(), resend);
-        updateLastMessageTimestampInHttpSession(System.currentTimeMillis());
-        return daResponse.getResponseObject();
+        // OTP data is taken from operation
+        try {
+            String language = LocaleContextHolder.getLocale().getLanguage();
+            CreateAndSendOtpResponse otpResponse = nextStepClient.createAndSendOtp(userId, otpName, credentialName, null, operation.getOperationId(), language).getResponseObject();
+            AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
+            result.setDelivered(otpResponse.isDelivered());
+            result.setOtpId(otpResponse.getOtpId());
+            result.setErrorMessage(otpResponse.getErrorMessage());
+            return result;
+        } catch (NextStepClientException ex) {
+            if (ex.getNextStepError() != null
+                    && (CredentialNotActiveException.CODE.equals(ex.getNextStepError().getCode())
+                        || UserNotActiveException.CODE.equals(ex.getNextStepError().getCode()))) {
+                AuthorizationOtpDeliveryResult result = new AuthorizationOtpDeliveryResult();
+                result.setDelivered(false);
+                result.setErrorMessage("smsAuthorization.deliveryFailed");
+                return result;
+            }
+            throw ex;
+        }
     }
 
     /**

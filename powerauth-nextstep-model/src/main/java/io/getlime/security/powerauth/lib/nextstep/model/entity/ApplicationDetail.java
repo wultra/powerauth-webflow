@@ -19,7 +19,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Appli
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -31,12 +33,13 @@ import java.util.Date;
 @EqualsAndHashCode(of = "applicationName")
 public class ApplicationDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
     @NotNull
     private ApplicationStatus applicationStatus;
+    @Size(min = 2, max = 256)
     private String description;
-    private String organizationId;
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

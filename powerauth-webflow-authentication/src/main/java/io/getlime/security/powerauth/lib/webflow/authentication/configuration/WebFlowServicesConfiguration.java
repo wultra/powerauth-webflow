@@ -16,11 +16,19 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.SSLConfigurationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -34,7 +42,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class WebFlowServicesConfiguration {
 
-    private SSLConfigurationService sslConfigurationService;
+    private static final Logger logger = LoggerFactory.getLogger(WebFlowServicesConfiguration.class);
+
+    private final SSLConfigurationService sslConfigurationService;
 
     /**
      * Data Adapter service URL.
@@ -59,6 +69,12 @@ public class WebFlowServicesConfiguration {
      */
     @Value("${powerauth.webflow.offlineMode.available}")
     private boolean offlineModeAvailable;
+
+    /**
+     * Whether PowerAuth operations support is enabled.
+     */
+    @Value("${powerauth.webflow.pa.operations.enabled}")
+    private boolean powerAuthOperationSupportEnabled;
 
     /**
      * Authentication type which configures how username and password is transferred for verification.
@@ -132,18 +148,33 @@ public class WebFlowServicesConfiguration {
     }
 
     /**
+     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
+     * @return Constructed object mapper.
+     */
+    private ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
+
+    /**
      * Default data adapter client.
      *
      * @return Data adapter client.
      */
     @Bean
     public DataAdapterClient defaultDataAdapterClient() {
-        DataAdapterClient client = new DataAdapterClient(dataAdapterServiceUrl);
-        // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificate) {
-            sslConfigurationService.trustAllCertificates();
+        RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
+        restClientConfiguration.setBaseUrl(dataAdapterServiceUrl);
+        restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
+        restClientConfiguration.setObjectMapper(objectMapper());
+        try {
+            return new DataAdapterClient(restClientConfiguration);
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
         }
-        return client;
     }
 
     /**
@@ -153,12 +184,16 @@ public class WebFlowServicesConfiguration {
      */
     @Bean
     public NextStepClient defaultNextStepClient() {
-        NextStepClient client = new NextStepClient(nextstepServiceUrl);
-        // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificate) {
-            sslConfigurationService.trustAllCertificates();
+        RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
+        restClientConfiguration.setBaseUrl(nextstepServiceUrl);
+        restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
+        restClientConfiguration.setObjectMapper(objectMapper());
+        try {
+            return new NextStepClient(restClientConfiguration);
+        } catch (NextStepClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
         }
-        return client;
     }
 
     /**
@@ -167,6 +202,14 @@ public class WebFlowServicesConfiguration {
      */
     public boolean isOfflineModeAvailable() {
         return offlineModeAvailable;
+    }
+
+    /**
+     * Whether PowerAuth operations support is enabled.
+     * @return Whether PowerAuth operations support is enabled.
+     */
+    public boolean isPowerAuthOperationSupportEnabled() {
+        return powerAuthOperationSupportEnabled;
     }
 
     /**

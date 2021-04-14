@@ -18,9 +18,9 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverter;
-import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
+import io.getlime.security.powerauth.app.nextstep.service.OrganizationService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOrganizationRequest;
@@ -38,8 +38,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Optional;
+import javax.validation.Valid;
 
 /**
  * REST controller class related to Next Step organizations.
@@ -52,43 +51,43 @@ public class OrganizationController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
-    private final OrganizationRepository organizationRepository;
-    private final OrganizationConverter organizationConverter = new OrganizationConverter();
+    private final OrganizationService organizationService;
 
     /**
-     * Controller constructor.
-     * @param organizationRepository Organization repository.
+     * REST controller constructor.
+     * @param organizationService Organization service.
      */
     @Autowired
-    public OrganizationController(OrganizationRepository organizationRepository) {
-        this.organizationRepository = organizationRepository;
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateOrganizationResponse> createOrganization(@RequestBody ObjectRequest<CreateOrganizationRequest> request) {
-        return new ObjectResponse<>(new CreateOrganizationResponse());
+    public OrganizationController(OrganizationService organizationService) {
+        this.organizationService = organizationService;
     }
 
     /**
-     * List organizations defined in Next Step service.
+     * Create an organization.
+     * @param request Create organization request.
+     * @return Create organization response.
+     * @throws OrganizationAlreadyExistsException Thrown when organization already exists.
+     */
+    @RequestMapping(method = RequestMethod.POST)
+    public ObjectResponse<CreateOrganizationResponse> createOrganization(@Valid @RequestBody ObjectRequest<CreateOrganizationRequest> request) throws OrganizationAlreadyExistsException {
+        logger.info("Received createOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
+        final CreateOrganizationResponse response = organizationService.createOrganization(request.getRequestObject());
+        logger.info("The createOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get organization detail.
      *
-     * @param request Get organizations request.
-     * @return Get organizations response.
+     * @param request Get organization detail request.
+     * @return Get organization detail response.
      * @throws OrganizationNotFoundException Thrown in case organization does not exist.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
-        logger.info("Received getOrganizationDetail request");
-        if (request == null || request.getRequestObject() == null) {
-            throw new OrganizationNotFoundException("Invalid request");
-        }
-        Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getRequestObject().getOrganizationId());
-        if (!organizationOptional.isPresent()) {
-            throw new OrganizationNotFoundException("Organization not found, organization ID: " + request.getRequestObject().getOrganizationId());
-        }
-        OrganizationEntity organization = organizationOptional.get();
-        GetOrganizationDetailResponse response = organizationConverter.fromOrganizationEntity(organization);
-        logger.info("The getOrganizationDetail request succeeded");
+    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@Valid @RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
+        logger.info("Received getOrganizationDetail request, organization ID: {}", request.getRequestObject().getOrganizationId());
+        final GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request.getRequestObject());
+        logger.info("The getOrganizationDetail request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
         return new ObjectResponse<>(response);
     }
 
@@ -99,22 +98,26 @@ public class OrganizationController {
      * @return Get organizations response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOrganizationListResponse> getOrganizationList(@RequestBody ObjectRequest<GetOrganizationListRequest> request) {
+    public ObjectResponse<GetOrganizationListResponse> getOrganizationList(@Valid @RequestBody ObjectRequest<GetOrganizationListRequest> request) {
         logger.info("Received getOrganizationList request");
-        GetOrganizationListResponse response = new GetOrganizationListResponse();
-        List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
-        for (OrganizationEntity organization: organizations) {
-            GetOrganizationDetailResponse orgResponse = organizationConverter.fromOrganizationEntity(organization);
-            response.getOrganizations().add(orgResponse);
-        }
+        final GetOrganizationListResponse response = organizationService.getOrganizationList(request.getRequestObject());
         logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);
     }
 
+    /**
+     * Delete an organization.
+     * @param request Delete organization request.
+     * @return Delete organization response.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
+     */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@RequestBody ObjectRequest<DeleteOrganizationRequest> request) {
-        return new ObjectResponse<>(new DeleteOrganizationResponse());
+    public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
+        logger.info("Received deleteOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
+        final DeleteOrganizationResponse response = organizationService.deleteOrganization(request.getRequestObject());
+        logger.info("The deleteOrganization request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
+        return new ObjectResponse<>(response);
     }
-
 
 }

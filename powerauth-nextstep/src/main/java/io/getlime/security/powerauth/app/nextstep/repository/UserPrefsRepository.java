@@ -18,14 +18,14 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 /**
  * Crud repository for persistence of user preferences.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface UserPrefsRepository extends CrudRepository<UserPrefsEntity, String> {
 
     /**

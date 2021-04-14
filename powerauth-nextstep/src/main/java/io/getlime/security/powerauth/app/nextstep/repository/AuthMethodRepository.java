@@ -19,16 +19,17 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMe
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Crud repository for persistence of authentication methods.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, AuthMethod> {
 
     /**
@@ -45,5 +46,5 @@ public interface AuthMethodRepository extends CrudRepository<AuthMethodEntity, A
      * @param authMethod Name of authentication method.
      * @return Authentication method.
      */
-    AuthMethodEntity findByAuthMethod(AuthMethod authMethod);
+    Optional<AuthMethodEntity> findByAuthMethod(AuthMethod authMethod);
 }

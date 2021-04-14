@@ -17,7 +17,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -28,8 +30,10 @@ import java.util.Date;
 @Data
 public class AuditDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String action;
+    @Size(min = 1, max = 256)
     private String data;
     @NotNull
     private Date timestampCreated;

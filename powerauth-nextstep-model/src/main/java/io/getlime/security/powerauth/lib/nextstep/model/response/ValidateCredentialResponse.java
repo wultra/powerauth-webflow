@@ -15,7 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationError;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationResult;
 import lombok.Data;
 
@@ -34,6 +34,6 @@ public class ValidateCredentialResponse {
     @NotNull
     private CredentialValidationResult validationResult;
     @NotNull
-    private final List<CredentialValidationError> validationErrors = new ArrayList<>();
+    private final List<CredentialValidationFailure> validationErrors = new ArrayList<>();
 
 }

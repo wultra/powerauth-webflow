@@ -15,10 +15,13 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -32,10 +35,15 @@ import java.util.Map;
 @EqualsAndHashCode(of = "aliasName")
 public class UserAliasDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String aliasName;
+    @Size(min = 2, max = 256)
     private String aliasValue;
-    private Map<String, Object> extras = new LinkedHashMap<>();
+    @NotNull
+    private UserAliasStatus userAliasStatus;
+    @NotNull
+    private final Map<String, Object> extras = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;
     private Date timestampLastUpdated;

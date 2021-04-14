@@ -19,7 +19,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Conta
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -31,12 +33,15 @@ import java.util.Date;
 @EqualsAndHashCode(of = "contactName")
 public class UserContactDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String contactName;
     @NotNull
     private ContactType contactType;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String contactValue;
+    @NotNull
     private boolean primary;
     @NotNull
     private Date timestampCreated;

@@ -44,7 +44,7 @@ public class ServiceController {
     private BuildProperties buildProperties;
 
     /**
-     * Controller constructor.
+     * REST controller constructor.
      * @param nextStepServerConfiguration Next step server configuration.
      */
     @Autowired
@@ -61,15 +61,14 @@ public class ServiceController {
         this.buildProperties = buildProperties;
     }
 
-
     /**
      * Controller resource with system information.
      * @return System status info.
      */
     @RequestMapping(value = "status", method = RequestMethod.GET)
     public ObjectResponse<ServiceStatusResponse> getServiceStatus() {
-        logger.info("Received getServiceStatus request");
-        ServiceStatusResponse response = new ServiceStatusResponse();
+        logger.debug("Received getServiceStatus request");
+        final ServiceStatusResponse response = new ServiceStatusResponse();
         response.setApplicationName(nextStepServerConfiguration.getApplicationName());
         response.setApplicationDisplayName(nextStepServerConfiguration.getApplicationDisplayName());
         response.setApplicationEnvironment(nextStepServerConfiguration.getApplicationEnvironment());

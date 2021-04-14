@@ -15,9 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.UsernameGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CredentialGenerationAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.UsernameGenerationAlgorithm;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 
 /**
  * Request object used for creating a credential policy.
@@ -27,21 +32,42 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateCredentialPolicyRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
-    private Long usernameLengthMin;
-    private Long usernameLengthMax;
-    private String usernameAllowedChars;
-    private Long passwordLengthMin;
-    private Long passwordLengthMax;
-    private String passwordAllowedChars;
-    private Long limitSoft;
-    private Long limitHard;
-    private long checkHistoryCount;
+    @Positive
+    private Integer usernameLengthMin;
+    @Positive
+    private Integer usernameLengthMax;
+    @Size(min = 2, max = 256)
+    private String usernameAllowedPattern;
+    @Positive
+    private Integer credentialLengthMin;
+    @Positive
+    private Integer credentialLengthMax;
+    @Positive
+    private Integer limitSoft;
+    @Positive
+    private Integer limitHard;
+    @PositiveOrZero
+    private int checkHistoryCount;
     private boolean rotationEnabled;
-    private String usernameGenAlgorithm;
-    private String passwordGenAlgorithm;
+    @Positive
+    private Integer rotationDays;
+    @Positive
+    private Integer temporaryCredentialExpirationTime;
+    @NotNull
+    private UsernameGenerationAlgorithm usernameGenAlgorithm;
+    @NotNull
+    private UsernameGenerationParam usernameGenParam = new UsernameGenerationParam();
+    @NotNull
+    private CredentialGenerationAlgorithm credentialGenAlgorithm;
+    @NotNull
+    private CredentialGenerationParam credentialGenParam = new CredentialGenerationParam();
+    @NotNull
+    private CredentialValidationParam credentialValParam = new CredentialValidationParam();
 
 }
 
