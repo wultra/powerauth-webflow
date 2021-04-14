@@ -19,7 +19,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserI
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,9 +33,13 @@ import java.util.List;
 @Data
 public class GetEnabledMethodListResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     private UserIdentityStatus userIdentityStatus;
+    @NotBlank
+    @Size(min = 2, max = 256)
+    private String operationName;
     @NotNull
     private final List<AuthMethod> enabledAuthMethods = new ArrayList<>();
 

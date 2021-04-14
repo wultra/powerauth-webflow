@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for deleting an OTP.
@@ -28,10 +30,11 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DeleteOtpResponse {
 
-    @NotNull
-    private String userId;
-    @NotNull
-    private String otpName;
+    @NotBlank
+    @Size(min = 36, max = 36)
+    private String otpId;
+    @Size(min = 1, max = 256)
+    private String operationId;
     @NotNull
     private OtpStatus otpStatus;
 

@@ -16,9 +16,14 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
 import lombok.Data;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 
 /**
  * Request object used for creating a credential.
@@ -28,13 +33,31 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateCredentialRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
     @NotNull
     private CredentialType credentialType;
+    @Size(min = 1, max = 256)
     private String username;
+    @Size(min = 1, max = 256)
     private String credentialValue;
+    // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
+    private CredentialValidationMode validationMode;
+    @Valid
+    private List<CredentialHistory> credentialHistory;
+
+    @Data
+    public static class CredentialHistory {
+        @Size(min = 1, max = 256)
+        private String username;
+        @NotBlank
+        @Size(min = 1, max = 256)
+        private String credentialValue;
+    }
+
 
 }

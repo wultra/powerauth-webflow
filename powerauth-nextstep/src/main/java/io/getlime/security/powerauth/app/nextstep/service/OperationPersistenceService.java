@@ -18,24 +18,27 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.adapter.OperationCustomizationService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -55,29 +58,41 @@ public class OperationPersistenceService {
 
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
 
-    private final ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
+    private final OrganizationRepository organizationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final StepResolutionService stepResolutionService;
+    private final AuthenticationRepository authenticationRepository;
+    private final OperationCustomizationService operationCustomizationService;
 
     /**
      * Service constructor.
      * @param idGeneratorService              ID generator service.
      * @param operationRepository             Operation repository.
+     * @param organizationRepository          Organization repository.
      * @param operationHistoryRepository      Operation history repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param stepResolutionService           Step resolution service.
+     * @param authenticationRepository        Authentication repository.
+     * @param operationCustomizationService   Operation customization service.
      */
     @Autowired
     public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OperationHistoryRepository operationHistoryRepository,
-                                       MobileTokenConfigurationService mobileTokenConfigurationService) {
-        this.objectMapper = new ObjectMapper();
+                                       OrganizationRepository organizationRepository, OperationHistoryRepository operationHistoryRepository,
+                                       MobileTokenConfigurationService mobileTokenConfigurationService,
+                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository, OperationCustomizationService operationCustomizationService) {
         this.idGeneratorService = idGeneratorService;
         this.operationRepository = operationRepository;
+        this.organizationRepository = organizationRepository;
         this.operationHistoryRepository = operationHistoryRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+        this.stepResolutionService = stepResolutionService;
+        this.authenticationRepository = authenticationRepository;
+        this.operationCustomizationService = operationCustomizationService;
     }
 
     /**
@@ -86,24 +101,35 @@ public class OperationPersistenceService {
      *
      * @param request  create request received from the client
      * @param response create response generated for the client
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public void createOperation(CreateOperationRequest request, CreateOperationResponse response) {
+    public void createOperation(CreateOperationRequest request, CreateOperationResponse response) throws OrganizationNotFoundException {
         OperationEntity operation = new OperationEntity();
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
         operation.setOperationId(response.getOperationId());
-        operation.setOrganizationId(request.getOrganizationId());
+        operation.setUserId(request.getUserId());
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            operation.setOrganization(organizationOptional.get());
+        }
+        operation.setExternalOperationName(request.getOperationNameExternal());
         operation.setExternalTransactionId(request.getExternalTransactionId());
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Assign operation context to entity in case it was sent in request
             assignApplicationContext(operation, request.getApplicationContext());
         }
-        try {
-            // Store form data as serialized JSON string.
-            operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
-        } catch (JsonProcessingException ex) {
-            logger.error("Error while serializing operation form data", ex);
+        if (request.getFormData() != null) {
+            try {
+                // Store form data as serialized JSON string.
+                operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
+            } catch (JsonProcessingException ex) {
+                logger.error("Error while serializing operation form data", ex);
+            }
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
@@ -129,21 +155,54 @@ public class OperationPersistenceService {
     }
 
     /**
+     * Update an operation.
+     * @param request Update operation request.
+     * @return Update operation response.
+     * @throws OperationAlreadyFailedException Thrown when operation is already failed.
+     * @throws OperationAlreadyFinishedException Thrown when operation is already finished.
+     * @throws OperationAlreadyCanceledException Thrown when operation is already canceled.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws OperationNotValidException Thrown when operation is not valid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
+     */
+    public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException, OrganizationNotFoundException {
+        // Resolve response based on dynamic step definitions
+        UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
+
+        // Persist operation update
+        updateOperation(request, response);
+        return response;
+    }
+
+    /**
      * Convert an UpdateOperationRequest and UpdateOperationResponse into OperationEntity and OperationHistoryEntity.
      * Both entities are persisted to update the status of processed operation as well as update its history.
      *
      * @param request  create request received from the client
      * @param response create response generated for the client
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException {
+    private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException, OrganizationNotFoundException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
         }
         OperationEntity operation = operationOptional.get();
-        operation.setUserId(request.getUserId());
-        operation.setOrganizationId(request.getOrganizationId());
+        AuthResult originalResult = operation.getResult();
+        if (request.getUserId() != null) {
+            operation.setUserId(request.getUserId());
+        }
+        if (request.getOrganizationId() != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(request.getOrganizationId());
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
+            }
+            operation.setOrganization(organizationOptional.get());
+        }
         operation.setResult(response.getResult());
         if (request.getApplicationContext() != null) {
             // Do not remove application context in case it was not sent in request
@@ -151,12 +210,15 @@ public class OperationPersistenceService {
         }
         // operation expiration time matches current response expiration time
         operation.setTimestampExpires(response.getTimestampExpires());
-        operationRepository.save(operation);
 
         OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(request.getAuthMethod());
         operationHistory.setRequestAuthStepResult(request.getAuthStepResult());
+        if (request.getAuthenticationId() != null) {
+            Optional<AuthenticationEntity> authenticationOptional = authenticationRepository.findById(request.getAuthenticationId());
+            authenticationOptional.ifPresent(operationHistory::setAuthentication);
+        }
         operationHistory.setResponseResult(response.getResult());
         operationHistory.setResponseResultDescription(response.getResultDescription());
         try {
@@ -166,29 +228,41 @@ public class OperationPersistenceService {
             operationHistory.setRequestParams(objectMapper.writeValueAsString(request.getParams()));
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
-            logger.error(
-                    "Error occurred while serializing operation history",
-                    e
-            );
+            logger.error("Error occurred while serializing operation history", e);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
-        operationHistoryRepository.save(operationHistory);
+        operation.getOperationHistory().add(operationHistory);
+        operationRepository.save(operation);
+
+        if (!originalResult.equals(operation.getResult())) {
+            operationCustomizationService.notifyOperationChange(operation);
+        }
     }
 
     /**
      * Update user ID and organization ID for an operation.
      * @param request Update operation user request.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
-    public void updateOperationUser(UpdateOperationUserRequest request) throws OperationNotFoundException {
+    public void updateOperationUser(UpdateOperationUserRequest request) throws OperationNotFoundException, OrganizationNotFoundException {
         String operationId = request.getOperationId();
         String userId = request.getUserId();
         String organizationId = request.getOrganizationId();
+        UserAccountStatus accountStatus = request.getAccountStatus();
         OperationEntity operation = getOperation(operationId);
         operation.setUserId(userId);
-        operation.setOrganizationId(organizationId);
-        operation.setUserAccountStatus(request.getAccountStatus());
+        if (organizationId != null) {
+            Optional<OrganizationEntity> organizationOptional = organizationRepository.findById(organizationId);
+            if (!organizationOptional.isPresent()) {
+                throw new OrganizationNotFoundException("Organization not found: " + organizationId);
+            }
+            operation.setOrganization(organizationOptional.get());
+        }
+        if (accountStatus != null) {
+            operation.setUserAccountStatus(accountStatus);
+        }
         operationRepository.save(operation);
     }
 
@@ -207,13 +281,10 @@ public class OperationPersistenceService {
         try {
             OperationFormData formData = objectMapper.readValue(operation.getOperationFormData(), OperationFormData.class);
             // update only formData.userInput which should contain all input from the user
-            formData.setUserInput(request.getFormData().getUserInput());
+            formData.getUserInput().putAll(request.getFormData().getUserInput());
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
         } catch (IOException e) {
-            logger.error(
-                    "Error occurred while serializing operation form data",
-                    e
-            );
+            logger.error("Error occurred while serializing operation form data", e);
         }
         operationRepository.save(operation);
     }
@@ -223,8 +294,10 @@ public class OperationPersistenceService {
      *
      * @param request Request to update chosen authentication method.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException {
+    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -232,7 +305,7 @@ public class OperationPersistenceService {
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
-            throw new IllegalStateException("Operation is missing history");
+            throw new InvalidConfigurationException("Operation is missing history");
         }
         boolean chosenAuthMethodValid = false;
         for (AuthStep step : getResponseAuthSteps(operation)) {
@@ -242,7 +315,7 @@ public class OperationPersistenceService {
             }
         }
         if (!chosenAuthMethodValid) {
-            throw new IllegalStateException("Invalid chosen authentication method");
+            throw new InvalidRequestException("Invalid chosen authentication method");
         }
         currentHistory.setChosenAuthMethod(request.getChosenAuthMethod());
         operationHistoryRepository.save(currentHistory);
@@ -254,7 +327,7 @@ public class OperationPersistenceService {
      * @param request Request to update mobile token status.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
-    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException {
+    public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException {
         Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -262,7 +335,7 @@ public class OperationPersistenceService {
         OperationEntity operation = operationOptional.get();
         OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
-            throw new IllegalStateException("Operation is missing history");
+            throw new OperationNotValidException("Operation is missing history");
         }
         currentHistory.setMobileTokenActive(request.isMobileTokenActive());
         operationHistoryRepository.save(currentHistory);
@@ -333,8 +406,9 @@ public class OperationPersistenceService {
      * @param userId User ID.
      * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
      * @return List of operations which match the query.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) {
+    public List<OperationEntity> getPendingOperations(String userId, boolean mobileTokenOnly) throws InvalidConfigurationException {
         List<OperationEntity> entities = operationRepository.findPendingOperationsForUser(userId);
         if (!mobileTokenOnly) {
             // Return all unfinished operations for user
@@ -387,15 +461,11 @@ public class OperationPersistenceService {
             return steps;
         }
         try {
-            steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {
-            }));
+            steps.addAll(objectMapper.readValue(responseSteps, new TypeReference<List<AuthStep>>() {}));
             return steps;
         } catch (IOException e) {
             // in case of an error empty list is returned
-            logger.error(
-                    "Error occurred while deserializing response steps",
-                    e
-            );
+            logger.error("Error occurred while deserializing response steps", e);
         }
         return steps;
     }

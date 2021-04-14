@@ -74,7 +74,7 @@ public class AuthMethodResolutionService {
         formData.addTitle("login.title");
         formData.addGreeting("login.greeting");
         formData.addSummary("login.summary");
-        formData.setUserInput(operation.getFormData().getUserInput());
+        formData.getUserInput().putAll(operation.getFormData().getUserInput());
         operation.setFormData(formData);
     }
 

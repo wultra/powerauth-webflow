@@ -20,7 +20,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.*;
 
 /**
@@ -31,7 +33,8 @@ import java.util.*;
 @Data
 public class GetUserDetailResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
 
     @NotNull
@@ -49,7 +52,6 @@ public class GetUserDetailResponse {
     @NotNull
     private final List<CredentialDetail> credentials = new ArrayList<>();
 
-    @NotNull
     private Date timestampCreated;
 
     private Date timestampLastUpdated;

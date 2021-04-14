@@ -38,6 +38,11 @@ public enum OtpStatus {
     BLOCKED,
 
     /**
+     * OTP is managed externally.
+     */
+    EXTERNAL,
+
+    /**
      * OTP is removed.
      */
     REMOVED

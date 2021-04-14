@@ -15,8 +15,13 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,11 +35,31 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class NextStepServerConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(NextStepServerConfiguration.class);
+
+    /**
+     * Data Adapter service URL.
+     */
+    @Value("${powerauth.dataAdapter.service.url}")
+    private String dataAdapterServiceUrl;
+
     /**
      * Operation expiration time in seconds.
      */
     @Value("${powerauth.nextstep.operation.expirationTimeInSeconds}")
     private int operationExpirationTime;
+
+    @Value("${powerauth.nextstep.identity.credential.useOriginalUsername}")
+    private boolean useOriginalUsername;
+
+    @Value("${powerauth.nextstep.identity.credential.generateUsernameMaxAttempts}")
+    private int generateUsernameMaxAttempts;
+
+    @Value("${powerauth.nextstep.e2eEncryption.key}")
+    private String e2eEncryptionKey;
+
+    @Value("${powerauth.nextstep.db.master.encryption.key}")
+    private String masterDbEncryptionKey;
 
     /**
      * Application name.
@@ -64,6 +89,38 @@ public class NextStepServerConfiguration {
     }
 
     /**
+     * Get whether original username for a removed credential when the credential is recreated.
+     * @return Whether original username for a removed credential when the credential is recreated.
+     */
+    public boolean isUseOriginalUsername() {
+        return useOriginalUsername;
+    }
+
+    /**
+     * Get maximum number of attempts when generating username.
+     * @return Maximum number of attempts when generating username.
+     */
+    public int getGenerateUsernameMaxAttempts() {
+        return generateUsernameMaxAttempts;
+    }
+
+    /**
+     * Get end-to-end encryption key.
+     * @return End-to-end encryption key
+     */
+    public String getE2eEncryptionKey() {
+        return e2eEncryptionKey;
+    }
+
+    /**
+     * Get master DB encryption key.
+     * @return Master DB encryption key.
+     */
+    public String getMasterDbEncryptionKey() {
+        return masterDbEncryptionKey;
+    }
+
+    /**
      * Get application name.
      * @return Application name.
      */
@@ -85,6 +142,21 @@ public class NextStepServerConfiguration {
      */
     public String getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    /**
+     * Default data adapter client.
+     *
+     * @return Data adapter client.
+     */
+    @Bean
+    public DataAdapterClient defaultDataAdapterClient() {
+        try {
+            return new DataAdapterClient(dataAdapterServiceUrl);
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
+        }
     }
 
 }

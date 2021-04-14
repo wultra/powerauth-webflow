@@ -20,7 +20,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Crede
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -32,16 +34,20 @@ import java.util.Date;
 @EqualsAndHashCode(of = "credentialName")
 public class CredentialDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialName;
     @NotNull
     private CredentialType credentialType;
     @NotNull
     private CredentialStatus credentialStatus;
+    @Size(min = 1, max = 256)
+    private String username;
+    @NotNull
     private boolean credentialChangeRequired;
     @NotNull
     private Date timestampCreated;
-    private Date timestampExpired;
+    private Date timestampExpires;
     private Date timestampBlocked;
     private Date timestampLastUpdated;
     private Date timestampLastCredentialChange;

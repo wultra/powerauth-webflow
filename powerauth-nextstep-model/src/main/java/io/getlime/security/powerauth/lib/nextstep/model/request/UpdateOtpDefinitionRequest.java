@@ -15,9 +15,12 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpDefinitionStatus;
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for updating an OTP definition.
@@ -27,13 +30,20 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateOtpDefinitionRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
+    private String description;
     private boolean encryptionEnabled;
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
+    private OtpDefinitionStatus otpDefinitionStatus;
+    private boolean dataAdapterProxyEnabled;
 
 }

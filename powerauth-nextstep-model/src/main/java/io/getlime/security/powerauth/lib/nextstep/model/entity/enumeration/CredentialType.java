@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration;
 
 /**
- * Enum representing an credential type.
+ * Enum representing a credential type.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

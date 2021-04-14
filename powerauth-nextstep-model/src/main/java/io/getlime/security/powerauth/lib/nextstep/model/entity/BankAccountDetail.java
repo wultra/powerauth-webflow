@@ -1,5 +1,11 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 
 /**
@@ -7,84 +13,22 @@ import java.math.BigDecimal;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
+@AllArgsConstructor
 public class BankAccountDetail {
 
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String number;
+    @Size(min = 1, max = 256)
     private String accountId;
+    @Size(min = 2, max = 256)
     private String name;
     private BigDecimal balance;
     private String currency;
+    @NotNull
     private boolean usableForPayment;
+    @Size(min = 2, max = 256)
     private String unusableForPaymentReason;
-
-    public BankAccountDetail() {
-    }
-
-    public BankAccountDetail(String number, String accountId, String name, BigDecimal balance, String currency,
-                             boolean usableForPayment, String unusableForPaymentReason) {
-        this.number = number;
-        this.accountId = accountId;
-        this.name = name;
-        this.balance = balance;
-        this.currency = currency;
-        this.usableForPayment = usableForPayment;
-        this.unusableForPaymentReason = unusableForPaymentReason;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public void setBalance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
-    public String getCurrency() {
-        return currency;
-    }
-
-    public void setCurrency(String currency) {
-        this.currency = currency;
-    }
-
-    public boolean isUsableForPayment() {
-        return usableForPayment;
-    }
-
-    public void setUsableForPayment(boolean usableForPayment) {
-        this.usableForPayment = usableForPayment;
-    }
-
-    public String getUnusableForPaymentReason() {
-        return unusableForPaymentReason;
-    }
-
-    public void setUnusableForPaymentReason(String unusableForPaymentReason) {
-        this.unusableForPaymentReason = unusableForPaymentReason;
-    }
 
 }

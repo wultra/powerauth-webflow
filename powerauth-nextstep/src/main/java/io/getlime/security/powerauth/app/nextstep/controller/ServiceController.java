@@ -44,7 +44,7 @@ public class ServiceController {
     private BuildProperties buildProperties;
 
     /**
-     * Controller constructor.
+     * REST controller constructor.
      * @param nextStepServerConfiguration Next step server configuration.
      */
     @Autowired
@@ -60,7 +60,6 @@ public class ServiceController {
     public void setBuildProperties(BuildProperties buildProperties) {
         this.buildProperties = buildProperties;
     }
-
 
     /**
      * Controller resource with system information.

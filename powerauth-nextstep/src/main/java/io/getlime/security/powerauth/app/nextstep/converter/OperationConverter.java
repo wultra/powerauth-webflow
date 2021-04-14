@@ -21,6 +21,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
@@ -30,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,7 +58,9 @@ public class OperationConverter {
         operationDetail.setOperationId(operation.getOperationId());
         operationDetail.setOperationName(operation.getOperationName());
         operationDetail.setUserId(operation.getUserId());
-        operationDetail.setOrganizationId(operation.getOrganizationId());
+        if (operation.getOrganization() != null) {
+            operationDetail.setOrganizationId(operation.getOrganization().getOrganizationId());
+        }
         operationDetail.setAccountStatus(operation.getUserAccountStatus());
         operationDetail.setExternalTransactionId(operation.getExternalTransactionId());
         operationDetail.setOperationData(operation.getOperationData());
@@ -68,6 +74,22 @@ public class OperationConverter {
         operationDetail.setTimestampCreated(operation.getTimestampCreated());
         operationDetail.setTimestampExpires(operation.getTimestampExpires());
         return operationDetail;
+    }
+
+    /**
+     * Convert operation entity to operation context.
+     * @param operation Operation entity.
+     * @return Operation context.
+     */
+    public OperationContext toOperationContext(OperationEntity operation) {
+        String operationId = operation.getOperationId();
+        String operationName = operation.getOperationName();
+        String operationData = operation.getOperationData();
+        GetOperationDetailResponse operationDetail = fromEntity(operation);
+        FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
+        ApplicationContext applicationContext = operationDetail.getApplicationContext();
+        final String externalTransactionId = operation.getExternalTransactionId();
+        return new OperationContext(operationId, operationName, operationData, externalTransactionId, formData, applicationContext);
     }
 
     /**
@@ -154,10 +176,10 @@ public class OperationConverter {
             AfsActionDetail action = new AfsActionDetail();
             action.setAction(afsAction.getAfsAction());
             action.setStepIndex(afsAction.getStepIndex());
-            action.setRequestExtras(convertExtrasToMap(afsAction.getRequestAfsExtras()));
+            action.getRequestExtras().putAll(convertExtrasToMap(afsAction.getRequestAfsExtras()));
             action.setAfsResponseApplied(afsAction.isAfsResponseApplied());
             action.setAfsLabel(afsAction.getAfsLabel());
-            action.setResponseExtras(convertExtrasToMap(afsAction.getResponseAfsExtras()));
+            action.getResponseExtras().putAll(convertExtrasToMap(afsAction.getResponseAfsExtras()));
             response.getAfsActions().add(action);
         }
     }
@@ -174,7 +196,7 @@ public class OperationConverter {
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {
             logger.error("Error occurred while deserializing data", e);
-            return null;
+            return new HashMap<>();
         }
     }
 }

@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for querying authentication methods per user.
@@ -27,7 +27,7 @@ import javax.validation.constraints.NotNull;
 @Data
 public class GetUserAuthMethodsRequest {
 
-    @NotNull
+    @Size(min = 1, max = 256)
     private String userId;
 
 }

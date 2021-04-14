@@ -25,4 +25,6 @@ import lombok.Data;
 @Data
 public class GetHashConfigListRequest {
 
+    private boolean includeRemoved;
+
 }

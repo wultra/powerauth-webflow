@@ -23,9 +23,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 public enum AuthInstrument {
 
     /**
-     * Password is used for step authentication / authorization.
+     * Credential is used for step authentication / authorization.
      */
-    PASSWORD,
+    CREDENTIAL,
 
     /**
      * OTP authorization code is used for step authentication / authorization.

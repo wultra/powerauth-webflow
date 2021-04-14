@@ -20,7 +20,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,13 +35,19 @@ import java.util.List;
 @Data
 public class UpdateOperationResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationId;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String operationName;
+    @Size(min = 1, max = 256)
     private String userId;
+    @Size(min = 2, max = 256)
     private String organizationId;
+    @Size(min = 2, max = 256)
     private String operationNameExternal;
+    @Size(min = 1, max = 256)
     private String externalTransactionId;
     @NotNull
     private AuthResult result;
@@ -48,9 +56,11 @@ public class UpdateOperationResponse {
     private Date timestampCreated;
     @NotNull
     private Date timestampExpires;
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationData;
     @NotNull
-    private final List<AuthStep> steps = new ArrayList<>();;
+    private final List<AuthStep> steps = new ArrayList<>();
     private OperationFormData formData;
 
 }

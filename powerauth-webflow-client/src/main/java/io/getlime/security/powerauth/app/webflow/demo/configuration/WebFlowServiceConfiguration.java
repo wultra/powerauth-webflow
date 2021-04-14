@@ -16,17 +16,17 @@
 
 package io.getlime.security.powerauth.app.webflow.demo.configuration;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.wultra.core.rest.client.base.RestClientConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 
 /**
  * Demo application configuration.
@@ -125,49 +125,32 @@ public class WebFlowServiceConfiguration {
     }
 
     /**
+     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
+     * @return Constructed object mapper.
+     */
+    private ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return mapper;
+    }
+
+    /**
      * Default Next Step service client.
      *
      * @return Next Step service client.
      */
     @Bean
     public NextStepClient defaultNextStepClient() {
-        NextStepClient client = new NextStepClient(nextstepServiceUrl);
-        // whether invalid SSL certificates should be accepted
-        if (acceptInvalidSslCertificate) {
-            trustAllCertificates();
-        }
-        return client;
-    }
-
-    /**
-     * Activate trust in all SSL certificates including invalid ones for non-production use.
-     */
-    private void trustAllCertificates() {
-        HttpsURLConnection.setDefaultHostnameVerifier((hostname, session) -> true);
-
-        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-
-            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                return null;
-            }
-
-            public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-            }
-
-            public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {
-            }
-
-        }};
-
+        RestClientConfiguration restClientConfiguration = new RestClientConfiguration();
+        restClientConfiguration.setBaseUrl(nextstepServiceUrl);
+        restClientConfiguration.setAcceptInvalidSslCertificate(acceptInvalidSslCertificate);
+        restClientConfiguration.setObjectMapper(objectMapper());
         try {
-            SSLContext sc = SSLContext.getInstance("SSL");
-            sc.init(null, trustAllCerts, new java.security.SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        } catch (Exception e) {
-            logger.error(
-                    "Error occurred while setting SSL socket factory",
-                    e
-            );
+            return new NextStepClient(restClientConfiguration);
+        } catch (NextStepClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            return null;
         }
     }
 

@@ -15,6 +15,10 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,49 +27,12 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class ApplicationExtras {
 
-    private final List<String> requestedScopes;
+    @NotNull
+    private final List<String> requestedScopes = new ArrayList<>();
+    @Size(min = 2, max = 256)
     private String applicationOwner;
 
-    /**
-     * Default constructor.
-     */
-    public ApplicationExtras() {
-        requestedScopes = new ArrayList<>();
-    }
-
-    /**
-     * Constructor with all details.
-     * @param requestedScopes Original requested scopes for OAuth 2.0 consent screen.
-     * @param applicationOwner Entity who created the application requesting consent.
-     */
-    public ApplicationExtras(List<String> requestedScopes, String applicationOwner) {
-        this.requestedScopes = requestedScopes;
-        this.applicationOwner = applicationOwner;
-    }
-
-    /**
-     * Get original requested scopes for OAuth 2.0 consent screen.
-     * @return Original requested scopes for OAuth 2.0 consent screen.
-     */
-    public List<String> getRequestedScopes() {
-        return requestedScopes;
-    }
-
-    /**
-     * Get entity who created the application requesting consent.
-     * @return Entity who created the application requesting consent.
-     */
-    public String getApplicationOwner() {
-        return applicationOwner;
-    }
-
-    /**
-     * Set entity who created the application requesting consent.
-     * @param applicationOwner Entity who created the application requesting consent.
-     */
-    public void setApplicationOwner(String applicationOwner) {
-        this.applicationOwner = applicationOwner;
-    }
 }

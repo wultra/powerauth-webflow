@@ -17,21 +17,17 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationChange;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OperationCancellationConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,15 +68,15 @@ public class OperationCancellationService {
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
      */
-    public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason) {
+    public UpdateOperationResponse cancelOperation(String operationId, AuthMethod authMethod, OperationCancelReason cancelReason) throws CommunicationFailedException {
         try {
             final ObjectResponse<GetOperationDetailResponse> operationResponse = nextStepClient.getOperationDetail(operationId);
             final GetOperationDetailResponse operationDetail = operationResponse.getResponseObject();
             return cancelOperation(operationDetail, authMethod, cancelReason);
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred while canceling operation", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred while canceling operation", ex);
+            throw new CommunicationFailedException("Communication failed while canceling operation");
         }
-        return null;
     }
 
     /**
@@ -90,23 +86,20 @@ public class OperationCancellationService {
      * @param cancelReason Reason for canceling the operation.
      * @return Update operation response or null in case cancellation was skipped.
      */
-    public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason) {
+    public UpdateOperationResponse cancelOperation(GetOperationDetailResponse operationDetail, AuthMethod authMethod, OperationCancelReason cancelReason) throws CommunicationFailedException {
         try {
             // Cancel operation only in case it is still active
             if (operationDetail.getResult() == AuthResult.CONTINUE) {
                 final ApplicationContext applicationContext = operationDetail.getApplicationContext();
                 ObjectResponse<UpdateOperationResponse> updateOperationResponse = nextStepClient.updateOperation(operationDetail.getOperationId(), operationDetail.getUserId(), operationDetail.getOrganizationId(), authMethod, Collections.emptyList(), AuthStepResult.CANCELED, cancelReason.toString(), null, applicationContext);
-                // Notify Data Adapter about cancellation event
-                FormData formData = new FormDataConverter().fromOperationFormData(operationDetail.getFormData());
-                OperationContext operationContext = new OperationContext(operationDetail.getOperationId(), operationDetail.getOperationName(), operationDetail.getOperationData(), operationDetail.getExternalTransactionId(), formData, applicationContext);
-                dataAdapterClient.operationChangedNotification(OperationChange.CANCELED, operationDetail.getUserId(), operationDetail.getOrganizationId(), operationContext);
                 // Notify AFS about logout event
                 OperationTerminationReason terminationReason = operationCancellationConverter.convertCancelReason(cancelReason);
                 afsIntegrationService.executeLogoutAction(operationDetail.getOperationId(), terminationReason);
                 return updateOperationResponse.getResponseObject();
             }
-        } catch (NextStepServiceException | DataAdapterClientErrorException e) {
-            logger.error("Error occurred while canceling operation", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred while canceling operation", ex);
+            throw new CommunicationFailedException("Communication failed while canceling operation");
         }
         return null;
     }

@@ -18,16 +18,21 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.CredentialCounterService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCounterRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ResetCountersResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCounterResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for counter management.
@@ -40,19 +45,58 @@ public class CredentialCounterController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialCounterController.class);
 
-    @RequestMapping(value = "counter", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCounterResponse> updateCredential(@RequestBody ObjectRequest<UpdateCounterRequest> request) {
-        return new ObjectResponse<>(new UpdateCounterResponse());
+    private final CredentialCounterService credentialCounterService;
+
+    /**
+     * REST controller constructor.
+     * @param credentialCounterService Credential counter service.
+     */
+    @Autowired
+    public CredentialCounterController(CredentialCounterService credentialCounterService) {
+        this.credentialCounterService = credentialCounterService;
     }
 
-    @RequestMapping(value = "counter/update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCounterResponse> updateCredentialPost(@RequestBody ObjectRequest<UpdateCounterRequest> request) {
-        return new ObjectResponse<>(new UpdateCounterResponse());
+    /**
+     * Update a credential counter via PUT method.
+     * @param request Update credential counter request.
+     * @return Update credential counter response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     */
+    @RequestMapping(method = RequestMethod.PUT)
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
+        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
-    @RequestMapping(value = "counter/reset-all", method = RequestMethod.PUT)
-    public ObjectResponse<ResetCountersResponse> resetAllCounters(@RequestBody ObjectRequest<ResetCountersRequest> request) {
-        return new ObjectResponse<>(new ResetCountersResponse());
+    /**
+     * Update a credential counter via POST method.
+     * @param request Update credential counter request.
+     * @return Update credential counter response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     */
+    @RequestMapping(value = "update", method = RequestMethod.POST)
+    public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
+        UpdateCounterResponse response = credentialCounterService.updateCredentialCounter(request.getRequestObject());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Reset all soft counters.
+     * @param request Rest counters request.
+     * @return Reset counters response.
+     */
+    @RequestMapping(value = "reset-all", method = RequestMethod.POST)
+    public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) {
+        ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

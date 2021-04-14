@@ -17,6 +17,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
+
 /**
  * Response object used for resetting counters.
  *
@@ -25,6 +28,8 @@ import lombok.Data;
 @Data
 public class ResetCountersResponse {
 
+    @NotNull
+    @PositiveOrZero
     private int resetCounterCount;
 
 }

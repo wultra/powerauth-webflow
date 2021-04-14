@@ -16,97 +16,61 @@
 
 package io.getlime.security.powerauth.lib.dataadapter.client;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import com.wultra.core.rest.client.base.DefaultRestClient;
+import com.wultra.core.rest.client.base.RestClient;
+import com.wultra.core.rest.client.base.RestClientConfiguration;
+import com.wultra.core.rest.client.base.RestClientException;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.core.rest.model.base.response.Response;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AccountStatus;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.*;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.ResourceAccessException;
-import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Data Adapter Client provides methods for communication with the Data Adapter.
- * It uses the RestTemplate class to handle REST API calls. HTTP client is used instead of default client
- * so that error responses contain full response bodies.
+ * It uses the RestClient class to handle REST API calls.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public class DataAdapterClient {
 
-    private final String serviceUrl;
-    private final ObjectMapper objectMapper;
-    private final RestTemplate restTemplate;
+    private static final Logger logger = LoggerFactory.getLogger(DataAdapterClient.class);
+
+    private final RestClient restClient;
 
     /**
      * Create a new client with provided base URL.
-     * @param serviceUrl Base URL.
+     * @param serviceBaseUrl REST service base URL.
+     * @throws DataAdapterClientErrorException Thrown when REST client initialization fails.
      */
-    public DataAdapterClient(String serviceUrl) {
-        this(serviceUrl, null);
-    }
-
-    /**
-     * Create a new client with provided base URL and custom object mapper.
-     * @param serviceUrl Base URL.
-     * @param objectMapper Object mapper.
-     */
-    public DataAdapterClient(String serviceUrl, ObjectMapper objectMapper) {
-        this.serviceUrl = serviceUrl;
-        if (objectMapper != null) {
-            this.objectMapper = objectMapper;
-        } else {
-            this.objectMapper = objectMapper();
+    public DataAdapterClient(String serviceBaseUrl) throws DataAdapterClientErrorException {
+        try {
+            restClient = new DefaultRestClient(serviceBaseUrl);
+        } catch (RestClientException ex) {
+            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
         }
-        restTemplate = new RestTemplate();
-
-        // Prepare message converters
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter(this.objectMapper);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        converters.add(converter);
-        restTemplate.setMessageConverters(converters);
-
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
     }
 
     /**
-     * Construct object mapper with default configuration which allows sending empty objects and allows unknown properties.
-     * @return Constructed object mapper.
+     * Create a new client with provided base URL.
+     * @param restClientConfiguration REST service client configuration.
+     * @throws DataAdapterClientErrorException Thrown when REST client initialization fails.
      */
-    private ObjectMapper objectMapper() {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        return mapper;
+    public DataAdapterClient(RestClientConfiguration restClientConfiguration) throws DataAdapterClientErrorException {
+        try {
+            restClient = new DefaultRestClient(restClientConfiguration);
+        } catch (RestClientException ex) {
+            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
+        }
     }
-
-    /**
-     * Get default instance of REST client.
-     * @return RestTemplate with default configuration.
-     */
-    public RestTemplate getRestTemplate() {
-        return restTemplate;
-    }
-
 
     /**
      * Lookup user account.
@@ -119,18 +83,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserDetailResponse> lookupUser(String username, String organizationId, String clientCertificate, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange authentication request with data adapter.
-            UserLookupRequest request = new UserLookupRequest(username, organizationId, clientCertificate, operationContext);
-            HttpEntity<ObjectRequest<UserLookupRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/lookup", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        UserLookupRequest request = new UserLookupRequest(username, organizationId, clientCertificate, operationContext);
+        return postObjectImpl("/api/auth/user/lookup", new ObjectRequest<>(request), UserDetailResponse.class);
     }
 
     /**
@@ -145,18 +99,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication fails.
      */
     public ObjectResponse<UserAuthenticationResponse> authenticateUser(String userId, String organizationId, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange authentication request with data adapter.
-            UserAuthenticationRequest request = new UserAuthenticationRequest(userId, organizationId, password, authenticationContext, operationContext);
-            HttpEntity<ObjectRequest<UserAuthenticationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UserAuthenticationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/authenticate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserAuthenticationResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        UserAuthenticationRequest request = new UserAuthenticationRequest(userId, organizationId, password, authenticationContext, operationContext);
+        return postObjectImpl("/api/auth/user/authenticate", new ObjectRequest<>(request), UserAuthenticationResponse.class);
     }
 
     /**
@@ -168,18 +112,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or user does not exist.
      */
     public ObjectResponse<UserDetailResponse> fetchUserDetail(String userId, String organizationId) throws DataAdapterClientErrorException {
-        try {
-            // Exchange user details with data adapter.
-            UserDetailRequest request = new UserDetailRequest(userId, organizationId);
-            HttpEntity<ObjectRequest<UserDetailRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<UserDetailResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/user/info", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<UserDetailResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        UserDetailRequest request = new UserDetailRequest(userId, organizationId);
+        return postObjectImpl("/api/auth/user/info", new ObjectRequest<>(request), UserDetailResponse.class);
     }
 
     /**
@@ -193,22 +127,12 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<InitAuthMethodResponse> initAuthMethod(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange initialization request with data adapter.
-            InitAuthMethodRequest request = new InitAuthMethodRequest(userId, organizationId, authMethod, operationContext);
-            HttpEntity<ObjectRequest<InitAuthMethodRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<InitAuthMethodResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/method/init", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<InitAuthMethodResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        InitAuthMethodRequest request = new InitAuthMethodRequest(userId, organizationId, authMethod, operationContext);
+        return postObjectImpl("/api/auth/method/init", new ObjectRequest<>(request), InitAuthMethodResponse.class);
     }
 
     /**
-     * Create authorization SMS message with OTP authorization code.
+     * Create authorization SMS message with new OTP authorization code.
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
@@ -221,19 +145,28 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
     public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
-        try {
-            CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
-            HttpEntity<ObjectRequest<CreateSmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<CreateSmsAuthorizationResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/auth/sms/create", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<CreateSmsAuthorizationResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
+        return postObjectImpl("/api/auth/sms/create", new ObjectRequest<>(request), CreateSmsAuthorizationResponse.class);
+    }
+
+    /**
+     * Send authorization SMS message with existing OTP authorization code.
+     *
+     * @param userId            User ID.
+     * @param organizationId    Organization ID.
+     * @param accountStatus     User account status.
+     * @param authMethod        Authentication method.
+     * @param operationContext  Operation context.
+     * @param messageId         Message ID.
+     * @param authorizationCode SMS OTP authorization code.
+     * @param lang              Language for i18n.
+     * @param resend            Whether SMS is being resent.
+     * @return Response with generated messageId.
+     * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
+     */
+    public ObjectResponse<SendAuthorizationSmsResponse> sendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String messageId, String authorizationCode, String lang, boolean resend) throws DataAdapterClientErrorException {
+        SendAuthorizationSmsRequest request = new SendAuthorizationSmsRequest(userId, organizationId, accountStatus, authMethod, operationContext, messageId, authorizationCode, lang, resend);
+        return postObjectImpl("/api/auth/sms/send", new ObjectRequest<>(request), SendAuthorizationSmsResponse.class);
     }
 
     /**
@@ -249,17 +182,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS code authorization fails.
      */
     public ObjectResponse<VerifySmsAuthorizationResponse> verifyAuthorizationSms(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, accountStatus, operationContext);
-            HttpEntity<ObjectRequest<VerifySmsAuthorizationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<VerifySmsAuthorizationResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAuthorizationResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        VerifySmsAuthorizationRequest request = new VerifySmsAuthorizationRequest(messageId, authorizationCode, userId, organizationId, accountStatus, operationContext);
+        return postObjectImpl("/api/auth/sms/verify", new ObjectRequest<>(request), VerifySmsAuthorizationResponse.class);
     }
 
     /**
@@ -277,17 +201,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
     public ObjectResponse<VerifySmsAndPasswordResponse> verifyAuthorizationSmsAndPassword(String messageId, String authorizationCode, String userId, String organizationId, AccountStatus accountStatus, String password, AuthenticationContext authenticationContext, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, accountStatus, password, authenticationContext, operationContext);
-            HttpEntity<ObjectRequest<VerifySmsAndPasswordRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<VerifySmsAndPasswordResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/sms/password/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifySmsAndPasswordResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        VerifySmsAndPasswordRequest request = new VerifySmsAndPasswordRequest(messageId, authorizationCode, userId, organizationId, accountStatus, password, authenticationContext, operationContext);
+        return postObjectImpl("/api/auth/sms/password/verify", new ObjectRequest<>(request), VerifySmsAndPasswordResponse.class);
     }
 
     /**
@@ -299,18 +214,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<CreateImplicitLoginOperationResponse> createImplicitLoginOperation(String clientId, String[] scopes) throws DataAdapterClientErrorException {
-        try {
-            // Exchange user details with data adapter.
-            CreateImplicitLoginOperationRequest request = new CreateImplicitLoginOperationRequest(clientId, scopes);
-            HttpEntity<ObjectRequest<CreateImplicitLoginOperationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<CreateImplicitLoginOperationResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/create", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<CreateImplicitLoginOperationResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        CreateImplicitLoginOperationRequest request = new CreateImplicitLoginOperationRequest(clientId, scopes);
+        return postObjectImpl("/api/operation/create", new ObjectRequest<>(request), CreateImplicitLoginOperationResponse.class);
     }
 
     /**
@@ -326,17 +231,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails or authentication/authorization fails.
      */
     public ObjectResponse<VerifyCertificateResponse> verifyClientCertificate(String userId, String organizationId, String clientCertificate, AuthMethod authMethod, AccountStatus accountStatus, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, clientCertificate, authMethod, accountStatus, operationContext);
-            HttpEntity<ObjectRequest<VerifyCertificateRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<VerifyCertificateResponse>> response = restTemplate.exchange(serviceUrl + "/api/auth/certificate/verify", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<VerifyCertificateResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        VerifyCertificateRequest request = new VerifyCertificateRequest(userId, organizationId, clientCertificate, authMethod, accountStatus, operationContext);
+        return postObjectImpl("/api/auth/certificate/verify", new ObjectRequest<>(request), VerifyCertificateResponse.class);
     }
 
     /**
@@ -350,18 +246,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<DecorateOperationFormDataResponse> decorateOperationFormData(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange user details with data adapter.
-            DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, authMethod, operationContext);
-            HttpEntity<ObjectRequest<DecorateOperationFormDataRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<DecorateOperationFormDataResponse>> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/decorate", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse<DecorateOperationFormDataResponse>>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        DecorateOperationFormDataRequest request = new DecorateOperationFormDataRequest(userId, organizationId, authMethod, operationContext);
+        return postObjectImpl("/api/operation/formdata/decorate", new ObjectRequest<>(request), DecorateOperationFormDataResponse.class);
     }
 
     /**
@@ -374,23 +260,13 @@ public class DataAdapterClient {
      * @return Object response.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse formDataChangedNotification(FormDataChange formDataChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange user details with data adapter.
-            FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
-            request.setUserId(userId);
-            request.setOrganizationId(organizationId);
-            request.setOperationContext(operationContext);
-            request.setFormDataChange(formDataChange);
-            HttpEntity<ObjectRequest<FormDataChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/api/operation/formdata/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+    public Response formDataChangedNotification(FormDataChange formDataChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+        FormDataChangeNotificationRequest request = new FormDataChangeNotificationRequest();
+        request.setUserId(userId);
+        request.setOrganizationId(organizationId);
+        request.setOperationContext(operationContext);
+        request.setFormDataChange(formDataChange);
+        return postObjectImpl("/api/operation/formdata/change", new ObjectRequest<>(request));
     }
 
     /**
@@ -403,23 +279,13 @@ public class DataAdapterClient {
      * @param operationContext Operation context.
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
-    public ObjectResponse operationChangedNotification(OperationChange operationChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            // Exchange user details with data adapter.
-            OperationChangeNotificationRequest request = new OperationChangeNotificationRequest();
-            request.setUserId(userId);
-            request.setOrganizationId(organizationId);
-            request.setOperationContext(operationContext);
-            request.setOperationChange(operationChange);
-            HttpEntity<ObjectRequest<OperationChangeNotificationRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse> response = restTemplate.exchange(serviceUrl + "/api/operation/change", HttpMethod.POST, entity, new ParameterizedTypeReference<ObjectResponse>() {
-            });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+    public Response operationChangedNotification(OperationChange operationChange, String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
+        OperationChangeNotificationRequest request = new OperationChangeNotificationRequest();
+        request.setUserId(userId);
+        request.setOrganizationId(organizationId);
+        request.setOperationContext(operationContext);
+        request.setOperationChange(operationChange);
+        return postObjectImpl("/api/operation/change", new ObjectRequest<>(request));
     }
 
     /**
@@ -431,19 +297,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<InitConsentFormResponse> initConsentForm(String userId, String organizationId, OperationContext operationContext) throws DataAdapterClientErrorException {
-        try {
-            InitConsentFormRequest request = new InitConsentFormRequest(userId, organizationId, operationContext);
-            HttpEntity<ObjectRequest<InitConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<InitConsentFormResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/auth/consent/init", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<InitConsentFormResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        InitConsentFormRequest request = new InitConsentFormRequest(userId, organizationId, operationContext);
+        return postObjectImpl("/api/auth/consent/init", new ObjectRequest<>(request), InitConsentFormResponse.class);
     }
 
     /**
@@ -456,19 +311,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<CreateConsentFormResponse> createConsentForm(String userId, String organizationId, OperationContext operationContext, String lang) throws DataAdapterClientErrorException {
-        try {
-            CreateConsentFormRequest request = new CreateConsentFormRequest(userId, organizationId, lang, operationContext);
-            HttpEntity<ObjectRequest<CreateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<CreateConsentFormResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/auth/consent/create", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<CreateConsentFormResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        CreateConsentFormRequest request = new CreateConsentFormRequest(userId, organizationId, lang, operationContext);
+        return postObjectImpl("/api/auth/consent/create", new ObjectRequest<>(request), CreateConsentFormResponse.class);
     }
 
     /**
@@ -482,19 +326,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<ValidateConsentFormResponse> validateConsentForm(String userId, String organizationId, OperationContext operationContext, String lang, List<ConsentOption> options) throws DataAdapterClientErrorException {
-        try {
-            ValidateConsentFormRequest request = new ValidateConsentFormRequest(userId, organizationId, operationContext, lang, options);
-            HttpEntity<ObjectRequest<ValidateConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<ValidateConsentFormResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/auth/consent/validate", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<ValidateConsentFormResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        ValidateConsentFormRequest request = new ValidateConsentFormRequest(userId, organizationId, operationContext, lang, options);
+        return postObjectImpl("/api/auth/consent/validate", new ObjectRequest<>(request), ValidateConsentFormResponse.class);
     }
 
     /**
@@ -507,19 +340,8 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<SaveConsentFormResponse> saveConsentForm(String userId, String organizationId, OperationContext operationContext, List<ConsentOption> options) throws DataAdapterClientErrorException {
-        try {
-            SaveConsentFormRequest request = new SaveConsentFormRequest(userId, organizationId, operationContext, options);
-            HttpEntity<ObjectRequest<SaveConsentFormRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<SaveConsentFormResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/auth/consent/save", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<SaveConsentFormResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
-        }
+        SaveConsentFormRequest request = new SaveConsentFormRequest(userId, organizationId, operationContext, options);
+        return postObjectImpl("/api/auth/consent/save", new ObjectRequest<>(request), SaveConsentFormResponse.class);
     }
 
     /**
@@ -534,60 +356,65 @@ public class DataAdapterClient {
      * @throws DataAdapterClientErrorException Thrown when client request fails.
      */
     public ObjectResponse<AfsResponse> executeAfsAction(String userId, String organizationId, OperationContext operationContext, AfsRequestParameters afsRequestParameters, Map<String, Object> extras) throws DataAdapterClientErrorException {
+        AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, extras);
+        return postObjectImpl("/api/afs/action/execute", new ObjectRequest<>(request), AfsResponse.class);
+    }
+
+    // Generic HTTP client methods
+
+    /**
+     * Prepare POST object response. Uses default {@link Response} type reference for response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @return Object obtained after processing the response JSON.
+     * @throws DataAdapterClientErrorException In case of network, response / JSON processing, or other IO error.
+     */
+    private Response postObjectImpl(String path, ObjectRequest<?> request) throws DataAdapterClientErrorException {
         try {
-            AfsRequest request = new AfsRequest(userId, organizationId, operationContext, afsRequestParameters, extras);
-            HttpEntity<ObjectRequest<AfsRequest>> entity = new HttpEntity<>(new ObjectRequest<>(request));
-            ResponseEntity<ObjectResponse<AfsResponse>> response = restTemplate.exchange(
-                    serviceUrl + "/api/afs/action/execute", HttpMethod.POST, entity,
-                    new ParameterizedTypeReference<ObjectResponse<AfsResponse>>() {
-                    });
-            return new ObjectResponse<>(response.getBody().getResponseObject());
-        } catch (HttpStatusCodeException ex) {
-            throw httpStatusException(ex);
-        } catch (ResourceAccessException ex) { // Data Adapter service is down
-            throw resourceAccessException(ex);
+            return restClient.postObject(path, request);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
         }
     }
 
     /**
-     * Create new DataAdapterClientErrorException from ResourceAccessException.
-     * @param ex Exception used when a resource access error occurs.
-     * @return Data adapter client exception.
+     * Prepare POST object response.
+     *
+     * @param path Resource path.
+     * @param request Request body.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws DataAdapterClientErrorException In case of network, response / JSON processing, or other IO error.
      */
-    private DataAdapterClientErrorException resourceAccessException(ResourceAccessException ex) {
-        DataAdapterError error = new DataAdapterError(DataAdapterError.Code.COMMUNICATION_ERROR, ex.getMessage());
-        return new DataAdapterClientErrorException(ex, error);
+    private <T> ObjectResponse<T> postObjectImpl(String path, ObjectRequest<?> request, Class<T> responseType) throws DataAdapterClientErrorException {
+        try {
+            return restClient.postObject(path, request, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
     }
 
     /**
-     * Create new DataAdapterClientErrorException from HttpStatusCodeException.
-     * @param ex Exception used when an HTTP error occurs.
-     * @return Data adapter client exception.
+     * Resolve error code based on HTTP status code from REST client exception.
      */
-    private DataAdapterClientErrorException httpStatusException(HttpStatusCodeException ex) {
-        try {
-            TypeReference<ObjectResponse<DataAdapterError>> typeReference = new TypeReference<ObjectResponse<DataAdapterError>>() {
-            };
-            ObjectResponse<DataAdapterError> errorResponse = objectMapper.readValue(ex.getResponseBodyAsString(), typeReference);
-            DataAdapterError error = errorResponse.getResponseObject();
-            if (error == null) {
-                error = new DataAdapterError();
-            }
-            if (error.getCode() == null) { // process malformed errors with undefined error code
-                error.setCode(DataAdapterError.Code.ERROR_GENERIC);
-                error.setMessage(ex.getMessage());
-            }
-            return new DataAdapterClientErrorException(ex, error);
-        } catch (IOException ex2) {
-            DataAdapterError error;
-            if (ex.getStatusCode() != HttpStatus.OK) {
-                error = new DataAdapterError(DataAdapterError.Code.COMMUNICATION_ERROR, "HTTP error occurred: " + ex.getMessage());
-                return new DataAdapterClientErrorException(ex, error);
-            } else {
-                error = new DataAdapterError(DataAdapterError.Code.ERROR_GENERIC, "IO error occurred: " + ex2.getMessage());
-                return new DataAdapterClientErrorException(ex2, error);
-            }
+    private String resolveErrorCode(RestClientException ex) {
+        if (ex.getStatusCode() == null) {
+            // REST client errors, response not received
+            return DataAdapterError.Code.ERROR_GENERIC;
         }
+        if (ex.getStatusCode().is4xxClientError()) {
+            // Errors caused by invalid Next Step client requests
+            return DataAdapterError.Code.DATA_ADAPTER_CLIENT_ERROR;
+        }
+        if (ex.getStatusCode().is5xxServerError()) {
+            // Internal errors in Next Step server
+            return DataAdapterError.Code.REMOTE_ERROR;
+        }
+        // Other errors during communication
+        return DataAdapterError.Code.COMMUNICATION_ERROR;
     }
 
 }

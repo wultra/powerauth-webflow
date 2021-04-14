@@ -18,14 +18,19 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
+import io.getlime.security.powerauth.app.nextstep.service.CredentialService;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
 
 /**
  * REST controller for credential management.
@@ -38,44 +43,143 @@ public class CredentialController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialController.class);
 
+    private final CredentialService credentialService;
+
+    /**
+     * REST controller constructor.
+     * @param credentialService Credential service.
+     */
+    @Autowired
+    public CredentialController(CredentialService credentialService) {
+        this.credentialService = credentialService;
+    }
+
+    /**
+     * Create a credential.
+     * @param request Create credential request.
+     * @return Create credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
+     */
     @RequestMapping(method = RequestMethod.POST)
-    public ObjectResponse<CreateCredentialResponse> createCredential(@RequestBody ObjectRequest<CreateCredentialRequest> request) {
-        return new ObjectResponse<>(new CreateCredentialResponse());
+    public ObjectResponse<CreateCredentialResponse> createCredential(@Valid @RequestBody ObjectRequest<CreateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
+        CreateCredentialResponse response = credentialService.createCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a credential via a PUT method.
+     * @param request Update credential request.
+     * @return Update credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
+     */
     @RequestMapping(method = RequestMethod.PUT)
-    public ObjectResponse<UpdateCredentialResponse> updateCredential(@RequestBody ObjectRequest<UpdateCredentialRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialResponse());
+    public ObjectResponse<UpdateCredentialResponse> updateCredential(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
+        UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Update a credential via a POST method.
+     * @param request Update credential request.
+     * @return Update credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws CredentialValidationFailedException Thrown when credential validation fails.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption or decryption fails.
+     */
     @RequestMapping(value = "update", method = RequestMethod.POST)
-    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@RequestBody ObjectRequest<UpdateCredentialRequest> request) {
-        return new ObjectResponse<>(new UpdateCredentialResponse());
+    public ObjectResponse<UpdateCredentialResponse> updateCredentialPost(@Valid @RequestBody ObjectRequest<UpdateCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialValidationFailedException, InvalidConfigurationException, EncryptionException {
+        UpdateCredentialResponse response = credentialService.updateCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Validate a credential.
+     * @param request Validate credential request.
+     * @return Validate credential response.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
     @RequestMapping(value = "validate", method = RequestMethod.POST)
-    public ObjectResponse<ValidateCredentialResponse> verifyCredential(@RequestBody ObjectRequest<ValidateCredentialRequest> request) {
-        return new ObjectResponse<>(new ValidateCredentialResponse());
+    public ObjectResponse<ValidateCredentialResponse> validateCredential(@Valid @RequestBody ObjectRequest<ValidateCredentialRequest> request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        ValidateCredentialResponse response = credentialService.validateCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Reset a credential.
+     * @param request Reset credential request.
+     * @return Reset credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when encryption fails.
+     */
     @RequestMapping(value = "reset", method = RequestMethod.POST)
-    public ObjectResponse<ResetCredentialResponse> resetCredential(@RequestBody ObjectRequest<ResetCredentialRequest> request) {
-        return new ObjectResponse<>(new ResetCredentialResponse());
+    public ObjectResponse<ResetCredentialResponse> resetCredential(@Valid @RequestBody ObjectRequest<ResetCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
+        ResetCredentialResponse response = credentialService.resetCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Delete a credential.
+     * @param request Delete credential request.
+     * @return Delete credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     */
     @RequestMapping(value = "delete", method = RequestMethod.POST)
-    public ObjectResponse<DeleteCredentialResponse> deleteCredential(@RequestBody ObjectRequest<DeleteCredentialRequest> request) {
-        return new ObjectResponse<>(new DeleteCredentialResponse());
+    public ObjectResponse<DeleteCredentialResponse> deleteCredential(@Valid @RequestBody ObjectRequest<DeleteCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+        DeleteCredentialResponse response = credentialService.deleteCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Block a credential.
+     * @param request Block credential request.
+     * @return Block credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotActiveException Thrown when credential is not active.
+     */
     @RequestMapping(value = "block", method = RequestMethod.POST)
-    public ObjectResponse<BlockCredentialResponse> blockCredential(@RequestBody ObjectRequest<BlockCredentialRequest> request) {
-        return new ObjectResponse<>(new BlockCredentialResponse());
+    public ObjectResponse<BlockCredentialResponse> blockCredential(@Valid @RequestBody ObjectRequest<BlockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
+        BlockCredentialResponse response = credentialService.blockCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
+    /**
+     * Unblock a credential.
+     * @param request Unblock credential request.
+     * @return Unblock credential response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     * @throws CredentialNotFoundException Thrown when credential is not found.
+     * @throws CredentialNotBlockedException Thrown when credential is not blocked.
+     */
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
-    public ObjectResponse<UnblockCredentialResponse> unblockCredential(@RequestBody ObjectRequest<UnblockCredentialRequest> request) {
-        return new ObjectResponse<>(new UnblockCredentialResponse());
+    public ObjectResponse<UnblockCredentialResponse> unblockCredential(@Valid @RequestBody ObjectRequest<UnblockCredentialRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
+        UnblockCredentialResponse response = credentialService.unblockCredential(request.getRequestObject());
+        return new ObjectResponse<>(response);
     }
 
 }

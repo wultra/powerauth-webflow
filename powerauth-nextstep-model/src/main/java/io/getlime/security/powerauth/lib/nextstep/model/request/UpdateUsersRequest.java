@@ -32,6 +32,7 @@ public class UpdateUsersRequest {
 
     @NotNull
     private final List<String> userIds = new ArrayList<>();
+    @NotNull
     private UserIdentityStatus userIdentityStatus;
 
 }

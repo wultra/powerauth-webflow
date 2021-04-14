@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -26,8 +26,13 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface OrganizationRepository extends CrudRepository<OrganizationEntity, String> {
 
+    /**
+     * Find all organizations ordered by order number.
+     * @return List of organizations.
+     */
     List<OrganizationEntity> findAllByOrderByOrderNumber();
+
 }

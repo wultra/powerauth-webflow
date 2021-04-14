@@ -18,7 +18,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for updating a Next Step application.
@@ -28,11 +30,14 @@ import javax.validation.constraints.NotNull;
 @Data
 public class UpdateApplicationResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
     @NotNull
     private ApplicationStatus applicationStatus;
+    @Size(min = 2, max = 256)
     private String description;
+    @Size(min = 2, max = 256)
     private String organizationId;
 
 }

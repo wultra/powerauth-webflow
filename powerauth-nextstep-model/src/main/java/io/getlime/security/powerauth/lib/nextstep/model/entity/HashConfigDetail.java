@@ -15,10 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -29,13 +33,17 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
-@EqualsAndHashCode(of = {"hashConfigName"})
+@EqualsAndHashCode(of = "hashConfigName")
 public class HashConfigDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String hashConfigName;
     @NotNull
-    private String algorithm;
+    private HashAlgorithm algorithm;
+    @NotNull
+    private HashConfigStatus hashConfigStatus;
+    @NotNull
     private final Map<String, String> parameters = new LinkedHashMap<>();
     @NotNull
     private Date timestampCreated;

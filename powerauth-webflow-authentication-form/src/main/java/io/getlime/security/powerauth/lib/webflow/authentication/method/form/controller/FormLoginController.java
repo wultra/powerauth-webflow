@@ -17,28 +17,24 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.method.form.controller;
 
 import io.getlime.core.rest.model.base.response.ObjectResponse;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
-import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
-import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.*;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.UserAuthenticationResponse;
-import io.getlime.security.powerauth.lib.dataadapter.model.response.UserDetailResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.UserAccountStatusConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
-import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
+import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.encryption.AesEncryptionPasswordProtection;
@@ -48,16 +44,14 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthenticationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordAuthRequest;
-import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.request.UsernamePasswordInitRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordAuthResponse;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.method.form.model.response.UsernamePasswordInitResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.OrganizationDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.AuthInstrumentConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.OrganizationConverter;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.UserAccountStatusConverter;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AfsIntegrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,26 +75,22 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
     private static final Logger logger = LoggerFactory.getLogger(FormLoginController.class);
 
-    private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final WebFlowServicesConfiguration configuration;
     private final AfsIntegrationService afsIntegrationService;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
-    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
     private final AuthInstrumentConverter authInstrumentConverter = new AuthInstrumentConverter();
-    private final UserAccountStatusConverter userAccountStatusConverter = new UserAccountStatusConverter();
+    private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
 
     /**
      * Controller constructor.
-     * @param dataAdapterClient Data Adapter client.
      * @param nextStepClient Next Step client.
      * @param configuration Web Flow configuration.
      * @param afsIntegrationService AFS integration service.
      */
     @Autowired
-    public FormLoginController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService) {
-        this.dataAdapterClient = dataAdapterClient;
+    public FormLoginController(NextStepClient nextStepClient, WebFlowServicesConfiguration configuration, AfsIntegrationService afsIntegrationService) {
         this.nextStepClient = nextStepClient;
         this.configuration = configuration;
         this.afsIntegrationService = afsIntegrationService;
@@ -113,23 +103,38 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected AuthenticationResult authenticate(UsernamePasswordAuthRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(UsernamePasswordAuthRequest request) throws AuthStepException {
         GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
 
         try {
-            FormData formData = new FormDataConverter().fromOperationFormData(operation.getFormData());
-            ApplicationContext applicationContext = operation.getApplicationContext();
-            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+            GetOrganizationDetailResponse organization = nextStepClient.getOrganizationDetail(request.getOrganizationId()).getResponseObject();
+            if (organization.getDefaultCredentialName() == null) {
+                logger.warn("Default credential name is not configured for organization: " + request.getOrganizationId());
+                throw new AuthStepException("User authentication failed", "error.communication");
+            }
+            String organizationId = organization.getOrganizationId();
+            String credentialName = organization.getDefaultCredentialName();
+            String username = request.getUsername();
+
             // Client certificate is not yet supported in non SCA login method
-            String clientCertificate = null;
-            ObjectResponse<UserDetailResponse> lookupResponse = dataAdapterClient.lookupUser(request.getUsername(), request.getOrganizationId(), clientCertificate, operationContext);
+            LookupUserResponse lookupResponse;
+            try {
+                lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();
+            } catch (NextStepClientException ex) {
+                if (ex.getNextStepError() != null && UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
+                    // User ID not found using lookup
+                    throw new AuthStepException("User authentication failed", "login.authenticationFailed");
+                }
+                throw ex;
+            }
 
-            String userId = lookupResponse.getResponseObject().getId();
-            String organizationId = lookupResponse.getResponseObject().getOrganizationId();
-            AccountStatus accountStatus = lookupResponse.getResponseObject().getAccountStatus();
+            GetUserDetailResponse userDetail = lookupResponse.getUser();
+            String userId = userDetail.getUserId();
+            UserIdentityStatus status = userDetail.getUserIdentityStatus();
 
-            nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, statusConverter.fromAccountStatus(accountStatus));
+            UserAccountStatus accountStatus = statusConverter.toUserAccountStatus(status);
+            nextStepClient.updateOperationUser(operation.getOperationId(), userId, organizationId, accountStatus);
             if (configuration.isAfsEnabled() && !afsLoginAuthAlreadyExecuted(operation)) {
                 // Trigger LOGIN_INIT action for the first time
                 AfsAction afsAction = AfsAction.LOGIN_INIT;
@@ -160,45 +165,38 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
 
             String protectedPassword = passwordProtection.protect(request.getPassword());
 
-            if (accountStatus != AccountStatus.ACTIVE) {
+            if (status != UserIdentityStatus.ACTIVE) {
                 throw new AuthStepException("User authentication failed", "login.authenticationFailed");
             }
 
-            AuthenticationContext authenticationContext = new AuthenticationContext(passwordProtectionType, cipherTransformation);
-
-            ObjectResponse<UserAuthenticationResponse> objectResponse = dataAdapterClient.authenticateUser(userId, organizationId, protectedPassword, authenticationContext, operationContext);
-            UserAuthenticationResponse authResponse = objectResponse.getResponseObject();
-            if (authResponse.getAuthenticationResult() == UserAuthenticationResult.SUCCEEDED) {
-                logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserDetail().getId(), getAuthMethodName().toString());
-                return new AuthenticationResult(authResponse.getUserDetail().getId(), authResponse.getUserDetail().getOrganizationId());
+            CredentialAuthenticationResponse authResponse = nextStepClient.authenticateWithCredential(credentialName, userId, protectedPassword, operation.getOperationId(), true, AuthMethod.USERNAME_PASSWORD_AUTH).getResponseObject();
+            if (authResponse.isOperationFailed()) {
+                logger.info("Step authentication failed due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
+                throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
+            }
+            boolean showRemainingAttempts = authResponse.isShowRemainingAttempts();
+            if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
+                logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserId(), getAuthMethodName().toString());
+                return new AuthResultDetail(userId, organizationId, true);
             } else {
-                if ("login.authenticationFailed".equals(authResponse.getErrorMessage())) {
-                    UpdateOperationResponse response = failAuthorization(operation.getOperationId(), null, request.getAuthInstruments(), null);
-                    if (response.getResult() == AuthResult.FAILED) {
-                        // FAILED result instead of CONTINUE means the authentication method is failed
-                        throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
-                    }
+                Integer remainingAttempts = authResponse.getRemainingAttempts();
+                if (remainingAttempts != null && remainingAttempts == 0) {
+                    throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
                 }
-                Integer remainingAttemptsDA = authResponse.getRemainingAttempts();
-                boolean showRemainingAttempts = authResponse.getShowRemainingAttempts();
-                String errorMessage = authResponse.getErrorMessage();
-                UserAccountStatus userAccountStatus = userAccountStatusConverter.fromAccountStatus(authResponse.getAccountStatus());
-
+                String errorMessage = "login.authenticationFailed";
+                if (authResponse.getErrorMessage() != null) {
+                    errorMessage = authResponse.getErrorMessage();
+                }
                 AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
                 if (showRemainingAttempts) {
-                    GetOperationDetailResponse updatedOperation = getOperation();
-                    Integer remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-                    Integer remainingAttempts = resolveRemainingAttempts(remainingAttemptsDA, remainingAttemptsNS);
                     authEx.setRemainingAttempts(remainingAttempts);
                 }
-                authEx.setAccountStatus(userAccountStatus);
+                authEx.setAccountStatus(accountStatus);
                 throw authEx;
             }
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
-            throw new AuthStepException(e.getError().getMessage(), e, "error.communication");
-        } catch (DataAdapterClientErrorException e) {
-            throw new AuthStepException(e.getError().getMessage(), e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
+            throw new AuthStepException("User authentication failed", ex, "error.communication");
         }
     }
 
@@ -320,8 +318,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             response.setMessage("operation.canceled");
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return response;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (CommunicationFailedException ex) {
             final UsernamePasswordAuthResponse response = new UsernamePasswordAuthResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");
@@ -337,8 +334,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
      * @throws AuthStepException Thrown when request is invalid or communication with Next Step fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody
-    UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
+    public @ResponseBody UsernamePasswordInitResponse initLoginForm(@RequestBody UsernamePasswordInitRequest request) throws AuthStepException {
         if (request == null) {
             throw new AuthStepException("Invalid request", "error.invalidRequest");
         }
@@ -349,10 +345,13 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             ObjectResponse<GetOrganizationListResponse> nsObjectResponse = nextStepClient.getOrganizationList();
             List<GetOrganizationDetailResponse> nsResponseList = nsObjectResponse.getResponseObject().getOrganizations();
             for (GetOrganizationDetailResponse nsResponse: nsResponseList) {
-                OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
-                response.addOrganization(organization);
+                // Show only organizations which have a display name key set to avoid broken UI
+                if (nsResponse.getDisplayNameKey() != null) {
+                    OrganizationDetail organization = organizationConverter.fromNSOrganization(nsResponse);
+                    response.addOrganization(organization);
+                }
             }
-        } catch (NextStepServiceException e) {
+        } catch (NextStepClientException ex) {
             throw new CommunicationFailedException("Organization is not available");
         }
         logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());

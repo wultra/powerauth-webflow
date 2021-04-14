@@ -17,9 +17,13 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialCategory;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialDefinitionStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EncryptionAlgorithm;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.EndToEndEncryptionAlgorithm;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Response object used for creating a credential definition.
@@ -29,20 +33,33 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateCredentialDefinitionResponse {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialDefinitionName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String applicationName;
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String credentialPolicyName;
+    @Size(min = 2, max = 256)
+    private String description;
     @NotNull
     private CredentialCategory category;
+    @NotNull
     private boolean encryptionEnabled;
-    private String encryptionAlgorithm;
+    private EncryptionAlgorithm encryptionAlgorithm;
+    @NotNull
     private boolean hashingEnabled;
+    @Size(min = 2, max = 256)
     private String hashConfigName;
+    @NotNull
     private boolean e2eEncryptionEnabled;
+    private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
+    private String e2eEncryptionCipherTransformation;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
+    @NotNull
+    private boolean dataAdapterProxyEnabled;
 
 }

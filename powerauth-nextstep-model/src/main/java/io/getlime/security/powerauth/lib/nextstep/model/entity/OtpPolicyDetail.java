@@ -16,10 +16,11 @@
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 /**
@@ -31,14 +32,22 @@ import java.util.Date;
 @EqualsAndHashCode(of = "otpPolicyName")
 public class OtpPolicyDetail {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
     @NotNull
-    private Long length;
-    private Long attemptLimit;
+    @Positive
+    private Integer length;
+    @PositiveOrZero
+    private Integer attemptLimit;
+    @Positive
     private Long expirationTime;
-    private String genAlgorithm;
+    @NotNull
+    private OtpGenerationAlgorithm genAlgorithm;
+    @NotNull
+    private OtpGenerationParam genParam;
     @NotNull
     private OtpPolicyStatus otpPolicyStatus;
     @NotNull

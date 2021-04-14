@@ -17,7 +17,8 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotConfiguredException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationConfigNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,8 +58,9 @@ public class MobileTokenConfigurationService {
      * @param operationName Operation name.
      * @param authMethod Authentication method.
      * @return Whether mobile token is enabled.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public boolean isMobileTokenEnabled(String userId, String operationName, AuthMethod authMethod) {
+    public boolean isMobileTokenEnabled(String userId, String operationName, AuthMethod authMethod) throws InvalidConfigurationException {
         // Check input parameters
         if (userId == null) {
             logger.debug("Mobile token is disabled because user is unknown for this authentication step");
@@ -81,7 +83,7 @@ public class MobileTokenConfigurationService {
                 // Mobile token is not enabled for this operation, skip it
                 return false;
             }
-        } catch (OperationNotConfiguredException e) {
+        } catch (OperationConfigNotFoundException e) {
             // Operation is not configured, skip it
             logger.error(e.getMessage(), e);
             return false;
@@ -108,6 +110,8 @@ public class MobileTokenConfigurationService {
             logger.debug("Mobile token is disabled because activation is not configured in user preferences for user: {}", userId);
             return false;
         }
+
+        // TODO - implement PowerAuth server status check for activation
 
         for (UserAuthMethodDetail userAuthMethod : authMethods) {
             // In case the chosen auth method is enabled for user and it supports mobile token,

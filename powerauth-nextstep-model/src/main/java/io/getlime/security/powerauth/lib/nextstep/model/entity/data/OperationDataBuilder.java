@@ -21,7 +21,7 @@ public class OperationDataBuilder {
 
     private String templateVersion;
     private Integer templateId;
-    private Map<Integer, OperationDataAttribute> attributes;
+    private final Map<Integer, OperationDataAttribute> attributes;
 
     /**
      * Default constructor.

@@ -17,7 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for deleting an OTP.
@@ -27,9 +27,10 @@ import javax.validation.constraints.NotNull;
 @Data
 public class DeleteOtpRequest {
 
-    @NotNull
-    private String userId;
-    @NotNull
-    private String otpName;
+    // Either specify an operationId or otpId
+    @Size(min = 36, max = 36)
+    private String otpId;
+    @Size(min = 1, max = 256)
+    private String operationId;
 
 }

@@ -16,8 +16,11 @@
 
 package io.getlime.security.powerauth.app.nextstep;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.security.Security;
 
 /**
  * Spring Boot application main class.
@@ -26,6 +29,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class NextStepApplication {
+
+    static {
+        // Initialize Bouncy Castle provider
+        Security.addProvider(new BouncyCastleProvider());
+    }
 
     /**
      * Spring boot - main method.

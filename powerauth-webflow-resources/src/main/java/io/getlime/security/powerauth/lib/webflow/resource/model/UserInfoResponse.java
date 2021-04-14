@@ -25,6 +25,8 @@ import java.util.Map;
  * Minimal OIDC UserInfo response, as defined in OpenID Connect specification.
  * See https://openid.net/specs/openid-connect-core-1_0.html#UserInfo for details.
  *
+ * TODO: implement support for generic parameters in extras
+ *
  * @author Petr Dvorak, petr@wultra.com
  */
 public class UserInfoResponse {

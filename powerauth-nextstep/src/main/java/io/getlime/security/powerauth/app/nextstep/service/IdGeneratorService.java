@@ -30,7 +30,7 @@ import java.util.UUID;
 @Service
 public class IdGeneratorService {
 
-    private OperationHistoryRepository operationHistoryRepository;
+    private final OperationHistoryRepository operationHistoryRepository;
 
     /**
      * ID generator constructor.
@@ -42,11 +42,35 @@ public class IdGeneratorService {
     }
 
     /**
-     * Generates random operationId using UUID.randomUUID().
+     * Generate random operationId using UUID.randomUUID().
      *
      * @return Generated operation ID.
      */
     public String generateOperationId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate credential ID.
+     * @return Credential ID.
+     */
+    public String generateCredentialId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate OTP ID.
+     * @return OTP ID.
+     */
+    public String generateOtpId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate authentication ID.
+     * @return Authentication ID.
+     */
+    public String generateAuthenticationId() {
         return UUID.randomUUID().toString();
     }
 

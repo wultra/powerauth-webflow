@@ -15,9 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpGenerationParam;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGenerationAlgorithm;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for creating an OTP policy.
@@ -27,13 +32,20 @@ import javax.validation.constraints.NotNull;
 @Data
 public class CreateOtpPolicyRequest {
 
-    @NotNull
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String otpPolicyName;
+    @Size(min = 2, max = 256)
     private String description;
     @NotNull
-    private Long length;
-    private Long attemptLimit;
+    @Positive
+    private Integer length;
+    @Positive
+    private Integer attemptLimit;
+    @Positive
     private Long expirationTime;
-    private String genAlgorithm;
+    @NotNull
+    private OtpGenerationAlgorithm genAlgorithm;
+    private OtpGenerationParam genParam = new OtpGenerationParam();
 
 }

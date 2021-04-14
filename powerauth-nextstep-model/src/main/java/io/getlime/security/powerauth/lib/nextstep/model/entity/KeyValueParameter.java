@@ -15,61 +15,22 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 /**
  * Class representing a generic key-value attribute.
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class KeyValueParameter {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String key;
     private String value;
 
-    /**
-     * Default constructor.
-     */
-    public KeyValueParameter() {
-    }
-
-    /**
-     * Helper constructor with key and value in parameters.
-     * @param key Key.
-     * @param value Value associated with given key.
-     */
-    public KeyValueParameter(String key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    /**
-     * Get a key.
-     * @return Key.
-     */
-    public String getKey() {
-        return key;
-    }
-
-    /**
-     * Set a key.
-     * @param key Key.
-     */
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    /**
-     * Get a value.
-     * @return Value.
-     */
-    public String getValue() {
-        return value;
-    }
-
-    /**
-     * Set a value.
-     * @param value Value.
-     */
-    public void setValue(String value) {
-        this.value = value;
-    }
 }
