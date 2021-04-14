@@ -25,6 +25,7 @@ import io.getlime.security.powerauth.lib.dataadapter.model.entity.BankAccountCho
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.DecorateOperationFormDataResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.GetPAOperationMappingResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
@@ -44,7 +45,6 @@ import io.getlime.security.powerauth.lib.webflow.authentication.method.operation
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.method.operation.model.response.OperationReviewResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
-import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodResolutionService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.MessageTranslationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,13 +69,14 @@ public class OperationReviewController extends AuthMethodController<OperationRev
 
     private static final Logger logger = LoggerFactory.getLogger(OperationReviewController.class);
 
-    private final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
-    private final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
+    private static final String FIELD_BANK_ACCOUNT_CHOICE = "operation.bankAccountChoice";
+    private static final String FIELD_BANK_ACCOUNT_CHOICE_DISABLED = "operation.bankAccountChoice.disabled";
 
     private final DataAdapterClient dataAdapterClient;
     private final NextStepClient nextStepClient;
     private final MessageTranslationService messageTranslationService;
-    private final AuthMethodResolutionService authMethodResolutionService;
+
+    private final FormDataConverter formDataConverter = new FormDataConverter();
 
     /**
      * Controller constructor.
@@ -83,14 +84,12 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      * @param dataAdapterClient Data adapter client.
      * @param nextStepClient Next step client.
      * @param messageTranslationService Message translation service.
-     * @param authMethodResolutionService Authentication method resolution service.
      */
     @Autowired
-    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService, AuthMethodResolutionService authMethodResolutionService) {
+    public OperationReviewController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, MessageTranslationService messageTranslationService) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.messageTranslationService = messageTranslationService;
-        this.authMethodResolutionService = authMethodResolutionService;
     }
 
     /**
@@ -125,18 +124,24 @@ public class OperationReviewController extends AuthMethodController<OperationRev
      */
     @RequestMapping(value = "/detail", method = RequestMethod.POST)
     public @ResponseBody OperationReviewDetailResponse getOperationDetails(@RequestBody OperationDetailRequest request) throws AuthStepException {
-        final GetOperationDetailResponse operation = getOperation();
-        // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
-        // In case of an approval operation the data would be incorrect, because it is related to the payment.
-        // This is a workaround until Web Flow supports multiple types of operation data within an operation.
-        if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
-            authMethodResolutionService.updateOperationForScaLogin(operation);
+        try {
+            final GetOperationDetailResponse operation = getOperation();
+            FormData formData = formDataConverter.fromOperationFormData(operation.getFormData());
+            ApplicationContext applicationContext = operation.getApplicationContext();
+            OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+            GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(operation.getUserId(), operation.getOrganizationId(), getAuthMethodName(operation), operationContext).getResponseObject();
+            operation.setOperationName(mappingResponse.getOperationName());
+            operation.setOperationData(mappingResponse.getOperationData());
+            operation.setFormData(formDataConverter.fromFormData(mappingResponse.getFormData()));
+            OperationReviewDetailResponse response = new OperationReviewDetailResponse();
+            response.setData(operation.getOperationData());
+            response.setFormData(decorateFormData(operation));
+            response.setChosenAuthMethod(operation.getChosenAuthMethod());
+            return response;
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error("Error occurred in Data Adapter server", ex);
+            throw new CommunicationFailedException("Operation mapping is not available");
         }
-        OperationReviewDetailResponse response = new OperationReviewDetailResponse();
-        response.setData(operation.getOperationData());
-        response.setFormData(decorateFormData(operation));
-        response.setChosenAuthMethod(operation.getChosenAuthMethod());
-        return response;
     }
 
     /**

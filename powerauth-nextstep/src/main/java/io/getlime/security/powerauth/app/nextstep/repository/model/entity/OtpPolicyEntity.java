@@ -66,7 +66,7 @@ public class OtpPolicyEntity implements Serializable {
     @Column(name = "gen_algorithm", nullable = false)
     private OtpGenerationAlgorithm genAlgorithm;
 
-    @Column(name = "gen_param", length = 4096)
+    @Column(name = "gen_param", length = 4000)
     private String genParam;
 
     @Column(name = "timestamp_created", nullable = false)

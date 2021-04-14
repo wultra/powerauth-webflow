@@ -16,7 +16,7 @@
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
 /**
- * Exception for case when operation is not configured.
+ * Exception for case when operation config is not configured.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */

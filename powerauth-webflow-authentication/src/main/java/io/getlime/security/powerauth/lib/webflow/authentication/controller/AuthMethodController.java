@@ -20,8 +20,12 @@ import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
+import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.CreateImplicitLoginOperationResponse;
+import io.getlime.security.powerauth.lib.dataadapter.model.response.GetPAOperationMappingResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.*;
@@ -93,6 +97,8 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
 
     @Autowired
     private OperationCancellationService operationCancellationService;
+
+    private final FormDataConverter formDataConverter = new FormDataConverter();
 
     /**
      * Get operation detail.
@@ -257,12 +263,13 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             final ObjectResponse<List<GetOperationDetailResponse>> operations = nextStepClient.getPendingOperations(userId, mobileTokenOnly);
             final List<GetOperationDetailResponse> responseObject = operations.getResponseObject();
             for (GetOperationDetailResponse operation: responseObject) {
-                // Convert operation data for LOGIN_SCA authentication method which requires login operation data.
-                // In case of an approval operation the data would be incorrect, because it is related to the payment.
-                // This is a workaround until Web Flow supports multiple types of operation data within an operation.
-                if (getAuthMethodName(operation) == AuthMethod.LOGIN_SCA && !"login".equals(operation.getOperationName())) {
-                    authMethodResolutionService.updateOperationForScaLogin(operation);
-                }
+                FormData formData = formDataConverter.fromOperationFormData(operation.getFormData());
+                ApplicationContext applicationContext = operation.getApplicationContext();
+                OperationContext operationContext = new OperationContext(operation.getOperationId(), operation.getOperationName(), operation.getOperationData(), operation.getExternalTransactionId(), formData, applicationContext);
+                GetPAOperationMappingResponse response = dataAdapterClient.getPAOperationMapping(userId, operation.getOrganizationId(), getAuthMethodName(operation), operationContext).getResponseObject();
+                operation.setOperationName(response.getOperationName());
+                operation.setOperationData(response.getOperationData());
+                operation.setFormData(formDataConverter.fromFormData(response.getFormData()));
                 // translate formData messages
                 messageTranslationService.translateFormData(operation.getFormData());
             }
@@ -270,6 +277,9 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         } catch (NextStepClientException ex) {
             logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Operations are not available");
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error("Error occurred in Data Adapter server", ex);
+            throw new CommunicationFailedException("Operation mapping is not available");
         }
     }
 

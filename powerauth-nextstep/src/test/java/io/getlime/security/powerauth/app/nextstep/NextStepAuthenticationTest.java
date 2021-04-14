@@ -400,9 +400,8 @@ public class NextStepAuthenticationTest extends NextStepTest {
 
     @Test
     public void testCredentialVerifyBlockedUser() throws NextStepClientException {
-        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA").getResponseObject();
         nextStepClient.blockUser("test_user_1");
-        OtpAuthenticationResponse r2 = nextStepClient.authenticateWithOtp(r1.getOtpId(), r1.getOtpValue()).getResponseObject();
+        CredentialAuthenticationResponse r2 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", "s3cret").getResponseObject();
         assertEquals(UserIdentityStatus.BLOCKED, r2.getUserIdentityStatus());
         assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
         assertEquals(0, (int) r2.getRemainingAttempts());
@@ -560,6 +559,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setE2eEncryptionEnabled(true);
         credentialDefinitionRequest.setE2eEncryptionAlgorithm(EndToEndEncryptionAlgorithm.AES);
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation("AES/CBC/PKCS7Padding");
+        credentialDefinitionRequest.setE2eEncryptionForTemporaryCredentialEnabled(true);
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
 
         // Test authentication
@@ -569,6 +569,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
         credentialDefinitionRequest.setE2eEncryptionEnabled(false);
         credentialDefinitionRequest.setE2eEncryptionAlgorithm(null);
         credentialDefinitionRequest.setE2eEncryptionCipherTransformation(null);
+        credentialDefinitionRequest.setE2eEncryptionForTemporaryCredentialEnabled(false);
         nextStepClient.updateCredentialDefinition(credentialDefinitionRequest);
         // Test authentication
         CredentialAuthenticationResponse r2 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", "test_user_1", credentialValue).getResponseObject();

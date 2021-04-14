@@ -140,7 +140,7 @@ public class NextStepTestConfiguration {
         nextStepClient.createStepDefinition(step6);
 
         // Configure Next Step application
-        nextStepClient.createApplication("TEST_APP", "Test application", "RETAIL");
+        nextStepClient.createApplication("TEST_APP", "Test application");
 
         // Create credential policy
         CreateCredentialPolicyRequest credentialPolicyRequest = new CreateCredentialPolicyRequest();

@@ -213,6 +213,7 @@ public class UserAliasService {
             }
         }
         alias.setStatus(UserAliasStatus.REMOVED);
+        alias.setTimestampLastUpdated(new Date());
         userAliasRepository.save(alias);
         DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());

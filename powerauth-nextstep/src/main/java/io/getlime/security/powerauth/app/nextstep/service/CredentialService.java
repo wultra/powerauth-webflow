@@ -106,7 +106,7 @@ public class CredentialService {
         CredentialType credentialType = request.getCredentialType();
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         CredentialValidationMode validationMode = request.getValidationMode();
@@ -136,9 +136,10 @@ public class CredentialService {
         response.setCredentialStatus(credentialDetail.getCredentialStatus());
         response.setUsername(credentialDetail.getUsername());
         if (request.getCredentialValue() == null) {
-            // Return generated credential value
+            // Return generated credential value, with possible end2end encryption
             String credentialValueResponse = credentialDetail.getCredentialValue();
-            if (credentialDefinition.isE2eEncryptionEnabled()) {
+            if (credentialDefinition.isE2eEncryptionEnabled() &&
+                    (credentialDetail.getCredentialType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
                 credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
             }
             response.setCredentialValue(credentialValueResponse);
@@ -226,12 +227,15 @@ public class CredentialService {
                 // Reset counters for active credentials
                 credential.setFailedAttemptCounterSoft(0);
                 credential.setFailedAttemptCounterHard(0);
+                credential.setTimestampBlocked(null);
             }
         }
         credential.setTimestampLastUpdated(new Date());
         credentialRepository.save(credential);
-        // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(credential, new Date());
+        if (request.getCredentialValue() != null) {
+            // Save credential into credential history
+            credentialHistoryService.createCredentialHistory(credential, new Date());
+        }
         UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -258,9 +262,10 @@ public class CredentialService {
      * @return Get credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException {
+    public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
@@ -299,7 +304,7 @@ public class CredentialService {
         String username = request.getUsername();
         String credentialValue = request.getCredentialValue();
         CredentialValidationMode validationMode = request.getValidationMode();
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
         List<CredentialValidationFailure> validationErrors = credentialValidationService.validateCredential(user,
@@ -320,8 +325,10 @@ public class CredentialService {
      * @param unprotectedCredentialValue Unprotected credential value.
      * @return Whether credential change is required.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
      */
-    public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException {
+    public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException, EncryptionException {
+        // Check expiration time
         Date expirationTime = credential.getTimestampExpires();
         if (expirationTime != null && new Date().after(expirationTime)) {
             return true;
@@ -373,8 +380,6 @@ public class CredentialService {
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + request.getCredentialName() + ", user ID: " + user.getUserId());
         }
-        // Save original credential into credential history
-        credentialHistoryService.createCredentialHistory(credential, new Date());
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
@@ -383,6 +388,7 @@ public class CredentialService {
         CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
+        credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credential.setTimestampLastUpdated(new Date());
         credential.setTimestampLastCredentialChange(new Date());
         credential.setFailedAttemptCounterSoft(0);
@@ -398,7 +404,8 @@ public class CredentialService {
         response.setUsername(credential.getUsername());
         // Generated password must be returned in unprotected form
         String credentialValueResponse = unprotectedCredentialValue;
-        if (credentialDefinition.isE2eEncryptionEnabled()) {
+        if (credentialDefinition.isE2eEncryptionEnabled() &&
+                (credential.getType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
             credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
         }
         response.setCredentialValue(credentialValueResponse);
@@ -512,11 +519,7 @@ public class CredentialService {
      * @throws CredentialNotActiveException Thrown when credential is not active.
      */
     public CredentialEntity findActiveCredential(CredentialDefinitionEntity credentialDefinition, UserIdentityEntity user) throws CredentialNotFoundException, CredentialNotActiveException {
-        Optional<CredentialEntity> credentialOptional = credentialRepository.findByCredentialDefinitionAndUser(credentialDefinition, user);
-        if (!credentialOptional.isPresent()) {
-            throw new CredentialNotFoundException("Credential not found: " + credentialDefinition.getName());
-        }
-        CredentialEntity credential = credentialOptional.get();
+        CredentialEntity credential = findCredential(credentialDefinition, user);
         if (credential.getStatus() == CredentialStatus.REMOVED) {
             throw new CredentialNotFoundException("Credential is REMOVED: " + credentialDefinition.getName());
         }
@@ -622,7 +625,7 @@ public class CredentialService {
         credential.setFailedAttemptCounterSoft(0);
         credential.setFailedAttemptCounterHard(0);
         credentialRepository.save(credential);
-        // Save original credential into credential history
+        // Save credential into credential history
         credentialHistoryService.createCredentialHistory(credential, new Date());
         CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
@@ -634,7 +637,8 @@ public class CredentialService {
             // Generated credential value is returned in unprotected form, with possible e2e-encryption
             credentialChangeRequired = isCredentialChangeRequired(credential, unprotectedCredentialValue);
             String credentialValueResponse = unprotectedCredentialValue;
-            if (credentialDefinition.isE2eEncryptionEnabled()) {
+            if (credentialDefinition.isE2eEncryptionEnabled() &&
+                    (credential.getType() == CredentialType.PERMANENT || credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled())) {
                 credentialValueResponse = endToEndEncryptionService.encryptCredential(credentialValueResponse, credentialDefinition);
             }
             credentialDetail.setCredentialValue(credentialValueResponse);

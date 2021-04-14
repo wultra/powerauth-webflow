@@ -46,5 +46,7 @@ public class CreateOperationConfigRequest {
     private boolean afsEnabled;
     @Size(min = 2, max = 256)
     private String afsConfigId;
+    @Positive
+    private Integer expirationTime;
 
 }

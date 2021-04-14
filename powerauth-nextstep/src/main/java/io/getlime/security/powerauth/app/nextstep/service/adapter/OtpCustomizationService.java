@@ -68,7 +68,7 @@ public class OtpCustomizationService {
             String organizationId = operationDetail.getOrganizationId();
             AuthMethod authMethod = operationDetail.getChosenAuthMethod();
             OperationContext operationContext = operationConverter.toOperationContext(operation);
-            CreateSmsAuthorizationResponse response = dataAdapterClient.createAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
+            CreateSmsAuthorizationResponse response = dataAdapterClient.createAndSendAuthorizationSms(userId, organizationId, AccountStatus.ACTIVE, authMethod, operationContext, language, resend).getResponseObject();
             otpDeliveryResult.setOtpId(response.getMessageId());
             otpDeliveryResult.setDelivered(response.getSmsDeliveryResult() == SmsDeliveryResult.SUCCEEDED);
             otpDeliveryResult.setErrorMessage(response.getErrorMessage());

@@ -132,7 +132,7 @@ public class DataAdapterClient {
     }
 
     /**
-     * Create authorization SMS message with new OTP authorization code.
+     * Create and send authorization SMS message with new OTP authorization code.
      *
      * @param userId           User ID.
      * @param organizationId   Organization ID.
@@ -144,7 +144,7 @@ public class DataAdapterClient {
      * @return Response with generated messageId.
      * @throws DataAdapterClientErrorException Thrown when client request fails or SMS could not be delivered.
      */
-    public ObjectResponse<CreateSmsAuthorizationResponse> createAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
+    public ObjectResponse<CreateSmsAuthorizationResponse> createAndSendAuthorizationSms(String userId, String organizationId, AccountStatus accountStatus, AuthMethod authMethod, OperationContext operationContext, String lang, boolean resend) throws DataAdapterClientErrorException {
         CreateSmsAuthorizationRequest request = new CreateSmsAuthorizationRequest(userId, organizationId, accountStatus, lang, authMethod, operationContext, resend);
         return postObjectImpl("/api/auth/sms/create", new ObjectRequest<>(request), CreateSmsAuthorizationResponse.class);
     }
@@ -216,6 +216,25 @@ public class DataAdapterClient {
     public ObjectResponse<CreateImplicitLoginOperationResponse> createImplicitLoginOperation(String clientId, String[] scopes) throws DataAdapterClientErrorException {
         CreateImplicitLoginOperationRequest request = new CreateImplicitLoginOperationRequest(clientId, scopes);
         return postObjectImpl("/api/operation/create", new ObjectRequest<>(request), CreateImplicitLoginOperationResponse.class);
+    }
+
+    /**
+     * Get the operation mapping from Next Step operation to PowerAuth operation.
+     *
+     * @param userId User ID of the user for this request.
+     * @param organizationId Organization ID for this request.
+     * @param authMethod Authentication method.
+     * @param operationContext Operation context.
+     * @return Operation mapping from Next Step operation to PowerAuth operation.
+     * @throws DataAdapterClientErrorException Thrown when client request fails.
+     */
+    public ObjectResponse<GetPAOperationMappingResponse> getPAOperationMapping(String userId, String organizationId, AuthMethod authMethod, OperationContext operationContext) throws DataAdapterClientErrorException {
+        GetPAOperationMappingRequest request = new GetPAOperationMappingRequest();
+        request.setUserId(userId);
+        request.setOrganizationId(organizationId);
+        request.setAuthMethod(authMethod);
+        request.setOperationContext(operationContext);
+        return postObjectImpl("/api/operation/mapping", new ObjectRequest<>(request), GetPAOperationMappingResponse.class);
     }
 
     /**

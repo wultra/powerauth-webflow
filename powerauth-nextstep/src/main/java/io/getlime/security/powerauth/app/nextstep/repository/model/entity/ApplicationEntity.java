@@ -52,10 +52,6 @@ public class ApplicationEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private ApplicationStatus status;
 
-    @ManyToOne
-    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
-    private OrganizationEntity organization;
-
     @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 

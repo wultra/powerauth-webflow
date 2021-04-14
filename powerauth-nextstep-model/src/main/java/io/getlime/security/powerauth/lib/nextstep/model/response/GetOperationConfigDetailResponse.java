@@ -47,5 +47,7 @@ public class GetOperationConfigDetailResponse {
     private boolean afsEnabled;
     @Size(min = 2, max = 256)
     private String afsConfigId;
+    @Positive
+    private Integer expirationTime;
 
 }

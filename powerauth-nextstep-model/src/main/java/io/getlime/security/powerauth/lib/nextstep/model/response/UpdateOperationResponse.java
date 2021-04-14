@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import lombok.Data;
 
@@ -61,6 +62,8 @@ public class UpdateOperationResponse {
     private String operationData;
     @NotNull
     private final List<AuthStep> steps = new ArrayList<>();
+    private AuthMethod chosenAuthMethod;
+    private boolean mobileTokenActive;
     private OperationFormData formData;
 
 }

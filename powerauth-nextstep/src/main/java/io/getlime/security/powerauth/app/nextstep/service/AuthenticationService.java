@@ -336,6 +336,7 @@ public class AuthenticationService {
                 otp.setTimestampVerified(new Date());
             }
             if (credential != null) {
+                // Update counters based on authentication result in case credential related to OTP is available
                 credentialCounterService.updateCredentialCounter(credential, authenticationResult);
             }
         }
@@ -502,12 +503,12 @@ public class AuthenticationService {
             otp.setStatus(OtpStatus.BLOCKED);
             otp.setTimestampBlocked(new Date());
         } else {
-            credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
-
             // Verify OTP value
             if (otp.getStatus() == OtpStatus.ACTIVE) {
+                credentialAuthenticationResult = verifyCredential(request.getAuthenticationMode(), credential, credentialValue, request.getCredentialPositionsToVerify());
                 otpAuthenticationResult = verifyOtp(otp, request.getOtpValue());
             } else {
+                credentialAuthenticationResult = AuthenticationResult.FAILED;
                 otpAuthenticationResult = AuthenticationResult.FAILED;
             }
 
@@ -679,6 +680,12 @@ public class AuthenticationService {
                                                   CredentialEntity credential, String credentialValue,
                                                   List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
+            return AuthenticationResult.FAILED;
+        }
+        // Temporary credentials cannot be used for authentication after their expiration
+        if (credential.getType() == CredentialType.TEMPORARY
+            && credential.getTimestampExpires() != null
+            && new Date().after(credential.getTimestampExpires())) {
             return AuthenticationResult.FAILED;
         }
         CredentialAuthenticationMode authModeResolved;

@@ -33,7 +33,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
-import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
@@ -174,7 +173,6 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                 logger.info("Step authentication failed due to failed operation, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
                 throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
             }
-            boolean showRemainingAttempts = authResponse.isShowRemainingAttempts();
             if (authResponse.getAuthenticationResult() == AuthenticationResult.SUCCEEDED) {
                 logger.info("Step authentication succeeded, operation ID: {}, user ID: {}, authentication method: {}", operation.getOperationId(), authResponse.getUserId(), getAuthMethodName().toString());
                 return new AuthResultDetail(userId, organizationId, true);
@@ -188,7 +186,7 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
                     errorMessage = authResponse.getErrorMessage();
                 }
                 AuthenticationFailedException authEx = new AuthenticationFailedException("Authentication failed", errorMessage);
-                if (showRemainingAttempts) {
+                if (authResponse.isShowRemainingAttempts()) {
                     authEx.setRemainingAttempts(remainingAttempts);
                 }
                 authEx.setAccountStatus(accountStatus);

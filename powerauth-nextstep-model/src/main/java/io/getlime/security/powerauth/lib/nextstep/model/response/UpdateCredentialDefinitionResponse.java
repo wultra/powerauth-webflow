@@ -38,6 +38,8 @@ public class UpdateCredentialDefinitionResponse {
     @NotBlank
     @Size(min = 2, max = 256)
     private String applicationName;
+    @Size(min = 2, max = 256)
+    private String organizationId;
     @NotBlank
     @Size(min = 2, max = 256)
     private String credentialPolicyName;
@@ -56,6 +58,7 @@ public class UpdateCredentialDefinitionResponse {
     private boolean e2eEncryptionEnabled;
     private EndToEndEncryptionAlgorithm e2eEncryptionAlgorithm;
     private String e2eEncryptionCipherTransformation;
+    private boolean e2eEncryptionForTemporaryCredentialEnabled;
     @NotNull
     private CredentialDefinitionStatus credentialDefinitionStatus;
     @NotNull

@@ -37,7 +37,5 @@ public class UpdateApplicationResponse {
     private ApplicationStatus applicationStatus;
     @Size(min = 2, max = 256)
     private String description;
-    @Size(min = 2, max = 256)
-    private String organizationId;
 
 }

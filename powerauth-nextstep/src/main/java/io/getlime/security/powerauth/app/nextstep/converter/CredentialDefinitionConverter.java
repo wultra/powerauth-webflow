@@ -36,6 +36,9 @@ public class CredentialDefinitionConverter {
         credentialDefinitionDetail.setDescription(credentialDefinition.getDescription());
         credentialDefinitionDetail.setCredentialDefinitionStatus(credentialDefinition.getStatus());
         credentialDefinitionDetail.setApplicationName(credentialDefinition.getApplication().getName());
+        if (credentialDefinition.getOrganization() != null) {
+            credentialDefinitionDetail.setOrganizationId(credentialDefinition.getOrganization().getOrganizationId());
+        }
         credentialDefinitionDetail.setCredentialPolicyName(credentialDefinition.getCredentialPolicy().getName());
         credentialDefinitionDetail.setCategory(credentialDefinition.getCategory());
         credentialDefinitionDetail.setEncryptionEnabled(credentialDefinition.isEncryptionEnabled());
@@ -47,6 +50,7 @@ public class CredentialDefinitionConverter {
         credentialDefinitionDetail.setE2eEncryptionEnabled(credentialDefinition.isE2eEncryptionEnabled());
         credentialDefinitionDetail.setE2eEncryptionAlgorithm(credentialDefinition.getE2eEncryptionAlgorithm());
         credentialDefinitionDetail.setE2eEncryptionCipherTransformation(credentialDefinition.getE2eEncryptionCipherTransformation());
+        credentialDefinitionDetail.setE2eEncryptionForTemporaryCredentialEnabled(credentialDefinition.isE2eEncryptionForTemporaryCredentialEnabled());
         credentialDefinitionDetail.setDataAdapterProxyEnabled(credentialDefinition.isDataAdapterProxyEnabled());
         credentialDefinitionDetail.setTimestampCreated(credentialDefinition.getTimestampCreated());
         credentialDefinitionDetail.setTimestampLastUpdated(credentialDefinition.getTimestampLastUpdated());

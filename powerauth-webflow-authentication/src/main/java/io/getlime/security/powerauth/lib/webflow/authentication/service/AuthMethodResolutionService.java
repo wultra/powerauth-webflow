@@ -15,7 +15,6 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
-import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -58,24 +57,6 @@ public class AuthMethodResolutionService {
         }
         // Regular case with no delegation.
         return null;
-    }
-
-    /**
-     * Update operation for SCA login for first step of an approval operation.
-     * @param operation Operation to update.
-     */
-    public void updateOperationForScaLogin(GetOperationDetailResponse operation) {
-        // Make sure Mobile Token and Data Adapter recognize the operation name
-        operation.setOperationName("login");
-        // Update operation data for login
-        operation.setOperationData("A2");
-        // Update operation form data
-        OperationFormData formData = new OperationFormData();
-        formData.addTitle("login.title");
-        formData.addGreeting("login.greeting");
-        formData.addSummary("login.summary");
-        formData.getUserInput().putAll(operation.getFormData().getUserInput());
-        operation.setFormData(formData);
     }
 
 }

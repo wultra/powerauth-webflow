@@ -56,6 +56,10 @@ public class CredentialDefinitionEntity implements Serializable {
     private ApplicationEntity application;
 
     @ManyToOne
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
+    private OrganizationEntity organization;
+
+    @ManyToOne
     @JoinColumn(name = "credential_policy_id", referencedColumnName = "credential_policy_id", nullable = false)
     private CredentialPolicyEntity credentialPolicy;
 
@@ -83,6 +87,9 @@ public class CredentialDefinitionEntity implements Serializable {
 
     @Column(name = "e2e_encryption_transform")
     private String e2eEncryptionCipherTransformation;
+
+    @Column(name = "e2e_encryption_temporary")
+    private boolean e2eEncryptionForTemporaryCredentialEnabled;
 
     @Column(name = "data_adapter_proxy_enabled")
     private boolean dataAdapterProxyEnabled;

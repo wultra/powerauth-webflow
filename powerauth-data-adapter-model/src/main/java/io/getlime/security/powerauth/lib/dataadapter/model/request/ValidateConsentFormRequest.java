@@ -39,7 +39,7 @@ public class ValidateConsentFormRequest {
     private String organizationId;
 
     /**
-     * Operation context which provides context for creating the consent form.
+     * Operation context which provides context for validating the consent form.
      */
     private OperationContext operationContext;
 
@@ -65,7 +65,7 @@ public class ValidateConsentFormRequest {
      * @param userId User ID.
      * @param organizationId Organization ID.
      * @param lang Language used for generating contest text.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * @param operationContext Operation context which provides context for validating the consent form.
      * @param options Consent form options selected by the user.
      */
     public ValidateConsentFormRequest(String userId, String organizationId, OperationContext operationContext, String lang, List<ConsentOption> options) {
@@ -109,16 +109,16 @@ public class ValidateConsentFormRequest {
     }
 
     /**
-     * Get operation context which provides context for creating the consent form.
-     * @return Operation context which provides context for creating the consent form.
+     * Get operation context which provides context for validating the consent form.
+     * @return Operation context which provides context for validating the consent form.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context which provides context for creating the consent form.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * Set operation context which provides context for validating the consent form.
+     * @param operationContext Operation context which provides context for validating the consent form.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;

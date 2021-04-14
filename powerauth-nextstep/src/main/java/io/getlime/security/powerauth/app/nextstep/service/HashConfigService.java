@@ -119,7 +119,6 @@ public class HashConfigService {
         if (hashConfig.getStatus() != HashConfigStatus.ACTIVE && request.getHashConfigStatus() != HashConfigStatus.ACTIVE) {
             throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
         }
-        hashConfig.setName(request.getHashConfigName());
         hashConfig.setAlgorithm(request.getAlgorithm());
         hashConfig.setStatus(HashConfigStatus.ACTIVE);
         if (request.getParameters() != null) {
@@ -130,7 +129,7 @@ public class HashConfigService {
                 throw new InvalidRequestException(ex);
             }
         }
-        hashConfig.setTimestampCreated(new Date());
+        hashConfig.setTimestampLastUpdated(new Date());
         hashConfigRepository.save(hashConfig);
         UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
@@ -177,6 +176,7 @@ public class HashConfigService {
         HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.REMOVED) {
             hashConfig.setStatus(HashConfigStatus.REMOVED);
+            hashConfig.setTimestampLastUpdated(new Date());
             hashConfigRepository.save(hashConfig);
         }
         DeleteHashConfigResponse response = new DeleteHashConfigResponse();

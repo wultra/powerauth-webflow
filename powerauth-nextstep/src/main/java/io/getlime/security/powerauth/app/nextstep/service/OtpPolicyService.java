@@ -195,6 +195,7 @@ public class OtpPolicyService {
             throw new OtpPolicyNotFoundException("One time password policy is already REMOVED: " + request.getOtpPolicyName());
         }
         otpPolicy.setStatus(OtpPolicyStatus.REMOVED);
+        otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicyRepository.save(otpPolicy);
         DeleteOtpPolicyResponse response = new DeleteOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());

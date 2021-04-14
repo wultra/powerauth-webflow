@@ -18,11 +18,10 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationMethodConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
-import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -64,6 +63,10 @@ public class StepResolutionService {
     private final AuthMethodService authMethodService;
     private final AuthMethodRepository authMethodRepository;
     private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final OperationConfigRepository operationConfigRepository;
+    private final OperationMethodConfigRepository operationMethodConfigRepository;
+    private final AuthMethodChangeService authMethodChangeService;
+
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
 
     private final OperationConverter operationConverter = new OperationConverter();
@@ -77,11 +80,14 @@ public class StepResolutionService {
      * @param authMethodService Authentication method service.
      * @param authMethodRepository Authentication method repository.
      * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param operationConfigRepository Operation configuration repository.
+     * @param operationMethodConfigRepository Operation and authentication method config repository.
+     * @param authMethodChangeService Authentication method change service.
      */
     @Autowired
     public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
                                  IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService) {
+                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConfigRepository operationConfigRepository, OperationMethodConfigRepository operationMethodConfigRepository, AuthMethodChangeService authMethodChangeService) {
         this.stepDefinitionRepository = stepDefinitionRepository;
         this.operationPersistenceService = operationPersistenceService;
         this.idGeneratorService = idGeneratorService;
@@ -89,6 +95,9 @@ public class StepResolutionService {
         this.authMethodService = authMethodService;
         this.authMethodRepository = authMethodRepository;
         this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+        this.operationConfigRepository = operationConfigRepository;
+        this.operationMethodConfigRepository = operationMethodConfigRepository;
+        this.authMethodChangeService = authMethodChangeService;
         reloadStepDefinitions();
     }
 
@@ -130,9 +139,10 @@ public class StepResolutionService {
         response.setExternalTransactionId(request.getExternalTransactionId());
         // AuthStepResult and AuthMethod are not available when creating the operation, null values are used to ignore them
         List<StepDefinitionEntity> stepDefinitions = filterStepDefinitions(request.getOperationName(), OperationRequestType.CREATE, null, null, null);
-        response.getSteps().addAll(filterAuthSteps(stepDefinitions, null, request.getOperationName()));
+        response.getSteps().addAll(convertAuthSteps(stepDefinitions));
         response.setTimestampCreated(new Date());
-        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        int expirationTime = getExpirationTime(request.getOperationName());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(expirationTime);
         response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         response.setFormData(request.getFormData());
         Set<AuthResult> allResults = new HashSet<>();
@@ -162,7 +172,7 @@ public class StepResolutionService {
      */
     public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws OperationNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, InvalidRequestException, OperationNotValidException, InvalidConfigurationException {
         OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
-        checkLegitimityOfUpdate(operation, request);
+        checkLegitimacyOfUpdate(operation, request);
         UpdateOperationResponse response = new UpdateOperationResponse();
         response.setOperationId(request.getOperationId());
         response.setOperationName(operation.getOperationName());
@@ -189,7 +199,8 @@ public class StepResolutionService {
             response.setResultDescription("operation.timeout");
             return response;
         }
-        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(nextStepServerConfiguration.getOperationExpirationTime());
+        int expirationTime = getExpirationTime(operation.getOperationName());
+        ZonedDateTime timestampExpires = ZonedDateTime.now().plusSeconds(expirationTime);
         response.setTimestampExpires(Date.from(timestampExpires.toInstant()));
         AuthStepResult authStepResult = request.getAuthStepResult();
         if (isAuthMethodFailed(operation, request.getAuthMethod(), authStepResult)) {
@@ -200,13 +211,23 @@ public class StepResolutionService {
         List<StepDefinitionEntity> stepDefinitions = filterStepDefinitions(operation.getOperationName(), OperationRequestType.UPDATE, request.getAuthStepResult(), request.getAuthMethod(), request.getUserId());
         sortSteps(stepDefinitions);
         verifyDuplicatePrioritiesAbsent(stepDefinitions);
+
+        // Authentication method downgrade result is handled separately due to specific logic
+        if (request.getAuthStepResult() == AuthStepResult.AUTH_METHOD_DOWNGRADE) {
+            return authMethodChangeService.downgradeAuthMethod(request, response, stepDefinitions);
+        }
+        // Authentication method chosen result is handled separately due to specific logic
+        if (request.getAuthStepResult() == AuthStepResult.AUTH_METHOD_CHOSEN) {
+            return authMethodChangeService.setChosenAuthMethod(request, response);
+        }
+
         Set<AuthResult> allResults = new HashSet<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             allResults.add(stepDef.getResponseResult());
         }
         if (allResults.size() == 1) {
             // Straightforward response - only one AuthResult found. Return all matching steps.
-            response.getSteps().addAll(filterAuthSteps(stepDefinitions, response.getUserId(), response.getOperationName()));
+            response.getSteps().addAll(convertAuthSteps(stepDefinitions));
             response.setResult(allResults.iterator().next());
             return response;
         } else if (allResults.size() > 1) {
@@ -220,17 +241,17 @@ public class StepResolutionService {
                     .collect(Collectors.groupingBy(StepDefinitionEntity::getResponseResult));
             if (stepsByAuthResult.containsKey(AuthResult.DONE)) {
                 List<StepDefinitionEntity> doneSteps = stepsByAuthResult.get(AuthResult.DONE);
-                response.getSteps().addAll(filterAuthSteps(doneSteps, response.getUserId(), response.getOperationName()));
+                response.getSteps().addAll(convertAuthSteps(doneSteps));
                 response.setResult(AuthResult.DONE);
                 return response;
             } else if (stepsByAuthResult.containsKey(AuthResult.CONTINUE)) {
                 List<StepDefinitionEntity> continueSteps = stepsByAuthResult.get(AuthResult.CONTINUE);
-                response.getSteps().addAll(filterAuthSteps(continueSteps, response.getUserId(), response.getOperationName()));
+                response.getSteps().addAll(convertAuthSteps(continueSteps));
                 response.setResult(AuthResult.CONTINUE);
                 return response;
             } else if (stepsByAuthResult.containsKey(AuthResult.FAILED)) {
                 List<StepDefinitionEntity> failedSteps = stepsByAuthResult.get(AuthResult.FAILED);
-                response.getSteps().addAll(filterAuthSteps(failedSteps, response.getUserId(), response.getOperationName()));
+                response.getSteps().addAll(convertAuthSteps(failedSteps));
                 response.setResult(AuthResult.FAILED);
                 return response;
             }
@@ -290,6 +311,11 @@ public class StepResolutionService {
                 // dynamically via user preferences
                 continue;
             }
+            // filter out POWERAUTH_TOKEN method in case it is not enabled for given operation and authentication method and active
+            if (userId != null && stepDef.getResponseAuthMethod() == AuthMethod.POWERAUTH_TOKEN
+                    && !mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
+                continue;
+            }
             filteredStepDefinitions.add(stepDef);
         }
         return filteredStepDefinitions;
@@ -320,21 +346,15 @@ public class StepResolutionService {
     }
 
     /**
-     * Converts List<StepDefinitionEntity> into a List<AuthStep> and filters out POWERAUTH_TOKEN method in case it is not available.
+     * Converts List<StepDefinitionEntity> into a List<AuthStep>.
      *
-     * @param stepDefinitions Step definitions to convert and filter.
-     * @return Final list of authentication steps.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @param stepDefinitions Step definitions to convert.
+     * @return Converted list of authentication steps.
      */
-    private List<AuthStep> filterAuthSteps(List<StepDefinitionEntity> stepDefinitions, String userId, String operationName) throws InvalidConfigurationException {
+    private List<AuthStep> convertAuthSteps(List<StepDefinitionEntity> stepDefinitions) {
         List<AuthStep> authSteps = new ArrayList<>();
         for (StepDefinitionEntity stepDef : stepDefinitions) {
             if (stepDef.getResponseAuthMethod() != null) {
-                // filter out POWERAUTH_TOKEN method in case it is not enabled for given operation and authentication method
-                if (stepDef.getResponseAuthMethod() == AuthMethod.POWERAUTH_TOKEN
-                        && !mobileTokenConfigurationService.isMobileTokenEnabled(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
-                    continue;
-                }
                 AuthStep authStep = new AuthStep();
                 authStep.setAuthMethod(stepDef.getResponseAuthMethod());
                 authSteps.add(authStep);
@@ -380,7 +400,8 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            return failureCount >= authMethodEntity.getMaxAuthFails();
+            int maxAuthFails = getMaxAuthFails(operation, authMethodEntity);
+            return failureCount >= maxAuthFails;
         }
         return false;
     }
@@ -417,10 +438,11 @@ public class StepResolutionService {
                     failureCount++;
                 }
             }
-            if (failureCount >= authMethodEntity.getMaxAuthFails()) {
+            int maxAuthFails = getMaxAuthFails(operation, authMethodEntity);
+            if (failureCount >= maxAuthFails) {
                 return 0;
             }
-            return authMethodEntity.getMaxAuthFails() - failureCount;
+            return maxAuthFails - failureCount;
         }
         return null;
     }
@@ -437,7 +459,7 @@ public class StepResolutionService {
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
-    private void checkLegitimityOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, OperationNotValidException, InvalidRequestException, OperationNotFoundException {
+    private void checkLegitimacyOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, OperationNotValidException, InvalidRequestException, OperationNotFoundException {
         if (request == null || request.getOperationId() == null) {
             throw new InvalidRequestException("Operation update failed, because request is invalid.");
         }
@@ -447,8 +469,10 @@ public class StepResolutionService {
         if (request.getAuthMethod() == null) {
             throw new InvalidRequestException("Operation update failed, because authentication method is missing, operation ID: " + request.getOperationId() + ".");
         }
-        // INIT method can cancel other operations due to concurrency check
-        if (request.getAuthStepResult() != AuthStepResult.CANCELED && request.getAuthMethod() == AuthMethod.INIT) {
+        // INIT method can cancel other operations due to concurrency check and can set chosen authentication method
+        if (request.getAuthMethod() == AuthMethod.INIT &&
+                (request.getAuthStepResult() != AuthStepResult.CANCELED
+                        && request.getAuthStepResult() != AuthStepResult.AUTH_METHOD_CHOSEN)) {
             throw new InvalidRequestException("Operation update failed, because INIT method cannot be updated, operation ID: " + request.getOperationId() + ".");
         }
         if (request.getAuthStepResult() == null) {
@@ -465,20 +489,30 @@ public class StepResolutionService {
         OperationHistoryEntity currentOperationHistory = operationEntity.getCurrentOperationHistoryEntity();
         // operation can be canceled anytime (e.g. by closed Web Socket) - do not check for step continuation
         if (currentOperationHistory != null && currentOperationHistory.getResponseResult() == AuthResult.CONTINUE
-                && request.getAuthStepResult() != AuthStepResult.CANCELED ) {
+                && request.getAuthStepResult() != AuthStepResult.CANCELED) {
             boolean stepAuthMethodValid = false;
+            List<AuthStep> authSteps = operationPersistenceService.getResponseAuthSteps(operationEntity);
             // check whether request AuthMethod is available in response AuthSteps - this verifies operation continuity
             if (request.getAuthMethod() == AuthMethod.SHOW_OPERATION_DETAIL) {
                 // special handling for SHOW_OPERATION_DETAIL - either SMS_KEY or POWERAUTH_TOKEN are present in next steps
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                for (AuthStep step : authSteps) {
                     if (step.getAuthMethod() == AuthMethod.SMS_KEY || step.getAuthMethod() == AuthMethod.POWERAUTH_TOKEN) {
+                        stepAuthMethodValid = true;
+                        break;
+                    }
+                }
+            } if (request.getAuthStepResult() == AuthStepResult.AUTH_METHOD_CHOSEN) {
+                // verification of operation continuity for chosen authentication method
+                for (AuthStep step : authSteps) {
+                    if (currentOperationHistory.getRequestAuthMethod() == request.getAuthMethod()
+                            && step.getAuthMethod() == request.getTargetAuthMethod()) {
                         stepAuthMethodValid = true;
                         break;
                     }
                 }
             } else {
                 // verification of operation continuity for all other authentication methods
-                for (AuthStep step : operationPersistenceService.getResponseAuthSteps(operationEntity)) {
+                for (AuthStep step : authSteps) {
                     if (step.getAuthMethod() == request.getAuthMethod()) {
                         stepAuthMethodValid = true;
                         break;
@@ -504,6 +538,40 @@ public class StepResolutionService {
                 }
             }
         }
+    }
+
+    /**
+     * Get expiration time for the operation in seconds.
+     * @param operationName Operation name.
+     * @return Expiration time in seconds.
+     */
+    private int getExpirationTime(String operationName) {
+        Integer expirationTime = null;
+        Optional<OperationConfigEntity> configOptional = operationConfigRepository.findById(operationName);
+        if (configOptional.isPresent()) {
+            OperationConfigEntity config = configOptional.get();
+            expirationTime = config.getExpirationTime();
+        }
+        if (expirationTime == null) {
+            expirationTime = nextStepServerConfiguration.getOperationExpirationTime();
+        }
+        return expirationTime;
+    }
+
+    /**
+     * Get maximum number of authentication failures for given operation and authentication method.
+     * @param operation Operation entity.
+     * @param authMethod Authentication method.
+     * @return Maximum number of authentication failures.
+     */
+    private int getMaxAuthFails(OperationEntity operation, AuthMethodEntity authMethod) {
+        OperationMethodConfigEntity.OperationAuthMethodKey primaryKey = new OperationMethodConfigEntity.OperationAuthMethodKey(operation.getOperationName(), authMethod.getAuthMethod());
+        Optional<OperationMethodConfigEntity> configOptional = operationMethodConfigRepository.findById(primaryKey);
+        if (configOptional.isPresent()) {
+            OperationMethodConfigEntity config = configOptional.get();
+            return config.getMaxAuthFails();
+        }
+        return authMethod.getMaxAuthFails();
     }
 
 }

@@ -146,11 +146,6 @@ public class OrganizationService {
             throw new OrganizationNotFoundException("Organization not found: " + request.getOrganizationId());
         }
         OrganizationEntity organization = organizationOptional.get();
-        long operationCount = operationRepository.countByOrganization(organization);
-        long applicationCount = applicationRepository.countByOrganization(organization);
-        if (operationCount >0 || applicationCount > 0) {
-            throw new DeleteNotAllowedException("Organization cannot be deleted because it is used: " + organization.getOrganizationId());
-        }
         organizationRepository.delete(organization);
         DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
