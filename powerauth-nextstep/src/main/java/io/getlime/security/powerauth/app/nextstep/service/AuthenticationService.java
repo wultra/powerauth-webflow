@@ -342,6 +342,7 @@ public class AuthenticationService {
             }
             if (credential != null) {
                 // Update counters based on authentication result in case credential related to OTP is available
+                credential.setAttemptCounter(credential.getAttemptCounter() + 1);
                 credentialCounterService.updateCredentialCounter(credential, authenticationResult);
             }
         }
