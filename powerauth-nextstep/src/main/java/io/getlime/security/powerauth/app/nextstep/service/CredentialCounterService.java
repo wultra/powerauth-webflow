@@ -137,14 +137,26 @@ public class CredentialCounterService {
     @Transactional
     public ResetCountersResponse resetCounters(ResetCountersRequest request) {
         final List<CredentialEntity> blockedCredentials = credentialRepository.findAllByStatus(CredentialStatus.BLOCKED_TEMPORARY);
+        int resetCounter = 0;
+        // Reset soft counters for credentials with status BLOCKED_TEMPORARY and set status to ACTIVE
         for (CredentialEntity credential: blockedCredentials) {
             credential.setStatus(CredentialStatus.ACTIVE);
             credential.setFailedAttemptCounterSoft(0);
             credential.setTimestampBlocked(null);
+            resetCounter++;
         }
         credentialRepository.saveAll(blockedCredentials);
+        // Reset soft counters for credentials with status ACTIVE with non-zero soft counter
+        final List<CredentialEntity> activeCredentials = credentialRepository.findAllByStatus(CredentialStatus.ACTIVE);
+        for (CredentialEntity credential: activeCredentials) {
+            if (credential.getFailedAttemptCounterSoft() != 0) {
+                credential.setFailedAttemptCounterSoft(0);
+                resetCounter++;
+            }
+        }
+        credentialRepository.saveAll(activeCredentials);
         final ResetCountersResponse response = new ResetCountersResponse();
-        response.setResetCounterCount(blockedCredentials.size());
+        response.setResetCounterCount(resetCounter);
         return response;
     }
 }
