@@ -34,10 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -110,15 +107,31 @@ public class CredentialPolicyController {
 
     /**
      * Get credential policy list.
+     * @param includeRemoved Whether removed credential policies should be included.
+     * @return Get credential policy list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
+        logger.info("Received getCredentialPolicyList request");
+        GetCredentialPolicyListRequest request = new GetCredentialPolicyListRequest();
+        request.setIncludeRemoved(includeRemoved);
+        final GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request);
+        logger.info("The getCredentialPolicyList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get credential policy list using POST method.
      * @param request Get credential policy list request.
      * @return Get credential policy list response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@Valid @RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) throws InvalidConfigurationException {
-        logger.info("Received getCredentialPolicyList request");
+    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyListPost(@Valid @RequestBody ObjectRequest<GetCredentialPolicyListRequest> request) throws InvalidConfigurationException {
+        logger.info("Received getCredentialPolicyListPost request");
         final GetCredentialPolicyListResponse response = credentialPolicyService.getCredentialPolicyList(request.getRequestObject());
-        logger.info("The getCredentialPolicyList request succeeded");
+        logger.info("The getCredentialPolicyListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

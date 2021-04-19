@@ -76,14 +76,26 @@ public class RoleController {
 
     /**
      * Get role list.
+     * @return Get role list response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetRoleListResponse> getRoleList() {
+        logger.info("Received getRoleList request");
+        final GetRoleListResponse response = roleService.getRoleList();
+        logger.info("The getRoleList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get role list using POST method.
      * @param request Get role list request.
      * @return Get role list response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetRoleListResponse> getRoleList(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
-        logger.info("Received getRoleList request");
-        final GetRoleListResponse response = roleService.getRoleList(request.getRequestObject());
-        logger.info("The getRoleList request succeeded");
+    public ObjectResponse<GetRoleListResponse> getRoleListPost(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
+        logger.info("Received getRoleListPost request");
+        final GetRoleListResponse response = roleService.getRoleList();
+        logger.info("The getRoleListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

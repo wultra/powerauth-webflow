@@ -37,8 +37,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import javax.validation.constraints.NotNull;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -400,6 +403,25 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@NotNull String userId, @NotNull String operationName, @NotNull AuthMethod authMethod) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("operationName", Collections.singletonList(operationName));
+        if (authMethod != null) {
+            params.put("authMethod", Collections.singletonList(authMethod.toString()));
+        }
+        return getObjectImpl("/operation/mobileToken/config/detail", params, GetMobileTokenConfigResponse.class);
+    }
+
+    /**
+     * Get mobile token configuration configuration using POST method.
+     *
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @param authMethod Authentication method.
+     * @return Mobile token configuration.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfigPost(@NotNull String userId, @NotNull String operationName, @NotNull AuthMethod authMethod) throws NextStepClientException {
         GetMobileTokenConfigRequest request = new GetMobileTokenConfigRequest();
         request.setUserId(userId);
         request.setOperationName(operationName);
@@ -415,6 +437,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOperationDetailResponse> getOperationDetail(@NotNull String operationId) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("operationId", Collections.singletonList(operationId));
+        return getObjectImpl("/operation/detail", params, GetOperationDetailResponse.class);
+    }
+
+    /**
+     * Calls the operation details endpoint via POST method to get operation details.
+     *
+     * @param operationId Operation ID.
+     * @return A Response with {@link GetOperationDetailResponse} object.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOperationDetailResponse> getOperationDetailPost(@NotNull String operationId) throws NextStepClientException {
         GetOperationDetailRequest request = new GetOperationDetailRequest();
         request.setOperationId(operationId);
         return postObjectImpl("/operation/detail", new ObjectRequest<>(request), GetOperationDetailResponse.class);
@@ -479,6 +514,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@NotNull String operationName) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("operationName", Collections.singletonList(operationName));
+        return getObjectImpl("/operation/config/detail", params, GetOperationConfigDetailResponse.class);
+    }
+
+    /**
+     * Get operation configuration using POST method.
+     *
+     * @param operationName Operation name.
+     * @return Operation configuration.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetailPost(@NotNull String operationName) throws NextStepClientException {
         GetOperationConfigDetailRequest request = new GetOperationConfigDetailRequest();
         request.setOperationName(operationName);
         return postObjectImpl("/operation/config/detail", new ObjectRequest<>(request), GetOperationConfigDetailResponse.class);
@@ -491,6 +539,16 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOperationConfigListResponse> getOperationConfigList() throws NextStepClientException {
+        return getObjectImpl("/operation/config",  GetOperationConfigListResponse.class);
+    }
+
+    /**
+     * Get all operation configurations using POST method.
+     *
+     * @return All operation configurations.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOperationConfigListResponse> getOperationConfigListPost() throws NextStepClientException {
         GetOperationConfigListRequest request = new GetOperationConfigListRequest();
         return postObjectImpl("/operation/config/list", new ObjectRequest<>(request), GetOperationConfigListResponse.class);
     }
@@ -528,6 +586,21 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@NotNull String userId, boolean mobileTokenOnly) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("mobileTokenOnly", Collections.singletonList(String.valueOf(mobileTokenOnly)));
+        return getImpl("/user/operation", params, new ParameterizedTypeReference<ObjectResponse<List<GetOperationDetailResponse>>>() {});
+    }
+
+    /**
+     * Get list of pending operations for given user and authentication method using POST method.
+     *
+     * @param userId User ID.
+     * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
+     * @return A Response with list of {@link GetOperationDetailResponse}.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperationsPost(@NotNull String userId, boolean mobileTokenOnly) throws NextStepClientException {
         GetPendingOperationsRequest request = new GetPendingOperationsRequest();
         request.setUserId(userId);
         request.setMobileTokenOnly(mobileTokenOnly);
@@ -564,6 +637,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@NotNull String organizationId) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("organizationId", Collections.singletonList(organizationId));
+        return getObjectImpl("/organization/detail", params, GetOrganizationDetailResponse.class);
+    }
+
+    /**
+     * Get organization detail using POST method.
+     *
+     * @param organizationId Organization ID.
+     * @return Organization detail.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetailPost(@NotNull String organizationId) throws NextStepClientException {
         GetOrganizationDetailRequest request = new GetOrganizationDetailRequest();
         request.setOrganizationId(organizationId);
         return postObjectImpl("/organization/detail", new ObjectRequest<>(request), GetOrganizationDetailResponse.class);
@@ -576,6 +662,16 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOrganizationListResponse> getOrganizationList() throws NextStepClientException {
+        return getObjectImpl("/organization", GetOrganizationListResponse.class);
+    }
+
+    /**
+     * Get all organizations using POST method.
+     *
+     * @return All organizations.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOrganizationListResponse> getOrganizationListPost() throws NextStepClientException {
         GetOrganizationListRequest request = new GetOrganizationListRequest();
         return postObjectImpl("/organization/list", new ObjectRequest<>(request), GetOrganizationListResponse.class);
     }
@@ -639,6 +735,17 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList() throws NextStepClientException {
+        return getObjectImpl("/auth-method", GetAuthMethodsResponse.class);
+    }
+
+
+    /**
+     * Get all authentication methods supported by Next Step server using POST method.
+     *
+     * @return List of authentication methods wrapped in GetAuthMethodsResponse.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodListPost() throws NextStepClientException {
         GetAuthMethodListRequest request = new GetAuthMethodListRequest();
         return postObjectImpl("/auth-method/list", new ObjectRequest<>(request), GetAuthMethodsResponse.class);
     }
@@ -665,6 +772,20 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsForUser(String userId) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        return getObjectImpl("/user/auth-method", params, GetUserAuthMethodsResponse.class);
+    }
+
+    /**
+     * Get all globally enabled authentication methods for given user using POST method. Do not perform checks of individual
+     * authentication methods whether they are currently available for authentication.
+     *
+     * @param userId User ID.
+     * @return List of globally enabled authentication methods for given user wrapped in GetAuthMethodsResponse.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsForUserPost(String userId) throws NextStepClientException {
         GetUserAuthMethodsRequest request = new GetUserAuthMethodsRequest();
         request.setUserId(userId);
         return postObjectImpl("/user/auth-method/list", new ObjectRequest<>(request), GetUserAuthMethodsResponse.class);
@@ -681,6 +802,23 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetEnabledMethodListResponse> getAuthMethodsEnabledForUser(@NotNull String userId, @NotNull String operationName) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("operationName", Collections.singletonList(operationName));
+        return getObjectImpl("/user/auth-method/enabled", params, GetEnabledMethodListResponse.class);
+    }
+
+    /**
+     * Get all currently enabled authentication methods for given user and operation name using POST method. Perform an actual check of each
+     * authentication method at the current moment to make they are currently available for authentication. Filter the
+     * authentication method list by the steps in given operation.
+     *
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @return List of currently enabled and available authentication methods for given user wrapped in GetEnabledMethodListResponse.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetEnabledMethodListResponse> getAuthMethodsEnabledForUserPost(@NotNull String userId, @NotNull String operationName) throws NextStepClientException {
         GetEnabledMethodListRequest request = new GetEnabledMethodListRequest();
         request.setUserId(userId);
         request.setOperationName(operationName);
@@ -784,6 +922,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetApplicationListResponse> getApplicationList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/application", params, GetApplicationListResponse.class);
+    }
+
+    /**
+     * Get Next Step application list using POST method.
+     *
+     * @param includeRemoved Whether removed applications should be included in the application list.
+     * @return Get application list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetApplicationListResponse> getApplicationListPost(boolean includeRemoved) throws NextStepClientException {
         GetApplicationListRequest request = new GetApplicationListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/application/list", new ObjectRequest<>(request), GetApplicationListResponse.class);
@@ -826,6 +977,16 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetRoleListResponse> getRoleList() throws NextStepClientException {
+        return getObjectImpl("/role", GetRoleListResponse.class);
+    }
+
+    /**
+     * Get the list of user roles using POST method.
+     *
+     * @return Get user role list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetRoleListResponse> getRoleListPost() throws NextStepClientException {
         GetRoleListRequest request = new GetRoleListRequest();
         return postObjectImpl("/role/list", new ObjectRequest<>(request), GetRoleListResponse.class);
     }
@@ -914,6 +1075,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetHashConfigListResponse> getHashConfigList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/hashconfig", params, GetHashConfigListResponse.class);
+    }
+
+    /**
+     * Get list of hashing configurations using POST method.
+     *
+     * @param includeRemoved Whether removed hashing configurations should be included.
+     * @return Get hashing configuration list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetHashConfigListResponse> getHashConfigListPost(boolean includeRemoved) throws NextStepClientException {
         GetHashConfigListRequest request = new GetHashConfigListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/hashconfig/list", new ObjectRequest<>(request), GetHashConfigListResponse.class);
@@ -975,6 +1149,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/credential/policy", params, GetCredentialPolicyListResponse.class);
+    }
+
+    /**
+     * Get credential policy list using POST method.
+     *
+     * @param includeRemoved Whether removed credential policies should be included.
+     * @return Get credential policy list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyListPost(boolean includeRemoved) throws NextStepClientException {
         GetCredentialPolicyListRequest request = new GetCredentialPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/credential/policy/list", new ObjectRequest<>(request), GetCredentialPolicyListResponse.class);
@@ -1036,6 +1223,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/credential/definition", params, GetCredentialDefinitionListResponse.class);
+    }
+
+    /**
+     * Get credential definition list using POST method.
+     *
+     * @param includeRemoved Whether removed credential definitions should be included.
+     * @return Get credential definition list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionListPost(boolean includeRemoved) throws NextStepClientException {
         GetCredentialDefinitionListRequest request = new GetCredentialDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/credential/definition/list", new ObjectRequest<>(request), GetCredentialDefinitionListResponse.class);
@@ -1097,6 +1297,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/otp/policy", params, GetOtpPolicyListResponse.class);
+    }
+
+    /**
+     * Get OTP policy list using POST method.
+     *
+     * @param includeRemoved Whether removed OTP policies should be included.
+     * @return Get OTP policy list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyListPost(boolean includeRemoved) throws NextStepClientException {
         GetOtpPolicyListRequest request = new GetOtpPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/otp/policy/list", new ObjectRequest<>(request), GetOtpPolicyListResponse.class);
@@ -1158,6 +1371,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/otp/definition", params, GetOtpDefinitionListResponse.class);
+    }
+
+    /**
+     * Get OTP definition list using POST method.
+     *
+     * @param includeRemoved Whether removed OTP definitions should be included.
+     * @return Get OTP definition list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionListPost(boolean includeRemoved) throws NextStepClientException {
         GetOtpDefinitionListRequest request = new GetOtpDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/otp/definition/list", new ObjectRequest<>(request), GetOtpDefinitionListResponse.class);
@@ -1234,9 +1460,9 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserDetailResponse> getUserDetail(@NotNull String userId) throws NextStepClientException {
-        GetUserDetailRequest request = new GetUserDetailRequest();
-        request.setUserId(userId);
-        return postObjectImpl("/user/detail", new ObjectRequest<>(request), GetUserDetailResponse.class);
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        return getObjectImpl("/user/detail", params, GetUserDetailResponse.class);
     }
 
     /**
@@ -1248,6 +1474,34 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserDetailResponse> getUserDetail(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/user/detail", params, GetUserDetailResponse.class);
+    }
+
+    /**
+     * Get user detail using POST method.
+     *
+     * @param userId User ID.
+     * @return Get user detail response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserDetailResponse> getUserDetailPost(@NotNull String userId) throws NextStepClientException {
+        GetUserDetailRequest request = new GetUserDetailRequest();
+        request.setUserId(userId);
+        return postObjectImpl("/user/detail", new ObjectRequest<>(request), GetUserDetailResponse.class);
+    }
+
+    /**
+     * Get user detail using POST method with includeRemoved option.
+     *
+     * @param userId User ID.
+     * @param includeRemoved Whether removed user identities should be returned.
+     * @return Get user detail response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserDetailResponse> getUserDetailPost(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
         GetUserDetailRequest request = new GetUserDetailRequest();
         request.setUserId(userId);
         request.setIncludeRemoved(includeRemoved);
@@ -1440,6 +1694,19 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserContactListResponse> getUserContactList(@NotNull String userId) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        return getObjectImpl("/user/contact", params, GetUserContactListResponse.class);
+    }
+
+    /**
+     * Get user contact list using POST method.
+     *
+     * @param userId User ID.
+     * @return Get user contact list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserContactListResponse> getUserContactListPost(@NotNull String userId) throws NextStepClientException {
         GetUserContactListRequest request = new GetUserContactListRequest();
         request.setUserId(userId);
         return postObjectImpl("/user/contact/list", new ObjectRequest<>(request), GetUserContactListResponse.class);
@@ -1532,12 +1799,29 @@ public class NextStepClient {
      * Get user alias list.
      *
      * @param userId User ID.
+     * @param includeRemoved Whether removed aliases should be included.
      * @return Get user alias list response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@NotNull String userId) throws NextStepClientException {
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(String.valueOf(includeRemoved)));
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/user/alias", params, GetUserAliasListResponse.class);
+    }
+
+    /**
+     * Get user alias list using POST method.
+     *
+     * @param userId User ID.
+     * @param includeRemoved Whether removed aliases should be included.
+     * @return Get user alias list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasListPost(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
         GetUserAliasListRequest request = new GetUserAliasListRequest();
         request.setUserId(userId);
+        request.setIncludeRemoved(includeRemoved);
         return postObjectImpl("/user/alias/list", new ObjectRequest<>(request), GetUserAliasListResponse.class);
     }
 
@@ -1565,6 +1849,21 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/user/credential", params, GetUserCredentialListResponse.class);
+    }
+
+    /**
+     * Get user credential list using POST method.
+     *
+     * @param userId User ID.
+     * @param includeRemoved Whether removed credentials should be included.
+     * @return Get user credential list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialListPost(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
         GetUserCredentialListRequest request = new GetUserCredentialListRequest();
         request.setUserId(userId);
         request.setIncludeRemoved(includeRemoved);
@@ -1581,6 +1880,27 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@NotNull String userId, Date createdStartDate, Date createdEndDate) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("userId", Collections.singletonList(userId));
+        if (createdStartDate != null) {
+            params.put("createdStartDate", Collections.singletonList(createdStartDate.toString()));
+        }
+        if (createdEndDate != null) {
+            params.put("createdEndDate", Collections.singletonList(createdEndDate.toString()));
+        }
+        return getObjectImpl("/user/authentication", params, GetUserAuthenticationListResponse.class);
+    }
+
+    /**
+     * Get user authentication list.
+     *
+     * @param userId User ID.
+     * @param createdStartDate Start of interval to use for date filter.
+     * @param createdEndDate End of interval to use for date filter.
+     * @return Get user authentication list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationListPost(@NotNull String userId, Date createdStartDate, Date createdEndDate) throws NextStepClientException {
         GetUserAuthenticationListRequest request = new GetUserAuthenticationListRequest();
         request.setUserId(userId);
         request.setCreatedStartDate(createdStartDate);
@@ -1882,6 +2202,21 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOtpListResponse> getOtpList(@NotNull String operationId, boolean includeRemoved) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("operationId", Collections.singletonList(operationId));
+        params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
+        return getObjectImpl("/otp", params, GetOtpListResponse.class);
+    }
+
+    /**
+     * Get OTP list using POST method.
+     *
+     * @param operationId Operation ID.
+     * @param includeRemoved Whether removed OTPs should be included.
+     * @return Get OTP list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOtpListResponse> getOtpListPost(@NotNull String operationId, boolean includeRemoved) throws NextStepClientException {
         GetOtpListRequest request = new GetOtpListRequest();
         request.setOperationId(operationId);
         request.setIncludeRemoved(includeRemoved);
@@ -1897,6 +2232,21 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetOtpDetailResponse> getOtpDetail(String otpId, String operationId) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.put("otpId", Collections.singletonList(otpId));
+        params.put("operationId", Collections.singletonList(operationId));
+        return getObjectImpl("/otp/detail", params, GetOtpDetailResponse.class);
+    }
+
+    /**
+     * Get OTP detail using POST method.
+     *
+     * @param otpId OTP ID.
+     * @param operationId Operation ID.
+     * @return Get OTP list response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetailPost(String otpId, String operationId) throws NextStepClientException {
         GetOtpDetailRequest request = new GetOtpDetailRequest();
         request.setOtpId(otpId);
         request.setOperationId(operationId);
@@ -2188,6 +2538,25 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<GetAuditListResponse> getAuditList(@NotNull Date startDate, @NotNull Date endDate) throws NextStepClientException {
+        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        if (startDate != null) {
+            params.put("startDate", Collections.singletonList(startDate.toString()));
+        }
+        if (endDate != null) {
+            params.put("endDate", Collections.singletonList(endDate.toString()));
+        }
+        return getObjectImpl("/audit", params, GetAuditListResponse.class);
+    }
+
+    /**
+     * Get audit log list using POST method.
+     *
+     * @param startDate Audit log interval start date.
+     * @param endDate Audit log interval end date.
+     * @return Delete audit log response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<GetAuditListResponse> getAuditListPost(@NotNull Date startDate, @NotNull Date endDate) throws NextStepClientException {
         GetAuditListRequest request = new GetAuditListRequest();
         request.setStartDate(startDate);
         request.setEndDate(endDate);
@@ -2195,6 +2564,59 @@ public class NextStepClient {
     }
 
     // Generic HTTP client methods
+
+    /**
+     * Prepare GET object response.
+     *
+     * @param path Resource path.
+     * @param queryParams Query parameters.
+     * @param typeReference Type reference.
+     * @return Object obtained after processing the response JSON.
+     * @throws NextStepClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> T getImpl(String path, MultiValueMap<String, String> queryParams, ParameterizedTypeReference<T> typeReference) throws NextStepClientException {
+        try {
+            return restClient.get(path, queryParams, null, typeReference).getBody();
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
+
+    /**
+     * Prepare GET object response.
+     *
+     * @param path Resource path.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws NextStepClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> ObjectResponse<T> getObjectImpl(String path, Class<T> responseType) throws NextStepClientException {
+        try {
+            return restClient.getObject(path, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
+
+    /**
+     * Prepare GET object response.
+     *
+     * @param path Resource path.
+     * @param queryParams Query parameters.
+     * @param responseType Response type.
+     * @return Object obtained after processing the response JSON.
+     * @throws NextStepClientException In case of network, response / JSON processing, or other IO error.
+     */
+    private <T> ObjectResponse<T> getObjectImpl(String path, MultiValueMap<String, String> queryParams, Class<T> responseType) throws NextStepClientException {
+        try {
+            return restClient.getObject(path, queryParams, null, responseType);
+        } catch (RestClientException ex) {
+            logger.warn(ex.getMessage(), ex);
+            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+        }
+    }
 
     /**
      * Prepare a generic POST response.

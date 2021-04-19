@@ -25,12 +25,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuditListRes
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import java.util.Date;
 
 /**
  * REST controller for auditing.
@@ -69,14 +68,31 @@ public class AuditController {
 
     /**
      * Get audit log list.
+     * @param startDate Start date filter for created timestamp.
+     * @param endDate End date filter for created timestamp.
+     * @return Get audit log list response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetAuditListResponse> getAuditList(@RequestParam @NotNull Date startDate, @RequestParam @NotNull Date endDate) {
+        GetAuditListRequest request = new GetAuditListRequest();
+        request.setStartDate(startDate);
+        request.setEndDate(endDate);
+        logger.info("Received getAuditList request");
+        final GetAuditListResponse response = auditLogService.getAuditLogList(request);
+        logger.info("The getAuditList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get audit log list using POST method.
      * @param request Get audit log list request.
      * @return Get audit log list response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetAuditListResponse> getAuditList(@Valid @RequestBody ObjectRequest<GetAuditListRequest> request) {
-        logger.info("Received getAuditList request");
+    public ObjectResponse<GetAuditListResponse> getAuditListPost(@Valid @RequestBody ObjectRequest<GetAuditListRequest> request) {
+        logger.info("Received getAuditListPost request");
         final GetAuditListResponse response = auditLogService.getAuditLogList(request.getRequestObject());
-        logger.info("The getAuditList request succeeded");
+        logger.info("The getAuditListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

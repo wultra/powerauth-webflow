@@ -33,12 +33,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganization
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * REST controller class related to Next Step organizations.
@@ -79,28 +78,57 @@ public class OrganizationController {
     /**
      * Get organization detail.
      *
+     * @param organizationId Organization ID.
+     * @return Get organization detail response.
+     * @throws OrganizationNotFoundException Thrown in case organization does not exist.
+     */
+    @RequestMapping(value = "detail", method = RequestMethod.GET)
+    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String organizationId) throws OrganizationNotFoundException {
+        logger.info("Received getOrganizationDetail request, organization ID: {}", organizationId);
+        GetOrganizationDetailRequest request = new GetOrganizationDetailRequest();
+        final GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request);
+        logger.info("The getOrganizationDetail request succeeded, organization ID: {}", organizationId);
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get organization detail using POST method.
+     *
      * @param request Get organization detail request.
      * @return Get organization detail response.
      * @throws OrganizationNotFoundException Thrown in case organization does not exist.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@Valid @RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
-        logger.info("Received getOrganizationDetail request, organization ID: {}", request.getRequestObject().getOrganizationId());
+    public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetailPost(@Valid @RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
+        logger.info("Received getOrganizationDetailPost request, organization ID: {}", request.getRequestObject().getOrganizationId());
         final GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request.getRequestObject());
-        logger.info("The getOrganizationDetail request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
+        logger.info("The getOrganizationDetailPost request succeeded, organization ID: {}", request.getRequestObject().getOrganizationId());
         return new ObjectResponse<>(response);
     }
 
     /**
      * List organizations defined in Next Step service.
      *
+     * @return Get organizations response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetOrganizationListResponse> getOrganizationList() {
+        logger.info("Received getOrganizationList request");
+        final GetOrganizationListResponse response = organizationService.getOrganizationList();
+        logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * List organizations defined in Next Step service using POST method.
+     *
      * @param request Get organizations request.
      * @return Get organizations response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOrganizationListResponse> getOrganizationList(@Valid @RequestBody ObjectRequest<GetOrganizationListRequest> request) {
+    public ObjectResponse<GetOrganizationListResponse> getOrganizationListPost(@Valid @RequestBody ObjectRequest<GetOrganizationListRequest> request) {
         logger.info("Received getOrganizationList request");
-        final GetOrganizationListResponse response = organizationService.getOrganizationList(request.getRequestObject());
+        final GetOrganizationListResponse response = organizationService.getOrganizationList();
         logger.info("The getOrganizationList request succeeded, number of organizations: {}", response.getOrganizations().size());
         return new ObjectResponse<>(response);
     }

@@ -34,10 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpDefini
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -113,14 +110,29 @@ public class OtpDefinitionController {
 
     /**
      * Get OTP definition list.
+     * @param includeRemoved Whether removed OTP definitions should be included.
+     * @return Get OTP definition list response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam boolean includeRemoved) {
+        logger.info("Received getOtpDefinitionList request");
+        GetOtpDefinitionListRequest request = new GetOtpDefinitionListRequest();
+        request.setIncludeRemoved(includeRemoved);
+        final GetOtpDefinitionListResponse response = otpDefinitionService.getOtpDefinitionList(request);
+        logger.info("The getOtpDefinitionList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get OTP definition list using POST method.
      * @param request Get OTP definition list request.
      * @return Get OTP definition list response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@Valid @RequestBody ObjectRequest<GetOtpDefinitionListRequest> request) {
-        logger.info("Received getOtpDefinitionList request");
+    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionListPost(@Valid @RequestBody ObjectRequest<GetOtpDefinitionListRequest> request) {
+        logger.info("Received getOtpDefinitionListPost request");
         final GetOtpDefinitionListResponse response = otpDefinitionService.getOtpDefinitionList(request.getRequestObject());
-        logger.info("The getOtpDefinitionList request succeeded");
+        logger.info("The getOtpDefinitionListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

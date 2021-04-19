@@ -37,6 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -193,12 +196,40 @@ public class OperationController {
     /**
      * Get detail of an operation with given ID.
      *
+     * @param operationId Operation ID.
+     * @return Get operation detail response.
+     * @throws OperationNotFoundException Thrown when operation does not exist.
+     */
+    @RequestMapping(value = "operation/detail", method = RequestMethod.GET)
+    public ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received operationDetail request, operation ID: {}", operationId);
+
+        final OperationEntity operation = operationPersistenceService.getOperation(operationId, true);
+        final GetOperationDetailResponse response = operationConverter.fromEntity(operation);
+
+        // add steps from current response
+        response.getSteps().addAll(operationPersistenceService.getResponseAuthSteps(operation));
+
+        // set number of remaining authentication attempts
+        response.setRemainingAttempts(stepResolutionService.getNumberOfRemainingAttempts(operation));
+
+        response.setTimestampCreated(operation.getTimestampCreated());
+        response.setTimestampExpires(operation.getTimestampExpires());
+
+        logger.debug("The operationDetail request succeeded, operation ID: {}", response.getOperationId());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get detail of an operation with given ID using POST method.
+     *
      * @param request Get operation detail request.
      * @return Get operation detail response.
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     @RequestMapping(value = "operation/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationDetailResponse> operationDetail(@Valid @RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException {
+    public ObjectResponse<GetOperationDetailResponse> operationDetailPost(@Valid @RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received operationDetail request, operation ID: {}", request.getRequestObject().getOperationId());
 
@@ -223,12 +254,30 @@ public class OperationController {
     /**
      * Get configuration of an operation with given operation name.
      *
+     * @param operationName Operation name.
+     * @return Get operation configuration response.
+     * @throws OperationConfigNotFoundException Thrown when operation is not configured.
+     */
+    @RequestMapping(value = "operation/config/detail", method = RequestMethod.GET)
+    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String operationName) throws OperationConfigNotFoundException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getOperationConfigDetail request, operation name: {}", operationName);
+
+        final GetOperationConfigDetailResponse response = operationConfigurationService.getOperationConfig(operationName);
+
+        logger.debug("The getOperationConfigDetail request succeeded, operation name: {}", operationName);
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get configuration of an operation with given operation name using POST method.
+     *
      * @param request Get operation configuration request.
      * @return Get operation configuration response.
      * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
     @RequestMapping(value = "operation/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@Valid @RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationConfigNotFoundException {
+    public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetailPost(@Valid @RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationConfigNotFoundException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigDetail request, operation name: {}", request.getRequestObject().getOperationName());
 
@@ -243,11 +292,10 @@ public class OperationController {
     /**
      * Get configurations of all operations.
      *
-     * @param request Get configurations of all operations request.
      * @return Get operation configurations response.
      */
-    @RequestMapping(value = "operation/config/list", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationConfigListResponse> getOperationConfigList(@Valid @RequestBody ObjectRequest<GetOperationConfigListRequest> request) {
+    @RequestMapping(value = "operation/config", method = RequestMethod.GET)
+    public ObjectResponse<GetOperationConfigListResponse> getOperationConfigList() {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getOperationConfigList request");
 
@@ -258,15 +306,56 @@ public class OperationController {
     }
 
     /**
+     * Get configurations of all operations using POST method.
+     *
+     * @param request Get configurations of all operations request.
+     * @return Get operation configurations response.
+     */
+    @RequestMapping(value = "operation/config/list", method = RequestMethod.POST)
+    public ObjectResponse<GetOperationConfigListResponse> getOperationConfigListPost(@Valid @RequestBody ObjectRequest<GetOperationConfigListRequest> request) {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getOperationConfigListPost request");
+
+        final GetOperationConfigListResponse response = operationConfigurationService.getOperationConfigList();
+
+        logger.debug("The getOperationConfigListPost request succeeded, operation config list size: {}", response.getOperationConfigs().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
      * Get the list of pending operations for user.
+     *
+     * @param userId User ID.
+     * @param mobileTokenOnly Whether only operations with mobile token should be returned
+     * @return List with operation details.
+     */
+    @RequestMapping(value = "user/operation", method = RequestMethod.GET)
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean mobileTokenOnly) {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getPendingOperations request, user ID: {}", userId);
+
+        final List<GetOperationDetailResponse> responseList = new ArrayList<>();
+
+        final List<OperationEntity> operations = operationPersistenceService.getPendingOperations(userId, mobileTokenOnly);
+        for (OperationEntity operation : operations) {
+            final GetOperationDetailResponse response = operationConverter.fromEntity(operation);
+            responseList.add(response);
+        }
+
+        logger.debug("The getPendingOperations request succeeded, operation list size: {}", responseList.size());
+        return new ObjectResponse<>(responseList);
+    }
+
+    /**
+     * Get the list of pending operations for user using POST method.
      *
      * @param request Get pending operations request.
      * @return List with operation details.
      */
     @RequestMapping(value = "user/operation/list", method = RequestMethod.POST)
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@Valid @RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperationsPost(@Valid @RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getPendingOperations request, user ID: {}", request.getRequestObject().getUserId());
+        logger.debug("Received getPendingOperationsPost request, user ID: {}", request.getRequestObject().getUserId());
 
         final GetPendingOperationsRequest requestObject = request.getRequestObject();
 
@@ -278,7 +367,7 @@ public class OperationController {
             responseList.add(response);
         }
 
-        logger.debug("The getPendingOperations request succeeded, operation list size: {}", responseList.size());
+        logger.debug("The getPendingOperationsPost request succeeded, operation list size: {}", responseList.size());
         return new ObjectResponse<>(responseList);
     }
 
@@ -408,20 +497,38 @@ public class OperationController {
 
     /**
      * Get mobile token configuration.
-     * @param request Get mobile token configuration request.
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @param authMethod Authentication method.
      * @return Get mobile token configuration response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@Valid @RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws InvalidConfigurationException {
-        final String userId = request.getRequestObject().getUserId();
-        final String operationName = request.getRequestObject().getOperationName();
-        final AuthMethod authMethod = request.getRequestObject().getAuthMethod();
+    @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.GET)
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @NotBlank @Size(min = 2, max = 256) String operationName, @RequestParam @NotNull AuthMethod authMethod) throws InvalidConfigurationException {
         logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
         final boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, authMethod);
         final GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
         response.setMobileTokenEnabled(isMobileTokenEnabled);
         logger.debug("The getMobileTokenConfig request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get mobile token configuration using POST method.
+     * @param request Get mobile token configuration request.
+     * @return Get mobile token configuration response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
+    public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfigPost(@Valid @RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws InvalidConfigurationException {
+        final String userId = request.getRequestObject().getUserId();
+        final String operationName = request.getRequestObject().getOperationName();
+        final AuthMethod authMethod = request.getRequestObject().getAuthMethod();
+        logger.info("Received getMobileTokenConfigPost request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
+        final boolean isMobileTokenEnabled = mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, authMethod);
+        final GetMobileTokenConfigResponse response = new GetMobileTokenConfigResponse();
+        response.setMobileTokenEnabled(isMobileTokenEnabled);
+        logger.debug("The getMobileTokenConfigPost request succeeded");
         return new ObjectResponse<>(response);
     }
 
@@ -512,23 +619,41 @@ public class OperationController {
     }
 
     /**
-     * Delete a configuration for authentication method by operation name.
-     * @param request Delete operation and authentication method configuration request.
-     * @return Delete operation and authentication method configuration response.
+     * Get a configuration for operation and authentication method.
+     * @param operationName Operation name.
+     * @param authMethod Authentication method.
+     * @return Get operation and authentication method config detail response.
      * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
      */
-    @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
-        logger.info("Received getOperationMethodConfigDetail request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
-        final GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
-        logger.info("The getOperationMethodConfigDetail request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
+    @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.GET)
+    public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String operationName, @RequestParam @NotNull AuthMethod authMethod) throws OperationMethodConfigNotFoundException {
+        logger.info("Received getOperationMethodConfigDetail request, operation name: {}, authentication method: {}", operationName, authMethod);
+        GetOperationMethodConfigDetailRequest request = new GetOperationMethodConfigDetailRequest();
+        request.setOperationName(operationName);
+        request.setAuthMethod(authMethod);
+        final GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request);
+        logger.info("The getOperationMethodConfigDetail request succeeded, operation name: {}, authentication method: {}", operationName, authMethod);
         return new ObjectResponse<>(response);
     }
 
     /**
-     * Delete a configuration for authentication method by operation name.
-     * @param request Delete operation and authentication method configuration request.
-     * @return Delete operation and authentication method configuration response.
+     * Get a configuration for operation and authentication method using POST method.
+     * @param request Get operation and authentication method config detail request.
+     * @return Get operation and authentication method config detail response.
+     * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
+     */
+    @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
+    public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetailPost(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
+        logger.info("Received getOperationMethodConfigDetailPost request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
+        final GetOperationMethodConfigDetailResponse response = operationConfigurationService.getOperationMethodConfigDetail(request.getRequestObject());
+        logger.info("The getOperationMethodConfigDetailPost request succeeded, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Delete a configuration for operation and authentication method.
+     * @param request Delete operation and authentication method config request.
+     * @return Delete operation and authentication method config response.
      * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
      */
     @RequestMapping(value = "operation/auth-method/config/delete", method = RequestMethod.POST)
