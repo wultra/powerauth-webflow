@@ -88,6 +88,7 @@ public class OrganizationController {
     public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String organizationId) throws OrganizationNotFoundException {
         logger.info("Received getOrganizationDetail request, organization ID: {}", organizationId);
         GetOrganizationDetailRequest request = new GetOrganizationDetailRequest();
+        request.setOrganizationId(organizationId);
         final GetOrganizationDetailResponse response = organizationService.getOrganizationDetail(request);
         logger.info("The getOrganizationDetail request succeeded, organization ID: {}", organizationId);
         return new ObjectResponse<>(response);
