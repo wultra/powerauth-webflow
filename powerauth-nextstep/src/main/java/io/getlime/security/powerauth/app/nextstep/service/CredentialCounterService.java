@@ -33,7 +33,6 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
-import java.util.List;
 
 /**
  * This service handles persistence of credential counters.
@@ -130,33 +129,37 @@ public class CredentialCounterService {
     }
 
     /**
-     * Reset all soft counters and unblock temporarily blocked credentials.
+     * Reset all soft failed attempt counters.
+     *
+     * Method behavior depends on the counter reset mode:
+     * <ul>
+     *     <li>RESET_ACTIVE_AND_BLOCKED_TEMPORARY - counters for credentials with ACTIVE and BLOCKED_TEMPORARY status are reset, status is set to ACTIVE</li>
+     *     <li>RESET_BLOCKED_TEMPORARY - counters for credentials with BLOCKED_TEMPORARY status are reset</li>
+     * </ul>
      * @param request Reset counters request.
      * @return Reset counters response.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @Transactional
-    public ResetCountersResponse resetCounters(ResetCountersRequest request) {
-        final List<CredentialEntity> blockedCredentials = credentialRepository.findAllByStatus(CredentialStatus.BLOCKED_TEMPORARY);
+    public ResetCountersResponse resetCounters(ResetCountersRequest request) throws InvalidRequestException {
         int resetCounter = 0;
-        // Reset soft counters for credentials with status BLOCKED_TEMPORARY and set status to ACTIVE
-        for (CredentialEntity credential: blockedCredentials) {
-            credential.setStatus(CredentialStatus.ACTIVE);
-            credential.setFailedAttemptCounterSoft(0);
-            credential.setTimestampBlocked(null);
-            resetCounter++;
+        switch (request.getResetMode()) {
+            case RESET_ACTIVE_AND_BLOCKED_TEMPORARY:
+                resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
+                resetCounter += credentialRepository.resetSoftFailedCountersForActiveStatus();
+                break;
+
+            case RESET_BLOCKED_TEMPORARY:
+                resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
+                break;
+
+            default:
+                throw new InvalidRequestException("Invalid counter reset mode: " + request.getResetMode());
+
         }
-        credentialRepository.saveAll(blockedCredentials);
-        // Reset soft counters for credentials with status ACTIVE with non-zero soft counter
-        final List<CredentialEntity> activeCredentials = credentialRepository.findAllByStatus(CredentialStatus.ACTIVE);
-        for (CredentialEntity credential: activeCredentials) {
-            if (credential.getFailedAttemptCounterSoft() != 0) {
-                credential.setFailedAttemptCounterSoft(0);
-                resetCounter++;
-            }
-        }
-        credentialRepository.saveAll(activeCredentials);
         final ResetCountersResponse response = new ResetCountersResponse();
         response.setResetCounterCount(resetCounter);
         return response;
     }
+
 }
