@@ -133,8 +133,8 @@ public class CredentialCounterService {
      *
      * Method behavior depends on the counter reset mode:
      * <ul>
-     *     <li>RESET_ACTIVE_AND_BLOCKED_TEMPORARY - counters for credentials with ACTIVE and BLOCKED_TEMPORARY status are reset, status is set to ACTIVE</li>
-     *     <li>RESET_BLOCKED_TEMPORARY - counters for credentials with BLOCKED_TEMPORARY status are reset</li>
+     *     <li>RESET_BLOCKED_TEMPORARY - reset soft failed attempt counters for credentials with BLOCKED_TEMPORARY status, change status to ACTIVE</li>
+     *     <li>RESET_ACTIVE_AND_BLOCKED_TEMPORARY - reset soft failed attempt counters for credentials with ACTIVE and BLOCKED_TEMPORARY statuses, change status to ACTIVE if required</li>
      * </ul>
      * @param request Reset counters request.
      * @return Reset counters response.
@@ -144,13 +144,13 @@ public class CredentialCounterService {
     public ResetCountersResponse resetCounters(ResetCountersRequest request) throws InvalidRequestException {
         int resetCounter = 0;
         switch (request.getResetMode()) {
+            case RESET_BLOCKED_TEMPORARY:
+                resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
+                break;
+
             case RESET_ACTIVE_AND_BLOCKED_TEMPORARY:
                 resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
                 resetCounter += credentialRepository.resetSoftFailedCountersForActiveStatus();
-                break;
-
-            case RESET_BLOCKED_TEMPORARY:
-                resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
                 break;
 
             default:

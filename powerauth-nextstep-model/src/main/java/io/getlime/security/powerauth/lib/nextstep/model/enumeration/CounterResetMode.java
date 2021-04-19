@@ -23,12 +23,12 @@ package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 public enum CounterResetMode {
 
     /**
-     * Reset soft failed attempt counters for credentials with BLOCKED status.
+     * Reset soft failed attempt counters for credentials with BLOCKED_TEMPORARY status, change status to ACTIVE.
      */
     RESET_BLOCKED_TEMPORARY,
 
     /**
-     * Reset soft failed attempt counters for credentials with ACTIVE and BLOCKED statuses.
+     * Reset soft failed attempt counters for credentials with ACTIVE and BLOCKED_TEMPORARY statuses, change status to ACTIVE if required.
      */
     RESET_ACTIVE_AND_BLOCKED_TEMPORARY,
 
