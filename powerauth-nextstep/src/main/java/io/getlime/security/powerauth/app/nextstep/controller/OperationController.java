@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -49,6 +50,7 @@ import java.util.List;
  * @author Petr Dvorak, petr@wultra.com
  */
 @RestController
+@Validated
 public class OperationController {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationController.class);
@@ -330,7 +332,7 @@ public class OperationController {
      * @return List with operation details.
      */
     @RequestMapping(value = "user/operation", method = RequestMethod.GET)
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean mobileTokenOnly) {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam  boolean mobileTokenOnly) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getPendingOperations request, user ID: {}", userId);
 

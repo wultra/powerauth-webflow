@@ -31,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateApplicati
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("application")
+@Validated
 public class ApplicationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
@@ -105,7 +107,7 @@ public class ApplicationController {
      * @return Get application list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam boolean includeRemoved) {
+    public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam  boolean includeRemoved) {
         logger.info("Received getApplicationList request");
         GetApplicationListRequest request = new GetApplicationListRequest();
         request.setIncludeRemoved(includeRemoved);

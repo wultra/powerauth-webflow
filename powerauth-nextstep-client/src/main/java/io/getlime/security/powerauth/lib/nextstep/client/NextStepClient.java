@@ -773,7 +773,9 @@ public class NextStepClient {
      */
     public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsForUser(String userId) throws NextStepClientException {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("userId", Collections.singletonList(userId));
+        if (userId != null) {
+            params.put("userId", Collections.singletonList(userId));
+        }
         return getObjectImpl("/user/auth-method", params, GetUserAuthMethodsResponse.class);
     }
 
@@ -1456,19 +1458,6 @@ public class NextStepClient {
      * Get user detail.
      *
      * @param userId User ID.
-     * @return Get user detail response.
-     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
-     */
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@NotNull String userId) throws NextStepClientException {
-        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("userId", Collections.singletonList(userId));
-        return getObjectImpl("/user/detail", params, GetUserDetailResponse.class);
-    }
-
-    /**
-     * Get user detail with includeRemoved option.
-     *
-     * @param userId User ID.
      * @param includeRemoved Whether removed user identities should be returned.
      * @return Get user detail response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
@@ -1482,19 +1471,6 @@ public class NextStepClient {
 
     /**
      * Get user detail using POST method.
-     *
-     * @param userId User ID.
-     * @return Get user detail response.
-     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
-     */
-    public ObjectResponse<GetUserDetailResponse> getUserDetailPost(@NotNull String userId) throws NextStepClientException {
-        GetUserDetailRequest request = new GetUserDetailRequest();
-        request.setUserId(userId);
-        return postObjectImpl("/user/detail", new ObjectRequest<>(request), GetUserDetailResponse.class);
-    }
-
-    /**
-     * Get user detail using POST method with includeRemoved option.
      *
      * @param userId User ID.
      * @param includeRemoved Whether removed user identities should be returned.
@@ -1805,7 +1781,7 @@ public class NextStepClient {
      */
     public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@NotNull String userId, boolean includeRemoved) throws NextStepClientException {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("userId", Collections.singletonList(String.valueOf(includeRemoved)));
+        params.put("userId", Collections.singletonList(userId));
         params.put("includeRemoved", Collections.singletonList(String.valueOf(includeRemoved)));
         return getObjectImpl("/user/alias", params, GetUserAliasListResponse.class);
     }
@@ -2233,8 +2209,12 @@ public class NextStepClient {
      */
     public ObjectResponse<GetOtpDetailResponse> getOtpDetail(String otpId, String operationId) throws NextStepClientException {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.put("otpId", Collections.singletonList(otpId));
-        params.put("operationId", Collections.singletonList(operationId));
+        if (otpId != null) {
+            params.put("otpId", Collections.singletonList(otpId));
+        }
+        if (operationId != null) {
+            params.put("operationId", Collections.singletonList(operationId));
+        }
         return getObjectImpl("/otp/detail", params, GetOtpDetailResponse.class);
     }
 

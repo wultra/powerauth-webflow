@@ -31,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -42,6 +43,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("credential/definition")
+@Validated
 public class CredentialDefinitionController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialDefinitionController.class);
@@ -117,7 +119,7 @@ public class CredentialDefinitionController {
      * @return Get credential definition list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam boolean includeRemoved) {
+    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam  boolean includeRemoved) {
         GetCredentialDefinitionListRequest request = new GetCredentialDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);
         logger.info("Received getCredentialDefinitionList request");

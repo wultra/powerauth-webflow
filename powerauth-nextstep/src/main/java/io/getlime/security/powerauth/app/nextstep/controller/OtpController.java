@@ -25,8 +25,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -38,6 +40,7 @@ import javax.validation.constraints.Size;
  */
 @RestController
 @RequestMapping("otp")
+@Validated
 public class OtpController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpController.class);
@@ -112,7 +115,7 @@ public class OtpController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam  boolean includeRemoved) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getOptList request, operation ID: {}", operationId);
         GetOtpListRequest request = new GetOtpListRequest();
         request.setOperationId(operationId);
@@ -148,7 +151,7 @@ public class OtpController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "detail", method = RequestMethod.GET)
-    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestParam @Size(min = 36, max = 36) String otpId, @RequestParam @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestParam @Nullable @Size(min = 36, max = 36) String otpId, @RequestParam @Nullable @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getOtpDetail request, OTP ID: {}, operation ID: {}", otpId, operationId);
         GetOtpDetailRequest request = new GetOtpDetailRequest();
         request.setOtpId(otpId);

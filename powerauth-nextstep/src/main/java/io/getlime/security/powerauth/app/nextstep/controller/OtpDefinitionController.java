@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpDefini
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("otp/definition")
+@Validated
 public class OtpDefinitionController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpDefinitionController.class);
@@ -114,7 +116,7 @@ public class OtpDefinitionController {
      * @return Get OTP definition list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam boolean includeRemoved) {
+    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam  boolean includeRemoved) {
         logger.info("Received getOtpDefinitionList request");
         GetOtpDefinitionListRequest request = new GetOtpDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);

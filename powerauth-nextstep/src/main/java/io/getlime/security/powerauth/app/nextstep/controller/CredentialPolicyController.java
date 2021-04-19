@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentia
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("credential/policy")
+@Validated
 public class CredentialPolicyController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialPolicyController.class);
@@ -112,7 +114,7 @@ public class CredentialPolicyController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
+    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam  boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getCredentialPolicyList request");
         GetCredentialPolicyListRequest request = new GetCredentialPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);

@@ -33,6 +33,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganization
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -46,6 +47,7 @@ import javax.validation.constraints.Size;
  */
 @RestController
 @RequestMapping(value = "organization")
+@Validated
 public class OrganizationController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);

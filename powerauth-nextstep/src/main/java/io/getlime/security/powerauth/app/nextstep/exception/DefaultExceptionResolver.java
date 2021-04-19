@@ -28,10 +28,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
 
 /**
  * Controller advice responsible for default exception resolving.
@@ -728,6 +732,41 @@ public class DefaultExceptionResolver {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         logger.warn("Validation errors: {}", ex.getError().getValidationFailures());
         final CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Credential validation failed.", ex.getError().getValidationFailures());
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for missing servlet request parameter error.
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
+        error.getViolations().add(
+                new Violation(ex.getParameterName(), null, ex.getMessage())
+        );
+        return new ErrorResponse(error);
+    }
+
+    /**
+     * Exception handler for failed request validations.
+     *
+     * @param ex Exception.
+     * @return Response with error details.
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
+        logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
+        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            error.getViolations().add(
+                    new Violation(violation.getPropertyPath().toString(), violation.getInvalidValue(), violation.getMessage())
+            );
+        }
         return new ErrorResponse(error);
     }
 

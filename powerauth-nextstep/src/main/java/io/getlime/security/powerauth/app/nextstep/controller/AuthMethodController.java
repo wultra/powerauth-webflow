@@ -28,8 +28,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -42,6 +44,7 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @RestController
+@Validated
 public class AuthMethodController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodController.class);
@@ -120,7 +123,7 @@ public class AuthMethodController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "user/auth-method", method = RequestMethod.GET)
-    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestParam @Size(min = 1, max = 256) String userId) throws InvalidConfigurationException {
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestParam @Nullable @Size(min = 1, max = 256) String userId) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", userId);
         // userId can be null - in this case default setting is returned when user is not known

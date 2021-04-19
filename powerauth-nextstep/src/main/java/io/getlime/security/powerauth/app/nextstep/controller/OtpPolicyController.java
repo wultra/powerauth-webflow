@@ -34,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpPolicy
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -45,6 +46,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("otp/policy")
+@Validated
 public class OtpPolicyController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpPolicyController.class);
@@ -112,7 +114,7 @@ public class OtpPolicyController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
+    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam  boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getOtpPolicyListPost request");
         GetOtpPolicyListRequest request = new GetOtpPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);
