@@ -114,7 +114,7 @@ public class OtpPolicyController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam  boolean includeRemoved) throws InvalidConfigurationException {
+    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getOtpPolicyListPost request");
         GetOtpPolicyListRequest request = new GetOtpPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);

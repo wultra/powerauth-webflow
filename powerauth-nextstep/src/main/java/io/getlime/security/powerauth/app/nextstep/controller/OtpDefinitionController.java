@@ -116,7 +116,7 @@ public class OtpDefinitionController {
      * @return Get OTP definition list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam  boolean includeRemoved) {
+    public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam boolean includeRemoved) {
         logger.info("Received getOtpDefinitionList request");
         GetOtpDefinitionListRequest request = new GetOtpDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);

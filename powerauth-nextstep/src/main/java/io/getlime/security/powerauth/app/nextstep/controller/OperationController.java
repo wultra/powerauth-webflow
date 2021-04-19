@@ -332,7 +332,7 @@ public class OperationController {
      * @return List with operation details.
      */
     @RequestMapping(value = "user/operation", method = RequestMethod.GET)
-    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam  boolean mobileTokenOnly) {
+    public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean mobileTokenOnly) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received getPendingOperations request, user ID: {}", userId);
 

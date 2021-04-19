@@ -145,7 +145,7 @@ public class UserController {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
     @RequestMapping(value = "detail", method = RequestMethod.GET)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable @Size(min = 2, max = 256) String credentialName, @RequestParam  boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable @Size(min = 2, max = 256) String credentialName, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
         GetUserDetailRequest request = new GetUserDetailRequest();
         request.setUserId(userId);
         request.setCredentialName(credentialName);
@@ -384,7 +384,7 @@ public class UserController {
      * @throws UserNotFoundException Thrown when user identity is not found.
      */
     @RequestMapping(value = "alias", method = RequestMethod.GET)
-    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam  boolean includeRemoved) throws InvalidRequestException, UserNotFoundException {
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws InvalidRequestException, UserNotFoundException {
         logger.info("Received getUserAliasList request, user ID: {}", userId);
         GetUserAliasListRequest request = new GetUserAliasListRequest();
         request.setUserId(userId);
@@ -466,7 +466,7 @@ public class UserController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "credential", method = RequestMethod.GET)
-    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam  boolean includeRemoved) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getUserCredentialList request, user ID: {}", userId);
         GetUserCredentialListRequest request = new GetUserCredentialListRequest();
         request.setUserId(userId);

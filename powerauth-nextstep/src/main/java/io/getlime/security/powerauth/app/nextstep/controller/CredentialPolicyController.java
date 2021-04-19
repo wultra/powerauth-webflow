@@ -114,7 +114,7 @@ public class CredentialPolicyController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam  boolean includeRemoved) throws InvalidConfigurationException {
+    public ObjectResponse<GetCredentialPolicyListResponse> getCredentialPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getCredentialPolicyList request");
         GetCredentialPolicyListRequest request = new GetCredentialPolicyListRequest();
         request.setIncludeRemoved(includeRemoved);

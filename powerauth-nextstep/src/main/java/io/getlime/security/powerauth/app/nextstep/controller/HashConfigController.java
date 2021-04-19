@@ -114,7 +114,7 @@ public class HashConfigController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetHashConfigListResponse> getHashConfigList(@RequestParam  boolean includeRemoved) throws InvalidConfigurationException {
+    public ObjectResponse<GetHashConfigListResponse> getHashConfigList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getHashConfigListPost request");
         GetHashConfigListRequest request = new GetHashConfigListRequest();
         request.setIncludeRemoved(includeRemoved);

@@ -115,7 +115,7 @@ public class OtpController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam  boolean includeRemoved) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
         logger.info("Received getOptList request, operation ID: {}", operationId);
         GetOtpListRequest request = new GetOtpListRequest();
         request.setOperationId(operationId);

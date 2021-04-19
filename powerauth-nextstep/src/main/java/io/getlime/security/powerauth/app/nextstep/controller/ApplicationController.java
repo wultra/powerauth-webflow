@@ -107,7 +107,7 @@ public class ApplicationController {
      * @return Get application list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam  boolean includeRemoved) {
+    public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam boolean includeRemoved) {
         logger.info("Received getApplicationList request");
         GetApplicationListRequest request = new GetApplicationListRequest();
         request.setIncludeRemoved(includeRemoved);

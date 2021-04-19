@@ -119,7 +119,7 @@ public class CredentialDefinitionController {
      * @return Get credential definition list response.
      */
     @RequestMapping(method = RequestMethod.GET)
-    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam  boolean includeRemoved) {
+    public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam boolean includeRemoved) {
         GetCredentialDefinitionListRequest request = new GetCredentialDefinitionListRequest();
         request.setIncludeRemoved(includeRemoved);
         logger.info("Received getCredentialDefinitionList request");
