@@ -19,6 +19,7 @@ import io.getlime.security.powerauth.app.nextstep.converter.OtpDefinitionConvert
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
@@ -65,15 +66,13 @@ public class OtpDefinitionService {
 
     /**
      * OTP definition service constructor.
-     * @param otpDefinitionRepository OTP definition repository.
-     * @param otpPolicyRepository OTP policy repository.
-     * @param applicationRepository Application repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public OtpDefinitionService(OtpDefinitionRepository otpDefinitionRepository, OtpPolicyRepository otpPolicyRepository, ApplicationRepository applicationRepository) {
-        this.otpDefinitionRepository = otpDefinitionRepository;
-        this.otpPolicyRepository = otpPolicyRepository;
-        this.applicationRepository = applicationRepository;
+    public OtpDefinitionService(RepositoryCatalogue repositoryCatalogue) {
+        this.otpDefinitionRepository = repositoryCatalogue.getOtpDefinitionRepository();
+        this.otpPolicyRepository = repositoryCatalogue.getOtpPolicyRepository();
+        this.applicationRepository = repositoryCatalogue.getApplicationRepository();
     }
 
     /**

@@ -17,6 +17,7 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,11 +35,11 @@ public class IdGeneratorService {
 
     /**
      * ID generator constructor.
-     * @param operationHistoryRepository Operation history repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public IdGeneratorService(OperationHistoryRepository operationHistoryRepository) {
-        this.operationHistoryRepository = operationHistoryRepository;
+    public IdGeneratorService(RepositoryCatalogue repositoryCatalogue) {
+        this.operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
     }
 
     /**

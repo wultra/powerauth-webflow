@@ -23,7 +23,9 @@ import io.getlime.security.powerauth.app.nextstep.converter.ValueListConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
@@ -34,6 +36,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -51,13 +54,9 @@ public class UserIdentityService {
     private final Logger logger = LoggerFactory.getLogger(UserIdentityService.class);
 
     private final UserIdentityRepository userIdentityRepository;
-    private final UserContactService userContactService;
     private final RoleRepository roleRepository;
-    private final CredentialDefinitionService credentialDefinitionService;
     private final OtpRepository otpRepository;
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final CredentialService credentialService;
-    private final EndToEndEncryptionService endToEndEncryptionService;
+    private final ServiceCatalogue serviceCatalogue;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
     private final CredentialConverter credentialConverter = new CredentialConverter();
@@ -66,25 +65,15 @@ public class UserIdentityService {
 
     /**
      * Service constructor.
-     * @param userIdentityRepository User identity repository.
-     * @param userContactService User contact service.
-     * @param roleRepository Role repository.
-     * @param credentialDefinitionService Credential definition service.
-     * @param otpRepository OTP repository.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param credentialService Credential service.
-     * @param endToEndEncryptionService End-to-end encryption service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public UserIdentityService(UserIdentityRepository userIdentityRepository, UserContactService userContactService, RoleRepository roleRepository, CredentialDefinitionService credentialDefinitionService, OtpRepository otpRepository, UserIdentityLookupService userIdentityLookupService, CredentialService credentialService, EndToEndEncryptionService endToEndEncryptionService) {
-        this.userIdentityRepository = userIdentityRepository;
-        this.userContactService = userContactService;
-        this.roleRepository = roleRepository;
-        this.credentialDefinitionService = credentialDefinitionService;
-        this.otpRepository = otpRepository;
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.credentialService = credentialService;
-        this.endToEndEncryptionService = endToEndEncryptionService;
+    public UserIdentityService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        this.roleRepository = repositoryCatalogue.getRoleRepository();
+        this.otpRepository = repositoryCatalogue.getOtpRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -100,6 +89,10 @@ public class UserIdentityService {
      */
     @Transactional(rollbackOn = Throwable.class)
     public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+
         final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         final UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
@@ -219,6 +212,10 @@ public class UserIdentityService {
      */
     @Transactional(rollbackOn = Throwable.class)
     public UpdateUserResponse updateUserIdentity(UpdateUserRequest request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+
         final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
         if (!userOptional.isPresent()) {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
@@ -316,6 +313,7 @@ public class UserIdentityService {
      */
     @Transactional
     public GetUserDetailResponse getUserDetail(GetUserDetailRequest request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
         CredentialDefinitionEntity credentialDefinition = null;
         final String credentialName = request.getCredentialName();
         if (credentialName != null) {
@@ -336,6 +334,8 @@ public class UserIdentityService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public GetUserDetailResponse getUserDetail(String userId, CredentialDefinitionEntity credentialDefinition, boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
         final UserIdentityEntity user = userIdentityLookupService.findUser(userId, includeRemoved);
         final GetUserDetailResponse response = new GetUserDetailResponse();
         response.setUserId(user.getUserId());
@@ -416,6 +416,7 @@ public class UserIdentityService {
      */
     @Transactional
     public DeleteUserResponse deleteUser(DeleteUserRequest request) throws UserNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         user.setStatus(UserIdentityStatus.REMOVED);
         user.setTimestampLastUpdated(new Date());
@@ -439,6 +440,7 @@ public class UserIdentityService {
      */
     @Transactional
     public BlockUserResponse blockUser(BlockUserRequest request) throws UserNotFoundException, UserNotActiveException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.ACTIVE) {
             throw new UserNotActiveException("User identity is not ACTIVE: " + request.getUserId());
@@ -463,6 +465,7 @@ public class UserIdentityService {
      */
     @Transactional
     public UnblockUserResponse unblockUser(UnblockUserRequest request) throws UserNotFoundException, UserNotBlockedException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         if (user.getStatus() != UserIdentityStatus.BLOCKED) {
             throw new UserNotBlockedException("User identity is not BLOCKED: " + request.getUserId());
@@ -566,6 +569,7 @@ public class UserIdentityService {
      * @return Contact details with resolved timestamps after merge with status in the database.
      */
     private List<UserContactDetail> updateContacts(UserIdentityEntity user, List<UserContactDetail> contacts) {
+        final UserContactService userContactService = serviceCatalogue.getUserContactService();
         final List<UserContactDetail> contactListResponse = new ArrayList<>();
         final Set<UserContactEntity> existingContacts = user.getContacts();
         final Map<String, UserContactEntity> existingContactMap = new HashMap<>();

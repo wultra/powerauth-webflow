@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialPolicyDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialPolicyStatus;
@@ -60,11 +61,11 @@ public class CredentialPolicyService {
 
     /**
      * Credential policy service constructor.
-     * @param credentialPolicyRepository Credential policy repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public CredentialPolicyService(CredentialPolicyRepository credentialPolicyRepository) {
-        this.credentialPolicyRepository = credentialPolicyRepository;
+    public CredentialPolicyService(RepositoryCatalogue repositoryCatalogue) {
+        this.credentialPolicyRepository = repositoryCatalogue.getCredentialPolicyRepository();
     }
 
     /**

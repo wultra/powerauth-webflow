@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialDefinitionConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.*;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDefinitionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
@@ -61,19 +62,15 @@ public class CredentialDefinitionService {
 
     /**
      * Credential definition service constructor.
-     * @param credentialDefinitionRepository Credential definition repository.
-     * @param credentialPolicyRepository Credential policy repository.
-     * @param applicationRepository Application repository.
-     * @param hashConfigRepository Hashing configuration repository.
-     * @param organizationRepository Organization repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public CredentialDefinitionService(CredentialDefinitionRepository credentialDefinitionRepository, CredentialPolicyRepository credentialPolicyRepository, ApplicationRepository applicationRepository, HashConfigRepository hashConfigRepository, OrganizationRepository organizationRepository) {
-        this.credentialDefinitionRepository = credentialDefinitionRepository;
-        this.credentialPolicyRepository = credentialPolicyRepository;
-        this.applicationRepository = applicationRepository;
-        this.hashConfigRepository = hashConfigRepository;
-        this.organizationRepository = organizationRepository;
+    public CredentialDefinitionService(RepositoryCatalogue repositoryCatalogue) {
+        this.credentialDefinitionRepository = repositoryCatalogue.getCredentialDefinitionRepository();
+        this.credentialPolicyRepository = repositoryCatalogue.getCredentialPolicyRepository();
+        this.applicationRepository = repositoryCatalogue.getApplicationRepository();
+        this.hashConfigRepository = repositoryCatalogue.getHashConfigRepository();
+        this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
     }
 
     /**

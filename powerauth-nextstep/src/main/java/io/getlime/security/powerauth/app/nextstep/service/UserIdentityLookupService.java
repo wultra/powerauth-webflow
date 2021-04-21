@@ -18,8 +18,10 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.UserLookupCustomizationService;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserRoleStatus;
@@ -45,30 +47,22 @@ import java.util.stream.Collectors;
 @Service
 public class UserIdentityLookupService {
 
-    private final UserIdentityService userIdentityService;
     private final UserIdentityRepository userIdentityRepository;
     private final CredentialDefinitionRepository credentialDefinitionRepository;
     private final CredentialRepository credentialRepository;
-    private final UserLookupCustomizationService userLookupCustomizationService;
-    private final OperationPersistenceService operationPersistenceService;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Lookup service constructor.
-     * @param userIdentityService User identity service.
-     * @param userIdentityRepository User identity repository.
-     * @param credentialDefinitionRepository Credential definition repository.
-     * @param credentialRepository Credential repository.
-     * @param userLookupCustomizationService User identity customization service.
-     * @param operationPersistenceService Operation persistence service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public UserIdentityLookupService(@Lazy UserIdentityService userIdentityService, UserIdentityRepository userIdentityRepository, CredentialDefinitionRepository credentialDefinitionRepository, CredentialRepository credentialRepository, UserLookupCustomizationService userLookupCustomizationService, @Lazy OperationPersistenceService operationPersistenceService) {
-        this.userIdentityService = userIdentityService;
-        this.userIdentityRepository = userIdentityRepository;
-        this.credentialDefinitionRepository = credentialDefinitionRepository;
-        this.credentialRepository = credentialRepository;
-        this.userLookupCustomizationService = userLookupCustomizationService;
-        this.operationPersistenceService = operationPersistenceService;
+    public UserIdentityLookupService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        this.credentialDefinitionRepository = repositoryCatalogue.getCredentialDefinitionRepository();
+        this.credentialRepository = repositoryCatalogue.getCredentialRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -82,6 +76,7 @@ public class UserIdentityLookupService {
      */
     @Transactional
     public LookupUsersResponse lookupUsers(LookupUsersRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
         final String username = request.getUsername();
         final String credentialName = request.getCredentialName();
         Date createdStartDate = request.getCreatedStartDate();
@@ -191,6 +186,10 @@ public class UserIdentityLookupService {
      */
     @Transactional
     public LookupUserResponse lookupUser(LookupUserRequest request) throws InvalidRequestException, UserNotFoundException, InvalidConfigurationException, OperationNotFoundException, EncryptionException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final UserLookupCustomizationService userLookupCustomizationService = serviceCatalogue.getUserLookupCustomizationService();
+        final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
+
         final String username = request.getUsername();
         final String credentialName = request.getCredentialName();
         final String operationId = request.getOperationId();

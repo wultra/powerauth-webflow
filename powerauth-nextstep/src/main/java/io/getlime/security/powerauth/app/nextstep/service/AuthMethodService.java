@@ -21,10 +21,12 @@ import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -56,32 +58,20 @@ public class AuthMethodService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodService.class);
 
-    private final AuthMethodRepository authMethodRepository;
-    private final UserPrefsRepository userPrefsRepository;
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final StepDefinitionRepository stepDefinitionRepository;
-    private final OperationHistoryRepository operationHistoryRepository;
-    private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final RepositoryCatalogue repositoryCatalogue;
+    private final ServiceCatalogue serviceCatalogue;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Service constructor.
-     * @param authMethodRepository Authentication method repository.
-     * @param userPrefsRepository User preferences repository.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param stepDefinitionRepository Step definition repository.
-     * @param operationHistoryRepository Operation history repository.
-     * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, UserIdentityLookupService userIdentityLookupService, StepDefinitionRepository stepDefinitionRepository, OperationHistoryRepository operationHistoryRepository, @Lazy MobileTokenConfigurationService mobileTokenConfigurationService) {
-        this.authMethodRepository = authMethodRepository;
-        this.userPrefsRepository = userPrefsRepository;
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.stepDefinitionRepository = stepDefinitionRepository;
-        this.operationHistoryRepository = operationHistoryRepository;
-        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.repositoryCatalogue = repositoryCatalogue;
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -92,6 +82,7 @@ public class AuthMethodService {
      */
     @Transactional
     public CreateAuthMethodResponse createAuthMethod(CreateAuthMethodRequest request) throws AuthMethodAlreadyExistsException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
         final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
         if (authMethodOptional.isPresent()) {
             throw new AuthMethodAlreadyExistsException("Authentication method already exists: " + request.getAuthMethod());
@@ -129,6 +120,7 @@ public class AuthMethodService {
      */
     @Transactional
     public List<AuthMethodDetail> listAuthMethods() {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
         final List<AuthMethodDetail> allMethods = new ArrayList<>();
         final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         for (AuthMethodEntity authMethodEntity : authMethodList) {
@@ -147,6 +139,8 @@ public class AuthMethodService {
      */
     @Transactional
     public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) throws InvalidConfigurationException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final UserPrefsRepository userPrefsRepository = repositoryCatalogue.getUserPrefsRepository();
         final List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
         final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = null;
@@ -200,6 +194,8 @@ public class AuthMethodService {
      */
     @Transactional
     public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) throws InvalidConfigurationException, InvalidRequestException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final UserPrefsRepository userPrefsRepository = repositoryCatalogue.getUserPrefsRepository();
         final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
         // check whether this method supports modifications at all
@@ -266,6 +262,9 @@ public class AuthMethodService {
      */
     @Transactional
     public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws InvalidConfigurationException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final StepDefinitionRepository stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        final MobileTokenConfigurationService mobileTokenConfigurationService = serviceCatalogue.getMobileTokenConfigurationService();
         final String userId = request.getUserId();
         final String operationName = request.getOperationName();
         // Lookup user identity to obtain its status
@@ -311,6 +310,9 @@ public class AuthMethodService {
      */
     @Transactional
     public DeleteAuthMethodResponse deleteAuthMethod(DeleteAuthMethodRequest request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final StepDefinitionRepository stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        final OperationHistoryRepository operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
         final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
         if (!authMethodOptional.isPresent()) {
             throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());

@@ -24,8 +24,10 @@ import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepos
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.OperationCustomizationService;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
@@ -64,42 +66,24 @@ public class OperationPersistenceService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final IdGeneratorService idGeneratorService;
     private final OperationRepository operationRepository;
     private final OrganizationRepository organizationRepository;
     private final OperationHistoryRepository operationHistoryRepository;
-    private final MobileTokenConfigurationService mobileTokenConfigurationService;
-    private final StepResolutionService stepResolutionService;
     private final AuthenticationRepository authenticationRepository;
-    private final OperationCustomizationService operationCustomizationService;
-    private final PowerAuthOperationService powerAuthOperationService;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Service constructor.
-     * @param idGeneratorService              ID generator service.
-     * @param operationRepository             Operation repository.
-     * @param organizationRepository          Organization repository.
-     * @param operationHistoryRepository      Operation history repository.
-     * @param mobileTokenConfigurationService Mobile token configuration service.
-     * @param stepResolutionService           Step resolution service.
-     * @param authenticationRepository        Authentication repository.
-     * @param operationCustomizationService   Operation customization service.
-     * @param powerAuthOperationService       PowerAuth operation service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public OperationPersistenceService(IdGeneratorService idGeneratorService, OperationRepository operationRepository,
-                                       OrganizationRepository organizationRepository, OperationHistoryRepository operationHistoryRepository,
-                                       MobileTokenConfigurationService mobileTokenConfigurationService,
-                                       @Lazy StepResolutionService stepResolutionService, AuthenticationRepository authenticationRepository, OperationCustomizationService operationCustomizationService, PowerAuthOperationService powerAuthOperationService) {
-        this.idGeneratorService = idGeneratorService;
-        this.operationRepository = operationRepository;
-        this.organizationRepository = organizationRepository;
-        this.operationHistoryRepository = operationHistoryRepository;
-        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
-        this.stepResolutionService = stepResolutionService;
-        this.authenticationRepository = authenticationRepository;
-        this.operationCustomizationService = operationCustomizationService;
-        this.powerAuthOperationService = powerAuthOperationService;
+    public OperationPersistenceService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.operationRepository = repositoryCatalogue.getOperationRepository();
+        this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
+        this.operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
+        this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -111,6 +95,7 @@ public class OperationPersistenceService {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     public void createOperation(CreateOperationRequest request, CreateOperationResponse response) throws OrganizationNotFoundException {
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
         OperationEntity operation = new OperationEntity();
         operation.setOperationName(request.getOperationName());
         operation.setOperationData(request.getOperationData());
@@ -176,6 +161,7 @@ public class OperationPersistenceService {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     public UpdateOperationResponse updateOperation(UpdateOperationRequest request) throws OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationNotFoundException, OperationNotValidException, InvalidConfigurationException, InvalidRequestException, OrganizationNotFoundException {
+        final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
         // Resolve response based on dynamic step definitions
         final UpdateOperationResponse response = stepResolutionService.resolveNextStepResponse(request);
 
@@ -194,6 +180,9 @@ public class OperationPersistenceService {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
     private void updateOperation(UpdateOperationRequest request, UpdateOperationResponse response) throws OperationNotFoundException, OrganizationNotFoundException {
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+        final OperationCustomizationService operationCustomizationService = serviceCatalogue.getOperationCustomizationService();
+
         final Optional<OperationEntity> operationOptional = operationRepository.findById(response.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + response.getOperationId());
@@ -352,6 +341,7 @@ public class OperationPersistenceService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public void updateMobileToken(UpdateMobileTokenRequest request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
+        final MobileTokenConfigurationService mobileTokenConfigurationService = serviceCatalogue.getMobileTokenConfigurationService();
         final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -476,6 +466,7 @@ public class OperationPersistenceService {
      * @return Whether operation is a pending operation with an active PowerAuth token.
      */
     private boolean validateMobileTokenOperation(OperationEntity operation) {
+        final PowerAuthOperationService powerAuthOperationService = serviceCatalogue.getPowerAuthOperationService();
         final OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
             if (currentHistoryEntity.getPowerAuthOperationId() == null) {

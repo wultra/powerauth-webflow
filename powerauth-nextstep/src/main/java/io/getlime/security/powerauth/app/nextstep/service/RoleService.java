@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.converter.RoleConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.RoleDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
@@ -55,13 +56,12 @@ public class RoleService {
 
     /**
      * Role service constructor.
-     * @param roleRepository Role repository.
-     * @param userRoleRepository User role repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public RoleService(RoleRepository roleRepository, UserRoleRepository userRoleRepository) {
-        this.roleRepository = roleRepository;
-        this.userRoleRepository = userRoleRepository;
+    public RoleService(RepositoryCatalogue repositoryCatalogue) {
+        this.roleRepository = repositoryCatalogue.getRoleRepository();
+        this.userRoleRepository = repositoryCatalogue.getUserRoleRepository();
     }
 
     /**

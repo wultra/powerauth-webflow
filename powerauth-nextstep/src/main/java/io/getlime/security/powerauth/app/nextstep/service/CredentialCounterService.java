@@ -16,9 +16,11 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
@@ -29,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCounterRe
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -45,24 +48,18 @@ public class CredentialCounterService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialCounterService.class);
 
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final CredentialDefinitionService credentialDefinitionService;
-    private final CredentialService credentialService;
     private final CredentialRepository credentialRepository;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Credential counter service constructor.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param credentialDefinitionService Credential definition service.
-     * @param credentialService Credential service.
-     * @param credentialRepository Credential repository.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public CredentialCounterService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, CredentialRepository credentialRepository) {
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.credentialDefinitionService = credentialDefinitionService;
-        this.credentialService = credentialService;
-        this.credentialRepository = credentialRepository;
+    public CredentialCounterService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.credentialRepository = repositoryCatalogue.getCredentialRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -77,6 +74,10 @@ public class CredentialCounterService {
      */
     @Transactional
     public UpdateCounterResponse updateCredentialCounter(UpdateCounterRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidRequestException, CredentialNotActiveException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final CredentialEntity credential = credentialService.findActiveCredential(credentialDefinition, user);

@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.ApplicationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.ApplicationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ApplicationStatus;
@@ -55,11 +56,11 @@ public class ApplicationService {
 
     /**
      * Application service constructor.
-     * @param applicationRepository Application repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public ApplicationService(ApplicationRepository applicationRepository) {
-        this.applicationRepository = applicationRepository;
+    public ApplicationService(RepositoryCatalogue repositoryCatalogue) {
+        this.applicationRepository = repositoryCatalogue.getApplicationRepository();
     }
 
     /**

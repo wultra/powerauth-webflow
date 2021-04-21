@@ -16,8 +16,10 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -29,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperation
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -46,20 +49,17 @@ public class AuthMethodChangeService {
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodChangeService.class);
 
     private final OperationRepository operationRepository;
-    private final OperationPersistenceService operationPersistenceService;
-    private final MobileTokenConfigurationService mobileTokenConfigurationService;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Authentication change service constructor.
-     * @param operationRepository Operation repository.
-     * @param operationPersistenceService Operation persistence service.
-     * @param mobileTokenConfigurationService Mobile token configuration service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public AuthMethodChangeService(OperationRepository operationRepository, OperationPersistenceService operationPersistenceService, MobileTokenConfigurationService mobileTokenConfigurationService) {
-        this.operationRepository = operationRepository;
-        this.operationPersistenceService = operationPersistenceService;
-        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
+    public AuthMethodChangeService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.operationRepository = repositoryCatalogue.getOperationRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -105,6 +105,7 @@ public class AuthMethodChangeService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public UpdateOperationResponse setChosenAuthMethod(UpdateOperationRequest request, UpdateOperationResponse response) throws InvalidConfigurationException, OperationNotFoundException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         logger.info("Set chosen authentication method started for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         final String operationId = request.getOperationId();
         final AuthMethod targetAuthMethod = request.getTargetAuthMethod();
@@ -149,6 +150,7 @@ public class AuthMethodChangeService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private UpdateOperationResponse enableMobileToken(UpdateOperationResponse response, OperationEntity operation) throws InvalidConfigurationException {
+        final MobileTokenConfigurationService mobileTokenConfigurationService = serviceCatalogue.getMobileTokenConfigurationService();
         logger.info("Enable mobile token started for operation ID: {}", operation.getOperationId());
         final String userId = operation.getUserId();
         if (userId == null) {

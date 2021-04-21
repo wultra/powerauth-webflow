@@ -20,6 +20,7 @@ import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationMethodConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationConfigEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationMethodConfigEntity;
@@ -49,17 +50,14 @@ public class OperationConfigurationService {
 
     /**
      * Service constructor.
-     * @param operationConfigRepository Operation configuration repository.
-     * @param operationMethodConfigRepository Operation and authentication method configuration repository.
-     * @param operationRepository Operation repository.
-     * @param authMethodRepository Authentication method repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public OperationConfigurationService(OperationConfigRepository operationConfigRepository, OperationMethodConfigRepository operationMethodConfigRepository, OperationRepository operationRepository, AuthMethodRepository authMethodRepository) {
-        this.operationConfigRepository = operationConfigRepository;
-        this.operationMethodConfigRepository = operationMethodConfigRepository;
-        this.operationRepository = operationRepository;
-        this.authMethodRepository = authMethodRepository;
+    public OperationConfigurationService(RepositoryCatalogue repositoryCatalogue) {
+        this.operationConfigRepository = repositoryCatalogue.getOperationConfigRepository();
+        this.operationMethodConfigRepository = repositoryCatalogue.getOperationMethodConfigRepository();
+        this.operationRepository = repositoryCatalogue.getOperationRepository();
+        this.authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
     }
 
     /**

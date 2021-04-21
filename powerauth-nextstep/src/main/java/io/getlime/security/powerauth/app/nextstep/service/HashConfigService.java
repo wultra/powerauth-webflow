@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.HashConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.HashConfigRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.HashConfigEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.HashConfigDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.HashConfigStatus;
@@ -54,17 +55,17 @@ public class HashConfigService {
     private final Logger logger = LoggerFactory.getLogger(HashConfigService.class);
 
     private final HashConfigRepository hashConfigRepository;
-    private final HashConfigConverter hashConfigConverter = new HashConfigConverter();
 
+    private final HashConfigConverter hashConfigConverter = new HashConfigConverter();
     private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Hashing configuration service constructor.
-     * @param hashConfigRepository Hashing configuration repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public HashConfigService(HashConfigRepository hashConfigRepository) {
-        this.hashConfigRepository = hashConfigRepository;
+    public HashConfigService(RepositoryCatalogue repositoryCatalogue) {
+        this.hashConfigRepository = repositoryCatalogue.getHashConfigRepository();
     }
 
     /**
