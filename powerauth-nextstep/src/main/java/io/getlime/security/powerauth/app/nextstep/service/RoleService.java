@@ -25,7 +25,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleAlreadyExi
 import io.getlime.security.powerauth.lib.nextstep.model.exception.RoleNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateRoleRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteRoleRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetRoleListRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateRoleResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteRoleResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetRoleListResponse;
@@ -89,11 +88,10 @@ public class RoleService {
 
     /**
      * Get list of roles.
-     * @param request Get role list request.
      * @return Get role list response.
      */
     @Transactional
-    public GetRoleListResponse getRoleList(GetRoleListRequest request) {
+    public GetRoleListResponse getRoleList() {
         final Iterable<RoleEntity> roles = roleRepository.findAll();
         final GetRoleListResponse response = new GetRoleListResponse();
         for (RoleEntity role : roles) {

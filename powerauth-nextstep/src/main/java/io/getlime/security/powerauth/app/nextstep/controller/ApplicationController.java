@@ -31,10 +31,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateApplicati
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -45,6 +43,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("application")
+@Validated
 public class ApplicationController {
 
     private static final Logger logger = LoggerFactory.getLogger(ApplicationController.class);
@@ -104,14 +103,29 @@ public class ApplicationController {
 
     /**
      * Get application list.
+     * @param includeRemoved Whether removed applications should be included.
+     * @return Get application list response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam boolean includeRemoved) {
+        logger.info("Received getApplicationList request");
+        GetApplicationListRequest request = new GetApplicationListRequest();
+        request.setIncludeRemoved(includeRemoved);
+        final GetApplicationListResponse response = applicationService.getApplicationList(request);
+        logger.info("The getApplicationList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get application list using POST method.
      * @param request Get application list request.
      * @return Get application list response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetApplicationListResponse> getApplicationList(@Valid @RequestBody ObjectRequest<GetApplicationListRequest> request) {
-        logger.info("Received getApplicationList request");
+    public ObjectResponse<GetApplicationListResponse> getApplicationListPost(@Valid @RequestBody ObjectRequest<GetApplicationListRequest> request) {
+        logger.info("Received getApplicationListPost request");
         final GetApplicationListResponse response = applicationService.getApplicationList(request.getRequestObject());
-        logger.info("The getApplicationList request succeeded");
+        logger.info("The getApplicationListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

@@ -25,9 +25,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 /**
  * REST controller for OTP management.
@@ -36,6 +40,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("otp")
+@Validated
 public class OtpController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpController.class);
@@ -103,16 +108,56 @@ public class OtpController {
 
     /**
      * Get OTP list for an operation.
+     * @param operationId Operation ID.
+     * @param includeRemoved Whether removed OTPs should be included.
+     * @return Get OTP list response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getOptList request, operation ID: {}", operationId);
+        GetOtpListRequest request = new GetOtpListRequest();
+        request.setOperationId(operationId);
+        request.setIncludeRemoved(includeRemoved);
+        final GetOtpListResponse response = otpService.getOtpList(request);
+        logger.info("The getOptList request succeeded, operation ID: {}", operationId);
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get OTP list for an operation using POST method.
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpListResponse> getOptList(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
-        logger.info("Received getOptList request, operation ID: {}", request.getRequestObject().getOperationId());
+    public ObjectResponse<GetOtpListResponse> getOptListPost(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getOptListPost request, operation ID: {}", request.getRequestObject().getOperationId());
         final GetOtpListResponse response = otpService.getOtpList(request.getRequestObject());
-        logger.info("The getOptList request succeeded, operation ID: {}", request.getRequestObject().getOperationId());
+        logger.info("The getOptListPost request succeeded, operation ID: {}", request.getRequestObject().getOperationId());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get OTP detail for an OTP or operation.
+     * @param otpId OTP ID, use null if operation ID should be used instead.
+     * @param operationId Operation ID, use null if OTP ID should be used instead.
+     * @return Get OTP detail response.
+     * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OtpNotFoundException Thrown when OTP is not found.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    @RequestMapping(value = "detail", method = RequestMethod.GET)
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestParam @Nullable @Size(min = 36, max = 36) String otpId, @RequestParam @Nullable @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getOtpDetail request, OTP ID: {}, operation ID: {}", otpId, operationId);
+        GetOtpDetailRequest request = new GetOtpDetailRequest();
+        request.setOtpId(otpId);
+        request.setOperationId(operationId);
+        final GetOtpDetailResponse response = otpService.getOtpDetail(request);
+        logger.info("The getOtpDetail request succeeded, OTP ID: {}, operation ID: {}", otpId, operationId);
         return new ObjectResponse<>(response);
     }
 
@@ -126,10 +171,10 @@ public class OtpController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
-        logger.info("Received getOtpDetail request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
+    public ObjectResponse<GetOtpDetailResponse> getOtpDetailPost(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getOtpDetailPost request, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         final GetOtpDetailResponse response = otpService.getOtpDetail(request.getRequestObject());
-        logger.info("The getOtpDetail request succeeded, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
+        logger.info("The getOtpDetailPost request succeeded, OTP ID: {}, operation ID: {}", request.getRequestObject().getOtpId(), request.getRequestObject().getOperationId());
         return new ObjectResponse<>(response);
     }
 

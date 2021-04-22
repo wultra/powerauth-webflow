@@ -25,12 +25,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * REST controller for user identities.
@@ -39,6 +41,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("user")
+@Validated
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -131,6 +134,30 @@ public class UserController {
 
     /**
      * Get user identity detail.
+     * @param userId User ID.
+     * @param credentialName Credential definition name in case response should only include specific credential.
+     * @param includeRemoved Whether removed objects should be included.
+     * @return Get user detail response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
+     * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
+     */
+    @RequestMapping(value = "detail", method = RequestMethod.GET)
+    public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable @Size(min = 2, max = 256) String credentialName, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
+        GetUserDetailRequest request = new GetUserDetailRequest();
+        request.setUserId(userId);
+        request.setCredentialName(credentialName);
+        request.setIncludeRemoved(includeRemoved);
+        logger.debug("Received getUserDetail request, user ID: {}", userId);
+        final GetUserDetailResponse response = userIdentityService.getUserDetail(request);
+        logger.debug("The getUserDetail request succeeded, user ID: {}", userId);
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get user identity detail using POST method.
      * @param request Get user detail request.
      * @return Get user detail response.
      * @throws UserNotFoundException Thrown when user identity is not found.
@@ -140,10 +167,10 @@ public class UserController {
      * @throws CredentialDefinitionNotFoundException Thrown when credential definition is not found.
      */
     @RequestMapping(value = "detail", method = RequestMethod.POST)
-    public ObjectResponse<GetUserDetailResponse> getUserDetail(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
-        logger.debug("Received getUserDetail request, user ID: {}", request.getRequestObject().getUserId());
+    public ObjectResponse<GetUserDetailResponse> getUserDetailPost(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
+        logger.debug("Received getUserDetailPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserDetailResponse response = userIdentityService.getUserDetail(request.getRequestObject());
-        logger.debug("The getUserDetail request succeeded, user ID: {}", request.getRequestObject().getUserId());
+        logger.debug("The getUserDetailPost request succeeded, user ID: {}", request.getRequestObject().getUserId());
         return new ObjectResponse<>(response);
     }
 
@@ -259,15 +286,31 @@ public class UserController {
 
     /**
      * Get list of contacts for a user identity.
+     * @param userId User ID.
+     * @return Get user contact list response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     */
+    @RequestMapping(value = "contact", method = RequestMethod.GET)
+    public ObjectResponse<GetUserContactListResponse> getUserContactList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId) throws UserNotFoundException {
+        logger.info("Received getUserContactList request, user ID: {}", userId);
+        GetUserContactListRequest request = new GetUserContactListRequest();
+        request.setUserId(userId);
+        final GetUserContactListResponse response = userContactService.getUserContactList(request);
+        logger.info("The getUserContactList request succeeded, user ID: {}, contact list size: {}", userId, response.getContacts().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get list of contacts for a user identity using POST method.
      * @param request Get user contact list request.
      * @return Get user contact list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      */
     @RequestMapping(value = "contact/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserContactListResponse> getUserContactList(@Valid @RequestBody ObjectRequest<GetUserContactListRequest> request) throws UserNotFoundException {
-        logger.info("Received getUserContactList request, user ID: {}", request.getRequestObject().getUserId());
+    public ObjectResponse<GetUserContactListResponse> getUserContactListPost(@Valid @RequestBody ObjectRequest<GetUserContactListRequest> request) throws UserNotFoundException {
+        logger.info("Received getUserContactListPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserContactListResponse response = userContactService.getUserContactList(request.getRequestObject());
-        logger.info("The getUserContactList request succeeded, user ID: {}, contact list size: {}", request.getRequestObject().getUserId(), response.getContacts().size());
+        logger.info("The getUserContactListPost request succeeded, user ID: {}, contact list size: {}", request.getRequestObject().getUserId(), response.getContacts().size());
         return new ObjectResponse<>(response);
     }
 
@@ -334,16 +377,35 @@ public class UserController {
 
     /**
      * Get alias list for a user identity.
+     * @param userId User ID.
+     * @param includeRemoved Whether removed aliases should be included.
+     * @return Get user alias list response.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     */
+    @RequestMapping(value = "alias", method = RequestMethod.GET)
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws InvalidRequestException, UserNotFoundException {
+        logger.info("Received getUserAliasList request, user ID: {}", userId);
+        GetUserAliasListRequest request = new GetUserAliasListRequest();
+        request.setUserId(userId);
+        request.setIncludeRemoved(includeRemoved);
+        final GetUserAliasListResponse response = userAliasService.getUserAliasList(request);
+        logger.info("The getUserAliasList request succeeded, user ID: {}, alias list size: {}", userId, response.getAliases().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get alias list for a user identity using POST method.
      * @param request Get user alias list request.
      * @return Get user alias list response.
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws UserNotFoundException Thrown when user identity is not found.
      */
     @RequestMapping(value = "alias/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@Valid @RequestBody ObjectRequest<GetUserAliasListRequest> request) throws InvalidRequestException, UserNotFoundException {
-        logger.info("Received getUserAliasList request, user ID: {}", request.getRequestObject().getUserId());
+    public ObjectResponse<GetUserAliasListResponse> getUserAliasListPost(@Valid @RequestBody ObjectRequest<GetUserAliasListRequest> request) throws InvalidRequestException, UserNotFoundException {
+        logger.info("Received getUserAliasListPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserAliasListResponse response = userAliasService.getUserAliasList(request.getRequestObject());
-        logger.info("The getUserAliasList request succeeded, user ID: {}, alias list size: {}", request.getRequestObject().getUserId(), response.getAliases().size());
+        logger.info("The getUserAliasListPost request succeeded, user ID: {}, alias list size: {}", request.getRequestObject().getUserId(), response.getAliases().size());
         return new ObjectResponse<>(response);
     }
 
@@ -396,6 +458,26 @@ public class UserController {
 
     /**
      * Get credential list for a user identity.
+     * @param userId User ID.
+     * @param includeRemoved Whether removed credentials should be included.
+     * @return Get user credential list response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws EncryptionException Thrown when decryption fails.
+     */
+    @RequestMapping(value = "credential", method = RequestMethod.GET)
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getUserCredentialList request, user ID: {}", userId);
+        GetUserCredentialListRequest request = new GetUserCredentialListRequest();
+        request.setUserId(userId);
+        request.setIncludeRemoved(includeRemoved);
+        final GetUserCredentialListResponse response = credentialService.getCredentialList(request);
+        logger.info("The getUserCredentialList request succeeded, user ID: {}, credential list size: {}", userId, response.getCredentials().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get credential list for a user identity using POST method.
      * @param request Get user credential list request.
      * @return Get user credential list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
@@ -403,24 +485,44 @@ public class UserController {
      * @throws EncryptionException Thrown when decryption fails.
      */
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
-        logger.info("Received getUserCredentialList request, user ID: {}", request.getRequestObject().getUserId());
+    public ObjectResponse<GetUserCredentialListResponse> getUserCredentialListPost(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        logger.info("Received getUserCredentialListPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserCredentialListResponse response = credentialService.getCredentialList(request.getRequestObject());
-        logger.info("The getUserCredentialList request succeeded, user ID: {}, credential list size: {}", request.getRequestObject().getUserId(), response.getCredentials().size());
+        logger.info("The getUserCredentialListPost request succeeded, user ID: {}, credential list size: {}", request.getRequestObject().getUserId(), response.getCredentials().size());
         return new ObjectResponse<>(response);
     }
 
     /**
-     * Get authentication list for a user identity.
+     * Get authentication list for a user identity using.
+     * @param userId User ID.
+     * @param createdStartDate Credential start date.
+     * @param createdEndDate Credential end date.
+     * @return Get user authentication list response.
+     * @throws UserNotFoundException Thrown when user identity is not found.
+     */
+    @RequestMapping(value = "authentication", method = RequestMethod.GET)
+    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable Date createdStartDate, @RequestParam @Nullable Date createdEndDate) throws UserNotFoundException {
+        logger.info("Received getUserAuthenticationList request, user ID: {}", userId);
+        GetUserAuthenticationListRequest request = new GetUserAuthenticationListRequest();
+        request.setUserId(userId);
+        request.setCreatedStartDate(createdStartDate);
+        request.setCreatedEndDate(createdEndDate);
+        final GetUserAuthenticationListResponse response = authenticationService.getUserAuthenticationList(request);
+        logger.info("The getUserAuthenticationList request succeeded, user ID: {}, authentication list size: {}", userId, response.getAuthentications().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get authentication list for a user identity using POST method.
      * @param request Get user authentication list request.
      * @return Get user authentication list response.
      * @throws UserNotFoundException Thrown when user identity is not found.
      */
     @RequestMapping(value = "authentication/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@Valid @RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) throws UserNotFoundException {
-        logger.info("Received getUserAuthenticationList request, user ID: {}", request.getRequestObject().getUserId());
+    public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationListPost(@Valid @RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) throws UserNotFoundException {
+        logger.info("Received getUserAuthenticationListPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserAuthenticationListResponse response = authenticationService.getUserAuthenticationList(request.getRequestObject());
-        logger.info("The getUserAuthenticationList request succeeded, user ID: {}, authentication list size: {}", request.getRequestObject().getUserId(), response.getAuthentications().size());
+        logger.info("The getUserAuthenticationListPost request succeeded, user ID: {}, authentication list size: {}", request.getRequestObject().getUserId(), response.getAuthentications().size());
         return new ObjectResponse<>(response);
     }
 
