@@ -95,12 +95,13 @@ public class CredentialCounterController {
     }
 
     /**
-     * Reset all soft counters.
+     * Reset all soft failed attempt counters.
      * @param request Rest counters request.
      * @return Reset counters response.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "reset-all", method = RequestMethod.POST)
-    public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) {
+    public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) throws InvalidRequestException {
         logger.info("Received resetAllCounters request");
         final ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
         logger.info("The resetAllCounters request succeeded");
