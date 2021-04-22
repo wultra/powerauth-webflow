@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -49,10 +51,26 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, S
     Optional<CredentialEntity> findByCredentialDefinitionAndUsername(CredentialDefinitionEntity credentialDefinition, String username);
 
     /**
-     * Find all credentials by credential status.
-     * @param status Credential status.
-     * @return Credentials with given status.
+     * Reset soft failed attempt counters for credentials in BLOCKED_TEMPORARY status and change credential status to ACTIVE.
+     * @return Count of updated credentials.
      */
-    List<CredentialEntity> findAllByStatus(CredentialStatus status);
+    @Modifying
+    @Query("UPDATE CredentialEntity c SET " +
+            "c.status = io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus.ACTIVE, " +
+            "c.failedAttemptCounterSoft = 0, " +
+            "c.timestampBlocked = null " +
+            "WHERE c.status = io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus.BLOCKED_TEMPORARY")
+    int resetSoftFailedCountersForBlockedTemporaryStatus();
+
+    /**
+     * Reset soft failed attempt counters for credentials in ACTIVE status.
+     * @return Count of updated credentials.
+     */
+    @Modifying
+    @Query("UPDATE CredentialEntity c SET " +
+            "c.failedAttemptCounterSoft = 0 " +
+            "WHERE c.status = io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialStatus.ACTIVE " +
+            "AND c.failedAttemptCounterSoft <> 0")
+    int resetSoftFailedCountersForActiveStatus();
 
 }

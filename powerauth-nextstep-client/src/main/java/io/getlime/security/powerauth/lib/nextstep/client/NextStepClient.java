@@ -1803,8 +1803,7 @@ public class NextStepClient {
      * @return Reset counters response.
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
-    public ObjectResponse<ResetCountersResponse> resetAllCounters() throws NextStepClientException {
-        ResetCountersRequest request = new ResetCountersRequest();
+    public ObjectResponse<ResetCountersResponse> resetAllCounters(ResetCountersRequest request) throws NextStepClientException {
         return postObjectImpl("/credential/counter/reset-all", new ObjectRequest<>(request), ResetCountersResponse.class);
     }
 

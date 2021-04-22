@@ -25,10 +25,12 @@ import io.getlime.security.powerauth.crypto.lib.util.KeyConvertor;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CounterResetMode;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.CredentialNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotActiveException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUsersRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.junit.Assert;
@@ -126,7 +128,9 @@ public class NextStepAuthenticationTest extends NextStepTest {
         GetUserCredentialListResponse ru1 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
         assertEquals(CredentialStatus.BLOCKED_TEMPORARY, ru1.getCredentials().get(0).getCredentialStatus());
         // Reset soft counters to be able to verify hard block later
-        nextStepClient.resetAllCounters();
+        ResetCountersRequest resetCountersRequest = new ResetCountersRequest();
+        resetCountersRequest.setResetMode(CounterResetMode.RESET_BLOCKED_TEMPORARY);
+        nextStepClient.resetAllCounters(resetCountersRequest);
         CreateOtpResponse r3 = nextStepClient.createOtp("test_user_1", "TEST_OTP", "TEST_CREDENTIAL", "TEST_DATA").getResponseObject();
         assertEquals(OtpStatus.ACTIVE, r3.getOtpStatus());
         GetUserCredentialListResponse ru2 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
@@ -468,13 +472,29 @@ public class NextStepAuthenticationTest extends NextStepTest {
     }
 
     @Test
-    public void testSoftCounterReset() throws NextStepClientException {
+    public void testSoftCounterResetActive() throws NextStepClientException {
+        nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.FAILED);
+        nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.FAILED);
+        GetUserCredentialListResponse r1 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
+        assertEquals(CredentialStatus.ACTIVE, r1.getCredentials().get(0).getCredentialStatus());
+        ResetCountersRequest resetCountersRequest = new ResetCountersRequest();
+        resetCountersRequest.setResetMode(CounterResetMode.RESET_ACTIVE_AND_BLOCKED_TEMPORARY);
+        ResetCountersResponse r2 = nextStepClient.resetAllCounters(resetCountersRequest).getResponseObject();
+        assertEquals(1, r2.getResetCounterCount());
+        GetUserCredentialListResponse r3 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
+        assertEquals(CredentialStatus.ACTIVE, r3.getCredentials().get(0).getCredentialStatus());
+    }
+
+    @Test
+    public void testSoftCounterResetWithUnblock() throws NextStepClientException {
         nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.FAILED);
         nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.FAILED);
         nextStepClient.updateCredentialCounter("test_user_1", "TEST_CREDENTIAL", AuthenticationResult.FAILED);
         GetUserCredentialListResponse r1 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
         assertEquals(CredentialStatus.BLOCKED_TEMPORARY, r1.getCredentials().get(0).getCredentialStatus());
-        ResetCountersResponse r2 = nextStepClient.resetAllCounters().getResponseObject();
+        ResetCountersRequest resetCountersRequest = new ResetCountersRequest();
+        resetCountersRequest.setResetMode(CounterResetMode.RESET_BLOCKED_TEMPORARY);
+        ResetCountersResponse r2 = nextStepClient.resetAllCounters(resetCountersRequest).getResponseObject();
         assertEquals(1, r2.getResetCounterCount());
         GetUserCredentialListResponse r3 = nextStepClient.getUserCredentialList("test_user_1", false).getResponseObject();
         assertEquals(CredentialStatus.ACTIVE, r3.getCredentials().get(0).getCredentialStatus());

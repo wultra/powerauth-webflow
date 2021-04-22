@@ -13,22 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.request;
-
-import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CounterResetMode;
-import lombok.Data;
-
-import javax.validation.constraints.NotNull;
+package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 
 /**
- * Request object used for resetting soft failed attempt counters.
+ * Enum representing modes for resetting soft failed attempt counters.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Data
-public class ResetCountersRequest {
+public enum CounterResetMode {
 
-    @NotNull
-    private CounterResetMode resetMode;
+    /**
+     * Reset soft failed attempt counters for credentials with BLOCKED_TEMPORARY status, change status to ACTIVE.
+     */
+    RESET_BLOCKED_TEMPORARY,
+
+    /**
+     * Reset soft failed attempt counters for credentials with ACTIVE and BLOCKED_TEMPORARY statuses, change status to ACTIVE if required.
+     */
+    RESET_ACTIVE_AND_BLOCKED_TEMPORARY,
 
 }
