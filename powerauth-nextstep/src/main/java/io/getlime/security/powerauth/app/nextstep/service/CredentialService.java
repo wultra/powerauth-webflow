@@ -209,7 +209,7 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
-        if (request.getUsername() != null && !request.getUsername().equals(username)) {
+        if (request.getUsername() != null && !request.getUsername().equals(credential.getUsername())) {
             credential.setUsername(username);
             credential.setTimestampLastUsernameChange(new Date());
         }
