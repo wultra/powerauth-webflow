@@ -209,8 +209,9 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
-        if (request.getUsername() != null) {
+        if (request.getUsername() != null && !request.getUsername().equals(username)) {
             credential.setUsername(username);
+            credential.setTimestampLastUsernameChange(new Date());
         }
         if (request.getCredentialValue() != null) {
             final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
@@ -625,6 +626,7 @@ public class CredentialService {
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credential.setTimestampLastCredentialChange(new Date());
+        credential.setTimestampLastUsernameChange(new Date());
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
@@ -663,6 +665,7 @@ public class CredentialService {
         credentialDetail.setTimestampExpires(credential.getTimestampExpires());
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
+        credentialDetail.setTimestampLastUsernameChange(credential.getTimestampLastUsernameChange());
         return credentialDetail;
     }
 
