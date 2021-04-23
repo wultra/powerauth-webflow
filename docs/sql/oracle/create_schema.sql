@@ -611,7 +611,8 @@ CREATE UNIQUE INDEX ns_credential_definition_name ON ns_credential_definition (n
 CREATE UNIQUE INDEX ns_otp_definition_name ON ns_otp_definition (name);
 CREATE INDEX ns_credential_storage_user_id ON ns_credential_storage (user_id);
 CREATE INDEX ns_credential_storage_status ON ns_credential_storage (status);
-CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (credential_definition_id, user_name);
+CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (CASE WHEN user_name IS NOT NULL THEN credential_definition_id || '&' || user_name END);
+CREATE INDEX ns_credential_storage_query1_perf ON ns_credential_storage (credential_definition_id, user_name);
 CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_id, credential_definition_id);
 CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
 CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
