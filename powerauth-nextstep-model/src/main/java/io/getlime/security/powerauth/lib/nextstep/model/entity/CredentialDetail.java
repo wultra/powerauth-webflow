@@ -51,5 +51,6 @@ public class CredentialDetail {
     private Date timestampBlocked;
     private Date timestampLastUpdated;
     private Date timestampLastCredentialChange;
+    private Date timestampLastUsernameChange;
 
 }
