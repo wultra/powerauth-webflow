@@ -36,6 +36,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This service handles user identity lookup.
@@ -123,13 +124,14 @@ public class UserIdentityLookupService {
             }
         } else if (credentialName != null && credentialStatus != null) {
             // When credentialName and credentialStatus are present, lookup the user identities, multiple or zero results are found
-            final List<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus);
-            for (CredentialEntity credential: credentialEntities) {
-                lookupResult.add(credential.getUser());
+            List<UserIdentityEntity> lookupResultTemp = new ArrayList<>();
+            try (final Stream<CredentialEntity> credentialEntities = credentialRepository.findAllByCredentialDefinitionAndStatus(credentialDefinition, credentialStatus)) {
+                credentialEntities.forEach(credential -> lookupResultTemp.add(credential.getUser()));
             }
+            lookupResult = lookupResultTemp;
         } else if (createdStartDate != null && credentialStatus == null) {
             // Lookup the user identities by createdDate, multiple or zero results are found, credentialStatus filter is not allowed
-            lookupResult = userIdentityRepository.findUserIdentitiesByCreatedDate(createdStartDate, createdEndDate);
+            lookupResult = userIdentityRepository.findUserIdentitiesByCreatedDate(createdStartDate, createdEndDate).collect(Collectors.toList());
             dateFiltered = true;
         } else {
             throw new InvalidRequestException("The lookup query contains an invalid combination of parameters");

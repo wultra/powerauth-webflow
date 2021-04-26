@@ -21,7 +21,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpSt
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of one time passwords.
@@ -32,18 +33,26 @@ import java.util.List;
 public interface OtpRepository extends CrudRepository<OtpEntity, String> {
 
     /**
-     * Find OTP entities by user identity.
+     * Find OTP entities by user identity and status.
      * @param userId User identity entity.
+     * @param status OTP status.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByUserId(String userId);
+    Stream<OtpEntity> findAllByUserIdAndStatus(String userId, OtpStatus status);
 
     /**
      * Find OTP entities by operation.
      * @param operationEntity Operation entity.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
+    Stream<OtpEntity> findAllByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
+
+    /**
+     * Find OTP entity by operation.
+     * @param operationEntity Operation entity.
+     * @return Optional OTP entity.
+     */
+    Optional<OtpEntity> findFirstByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
 
     /**
      * Find OTP entities by operation and status.
@@ -51,6 +60,6 @@ public interface OtpRepository extends CrudRepository<OtpEntity, String> {
      * @param status OTP status.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByOperationAndStatus(OperationEntity operationEntity, OtpStatus status);
+    Stream<OtpEntity> findAllByOperationAndStatus(OperationEntity operationEntity, OtpStatus status);
 
 }

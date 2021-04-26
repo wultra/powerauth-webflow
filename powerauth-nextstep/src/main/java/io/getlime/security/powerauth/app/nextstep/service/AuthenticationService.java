@@ -43,6 +43,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This service handles user authentication.
@@ -632,7 +633,7 @@ public class AuthenticationService {
     @Transactional
     public GetUserAuthenticationListResponse getUserAuthenticationList(GetUserAuthenticationListRequest request) throws UserNotFoundException {
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
-        final List<AuthenticationEntity> authentications;
+        final Stream<AuthenticationEntity> authentications;
         if (request.getCreatedStartDate() == null && request.getCreatedEndDate() == null) {
             authentications = authenticationRepository.findAllByUserIdOrderByTimestampCreatedDesc(user.getUserId());
         }  else {
@@ -652,10 +653,11 @@ public class AuthenticationService {
         }
         final GetUserAuthenticationListResponse response = new GetUserAuthenticationListResponse();
         response.setUserId(user.getUserId());
-        for (AuthenticationEntity authentication: authentications) {
+        authentications.forEach(authentication -> {
             final AuthenticationDetail authenticationDetail = authenticationConverter.fromEntity(authentication);
             response.getAuthentications().add(authenticationDetail);
-        }
+        });
+        authentications.close();
         return response;
     }
 

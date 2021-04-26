@@ -23,8 +23,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of credentials.
@@ -40,7 +40,7 @@ public interface CredentialRepository extends CrudRepository<CredentialEntity, S
      * @param status Credential status.
      * @return Credentials matching query criteria.
      */
-    List<CredentialEntity> findAllByCredentialDefinitionAndStatus(CredentialDefinitionEntity credentialDefinition, CredentialStatus status);
+    Stream<CredentialEntity> findAllByCredentialDefinitionAndStatus(CredentialDefinitionEntity credentialDefinition, CredentialStatus status);
 
     /**
      * Find credential by credential name and username.
