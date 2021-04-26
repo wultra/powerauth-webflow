@@ -22,7 +22,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of audit logs.
@@ -36,9 +36,9 @@ public interface AuditLogRepository extends CrudRepository<AuditLogEntity, Long>
      * Find audit logs with specified created date.
      * @param startDate Start of interval for created date.
      * @param endDate End of interval for created date.
-     * @return List of audit logs.
+     * @return Stream of audit logs.
      */
     @Query(value = "from AuditLogEntity a where a.timestampCreated BETWEEN :startDate AND :endDate")
-    List<AuditLogEntity> findAuditLogsByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    Stream<AuditLogEntity> findAuditLogsByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

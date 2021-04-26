@@ -618,6 +618,7 @@ CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_
 CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
 CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
 CREATE INDEX ns_otp_storage_user_id ON ns_otp_storage (user_id);
+CREATE INDEX ns_otp_storage_user_id_status ON ns_otp_storage (user_id, status);
 CREATE INDEX ns_otp_storage_operation_id ON ns_otp_storage (operation_id);
 CREATE INDEX ns_authentication_user_id ON ns_authentication (user_id);
 CREATE INDEX ns_authentication_operation_id ON ns_authentication (operation_id);

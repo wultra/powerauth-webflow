@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of user identities.
@@ -33,12 +34,19 @@ import java.util.List;
 public interface UserIdentityRepository extends CrudRepository<UserIdentityEntity, String> {
 
     /**
+     * Find user identities by their identifiers.
+     * @param userIds User IDs.
+     * @return Stream of user identities.
+     */
+    Stream<UserIdentityEntity> findAllByUserIdIn(List<String> userIds);
+
+    /**
      * Find user identities with given created date.
      * @param startDate Start of interval for created date.
      * @param endDate End of interval for created date.
-     * @return List of user identities.
+     * @return Stream of user identities.
      */
     @Query(value = "from UserIdentityEntity u where u.timestampCreated BETWEEN :startDate AND :endDate")
-    List<UserIdentityEntity> findUserIdentitiesByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    Stream<UserIdentityEntity> findUserIdentitiesByCreatedDate(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

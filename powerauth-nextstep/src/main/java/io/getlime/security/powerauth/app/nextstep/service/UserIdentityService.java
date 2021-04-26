@@ -39,6 +39,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This service handles persistence of user identities.
@@ -387,17 +388,18 @@ public class UserIdentityService {
      */
     @Transactional
     public UpdateUsersResponse updateUsers(UpdateUsersRequest request) throws UserNotFoundException {
-        final Iterable<UserIdentityEntity> users = userIdentityRepository.findAllById(request.getUserIds());
         final List<String> updatedUserIds = new ArrayList<>();
-        for (UserIdentityEntity user: users) {
-            if (user.getStatus() != request.getUserIdentityStatus()) {
-                user.setStatus(request.getUserIdentityStatus());
-                user.setTimestampLastUpdated(new Date());
-                // Save user identity and a snapshot to the history table
-                updateUserIdentityHistory(user);
-                user = userIdentityRepository.save(user);
-            }
-            updatedUserIds.add(user.getUserId());
+        try (final Stream<UserIdentityEntity> users = userIdentityRepository.findAllByUserIdIn(request.getUserIds())) {
+            users.forEach(user -> {
+                if (user.getStatus() != request.getUserIdentityStatus()) {
+                    user.setStatus(request.getUserIdentityStatus());
+                    user.setTimestampLastUpdated(new Date());
+                    // Save user identity and a snapshot to the history table
+                    updateUserIdentityHistory(user);
+                    user = userIdentityRepository.save(user);
+                }
+                updatedUserIds.add(user.getUserId());
+            });
         }
         if (updatedUserIds.isEmpty()) {
             throw new UserNotFoundException("No user identity found for update");
@@ -642,13 +644,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllOtps(UserIdentityEntity user) {
-        final List<OtpEntity> otps = otpRepository.findAllByUserId(user.getUserId());
-        otps.forEach(otp -> {
-            if (otp.getStatus() != OtpStatus.REMOVED) {
-                otp.setStatus(OtpStatus.REMOVED);
-                otpRepository.save(otp);
-            }
-        });
+        otpRepository.removeOtpsForUserId(user.getUserId());
     }
 
 }
