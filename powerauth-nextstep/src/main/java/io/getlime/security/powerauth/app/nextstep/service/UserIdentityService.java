@@ -644,26 +644,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllOtps(UserIdentityEntity user) {
-        List<OtpEntity> removedOtps = new ArrayList<>();
-        try (final Stream<OtpEntity> activeOtps = otpRepository.findAllByUserIdAndStatus(user.getUserId(), OtpStatus.ACTIVE)) {
-            activeOtps.forEach(otp -> {
-                otp.setStatus(OtpStatus.REMOVED);
-                removedOtps.add(otp);
-            });
-        }
-        try (final Stream<OtpEntity> usedOtps = otpRepository.findAllByUserIdAndStatus(user.getUserId(), OtpStatus.USED)) {
-            usedOtps.forEach(otp -> {
-                otp.setStatus(OtpStatus.REMOVED);
-                removedOtps.add(otp);
-            });
-        }
-        try (final Stream<OtpEntity> blockedOtps = otpRepository.findAllByUserIdAndStatus(user.getUserId(), OtpStatus.BLOCKED)) {
-            blockedOtps.forEach(otp -> {
-                otp.setStatus(OtpStatus.REMOVED);
-                removedOtps.add(otp);
-            });
-        }
-        otpRepository.saveAll(removedOtps);
+        otpRepository.removeOtpsForUserId(user.getUserId());
     }
 
 }

@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -33,12 +35,15 @@ import java.util.stream.Stream;
 public interface OtpRepository extends CrudRepository<OtpEntity, String> {
 
     /**
-     * Find OTP entities by user identity and status.
+     * Remove all OTP entities for user identity.
      * @param userId User identity entity.
-     * @param status OTP status.
-     * @return List of OTP entities.
+     * @return Count of removed OTP entities.
      */
-    Stream<OtpEntity> findAllByUserIdAndStatus(String userId, OtpStatus status);
+    @Modifying
+    @Query("UPDATE OtpEntity o SET o.status = io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus.REMOVED " +
+            "WHERE o.userId = ?1 " +
+            "AND o.status <> io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus.REMOVED")
+    int removeOtpsForUserId(String userId);
 
     /**
      * Find OTP entities by operation.
