@@ -209,16 +209,17 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
+        Date changeTimestamp = new Date();
         if (request.getUsername() != null && !request.getUsername().equals(credential.getUsername())) {
             credential.setUsername(username);
-            credential.setTimestampLastUsernameChange(new Date());
+            credential.setTimestampLastUsernameChange(changeTimestamp);
         }
         if (request.getCredentialValue() != null) {
             final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
             credential.setValue(protectedValue.getValue());
             credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
-            credential.setTimestampLastCredentialChange(new Date());
+            credential.setTimestampLastCredentialChange(changeTimestamp);
             updateCredentialExpiration = true;
         }
         if (updateCredentialExpiration) {
@@ -228,7 +229,7 @@ public class CredentialService {
             credential.setStatus(request.getCredentialStatus());
                 if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
                 // For blocked credentials set timestamp when credential was blocked
-                credential.setTimestampBlocked(new Date());
+                credential.setTimestampBlocked(changeTimestamp);
             } else if (credential.getStatus() == CredentialStatus.ACTIVE) {
                 // Reset counters for active credentials
                 credential.setFailedAttemptCounterSoft(0);
@@ -236,10 +237,10 @@ public class CredentialService {
                 credential.setTimestampBlocked(null);
             }
         }
-        credential.setTimestampLastUpdated(new Date());
+        credential.setTimestampLastUpdated(changeTimestamp);
         if (request.getCredentialValue() != null) {
             // Save credential into credential history
-            credentialHistoryService.createCredentialHistory(user, credential, new Date());
+            credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         }
         user = userIdentityRepository.save(user);
         final UpdateCredentialResponse response = new UpdateCredentialResponse();
@@ -395,14 +396,15 @@ public class CredentialService {
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
-        credential.setTimestampLastUpdated(new Date());
-        credential.setTimestampLastCredentialChange(new Date());
+        Date changeTimestamp = new Date();
+        credential.setTimestampLastUpdated(changeTimestamp);
+        credential.setTimestampLastCredentialChange(changeTimestamp);
         credential.setFailedAttemptCounterSoft(0);
         credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(user, credential, new Date());
+        credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         user = userIdentityRepository.save(user);
         final ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
@@ -572,17 +574,18 @@ public class CredentialService {
         final CredentialEntity credential;
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         final boolean newCredential;
+        Date changeTimestamp = new Date();
         if (credentialOptional.isPresent()) {
             // TODO - auditing
             credential = credentialOptional.get();
-            credential.setTimestampLastUpdated(new Date());
-            credential.setTimestampLastCredentialChange(new Date());
+            credential.setTimestampLastUpdated(changeTimestamp);
+            credential.setTimestampLastCredentialChange(changeTimestamp);
             newCredential = false;
         } else {
             credential = new CredentialEntity();
             credential.setCredentialId(idGeneratorService.generateCredentialId());
             credential.setCredentialDefinition(credentialDefinition);
-            credential.setTimestampCreated(new Date());
+            credential.setTimestampCreated(changeTimestamp);
             credential.setUser(user);
             newCredential = true;
         }
@@ -625,8 +628,8 @@ public class CredentialService {
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
-        credential.setTimestampLastCredentialChange(new Date());
-        credential.setTimestampLastUsernameChange(new Date());
+        credential.setTimestampLastCredentialChange(changeTimestamp);
+        credential.setTimestampLastUsernameChange(changeTimestamp);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
@@ -639,7 +642,7 @@ public class CredentialService {
         }
 
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(user, credential, new Date());
+        credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         userIdentityRepository.save(user);
         final CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
