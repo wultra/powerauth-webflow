@@ -24,10 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Request object used for creating a user identity.
@@ -78,6 +75,7 @@ public class CreateUserRequest {
         private String username;
         @Size(min = 1, max = 256)
         private String credentialValue;
+        private Date timestampExpires;
         // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
         private CredentialValidationMode validationMode;
         @Valid

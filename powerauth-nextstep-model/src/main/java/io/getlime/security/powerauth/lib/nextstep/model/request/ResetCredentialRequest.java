@@ -20,6 +20,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * Request object used for resetting a credential.
@@ -36,5 +37,6 @@ public class ResetCredentialRequest {
     @Size(min = 2, max = 256)
     private String credentialName;
     private CredentialType credentialType;
+    private Date timestampExpires;
 
 }
