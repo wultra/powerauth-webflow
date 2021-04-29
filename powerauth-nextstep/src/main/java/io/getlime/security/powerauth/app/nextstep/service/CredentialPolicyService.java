@@ -80,7 +80,7 @@ public class CredentialPolicyService {
         if (credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyAlreadyExistsException("Credential policy already exists: " + request.getCredentialPolicyName());
         }
-        final CredentialPolicyEntity credentialPolicy = new CredentialPolicyEntity();
+        CredentialPolicyEntity credentialPolicy = new CredentialPolicyEntity();
         credentialPolicy.setName(request.getCredentialPolicyName());
         credentialPolicy.setDescription(request.getDescription());
         credentialPolicy.setStatus(CredentialPolicyStatus.ACTIVE);
@@ -113,7 +113,8 @@ public class CredentialPolicyService {
             throw new InvalidRequestException(ex);
         }
         credentialPolicy.setTimestampCreated(new Date());
-        credentialPolicyRepository.save(credentialPolicy);
+        credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
+        logger.debug("Credential policy was created, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
         final CreateCredentialPolicyResponse response = new CreateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -150,7 +151,7 @@ public class CredentialPolicyService {
         if (!credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
         }
-        final CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
         if (credentialPolicy.getStatus() != CredentialPolicyStatus.ACTIVE && request.getCredentialPolicyStatus() != CredentialPolicyStatus.ACTIVE) {
             throw new CredentialPolicyNotFoundException("Credential policy is not ACTIVE: " + request.getCredentialPolicyName());
         }
@@ -198,7 +199,8 @@ public class CredentialPolicyService {
             }
         }
         credentialPolicy.setTimestampLastUpdated(new Date());
-        credentialPolicyRepository.save(credentialPolicy);
+        credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
+        logger.debug("Credential policy was updated, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
         final UpdateCredentialPolicyResponse response  = new UpdateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -256,13 +258,14 @@ public class CredentialPolicyService {
         if (!credentialPolicyOptional.isPresent()) {
             throw new CredentialPolicyNotFoundException("Credential policy not found: " + request.getCredentialPolicyName());
         }
-        final CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
+        CredentialPolicyEntity credentialPolicy = credentialPolicyOptional.get();
         if (credentialPolicy.getStatus() == CredentialPolicyStatus.REMOVED) {
             throw new CredentialPolicyNotFoundException("Credential policy is already REMOVED: " + request.getCredentialPolicyName());
         }
         credentialPolicy.setStatus(CredentialPolicyStatus.REMOVED);
         credentialPolicy.setTimestampLastUpdated(new Date());
-        credentialPolicyRepository.save(credentialPolicy);
+        credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
+        logger.debug("Credential policy was removed, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
         final DeleteCredentialPolicyResponse response = new DeleteCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setCredentialPolicyStatus(credentialPolicy.getStatus());

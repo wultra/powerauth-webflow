@@ -134,6 +134,7 @@ public class CredentialService {
             }
         }
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
@@ -243,6 +244,7 @@ public class CredentialService {
             credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         }
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was updated for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -322,6 +324,7 @@ public class CredentialService {
         } else {
             response.setValidationResult(CredentialValidationResult.FAILED);
         }
+        logger.debug("Credential validation result: {}, validation errors: {}", response.getValidationResult(), response.getValidationErrors());
         response.getValidationErrors().addAll(validationErrors);
         return response;
     }
@@ -406,6 +409,7 @@ public class CredentialService {
         // Save credential into credential history
         credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was reset for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -444,6 +448,7 @@ public class CredentialService {
         }
         credential.setStatus(CredentialStatus.REMOVED);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was removed for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -475,6 +480,7 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
         credential.setTimestampBlocked(new Date());
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was blocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -511,6 +517,7 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was unblocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -643,7 +650,8 @@ public class CredentialService {
 
         // Save credential into credential history
         credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
+        logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());
@@ -692,6 +700,7 @@ public class CredentialService {
         credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credentialHistoryService.createCredentialHistory(user, credential, createdDate);
+        logger.debug("Credential history record was imported for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
     }
 
     /**
@@ -706,6 +715,7 @@ public class CredentialService {
                 final Calendar c = Calendar.getInstance();
                 c.add(Calendar.SECOND, expirationTime);
                 credential.setTimestampExpires(c.getTime());
+                logger.debug("Credential expiration time was updated for user ID: {}, credential definition name: {}, expiration: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getTimestampExpires());
                 return;
             }
         }
@@ -713,6 +723,7 @@ public class CredentialService {
             final Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, credentialPolicy.getRotationDays());
             credential.setTimestampExpires(c.getTime());
+            logger.debug("Credential expiration time was updated for user ID: {}, credential definition name: {}, expiration: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getTimestampExpires());
             return;
         }
         credential.setTimestampExpires(null);

@@ -241,6 +241,7 @@ public class OtpService {
             List<OtpEntity> otpsToRemove = new ArrayList<>();
             try (final Stream<OtpEntity> existingOtps = otpRepository.findAllByOperationAndStatus(operation, OtpStatus.ACTIVE)) {
                 existingOtps.forEach(otp -> {
+                    logger.debug("Existing OTP was removed due to new OTP: {}", otp.getOtpId());
                     otp.setStatus(OtpStatus.REMOVED);
                     otpsToRemove.add(otp);
                 });
@@ -263,7 +264,7 @@ public class OtpService {
         }
         final OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());
         final String otpId = idGeneratorService.generateOtpId();
-        final OtpEntity otp = new OtpEntity();
+        OtpEntity otp = new OtpEntity();
         otp.setOtpId(otpId);
         otp.setOtpDefinition(otpDefinition);
         otp.setUserId(userId);
@@ -284,7 +285,8 @@ public class OtpService {
             cal.add(Calendar.SECOND, expirationTime.intValue());
             otp.setTimestampExpires(cal.getTime());
         }
-        otpRepository.save(otp);
+        otp = otpRepository.save(otp);
+        logger.debug("OTP was created, user ID: {}, OTP ID: {}", userId, otp.getOtpId());
         final CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
         response.setUserId(userId);
@@ -357,6 +359,7 @@ public class OtpService {
         }
         otp.setStatus(OtpStatus.REMOVED);
         otpRepository.save(otp);
+        logger.debug("OTP was removed, OTP ID: {}", otp.getOtpId());
         final DeleteOtpResponse response = new DeleteOtpResponse();
         response.setOtpId(otp.getOtpId());
         if (otp.getOperation() != null) {

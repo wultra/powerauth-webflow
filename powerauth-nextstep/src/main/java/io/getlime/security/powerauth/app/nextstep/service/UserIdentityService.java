@@ -102,7 +102,7 @@ public class UserIdentityService {
     @Transactional(rollbackOn = Throwable.class)
     public CreateUserResponse createUserIdentity(CreateUserRequest request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
         final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
-        final UserIdentityEntity user;
+        UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -203,7 +203,8 @@ public class UserIdentityService {
         }
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
+        logger.debug("User identity was created, user ID: {}", user.getUserId());
         return response;
     }
 
@@ -225,7 +226,7 @@ public class UserIdentityService {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
         }
         // The findUser() method is not used to allow update REMOVED -> ACTIVE
-        final UserIdentityEntity user = userOptional.get();
+        UserIdentityEntity user = userOptional.get();
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -301,7 +302,8 @@ public class UserIdentityService {
         }
         // Save user identity snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
+        logger.debug("User identity was updated, user ID: {}", user.getUserId());
         return response;
     }
 
@@ -397,6 +399,7 @@ public class UserIdentityService {
                     // Save user identity and a snapshot to the history table
                     updateUserIdentityHistory(user);
                     user = userIdentityRepository.save(user);
+                    logger.debug("User identity was updated, user ID: {}", user.getUserId());
                 }
                 updatedUserIds.add(user.getUserId());
             });
@@ -426,6 +429,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was removed, user ID: {}", user.getUserId());
         final DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -450,6 +454,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was blocked, user ID: {}", user.getUserId());
         final BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -474,6 +479,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was unblocked, user ID: {}", user.getUserId());
         final UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());

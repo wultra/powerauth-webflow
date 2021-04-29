@@ -81,6 +81,7 @@ public class OrganizationService {
         organization.setDefaultCredentialName(request.getDefaultCredentialName());
         organization.setDefaultOtpName(request.getDefaultOtpName());
         organization = organizationRepository.save(organization);
+        logger.debug("Organization was created: {}", organization.getOrganizationId());
         final CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
@@ -137,6 +138,7 @@ public class OrganizationService {
         }
         final OrganizationEntity organization = organizationOptional.get();
         organizationRepository.delete(organization);
+        logger.debug("Organization was deleted: {}", organization.getOrganizationId());
         final DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         return response;

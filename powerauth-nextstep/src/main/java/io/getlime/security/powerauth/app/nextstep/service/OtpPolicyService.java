@@ -80,7 +80,7 @@ public class OtpPolicyService {
         if (otpPolicyOptional.isPresent()) {
             throw new OtpPolicyAlreadyExistsException("One time password policy already exists: " + request.getOtpPolicyName());
         }
-        final OtpPolicyEntity otpPolicy = new OtpPolicyEntity();
+        OtpPolicyEntity otpPolicy = new OtpPolicyEntity();
         otpPolicy.setName(request.getOtpPolicyName());
         otpPolicy.setDescription(request.getDescription());
         otpPolicy.setStatus(OtpPolicyStatus.ACTIVE);
@@ -94,7 +94,8 @@ public class OtpPolicyService {
         }
         otpPolicy.setExpirationTime(request.getExpirationTime());
         otpPolicy.setTimestampCreated(new Date());
-        otpPolicyRepository.save(otpPolicy);
+        otpPolicy = otpPolicyRepository.save(otpPolicy);
+        logger.debug("OTP policy was created, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
         final CreateOtpPolicyResponse response = new CreateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -120,7 +121,7 @@ public class OtpPolicyService {
         if (!otpPolicyOptional.isPresent()) {
             throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
         }
-        final OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
         if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE && request.getOtpPolicyStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("One time password policy is not ACTIVE: " + request.getOtpPolicyName());
         }
@@ -143,7 +144,8 @@ public class OtpPolicyService {
         }
         otpPolicy.setExpirationTime(request.getExpirationTime());
         otpPolicy.setTimestampLastUpdated(new Date());
-        otpPolicyRepository.save(otpPolicy);
+        otpPolicy = otpPolicyRepository.save(otpPolicy);
+        logger.debug("OTP policy was updated, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
         final UpdateOtpPolicyResponse response  = new UpdateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -190,13 +192,14 @@ public class OtpPolicyService {
         if (!otpPolicyOptional.isPresent()) {
             throw new OtpPolicyNotFoundException("One time password policy not found: " + request.getOtpPolicyName());
         }
-        final OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
+        OtpPolicyEntity otpPolicy = otpPolicyOptional.get();
         if (otpPolicy.getStatus() == OtpPolicyStatus.REMOVED) {
             throw new OtpPolicyNotFoundException("One time password policy is already REMOVED: " + request.getOtpPolicyName());
         }
         otpPolicy.setStatus(OtpPolicyStatus.REMOVED);
         otpPolicy.setTimestampLastUpdated(new Date());
-        otpPolicyRepository.save(otpPolicy);
+        otpPolicy = otpPolicyRepository.save(otpPolicy);
+        logger.debug("OTP policy was removed, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
         final DeleteOtpPolicyResponse response = new DeleteOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setOtpPolicyStatus(otpPolicy.getStatus());

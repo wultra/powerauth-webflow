@@ -79,7 +79,8 @@ public class RoleService {
         role.setName(request.getRoleName());
         role.setDescription(request.getDescription());
         role.setTimestampCreated(new Date());
-        roleRepository.save(role);
+        role = roleRepository.save(role);
+        logger.debug("Role was created, role ID: {}, role name: {}", role.getRoleId(), role.getName());
         final CreateRoleResponse response = new CreateRoleResponse();
         response.setRoleName(role.getName());
         response.setDescription(role.getDescription());
@@ -119,6 +120,7 @@ public class RoleService {
             throw new DeleteNotAllowedException("Role cannot be deleted because it is used: " + request.getRoleName());
         }
         roleRepository.delete(role);
+        logger.debug("Role was deleted, role ID: {}, role name: {}", role.getRoleId(), role.getName());
         final DeleteRoleResponse response = new DeleteRoleResponse();
         response.setRoleName(role.getName());
         return response;
