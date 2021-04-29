@@ -122,7 +122,7 @@ public class CredentialCounterService {
 
         }
         credential = credentialRepository.save(credential);
-        logger.info("Credential counter updated, user ID: {}, credential name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
+        logger.info("Credential counter updated, user ID: {}, credential definition name: {}, attempt counter: {}, soft counter: {}, hard counter: {}, status: {}",
                 credential.getUser().getUserId(), credential.getCredentialDefinition().getName(),
                 credential.getAttemptCounter(), credential.getFailedAttemptCounterSoft(),
                 credential.getFailedAttemptCounterHard(), credential.getStatus());
@@ -146,11 +146,13 @@ public class CredentialCounterService {
         switch (request.getResetMode()) {
             case RESET_BLOCKED_TEMPORARY:
                 resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
+                logger.info("Soft failed attempt credential counters were reset for status BLOCKED_TEMPORARY and status was changed to ACTIVE, updated record count: {}", resetCounter);
                 break;
 
             case RESET_ACTIVE_AND_BLOCKED_TEMPORARY:
                 resetCounter += credentialRepository.resetSoftFailedCountersForBlockedTemporaryStatus();
                 resetCounter += credentialRepository.resetSoftFailedCountersForActiveStatus();
+                logger.info("Soft failed attempt credential counters were reset for statuses ACTIVE and BLOCKED_TEMPORARY, status was changed to ACTIVE, updated record count: {}", resetCounter);
                 break;
 
             default:

@@ -103,6 +103,7 @@ public class UserRoleService {
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User role was added, user ID: {}, role name: {}", user.getUserId(), role.getName());
         final AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
@@ -142,6 +143,7 @@ public class UserRoleService {
         // Save user identity and a snapshot to the history table
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User role was removed, user ID: {}, role name: {}", user.getUserId(), role.getName());
         final RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());

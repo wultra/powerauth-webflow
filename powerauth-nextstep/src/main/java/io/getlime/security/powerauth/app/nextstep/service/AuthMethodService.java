@@ -96,7 +96,7 @@ public class AuthMethodService {
         if (authMethodOptional.isPresent()) {
             throw new AuthMethodAlreadyExistsException("Authentication method already exists: " + request.getAuthMethod());
         }
-        final AuthMethodEntity authMethod = new AuthMethodEntity();
+        AuthMethodEntity authMethod = new AuthMethodEntity();
         authMethod.setAuthMethod(request.getAuthMethod());
         authMethod.setOrderNumber(request.getOrderNumber());
         authMethod.setCheckUserPrefs(request.getCheckUserPrefs());
@@ -107,7 +107,8 @@ public class AuthMethodService {
         authMethod.setHasUserInterface(request.getHasUserInterface());
         authMethod.setDisplayNameKey(request.getDisplayNameKey());
         authMethod.setHasMobileToken(request.getHasMobileToken());
-        authMethodRepository.save(authMethod);
+        authMethod = authMethodRepository.save(authMethod);
+        logger.debug("Authentication method was created: {}", authMethod.getAuthMethod());
         final CreateAuthMethodResponse response = new CreateAuthMethodResponse();
         response.setAuthMethod(authMethod.getAuthMethod());
         response.setOrderNumber(authMethod.getOrderNumber());
@@ -256,6 +257,7 @@ public class AuthMethodService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
+        logger.debug("User preferences were updated for user: {}, authentication method: {}", userId, authMethod);
     }
 
     /**
@@ -324,6 +326,7 @@ public class AuthMethodService {
         }
         final AuthMethodEntity authMethod = authMethodOptional.get();
         authMethodRepository.delete(authMethod);
+        logger.debug("Authentication method was deleted: {}", authMethod.getAuthMethod());
         final DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();
         response.setAuthMethod(authMethod.getAuthMethod());
         return response;

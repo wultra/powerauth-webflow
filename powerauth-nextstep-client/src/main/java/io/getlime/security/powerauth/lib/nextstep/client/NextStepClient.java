@@ -20,6 +20,7 @@ import com.wultra.core.rest.client.base.DefaultRestClient;
 import com.wultra.core.rest.client.base.RestClient;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.core.rest.client.base.RestClientException;
+import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
@@ -66,7 +67,9 @@ public class NextStepClient {
         try {
             restClient = new DefaultRestClient(serviceBaseUrl);
         } catch (RestClientException ex) {
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "Rest client initialization failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -79,7 +82,9 @@ public class NextStepClient {
         try {
             restClient = new DefaultRestClient(restClientConfiguration);
         } catch (RestClientException ex) {
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "Rest client initialization failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2558,8 +2563,9 @@ public class NextStepClient {
         try {
             return restClient.get(path, queryParams, null, typeReference).getBody();
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP GET request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2575,8 +2581,9 @@ public class NextStepClient {
         try {
             return restClient.getObject(path, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP GET request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2593,8 +2600,9 @@ public class NextStepClient {
         try {
             return restClient.getObject(path, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP GET request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2611,8 +2619,9 @@ public class NextStepClient {
         try {
             return restClient.post(path, request, typeReference).getBody();
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2628,8 +2637,9 @@ public class NextStepClient {
         try {
             return restClient.postObject(path, request);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2646,8 +2656,9 @@ public class NextStepClient {
         try {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2663,8 +2674,9 @@ public class NextStepClient {
         try {
             return restClient.putObject(path, request);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -2681,8 +2693,22 @@ public class NextStepClient {
         try {
             return restClient.putObject(path, request, responseType);
         } catch (RestClientException ex) {
+            NextStepClientException ex2 = new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            logError(ex2);
+            throw ex2;
+        }
+    }
+
+    /**
+     * Log Next Step client exception details.
+     * @param ex Next Step client exception.
+     */
+    private void logError(NextStepClientException ex) {
+        Error error = ex.getNextStepError();
+        if (error != null) {
+            logger.warn("Next Step REST API call failed with error code: {}", error.getCode());
+        } else {
             logger.warn(ex.getMessage(), ex);
-            throw new NextStepClientException(ex, new NextStepError(resolveErrorCode(ex), "HTTP PUT request failed."));
         }
     }
 

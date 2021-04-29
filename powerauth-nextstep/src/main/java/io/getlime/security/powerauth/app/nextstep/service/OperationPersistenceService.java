@@ -141,6 +141,7 @@ public class OperationPersistenceService {
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
         operation = operationRepository.save(operation);
+        logger.debug("Operation was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
 
         final OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
@@ -159,6 +160,7 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operationHistoryRepository.save(operationHistory);
+        logger.debug("Operation initial history was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -244,6 +246,7 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operation.getOperationHistory().add(operationHistory);
         operation = operationRepository.save(operation);
+        logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
 
         if (!originalResult.equals(operation.getResult())) {
             operationCustomizationService.notifyOperationChange(operation);
@@ -274,6 +277,7 @@ public class OperationPersistenceService {
             operation.setUserAccountStatus(accountStatus);
         }
         operationRepository.save(operation);
+        logger.debug("Operation user was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -297,6 +301,7 @@ public class OperationPersistenceService {
             logger.error("Error occurred while serializing operation form data", e);
         }
         operationRepository.save(operation);
+        logger.debug("Operation form data was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -341,6 +346,7 @@ public class OperationPersistenceService {
         }
         currentHistory.setChosenAuthMethod(chosenAuthMethod);
         operationHistoryRepository.save(currentHistory);
+        logger.debug("Operation chosen authentication method was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -370,6 +376,7 @@ public class OperationPersistenceService {
             currentHistory.setPowerAuthOperationId(null);
         }
         operationHistoryRepository.save(currentHistory);
+        logger.debug("Operation mobile token was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -403,6 +410,7 @@ public class OperationPersistenceService {
             logger.error("Error occurred while serializing application attributes for an operation", e);
         }
         operationRepository.save(operation);
+        logger.debug("Operation application was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
     /**
@@ -577,6 +585,7 @@ public class OperationPersistenceService {
             afsEntity.setTimestampCreated(request.getTimestampCreated());
             operation.getAfsActions().add(afsEntity);
             operationRepository.save(operation);
+            logger.debug("Operation AFS action was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
         } catch (OperationNotFoundException e) {
             logger.error("AFS action could not be saved because operation does not exist: {}", request.getOperationId());
         }

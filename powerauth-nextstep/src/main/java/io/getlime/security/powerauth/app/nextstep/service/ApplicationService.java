@@ -74,12 +74,13 @@ public class ApplicationService {
         if (applicationOptional.isPresent()) {
             throw new ApplicationAlreadyExistsException("Application already exists: " + request.getApplicationName());
         }
-        final ApplicationEntity application = new ApplicationEntity();
+        ApplicationEntity application = new ApplicationEntity();
         application.setName(request.getApplicationName());
         application.setDescription(request.getDescription());
         application.setStatus(ApplicationStatus.ACTIVE);
         application.setTimestampCreated(new Date());
-        applicationRepository.save(application);
+        application = applicationRepository.save(application);
+        logger.debug("Application was created, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
         final CreateApplicationResponse response = new CreateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -99,7 +100,7 @@ public class ApplicationService {
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
         }
-        final ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationOptional.get();
         if (application.getStatus() != ApplicationStatus.ACTIVE && request.getApplicationStatus() != ApplicationStatus.ACTIVE) {
             throw new ApplicationNotFoundException("Application is not ACTIVE: " + request.getApplicationName());
         }
@@ -108,7 +109,8 @@ public class ApplicationService {
             application.setStatus(request.getApplicationStatus());
         }
         application.setTimestampLastUpdated(new Date());
-        applicationRepository.save(application);
+        application = applicationRepository.save(application);
+        logger.debug("Application was updated, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
         final UpdateApplicationResponse response = new UpdateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -149,10 +151,11 @@ public class ApplicationService {
         if (!applicationOptional.isPresent()) {
             throw new ApplicationNotFoundException("Application not found: " + request.getApplicationName());
         }
-        final ApplicationEntity application = applicationOptional.get();
+        ApplicationEntity application = applicationOptional.get();
         application.setStatus(ApplicationStatus.REMOVED);
         application.setTimestampLastUpdated(new Date());
-        applicationRepository.save(application);
+        application = applicationRepository.save(application);
+        logger.debug("Application was removed, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
         final DeleteApplicationResponse response = new DeleteApplicationResponse();
         response.setApplicationName(application.getName());
         response.setApplicationStatus(application.getStatus());
