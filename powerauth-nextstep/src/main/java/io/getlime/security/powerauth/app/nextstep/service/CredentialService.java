@@ -113,12 +113,13 @@ public class CredentialService {
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
+        final Date timestampExpires = request.getTimestampExpires();
         CredentialValidationMode validationMode = request.getValidationMode();
         final List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
         if (validationMode == null) {
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         }
-        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
+        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, timestampExpires, validationMode);
         if (credentialHistory != null && !credentialHistory.isEmpty()) {
             final int dateCount = credentialHistory.size();
             // Use unique timestamps in seconds to keep order of credential history
@@ -223,7 +224,11 @@ public class CredentialService {
             credential.setTimestampLastCredentialChange(changeTimestamp);
             updateCredentialExpiration = true;
         }
-        if (updateCredentialExpiration) {
+        if (request.getTimestampExpires() != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(request.getTimestampExpires());
+        } else if (updateCredentialExpiration) {
+            // Credential expiration needs to be derived
             updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         }
         if (request.getCredentialStatus() != null) {
@@ -393,7 +398,13 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        if (request.getTimestampExpires() != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(request.getTimestampExpires());
+        } else {
+            // Credential expiration needs to be derived
+            updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        }
         final String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
         final CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
@@ -568,6 +579,7 @@ public class CredentialService {
      * @param credentialType Credential type.
      * @param username Username, use null for generated username.
      * @param credentialValue Credential value, use null for generated credential value.
+     * @param timestampExpires Expiration timestamp for case when expiration timestamp is overridden.
      * @param validationMode Credential validation mode.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
@@ -576,7 +588,7 @@ public class CredentialService {
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                    CredentialType credentialType, String username, String credentialValue,
-                                                   CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
+                                                   Date timestampExpires, CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
         // Lookup credential in case it already exists
         final CredentialEntity credential;
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -618,7 +630,13 @@ public class CredentialService {
             }
         }
         credential.setType(credentialType);
-        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        if (timestampExpires != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(timestampExpires);
+        } else {
+            // Credential expiration needs to be derived
+            updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        }
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
