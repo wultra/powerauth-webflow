@@ -22,7 +22,19 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum OperationChange {
+
+    /**
+     * Operation is finished.
+     */
     DONE,
+
+    /**
+     * Operation was canceled.
+     */
     CANCELED,
+
+    /**
+     * Operation has failed.
+     */
     FAILED
 }

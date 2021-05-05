@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class RoleAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Role already exists.
+     */
     public static final String CODE = "ROLE_ALREADY_EXISTS";
 
     /**

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class AuthMethodAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Authentication method already exists.
+     */
     public static final String CODE = "AUTH_METHOD_ALREADY_EXISTS";
 
     /**

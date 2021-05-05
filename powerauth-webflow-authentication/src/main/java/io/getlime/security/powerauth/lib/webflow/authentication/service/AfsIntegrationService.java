@@ -237,6 +237,9 @@ public class AfsIntegrationService {
         AfsType afsType = configuration.getAfsType();
         if (afsType == AfsType.THREAT_MARK) {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            if (requestAttributes == null) {
+                return extras;
+            }
             if (!(requestAttributes instanceof ServletRequestAttributes)) {
                 // The action is not dispatched using DispatcherServlet. This occurs in case of processing of the Web
                 // Socket close session event. Obtain AFS parameters from last regular request and reuse them.
@@ -247,7 +250,7 @@ public class AfsIntegrationService {
                     return lastAction.getRequestExtras();
                 }
             } else {
-                HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                HttpServletRequest servletRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
                 Cookie[] cookies = servletRequest.getCookies();
                 String deviceTagCookie = configuration.getTmDeviceTagCookie();
                 String sessionSidCookie = configuration.getTmSessionSidCookie();

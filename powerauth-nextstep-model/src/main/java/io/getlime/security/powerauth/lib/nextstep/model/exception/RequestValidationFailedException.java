@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class RequestValidationFailedException extends NextStepServiceException {
 
+    /**
+     * Request validation failed.
+     */
     public static final String CODE = "REQUEST_VALIDATION_FAILED";
 
     /**

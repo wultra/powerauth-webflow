@@ -24,8 +24,14 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialV
  */
 public class CredentialValidationFailedException extends NextStepServiceException {
 
+    /**
+     * Credential validation failed.
+     */
     public static final String CODE = "CREDENTIAL_VALIDATION_FAILED";
 
+    /**
+     * Credential validation error.
+     */
     private final CredentialValidationError error;
 
     /**

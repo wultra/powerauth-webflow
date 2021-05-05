@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationNotValidException extends NextStepServiceException {
 
+    /**
+     * Operation is not valid.
+     */
     public static final String CODE = "OPERATION_NOT_VALID";
 
     /**

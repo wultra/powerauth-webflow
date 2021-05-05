@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class CredentialNotActiveException extends NextStepServiceException {
 
+    /**
+     * Credential is not active.
+     */
     public static final String CODE = "CREDENTIAL_NOT_ACTIVE";
 
     /**

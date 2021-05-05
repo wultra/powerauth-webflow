@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserNotFoundException extends NextStepServiceException {
 
+    /**
+     * User identity not found.
+     */
     public static final String CODE = "USER_IDENTITY_NOT_FOUND";
 
     /**

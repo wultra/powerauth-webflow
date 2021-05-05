@@ -27,26 +27,50 @@ public class ActivationEntity {
     private String activationName;
     private String timestampLastUsed;
 
+    /**
+     * Get activation ID.
+     * @return Activation ID.
+     */
     public String getActivationId() {
         return activationId;
     }
 
+    /**
+     * Set activation ID.
+     * @param activationId Activation ID.
+     */
     public void setActivationId(String activationId) {
         this.activationId = activationId;
     }
 
+    /**
+     * Get activation name.
+     * @return Activation name.
+     */
     public String getActivationName() {
         return activationName;
     }
 
+    /**
+     * Set activation name.
+     * @param activationName Activation name.
+     */
     public void setActivationName(String activationName) {
         this.activationName = activationName;
     }
 
+    /**
+     * Get last used timestamp.
+     * @return Last used timestamp.
+     */
     public String getTimestampLastUsed() {
         return timestampLastUsed;
     }
 
+    /**
+     * Set last used timestamp.
+     * @param timestampLastUsed Last used timestamp.
+     */
     public void setTimestampLastUsed(String timestampLastUsed) {
         this.timestampLastUsed = timestampLastUsed;
     }

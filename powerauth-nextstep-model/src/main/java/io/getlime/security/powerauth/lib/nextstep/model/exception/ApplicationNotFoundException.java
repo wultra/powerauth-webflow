@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class ApplicationNotFoundException extends NextStepServiceException {
 
+    /**
+     * Application not found.
+     */
     public static final String CODE = "APPLICATION_NOT_FOUND";
 
     /**

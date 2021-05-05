@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserRoleAlreadyAssignedException extends NextStepServiceException {
 
+    /**
+     * User role is already assigned.
+     */
     public static final String CODE = "USER_ROLE_ALREADY_ASSIGNED";
 
     /**

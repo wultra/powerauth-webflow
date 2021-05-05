@@ -24,6 +24,10 @@ import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthSt
  */
 public class OfflineModeInvalidActivationException extends AuthStepException {
 
+    /**
+     * Exception constructor.
+     * @param message Exception message.
+     */
     public OfflineModeInvalidActivationException(String message) {
         super(message, "offlineMode.invalidActivation");
     }

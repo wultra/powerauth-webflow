@@ -61,6 +61,10 @@ public class OtpGenerationService {
                 try {
                     final DataDigest dataDigest = new DataDigest(length);
                     final DataDigest.Result result = dataDigest.generateDigest(Collections.singletonList(otpData));
+                    if (result == null) {
+                        // This case cannot happen, the generateDigest call is always valid
+                        throw new InvalidConfigurationException("OTP generation failed");
+                    }
                     otpValueDetail.setSalt(result.getSalt());
                     otpValueDetail.setOtpValue(result.getDigest());
                 } catch (GenericCryptoException ex) {

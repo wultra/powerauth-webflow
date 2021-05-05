@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class InvalidConfigurationException extends NextStepServiceException {
 
+    /**
+     * Invalid Next Step configuration.
+     */
     public static final String CODE = "INVALID_CONFIGURATION";
 
     /**

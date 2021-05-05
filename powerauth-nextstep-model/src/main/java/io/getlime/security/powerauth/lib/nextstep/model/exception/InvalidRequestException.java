@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class InvalidRequestException extends NextStepServiceException {
 
+    /**
+     * Request is invalid.
+     */
     public static final String CODE = "INVALID_REQUEST";
 
     /**

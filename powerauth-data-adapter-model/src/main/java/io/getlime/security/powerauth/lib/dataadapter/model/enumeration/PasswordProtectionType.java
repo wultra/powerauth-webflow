@@ -32,6 +32,14 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum PasswordProtectionType {
+
+    /**
+     * No password protection, plain text password format is used.
+     */
     NO_PROTECTION,
+
+    /**
+     * Password is encrypted using AES.
+     */
     PASSWORD_ENCRYPTION_AES,
 }

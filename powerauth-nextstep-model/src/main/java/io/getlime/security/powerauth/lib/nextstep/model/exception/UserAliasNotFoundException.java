@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserAliasNotFoundException extends NextStepServiceException {
 
+    /**
+     * User alias not found.
+     */
     public static final String CODE = "USER_ALIAS_NOT_FOUND";
 
     /**

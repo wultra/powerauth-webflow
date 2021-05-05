@@ -309,10 +309,10 @@ public class OperationPersistenceService {
      *
      * @param request Request to update chosen authentication method.
      * @throws OperationNotFoundException Thrown when operation does not exist.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
-    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
+    public void updateChosenAuthMethod(UpdateChosenAuthMethodRequest request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         final Optional<OperationEntity> operationOptional = operationRepository.findById(request.getOperationId());
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + request.getOperationId());
@@ -326,13 +326,13 @@ public class OperationPersistenceService {
      *
      * @param operation Operation.
      * @param chosenAuthMethod Chosen authentication method.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
-    public void updateChosenAuthMethod(OperationEntity operation, AuthMethod chosenAuthMethod) throws InvalidConfigurationException, InvalidRequestException {
+    public void updateChosenAuthMethod(OperationEntity operation, AuthMethod chosenAuthMethod) throws OperationNotValidException, InvalidRequestException {
         final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
         if (currentHistory == null) {
-            throw new InvalidConfigurationException("Operation is missing history");
+            throw new OperationNotValidException("Operation is missing history");
         }
         boolean chosenAuthMethodValid = false;
         for (AuthStep step : getResponseAuthSteps(operation)) {
@@ -421,7 +421,12 @@ public class OperationPersistenceService {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      */
     public OperationEntity getOperation(String operationId) throws OperationNotFoundException {
-        return getOperation(operationId, false);
+        try {
+            return getOperation(operationId, false);
+        } catch (OperationNotValidException ex) {
+            // Not possible, operation is not validated
+            return null;
+        }
     }
 
     /**
@@ -431,8 +436,9 @@ public class OperationPersistenceService {
      * @param validateOperation Whether operation should be validated.
      * @return OperationEntity loaded from database.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
-    public OperationEntity getOperation(String operationId, boolean validateOperation) throws OperationNotFoundException {
+    public OperationEntity getOperation(String operationId, boolean validateOperation) throws OperationNotFoundException, OperationNotValidException {
         final Optional<OperationEntity> operationOptional = operationRepository.findById(operationId);
         if (!operationOptional.isPresent()) {
             throw new OperationNotFoundException("Operation not found, operation ID: " + operationId);
@@ -470,9 +476,14 @@ public class OperationPersistenceService {
         }
         final List<OperationEntity> filteredList = new ArrayList<>();
         for (OperationEntity operation : entities) {
-            final boolean mobileTokenActive = validateMobileTokenOperation(operation);
-            if (mobileTokenActive) {
-                filteredList.add(operation);
+            try {
+                final boolean mobileTokenActive = validateMobileTokenOperation(operation);
+                if (mobileTokenActive) {
+                    filteredList.add(operation);
+                }
+            } catch (OperationNotValidException ex) {
+                // Invalid operations are skipped
+                logger.warn(ex.getMessage(), ex);
             }
         }
         return filteredList;
@@ -482,8 +493,9 @@ public class OperationPersistenceService {
      * Validate a mobile token operation status.
      * @param operation Operation entity.
      * @return Whether operation is a pending operation with an active PowerAuth token.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
-    private boolean validateMobileTokenOperation(OperationEntity operation) {
+    private boolean validateMobileTokenOperation(OperationEntity operation) throws OperationNotValidException {
         final OperationHistoryEntity currentHistoryEntity = operation.getCurrentOperationHistoryEntity();
         if (currentHistoryEntity != null && currentHistoryEntity.getResponseResult() == AuthResult.CONTINUE && currentHistoryEntity.isMobileTokenActive()) {
             if (currentHistoryEntity.getPowerAuthOperationId() == null) {
@@ -492,6 +504,9 @@ public class OperationPersistenceService {
             }
             // PowerAuth operation was created, reconcile states of both operations
             final OperationDetailResponse detail = powerAuthOperationService.getOperationDetail(operation);
+            if (detail == null) {
+                return false;
+            }
             // PowerAuth operation expired, cancel Next Step operation
             if (detail.getStatus() == OperationStatus.EXPIRED) {
                 handlePowerAuthOperationExpiration(operation);
@@ -509,14 +524,19 @@ public class OperationPersistenceService {
     /**
      * Handle status change of PowerAuth operation when it expires in PowerAuth server.
      * @param operation Operation entity.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
-    private void handlePowerAuthOperationExpiration(OperationEntity operation) {
+    private void handlePowerAuthOperationExpiration(OperationEntity operation) throws OperationNotValidException {
         // Operation expired in PowerAuth server, cancel Next Step operation
         final UpdateOperationRequest request = new UpdateOperationRequest();
         request.setOperationId(operation.getOperationId());
         request.setUserId(operation.getUserId());
         request.setOperationId(operation.getOperationId());
-        request.setAuthMethod(operation.getCurrentOperationHistoryEntity().getChosenAuthMethod());
+        final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            throw new OperationNotValidException("Operation is missing history");
+        }
+        request.setAuthMethod(currentHistory.getChosenAuthMethod());
         request.setAuthStepResult(AuthStepResult.CANCELED);
         request.setAuthStepResultDescription(OperationCancelReason.TIMED_OUT_OPERATION.toString());
         try {

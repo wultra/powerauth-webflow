@@ -22,7 +22,14 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity.attribute;
  */
 public class MessageAttribute {
 
+    /**
+     * Message identifier.
+     */
     protected String id;
+
+    /**
+     * Message.
+     */
     protected String message;
 
     /**

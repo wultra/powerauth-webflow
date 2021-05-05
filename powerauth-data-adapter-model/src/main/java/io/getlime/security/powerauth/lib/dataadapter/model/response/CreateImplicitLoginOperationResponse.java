@@ -28,26 +28,50 @@ public class CreateImplicitLoginOperationResponse {
     private FormData formData;
     private ApplicationContext applicationContext;
 
+    /**
+     * Get operation name.
+     * @return Operation name.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set operation name.
+     * @param name Operation name.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Get operation form data.
+     * @return Operation form data.
+     */
     public FormData getFormData() {
         return formData;
     }
 
+    /**
+     * Set operation form data.
+     * @param formData Operation form data.
+     */
     public void setFormData(FormData formData) {
         this.formData = formData;
     }
 
+    /**
+     * Get application context.
+     * @return Application context.
+     */
     public ApplicationContext getApplicationContext() {
         return applicationContext;
     }
 
+    /**
+     * Set application context.
+     * @param applicationContext Application context.
+     */
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserRoleNotAssignedException extends NextStepServiceException {
 
+    /**
+     * User role is not assigned.
+     */
     public static final String CODE = "USER_ROLE_NOT_ASSIGNED";
 
     /**

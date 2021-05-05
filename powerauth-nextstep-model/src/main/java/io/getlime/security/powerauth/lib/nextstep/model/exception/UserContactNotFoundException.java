@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserContactNotFoundException extends NextStepServiceException {
 
+    /**
+     * User contact not found.
+     */
     public static final String CODE = "USER_CONTACT_NOT_FOUND";
 
     /**

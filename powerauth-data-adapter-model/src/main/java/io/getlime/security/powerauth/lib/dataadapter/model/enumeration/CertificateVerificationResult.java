@@ -27,7 +27,19 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum CertificateVerificationResult {
+
+    /**
+     * Authentication succeeded.
+     */
     SUCCEEDED,
+
+    /**
+     * Authentication failed.
+     */
     FAILED,
+
+    /**
+     * Authentication was not performed.
+     */
     SKIPPED
 }

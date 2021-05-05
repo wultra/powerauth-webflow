@@ -31,6 +31,9 @@ public class CredentialValidationError extends Error implements Serializable {
 
     private static final long serialVersionUID = -4674388987180219329L;
 
+    /**
+     * List of validation failures.
+     */
     private final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
 
     /**
@@ -53,8 +56,9 @@ public class CredentialValidationError extends Error implements Serializable {
     /**
      * Constructor accepting code, message and credential validation failures.
      *
-     * @param code    Error code.
+     * @param code Error code.
      * @param message Error message.
+     * @param validationFailures Validation failures.
      */
     public CredentialValidationError(String code, String message, List<CredentialValidationFailure> validationFailures) {
         super(code, message);

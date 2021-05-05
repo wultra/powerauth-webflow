@@ -33,14 +33,50 @@ public class DataAdapterError extends Error {
      * Response codes for different authentication failures.
      */
     public class Code extends Error.Code {
+
+        /**
+         * User authentication failed.
+         */
         public static final String AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
+
+        /**
+         * SMS authorization failed.
+         */
         public static final String SMS_AUTHORIZATION_FAILED = "SMS_AUTHORIZATION_FAILED";
+
+        /**
+         * User was not found.
+         */
         public static final String USER_NOT_FOUND = "USER_NOT_FOUND";
+
+        /**
+         * Invalid request.
+         */
         public static final String INPUT_INVALID = "INPUT_INVALID";
+
+        /**
+         * Operation context is invalid.
+         */
         public static final String OPERATION_CONTEXT_INVALID = "OPERATION_CONTEXT_INVALID";
+
+        /**
+         * Consent data is invalid.
+         */
         public static final String CONSENT_DATA_INVALID = "CONSENT_DATA_INVALID";
+
+        /**
+         * Error caused by client.
+         */
         public static final String DATA_ADAPTER_CLIENT_ERROR = "DATA_ADAPTER_CLIENT_ERROR";
+
+        /**
+         * Error caused by remote error.
+         */
         public static final String REMOTE_ERROR = "REMOTE_ERROR";
+
+        /**
+         * Communication error.
+         */
         public static final String COMMUNICATION_ERROR = "COMMUNICATION_ERROR";
     }
 

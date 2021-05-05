@@ -52,6 +52,9 @@ public class CreateCredentialRequest {
     @Valid
     private List<CredentialHistory> credentialHistory;
 
+    /**
+     * Credential history.
+     */
     @Data
     public static class CredentialHistory {
         @Size(min = 1, max = 256)

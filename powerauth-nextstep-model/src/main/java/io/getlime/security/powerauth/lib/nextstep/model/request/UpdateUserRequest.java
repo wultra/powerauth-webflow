@@ -52,6 +52,9 @@ public class UpdateUserRequest {
     @Valid
     private List<UpdatedCredential> credentials;
 
+    /**
+     * Contact to update.
+     */
     @Data
     public static class UpdatedContact {
 
@@ -67,6 +70,9 @@ public class UpdateUserRequest {
 
     }
 
+    /**
+     * Credential to update.
+     */
     @Data
     public static class UpdatedCredential {
 
