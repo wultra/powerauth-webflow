@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class EncryptionException extends NextStepServiceException {
 
+    /**
+     * Encryption or decryption failed.
+     */
     public static final String CODE = "ENCRYPTION_FAILED";
 
     /**

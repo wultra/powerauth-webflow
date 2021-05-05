@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserContactAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * User contact already exists.
+     */
     public static final String CODE = "USER_CONTACT_ALREADY_EXISTS";
 
     /**

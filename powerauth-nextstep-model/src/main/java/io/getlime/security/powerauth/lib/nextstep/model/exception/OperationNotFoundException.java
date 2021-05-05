@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationNotFoundException extends NextStepServiceException {
 
+    /**
+     * Operation not found.
+     */
     public static final String CODE = "OPERATION_NOT_FOUND";
 
     /**

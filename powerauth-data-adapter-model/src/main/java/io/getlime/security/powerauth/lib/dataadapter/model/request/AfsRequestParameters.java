@@ -24,6 +24,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResu
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Request parameters for AFS action.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
 public class AfsRequestParameters {
 
     /**

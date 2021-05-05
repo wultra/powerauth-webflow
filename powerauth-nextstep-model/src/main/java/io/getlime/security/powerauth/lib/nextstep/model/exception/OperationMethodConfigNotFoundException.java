@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationMethodConfigNotFoundException extends NextStepServiceException {
 
+    /**
+     * Operation method config not found.
+     */
     public static final String CODE = "OPERATION_METHOD_CONFIG_NOT_FOUND";
 
     /**

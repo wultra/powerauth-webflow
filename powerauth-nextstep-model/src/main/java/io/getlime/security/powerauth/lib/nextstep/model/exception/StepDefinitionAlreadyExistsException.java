@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class StepDefinitionAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Step definition already exists.
+     */
     public static final String CODE = "STEP_DEFINITION_ALREADY_EXISTS";
 
     /**

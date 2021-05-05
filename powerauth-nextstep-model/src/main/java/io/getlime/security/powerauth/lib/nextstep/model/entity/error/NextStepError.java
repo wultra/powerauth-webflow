@@ -32,8 +32,20 @@ public class NextStepError extends Error implements Serializable {
      * Response codes for different failures.
      */
     public class Code extends Error.Code {
+
+        /**
+         * Error caused by the client.
+         */
         public static final String NEXT_STEP_CLIENT_ERROR = "NEXT_STEP_CLIENT_ERROR";
+
+        /**
+         * Error caused by a remote error.
+         */
         public static final String REMOTE_ERROR = "REMOTE_ERROR";
+
+        /**
+         * Communication error.
+         */
         public static final String COMMUNICATION_ERROR = "COMMUNICATION_ERROR";
     }
 

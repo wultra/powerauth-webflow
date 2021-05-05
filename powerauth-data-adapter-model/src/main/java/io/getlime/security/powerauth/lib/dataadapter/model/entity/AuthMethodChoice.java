@@ -27,7 +27,14 @@ public class AuthMethodChoice extends FormDataChange {
      * Enumeration for authentication method choice.
      */
     public enum ChosenAuthMethod {
+        /**
+         * Authentication using PowerAuth token.
+         */
         POWERAUTH_TOKEN,
+
+        /**
+         * Authentication using SMS key.
+         */
         SMS_KEY
     }
 

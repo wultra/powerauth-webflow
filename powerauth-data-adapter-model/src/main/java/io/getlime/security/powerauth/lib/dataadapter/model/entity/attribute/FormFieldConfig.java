@@ -25,6 +25,9 @@ import java.util.Objects;
  */
 public class FormFieldConfig {
 
+    /**
+     * Field identifier.
+     */
     protected String id;
     private boolean enabled;
     private String defaultValue;

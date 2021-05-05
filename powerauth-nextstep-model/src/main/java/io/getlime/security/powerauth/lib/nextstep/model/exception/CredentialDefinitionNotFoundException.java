@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class CredentialDefinitionNotFoundException extends NextStepServiceException {
 
+    /**
+     * Credential definition not found.
+     */
     public static final String CODE = "CREDENTIAL_DEFINITION_NOT_FOUND";
 
     /**

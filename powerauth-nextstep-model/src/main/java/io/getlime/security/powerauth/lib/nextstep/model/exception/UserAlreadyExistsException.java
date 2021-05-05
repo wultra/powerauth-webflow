@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * User identity already exists.
+     */
     public static final String CODE = "USER_IDENTITY_ALREADY_EXISTS";
 
     /**

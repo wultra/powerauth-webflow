@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public class KeyValueAttribute extends AttributeFormatted {
 
+    /**
+     * Attribute value.
+     */
     protected String value;
 
     /**

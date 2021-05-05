@@ -26,6 +26,9 @@ import java.util.Map;
  */
 public class OperationKeyValueFieldAttribute extends OperationFormFieldAttributeFormatted {
 
+    /**
+     * Attribute value.
+     */
     protected String value;
 
     /**

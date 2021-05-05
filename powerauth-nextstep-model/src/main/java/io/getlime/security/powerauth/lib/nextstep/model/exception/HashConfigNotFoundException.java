@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class HashConfigNotFoundException extends NextStepServiceException {
 
+    /**
+     * Hashing configuration not found.
+     */
     public static final String CODE = "HASHING_CONFIG_NOT_FOUND";
 
     /**

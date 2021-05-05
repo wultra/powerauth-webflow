@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class StepDefinitionNotFoundException extends NextStepServiceException {
 
+    /**
+     * Step definition not found.
+     */
     public static final String CODE = "STEP_DEFINITION_NOT_FOUND";
 
     /**

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OtpGenAlgorithmNotSupportedException extends NextStepServiceException {
 
+    /**
+     * OTP generation algorithm is not supported.
+     */
     public static final String CODE = "OTP_GEN_ALGORITHM_NOT_SUPPORTED";
 
     /**

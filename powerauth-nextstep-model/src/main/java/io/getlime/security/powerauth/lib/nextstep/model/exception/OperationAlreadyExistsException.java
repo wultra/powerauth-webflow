@@ -7,6 +7,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Operation aleady exists.
+     */
     public static final String CODE = "OPERATION_ALREADY_EXISTS";
 
     /**

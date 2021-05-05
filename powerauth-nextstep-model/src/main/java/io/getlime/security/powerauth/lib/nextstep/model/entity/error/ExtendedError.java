@@ -35,6 +35,11 @@ public class ExtendedError extends Error {
 
     private final List<Violation> violations = new ArrayList<>();
 
+    /**
+     * Extended error with multiple error causes.
+     * @param code Error code.
+     * @param message Error message.
+     */
     public ExtendedError(String code, String message) {
         super(code, message);
     }

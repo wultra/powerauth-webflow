@@ -51,6 +51,9 @@ public class CreateUserRequest {
     @Valid
     private final List<NewCredential> credentials = new ArrayList<>();
 
+    /**
+     * Contact to create.
+     */
     @Data
     public static class NewContact {
 
@@ -66,6 +69,9 @@ public class CreateUserRequest {
 
     }
 
+    /**
+     * Credential to create.
+     */
     @Data
     public static class NewCredential {
 
@@ -85,6 +91,9 @@ public class CreateUserRequest {
 
     }
 
+    /**
+     * Credential history.
+     */
     @Data
     public static class CredentialHistory {
 

@@ -23,6 +23,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationAlreadyCanceledException extends NextStepServiceException {
 
+    /**
+     * Operation is already canceled.
+     */
     public static final String CODE = "OPERATION_ALREADY_CANCELED";
 
     /**

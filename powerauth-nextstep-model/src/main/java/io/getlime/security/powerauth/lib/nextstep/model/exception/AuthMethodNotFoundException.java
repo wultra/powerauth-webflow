@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class AuthMethodNotFoundException extends NextStepServiceException {
 
+    /**
+     * Authentication method was not found.
+     */
     public static final String CODE = "AUTH_METHOD_NOT_FOUND";
 
     /**

@@ -201,9 +201,10 @@ public class OperationController {
      * @param operationId Operation ID.
      * @return Get operation detail response.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
     @RequestMapping(value = "operation/detail", method = RequestMethod.GET)
-    public ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException {
+    public ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, OperationNotValidException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received operationDetail request, operation ID: {}", operationId);
 
@@ -229,9 +230,10 @@ public class OperationController {
      * @param request Get operation detail request.
      * @return Get operation detail response.
      * @throws OperationNotFoundException Thrown when operation does not exist.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
     @RequestMapping(value = "operation/detail", method = RequestMethod.POST)
-    public ObjectResponse<GetOperationDetailResponse> operationDetailPost(@Valid @RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException {
+    public ObjectResponse<GetOperationDetailResponse> operationDetailPost(@Valid @RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException, OperationNotValidException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
         logger.debug("Received operationDetail request, operation ID: {}", request.getRequestObject().getOperationId());
 
@@ -434,11 +436,11 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
     @RequestMapping(value = "operation/chosenAuthMethod", method = RequestMethod.PUT)
-    public Response updateChosenAuthMethod(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
+    public Response updateChosenAuthMethod(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         return updateChosenAuthMethodImpl(request);
     }
 
@@ -447,15 +449,15 @@ public class OperationController {
      * @param request Update operation request.
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws OperationNotValidException Thrown when operation is invalid.
      */
     @RequestMapping(value = "operation/chosenAuthMethod/update", method = RequestMethod.POST)
-    public Response updateChosenAuthMethodPost(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
+    public Response updateChosenAuthMethodPost(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         return updateChosenAuthMethodImpl(request);
     }
 
-    private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidConfigurationException, InvalidRequestException {
+    private Response updateChosenAuthMethodImpl(ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         logger.info("Received updateChosenAuthMethod request, operation ID: {}, chosen authentication method: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getChosenAuthMethod().toString());
         // persist chosen auth method update
         operationPersistenceService.updateChosenAuthMethod(request.getRequestObject());

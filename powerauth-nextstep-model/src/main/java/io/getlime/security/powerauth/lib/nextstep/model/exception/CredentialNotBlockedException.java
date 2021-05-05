@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class CredentialNotBlockedException extends NextStepServiceException {
 
+    /**
+     * Credential is not blocked.
+     */
     public static final String CODE = "CREDENTIAL_NOT_BLOCKED";
 
     /**

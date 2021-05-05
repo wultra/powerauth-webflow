@@ -23,6 +23,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationAlreadyFinishedException extends NextStepServiceException {
 
+    /**
+     * Operation is already finished.
+     */
     public static final String CODE = "OPERATION_ALREADY_FINISHED";
 
     /**

@@ -31,6 +31,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErr
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.GetPAOperationMappingResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.OperationNotValidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,11 @@ public class PowerAuthOperationService {
 
             // Get operation mapping from Data Adapter
             final OperationContext operationContext = operationConverter.toOperationContext(operation);
-            final AuthMethod authMethod = operation.getCurrentOperationHistoryEntity().getChosenAuthMethod();
+            final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+            if (currentHistory == null) {
+                throw new OperationNotValidException("Operation is missing history");
+            }
+            final AuthMethod authMethod = currentHistory.getChosenAuthMethod();
             final GetPAOperationMappingResponse mappingResponse = dataAdapterClient.getPAOperationMapping(userId, organizationId, authMethod, operationContext).getResponseObject();
             final OperationCreateRequest request = new OperationCreateRequest();
             request.setUserId(operation.getUserId());
@@ -108,7 +113,7 @@ public class PowerAuthOperationService {
             // Create PowerAuth operation and store PA operation ID
             final OperationDetailResponse paResponse = powerAuthClient.createOperation(request);
             return paResponse.getId();
-        } catch (PowerAuthClientException | DataAdapterClientErrorException ex) {
+        } catch (PowerAuthClientException | DataAdapterClientErrorException | OperationNotValidException ex) {
             logger.warn(ex.getMessage(), ex);
         }
         return null;
@@ -125,6 +130,10 @@ public class PowerAuthOperationService {
             return null;
         }
         final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+        if (currentHistory == null) {
+            // Cannot occur unless data in database is manually manipulated
+            return null;
+        }
         final boolean mobileTokenActive = currentHistory.isMobileTokenActive();
         final String paOperationId = currentHistory.getPowerAuthOperationId();
         if (!mobileTokenActive || paOperationId == null) {

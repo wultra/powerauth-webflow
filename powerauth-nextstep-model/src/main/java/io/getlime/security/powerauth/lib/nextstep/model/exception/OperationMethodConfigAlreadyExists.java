@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OperationMethodConfigAlreadyExists extends NextStepServiceException {
 
+    /**
+     * Operation method config already exists.
+     */
     public static final String CODE = "OPERATION_METHOD_CONFIG_ALREADY_EXISTS";
 
     /**

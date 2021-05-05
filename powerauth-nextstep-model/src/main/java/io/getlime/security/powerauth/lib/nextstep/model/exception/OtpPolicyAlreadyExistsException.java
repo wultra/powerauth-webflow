@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OtpPolicyAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * OTP policy already exists.
+     */
     public static final String CODE = "OTP_POLICY_ALREADY_EXISTS";
 
     /**

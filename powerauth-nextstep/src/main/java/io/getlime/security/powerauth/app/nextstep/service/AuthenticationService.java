@@ -828,6 +828,10 @@ public class AuthenticationService {
         } else {
             // Determine authentication method, this only works when there is a single next method available
             final OperationHistoryEntity currentHistory = operation.getCurrentOperationHistoryEntity();
+            if (currentHistory == null) {
+                // Cannot occur unless data in database is manually manipulated
+                return null;
+            }
             try {
                 final List<AuthStep> authSteps = objectMapper.readValue(currentHistory.getResponseSteps(), new TypeReference<List<AuthStep>>() {});
                 if (authSteps.size() != 1) {
