@@ -31,12 +31,15 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.VerifyCertif
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.*;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthenticationFailedException;
@@ -82,6 +85,7 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
     private final AuthMethodQueryService authMethodQueryService;
     private final AuthenticationManagementService authenticationManagementService;
     private final HttpSession httpSession;
+    private final WebFlowServicesConfiguration configuration;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
     private final UserAccountStatusConverter statusConverter = new UserAccountStatusConverter();
@@ -93,14 +97,16 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
      * @param authMethodQueryService Service for querying authentication methods.
      * @param authenticationManagementService Authentication management service.
      * @param httpSession HTTP session.
+     * @param configuration Web Flow configuration.
      */
     @Autowired
-    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession) {
+    public LoginScaController(DataAdapterClient dataAdapterClient, NextStepClient nextStepClient, AuthMethodQueryService authMethodQueryService, AuthenticationManagementService authenticationManagementService, HttpSession httpSession, WebFlowServicesConfiguration configuration) {
         this.dataAdapterClient = dataAdapterClient;
         this.nextStepClient = nextStepClient;
         this.authMethodQueryService = authMethodQueryService;
         this.authenticationManagementService = authenticationManagementService;
         this.httpSession = httpSession;
+        this.configuration = configuration;
     }
 
     /**
@@ -155,7 +161,26 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                     try {
                         lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();
                         GetUserDetailResponse userDetail = lookupResponse.getUser();
-                        userId = userDetail.getUserId();
+                        // The temporary credential type should can be checked, if required by Web Flow configuration
+                        if (!configuration.isAuthenticationWithTemporaryCredentialsAllowed()) {
+                            List<CredentialDetail> credentials = lookupResponse.getUser().getCredentials();
+                            if (credentials != null) {
+                                // Lookup returns either null credentials when Data Adapter proxy is enabled
+                                // or exactly one credential for queried credential definition in Next Step.
+                                if (credentials.size() != 1) {
+                                    logger.warn("Unexpected credential count in Next Step response: {}", credentials.size());
+                                    throw new AuthStepException("User authentication failed", "error.communication");
+                                }
+                                CredentialDetail credentialDetail = credentials.get(0);
+                                if (credentialDetail.getCredentialType() != CredentialType.TEMPORARY) {
+                                    // Lookup succeeded and credential type is not temporary, use user ID from lookup response
+                                    userId = userDetail.getUserId();
+                                }
+                            }
+                        } else {
+                            // Lookup succeeded, use user ID from lookup response
+                            userId = userDetail.getUserId();
+                        }
                         status = userDetail.getUserIdentityStatus();
                     } catch (NextStepClientException ex) {
                         if (ex.getNextStepError() == null || !UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
