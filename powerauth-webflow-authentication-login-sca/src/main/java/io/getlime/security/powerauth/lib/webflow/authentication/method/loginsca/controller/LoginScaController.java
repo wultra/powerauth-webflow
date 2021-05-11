@@ -164,8 +164,8 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                         // The temporary credential type should can be checked, if required by Web Flow configuration
                         if (!configuration.isAuthenticationWithTemporaryCredentialsAllowed()) {
                             List<CredentialDetail> credentials = lookupResponse.getUser().getCredentials();
-                            if (credentials != null) {
-                                // Lookup returns either null credentials when Data Adapter proxy is enabled
+                            if (credentials != null && !credentials.isEmpty()) {
+                                // Lookup returns either empty credentials when Data Adapter proxy is enabled
                                 // or exactly one credential for queried credential definition in Next Step.
                                 if (credentials.size() != 1) {
                                     logger.warn("Unexpected credential count in Next Step response: {}", credentials.size());
