@@ -16,11 +16,13 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.EncryptionException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -36,15 +38,15 @@ public class CredentialHistoryService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialHistoryService.class);
 
-    private final CredentialProtectionService credentialProtectionService;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Service constructor.
-     * @param credentialProtectionService Credential protection service.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public CredentialHistoryService(CredentialProtectionService credentialProtectionService) {
-        this.credentialProtectionService = credentialProtectionService;
+    public CredentialHistoryService(@Lazy ServiceCatalogue serviceCatalogue) {
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -75,6 +77,7 @@ public class CredentialHistoryService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public boolean checkCredentialHistory(UserIdentityEntity user, String credentialValue, CredentialDefinitionEntity credentialDefinition) throws InvalidConfigurationException, EncryptionException {
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
         final CredentialPolicyEntity credentialPolicy = credentialDefinition.getCredentialPolicy();
         final int credentialHistoryCount = credentialPolicy.getCheckHistoryCount();
         if (credentialHistoryCount == 0) {

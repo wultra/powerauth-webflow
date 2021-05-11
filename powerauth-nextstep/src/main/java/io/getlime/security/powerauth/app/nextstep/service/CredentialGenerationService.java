@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
@@ -56,11 +57,11 @@ public class CredentialGenerationService {
 
     /**
      * Credential generation service constructor.
-     * @param credentialRepository Credential repository.
+     * @param repositoryCatalogue Repository catalogue.
      * @param nextStepServerConfiguration Next Step server configuration.
      */
-    public CredentialGenerationService(CredentialRepository credentialRepository, NextStepServerConfiguration nextStepServerConfiguration) {
-        this.credentialRepository = credentialRepository;
+    public CredentialGenerationService(RepositoryCatalogue repositoryCatalogue, NextStepServerConfiguration nextStepServerConfiguration) {
+        this.credentialRepository = repositoryCatalogue.getCredentialRepository();
         this.nextStepServerConfiguration = nextStepServerConfiguration;
     }
 

@@ -17,9 +17,11 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.RoleEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserRoleEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserRoleStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotFoundException;
@@ -32,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.RemoveUserRoleR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -48,24 +51,20 @@ public class UserRoleService {
 
     private final Logger logger = LoggerFactory.getLogger(UserRoleService.class);
 
-    private final UserIdentityService userIdentityService;
-    private final UserIdentityLookupService userIdentityLookupService;
     private final RoleRepository roleRepository;
     private final UserIdentityRepository userIdentityRepository;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Service constructor.
-     * @param userIdentityService User identity service.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param roleRepository Role repository.
-     * @param userIdentityRepository User identity repository.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public UserRoleService(UserIdentityService userIdentityService, UserIdentityLookupService userIdentityLookupService, RoleRepository roleRepository, UserIdentityRepository userIdentityRepository) {
-        this.userIdentityService = userIdentityService;
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.roleRepository = roleRepository;
-        this.userIdentityRepository = userIdentityRepository;
+    public UserRoleService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.roleRepository = repositoryCatalogue.getRoleRepository();
+        this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -78,6 +77,9 @@ public class UserRoleService {
      */
     @Transactional
     public AddUserRoleResponse addUserRole(AddUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleAlreadyAssignedException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {
@@ -121,6 +123,9 @@ public class UserRoleService {
      */
     @Transactional
     public RemoveUserRoleResponse removeUserRole(RemoveUserRoleRequest request) throws UserNotFoundException, InvalidRequestException, UserRoleNotAssignedException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final UserIdentityService userIdentityService = serviceCatalogue.getUserIdentityService();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Optional<RoleEntity> roleOptional = roleRepository.findByName(request.getRoleName());
         if (!roleOptional.isPresent()) {

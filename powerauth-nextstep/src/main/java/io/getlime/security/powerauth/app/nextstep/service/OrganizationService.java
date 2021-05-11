@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OrganizationEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.DeleteNotAllowedException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationAlreadyExistsException;
@@ -54,11 +55,11 @@ public class OrganizationService {
 
     /**
      * Organization service constructor.
-     * @param organizationRepository Organization repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public OrganizationService(OrganizationRepository organizationRepository) {
-        this.organizationRepository = organizationRepository;
+    public OrganizationService(RepositoryCatalogue repositoryCatalogue) {
+        this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
     }
 
     /**

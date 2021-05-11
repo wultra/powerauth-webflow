@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialValueConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialHistoryEntity;
@@ -60,12 +61,12 @@ public class CredentialProtectionService {
 
     /**
      * Credential protection service constructor.
-     * @param credentialRepository Credential repository.
+     * @param repositoryCatalogue Repository catalogue.
      * @param credentialValueConverter Credential value converter.
      */
     @Autowired
-    public CredentialProtectionService(CredentialRepository credentialRepository, CredentialValueConverter credentialValueConverter) {
-        this.credentialRepository = credentialRepository;
+    public CredentialProtectionService(RepositoryCatalogue repositoryCatalogue, CredentialValueConverter credentialValueConverter) {
+        this.credentialRepository = repositoryCatalogue.getCredentialRepository();
         this.credentialValueConverter = credentialValueConverter;
     }
 

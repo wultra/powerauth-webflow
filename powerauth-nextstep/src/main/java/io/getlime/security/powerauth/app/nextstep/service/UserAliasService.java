@@ -19,8 +19,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserAliasConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserAliasEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAliasDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAliasStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequestException;
@@ -38,6 +40,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateUserAlias
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -56,21 +59,21 @@ public class UserAliasService {
 
     private final Logger logger = LoggerFactory.getLogger(UserAliasService.class);
 
-    private final UserIdentityLookupService userIdentityLookupService;
     private final UserIdentityRepository userIdentityRepository;
+    private final ServiceCatalogue serviceCatalogue;
 
     private final UserAliasConverter userAliasConverter = new UserAliasConverter();
     private final ExtrasConverter extrasConverter = new ExtrasConverter();
 
     /**
      * User alias service constructor.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param userIdentityRepository User identity repository.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public UserAliasService(UserIdentityLookupService userIdentityLookupService, UserIdentityRepository userIdentityRepository) {
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.userIdentityRepository = userIdentityRepository;
+    public UserAliasService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.serviceCatalogue = serviceCatalogue;
+        this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
     }
 
     /**
@@ -83,6 +86,7 @@ public class UserAliasService {
      */
     @Transactional
     public CreateUserAliasResponse createUserAlias(CreateUserAliasRequest request) throws UserNotFoundException, UserAliasAlreadyExistsException, InvalidRequestException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         final UserAliasEntity alias;
@@ -129,6 +133,7 @@ public class UserAliasService {
      */
     @Transactional
     public GetUserAliasListResponse getUserAliasList(GetUserAliasListRequest request) throws UserNotFoundException, InvalidRequestException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Set<UserAliasEntity> aliases;
         if (request.isIncludeRemoved()) {
@@ -159,6 +164,7 @@ public class UserAliasService {
      */
     @Transactional
     public UpdateUserAliasResponse updateUserAlias(UpdateUserAliasRequest request) throws UserNotFoundException, InvalidRequestException, UserAliasNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         final UserAliasEntity alias;
@@ -205,6 +211,7 @@ public class UserAliasService {
      */
     @Transactional
     public DeleteUserAliasResponse deleteUserAlias(DeleteUserAliasRequest request) throws UserNotFoundException, UserAliasNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Optional<UserAliasEntity> aliasOptional = user.getAliases().stream().filter(alias -> alias.getName().equals(request.getAliasName())).findFirst();
         final UserAliasEntity alias;

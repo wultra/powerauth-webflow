@@ -21,7 +21,9 @@ import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepositor
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationMethodConfigRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -34,6 +36,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOperationR
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOperationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
@@ -53,15 +56,11 @@ import java.util.stream.Collectors;
 public class StepResolutionService {
 
     private final StepDefinitionRepository stepDefinitionRepository;
-    private final IdGeneratorService idGeneratorService;
-    private final OperationPersistenceService operationPersistenceService;
-    private final NextStepServerConfiguration nextStepServerConfiguration;
-    private final AuthMethodService authMethodService;
     private final AuthMethodRepository authMethodRepository;
-    private final MobileTokenConfigurationService mobileTokenConfigurationService;
     private final OperationConfigRepository operationConfigRepository;
     private final OperationMethodConfigRepository operationMethodConfigRepository;
-    private final AuthMethodChangeService authMethodChangeService;
+    private final ServiceCatalogue serviceCatalogue;
+    private final NextStepServerConfiguration nextStepServerConfiguration;
 
     private final Map<String, List<StepDefinitionEntity>> stepDefinitionsPerOperation = new HashMap<>();
 
@@ -71,31 +70,18 @@ public class StepResolutionService {
 
     /**
      * Service constructor.
-     * @param stepDefinitionRepository Step definition repository.
-     * @param operationPersistenceService Operation persistence service.
-     * @param idGeneratorService ID generator service.
-     * @param nextStepServerConfiguration Next step server configuration.
-     * @param authMethodService Authentication method service.
-     * @param authMethodRepository Authentication method repository.
-     * @param mobileTokenConfigurationService Mobile token configuration service.
-     * @param operationConfigRepository Operation configuration repository.
-     * @param operationMethodConfigRepository Operation and authentication method config repository.
-     * @param authMethodChangeService Authentication method change service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
+     * @param nextStepServerConfiguration Next Step server configuration.
      */
     @Autowired
-    public StepResolutionService(StepDefinitionRepository stepDefinitionRepository, OperationPersistenceService operationPersistenceService,
-                                 IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration,
-                                 AuthMethodService authMethodService, AuthMethodRepository authMethodRepository, MobileTokenConfigurationService mobileTokenConfigurationService, OperationConfigRepository operationConfigRepository, OperationMethodConfigRepository operationMethodConfigRepository, AuthMethodChangeService authMethodChangeService) {
-        this.stepDefinitionRepository = stepDefinitionRepository;
-        this.operationPersistenceService = operationPersistenceService;
-        this.idGeneratorService = idGeneratorService;
+    public StepResolutionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration) {
+        this.stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        this.authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        this.operationConfigRepository = repositoryCatalogue.getOperationConfigRepository();
+        this.operationMethodConfigRepository = repositoryCatalogue.getOperationMethodConfigRepository();
+        this.serviceCatalogue = serviceCatalogue;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
-        this.authMethodService = authMethodService;
-        this.authMethodRepository = authMethodRepository;
-        this.mobileTokenConfigurationService = mobileTokenConfigurationService;
-        this.operationConfigRepository = operationConfigRepository;
-        this.operationMethodConfigRepository = operationMethodConfigRepository;
-        this.authMethodChangeService = authMethodChangeService;
         reloadStepDefinitions();
     }
 
@@ -121,6 +107,9 @@ public class StepResolutionService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public CreateOperationResponse resolveNextStepResponse(CreateOperationRequest request) throws OperationAlreadyExistsException, InvalidConfigurationException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+
         final CreateOperationResponse response = new CreateOperationResponse();
         if (request.getOperationId() != null && !request.getOperationId().isEmpty()) {
             // operation ID received from the client, verify that it is available
@@ -171,6 +160,9 @@ public class StepResolutionService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is not valid.
      */
     public UpdateOperationResponse resolveNextStepResponse(UpdateOperationRequest request) throws OperationNotFoundException, OperationAlreadyFailedException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, InvalidRequestException, OperationNotValidException, InvalidConfigurationException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final AuthMethodChangeService authMethodChangeService = serviceCatalogue.getAuthMethodChangeService();
+
         final OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         checkLegitimacyOfUpdate(operation, request);
         final UpdateOperationResponse response = new UpdateOperationResponse();
@@ -282,6 +274,8 @@ public class StepResolutionService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private synchronized List<StepDefinitionEntity> filterStepDefinitions(String operationName, OperationRequestType operationType, AuthStepResult authStepResult, AuthMethod authMethod, String userId) throws InvalidConfigurationException {
+        final AuthMethodService authMethodService = serviceCatalogue.getAuthMethodService();
+        final MobileTokenConfigurationService mobileTokenConfigurationService = serviceCatalogue.getMobileTokenConfigurationService();
         final List<StepDefinitionEntity> stepDefinitions;
         synchronized (stepDefinitionLock) {
             // Step definitions may be modified and reloaded using REST API, lock is required
@@ -464,6 +458,7 @@ public class StepResolutionService {
      * @throws InvalidRequestException Thrown when request is invalid.
      */
     private void checkLegitimacyOfUpdate(OperationEntity operationEntity, UpdateOperationRequest request) throws OperationAlreadyFinishedException, OperationAlreadyCanceledException, OperationAlreadyFailedException, OperationNotValidException, InvalidRequestException, OperationNotFoundException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         if (request == null || request.getOperationId() == null) {
             throw new InvalidRequestException("Operation update failed, because request is invalid.");
         }

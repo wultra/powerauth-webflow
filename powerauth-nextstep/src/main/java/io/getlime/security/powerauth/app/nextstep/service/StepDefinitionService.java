@@ -17,7 +17,9 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.StepDefinitionAlreadyExistsException;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.StepDefinitionNotFoundException;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateStepDefinitionRequest;
@@ -27,6 +29,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteStepDefin
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -43,17 +46,17 @@ public class StepDefinitionService {
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
 
     private final StepDefinitionRepository stepDefinitionRepository;
-    private final StepResolutionService stepResolutionService;
+    private final ServiceCatalogue serviceCatalogue;
 
     /**
      * Step definition service constructor.
-     * @param stepDefinitionRepository Step definition repository.
-     * @param stepResolutionService Step resolution service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public StepDefinitionService(StepDefinitionRepository stepDefinitionRepository, StepResolutionService stepResolutionService) {
-        this.stepDefinitionRepository = stepDefinitionRepository;
-        this.stepResolutionService = stepResolutionService;
+    public StepDefinitionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -64,6 +67,7 @@ public class StepDefinitionService {
      */
     @Transactional
     public CreateStepDefinitionResponse createStepDefinition(CreateStepDefinitionRequest request) throws StepDefinitionAlreadyExistsException {
+        final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
         final Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
         if (stepDefinitionOptional.isPresent()) {
             throw new StepDefinitionAlreadyExistsException("Step definition already exits, ID: " + request.getStepDefinitionId());
@@ -100,6 +104,7 @@ public class StepDefinitionService {
      */
     @Transactional
     public DeleteStepDefinitionResponse deleteStepDefinition(DeleteStepDefinitionRequest request) throws StepDefinitionNotFoundException {
+        final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
         final Optional<StepDefinitionEntity> stepDefinitionOptional = stepDefinitionRepository.findById(request.getStepDefinitionId());
         if (!stepDefinitionOptional.isPresent()) {
             throw new StepDefinitionNotFoundException("Step definition not found, ID: " + request.getStepDefinitionId());

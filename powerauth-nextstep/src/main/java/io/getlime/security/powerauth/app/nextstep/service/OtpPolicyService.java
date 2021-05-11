@@ -19,6 +19,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpPolicyEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpPolicyDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpPolicyStatus;
@@ -60,11 +61,11 @@ public class OtpPolicyService {
 
     /**
      * Constructor for OTP policy service.
-     * @param otpPolicyRepository OTP policy repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public OtpPolicyService(OtpPolicyRepository otpPolicyRepository) {
-        this.otpPolicyRepository = otpPolicyRepository;
+    public OtpPolicyService(RepositoryCatalogue repositoryCatalogue) {
+        this.otpPolicyRepository = repositoryCatalogue.getOtpPolicyRepository();
     }
 
     /**

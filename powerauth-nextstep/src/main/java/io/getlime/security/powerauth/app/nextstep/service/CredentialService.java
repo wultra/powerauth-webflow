@@ -19,10 +19,12 @@ import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerCo
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialSecretDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValue;
@@ -34,6 +36,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -49,47 +52,23 @@ public class CredentialService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialService.class);
 
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final CredentialDefinitionService credentialDefinitionService;
-    private final CredentialRepository credentialRepository;
-    private final CredentialHistoryService credentialHistoryService;
-    private final IdGeneratorService idGeneratorService;
+    private final RepositoryCatalogue repositoryCatalogue;
+    private final ServiceCatalogue serviceCatalogue;
     private final NextStepServerConfiguration nextStepServerConfiguration;
-    private final CredentialGenerationService credentialGenerationService;
-    private final CredentialValidationService credentialValidationService;
-    private final CredentialProtectionService credentialProtectionService;
-    private final EndToEndEncryptionService endToEndEncryptionService;
-    private final UserIdentityRepository userIdentityRepository;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
 
     /**
      * Credential service constructor.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param credentialDefinitionService Credential definition service.
-     * @param credentialRepository Credential repository.
-     * @param credentialHistoryService Credential history service.
-     * @param idGeneratorService ID generator service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      * @param nextStepServerConfiguration Next Step server configuration.
-     * @param credentialGenerationService Credential generation service.
-     * @param credentialValidationService Credential validation service.
-     * @param credentialProtectionService Credential protection service.
-     * @param endToEndEncryptionService End-to-end encryption service.
-     * @param userIdentityRepository User identity repository.
      */
     @Autowired
-    public CredentialService(UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService, IdGeneratorService idGeneratorService, NextStepServerConfiguration nextStepServerConfiguration, CredentialGenerationService credentialGenerationService, CredentialValidationService credentialValidationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService, UserIdentityRepository userIdentityRepository) {
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.credentialDefinitionService = credentialDefinitionService;
-        this.credentialRepository = credentialRepository;
-        this.credentialHistoryService = credentialHistoryService;
-        this.idGeneratorService = idGeneratorService;
+    public CredentialService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration) {
+        this.repositoryCatalogue = repositoryCatalogue;
+        this.serviceCatalogue = serviceCatalogue;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
-        this.credentialGenerationService = credentialGenerationService;
-        this.credentialValidationService = credentialValidationService;
-        this.credentialProtectionService = credentialProtectionService;
-        this.endToEndEncryptionService = endToEndEncryptionService;
-        this.userIdentityRepository = userIdentityRepository;
     }
 
     /**
@@ -105,6 +84,11 @@ public class CredentialService {
      */
     @Transactional
     public CreateCredentialResponse createCredential(CreateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidConfigurationException, InvalidRequestException, CredentialValidationFailedException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final CredentialType credentialType = request.getCredentialType();
@@ -169,6 +153,14 @@ public class CredentialService {
      */
     @Transactional
     public UpdateCredentialResponse updateCredential(UpdateCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialValidationFailedException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final CredentialValidationService credentialValidationService = serviceCatalogue.getCredentialValidationService();
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
+        final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -280,6 +272,7 @@ public class CredentialService {
      */
     @Transactional
     public GetUserCredentialListResponse getCredentialList(GetUserCredentialListRequest request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final GetUserCredentialListResponse response = new GetUserCredentialListResponse();
         response.setUserId(user.getUserId());
@@ -313,6 +306,11 @@ public class CredentialService {
      */
     @Transactional
     public ValidateCredentialResponse validateCredential(ValidateCredentialRequest request) throws CredentialDefinitionNotFoundException, InvalidRequestException, UserNotFoundException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final CredentialValidationService credentialValidationService = serviceCatalogue.getCredentialValidationService();
+
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final String username = request.getUsername();
@@ -343,6 +341,7 @@ public class CredentialService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public boolean isCredentialChangeRequired(CredentialEntity credential, String unprotectedCredentialValue) throws InvalidConfigurationException, EncryptionException {
+        final CredentialValidationService credentialValidationService = serviceCatalogue.getCredentialValidationService();
         // Check expiration time
         final Date expirationTime = credential.getTimestampExpires();
         if (expirationTime != null && new Date().after(expirationTime)) {
@@ -385,6 +384,14 @@ public class CredentialService {
      */
     @Transactional
     public ResetCredentialResponse resetCredential(ResetCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, InvalidConfigurationException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final CredentialGenerationService credentialGenerationService = serviceCatalogue.getCredentialGenerationService();
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
+        final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -447,6 +454,10 @@ public class CredentialService {
      */
     @Transactional
     public DeleteCredentialResponse deleteCredential(DeleteCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -478,6 +489,10 @@ public class CredentialService {
      */
     @Transactional
     public BlockCredentialResponse blockCredential(BlockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -510,6 +525,10 @@ public class CredentialService {
      */
     @Transactional
     public UnblockCredentialResponse unblockCredential(UnblockCredentialRequest request) throws UserNotFoundException, CredentialDefinitionNotFoundException, CredentialNotFoundException, CredentialNotBlockedException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -589,6 +608,14 @@ public class CredentialService {
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                    CredentialType credentialType, String username, String credentialValue,
                                                    Date timestampExpires, CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+        final CredentialRepository credentialRepository = repositoryCatalogue.getCredentialRepository();
+        final CredentialGenerationService credentialGenerationService = serviceCatalogue.getCredentialGenerationService();
+        final CredentialValidationService credentialValidationService = serviceCatalogue.getCredentialValidationService();
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
+        final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
+        final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
         // Lookup credential in case it already exists
         final CredentialEntity credential;
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
@@ -709,6 +736,9 @@ public class CredentialService {
      */
     public void importCredentialHistory(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                         String username, String credentialValue, Date createdDate) throws InvalidConfigurationException, EncryptionException {
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
+        final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
+
         final CredentialEntity credential = new CredentialEntity();
         credential.setUser(user);
         credential.setCredentialDefinition(credentialDefinition);

@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.AuditLogConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuditLogRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuditLogEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuditDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuditRequest;
@@ -48,11 +49,11 @@ public class AuditLogService {
 
     /**
      * Audit log service constructor.
-     * @param auditLogRepository Audit log repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
     @Autowired
-    public AuditLogService(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
+    public AuditLogService(RepositoryCatalogue repositoryCatalogue) {
+        this.auditLogRepository = repositoryCatalogue.getAuditLogRepository();
     }
 
     /**

@@ -18,10 +18,12 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialDefinitionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.CredentialPolicyEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialValidationParam;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationFailure;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialValidationMode;
@@ -32,6 +34,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidRequest
 import org.passay.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -49,18 +52,18 @@ public class CredentialValidationService {
     private final Logger logger = LoggerFactory.getLogger(CredentialValidationService.class);
 
     private final CredentialRepository credentialRepository;
-    private final CredentialHistoryService credentialHistoryService;
+    private final ServiceCatalogue serviceCatalogue;
 
     private final ParameterConverter parameterConverter = new ParameterConverter();
 
     /**
      * Credential validation service constructor.
-     * @param credentialRepository Credential repository.
-     * @param credentialHistoryService Credential history service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
-    public CredentialValidationService(CredentialRepository credentialRepository, CredentialHistoryService credentialHistoryService) {
-        this.credentialRepository = credentialRepository;
-        this.credentialHistoryService = credentialHistoryService;
+    public CredentialValidationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.credentialRepository = repositoryCatalogue.getCredentialRepository();
+        this.serviceCatalogue = serviceCatalogue;
     }
 
     /**
@@ -156,6 +159,7 @@ public class CredentialValidationService {
      * @throws EncryptionException Thrown when decryption fails.
      */
     public List<CredentialValidationFailure> validateCredentialValue(UserIdentityEntity user, String username, String credentialValue, CredentialDefinitionEntity credentialDefinition, boolean checkHistory) throws InvalidConfigurationException, EncryptionException {
+        final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
         final List<CredentialValidationFailure> validationFailures = new ArrayList<>();
         if (credentialValue == null || credentialValue.trim().isEmpty()) {
             validationFailures.add(CredentialValidationFailure.CREDENTIAL_EMPTY);

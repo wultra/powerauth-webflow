@@ -21,8 +21,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.security.powerauth.app.nextstep.converter.AuthenticationConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.AuthenticationCustomizationService;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.AuthenticationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.PasswordProtectionType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
@@ -39,6 +41,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -56,17 +59,7 @@ public class AuthenticationService {
     private final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private final AuthenticationRepository authenticationRepository;
-    private final CredentialDefinitionService credentialDefinitionService;
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final OtpService otpService;
-    private final OperationPersistenceService operationPersistenceService;
-    private final CredentialService credentialService;
-    private final CredentialCounterService credentialCounterService;
-    private final StepResolutionService stepResolutionService;
-    private final IdGeneratorService idGeneratorService;
-    private final AuthenticationCustomizationService authenticationCustomizationService;
-    private final CredentialProtectionService credentialProtectionService;
-    private final EndToEndEncryptionService endToEndEncryptionService;
+    private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
@@ -75,34 +68,14 @@ public class AuthenticationService {
 
     /**
      * Authentication service constructor.
-     * @param authenticationRepository Authentication repository.
-     * @param credentialDefinitionService Credential definition service.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param otpService OTP service.
-     * @param operationPersistenceService Operation persistence service.
-     * @param credentialService Credential service.
-     * @param credentialCounterService Credential counter service.
-     * @param stepResolutionService Step resolution service.
-     * @param idGeneratorService ID generator service.
-     * @param authenticationCustomizationService Authentication customization service.
-     * @param credentialProtectionService Credential protection service.
-     * @param endToEndEncryptionService End-to-end encryption service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      * @param otpValueConverter OTP value converter.
      */
     @Autowired
-    public AuthenticationService(AuthenticationRepository authenticationRepository, CredentialDefinitionService credentialDefinitionService, UserIdentityLookupService userIdentityLookupService, OtpService otpService, OperationPersistenceService operationPersistenceService, CredentialService credentialService, CredentialCounterService credentialCounterService, StepResolutionService stepResolutionService, IdGeneratorService idGeneratorService, AuthenticationCustomizationService authenticationCustomizationService, CredentialProtectionService credentialProtectionService, EndToEndEncryptionService endToEndEncryptionService, OtpValueConverter otpValueConverter) {
-        this.authenticationRepository = authenticationRepository;
-        this.credentialDefinitionService = credentialDefinitionService;
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.otpService = otpService;
-        this.operationPersistenceService = operationPersistenceService;
-        this.credentialService = credentialService;
-        this.credentialCounterService = credentialCounterService;
-        this.stepResolutionService = stepResolutionService;
-        this.idGeneratorService = idGeneratorService;
-        this.authenticationCustomizationService = authenticationCustomizationService;
-        this.credentialProtectionService = credentialProtectionService;
-        this.endToEndEncryptionService = endToEndEncryptionService;
+    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter) {
+        this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
+        this.serviceCatalogue = serviceCatalogue;
         this.otpValueConverter = otpValueConverter;
     }
 
@@ -126,6 +99,14 @@ public class AuthenticationService {
      */
     @Transactional
     public CredentialAuthenticationResponse authenticateWithCredential(CredentialAuthenticationRequest request) throws CredentialDefinitionNotFoundException, UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, InvalidConfigurationException, OperationNotValidException, EncryptionException {
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+        final CredentialCounterService credentialCounterService = serviceCatalogue.getCredentialCounterService();
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+
         final CredentialDefinitionEntity credentialDefinition = credentialDefinitionService.findActiveCredentialDefinition(request.getCredentialName());
         if (credentialDefinition.isDataAdapterProxyEnabled()) {
             logger.info("Credential authentication proxied through Data Adapter, credential definition name: {}", credentialDefinition.getName());
@@ -237,6 +218,8 @@ public class AuthenticationService {
      */
     private CredentialAuthenticationResponse authenticateWithCredentialCustom(CredentialDefinitionEntity credentialDefinition, String credentialValue,
                                                                               String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
@@ -283,6 +266,13 @@ public class AuthenticationService {
      */
     @Transactional
     public OtpAuthenticationResponse authenticateWithOtp(OtpAuthenticationRequest request) throws OtpNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
+        final OtpService otpService = serviceCatalogue.getOtpService();
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+        final CredentialCounterService credentialCounterService = serviceCatalogue.getCredentialCounterService();
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("OTP authentication proxied through Data Adapter, OTP ID: {}", otp.getOtpId());
@@ -355,7 +345,7 @@ public class AuthenticationService {
         }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
-        authentication.setAuthenticationId(UUID.randomUUID().toString());
+        authentication.setAuthenticationId(idGeneratorService.generateAuthenticationId());
         authentication.setUserId(userId);
         authentication.setAuthenticationType(AuthenticationType.OTP);
         authentication.setOtp(otp);
@@ -430,6 +420,8 @@ public class AuthenticationService {
      */
     private OtpAuthenticationResponse authenticateWithOtpCustom(OtpDefinitionEntity otpDefinition, String otpId, String otpValue,
                                                                 String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
@@ -470,6 +462,14 @@ public class AuthenticationService {
      */
     @Transactional
     public CombinedAuthenticationResponse authenticateCombined(CombinedAuthenticationRequest request) throws UserNotFoundException, OperationNotFoundException, InvalidRequestException, CredentialNotFoundException, OtpNotFoundException, OperationAlreadyCanceledException, OperationAlreadyFinishedException, InvalidConfigurationException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException, EncryptionException {
+        final OtpService otpService = serviceCatalogue.getOtpService();
+        final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+        final CredentialCounterService credentialCounterService = serviceCatalogue.getCredentialCounterService();
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+
         final OtpEntity otp = otpService.findOtp(request.getOtpId(), request.getOperationId());
         if (otp.getOtpDefinition().isDataAdapterProxyEnabled()) {
             logger.info("Combined authentication proxied through Data Adapter, OTP ID: {}", request.getOtpId());
@@ -551,7 +551,7 @@ public class AuthenticationService {
         }
 
         AuthenticationEntity authentication = new AuthenticationEntity();
-        authentication.setAuthenticationId(UUID.randomUUID().toString());
+        authentication.setAuthenticationId(idGeneratorService.generateAuthenticationId());
         authentication.setUserId(user.getUserId());
         authentication.setAuthenticationType(AuthenticationType.CREDENTIAL_OTP);
         authentication.setCredential(credential);
@@ -623,6 +623,8 @@ public class AuthenticationService {
      */
     private CombinedAuthenticationResponse authenticateCombinedCustom(CredentialDefinitionEntity credentialDefinition, String otpId, String otpValue, String credentialValue,
                                                                     String operationId, String userId, AuthMethod authMethod) throws InvalidRequestException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, AuthMethodNotFoundException, OperationAlreadyCanceledException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final AuthenticationCustomizationService authenticationCustomizationService = serviceCatalogue.getAuthenticationCustomizationService();
         if (operationId == null) {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
@@ -659,6 +661,7 @@ public class AuthenticationService {
      */
     @Transactional
     public GetUserAuthenticationListResponse getUserAuthenticationList(GetUserAuthenticationListRequest request) throws UserNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         final UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Stream<AuthenticationEntity> authentications;
         if (request.getCreatedStartDate() == null && request.getCreatedEndDate() == null) {
@@ -702,6 +705,7 @@ public class AuthenticationService {
     private AuthenticationResult verifyCredential(CredentialAuthenticationMode authenticationMode,
                                                   CredentialEntity credential, String credentialValue,
                                                   List<Integer> credentialPositionsToVerify) throws InvalidRequestException, InvalidConfigurationException, EncryptionException {
+        final CredentialProtectionService credentialProtectionService = serviceCatalogue.getCredentialProtectionService();
         if (credential.getStatus() != CredentialStatus.ACTIVE) {
             logger.info("Credential verification failed, user ID: {}, credential definition name: {}, status: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getStatus());
             return AuthenticationResult.FAILED;
@@ -816,6 +820,7 @@ public class AuthenticationService {
     private UpdateOperationResponse updateOperation(String userId, OperationEntity operation, AuthMethod authMethod,
                                                     AuthenticationResult authenticationResult, String authenticationId,
                                                     boolean lastAttempt, List<AuthInstrument> authInstruments) throws InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, OperationAlreadyFinishedException, OperationAlreadyCanceledException, AuthMethodNotFoundException, OperationAlreadyFailedException, OperationNotValidException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final UpdateOperationRequest updateRequest = new UpdateOperationRequest();
         if (userId != null) {
             // User ID can be null during OTP authentication with unknown user identity. The referred user ID may not be present in Next Step.
@@ -871,6 +876,7 @@ public class AuthenticationService {
      * @return Remaining attempts.
      */
     private Integer resolveRemainingAttempts(CredentialEntity credential, OtpEntity otp, OperationEntity operation) {
+        final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
         Integer remainingAttempts = null;
         if (otp != null) {
             final Integer limitOtp = otp.getOtpDefinition().getOtpPolicy().getAttemptLimit();

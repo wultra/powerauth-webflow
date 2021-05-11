@@ -17,8 +17,10 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserContactEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserContactDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.ContactType;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.UserContactAlreadyExistsException;
@@ -35,6 +37,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateUserConta
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -54,20 +57,20 @@ public class UserContactService {
 
     private final Logger logger = LoggerFactory.getLogger(UserContactService.class);
 
-    private final UserIdentityLookupService userIdentityLookupService;
     private final UserIdentityRepository userIdentityRepository;
+    private final ServiceCatalogue serviceCatalogue;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
 
     /**
      * User contact service constructor.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param userIdentityRepository User identity repository.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      */
     @Autowired
-    public UserContactService(UserIdentityLookupService userIdentityLookupService, UserIdentityRepository userIdentityRepository) {
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.userIdentityRepository = userIdentityRepository;
+    public UserContactService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+        this.serviceCatalogue = serviceCatalogue;
+        this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
     }
 
     /**
@@ -79,6 +82,7 @@ public class UserContactService {
      */
     @Transactional
     public CreateUserContactResponse createUserContact(CreateUserContactRequest request) throws UserNotFoundException, UserContactAlreadyExistsException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         final Set<UserContactEntity> contacts = user.getContacts();
         final Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
@@ -114,6 +118,7 @@ public class UserContactService {
      */
     @Transactional
     public GetUserContactListResponse getUserContactList(GetUserContactListRequest request) throws UserNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Set<UserContactEntity> contacts = user.getContacts();
         GetUserContactListResponse response = new GetUserContactListResponse();
@@ -134,6 +139,7 @@ public class UserContactService {
      */
     @Transactional
     public UpdateUserContactResponse updateUserContact(UpdateUserContactRequest request) throws UserNotFoundException, UserContactNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Set<UserContactEntity> contacts = user.getContacts();
         Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();
@@ -169,6 +175,7 @@ public class UserContactService {
      */
     @Transactional
     public DeleteUserContactResponse deleteUserContact(DeleteUserContactRequest request) throws UserNotFoundException, UserContactNotFoundException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
         UserIdentityEntity user = userIdentityLookupService.findUser(request.getUserId());
         Set<UserContactEntity> contacts = user.getContacts();
         Optional<UserContactEntity> contactOptional = contacts.stream().filter(c -> c.getName().equals(request.getContactName()) && c.getType().equals(request.getContactType())).findFirst();

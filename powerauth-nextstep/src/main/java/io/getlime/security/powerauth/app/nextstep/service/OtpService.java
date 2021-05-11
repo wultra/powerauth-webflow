@@ -17,8 +17,10 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.*;
 import io.getlime.security.powerauth.app.nextstep.service.adapter.OtpCustomizationService;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDeliveryResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OtpValue;
@@ -33,6 +35,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -49,44 +52,20 @@ public class OtpService {
 
     private final Logger logger = LoggerFactory.getLogger(OtpService.class);
 
-    private final OtpDefinitionService otpDefinitionService;
-    private final UserIdentityLookupService userIdentityLookupService;
-    private final CredentialDefinitionService credentialDefinitionService;
-    private final CredentialService credentialService;
-    private final OperationPersistenceService operationPersistenceService;
-    private final OtpGenerationService otpGenerationService;
-    private final StepResolutionService stepResolutionService;
     private final OtpRepository otpRepository;
-    private final OtpCustomizationService otpCustomizationService;
-    private final IdGeneratorService idGeneratorService;
+    private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
 
     /**
      * OTP service constructor.
-     * @param otpDefinitionService OTP definition service.
-     * @param userIdentityLookupService User identity lookup service.
-     * @param credentialDefinitionService Credential definition service.
-     * @param credentialService Credential service.
-     * @param operationPersistenceService Operation persistence service.
-     * @param otpGenerationService OTP generation service.
-     * @param stepResolutionService Step resolution service.
-     * @param otpRepository OTP repository.
-     * @param otpCustomizationService OTP customization service.
-     * @param idGeneratorService ID generator service.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
      * @param otpValueConverter OTP value converter.
      */
     @Autowired
-    public OtpService(OtpDefinitionService otpDefinitionService, UserIdentityLookupService userIdentityLookupService, CredentialDefinitionService credentialDefinitionService, CredentialService credentialService, OperationPersistenceService operationPersistenceService, OtpGenerationService otpGenerationService, StepResolutionService stepResolutionService, OtpRepository otpRepository, OtpCustomizationService otpCustomizationService, IdGeneratorService idGeneratorService, OtpValueConverter otpValueConverter) {
-        this.otpDefinitionService = otpDefinitionService;
-        this.userIdentityLookupService = userIdentityLookupService;
-        this.credentialDefinitionService = credentialDefinitionService;
-        this.credentialService = credentialService;
-        this.operationPersistenceService = operationPersistenceService;
-        this.otpGenerationService = otpGenerationService;
-        this.stepResolutionService = stepResolutionService;
-        this.otpRepository = otpRepository;
-        this.otpCustomizationService = otpCustomizationService;
-        this.idGeneratorService = idGeneratorService;
+    public OtpService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter) {
+        this.serviceCatalogue = serviceCatalogue;
+        this.otpRepository = repositoryCatalogue.getOtpRepository();
         this.otpValueConverter = otpValueConverter;
     }
 
@@ -109,6 +88,7 @@ public class OtpService {
      */
     @Transactional
     public CreateOtpResponse createOtp(CreateOtpRequest request) throws OtpDefinitionNotFoundException, UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
+        final OtpDefinitionService otpDefinitionService = serviceCatalogue.getOtpDefinitionService();
         final OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
         final String userId = request.getUserId();
         final String credentialName = request.getCredentialName();
@@ -137,6 +117,11 @@ public class OtpService {
      */
     @Transactional
     public CreateAndSendOtpResponse createAndSendOtp(CreateAndSendOtpRequest request) throws OtpDefinitionNotFoundException, CredentialNotFoundException, CredentialNotActiveException, InvalidRequestException, InvalidConfigurationException, OtpGenAlgorithmNotSupportedException, CredentialDefinitionNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotFoundException, UserNotActiveException, EncryptionException {
+        final OtpDefinitionService otpDefinitionService = serviceCatalogue.getOtpDefinitionService();
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+        final OtpCustomizationService otpCustomizationService = serviceCatalogue.getOtpCustomizationService();
+
         final OtpDefinitionEntity otpDefinition = otpDefinitionService.findActiveOtpDefinition(request.getOtpName());
         final String userId = request.getUserId();
         final String credentialName = request.getCredentialName();
@@ -218,6 +203,13 @@ public class OtpService {
      * @throws EncryptionException Thrown when encryption fails.
      */
     private CreateOtpResponse createOtpInternal(OtpDefinitionEntity otpDefinition, String userId, String credentialName, String otpData, String operationId) throws UserNotActiveException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final CredentialService credentialService = serviceCatalogue.getCredentialService();
+        final OtpGenerationService otpGenerationService = serviceCatalogue.getOtpGenerationService();
+        final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
+        final CredentialDefinitionService credentialDefinitionService = serviceCatalogue.getCredentialDefinitionService();
+
         UserIdentityEntity user = null;
         if (userId != null) {
             Optional<UserIdentityEntity> userOptional = userIdentityLookupService.findUserOptional(userId);
@@ -301,9 +293,11 @@ public class OtpService {
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
+     * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException {
+    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException, EncryptionException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
         final GetOtpListResponse response = new GetOtpListResponse();
         try (final Stream<OtpEntity> otps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation)) {
@@ -379,6 +373,7 @@ public class OtpService {
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
     public OtpEntity findOtp(String otpId, String operationId) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {
+        final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final OtpEntity otp;
         if (otpId != null) {
             final Optional<OtpEntity> otpOptional = otpRepository.findById(otpId);
@@ -449,6 +444,7 @@ public class OtpService {
      * @return Remaining attempts.
      */
     private Integer resolveRemainingAttempts(OtpEntity otp) {
+        final StepResolutionService stepResolutionService = serviceCatalogue.getStepResolutionService();
         final OtpPolicyEntity otpPolicy = otp.getOtpDefinition().getOtpPolicy();
         Integer remainingAttempts = null;
         if (otpPolicy.getAttemptLimit() != null) {

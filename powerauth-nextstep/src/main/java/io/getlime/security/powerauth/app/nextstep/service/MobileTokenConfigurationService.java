@@ -20,6 +20,7 @@ import com.wultra.security.powerauth.client.model.error.PowerAuthClientException
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.GetActivationStatusResponse;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.EnableMobileTokenResult;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -29,6 +30,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationCon
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -44,23 +46,17 @@ public class MobileTokenConfigurationService {
 
     private static final Logger logger = LoggerFactory.getLogger(MobileTokenConfigurationService.class);
 
-    private final OperationConfigurationService operationConfigurationService;
-    private final AuthMethodService authMethodService;
-    private final PowerAuthOperationService powerAuthOperationService;
+    private final ServiceCatalogue serviceCatalogue;
     private final PowerAuthClient powerAuthClient;
 
     /**
      * Service constructor.
-     * @param operationConfigurationService Operation configuration service.
-     * @param authMethodService Authentication method service.
-     * @param powerAuthOperationService PowerAuth operation service.
+     * @param serviceCatalogue Service catalogue.
      * @param powerAuthClient PowerAuth service client.
      */
     @Autowired
-    public MobileTokenConfigurationService(OperationConfigurationService operationConfigurationService, AuthMethodService authMethodService, PowerAuthOperationService powerAuthOperationService, PowerAuthClient powerAuthClient) {
-        this.operationConfigurationService = operationConfigurationService;
-        this.authMethodService = authMethodService;
-        this.powerAuthOperationService = powerAuthOperationService;
+    public MobileTokenConfigurationService(@Lazy ServiceCatalogue serviceCatalogue, PowerAuthClient powerAuthClient) {
+        this.serviceCatalogue = serviceCatalogue;
         this.powerAuthClient = powerAuthClient;
     }
 
@@ -73,6 +69,8 @@ public class MobileTokenConfigurationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public boolean isMobileTokenActive(String userId, String operationName, AuthMethod authMethod) throws InvalidConfigurationException {
+        final OperationConfigurationService operationConfigurationService = serviceCatalogue.getOperationConfigurationService();
+        final AuthMethodService authMethodService = serviceCatalogue.getAuthMethodService();
         // Check input parameters
         if (userId == null) {
             logger.debug("Mobile token is disabled because user is unknown for this authentication step");
@@ -150,6 +148,7 @@ public class MobileTokenConfigurationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     public EnableMobileTokenResult enableMobileToken(OperationEntity operation) throws InvalidConfigurationException {
+        final PowerAuthOperationService powerAuthOperationService = serviceCatalogue.getPowerAuthOperationService();
         if (operation == null || operation.getUserId() == null || operation.getOperationName() == null) {
             return new EnableMobileTokenResult(false, null);
         }
@@ -176,6 +175,7 @@ public class MobileTokenConfigurationService {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     private String getActivationId(String userId) throws InvalidConfigurationException {
+        final AuthMethodService authMethodService = serviceCatalogue.getAuthMethodService();
         final List<UserAuthMethodDetail> authMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         for (UserAuthMethodDetail userAuthMethod : authMethods) {
             // Check whether activation ID is configured for mobile token, this configuration is set using
