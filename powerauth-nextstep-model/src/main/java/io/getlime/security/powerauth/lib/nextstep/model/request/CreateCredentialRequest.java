@@ -23,6 +23,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -45,11 +46,15 @@ public class CreateCredentialRequest {
     private String username;
     @Size(min = 1, max = 256)
     private String credentialValue;
+    private Date timestampExpires;
     // Null value allowed, defaults to CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL
     private CredentialValidationMode validationMode;
     @Valid
     private List<CredentialHistory> credentialHistory;
 
+    /**
+     * Credential history.
+     */
     @Data
     public static class CredentialHistory {
         @Size(min = 1, max = 256)

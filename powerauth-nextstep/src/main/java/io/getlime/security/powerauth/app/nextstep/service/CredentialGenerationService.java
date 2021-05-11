@@ -93,7 +93,7 @@ public class CredentialGenerationService {
                 }
 
             case NO_USERNAME:
-                return "";
+                return null;
 
             default:
                 throw new InvalidConfigurationException("Unsupported username generation algorithm: " + credentialPolicy.getUsernameGenAlgorithm());

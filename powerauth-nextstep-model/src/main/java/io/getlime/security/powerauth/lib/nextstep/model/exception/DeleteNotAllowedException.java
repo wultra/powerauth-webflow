@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class DeleteNotAllowedException extends NextStepServiceException {
 
+    /**
+     * Delete action is not allowed.
+     */
     public static final String CODE = "DELETE_NOT_ALLOWED";
 
     /**

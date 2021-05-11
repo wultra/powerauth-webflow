@@ -22,7 +22,14 @@ package io.getlime.security.powerauth.lib.nextstep.model.entity.attribute;
  */
 public class OperationFormMessageAttribute {
 
+    /**
+     * Field identifier.
+     */
     protected String id;
+
+    /**
+     * Message.
+     */
     protected String message;
 
     /**

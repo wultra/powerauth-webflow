@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class CredentialPolicyAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Credential policy already exists.
+     */
     public static final String CODE = "CREDENTIAL_POLICY_ALREADY_EXISTS";
 
     /**

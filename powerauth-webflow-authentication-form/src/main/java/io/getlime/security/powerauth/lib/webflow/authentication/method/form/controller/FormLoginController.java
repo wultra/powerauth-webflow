@@ -26,7 +26,9 @@ import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.CredentialDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.AuthenticationResult;
+import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.CredentialType;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserIdentityStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
@@ -120,6 +122,23 @@ public class FormLoginController extends AuthMethodController<UsernamePasswordAu
             LookupUserResponse lookupResponse;
             try {
                 lookupResponse = nextStepClient.lookupUser(username, credentialName, operation.getOperationId()).getResponseObject();
+                // The temporary credential type should can be checked, if required by Web Flow configuration
+                if (!configuration.isAuthenticationWithTemporaryCredentialsAllowed()) {
+                    List<CredentialDetail> credentials = lookupResponse.getUser().getCredentials();
+                    if (credentials != null) {
+                        // Lookup returns either null credentials when Data Adapter proxy is enabled
+                        // or exactly one credential for queried credential definition in Next Step.
+                        if (credentials.size() != 1) {
+                            logger.warn("Unexpected credential count in Next Step response: {}", credentials.size());
+                            throw new AuthStepException("User authentication failed", "error.communication");
+                        }
+                        CredentialDetail credentialDetail = credentials.get(0);
+                        if (credentialDetail.getCredentialType() == CredentialType.TEMPORARY) {
+                            // Authentication is not allowed for temporary passwords
+                            throw new AuthStepException("User authentication failed", "login.authenticationFailed");
+                        }
+                    }
+                }
             } catch (NextStepClientException ex) {
                 if (ex.getNextStepError() != null && UserNotFoundException.CODE.equals(ex.getNextStepError().getCode())) {
                     // User ID not found using lookup

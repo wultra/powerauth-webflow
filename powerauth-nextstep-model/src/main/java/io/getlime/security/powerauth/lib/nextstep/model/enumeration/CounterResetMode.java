@@ -13,34 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package io.getlime.security.powerauth.lib.nextstep.model.exception;
+package io.getlime.security.powerauth.lib.nextstep.model.enumeration;
 
 /**
- * Exception for case when request is invalid.
+ * Enum representing modes for resetting soft failed attempt counters.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-public class InvalidRequestException extends NextStepServiceException {
+public enum CounterResetMode {
 
     /**
-     * Request is invalid.
+     * Reset soft failed attempt counters for credentials with BLOCKED_TEMPORARY status, change status to ACTIVE.
      */
-    public static final String CODE = "INVALID_REQUEST";
+    RESET_BLOCKED_TEMPORARY,
 
     /**
-     * Constructor with error message.
-     * @param message Error message.
+     * Reset soft failed attempt counters for credentials with ACTIVE and BLOCKED_TEMPORARY statuses, change status to ACTIVE if required.
      */
-    public InvalidRequestException(String message) {
-        super(message);
-    }
-
-    /**
-     * Constructor with cause.
-     * @param cause Original exception.
-     */
-    public InvalidRequestException(Throwable cause) {
-        super(cause);
-    }
+    RESET_ACTIVE_AND_BLOCKED_TEMPORARY,
 
 }

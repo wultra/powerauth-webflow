@@ -26,7 +26,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.OrganizationNo
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOrganizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteOrganizationRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetOrganizationDetailRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetOrganizationListRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOrganizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOrganizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
@@ -83,6 +82,7 @@ public class OrganizationService {
         organization.setDefaultCredentialName(request.getDefaultCredentialName());
         organization.setDefaultOtpName(request.getDefaultOtpName());
         organization = organizationRepository.save(organization);
+        logger.debug("Organization was created: {}", organization.getOrganizationId());
         final CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
@@ -111,11 +111,10 @@ public class OrganizationService {
 
     /**
      * Get organization list.
-     * @param requestObject Get organization list request.
      * @return Get organization list response.
      */
     @Transactional
-    public GetOrganizationListResponse getOrganizationList(GetOrganizationListRequest requestObject) {
+    public GetOrganizationListResponse getOrganizationList() {
         final GetOrganizationListResponse response = new GetOrganizationListResponse();
         final List<OrganizationEntity> organizations = organizationRepository.findAllByOrderByOrderNumber();
         for (OrganizationEntity organization: organizations) {
@@ -140,6 +139,7 @@ public class OrganizationService {
         }
         final OrganizationEntity organization = organizationOptional.get();
         organizationRepository.delete(organization);
+        logger.debug("Organization was deleted: {}", organization.getOrganizationId());
         final DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         return response;

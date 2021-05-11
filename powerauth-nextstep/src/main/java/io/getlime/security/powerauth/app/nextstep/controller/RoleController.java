@@ -31,6 +31,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.GetRoleListResp
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -45,6 +46,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("role")
+@Validated
 public class RoleController {
 
     private static final Logger logger = LoggerFactory.getLogger(RoleController.class);
@@ -76,14 +78,26 @@ public class RoleController {
 
     /**
      * Get role list.
+     * @return Get role list response.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetRoleListResponse> getRoleList() {
+        logger.info("Received getRoleList request");
+        final GetRoleListResponse response = roleService.getRoleList();
+        logger.info("The getRoleList request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get role list using POST method.
      * @param request Get role list request.
      * @return Get role list response.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetRoleListResponse> getRoleList(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
-        logger.info("Received getRoleList request");
-        final GetRoleListResponse response = roleService.getRoleList(request.getRequestObject());
-        logger.info("The getRoleList request succeeded");
+    public ObjectResponse<GetRoleListResponse> getRoleListPost(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
+        logger.info("Received getRoleListPost request");
+        final GetRoleListResponse response = roleService.getRoleList();
+        logger.info("The getRoleListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

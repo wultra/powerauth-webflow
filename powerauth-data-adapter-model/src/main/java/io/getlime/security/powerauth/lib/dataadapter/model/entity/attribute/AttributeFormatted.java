@@ -28,8 +28,14 @@ import java.util.Map;
  */
 public class AttributeFormatted extends Attribute {
 
+    /**
+     * Formatted value type.
+     */
     protected ValueFormatType valueFormatType;
 
+    /**
+     * Formatted values.
+     */
     protected Map<String, String> formattedValues = new HashMap<>();
 
     /**

@@ -21,6 +21,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 /**
  * Request object used for updating a credential.
@@ -41,6 +42,7 @@ public class UpdateCredentialRequest {
     private String username;
     @Size(min = 1, max = 256)
     private String credentialValue;
+    private Date timestampExpires;
     private CredentialStatus credentialStatus;
 
 }

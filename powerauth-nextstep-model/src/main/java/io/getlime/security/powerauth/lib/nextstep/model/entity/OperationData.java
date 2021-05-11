@@ -20,6 +20,9 @@ import java.util.Map;
 @Data
 public class OperationData {
 
+    /**
+     * Maximum number of attributes for operation data.
+     */
     public static final int OPERATION_DATA_ATTRIBUTE_COUNT = 5;
 
     @NotBlank

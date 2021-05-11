@@ -24,6 +24,7 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,9 @@ public class UpdateUserRequest {
     @Valid
     private List<UpdatedCredential> credentials;
 
+    /**
+     * Contact to update.
+     */
     @Data
     public static class UpdatedContact {
 
@@ -66,6 +70,9 @@ public class UpdateUserRequest {
 
     }
 
+    /**
+     * Credential to update.
+     */
     @Data
     public static class UpdatedCredential {
 
@@ -78,6 +85,7 @@ public class UpdateUserRequest {
         private String username;
         @Size(min = 1, max = 256)
         private String credentialValue;
+        private Date timestampExpires;
 
     }
 

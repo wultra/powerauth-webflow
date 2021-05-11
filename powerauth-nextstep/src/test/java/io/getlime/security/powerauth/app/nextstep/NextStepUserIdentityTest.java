@@ -80,7 +80,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         CredentialAuthenticationResponse r3 = nextStepClient.authenticateWithCredential("TEST_CREDENTIAL", r2.getUser().getUserId(), credentialValue).getResponseObject();
         assertEquals(AuthenticationResult.SUCCEEDED, r3.getAuthenticationResult());
         assertEquals(CredentialStatus.ACTIVE, r3.getCredentialStatus());
-        GetUserDetailResponse r4 = nextStepClient.getUserDetail(userId).getResponseObject();
+        GetUserDetailResponse r4 = nextStepClient.getUserDetail(userId, false).getResponseObject();
         assertEquals(userId, r4.getUserId());
         assertEquals(1, r4.getCredentials().size());
         assertEquals(1, r4.getContacts().size());
@@ -116,7 +116,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals(UserIdentityStatus.ACTIVE, r10.getUserIdentityStatus());
         assertNotNull(r10.getCredentials().get(0).getCredentialValue());
         assertFalse(r10.getCredentials().get(0).isCredentialChangeRequired());
-        GetUserDetailResponse r11 = nextStepClient.getUserDetail(userId).getResponseObject();
+        GetUserDetailResponse r11 = nextStepClient.getUserDetail(userId, false).getResponseObject();
         // Check that the credential is active
         assertEquals(CredentialStatus.ACTIVE, r11.getCredentials().get(0).getCredentialStatus());
         assertNotNull(r11.getTimestampLastUpdated());
@@ -197,14 +197,14 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals(userId, r2.getUserId());
         assertEquals("TEST_ROLE", r2.getRoleName());
         assertEquals(UserRoleStatus.ACTIVE, r2.getUserRoleStatus());
-        GetUserDetailResponse r3 = nextStepClient.getUserDetail(userId).getResponseObject();
+        GetUserDetailResponse r3 = nextStepClient.getUserDetail(userId, false).getResponseObject();
         assertEquals(1, r3.getRoles().size());
         assertEquals("TEST_ROLE", r3.getRoles().get(0));
         RemoveUserRoleResponse r4 = nextStepClient.removeUserRole(userId, "TEST_ROLE").getResponseObject();
         assertEquals(userId, r4.getUserId());
         assertEquals("TEST_ROLE", r4.getRoleName());
         assertEquals(UserRoleStatus.REMOVED, r4.getUserRoleStatus());
-        GetUserDetailResponse r5 = nextStepClient.getUserDetail(userId).getResponseObject();
+        GetUserDetailResponse r5 = nextStepClient.getUserDetail(userId, false).getResponseObject();
         assertTrue(r5.getRoles().isEmpty());
     }
 
@@ -222,7 +222,7 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals("TEST_ALIAS", r2.getAliasName());
         assertEquals("TEST_VALUE", r2.getAliasValue());
         assertTrue(r2.getExtras().isEmpty());
-        GetUserAliasListResponse r3 = nextStepClient.getUserAliasList(userId).getResponseObject();
+        GetUserAliasListResponse r3 = nextStepClient.getUserAliasList(userId, false).getResponseObject();
         assertEquals(userId, r3.getUserId());
         assertEquals(1, r3.getAliases().size());
         assertEquals("TEST_ALIAS", r3.getAliases().get(0).getAliasName());
@@ -232,14 +232,14 @@ public class NextStepUserIdentityTest extends NextStepTest {
         assertEquals("TEST_ALIAS", r4.getAliasName());
         assertEquals("TEST_VALUE_2", r4.getAliasValue());
         assertTrue(r4.getExtras().isEmpty());
-        GetUserAliasListResponse r5 = nextStepClient.getUserAliasList(userId).getResponseObject();
+        GetUserAliasListResponse r5 = nextStepClient.getUserAliasList(userId, false).getResponseObject();
         assertEquals(userId, r5.getUserId());
         assertEquals(1, r5.getAliases().size());
         assertEquals("TEST_ALIAS", r5.getAliases().get(0).getAliasName());
         assertEquals("TEST_VALUE_2", r5.getAliases().get(0).getAliasValue());
         DeleteUserAliasResponse r6 = nextStepClient.deleteUserAlias(userId, "TEST_ALIAS").getResponseObject();
         assertEquals(UserAliasStatus.REMOVED, r6.getUserAliasStatus());
-        GetUserAliasListResponse r7 = nextStepClient.getUserAliasList(userId).getResponseObject();
+        GetUserAliasListResponse r7 = nextStepClient.getUserAliasList(userId, false).getResponseObject();
         assertEquals(userId, r7.getUserId());
         assertTrue(r7.getAliases().isEmpty());
     }

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserAliasAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * User alias already exists.
+     */
     public static final String CODE = "USER_ALIAS_ALREADY_EXISTS";
 
     /**

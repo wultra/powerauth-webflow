@@ -41,6 +41,7 @@ public class CredentialConverter {
         credentialDetail.setTimestampExpires(credential.getTimestampExpires());
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
+        credentialDetail.setTimestampLastUsernameChange(credential.getTimestampLastUsernameChange());
         return credentialDetail;
     }
 

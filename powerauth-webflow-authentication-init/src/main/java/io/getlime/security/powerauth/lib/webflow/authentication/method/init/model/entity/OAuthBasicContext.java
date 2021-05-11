@@ -24,27 +24,43 @@ package io.getlime.security.powerauth.lib.webflow.authentication.method.init.mod
 public class OAuthBasicContext {
 
     /**
-     * OAuth 2.0 Client ID
+     * OAuth 2.0 client ID.
      */
     private String clientId;
 
     /**
-     * OAuth 2.0 Scopes
+     * OAuth 2.0 scopes.
      */
     private String[] scopes;
 
+    /**
+     * Get OAuth 2.0 client ID.
+     * @return OAuth 2.0 client ID.
+     */
     public String getClientId() {
         return clientId;
     }
 
+    /**
+     * Set OAuth 2.0 client ID.
+     * @param clientId OAuth 2.0 client ID.
+     */
     public void setClientId(String clientId) {
         this.clientId = clientId;
     }
 
+    /**
+     * Get OAuth 2.0 scopes.
+     * @return OAuth 2.0 scopes.
+     */
     public String[] getScopes() {
         return scopes;
     }
 
+    /**
+     * Set OAuth 2.0 scopes.
+     * @param scopes OAuth 2.0 scopes.
+     */
     public void setScopes(String[] scopes) {
         this.scopes = scopes;
     }

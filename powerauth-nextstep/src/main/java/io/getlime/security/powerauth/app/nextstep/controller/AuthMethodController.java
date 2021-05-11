@@ -28,12 +28,13 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ import java.util.Map;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @RestController
+@Validated
 public class AuthMethodController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodController.class);
@@ -75,12 +77,11 @@ public class AuthMethodController {
     /**
      * Get all authentication methods supported by Next Step server.
      *
-     * @param request Get auth methods request. Use null user ID in request.
      * @return List of authentication methods wrapped in GetAuthMethodResponse.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
-    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
+    @RequestMapping(value = "auth-method", method = RequestMethod.GET)
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList() throws InvalidConfigurationException {
         logger.info("Received getAuthMethodList request");
         final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
         if (authMethods == null || authMethods.isEmpty()) {
@@ -94,23 +95,63 @@ public class AuthMethodController {
     }
 
     /**
-     * Get all enabled authentication methods for given user.
+     * Get all authentication methods supported by Next Step server using POST method.
+     *
+     * @param request Get auth methods request.
+     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodListPost(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
+        logger.info("Received getAuthMethodListPost request");
+        final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
+        if (authMethods == null || authMethods.isEmpty()) {
+            logger.error("No authentication method is configured in Next Step server");
+            throw new InvalidConfigurationException("No authentication method is configured in Next Step server.");
+        }
+        final GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.getAuthMethods().addAll(authMethods);
+        logger.debug("The getAuthMethodListPost request succeeded, available authentication method list size: {}", authMethods.size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get all enabled authentication methods for given user. In case user ID is null, list of auth methods enabled by default is returned.
+     *
+     * @param userId User ID.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @RequestMapping(value = "user/auth-method", method = RequestMethod.GET)
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestParam @Nullable @Size(min = 1, max = 256) String userId) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", userId);
+        // userId can be null - in this case default setting is returned when user is not known
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        response.getUserAuthMethods().addAll(userAuthMethods);
+        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication list size: {}", userAuthMethods.size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get all enabled authentication methods for given user using POST method.
      *
      * @param request Get auth methods request. In case user ID is null, list of auth methods enabled by default is returned.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "user/auth-method/list", method = RequestMethod.POST)
-    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@Valid @RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) throws InvalidConfigurationException {
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUserPost(@Valid @RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", request.getRequestObject().getUserId());
+        logger.debug("Received getAuthMethodsEnabledForUserPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetUserAuthMethodsRequest requestObject = request.getRequestObject();
         // userId can be null - in this case default setting is returned when user is not known
         final String userId = requestObject.getUserId();
         final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
         final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
         response.getUserAuthMethods().addAll(userAuthMethods);
-        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication list size: {}", userAuthMethods.size());
+        logger.debug("The getAuthMethodsEnabledForUserPost request succeeded, available authentication list size: {}", userAuthMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -182,16 +223,35 @@ public class AuthMethodController {
 
     /**
      * Get enabled method list.
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @return Get enabled method list response.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     */
+    @RequestMapping(value = "user/auth-method/enabled", method = RequestMethod.GET)
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @NotBlank @Size(min = 2, max = 256) String operationName) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getEnabledMethodList request, user ID: {}", userId);
+        GetEnabledMethodListRequest request = new GetEnabledMethodListRequest();
+        request.setUserId(userId);
+        request.setOperationName(operationName);
+        final GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request);
+        logger.debug("The getEnabledMethodList request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get enabled method list using POST method.
      * @param request Get enabled method list request.
      * @return Get enabled method list response.
      * @throws InvalidConfigurationException Thrown when configuration is invalid.
      */
     @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
-    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodListPost(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getEnabledMethodList request, user ID: {}", request.getRequestObject().getUserId());
+        logger.debug("Received getEnabledMethodListPost request, user ID: {}", request.getRequestObject().getUserId());
         final GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
-        logger.debug("The getEnabledMethodList request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
+        logger.debug("The getEnabledMethodListPost request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
         return new ObjectResponse<>(response);
     }
 

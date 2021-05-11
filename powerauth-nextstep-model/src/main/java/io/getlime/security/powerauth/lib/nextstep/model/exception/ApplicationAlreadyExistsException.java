@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class ApplicationAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Application already exists.
+     */
     public static final String CODE = "APPLICATION_ALREADY_EXISTS";
 
     /**

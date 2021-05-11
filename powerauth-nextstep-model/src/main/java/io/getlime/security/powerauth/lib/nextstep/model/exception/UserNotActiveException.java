@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserNotActiveException extends NextStepServiceException {
 
+    /**
+     * User identity is not active.
+     */
     public static final String CODE = "USER_IDENTITY_NOT_ACTIVE";
 
     /**

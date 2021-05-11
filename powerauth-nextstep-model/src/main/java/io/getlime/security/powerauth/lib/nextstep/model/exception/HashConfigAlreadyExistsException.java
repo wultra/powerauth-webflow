@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class HashConfigAlreadyExistsException extends NextStepServiceException {
 
+    /**
+     * Hashing configuration already exists.
+     */
     public static final String CODE = "HASHING_CONFIG_ALREADY_EXISTS";
 
     /**

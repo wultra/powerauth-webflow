@@ -18,10 +18,13 @@ package io.getlime.security.powerauth.app.nextstep.repository;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OtpEntity;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of one time passwords.
@@ -32,18 +35,29 @@ import java.util.List;
 public interface OtpRepository extends CrudRepository<OtpEntity, String> {
 
     /**
-     * Find OTP entities by user identity.
+     * Remove all OTP entities for user identity.
      * @param userId User identity entity.
-     * @return List of OTP entities.
+     * @return Count of removed OTP entities.
      */
-    List<OtpEntity> findAllByUserId(String userId);
+    @Modifying
+    @Query("UPDATE OtpEntity o SET o.status = io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus.REMOVED " +
+            "WHERE o.userId = ?1 " +
+            "AND o.status <> io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.OtpStatus.REMOVED")
+    int removeOtpsForUserId(String userId);
 
     /**
      * Find OTP entities by operation.
      * @param operationEntity Operation entity.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
+    Stream<OtpEntity> findAllByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
+
+    /**
+     * Find OTP entity by operation.
+     * @param operationEntity Operation entity.
+     * @return Optional OTP entity.
+     */
+    Optional<OtpEntity> findFirstByOperationOrderByTimestampCreatedDesc(OperationEntity operationEntity);
 
     /**
      * Find OTP entities by operation and status.
@@ -51,6 +65,6 @@ public interface OtpRepository extends CrudRepository<OtpEntity, String> {
      * @param status OTP status.
      * @return List of OTP entities.
      */
-    List<OtpEntity> findAllByOperationAndStatus(OperationEntity operationEntity, OtpStatus status);
+    Stream<OtpEntity> findAllByOperationAndStatus(OperationEntity operationEntity, OtpStatus status);
 
 }

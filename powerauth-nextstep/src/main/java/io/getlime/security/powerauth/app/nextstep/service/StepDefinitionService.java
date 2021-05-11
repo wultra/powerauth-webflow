@@ -72,7 +72,7 @@ public class StepDefinitionService {
         if (stepDefinitionOptional.isPresent()) {
             throw new StepDefinitionAlreadyExistsException("Step definition already exits, ID: " + request.getStepDefinitionId());
         }
-        final StepDefinitionEntity stepDefinition = new StepDefinitionEntity();
+        StepDefinitionEntity stepDefinition = new StepDefinitionEntity();
         stepDefinition.setStepDefinitionId(request.getStepDefinitionId());
         stepDefinition.setOperationName(request.getOperationName());
         stepDefinition.setOperationType(request.getOperationRequestType());
@@ -81,7 +81,8 @@ public class StepDefinitionService {
         stepDefinition.setResponsePriority(request.getResponsePriority());
         stepDefinition.setResponseAuthMethod(request.getResponseAuthMethod());
         stepDefinition.setResponseResult(request.getResponseResult());
-        stepDefinitionRepository.save(stepDefinition);
+        stepDefinition = stepDefinitionRepository.save(stepDefinition);
+        logger.debug("Step definition was created, step definition ID: {}", stepDefinition.getStepDefinitionId());
         stepResolutionService.reloadStepDefinitions();
         final CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
         response.setStepDefinitionId(request.getStepDefinitionId());
@@ -110,6 +111,7 @@ public class StepDefinitionService {
         }
         final StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
         stepDefinitionRepository.delete(stepDefinition);
+        logger.debug("Step definition was deleted, step definition ID: {}", stepDefinition.getStepDefinitionId());
         stepResolutionService.reloadStepDefinitions();
         final DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();
         response.setStepDefinitionId(stepDefinition.getStepDefinitionId());

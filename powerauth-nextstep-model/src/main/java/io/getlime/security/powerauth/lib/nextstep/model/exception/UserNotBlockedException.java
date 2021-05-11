@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class UserNotBlockedException extends NextStepServiceException {
 
+    /**
+     * User identity is not blocked.
+     */
     public static final String CODE = "USER_IDENTITY_NOT_BLOCKED";
 
     /**

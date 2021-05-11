@@ -22,7 +22,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Crud repository for persistence of authentication events.
@@ -35,11 +35,18 @@ public interface AuthenticationRepository extends CrudRepository<AuthenticationE
     /**
      * Find all authentication entities by user identity.
      * @param userId User ID.
-     * @return List of authentication entities.
+     * @return Stream of authentication entities.
      */
-    List<AuthenticationEntity> findAllByUserIdOrderByTimestampCreatedDesc(String userId);
+    Stream<AuthenticationEntity> findAllByUserIdOrderByTimestampCreatedDesc(String userId);
 
+    /**
+     * Find authentication entities by user identity and created date.
+     * @param userId User ID.
+     * @param startDate Created date range start.
+     * @param endDate Created date range end.
+     * @return Stream of authentication entities.
+     */
     @Query(value = "from AuthenticationEntity a where a.userId = :userId AND a.timestampCreated BETWEEN :startDate AND :endDate ORDER BY a.timestampCreated DESC")
-    List<AuthenticationEntity> findAuthenticationsByUserIdAndCreatedDate(@Param("userId") String userId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+    Stream<AuthenticationEntity> findAuthenticationsByUserIdAndCreatedDate(@Param("userId") String userId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
 }

@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class InvalidOperationDataException extends NextStepServiceException {
 
+    /**
+     * Operation contains invalid data.
+     */
     public static final String CODE = "INVALID_OPERATION_DATA";
 
     /**

@@ -114,6 +114,7 @@ public class UserAliasService {
             }
         }
         user = userIdentityRepository.save(user);
+        logger.debug("User alias was created, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
         CreateUserAliasResponse response = new CreateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -189,6 +190,7 @@ public class UserAliasService {
             }
         }
         user = userIdentityRepository.save(user);
+        logger.debug("User alias was updated, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
         final UpdateUserAliasResponse response = new UpdateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -224,6 +226,7 @@ public class UserAliasService {
         alias.setStatus(UserAliasStatus.REMOVED);
         alias.setTimestampLastUpdated(new Date());
         user = userIdentityRepository.save(user);
+        logger.debug("User alias was removed, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
         final DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());

@@ -21,10 +21,34 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum ValueFormatType {
+
+    /**
+     * Text without additional formatting.
+     */
     TEXT,
+
+    /**
+     * Text localized into chosen language.
+     */
     LOCALIZED_TEXT,
+
+    /**
+     * Date.
+     */
     DATE,
+
+    /**
+     * Number with integer type.
+     */
     NUMBER,
+
+    /**
+     * Monetary amount.
+     */
     AMOUNT,
+
+    /**
+     * Account number.
+     */
     ACCOUNT
 }

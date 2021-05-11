@@ -11,15 +11,45 @@ public abstract class OperationDataAttribute {
      * Operation data attribute type.
      */
     public enum Type {
+        /**
+         * Monetary amount.
+         */
         AMOUNT,
+
+        /**
+         * Generic account format.
+         */
         ACCOUNT_GENERIC,
+
+        /**
+         * Account in IBAN format.
+         */
         ACCOUNT_IBAN,
+
+        /**
+         * Payment date.
+         */
         DATE,
+
+        /**
+         * Payment reference.
+         */
         REFERENCE,
+
+        /**
+         * Payment note.
+         */
         NOTE,
+
+        /**
+         * Text element.
+         */
         TEXT
     }
 
+    /**
+     * Data type.
+     */
     protected Type type;
 
     /**

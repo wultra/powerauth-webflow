@@ -96,4 +96,7 @@ public class CredentialEntity implements Serializable {
     @Column(name = "timestamp_last_credential_change")
     private Date timestampLastCredentialChange;
 
+    @Column(name = "timestamp_last_username_change")
+    private Date timestampLastUsernameChange;
+
 }

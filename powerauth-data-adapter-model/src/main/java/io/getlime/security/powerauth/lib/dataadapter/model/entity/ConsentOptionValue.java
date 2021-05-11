@@ -22,6 +22,14 @@ package io.getlime.security.powerauth.lib.dataadapter.model.entity;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum ConsentOptionValue {
+
+    /**
+     * Consent option is checked.
+     */
     CHECKED,
+
+    /**
+     * Consent option is not checked.
+     */
     NOT_CHECKED
 }

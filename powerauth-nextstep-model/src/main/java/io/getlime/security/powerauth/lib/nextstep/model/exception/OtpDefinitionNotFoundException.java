@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OtpDefinitionNotFoundException extends NextStepServiceException {
 
+    /**
+     * OTP definition not found.
+     */
     public static final String CODE = "OTP_DEFINITION_NOT_FOUND";
 
     /**

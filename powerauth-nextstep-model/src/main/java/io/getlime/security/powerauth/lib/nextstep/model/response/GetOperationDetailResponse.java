@@ -73,6 +73,10 @@ public class GetOperationDetailResponse {
     private Integer remainingAttempts;
     private ApplicationContext applicationContext;
 
+    /**
+     * Get whether operation is expired.
+     * @return Whether operation is expired.
+     */
     public boolean isExpired() {
         return new Date().after(timestampExpires);
     }

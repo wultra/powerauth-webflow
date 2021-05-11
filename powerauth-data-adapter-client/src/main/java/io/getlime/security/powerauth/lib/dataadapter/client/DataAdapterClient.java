@@ -20,6 +20,7 @@ import com.wultra.core.rest.client.base.DefaultRestClient;
 import com.wultra.core.rest.client.base.RestClient;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.core.rest.client.base.RestClientException;
+import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
@@ -55,7 +56,9 @@ public class DataAdapterClient {
         try {
             restClient = new DefaultRestClient(serviceBaseUrl);
         } catch (RestClientException ex) {
-            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
+            DataAdapterClientErrorException ex2 = new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -68,7 +71,9 @@ public class DataAdapterClient {
         try {
             restClient = new DefaultRestClient(restClientConfiguration);
         } catch (RestClientException ex) {
-            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
+            DataAdapterClientErrorException ex2 = new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -393,8 +398,9 @@ public class DataAdapterClient {
         try {
             return restClient.postObject(path, request);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
+            DataAdapterClientErrorException ex2 = new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -411,8 +417,22 @@ public class DataAdapterClient {
         try {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
+            DataAdapterClientErrorException ex2 = new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
+        }
+    }
+
+    /**
+     * Log REST client exception details.
+     * @param ex REST client exception.
+     */
+    private void logError(DataAdapterClientErrorException ex) {
+        Error error = ex.getError();
+        if (error != null) {
+            logger.warn("Data Adapter REST API call failed with error code: {}", error.getCode());
+        } else {
             logger.warn(ex.getMessage(), ex);
-            throw new DataAdapterClientErrorException(ex, new DataAdapterError(resolveErrorCode(ex), "HTTP POST request failed."));
         }
     }
 

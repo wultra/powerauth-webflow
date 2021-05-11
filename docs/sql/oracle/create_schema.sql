@@ -362,6 +362,7 @@ CREATE TABLE ns_credential_storage (
   timestamp_blocked                TIMESTAMP,                               -- Timestamp when credential was blocked.
   timestamp_last_updated           TIMESTAMP,                               -- Timestamp when credential was last updated.
   timestamp_last_credential_change TIMESTAMP,                               -- Timestamp when credential value was last changed.
+  timestamp_last_username_change   TIMESTAMP,                               -- Timestamp when username value was last changed.
   CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
   CONSTRAINT ns_credential_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 );
@@ -611,11 +612,13 @@ CREATE UNIQUE INDEX ns_credential_definition_name ON ns_credential_definition (n
 CREATE UNIQUE INDEX ns_otp_definition_name ON ns_otp_definition (name);
 CREATE INDEX ns_credential_storage_user_id ON ns_credential_storage (user_id);
 CREATE INDEX ns_credential_storage_status ON ns_credential_storage (status);
-CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (credential_definition_id, user_name);
+CREATE UNIQUE INDEX ns_credential_storage_query1 ON ns_credential_storage (CASE WHEN user_name IS NOT NULL THEN credential_definition_id || '&' || user_name END);
+CREATE INDEX ns_credential_storage_query1_perf ON ns_credential_storage (credential_definition_id, user_name);
 CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_id, credential_definition_id);
 CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
 CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
 CREATE INDEX ns_otp_storage_user_id ON ns_otp_storage (user_id);
+CREATE INDEX ns_otp_storage_user_id_status ON ns_otp_storage (user_id, status);
 CREATE INDEX ns_otp_storage_operation_id ON ns_otp_storage (operation_id);
 CREATE INDEX ns_authentication_user_id ON ns_authentication (user_id);
 CREATE INDEX ns_authentication_operation_id ON ns_authentication (operation_id);

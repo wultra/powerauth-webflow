@@ -40,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * This service handles persistence of one time passwords.
@@ -131,8 +132,8 @@ public class OtpService {
         boolean resend = false;
         // Operation is required, otherwise Data Adapter would not have enough context to generate SMS message
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        final List<OtpEntity> existingOtps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
-        if (!existingOtps.isEmpty()) {
+        final Optional<OtpEntity> existingOtp = otpRepository.findFirstByOperationOrderByTimestampCreatedDesc(operation);
+        if (existingOtp.isPresent()) {
             resend = true;
         }
         CredentialDefinitionEntity credentialDefinition = null;
@@ -229,11 +230,15 @@ public class OtpService {
         if (operationId != null) {
             operation = operationPersistenceService.getOperation(operationId);
             // Remove obsolete OTPs for this operation
-            List<OtpEntity> existingOtps = otpRepository.findAllByOperationAndStatus(operation, OtpStatus.ACTIVE);
-            for (OtpEntity otp : existingOtps) {
-                otp.setStatus(OtpStatus.REMOVED);
-                otpRepository.save(otp);
+            List<OtpEntity> otpsToRemove = new ArrayList<>();
+            try (final Stream<OtpEntity> existingOtps = otpRepository.findAllByOperationAndStatus(operation, OtpStatus.ACTIVE)) {
+                existingOtps.forEach(otp -> {
+                    logger.debug("Existing OTP was removed due to new OTP: {}", otp.getOtpId());
+                    otp.setStatus(OtpStatus.REMOVED);
+                    otpsToRemove.add(otp);
+                });
             }
+            otpRepository.saveAll(otpsToRemove);
             if (operation.getResult() == AuthResult.DONE) {
                 throw new OperationAlreadyFinishedException("Cannot create OTP, because operation is already finished: " + operation.getOperationId());
             }
@@ -251,7 +256,7 @@ public class OtpService {
         }
         final OtpValueDetail otpValueDetail = otpGenerationService.generateOtpValue(otpData, otpDefinition.getOtpPolicy());
         final String otpId = idGeneratorService.generateOtpId();
-        final OtpEntity otp = new OtpEntity();
+        OtpEntity otp = new OtpEntity();
         otp.setOtpId(otpId);
         otp.setOtpDefinition(otpDefinition);
         otp.setUserId(userId);
@@ -272,7 +277,8 @@ public class OtpService {
             cal.add(Calendar.SECOND, expirationTime.intValue());
             otp.setTimestampExpires(cal.getTime());
         }
-        otpRepository.save(otp);
+        otp = otpRepository.save(otp);
+        logger.debug("OTP was created, user ID: {}, OTP ID: {}", userId, otp.getOtpId());
         final CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
         response.setUserId(userId);
@@ -287,22 +293,26 @@ public class OtpService {
      * @param request Get OTP list request.
      * @return Get OTP list response.
      * @throws OperationNotFoundException Thrown when operation is not found.
-     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws EncryptionException Thrown when decryption fails.
      */
     @Transactional
-    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException, InvalidConfigurationException, EncryptionException {
+    public GetOtpListResponse getOtpList(GetOtpListRequest request) throws OperationNotFoundException, EncryptionException {
         final OperationPersistenceService operationPersistenceService = serviceCatalogue.getOperationPersistenceService();
         final OperationEntity operation = operationPersistenceService.getOperation(request.getOperationId());
-        final List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
         final GetOtpListResponse response = new GetOtpListResponse();
-        response.setOperationId(operation.getOperationId());
-        for (OtpEntity otp : otpList) {
-            if (!request.isIncludeRemoved() && otp.getStatus() == OtpStatus.REMOVED) {
-                continue;
-            }
-            final OtpDetail otpDetail = getOtpDetail(otp);
-            response.getOtpDetails().add(otpDetail);
+        try (final Stream<OtpEntity> otps = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation)) {
+            response.setOperationId(operation.getOperationId());
+            otps.forEach(otp -> {
+                if (!request.isIncludeRemoved() && otp.getStatus() == OtpStatus.REMOVED) {
+                    return;
+                }
+                try {
+                    final OtpDetail otpDetail = getOtpDetail(otp);
+                    response.getOtpDetails().add(otpDetail);
+                } catch (EncryptionException | InvalidConfigurationException ex) {
+                    logger.error(ex.getMessage(), ex);
+                }
+            });
         }
         return response;
     }
@@ -343,6 +353,7 @@ public class OtpService {
         }
         otp.setStatus(OtpStatus.REMOVED);
         otpRepository.save(otp);
+        logger.debug("OTP was removed, OTP ID: {}", otp.getOtpId());
         final DeleteOtpResponse response = new DeleteOtpResponse();
         response.setOtpId(otp.getOtpId());
         if (otp.getOperation() != null) {
@@ -380,11 +391,11 @@ public class OtpService {
             }
         } else if (operationId != null) {
             final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-            final List<OtpEntity> otpList = otpRepository.findAllByOperationOrderByTimestampCreatedDesc(operation);
-            if (otpList.isEmpty()) {
+            final Optional<OtpEntity> otpOptional = otpRepository.findFirstByOperationOrderByTimestampCreatedDesc(operation);
+            if (!otpOptional.isPresent()) {
                 throw new OtpNotFoundException("No OTP found for operation: " + operation.getOperationId());
             }
-            otp = otpList.get(0);
+            otp = otpOptional.get();
         } else {
             throw new InvalidRequestException("Missing otp ID or operation ID");
         }

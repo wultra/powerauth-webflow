@@ -34,10 +34,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpPolicy
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
@@ -48,6 +46,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("otp/policy")
+@Validated
 public class OtpPolicyController {
 
     private static final Logger logger = LoggerFactory.getLogger(OtpPolicyController.class);
@@ -110,15 +109,31 @@ public class OtpPolicyController {
 
     /**
      * Get OTP policy list.
+     * @param includeRemoved Whether removed OTP policies should be included.
+     * @return Get OTP policy list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @RequestMapping(method = RequestMethod.GET)
+    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
+        logger.info("Received getOtpPolicyListPost request");
+        GetOtpPolicyListRequest request = new GetOtpPolicyListRequest();
+        request.setIncludeRemoved(includeRemoved);
+        final GetOtpPolicyListResponse response = otpPolicyService.getOtpPolicyList(request);
+        logger.info("The getOtpPolicyListPost request succeeded");
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get OTP policy list using POST method.
      * @param request Get OTP policy list request.
      * @return Get OTP policy list response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
     @RequestMapping(value = "list", method = RequestMethod.POST)
-    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@Valid @RequestBody ObjectRequest<GetOtpPolicyListRequest> request) throws InvalidConfigurationException {
-        logger.info("Received getOtpPolicyList request");
+    public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyListPost(@Valid @RequestBody ObjectRequest<GetOtpPolicyListRequest> request) throws InvalidConfigurationException {
+        logger.info("Received getOtpPolicyListPost request");
         final GetOtpPolicyListResponse response = otpPolicyService.getOtpPolicyList(request.getRequestObject());
-        logger.info("The getOtpPolicyList request succeeded");
+        logger.info("The getOtpPolicyListPost request succeeded");
         return new ObjectResponse<>(response);
     }
 

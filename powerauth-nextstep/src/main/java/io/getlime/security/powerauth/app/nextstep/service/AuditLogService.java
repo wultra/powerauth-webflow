@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.Date;
+import java.util.stream.Stream;
 
 /**
  * This service handles persistence of audit logs.
@@ -81,11 +82,12 @@ public class AuditLogService {
     public GetAuditListResponse getAuditLogList(GetAuditListRequest request) {
         final Date startDate = request.getStartDate();
         final Date endDate = request.getEndDate();
-        final Iterable<AuditLogEntity> auditLogs = auditLogRepository.findAuditLogsByCreatedDate(startDate, endDate);
         final GetAuditListResponse response = new GetAuditListResponse();
-        for (AuditLogEntity auditLog : auditLogs) {
-            final AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);
-            response.getAudits().add(auditDetail);
+        try (final Stream<AuditLogEntity> auditLogs = auditLogRepository.findAuditLogsByCreatedDate(startDate, endDate)) {
+            auditLogs.forEach(auditLog -> {
+                final AuditDetail auditDetail = auditLogConverter.fromEntity(auditLog);
+                response.getAudits().add(auditDetail);
+            });
         }
         return response;
     }

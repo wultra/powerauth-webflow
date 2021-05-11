@@ -97,12 +97,13 @@ public class CredentialService {
         if (credentialValue != null && credentialDefinition.isE2eEncryptionEnabled()) {
             credentialValue = endToEndEncryptionService.decryptCredential(credentialValue, credentialDefinition);
         }
+        final Date timestampExpires = request.getTimestampExpires();
         CredentialValidationMode validationMode = request.getValidationMode();
         final List<CreateCredentialRequest.CredentialHistory> credentialHistory = request.getCredentialHistory();
         if (validationMode == null) {
             validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
         }
-        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, validationMode);
+        final CredentialSecretDetail credentialDetail = createCredential(user, credentialDefinition, credentialType, username, credentialValue, timestampExpires, validationMode);
         if (credentialHistory != null && !credentialHistory.isEmpty()) {
             final int dateCount = credentialHistory.size();
             // Use unique timestamps in seconds to keep order of credential history
@@ -118,6 +119,7 @@ public class CredentialService {
             }
         }
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
@@ -201,25 +203,31 @@ public class CredentialService {
                 throw new CredentialValidationFailedException("Validation failed for user ID: " + user.getUserId(), error);
             }
         }
-        if (request.getUsername() != null) {
+        Date changeTimestamp = new Date();
+        if (request.getUsername() != null && !request.getUsername().equals(credential.getUsername())) {
             credential.setUsername(username);
+            credential.setTimestampLastUsernameChange(changeTimestamp);
         }
         if (request.getCredentialValue() != null) {
             final CredentialValue protectedValue = credentialProtectionService.protectCredential(credentialValue, credential);
             credential.setValue(protectedValue.getValue());
             credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
-            credential.setTimestampLastCredentialChange(new Date());
+            credential.setTimestampLastCredentialChange(changeTimestamp);
             updateCredentialExpiration = true;
         }
-        if (updateCredentialExpiration) {
+        if (request.getTimestampExpires() != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(request.getTimestampExpires());
+        } else if (updateCredentialExpiration) {
+            // Credential expiration needs to be derived
             updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
         }
         if (request.getCredentialStatus() != null) {
             credential.setStatus(request.getCredentialStatus());
                 if (credential.getStatus() == CredentialStatus.BLOCKED_TEMPORARY || credential.getStatus() == CredentialStatus.BLOCKED_PERMANENT){
                 // For blocked credentials set timestamp when credential was blocked
-                credential.setTimestampBlocked(new Date());
+                credential.setTimestampBlocked(changeTimestamp);
             } else if (credential.getStatus() == CredentialStatus.ACTIVE) {
                 // Reset counters for active credentials
                 credential.setFailedAttemptCounterSoft(0);
@@ -227,12 +235,13 @@ public class CredentialService {
                 credential.setTimestampBlocked(null);
             }
         }
-        credential.setTimestampLastUpdated(new Date());
+        credential.setTimestampLastUpdated(changeTimestamp);
         if (request.getCredentialValue() != null) {
             // Save credential into credential history
-            credentialHistoryService.createCredentialHistory(user, credential, new Date());
+            credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         }
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was updated for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -318,6 +327,7 @@ public class CredentialService {
         } else {
             response.setValidationResult(CredentialValidationResult.FAILED);
         }
+        logger.debug("Credential validation result: {}, validation errors: {}", response.getValidationResult(), response.getValidationErrors());
         response.getValidationErrors().addAll(validationErrors);
         return response;
     }
@@ -395,21 +405,29 @@ public class CredentialService {
         if (request.getCredentialType() != null) {
             credential.setType(request.getCredentialType());
         }
-        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        if (request.getTimestampExpires() != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(request.getTimestampExpires());
+        } else {
+            // Credential expiration needs to be derived
+            updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        }
         final String unprotectedCredentialValue = credentialGenerationService.generateCredentialValue(credentialDefinition);
         final CredentialValue protectedCredentialValue = credentialProtectionService.protectCredential(unprotectedCredentialValue, credential);
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
-        credential.setTimestampLastUpdated(new Date());
-        credential.setTimestampLastCredentialChange(new Date());
+        Date changeTimestamp = new Date();
+        credential.setTimestampLastUpdated(changeTimestamp);
+        credential.setTimestampLastCredentialChange(changeTimestamp);
         credential.setFailedAttemptCounterSoft(0);
         credential.setFailedAttemptCounterHard(0);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(user, credential, new Date());
+        credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was reset for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -452,6 +470,7 @@ public class CredentialService {
         }
         credential.setStatus(CredentialStatus.REMOVED);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was removed for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -487,6 +506,7 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.BLOCKED_PERMANENT);
         credential.setTimestampBlocked(new Date());
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was blocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -527,6 +547,7 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         user = userIdentityRepository.save(user);
+        logger.debug("Credential was unblocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -577,6 +598,7 @@ public class CredentialService {
      * @param credentialType Credential type.
      * @param username Username, use null for generated username.
      * @param credentialValue Credential value, use null for generated credential value.
+     * @param timestampExpires Expiration timestamp for case when expiration timestamp is overridden.
      * @param validationMode Credential validation mode.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws CredentialValidationFailedException Thrown when credential validation fails.
@@ -585,7 +607,7 @@ public class CredentialService {
      */
     public CredentialSecretDetail createCredential(UserIdentityEntity user, CredentialDefinitionEntity credentialDefinition,
                                                    CredentialType credentialType, String username, String credentialValue,
-                                                   CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
+                                                   Date timestampExpires, CredentialValidationMode validationMode) throws InvalidConfigurationException, CredentialValidationFailedException, InvalidRequestException, EncryptionException {
         final IdGeneratorService idGeneratorService = serviceCatalogue.getIdGeneratorService();
         final CredentialRepository credentialRepository = repositoryCatalogue.getCredentialRepository();
         final CredentialGenerationService credentialGenerationService = serviceCatalogue.getCredentialGenerationService();
@@ -594,22 +616,22 @@ public class CredentialService {
         final CredentialHistoryService credentialHistoryService = serviceCatalogue.getCredentialHistoryService();
         final UserIdentityRepository userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
         final EndToEndEncryptionService endToEndEncryptionService = serviceCatalogue.getEndToEndEncryptionService();
-
         // Lookup credential in case it already exists
         final CredentialEntity credential;
         final Optional<CredentialEntity> credentialOptional = user.getCredentials().stream().filter(c -> c.getCredentialDefinition().equals(credentialDefinition)).findFirst();
         final boolean newCredential;
+        Date changeTimestamp = new Date();
         if (credentialOptional.isPresent()) {
             // TODO - auditing
             credential = credentialOptional.get();
-            credential.setTimestampLastUpdated(new Date());
-            credential.setTimestampLastCredentialChange(new Date());
+            credential.setTimestampLastUpdated(changeTimestamp);
+            credential.setTimestampLastCredentialChange(changeTimestamp);
             newCredential = false;
         } else {
             credential = new CredentialEntity();
             credential.setCredentialId(idGeneratorService.generateCredentialId());
             credential.setCredentialDefinition(credentialDefinition);
-            credential.setTimestampCreated(new Date());
+            credential.setTimestampCreated(changeTimestamp);
             credential.setUser(user);
             newCredential = true;
         }
@@ -635,7 +657,13 @@ public class CredentialService {
             }
         }
         credential.setType(credentialType);
-        updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        if (timestampExpires != null) {
+            // Credential expiration is set in the request
+            credential.setTimestampExpires(timestampExpires);
+        } else {
+            // Credential expiration needs to be derived
+            updateCredentialExpirationTime(credential, credentialDefinition.getCredentialPolicy());
+        }
         credential.setUsername(username);
         final String credentialValueRequest = credentialValue;
         if (credentialValue == null) {
@@ -652,7 +680,8 @@ public class CredentialService {
         credential.setValue(protectedCredentialValue.getValue());
         credential.setEncryptionAlgorithm(protectedCredentialValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
-        credential.setTimestampLastCredentialChange(new Date());
+        credential.setTimestampLastCredentialChange(changeTimestamp);
+        credential.setTimestampLastUsernameChange(changeTimestamp);
         credential.setStatus(CredentialStatus.ACTIVE);
         credential.setTimestampBlocked(null);
         // Counters are reset even in case of an existing credential
@@ -665,8 +694,9 @@ public class CredentialService {
         }
 
         // Save credential into credential history
-        credentialHistoryService.createCredentialHistory(user, credential, new Date());
-        userIdentityRepository.save(user);
+        credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
+        user = userIdentityRepository.save(user);
+        logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         final CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());
@@ -691,6 +721,7 @@ public class CredentialService {
         credentialDetail.setTimestampExpires(credential.getTimestampExpires());
         credentialDetail.setTimestampBlocked(credential.getTimestampBlocked());
         credentialDetail.setTimestampLastCredentialChange(credential.getTimestampLastCredentialChange());
+        credentialDetail.setTimestampLastUsernameChange(credential.getTimestampLastUsernameChange());
         return credentialDetail;
     }
 
@@ -717,6 +748,7 @@ public class CredentialService {
         credential.setEncryptionAlgorithm(protectedValue.getEncryptionAlgorithm());
         credential.setHashingConfig(credentialDefinition.getHashingConfig());
         credentialHistoryService.createCredentialHistory(user, credential, createdDate);
+        logger.debug("Credential history record was imported for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
     }
 
     /**
@@ -731,6 +763,7 @@ public class CredentialService {
                 final Calendar c = Calendar.getInstance();
                 c.add(Calendar.SECOND, expirationTime);
                 credential.setTimestampExpires(c.getTime());
+                logger.debug("Credential expiration time was updated for user ID: {}, credential definition name: {}, expiration: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getTimestampExpires());
                 return;
             }
         }
@@ -738,6 +771,7 @@ public class CredentialService {
             final Calendar c = GregorianCalendar.getInstance();
             c.add(Calendar.DAY_OF_YEAR, credentialPolicy.getRotationDays());
             credential.setTimestampExpires(c.getTime());
+            logger.debug("Credential expiration time was updated for user ID: {}, credential definition name: {}, expiration: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName(), credential.getTimestampExpires());
             return;
         }
         credential.setTimestampExpires(null);

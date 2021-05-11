@@ -27,6 +27,8 @@ import io.getlime.security.powerauth.app.nextstep.repository.model.entity.Operat
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,6 +42,8 @@ import java.util.Optional;
  */
 @Service
 public class OperationConfigurationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(OperationConfigurationService.class);
 
     private final OperationConfigRepository operationConfigRepository;
     private final OperationMethodConfigRepository operationMethodConfigRepository;
@@ -72,7 +76,7 @@ public class OperationConfigurationService {
         if (operationConfigOptional.isPresent()) {
             throw new OperationConfigAlreadyExists("Operation configuration already exists for operation: " + request.getOperationName());
         }
-        final OperationConfigEntity operationConfig = new OperationConfigEntity();
+        OperationConfigEntity operationConfig = new OperationConfigEntity();
         operationConfig.setOperationName(request.getOperationName());
         operationConfig.setTemplateVersion(request.getTemplateVersion());
         operationConfig.setTemplateId(request.getTemplateId());
@@ -81,7 +85,8 @@ public class OperationConfigurationService {
         operationConfig.setAfsEnabled(request.isAfsEnabled());
         operationConfig.setAfsConfigId(request.getAfsConfigId());
         operationConfig.setExpirationTime(request.getExpirationTime());
-        operationConfigRepository.save(operationConfig);
+        operationConfig = operationConfigRepository.save(operationConfig);
+        logger.debug("Operation configuration was created, operation name: {}", operationConfig.getOperationName());
         final CreateOperationConfigResponse response = new CreateOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
@@ -144,6 +149,7 @@ public class OperationConfigurationService {
         }
         final OperationConfigEntity operationConfig = operationConfigOptional.get();
         operationConfigRepository.delete(operationConfig);
+        logger.debug("Operation configuration was deleted, operation name: {}", operationConfig.getOperationName());
         final DeleteOperationConfigResponse response = new DeleteOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
         return response;
@@ -172,10 +178,11 @@ public class OperationConfigurationService {
         if (operationMethodConfigOptional.isPresent()) {
             throw new OperationMethodConfigAlreadyExists("Configuration already exists for operation: " + request.getOperationName() + ", authentication method: " + request.getAuthMethod());
         }
-        final OperationMethodConfigEntity operationMethodConfig = new OperationMethodConfigEntity();
+        OperationMethodConfigEntity operationMethodConfig = new OperationMethodConfigEntity();
         operationMethodConfig.setPrimaryKey(primaryKey);
         operationMethodConfig.setMaxAuthFails(request.getMaxAuthFails());
-        operationMethodConfigRepository.save(operationMethodConfig);
+        operationMethodConfig = operationMethodConfigRepository.save(operationMethodConfig);
+        logger.debug("Operation and authentication method configuration was created, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
         final CreateOperationMethodConfigResponse response = new CreateOperationMethodConfigResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
@@ -213,6 +220,7 @@ public class OperationConfigurationService {
         }
         final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
         operationMethodConfigRepository.delete(operationMethodConfig);
+        logger.debug("Operation and authentication method configuration was deleted, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
         final DeleteOperationMethodConfigResponse response = new DeleteOperationMethodConfigResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());

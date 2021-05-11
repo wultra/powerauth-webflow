@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OtpNotFoundException extends NextStepServiceException {
 
+    /**
+     * OTP not found.
+     */
     public static final String CODE = "OTP_NOT_FOUND";
 
     /**

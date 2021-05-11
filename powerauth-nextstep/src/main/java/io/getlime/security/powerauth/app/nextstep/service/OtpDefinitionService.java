@@ -105,7 +105,7 @@ public class OtpDefinitionService {
         if (otpPolicy.getStatus() != OtpPolicyStatus.ACTIVE) {
             throw new OtpPolicyNotFoundException("Otp policy is not ACTIVE: " + request.getOtpPolicyName());
         }
-        final OtpDefinitionEntity otpDefinition = new OtpDefinitionEntity();
+        OtpDefinitionEntity otpDefinition = new OtpDefinitionEntity();
         otpDefinition.setName(request.getOtpDefinitionName());
         otpDefinition.setDescription(request.getDescription());
         otpDefinition.setApplication(application);
@@ -115,7 +115,8 @@ public class OtpDefinitionService {
         otpDefinition.setStatus(OtpDefinitionStatus.ACTIVE);
         otpDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         otpDefinition.setTimestampCreated(new Date());
-        otpDefinitionRepository.save(otpDefinition);
+        otpDefinition = otpDefinitionRepository.save(otpDefinition);
+        logger.debug("OTP definition was created, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
         final CreateOtpDefinitionResponse response = new CreateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());
@@ -141,7 +142,7 @@ public class OtpDefinitionService {
         if (!otpDefinitionOptional.isPresent()) {
             throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
         }
-        final OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
         if (otpDefinition.getStatus() != OtpDefinitionStatus.ACTIVE && request.getOtpDefinitionStatus() != OtpDefinitionStatus.ACTIVE) {
             throw new OtpDefinitionNotFoundException("One time password definition is not ACTIVE: " + request.getOtpDefinitionName());
         }
@@ -172,7 +173,8 @@ public class OtpDefinitionService {
         otpDefinition.setEncryptionAlgorithm(request.getEncryptionAlgorithm());
         otpDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         otpDefinition.setTimestampLastUpdated(new Date());
-        otpDefinitionRepository.save(otpDefinition);
+        otpDefinition = otpDefinitionRepository.save(otpDefinition);
+        logger.debug("OTP definition was updated, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
         final UpdateOtpDefinitionResponse response  = new UpdateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setDescription(otpDefinition.getDescription());
@@ -218,13 +220,14 @@ public class OtpDefinitionService {
         if (!otpDefinitionOptional.isPresent()) {
             throw new OtpDefinitionNotFoundException("One time password definition not found: " + request.getOtpDefinitionName());
         }
-        final OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
+        OtpDefinitionEntity otpDefinition = otpDefinitionOptional.get();
         if (otpDefinition.getStatus() == OtpDefinitionStatus.REMOVED) {
             throw new OtpDefinitionNotFoundException("One time password definition is already REMOVED: " + request.getOtpDefinitionName());
         }
         otpDefinition.setStatus(OtpDefinitionStatus.REMOVED);
         otpDefinition.setTimestampLastUpdated(new Date());
-        otpDefinitionRepository.save(otpDefinition);
+        otpDefinition = otpDefinitionRepository.save(otpDefinition);
+        logger.debug("OTP definition was removed, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
         final DeleteOtpDefinitionResponse response = new DeleteOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());

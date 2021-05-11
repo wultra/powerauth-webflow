@@ -27,6 +27,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCounterRe
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -41,6 +42,7 @@ import javax.validation.Valid;
  */
 @RestController
 @RequestMapping("credential/counter")
+@Validated
 public class CredentialCounterController {
 
     private static final Logger logger = LoggerFactory.getLogger(CredentialCounterController.class);
@@ -93,12 +95,13 @@ public class CredentialCounterController {
     }
 
     /**
-     * Reset all soft counters.
+     * Reset all soft failed attempt counters.
      * @param request Rest counters request.
      * @return Reset counters response.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
     @RequestMapping(value = "reset-all", method = RequestMethod.POST)
-    public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) {
+    public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) throws InvalidRequestException {
         logger.info("Received resetAllCounters request");
         final ResetCountersResponse response = credentialCounterService.resetCounters(request.getRequestObject());
         logger.info("The resetAllCounters request succeeded");

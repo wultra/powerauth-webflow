@@ -15,14 +15,20 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.CounterResetMode;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 /**
- * Request object used for resetting soft counters.
+ * Request object used for resetting soft failed attempt counters.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Data
 public class ResetCountersRequest {
+
+    @NotNull
+    private CounterResetMode resetMode;
 
 }

@@ -54,23 +54,39 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
 
     /* Register PowerAuth 2.0 Server Beans */
 
+    /**
+     * Register PowerAuth web argument resolver.
+     * @return PowerAuth web argument resolver.
+     */
     @Bean
     public PowerAuthWebArgumentResolver powerAuthWebArgumentResolver() {
         return new PowerAuthWebArgumentResolver();
     }
 
+    /**
+     * Register PowerAuth encryption argument resolver.
+     * @return PowerAuth encryption argument resolver.
+     */
     @Bean
     public PowerAuthEncryptionArgumentResolver powerAuthEncryptionArgumentResolver() {
         return new PowerAuthEncryptionArgumentResolver();
     }
 
+    /**
+     * Register PowerAuth interceptor.
+     * @return PowerAuth interceptor.
+     */
     @Bean
     public PowerAuthAnnotationInterceptor powerAuthInterceptor() {
         return new PowerAuthAnnotationInterceptor();
     }
 
+    /**
+     * Register PowerAuth filter.
+     * @return PowerAuth filter.
+     */
     @Bean
-    public FilterRegistrationBean powerAuthFilterRegistration() {
+    public FilterRegistrationBean<PowerAuthRequestFilter> powerAuthFilterRegistration() {
         FilterRegistrationBean<PowerAuthRequestFilter> registrationBean = new FilterRegistrationBean<>();
         registrationBean.setFilter(new PowerAuthRequestFilter());
         registrationBean.setMatchAfter(true);

@@ -25,6 +25,9 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class NextStepServiceException extends Exception {
 
+    /**
+     * Error detail.
+     */
     private Error error;
 
     /**

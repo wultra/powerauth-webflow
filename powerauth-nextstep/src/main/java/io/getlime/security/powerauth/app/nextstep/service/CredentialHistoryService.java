@@ -88,6 +88,7 @@ public class CredentialHistoryService {
         for (CredentialHistoryEntity h : history) {
             final boolean matchFound = credentialProtectionService.verifyCredentialHistory(credentialValue, h);
             if (matchFound) {
+                logger.debug("Credential history check failed for user: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
                 return false;
             }
             historyPassCounter++;
@@ -96,6 +97,7 @@ public class CredentialHistoryService {
                 break;
             }
         }
+        logger.debug("Credential history check succeeded for user: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
         return true;
     }
 

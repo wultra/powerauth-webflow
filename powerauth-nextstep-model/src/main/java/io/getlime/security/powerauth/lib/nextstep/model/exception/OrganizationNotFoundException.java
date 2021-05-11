@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class OrganizationNotFoundException extends NextStepServiceException {
 
+    /**
+     * Organization not found.
+     */
     public static final String CODE = "ORGANIZATION_NOT_FOUND";
 
     /**

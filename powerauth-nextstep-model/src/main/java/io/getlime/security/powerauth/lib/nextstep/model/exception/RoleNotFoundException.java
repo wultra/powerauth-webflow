@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class RoleNotFoundException extends NextStepServiceException {
 
+    /**
+     * Role not found.
+     */
     public static final String CODE = "ROLE_NOT_FOUND";
 
     /**

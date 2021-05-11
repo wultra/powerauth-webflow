@@ -42,6 +42,7 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This service handles persistence of user identities.
@@ -94,7 +95,7 @@ public class UserIdentityService {
         final CredentialService credentialService = serviceCatalogue.getCredentialService();
 
         final Optional<UserIdentityEntity> userOptional = userIdentityRepository.findById(request.getUserId());
-        final UserIdentityEntity user;
+        UserIdentityEntity user;
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -148,7 +149,8 @@ public class UserIdentityService {
                     validationMode = CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL;
                 }
                 final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                        credential.getCredentialType(), credential.getUsername(), credentialValueRequest, validationMode);
+                        credential.getCredentialType(), credential.getUsername(), credentialValueRequest,
+                        credential.getTimestampExpires(), validationMode);
                 if (credentialHistory != null && !credentialHistory.isEmpty()) {
                     final int dateCount = credentialHistory.size();
                     // Use unique timestamps in seconds to keep order of credential history
@@ -195,7 +197,8 @@ public class UserIdentityService {
         }
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
+        logger.debug("User identity was created, user ID: {}", user.getUserId());
         return response;
     }
 
@@ -221,7 +224,7 @@ public class UserIdentityService {
             throw new UserNotFoundException("User identity not found: " + request.getUserId());
         }
         // The findUser() method is not used to allow update REMOVED -> ACTIVE
-        final UserIdentityEntity user = userOptional.get();
+        UserIdentityEntity user = userOptional.get();
         Map<String, RoleEntity> roleEntities = new HashMap<>();
         if (request.getRoles() != null) {
             roleEntities = collectRoleEntities(request.getRoles());
@@ -263,7 +266,8 @@ public class UserIdentityService {
                         credentialValueRequest = endToEndEncryptionService.decryptCredential(credentialValueRequest, credentialDefinition);
                     }
                     final CredentialSecretDetail credentialDetail = credentialService.createCredential(user, credentialDefinition,
-                            credential.getCredentialType(), credential.getUsername(), credentialValueRequest, CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
+                            credential.getCredentialType(), credential.getUsername(), credentialValueRequest,
+                            credential.getTimestampExpires(), CredentialValidationMode.VALIDATE_USERNAME_AND_CREDENTIAL);
                     // Return generated credential value, with possible end2end encryption
                     if (credentialValueRequest == null && credentialDefinition.isE2eEncryptionEnabled()) {
                         final String credentialValueResponse = credentialDetail.getCredentialValue();
@@ -297,7 +301,8 @@ public class UserIdentityService {
         }
         // Save user identity snapshot to the history table
         updateUserIdentityHistory(user);
-        userIdentityRepository.save(user);
+        user = userIdentityRepository.save(user);
+        logger.debug("User identity was updated, user ID: {}", user.getUserId());
         return response;
     }
 
@@ -387,17 +392,19 @@ public class UserIdentityService {
      */
     @Transactional
     public UpdateUsersResponse updateUsers(UpdateUsersRequest request) throws UserNotFoundException {
-        final Iterable<UserIdentityEntity> users = userIdentityRepository.findAllById(request.getUserIds());
         final List<String> updatedUserIds = new ArrayList<>();
-        for (UserIdentityEntity user: users) {
-            if (user.getStatus() != request.getUserIdentityStatus()) {
-                user.setStatus(request.getUserIdentityStatus());
-                user.setTimestampLastUpdated(new Date());
-                // Save user identity and a snapshot to the history table
-                updateUserIdentityHistory(user);
-                user = userIdentityRepository.save(user);
-            }
-            updatedUserIds.add(user.getUserId());
+        try (final Stream<UserIdentityEntity> users = userIdentityRepository.findAllByUserIdIn(request.getUserIds())) {
+            users.forEach(user -> {
+                if (user.getStatus() != request.getUserIdentityStatus()) {
+                    user.setStatus(request.getUserIdentityStatus());
+                    user.setTimestampLastUpdated(new Date());
+                    // Save user identity and a snapshot to the history table
+                    updateUserIdentityHistory(user);
+                    user = userIdentityRepository.save(user);
+                    logger.debug("User identity was updated, user ID: {}", user.getUserId());
+                }
+                updatedUserIds.add(user.getUserId());
+            });
         }
         if (updatedUserIds.isEmpty()) {
             throw new UserNotFoundException("No user identity found for update");
@@ -425,6 +432,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was removed, user ID: {}", user.getUserId());
         final DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -450,6 +458,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was blocked, user ID: {}", user.getUserId());
         final BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -475,6 +484,7 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was unblocked, user ID: {}", user.getUserId());
         final UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -646,13 +656,7 @@ public class UserIdentityService {
      * @param user User identity entity.
      */
     private void removeAllOtps(UserIdentityEntity user) {
-        final List<OtpEntity> otps = otpRepository.findAllByUserId(user.getUserId());
-        otps.forEach(otp -> {
-            if (otp.getStatus() != OtpStatus.REMOVED) {
-                otp.setStatus(OtpStatus.REMOVED);
-                otpRepository.save(otp);
-            }
-        });
+        otpRepository.removeOtpsForUserId(user.getUserId());
     }
 
 }

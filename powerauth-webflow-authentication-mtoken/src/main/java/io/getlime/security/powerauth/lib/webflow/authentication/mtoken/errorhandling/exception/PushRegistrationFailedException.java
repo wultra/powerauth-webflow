@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhan
  */
 public class PushRegistrationFailedException extends MobileAppApiException {
 
+    /**
+     * Exception constructor.
+     */
     public PushRegistrationFailedException() {
         super("Push registration failed in Mobile Token API component.");
     }

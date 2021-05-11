@@ -355,7 +355,8 @@ public class CredentialProtectionService {
             credential.setHashingConfig(credentialDefinition.getHashingConfig());
             credential.setEncryptionAlgorithm(credentialDefinition.getEncryptionAlgorithm());
             credential.setValue(updatedValue.getValue());
-            credentialRepository.save(credential);
+            credential = credentialRepository.save(credential);
+            logger.debug("Credential value was updated in database, user ID: {}, credential definition name: {}", credential.getUser().getUserId(), credential.getCredentialDefinition().getName());
         }
     }
 

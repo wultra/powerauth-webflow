@@ -81,7 +81,7 @@ public class HashConfigService {
         if (hashConfigOptional.isPresent()) {
             throw new HashConfigAlreadyExistsException("Hashing configuration already exists: " + request.getHashConfigName());
         }
-        final HashConfigEntity hashConfig = new HashConfigEntity();
+        HashConfigEntity hashConfig = new HashConfigEntity();
         hashConfig.setName(request.getHashConfigName());
         hashConfig.setAlgorithm(request.getAlgorithm());
         hashConfig.setStatus(HashConfigStatus.ACTIVE);
@@ -94,7 +94,8 @@ public class HashConfigService {
             }
         }
         hashConfig.setTimestampCreated(new Date());
-        hashConfigRepository.save(hashConfig);
+        hashConfig = hashConfigRepository.save(hashConfig);
+        logger.debug("Hashing configuration was created, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
         final CreateHashConfigResponse response = new CreateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -116,7 +117,7 @@ public class HashConfigService {
         if (!hashConfigOptional.isPresent()) {
             throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
-        final HashConfigEntity hashConfig = hashConfigOptional.get();
+        HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.ACTIVE && request.getHashConfigStatus() != HashConfigStatus.ACTIVE) {
             throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
         }
@@ -131,7 +132,8 @@ public class HashConfigService {
             }
         }
         hashConfig.setTimestampLastUpdated(new Date());
-        hashConfigRepository.save(hashConfig);
+        hashConfig = hashConfigRepository.save(hashConfig);
+        logger.debug("Hashing configuration was updated, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
         final UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -174,11 +176,12 @@ public class HashConfigService {
         if (!hashConfigOptional.isPresent()) {
             throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
-        final HashConfigEntity hashConfig = hashConfigOptional.get();
+        HashConfigEntity hashConfig = hashConfigOptional.get();
         if (hashConfig.getStatus() != HashConfigStatus.REMOVED) {
             hashConfig.setStatus(HashConfigStatus.REMOVED);
             hashConfig.setTimestampLastUpdated(new Date());
-            hashConfigRepository.save(hashConfig);
+            hashConfig = hashConfigRepository.save(hashConfig);
+            logger.debug("Hashing configuration was removed, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
         }
         final DeleteHashConfigResponse response = new DeleteHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());

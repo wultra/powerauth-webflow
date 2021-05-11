@@ -341,6 +341,7 @@ CREATE TABLE ns_credential_storage (
   timestamp_blocked                TIMESTAMP,                           -- Timestamp when credential was blocked.
   timestamp_last_updated           TIMESTAMP,                           -- Timestamp when credential was last updated.
   timestamp_last_credential_change TIMESTAMP,                           -- Timestamp when credential value was last changed.
+  timestamp_last_username_change   TIMESTAMP,                           -- Timestamp when username value was last changed.
   CONSTRAINT ns_credential_definition_fk FOREIGN KEY (credential_definition_id) REFERENCES ns_credential_definition (credential_definition_id),
   CONSTRAINT ns_credential_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

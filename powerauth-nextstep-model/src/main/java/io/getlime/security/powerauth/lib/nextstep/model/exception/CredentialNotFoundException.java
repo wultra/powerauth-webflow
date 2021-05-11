@@ -22,6 +22,9 @@ package io.getlime.security.powerauth.lib.nextstep.model.exception;
  */
 public class CredentialNotFoundException extends NextStepServiceException {
 
+    /**
+     * Credential not found.
+     */
     public static final String CODE = "CREDENTIAL_NOT_FOUND";
 
     /**

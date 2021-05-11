@@ -29,8 +29,13 @@ import java.util.List;
  */
 public class FormDataConverter {
 
-    private AttributeConverter attributeConverter = new AttributeConverter();
+    private final AttributeConverter attributeConverter = new AttributeConverter();
 
+    /**
+     * Convert operation form data.
+     * @param input Operation form data.
+     * @return Form data.
+     */
     public FormData fromOperationFormData(OperationFormData input) {
         if (input == null) {
             return null;

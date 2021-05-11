@@ -116,7 +116,7 @@ public class CredentialDefinitionService {
                 throw new HashConfigNotFoundException("Hashing configuration is not ACTIVE: " + request.getHashConfigName());
             }
         }
-        final CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
+        CredentialDefinitionEntity credentialDefinition = new CredentialDefinitionEntity();
         credentialDefinition.setName(request.getCredentialDefinitionName());
         credentialDefinition.setDescription(request.getDescription());
         credentialDefinition.setApplication(application);
@@ -141,7 +141,8 @@ public class CredentialDefinitionService {
         credentialDefinition.setStatus(CredentialDefinitionStatus.ACTIVE);
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampCreated(new Date());
-        credentialDefinitionRepository.save(credentialDefinition);
+        credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
+        logger.debug("Credential definition was created, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
         final CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
@@ -179,7 +180,7 @@ public class CredentialDefinitionService {
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
         }
-        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
         if (credentialDefinition.getStatus() != CredentialDefinitionStatus.ACTIVE && request.getCredentialDefinitionStatus() != CredentialDefinitionStatus.ACTIVE) {
             throw new CredentialDefinitionNotFoundException("Credential definition is not ACTIVE: " + request.getCredentialDefinitionName());
         }
@@ -236,7 +237,8 @@ public class CredentialDefinitionService {
         credentialDefinition.setE2eEncryptionForTemporaryCredentialEnabled(request.isE2eEncryptionForTemporaryCredentialEnabled());
         credentialDefinition.setDataAdapterProxyEnabled(request.isDataAdapterProxyEnabled());
         credentialDefinition.setTimestampLastUpdated(new Date());
-        credentialDefinitionRepository.save(credentialDefinition);
+        credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
+        logger.debug("Credential definition was updated, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
         final UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
@@ -294,13 +296,14 @@ public class CredentialDefinitionService {
         if (!credentialDefinitionOptional.isPresent()) {
             throw new CredentialDefinitionNotFoundException("Credential definition not found: " + request.getCredentialDefinitionName());
         }
-        final CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
+        CredentialDefinitionEntity credentialDefinition = credentialDefinitionOptional.get();
         if (credentialDefinition.getStatus() == CredentialDefinitionStatus.REMOVED) {
             throw new CredentialDefinitionNotFoundException("Credential definition is already REMOVED: " + request.getCredentialDefinitionName());
         }
         credentialDefinition.setStatus(CredentialDefinitionStatus.REMOVED);
         credentialDefinition.setTimestampLastUpdated(new Date());
-        credentialDefinitionRepository.save(credentialDefinition);
+        credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
+        logger.debug("Credential definition was removed, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
         final DeleteCredentialDefinitionResponse response = new DeleteCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());

@@ -23,6 +23,7 @@ import com.wultra.core.rest.client.base.DefaultRestClient;
 import com.wultra.core.rest.client.base.RestClient;
 import com.wultra.core.rest.client.base.RestClientConfiguration;
 import com.wultra.core.rest.client.base.RestClientException;
+import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
@@ -72,7 +73,9 @@ public class TppEngineClient {
             config.setObjectMapper(objectMapper);
             restClient = new DefaultRestClient(config);
         } catch (RestClientException ex) {
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -86,7 +89,9 @@ public class TppEngineClient {
         try {
             restClient = new DefaultRestClient(restClientConfiguration);
         } catch (RestClientException ex) {
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "Rest client initialization failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -253,8 +258,9 @@ public class TppEngineClient {
         try {
             return restClient.get(path, queryParams, null, typeReference).getBody();
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP GET request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -271,8 +277,9 @@ public class TppEngineClient {
         try {
             return restClient.getObject(path, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP GET request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -288,8 +295,9 @@ public class TppEngineClient {
         try {
             return restClient.postObject(path, request);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -306,8 +314,9 @@ public class TppEngineClient {
         try {
             return restClient.postObject(path, request, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -325,8 +334,9 @@ public class TppEngineClient {
         try {
             return restClient.putObject(path, request, queryParams, null, responseType);
         } catch (RestClientException ex) {
-            logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP PUT request failed."));
+            logError(ex2);
+            throw ex2;
         }
     }
 
@@ -342,8 +352,22 @@ public class TppEngineClient {
         try {
             return restClient.deleteObject(path, queryParams, null);
         } catch (RestClientException ex) {
+            TppEngineClientException ex2 = new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP DELETE request failed."));
+            logError(ex2);
+            throw ex2;
+        }
+    }
+
+    /**
+     * Log TPP engine client exception details.
+     * @param ex TPP engine client exception.
+     */
+    private void logError(TppEngineClientException ex) {
+        Error error = ex.getError();
+        if (error != null) {
+            logger.warn("TPP Engine REST API call failed with error code: {}", error.getCode());
+        } else {
             logger.warn(ex.getMessage(), ex);
-            throw new TppEngineClientException(ex, new TppEngineError(resolveErrorCode(ex), "HTTP POST request failed."));
         }
     }
 
