@@ -95,6 +95,12 @@ public class WebFlowServicesConfiguration {
     private String passwordEncryptionKey;
 
     /**
+     * Whether authentication with temporary credentials is allowed in Web Flow.
+     */
+    @Value("${powerauth.webflow.authentication.allowTemporaryCredentials:false}")
+    private boolean authenticationWithTemporaryCredentialsAllowed;
+
+    /**
      * Delay for resending SMS in milliseconds.
      */
     @Value("${powerauth.webflow.sms.resend.delayMs:60000}")
@@ -234,6 +240,14 @@ public class WebFlowServicesConfiguration {
      */
     public String getPasswordEncryptionKey() {
         return passwordEncryptionKey;
+    }
+
+    /**
+     * Get whether authentication with temporary credentials is allowed.
+     * @return Whether authentication with temporary credentials is allowed.
+     */
+    public boolean isAuthenticationWithTemporaryCredentialsAllowed() {
+        return authenticationWithTemporaryCredentialsAllowed;
     }
 
     /**
