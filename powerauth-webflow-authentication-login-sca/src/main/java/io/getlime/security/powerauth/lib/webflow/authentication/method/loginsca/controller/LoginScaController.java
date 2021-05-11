@@ -176,6 +176,9 @@ public class LoginScaController extends AuthMethodController<LoginScaAuthRequest
                                     // Lookup succeeded and credential type is not temporary, use user ID from lookup response
                                     userId = userDetail.getUserId();
                                 }
+                            } else {
+                                // Lookup succeeded and Data Adapter proxy is enabled
+                                userId = userDetail.getUserId();
                             }
                         } else {
                             // Lookup succeeded, use user ID from lookup response
