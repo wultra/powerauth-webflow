@@ -160,6 +160,9 @@ public class OtpDefinitionController {
             @ApiResponse(responseCode = "200", description = "OTP list sent in response", content = {
                     @Content(mediaType = "application/json")
             }),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = {
+                    @Content(mediaType = "application/json")
+            }),
             @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
                     @Content(mediaType = "application/json")
             })

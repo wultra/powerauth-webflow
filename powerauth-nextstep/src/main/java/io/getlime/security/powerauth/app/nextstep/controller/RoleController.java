@@ -101,6 +101,9 @@ public class RoleController {
             @ApiResponse(responseCode = "200", description = "Role list sent in response", content = {
                     @Content(mediaType = "application/json")
             }),
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = {
+                    @Content(mediaType = "application/json")
+            }),
             @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
                     @Content(mediaType = "application/json")
             })
