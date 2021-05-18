@@ -31,6 +31,10 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,6 +91,18 @@ public class OperationController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
+    @Operation(summary = "Create an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation was created", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_ALREADY_EXISTS, INVALID_CONFIGURATION, ORGANIZATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationResponse> createOperation(@Valid @RequestBody ObjectRequest<CreateOperationRequest> request) throws OperationAlreadyExistsException, InvalidConfigurationException, OrganizationNotFoundException {
         logger.info("Received createOperation request, operation ID: {}, operation name: {}", request.getRequestObject().getOperationId(), request.getRequestObject().getOperationName());
@@ -118,8 +134,20 @@ public class OperationController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
+    @Operation(summary = "Update an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, AUTH_METHOD_NOT_FOUND, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, OPERATION_ALREADY_CANCELED, OPERATION_NOT_VALID, OPERATION_NOT_FOUND, INVALID_CONFIGURATION, ORGANIZATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation", method = RequestMethod.PUT)
-    public ObjectResponse<UpdateOperationResponse> updateOperation(@Valid @RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException, OrganizationNotFoundException {
+    public ObjectResponse<UpdateOperationResponse> updateOperation(@Valid @RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationAlreadyCanceledException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OrganizationNotFoundException {
         return updateOperationImpl(request);
     }
 
@@ -138,6 +166,18 @@ public class OperationController {
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
+    @Operation(summary = "Update an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, AUTH_METHOD_NOT_FOUND, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, OPERATION_ALREADY_CANCELED, OPERATION_NOT_VALID, OPERATION_NOT_FOUND, INVALID_CONFIGURATION, ORGANIZATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/update", method = RequestMethod.POST)
     public ObjectResponse<UpdateOperationResponse> updateOperationPost(@Valid @RequestBody ObjectRequest<UpdateOperationRequest> request) throws InvalidRequestException, AuthMethodNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OperationNotValidException, OperationNotFoundException, InvalidConfigurationException, OperationAlreadyCanceledException, OrganizationNotFoundException {
         return updateOperationImpl(request);
@@ -163,6 +203,18 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
+    @Operation(summary = "Update user for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation user was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ORGANIZATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/user", method = RequestMethod.PUT)
     public Response updateOperationUser(@Valid @RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
         return updateOperationUserImpl(request);
@@ -176,6 +228,18 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation is not found.
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      */
+    @Operation(summary = "Update user for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation user was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ORGANIZATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/user/update", method = RequestMethod.POST)
     public Response updateOperationUserPost(@Valid @RequestBody ObjectRequest<UpdateOperationUserRequest> request) throws OperationNotFoundException, OrganizationNotFoundException {
         return updateOperationUserImpl(request);
@@ -203,6 +267,18 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      * @throws OperationNotValidException Thrown when operation is invalid.
      */
+    @Operation(summary = "Get operation detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, OPERATION_NOT_VALID", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/detail", method = RequestMethod.GET)
     public ObjectResponse<GetOperationDetailResponse> operationDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, OperationNotValidException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -232,6 +308,18 @@ public class OperationController {
      * @throws OperationNotFoundException Thrown when operation does not exist.
      * @throws OperationNotValidException Thrown when operation is invalid.
      */
+    @Operation(summary = "Get operation detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, OPERATION_NOT_VALID", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/detail", method = RequestMethod.POST)
     public ObjectResponse<GetOperationDetailResponse> operationDetailPost(@Valid @RequestBody ObjectRequest<GetOperationDetailRequest> request) throws OperationNotFoundException, OperationNotValidException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -262,6 +350,18 @@ public class OperationController {
      * @return Get operation configuration response.
      * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
+    @Operation(summary = "Get operation configuration detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_CONFIG_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config/detail", method = RequestMethod.GET)
     public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String operationName) throws OperationConfigNotFoundException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -280,6 +380,18 @@ public class OperationController {
      * @return Get operation configuration response.
      * @throws OperationConfigNotFoundException Thrown when operation is not configured.
      */
+    @Operation(summary = "Get operation configuration detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_CONFIG_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetOperationConfigDetailResponse> getOperationConfigDetailPost(@Valid @RequestBody ObjectRequest<GetOperationConfigDetailRequest> request) throws OperationConfigNotFoundException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -298,6 +410,15 @@ public class OperationController {
      *
      * @return Get operation configurations response.
      */
+    @Operation(summary = "Get operation configuration list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration list sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config", method = RequestMethod.GET)
     public ObjectResponse<GetOperationConfigListResponse> getOperationConfigList() {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -315,6 +436,18 @@ public class OperationController {
      * @param request Get configurations of all operations request.
      * @return Get operation configurations response.
      */
+    @Operation(summary = "Get operation configuration list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration list sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config/list", method = RequestMethod.POST)
     public ObjectResponse<GetOperationConfigListResponse> getOperationConfigListPost(@Valid @RequestBody ObjectRequest<GetOperationConfigListRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -333,6 +466,18 @@ public class OperationController {
      * @param mobileTokenOnly Whether only operations with mobile token should be returned
      * @return List with operation details.
      */
+    @Operation(summary = "Get pending operation list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pending operation list sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "user/operation", method = RequestMethod.GET)
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperations(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean mobileTokenOnly) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -356,6 +501,18 @@ public class OperationController {
      * @param request Get pending operations request.
      * @return List with operation details.
      */
+    @Operation(summary = "Get pending operation list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Pending operation list sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "user/operation/list", method = RequestMethod.POST)
     public ObjectResponse<List<GetOperationDetailResponse>> getPendingOperationsPost(@Valid @RequestBody ObjectRequest<GetPendingOperationsRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -381,6 +538,18 @@ public class OperationController {
      * @param request Lookup operations by external transaction ID request.
      * @return Response for operations lookup by external transaction ID.
      */
+    @Operation(summary = "Lookup operations by external ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation list sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/lookup/external", method = RequestMethod.POST)
     public ObjectResponse<LookupOperationsByExternalIdResponse> lookupOperationsByExternalId(@Valid @RequestBody ObjectRequest<LookupOperationsByExternalIdRequest> request) {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
@@ -406,6 +575,18 @@ public class OperationController {
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
+    @Operation(summary = "Update operation form data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation form data was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/formData", method = RequestMethod.PUT)
     public Response updateOperationFormData(@Valid @RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
         return updateOperationFormDataImpl(request);
@@ -418,6 +599,18 @@ public class OperationController {
      * @return Update operation response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
+    @Operation(summary = "Update operation form data")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation form data was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/formData/update", method = RequestMethod.POST)
     public Response updateOperationFormDataPost(@Valid @RequestBody ObjectRequest<UpdateFormDataRequest> request) throws OperationNotFoundException {
         return updateOperationFormDataImpl(request);
@@ -439,6 +632,18 @@ public class OperationController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws OperationNotValidException Thrown when operation is invalid.
      */
+    @Operation(summary = "Update chosen authentication method for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Chosen authentication method was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OPERATION_NOT_VALID", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/chosenAuthMethod", method = RequestMethod.PUT)
     public Response updateChosenAuthMethod(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         return updateChosenAuthMethodImpl(request);
@@ -452,6 +657,18 @@ public class OperationController {
      * @throws InvalidRequestException Thrown when request is invalid.
      * @throws OperationNotValidException Thrown when operation is invalid.
      */
+    @Operation(summary = "Update chosen authentication method for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Chosen authentication method was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OPERATION_NOT_VALID", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/chosenAuthMethod/update", method = RequestMethod.POST)
     public Response updateChosenAuthMethodPost(@Valid @RequestBody ObjectRequest<UpdateChosenAuthMethodRequest> request) throws OperationNotFoundException, InvalidRequestException, OperationNotValidException {
         return updateChosenAuthMethodImpl(request);
@@ -473,6 +690,18 @@ public class OperationController {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Update mobile token status for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Mobile token status was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, OPERATION_NOT_VALID, INVALID_CONFIGURATION", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/mobileToken/status", method = RequestMethod.PUT)
     public Response updateMobileToken(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         return updateMobileTokenImpl(request);
@@ -486,6 +715,18 @@ public class OperationController {
      * @throws OperationNotValidException Thrown when operation is not valid.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Update mobile token status for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Mobile token status was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, OPERATION_NOT_VALID, INVALID_CONFIGURATION", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/mobileToken/status/update", method = RequestMethod.POST)
     public @ResponseBody Response updateMobileTokenPost(@Valid @RequestBody ObjectRequest<UpdateMobileTokenRequest> request) throws OperationNotFoundException, OperationNotValidException, InvalidConfigurationException {
         return updateMobileTokenImpl(request);
@@ -507,6 +748,18 @@ public class OperationController {
      * @return Get mobile token configuration response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Get mobile token configuration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Mobile token configuration sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.GET)
     public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfig(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @NotBlank @Size(min = 2, max = 256) String operationName, @RequestParam @NotNull AuthMethod authMethod) throws InvalidConfigurationException {
         logger.info("Received getMobileTokenConfig request, user ID: {}, operation name: {}, authentication method: {}", userId, operationName, authMethod);
@@ -523,6 +776,18 @@ public class OperationController {
      * @return Get mobile token configuration response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Get mobile token configuration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Mobile token configuration sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/mobileToken/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetMobileTokenConfigResponse> getMobileTokenConfigPost(@Valid @RequestBody ObjectRequest<GetMobileTokenConfigRequest> request) throws InvalidConfigurationException {
         final String userId = request.getRequestObject().getUserId();
@@ -542,6 +807,18 @@ public class OperationController {
      * @return Response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
+    @Operation(summary = "Update application context for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application context was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/application", method = RequestMethod.PUT)
     public Response updateApplicationContext(@Valid @RequestBody ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
         return updateApplicationContextImpl(request);
@@ -553,11 +830,40 @@ public class OperationController {
      * @return Response.
      * @throws OperationNotFoundException Thrown when operation is not found.
      */
+    @Operation(summary = "Update application context for an operation")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application context was updated", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/application/update", method = RequestMethod.POST)
     public Response updateApplicationContextPost(@Valid @RequestBody ObjectRequest<UpdateApplicationContextRequest> request) throws OperationNotFoundException {
         return updateApplicationContextImpl(request);
     }
 
+    /**
+     * Create an AFS action and store it in Next Step.
+     * @param request Create AFS action request.
+     * @return Response.
+     */
+    @Operation(summary = "Create an AFS action")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "AFS action was created", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/afs/action", method = RequestMethod.POST)
     public Response createAfsAction(@Valid @RequestBody ObjectRequest<CreateAfsActionRequest> request) {
         final CreateAfsActionRequest afsRequest = request.getRequestObject();
@@ -583,6 +889,18 @@ public class OperationController {
      * @return Create operation configuration response.
      * @throws OperationConfigAlreadyExists Thrown when operation configuration already exists.
      */
+    @Operation(summary = "Create an operation configuration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration was created", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_CONFIG_ALREADY_EXISTS", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationConfigResponse> createOperationConfig(@Valid @RequestBody ObjectRequest<CreateOperationConfigRequest> request) throws OperationConfigAlreadyExists {
         logger.info("Received createOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
@@ -598,6 +916,18 @@ public class OperationController {
      * @throws OperationConfigNotFoundException Thrown when operation configuration is not found.
      * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
+    @Operation(summary = "Delete an operation configuration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation configuration was deleted", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_CONFIG_NOT_FOUND, DELETE_NOT_ALLOWED", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationConfigResponse> deleteOperationConfig(@Valid @RequestBody ObjectRequest<DeleteOperationConfigRequest> request) throws OperationConfigNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteOperationConfig request, operation name: {}", request.getRequestObject().getOperationName());
@@ -614,6 +944,18 @@ public class OperationController {
      * @throws OperationConfigNotFoundException Thrown when operation configuration is not found.
      * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
      */
+    @Operation(summary = "Create an operation and authentication method configuration")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation and authentication method configuration was created", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_METHOD_CONFIG_ALREADY_EXISTS, OPERATION_CONFIG_NOT_FOUND, AUTH_METHOD_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/auth-method/config", method = RequestMethod.POST)
     public ObjectResponse<CreateOperationMethodConfigResponse> createOperationMethodConfig(@Valid @RequestBody ObjectRequest<CreateOperationMethodConfigRequest> request) throws OperationMethodConfigAlreadyExists, OperationConfigNotFoundException, AuthMethodNotFoundException {
         logger.info("Received createOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
@@ -629,6 +971,18 @@ public class OperationController {
      * @return Get operation and authentication method config detail response.
      * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
      */
+    @Operation(summary = "Get an operation and authentication method configuration detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation and authentication method configuration detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_METHOD_CONFIG_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.GET)
     public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String operationName, @RequestParam @NotNull AuthMethod authMethod) throws OperationMethodConfigNotFoundException {
         logger.info("Received getOperationMethodConfigDetail request, operation name: {}, authentication method: {}", operationName, authMethod);
@@ -646,6 +1000,18 @@ public class OperationController {
      * @return Get operation and authentication method config detail response.
      * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
      */
+    @Operation(summary = "Get an operation and authentication method configuration detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation and authentication method configuration detail sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_METHOD_CONFIG_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/auth-method/config/detail", method = RequestMethod.POST)
     public ObjectResponse<GetOperationMethodConfigDetailResponse> getOperationMethodConfigDetailPost(@Valid @RequestBody ObjectRequest<GetOperationMethodConfigDetailRequest> request) throws OperationMethodConfigNotFoundException {
         logger.info("Received getOperationMethodConfigDetailPost request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());
@@ -660,6 +1026,18 @@ public class OperationController {
      * @return Delete operation and authentication method config response.
      * @throws OperationMethodConfigNotFoundException Thrown when operation and authentication method configuration is not found.
      */
+    @Operation(summary = "Delete an operation and authentication method configuration detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Operation and authentication method configuration detail was deleted", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_METHOD_CONFIG_NOT_FOUND", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "operation/auth-method/config/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOperationMethodConfigResponse> deleteOperationMethodConfig(@Valid @RequestBody ObjectRequest<DeleteOperationMethodConfigRequest> request) throws OperationMethodConfigNotFoundException {
         logger.info("Received deleteOperationMethodConfig request, operation name: {}, authentication method: {}", request.getRequestObject().getOperationName(), request.getRequestObject().getAuthMethod());

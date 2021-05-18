@@ -19,6 +19,10 @@ package io.getlime.security.powerauth.app.nextstep.controller;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.model.response.ServiceStatusResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +71,15 @@ public class ServiceController {
      * Controller resource with system information.
      * @return System status info.
      */
+    @Operation(summary = "Get service status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Service status sent in response", content = {
+                    @Content(mediaType = "application/json")
+            }),
+            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
+                    @Content(mediaType = "application/json")
+            })
+    })
     @RequestMapping(value = "status", method = RequestMethod.GET)
     public ObjectResponse<ServiceStatusResponse> getServiceStatus() {
         logger.debug("Received getServiceStatus request");
