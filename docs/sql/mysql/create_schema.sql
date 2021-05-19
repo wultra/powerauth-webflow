@@ -88,10 +88,10 @@ CREATE TABLE wf_certificate_verification (
 CREATE TABLE ns_auth_method (
   auth_method        VARCHAR(32) PRIMARY KEY NOT NULL, -- Name of the authentication method: APPROVAL_SCA, CONSENT, INIT, LOGIN_SCA, POWERAUTH_TOKEN, SHOW_OPERATION_DETAIL, SMS_KEY, USER_ID_ASSIGN, USERNAME_PASSWORD_AUTH, OTP_CODE.
   order_number       INTEGER NOT NULL,                 -- Order of the authentication method, incrementing value, starts with 1.
-  check_user_prefs   BOOLEAN NOT NULL,                 -- Indication if the authentication method requires checking the user preference first.
+  check_user_prefs   BOOLEAN DEFAULT FALSE NOT NULL,   -- Indication if the authentication method requires checking the user preference first.
   user_prefs_column  INTEGER,                          -- In case the previous column is 'true', this is pointer to the user preferences configuration column index.
   user_prefs_default BOOLEAN DEFAULT FALSE,            -- Default value of the user preferences, in case the per-user preference is not found.
-  check_auth_fails   BOOLEAN NOT NULL,                 -- Indication if the methods can fail, and hence the fail count must be checked.
+  check_auth_fails   BOOLEAN DEFAULT FALSE NOT NULL,   -- Indication if the methods can fail, and hence the fail count must be checked.
   max_auth_fails     INTEGER,                          -- Maximum allowed number of authentication fails.
   has_user_interface BOOLEAN DEFAULT FALSE,            -- Indication of if the given method has any user interface in the web flow.
   has_mobile_token   BOOLEAN DEFAULT FALSE,            -- Indication of if the given authentication method has mobile token as a part of the flow.
@@ -274,7 +274,7 @@ CREATE TABLE ns_hashing_config (
   algorithm                VARCHAR(256) NOT NULL,                       -- Hashing algorithm name.
   status                   VARCHAR(32) NOT NULL,                        -- Hashing configuration status: ACTIVE, REMOVED.
   parameters               VARCHAR(256),                                -- Hashing algorithm parameters.
-  timestamp_created        TIMESTAMP,                                   -- Timestamp when hashing configuration was created.
+  timestamp_created        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Timestamp when hashing configuration was created.
   timestamp_last_updated   TIMESTAMP                                    -- Timestamp when hashing configuration was last updated.
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
@@ -376,7 +376,7 @@ CREATE TABLE ns_otp_storage (
   encryption_algorithm        VARCHAR(256),                        -- Encryption algorithm used for encrypting OTP value.
   timestamp_created           TIMESTAMP DEFAULT CURRENT_TIMESTAMP, -- Timestamp when one time password was created.
   timestamp_verified          TIMESTAMP,                           -- Timestamp when one time password was verified.
-  timestamp_blocked           TIMESTAMP,                           -- Timestamp when one time password was verified.
+  timestamp_blocked           TIMESTAMP,                           -- Timestamp when one time password was blocked.
   timestamp_expires           TIMESTAMP,                           -- Timestamp when one time password expires.
   CONSTRAINT ns_otp_definition_fk FOREIGN KEY (otp_definition_id) REFERENCES ns_otp_definition (otp_definition_id)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -593,6 +593,7 @@ CREATE UNIQUE INDEX ns_credential_storage_query2 ON ns_credential_storage (user_
 CREATE INDEX ns_credential_storage_query3 ON ns_credential_storage (credential_definition_id, status);
 CREATE INDEX ns_credential_history_user_id ON ns_credential_history (user_id);
 CREATE INDEX ns_otp_storage_user_id ON ns_otp_storage (user_id);
+CREATE INDEX ns_otp_storage_user_id_status ON ns_otp_storage (user_id, status);
 CREATE INDEX ns_otp_storage_operation_id ON ns_otp_storage (operation_id);
 CREATE INDEX ns_authentication_user_id ON ns_authentication (user_id);
 CREATE INDEX ns_authentication_operation_id ON ns_authentication (operation_id);
@@ -603,7 +604,7 @@ CREATE UNIQUE INDEX ns_user_alias_unique ON ns_user_alias (user_id, name);
 CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
-ALTER TABLE ns_user_prefs ADD FOREIGN KEY ns_user_prefs_fk (user_id) REFERENCES ns_user_identity (user_id);
 ALTER TABLE ns_operation ADD FOREIGN KEY ns_operation_user_fk (user_id) REFERENCES ns_user_identity (user_id);
+ALTER TABLE ns_user_prefs ADD FOREIGN KEY ns_user_prefs_fk (user_id) REFERENCES ns_user_identity (user_id);
 ALTER TABLE ns_otp_storage ADD FOREIGN KEY ns_otp_user_fk (user_id) REFERENCES ns_user_identity (user_id);
 ALTER TABLE ns_authentication ADD FOREIGN KEY ns_auth_user_fk (user_id) REFERENCES ns_user_identity (user_id);
