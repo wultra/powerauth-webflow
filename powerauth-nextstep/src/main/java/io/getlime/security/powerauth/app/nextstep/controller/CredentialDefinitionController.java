@@ -29,7 +29,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteCredentia
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetCredentialDefinitionListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCredentialDefinitionResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -75,15 +74,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Create a credential definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_ALREADY_EXISTS, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_ALREADY_EXISTS, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateCredentialDefinitionResponse> createCredentialDefinition(@Valid @RequestBody ObjectRequest<CreateCredentialDefinitionRequest> request) throws CredentialDefinitionAlreadyExistsException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
@@ -105,15 +98,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Update a credential definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinition(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
@@ -135,15 +122,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Update a credential definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, HASHING_CONFIG_NOT_FOUND, CREDENTIAL_POLICY_NOT_FOUND, ORGANIZATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateCredentialDefinitionResponse> updateCredentialDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException, ApplicationNotFoundException, HashConfigNotFoundException, CredentialPolicyNotFoundException, OrganizationNotFoundException {
@@ -160,15 +141,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Get credential definition list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionList(@RequestParam boolean includeRemoved) {
@@ -187,15 +162,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Get credential definition list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetCredentialDefinitionListResponse> getCredentialDefinitionListPost(@Valid @RequestBody ObjectRequest<GetCredentialDefinitionListRequest> request) {
@@ -213,15 +182,9 @@ public class CredentialDefinitionController {
      */
     @Operation(summary = "Delete a credential definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential definition was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential definition was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteCredentialDefinitionResponse> deleteCredentialDefinition(@Valid @RequestBody ObjectRequest<DeleteCredentialDefinitionRequest> request) throws CredentialDefinitionNotFoundException {

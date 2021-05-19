@@ -25,7 +25,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCounterReq
 import io.getlime.security.powerauth.lib.nextstep.model.response.ResetCountersResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateCounterResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -74,15 +73,9 @@ public class CredentialCounterController {
      */
     @Operation(summary = "Update a credential counter")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential counter was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_ACTIVE", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential counter was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_ACTIVE"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateCounterResponse> updateCredentialCounter(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
@@ -104,15 +97,9 @@ public class CredentialCounterController {
      */
     @Operation(summary = "Update a credential counter")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential counter was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_ACTIVE", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential counter was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_NOT_FOUND, CREDENTIAL_NOT_ACTIVE"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateCounterResponse> updateCredentialCounterPost(@Valid @RequestBody ObjectRequest<UpdateCounterRequest> request) throws UserNotFoundException, CredentialDefinitionNotFoundException, InvalidRequestException, CredentialNotFoundException, CredentialNotActiveException {
@@ -130,15 +117,9 @@ public class CredentialCounterController {
      */
     @Operation(summary = "Reset all soft failed attempt counters")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Credential counters were reset", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Credential counters were reset"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "reset-all", method = RequestMethod.POST)
     public ObjectResponse<ResetCountersResponse> resetAllCounters(@Valid @RequestBody ObjectRequest<ResetCountersRequest> request) throws InvalidRequestException {

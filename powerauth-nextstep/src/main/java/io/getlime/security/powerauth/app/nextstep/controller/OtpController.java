@@ -23,7 +23,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -79,15 +78,9 @@ public class OtpController {
      */
     @Operation(summary = "Create an OTP")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_GEN_ALGORITHM_NOT_SUPPORTED, INVALID_CONFIGURATION, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, USER_IDENTITY_NOT_ACTIVE, CREDENTIAL_NOT_ACTIVE, CREDENTIAL_NOT_FOUND, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, CREDENTIAL_DEFINITION_NOT_FOUND, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_GEN_ALGORITHM_NOT_SUPPORTED, INVALID_CONFIGURATION, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, USER_IDENTITY_NOT_ACTIVE, CREDENTIAL_NOT_ACTIVE, CREDENTIAL_NOT_FOUND, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpResponse> createOtp(@Valid @RequestBody ObjectRequest<CreateOtpRequest> request) throws OtpDefinitionNotFoundException, CredentialDefinitionNotFoundException, OperationNotFoundException, InvalidRequestException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, OperationAlreadyFinishedException, OperationAlreadyFailedException, UserNotActiveException, CredentialNotActiveException, CredentialNotFoundException, EncryptionException {
@@ -116,15 +109,9 @@ public class OtpController {
      */
     @Operation(summary = "Create an send an OTP")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP was created and sent", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_ACTIVE, CREDENTIAL_NOT_ACTIVE, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, OTP_GEN_ALGORITHM_NOT_SUPPORTED, INVALID_CONFIGURATION, CREDENTIAL_NOT_FOUND, OTP_DEFINITION_NOT_FOUND, OPERATION_NOT_FOUND, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP was created and sent"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_ACTIVE, CREDENTIAL_NOT_ACTIVE, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, OPERATION_ALREADY_FINISHED, OPERATION_ALREADY_FAILED, OTP_GEN_ALGORITHM_NOT_SUPPORTED, INVALID_CONFIGURATION, CREDENTIAL_NOT_FOUND, OTP_DEFINITION_NOT_FOUND, OPERATION_NOT_FOUND, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "send", method = RequestMethod.POST)
     public ObjectResponse<CreateAndSendOtpResponse> createAndSendOtp(@Valid @RequestBody ObjectRequest<CreateAndSendOtpRequest> request) throws UserNotActiveException, CredentialNotActiveException, InvalidRequestException, CredentialDefinitionNotFoundException, OperationAlreadyFinishedException, OperationAlreadyFailedException, OtpGenAlgorithmNotSupportedException, InvalidConfigurationException, CredentialNotFoundException, OtpDefinitionNotFoundException, OperationNotFoundException, EncryptionException {
@@ -144,15 +131,9 @@ public class OtpController {
      */
     @Operation(summary = "Get an OTP list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetOtpListResponse> getOptList(@RequestParam @NotBlank @Size(min = 1, max = 256) String operationId, @RequestParam boolean includeRemoved) throws OperationNotFoundException, EncryptionException {
@@ -174,15 +155,9 @@ public class OtpController {
      */
     @Operation(summary = "Get an OTP list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpListResponse> getOptListPost(@Valid @RequestBody ObjectRequest<GetOtpListRequest> request) throws OperationNotFoundException, EncryptionException {
@@ -204,15 +179,9 @@ public class OtpController {
      */
     @Operation(summary = "Get an OTP detail")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP detail sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "detail", method = RequestMethod.GET)
     public ObjectResponse<GetOtpDetailResponse> getOtpDetail(@RequestParam @Nullable @Size(min = 36, max = 36) String otpId, @RequestParam @Nullable @Size(min = 1, max = 256) String operationId) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
@@ -236,15 +205,9 @@ public class OtpController {
      */
     @Operation(summary = "Get an OTP detail")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP detail sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OPERATION_NOT_FOUND, INVALID_REQUEST, OTP_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "detail", method = RequestMethod.POST)
     public ObjectResponse<GetOtpDetailResponse> getOtpDetailPost(@Valid @RequestBody ObjectRequest<GetOtpDetailRequest> request) throws OperationNotFoundException, InvalidRequestException, OtpNotFoundException, InvalidConfigurationException, EncryptionException {
@@ -264,15 +227,9 @@ public class OtpController {
      */
     @Operation(summary = "Delete an OTP")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_NOT_FOUND, INVALID_REQUEST, OPERATION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_NOT_FOUND, INVALID_REQUEST, OPERATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public @ResponseBody ObjectResponse<DeleteOtpResponse> deleteOtp(@Valid @RequestBody ObjectRequest<DeleteOtpRequest> request) throws OtpNotFoundException, InvalidRequestException, OperationNotFoundException {

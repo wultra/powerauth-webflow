@@ -29,7 +29,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateRoleRespo
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteRoleResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetRoleListResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -74,15 +73,9 @@ public class RoleController {
      */
     @Operation(summary = "Create a role")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ROLE_ALREADY_EXISTS", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ROLE_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateRoleResponse> createRole(@Valid @RequestBody ObjectRequest<CreateRoleRequest> request) throws RoleAlreadyExistsException {
@@ -98,15 +91,9 @@ public class RoleController {
      */
     @Operation(summary = "Get role list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetRoleListResponse> getRoleList() {
@@ -123,15 +110,9 @@ public class RoleController {
      */
     @Operation(summary = "Get role list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetRoleListResponse> getRoleListPost(@Valid @RequestBody ObjectRequest<GetRoleListRequest> request) {
@@ -150,15 +131,9 @@ public class RoleController {
      */
     @Operation(summary = "Delete a role")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ROLE_NOT_FOUND, DELETE_NOT_ALLOWED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ROLE_NOT_FOUND, DELETE_NOT_ALLOWED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteRoleResponse> deleteRole(@Valid @RequestBody ObjectRequest<DeleteRoleRequest> request) throws RoleNotFoundException, DeleteNotAllowedException {

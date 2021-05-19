@@ -23,7 +23,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import io.getlime.security.powerauth.lib.nextstep.model.request.*;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -92,15 +91,9 @@ public class UserController {
      */
     @Operation(summary = "Create a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_ALREADY_EXISTS, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_ALREADY_EXISTS, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateUserResponse> createUser(@Valid @RequestBody ObjectRequest<CreateUserRequest> request) throws UserAlreadyExistsException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
@@ -123,15 +116,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateUserResponse> updateUser(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
@@ -154,15 +141,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, CREDENTIAL_DEFINITION_NOT_FOUND, INVALID_CONFIGURATION, CREDENTIAL_VALIDATION_FAILED, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateUserResponse> updateUserPost(@Valid @RequestBody ObjectRequest<UpdateUserRequest> request) throws UserNotFoundException, InvalidRequestException, CredentialDefinitionNotFoundException, InvalidConfigurationException, CredentialValidationFailedException, EncryptionException {
@@ -186,15 +167,9 @@ public class UserController {
      */
     @Operation(summary = "Get user identity detail")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity detail sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "detail", method = RequestMethod.GET)
     public ObjectResponse<GetUserDetailResponse> getUserDetail(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable @Size(min = 2, max = 256) String credentialName, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
@@ -220,15 +195,9 @@ public class UserController {
      */
     @Operation(summary = "Get user identity detail")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity detail sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED, CREDENTIAL_DEFINITION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "detail", method = RequestMethod.POST)
     public ObjectResponse<GetUserDetailResponse> getUserDetailPost(@Valid @RequestBody ObjectRequest<GetUserDetailRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException, CredentialDefinitionNotFoundException {
@@ -249,15 +218,9 @@ public class UserController {
      */
     @Operation(summary = "Lookup user identities")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "lookup", method = RequestMethod.POST)
     public ObjectResponse<LookupUsersResponse> lookupUsers(@Valid @RequestBody ObjectRequest<LookupUsersRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, EncryptionException {
@@ -279,15 +242,9 @@ public class UserController {
      */
     @Operation(summary = "Lookup user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_REQUEST, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "lookup/single", method = RequestMethod.POST)
     public ObjectResponse<LookupUserResponse> lookupSingleUser(@Valid @RequestBody ObjectRequest<LookupUserRequest> request) throws UserNotFoundException, InvalidRequestException, InvalidConfigurationException, OperationNotFoundException, EncryptionException {
@@ -305,15 +262,9 @@ public class UserController {
      */
     @Operation(summary = "Update multiple user identities")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identities were updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identities were updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "multi", method = RequestMethod.PUT)
     public ObjectResponse<UpdateUsersResponse> updateMultipleUsers(@Valid @RequestBody ObjectRequest<UpdateUsersRequest> request) throws UserNotFoundException {
@@ -331,15 +282,9 @@ public class UserController {
      */
     @Operation(summary = "Update multiple user identities")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identities were updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identities were updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "update/multi", method = RequestMethod.POST)
     public ObjectResponse<UpdateUsersResponse> updateMultipleUsersPost(@Valid @RequestBody ObjectRequest<UpdateUsersRequest> request) throws UserNotFoundException {
@@ -359,15 +304,9 @@ public class UserController {
      */
     @Operation(summary = "Assign a role to a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role was assigned", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ROLE_ALREADY_ASSIGNED, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role was assigned"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ROLE_ALREADY_ASSIGNED, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "role", method = RequestMethod.POST)
     public ObjectResponse<AddUserRoleResponse> addRole(@Valid @RequestBody ObjectRequest<AddUserRoleRequest> request) throws UserNotFoundException, UserRoleAlreadyAssignedException, InvalidRequestException {
@@ -387,15 +326,9 @@ public class UserController {
      */
     @Operation(summary = "Remove a role from a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Role was removed", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ROLE_NOT_ASSIGNED, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Role was removed"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ROLE_NOT_ASSIGNED, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "role/remove", method = RequestMethod.POST)
     public ObjectResponse<RemoveUserRoleResponse> removeRole(@Valid @RequestBody ObjectRequest<RemoveUserRoleRequest> request) throws UserNotFoundException, UserRoleNotAssignedException, InvalidRequestException {
@@ -414,15 +347,9 @@ public class UserController {
      */
     @Operation(summary = "Create a user contact")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_ALREADY_EXISTS", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact", method = RequestMethod.POST)
     public ObjectResponse<CreateUserContactResponse> createUserContact(@Valid @RequestBody ObjectRequest<CreateUserContactRequest> request) throws UserNotFoundException, UserContactAlreadyExistsException {
@@ -440,15 +367,9 @@ public class UserController {
      */
     @Operation(summary = "Get user contact list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact", method = RequestMethod.GET)
     public ObjectResponse<GetUserContactListResponse> getUserContactList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId) throws UserNotFoundException {
@@ -468,15 +389,9 @@ public class UserController {
      */
     @Operation(summary = "Get user contact list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserContactListResponse> getUserContactListPost(@Valid @RequestBody ObjectRequest<GetUserContactListRequest> request) throws UserNotFoundException {
@@ -495,15 +410,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user contact")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact", method = RequestMethod.PUT)
     public ObjectResponse<UpdateUserContactResponse> updateUserContact(@Valid @RequestBody ObjectRequest<UpdateUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
@@ -522,15 +431,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user contact")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact/update", method = RequestMethod.POST)
     public ObjectResponse<UpdateUserContactResponse> updateUserContactPost(@Valid @RequestBody ObjectRequest<UpdateUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
@@ -549,15 +452,9 @@ public class UserController {
      */
     @Operation(summary = "Delete a user contact")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_CONTACT_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "contact/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteUserContactResponse> deleteUserContact(@Valid @RequestBody ObjectRequest<DeleteUserContactRequest> request) throws UserNotFoundException, UserContactNotFoundException {
@@ -577,15 +474,9 @@ public class UserController {
      */
     @Operation(summary = "Create a user alias")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Contact was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_ALREADY_EXISTS, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Contact was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_ALREADY_EXISTS, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias", method = RequestMethod.POST)
     public ObjectResponse<CreateUserAliasResponse> createUserAlias(@Valid @RequestBody ObjectRequest<CreateUserAliasRequest> request) throws UserNotFoundException, UserAliasAlreadyExistsException, InvalidRequestException {
@@ -605,15 +496,9 @@ public class UserController {
      */
     @Operation(summary = "Get user alias list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User alias list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User alias list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias", method = RequestMethod.GET)
     public ObjectResponse<GetUserAliasListResponse> getUserAliasList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws InvalidRequestException, UserNotFoundException {
@@ -635,15 +520,9 @@ public class UserController {
      */
     @Operation(summary = "Get user alias list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User alias list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User alias list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserAliasListResponse> getUserAliasListPost(@Valid @RequestBody ObjectRequest<GetUserAliasListRequest> request) throws InvalidRequestException, UserNotFoundException {
@@ -663,15 +542,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user alias")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User alias was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User alias was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias", method = RequestMethod.PUT)
     public ObjectResponse<UpdateUserAliasResponse> updateUserAlias(@Valid @RequestBody ObjectRequest<UpdateUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException, InvalidRequestException {
@@ -691,15 +564,9 @@ public class UserController {
      */
     @Operation(summary = "Update a user alias")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User alias was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND, INVALID_REQUEST", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User alias was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias/update", method = RequestMethod.POST)
     public ObjectResponse<UpdateUserAliasResponse> updateUserAliasPost(@Valid @RequestBody ObjectRequest<UpdateUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException, InvalidRequestException {
@@ -718,15 +585,9 @@ public class UserController {
      */
     @Operation(summary = "Delete a user alias")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User alias was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User alias was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_ALIAS_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "alias/delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteUserAliasResponse> deleteUserAlias(@Valid @RequestBody ObjectRequest<DeleteUserAliasRequest> request) throws UserNotFoundException, UserAliasNotFoundException {
@@ -747,15 +608,9 @@ public class UserController {
      */
     @Operation(summary = "Get user credential list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User credential list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User credential list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "credential", method = RequestMethod.GET)
     public ObjectResponse<GetUserCredentialListResponse> getUserCredentialList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam boolean includeRemoved) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
@@ -778,15 +633,9 @@ public class UserController {
      */
     @Operation(summary = "Get user credential list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User credential list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User credential list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, INVALID_CONFIGURATION, ENCRYPTION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "credential/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserCredentialListResponse> getUserCredentialListPost(@Valid @RequestBody ObjectRequest<GetUserCredentialListRequest> request) throws UserNotFoundException, InvalidConfigurationException, EncryptionException {
@@ -806,15 +655,9 @@ public class UserController {
      */
     @Operation(summary = "Get user authentication list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User authentication list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User authentication list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "authentication", method = RequestMethod.GET)
     public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @Nullable Date createdStartDate, @RequestParam @Nullable Date createdEndDate) throws UserNotFoundException {
@@ -836,15 +679,9 @@ public class UserController {
      */
     @Operation(summary = "Get user authentication list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User authentication list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User authentication list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "authentication/list", method = RequestMethod.POST)
     public ObjectResponse<GetUserAuthenticationListResponse> getUserAuthenticationListPost(@Valid @RequestBody ObjectRequest<GetUserAuthenticationListRequest> request) throws UserNotFoundException {
@@ -862,15 +699,9 @@ public class UserController {
      */
     @Operation(summary = "Delete a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was deleted", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteUserResponse> deleteUser(@Valid @RequestBody ObjectRequest<DeleteUserRequest> request) throws UserNotFoundException {
@@ -889,15 +720,9 @@ public class UserController {
      */
     @Operation(summary = "Block a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was blocked", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_IDENTITY_NOT_ACTIVE", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was blocked"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_IDENTITY_NOT_ACTIVE"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "block", method = RequestMethod.POST)
     public ObjectResponse<BlockUserResponse> blockUser(@Valid @RequestBody ObjectRequest<BlockUserRequest> request) throws UserNotFoundException, UserNotActiveException {
@@ -916,15 +741,9 @@ public class UserController {
      */
     @Operation(summary = "Unblock a user identity")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User identity was unblocked", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_IDENTITY_NOT_BLOCKED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "User identity was unblocked"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, USER_IDENTITY_NOT_FOUND, USER_IDENTITY_NOT_BLOCKED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "unblock", method = RequestMethod.POST)
     public ObjectResponse<UnblockUserResponse> unblockUser(@Valid @RequestBody ObjectRequest<UnblockUserRequest> request) throws UserNotFoundException, UserNotBlockedException {

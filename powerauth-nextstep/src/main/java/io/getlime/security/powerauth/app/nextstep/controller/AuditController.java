@@ -23,7 +23,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.GetAuditListRequ
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateAuditResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuditListResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -66,15 +65,9 @@ public class AuditController {
      */
     @Operation(summary = "Create an audit")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Audit was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Audit was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateAuditResponse> createAudit(@Valid @RequestBody ObjectRequest<CreateAuditRequest> request) {
@@ -92,15 +85,9 @@ public class AuditController {
      */
     @Operation(summary = "Get audit list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Audit list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Audit list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetAuditListResponse> getAuditList(@RequestParam @NotNull Date startDate, @RequestParam @NotNull Date endDate) {
@@ -120,15 +107,9 @@ public class AuditController {
      */
     @Operation(summary = "Get audit list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Audit list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "Audit list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetAuditListResponse> getAuditListPost(@Valid @RequestBody ObjectRequest<GetAuditListRequest> request) {

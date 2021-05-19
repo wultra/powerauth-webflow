@@ -32,7 +32,6 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOtpDefini
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpDefinitionListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpDefinitionResponse;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
@@ -76,15 +75,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Create an OTP definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP definition was created", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_ALREADY_EXISTS, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP definition was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_ALREADY_EXISTS, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpDefinitionResponse> createOtpDefinition(@Valid @RequestBody ObjectRequest<CreateOtpDefinitionRequest> request) throws OtpDefinitionAlreadyExistsException, ApplicationNotFoundException, OtpPolicyNotFoundException {
@@ -104,15 +97,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Update an OTP definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateOtpDefinitionResponse> updateOtpDefinition(@Valid @RequestBody ObjectRequest<UpdateOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
@@ -132,15 +119,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Update an OTP definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND, APPLICATION_NOT_FOUND, OTP_POLICY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateOtpDefinitionResponse> updateOtpDefinitionPost(@Valid @RequestBody ObjectRequest<UpdateOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException, ApplicationNotFoundException, OtpPolicyNotFoundException {
@@ -157,15 +138,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Get OTP list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP list sent in response", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionList(@RequestParam boolean includeRemoved) {
@@ -184,15 +159,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Get OTP definition list")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpDefinitionListResponse> getOtpDefinitionListPost(@Valid @RequestBody ObjectRequest<GetOtpDefinitionListRequest> request) {
@@ -210,15 +179,9 @@ public class OtpDefinitionController {
      */
     @Operation(summary = "Delete an OTP definition")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "OTP definition was updated", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND", content = {
-                    @Content(mediaType = "application/json")
-            }),
-            @ApiResponse(responseCode = "500", description = "Unexpected error", content = {
-                    @Content(mediaType = "application/json")
-            })
+            @ApiResponse(responseCode = "200", description = "OTP definition was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_DEFINITION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
     })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOtpDefinitionResponse> deleteOtpDefinition(@Valid @RequestBody ObjectRequest<DeleteOtpDefinitionRequest> request) throws OtpDefinitionNotFoundException {
