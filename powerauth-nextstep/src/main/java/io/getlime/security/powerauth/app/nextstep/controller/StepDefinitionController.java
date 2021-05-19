@@ -25,6 +25,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.CreateStepDefini
 import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteStepDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateStepDefinitionResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteStepDefinitionResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,12 @@ public class StepDefinitionController {
      * @return Create step definition response.
      * @throws StepDefinitionAlreadyExistsException Thrown when step definition already exists.
      */
+    @Operation(summary = "Create a step definition")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Step definition was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, STEP_DEFINITION_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateStepDefinitionResponse> createStepDefinition(@Valid @RequestBody ObjectRequest<CreateStepDefinitionRequest> request) throws StepDefinitionAlreadyExistsException {
         logger.info("Received createStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());
@@ -79,6 +88,12 @@ public class StepDefinitionController {
      * @return Delete step definition response.
      * @throws StepDefinitionNotFoundException Thrown when step definition is not found.
      */
+    @Operation(summary = "Delete a step definition")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Step definition was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, STEP_DEFINITION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteStepDefinitionResponse> deleteStepDefinition(@Valid @RequestBody ObjectRequest<DeleteStepDefinitionRequest> request) throws StepDefinitionNotFoundException {
         logger.info("Received deleteStepDefinition request, step definition ID: {}", request.getRequestObject().getStepDefinitionId());

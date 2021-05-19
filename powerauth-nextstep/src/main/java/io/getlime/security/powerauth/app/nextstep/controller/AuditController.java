@@ -22,6 +22,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuditReque
 import io.getlime.security.powerauth.lib.nextstep.model.request.GetAuditListRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.CreateAuditResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuditListResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +63,12 @@ public class AuditController {
      * @param request Create audit request.
      * @return Create audit response.
      */
+    @Operation(summary = "Create an audit")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Audit was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateAuditResponse> createAudit(@Valid @RequestBody ObjectRequest<CreateAuditRequest> request) {
         logger.info("Received createAudit request, action: {}", request.getRequestObject().getAction());
@@ -74,6 +83,12 @@ public class AuditController {
      * @param endDate End date filter for created timestamp.
      * @return Get audit log list response.
      */
+    @Operation(summary = "Get audit list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Audit list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetAuditListResponse> getAuditList(@RequestParam @NotNull Date startDate, @RequestParam @NotNull Date endDate) {
         GetAuditListRequest request = new GetAuditListRequest();
@@ -90,6 +105,12 @@ public class AuditController {
      * @param request Get audit log list request.
      * @return Get audit log list response.
      */
+    @Operation(summary = "Get audit list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Audit list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetAuditListResponse> getAuditListPost(@Valid @RequestBody ObjectRequest<GetAuditListRequest> request) {
         logger.info("Received getAuditListPost request");

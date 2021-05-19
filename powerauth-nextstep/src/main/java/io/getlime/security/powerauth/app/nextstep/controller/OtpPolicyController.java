@@ -31,6 +31,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOtpPolicy
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOtpPolicyResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOtpPolicyListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOtpPolicyResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,12 @@ public class OtpPolicyController {
      * @throws OtpPolicyAlreadyExistsException Thrown when OTP policy already exists.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
+    @Operation(summary = "Create an OTP policy")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_POLICY_ALREADY_EXISTS, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOtpPolicyResponse> createOtpPolicy(@Valid @RequestBody ObjectRequest<CreateOtpPolicyRequest> request) throws OtpPolicyAlreadyExistsException, InvalidRequestException {
         logger.info("Received createOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
@@ -84,6 +93,12 @@ public class OtpPolicyController {
      * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
+    @Operation(summary = "Update an OTP policy")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_POLICY_NOT_FOUND, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicy(@Valid @RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
@@ -99,6 +114,12 @@ public class OtpPolicyController {
      * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
      * @throws InvalidRequestException Thrown when request is invalid.
      */
+    @Operation(summary = "Update an OTP policy")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_POLICY_NOT_FOUND, INVALID_REQUEST"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateOtpPolicyResponse> updateOtpPolicyPost(@Valid @RequestBody ObjectRequest<UpdateOtpPolicyRequest> request) throws OtpPolicyNotFoundException, InvalidRequestException {
         logger.info("Received updateOtpPolicyPost request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());
@@ -113,6 +134,12 @@ public class OtpPolicyController {
      * @return Get OTP policy list response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Get an OTP policy list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyList(@RequestParam boolean includeRemoved) throws InvalidConfigurationException {
         logger.info("Received getOtpPolicyListPost request");
@@ -129,6 +156,12 @@ public class OtpPolicyController {
      * @return Get OTP policy list response.
      * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
+    @Operation(summary = "Get an OTP policy list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOtpPolicyListResponse> getOtpPolicyListPost(@Valid @RequestBody ObjectRequest<GetOtpPolicyListRequest> request) throws InvalidConfigurationException {
         logger.info("Received getOtpPolicyListPost request");
@@ -143,6 +176,12 @@ public class OtpPolicyController {
      * @return Delete OTP policy response.
      * @throws OtpPolicyNotFoundException Thrown when OTP policy is not found.
      */
+    @Operation(summary = "Delete an OTP policy")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "OTP policy was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, OTP_POLICY_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOtpPolicyResponse> deleteOtpPolicy(@Valid @RequestBody ObjectRequest<DeleteOtpPolicyRequest> request) throws OtpPolicyNotFoundException {
         logger.info("Received deleteOtpPolicy request, OTP policy name: {}", request.getRequestObject().getOtpPolicyName());

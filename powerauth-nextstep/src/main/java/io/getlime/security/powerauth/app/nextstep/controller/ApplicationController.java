@@ -28,6 +28,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateApplicati
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteApplicationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetApplicationListResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateApplicationResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +68,12 @@ public class ApplicationController {
      * @return Create application response.
      * @throws ApplicationAlreadyExistsException Thrown when application already exists.
      */
+    @Operation(summary = "Create an application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateApplicationResponse> createApplication(@Valid @RequestBody ObjectRequest<CreateApplicationRequest> request) throws ApplicationAlreadyExistsException {
         logger.info("Received createApplication request, application name: {}", request.getRequestObject().getApplicationName());
@@ -79,6 +88,12 @@ public class ApplicationController {
      * @return Update application response.
      * @throws ApplicationNotFoundException Thrown when application is not found.
      */
+    @Operation(summary = "Update an application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.PUT)
     public ObjectResponse<UpdateApplicationResponse> updateApplication(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplication request, application name: {}", request.getRequestObject().getApplicationName());
@@ -93,6 +108,12 @@ public class ApplicationController {
      * @return Update application response.
      * @throws ApplicationNotFoundException Thrown when application is not found.
      */
+    @Operation(summary = "Update an application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application was updated"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "update", method = RequestMethod.POST)
     public ObjectResponse<UpdateApplicationResponse> updateApplicationPost(@Valid @RequestBody ObjectRequest<UpdateApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received updateApplicationPost request, application name: {}", request.getRequestObject().getApplicationName());
@@ -106,6 +127,12 @@ public class ApplicationController {
      * @param includeRemoved Whether removed applications should be included.
      * @return Get application list response.
      */
+    @Operation(summary = "Get application list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application list"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetApplicationListResponse> getApplicationList(@RequestParam boolean includeRemoved) {
         logger.info("Received getApplicationList request");
@@ -121,6 +148,12 @@ public class ApplicationController {
      * @param request Get application list request.
      * @return Get application list response.
      */
+    @Operation(summary = "Get application list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetApplicationListResponse> getApplicationListPost(@Valid @RequestBody ObjectRequest<GetApplicationListRequest> request) {
         logger.info("Received getApplicationListPost request");
@@ -135,6 +168,12 @@ public class ApplicationController {
      * @return Delete application response.
      * @throws ApplicationNotFoundException Thrown when application is not found.
      */
+    @Operation(summary = "Delete an application")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Application was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, APPLICATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteApplicationResponse> deleteApplication(@Valid @RequestBody ObjectRequest<DeleteApplicationRequest> request) throws ApplicationNotFoundException {
         logger.info("Received deleteApplication request, application name: {}", request.getRequestObject().getApplicationName());

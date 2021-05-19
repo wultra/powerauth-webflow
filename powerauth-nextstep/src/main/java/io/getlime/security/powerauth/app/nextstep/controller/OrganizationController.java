@@ -30,6 +30,9 @@ import io.getlime.security.powerauth.lib.nextstep.model.response.CreateOrganizat
 import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteOrganizationResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOrganizationListResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,6 +72,12 @@ public class OrganizationController {
      * @return Create organization response.
      * @throws OrganizationAlreadyExistsException Thrown when organization already exists.
      */
+    @Operation(summary = "Create an organization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ORGANIZATION_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.POST)
     public ObjectResponse<CreateOrganizationResponse> createOrganization(@Valid @RequestBody ObjectRequest<CreateOrganizationRequest> request) throws OrganizationAlreadyExistsException {
         logger.info("Received createOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
@@ -84,6 +93,12 @@ public class OrganizationController {
      * @return Get organization detail response.
      * @throws OrganizationNotFoundException Thrown in case organization does not exist.
      */
+    @Operation(summary = "Get organization detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ORGANIZATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "detail", method = RequestMethod.GET)
     public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetail(@RequestParam @NotBlank @Size(min = 2, max = 256) String organizationId) throws OrganizationNotFoundException {
         logger.info("Received getOrganizationDetail request, organization ID: {}", organizationId);
@@ -101,6 +116,12 @@ public class OrganizationController {
      * @return Get organization detail response.
      * @throws OrganizationNotFoundException Thrown in case organization does not exist.
      */
+    @Operation(summary = "Get organization detail")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization detail sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ORGANIZATION_NOT_FOUND"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "detail", method = RequestMethod.POST)
     public ObjectResponse<GetOrganizationDetailResponse> getOrganizationDetailPost(@Valid @RequestBody ObjectRequest<GetOrganizationDetailRequest> request) throws OrganizationNotFoundException {
         logger.info("Received getOrganizationDetailPost request, organization ID: {}", request.getRequestObject().getOrganizationId());
@@ -114,6 +135,12 @@ public class OrganizationController {
      *
      * @return Get organizations response.
      */
+    @Operation(summary = "Get organization list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(method = RequestMethod.GET)
     public ObjectResponse<GetOrganizationListResponse> getOrganizationList() {
         logger.info("Received getOrganizationList request");
@@ -128,6 +155,12 @@ public class OrganizationController {
      * @param request Get organizations request.
      * @return Get organizations response.
      */
+    @Operation(summary = "Get organization list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "list", method = RequestMethod.POST)
     public ObjectResponse<GetOrganizationListResponse> getOrganizationListPost(@Valid @RequestBody ObjectRequest<GetOrganizationListRequest> request) {
         logger.info("Received getOrganizationList request");
@@ -143,6 +176,12 @@ public class OrganizationController {
      * @throws OrganizationNotFoundException Thrown when organization is not found.
      * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
      */
+    @Operation(summary = "Delete an organization")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Organization was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, ORGANIZATION_NOT_FOUND, DELETE_NOT_ALLOWED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
     @RequestMapping(value = "delete", method = RequestMethod.POST)
     public ObjectResponse<DeleteOrganizationResponse> deleteOrganization(@Valid @RequestBody ObjectRequest<DeleteOrganizationRequest> request) throws OrganizationNotFoundException, DeleteNotAllowedException {
         logger.info("Received deleteOrganization request, organization ID: {}", request.getRequestObject().getOrganizationId());
