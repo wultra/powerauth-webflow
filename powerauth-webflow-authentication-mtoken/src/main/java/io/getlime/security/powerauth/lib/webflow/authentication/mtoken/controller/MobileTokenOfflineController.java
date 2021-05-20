@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 
 import com.google.common.io.BaseEncoding;
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
@@ -148,7 +149,8 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
-                boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, signatureResponse.getActivationId(), signatureResponse.getSignatureType().toString());
+                SignatureType signatureType = SignatureType.enumFromString(signatureResponse.getSignatureType().toString());
+                boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, signatureResponse.getActivationId(), signatureType);
                 if (!approvalSucceeded) {
                     throw new OperationIsAlreadyFailedException("Operation approval has failed");
                 }

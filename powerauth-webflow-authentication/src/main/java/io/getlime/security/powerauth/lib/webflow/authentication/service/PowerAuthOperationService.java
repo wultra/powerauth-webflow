@@ -17,6 +17,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.service;
 
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
+import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.enumeration.UserActionResult;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.model.request.*;
@@ -77,7 +78,7 @@ public class PowerAuthOperationService {
      * @param signatureType Used signature type.
      * @return Whether approval succeeded.
      */
-    public boolean approveOperation(GetOperationDetailResponse operation, String activationId, String signatureType) {
+    public boolean approveOperation(GetOperationDetailResponse operation, String activationId, SignatureType signatureType) {
         boolean operationEnabled = configuration.isPowerAuthOperationSupportEnabled();
         if (!operationEnabled) {
             return true;

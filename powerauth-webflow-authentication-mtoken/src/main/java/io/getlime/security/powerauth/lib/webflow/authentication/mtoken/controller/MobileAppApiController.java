@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
+import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import io.getlime.core.rest.model.base.request.ObjectRequest;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.core.rest.model.base.response.Response;
@@ -271,7 +272,8 @@ public class MobileAppApiController extends AuthMethodController<MobileTokenAuth
                         && operation.getUserId() != null
                         && operation.getUserId().equals(apiAuthentication.getUserId())) {
                     final List<AuthInstrument> authInstruments = Collections.singletonList(AuthInstrument.POWERAUTH_TOKEN);
-                    boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, activationId, apiAuthentication.getSignatureFactors().toString());
+                    SignatureType signatureType = SignatureType.enumFromString(apiAuthentication.getSignatureFactors().toString());
+                    boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, activationId, signatureType);
                     if (!approvalSucceeded) {
                         throw new OperationIsAlreadyFailedException("Operation approval has failed");
                     }
