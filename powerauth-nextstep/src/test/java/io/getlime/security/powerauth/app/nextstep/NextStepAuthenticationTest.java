@@ -33,16 +33,16 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.LookupUsersReque
 import io.getlime.security.powerauth.lib.nextstep.model.request.ResetCountersRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Next Step authentication tests.
@@ -58,7 +58,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
     @Autowired
     private NextStepServerConfiguration nextStepServerConfiguration;
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);
@@ -275,7 +275,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -358,7 +358,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -375,7 +375,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             assertEquals(UserNotFoundException.CODE, ex.getNextStepError().getCode());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -388,7 +388,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             nextStepClient.unblockUser("test_user_1");
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -468,7 +468,7 @@ public class NextStepAuthenticationTest extends NextStepTest {
             nextStepClient.unblockCredential("test_user_1", "TEST_CREDENTIAL");
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test

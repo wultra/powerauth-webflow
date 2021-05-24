@@ -22,15 +22,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OtpGeneratio
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateOtpPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateOtpDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.security.SecureRandom;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Next Step OTP tests.
@@ -39,7 +39,7 @@ import static org.junit.Assert.*;
  */
 public class NextStepOtpTest extends NextStepTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);

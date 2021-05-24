@@ -29,15 +29,15 @@ import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserReques
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialDefinitionRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateCredentialPolicyRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Next Step credential tests.
@@ -46,7 +46,7 @@ import static org.junit.Assert.*;
  */
 public class NextStepCredentialTest extends NextStepTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);
@@ -378,7 +378,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_ILLEGAL_WHITESPACE, CredentialValidationFailure.USERNAME_ALLOWED_MATCH_FAILED), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -417,7 +417,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Arrays.asList(CredentialValidationFailure.USERNAME_TOO_SHORT, CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -456,7 +456,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_EMPTY), ((CredentialValidationError)ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -486,7 +486,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Collections.singletonList(CredentialValidationFailure.USERNAME_ALREADY_EXISTS), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -589,7 +589,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
@@ -617,7 +617,7 @@ public class NextStepCredentialTest extends NextStepTest {
             assertEquals(Collections.singletonList(CredentialValidationFailure.CREDENTIAL_HISTORY_CHECK_FAILED), ((CredentialValidationError) ex.getNextStepError()).getValidationFailures());
             return;
         }
-        Assert.fail();
+        Assertions.fail();
     }
 
     @Test
