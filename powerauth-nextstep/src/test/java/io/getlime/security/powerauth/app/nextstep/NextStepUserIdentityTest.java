@@ -23,12 +23,12 @@ import io.getlime.security.powerauth.lib.nextstep.model.exception.UserNotBlocked
 import io.getlime.security.powerauth.lib.nextstep.model.request.CreateUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateUserRequest;
 import io.getlime.security.powerauth.lib.nextstep.model.response.*;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.*;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Next Step user identity tests.
@@ -37,7 +37,7 @@ import static org.junit.Assert.*;
  */
 public class NextStepUserIdentityTest extends NextStepTest {
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         nextStepClient = nextStepClientFactory.createNextStepClient("http://localhost:" + port);
         nextStepTestConfiguration.configure(nextStepClient);
