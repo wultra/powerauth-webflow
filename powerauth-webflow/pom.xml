@@ -87,7 +87,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.68</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->

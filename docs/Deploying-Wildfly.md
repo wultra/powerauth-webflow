@@ -178,7 +178,5 @@ You need to configure separate `application-ext.properties` files for Web Flow a
 
 ### Bouncy Castle Installation
 
-The Bouncy Castle module for JBoss / Wildfly needs to be enabled as a global module for Web Flow.
-
-Follow the instructions in the [Installing Bouncy Castle](https://github.com/wultra/powerauth-server/blob/develop/docs/Installing-Bouncy-Castle.md) chapter of PowerAuth Server documentation. 
-Note that the instructions differ based on Java version and application server type.
+The Bouncy Castle library for JBoss / Wildfly is included in the Web Flow and Next Step war files. The library is configured 
+using the `jboss-deployment-structure.xml` descriptor. Global module configuration of Bouncy Castle is no longer required.
