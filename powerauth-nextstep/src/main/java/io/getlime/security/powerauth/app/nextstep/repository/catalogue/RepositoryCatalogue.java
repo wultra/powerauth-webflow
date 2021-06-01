@@ -28,7 +28,6 @@ import org.springframework.stereotype.Component;
 public class RepositoryCatalogue {
 
     private ApplicationRepository applicationRepository;
-    private AuditLogRepository auditLogRepository;
     private AuthenticationRepository authenticationRepository;
     private AuthMethodRepository authMethodRepository;
     private CredentialDefinitionRepository credentialDefinitionRepository;
@@ -57,15 +56,6 @@ public class RepositoryCatalogue {
     @Autowired
     public void setApplicationRepository(ApplicationRepository applicationRepository) {
         this.applicationRepository = applicationRepository;
-    }
-
-    /**
-     * Set audit log repository.
-     * @param auditLogRepository Audit log repository.
-     */
-    @Autowired
-    public void setAuditLogRepository(AuditLogRepository auditLogRepository) {
-        this.auditLogRepository = auditLogRepository;
     }
 
     /**
@@ -254,14 +244,6 @@ public class RepositoryCatalogue {
      */
     public ApplicationRepository getApplicationRepository() {
         return applicationRepository;
-    }
-
-    /**
-     * Get audit log repository.
-     * @return Audit log repository.
-     */
-    public AuditLogRepository getAuditLogRepository() {
-        return auditLogRepository;
     }
 
     /**

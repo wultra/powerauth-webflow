@@ -313,7 +313,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         // validate operation before requesting update
         GetOperationDetailResponse operation = getOperation(operationId);
         AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
+        logger.info("Step authorization started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, organizationId, authMethod, authInstruments, AuthStepResult.CONFIRMED, null, params, applicationContext);
         AuthResult authResult = response.getResponseObject().getResult();
@@ -325,7 +325,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         List<AuthStep> steps = response.getResponseObject().getSteps();
         operationSessionService.updateOperationResult(operationId, authResult);
         filterStepsBasedOnActiveAuthMethods(steps, userId, operationId);
-        logger.info("Step authorization succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
+        logger.info("Step authorization succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         return new AuthOperationResponse(operationId, authResult, null, steps);
     }
 
@@ -343,7 +343,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
     protected AuthOperationResponse failAuthorization(String operationId, String userId, List<AuthInstrument> authInstruments, List<KeyValueParameter> params) throws NextStepClientException, AuthStepException {
         GetOperationDetailResponse operation = getOperation(operationId, false);
         AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
+        logger.info("Fail step started, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         ApplicationContext applicationContext = operation.getApplicationContext();
         ObjectResponse<UpdateOperationResponse> response = nextStepClient.updateOperation(operationId, userId, operation.getOrganizationId(), authMethod, authInstruments, AuthStepResult.AUTH_FAILED, null, params, applicationContext);
         // notify Data Adapter in case operation is in FAILED state now
@@ -353,7 +353,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         operationSessionService.updateOperationResult(operationId, authResult);
         filterStepsBasedOnActiveAuthMethods(steps, userId, operationId);
         String authResultDescription = response.getResponseObject().getResultDescription();
-        logger.info("Fail step succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod.toString());
+        logger.info("Fail step succeeded, operation ID: {}, user ID: {}, authentication method: {}", operationId, userId, authMethod);
         return new AuthOperationResponse(operationId, authResult, authResultDescription, steps);
     }
 
@@ -639,7 +639,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
         if (chosenAuthMethod != null) {
             // check that chosen authentication method matches next steps
             if (!isAuthMethodAvailable(operation, chosenAuthMethod)) {
-                logger.warn("Invalid chosen authentication method, operation ID: {}, authentication method: {}", operation.getOperationId(), chosenAuthMethod.toString());
+                logger.warn("Invalid chosen authentication method, operation ID: {}, authentication method: {}", operation.getOperationId(), chosenAuthMethod);
                 throw new InvalidChosenMethodException("Invalid chosen authentication method: "+chosenAuthMethod);
             }
         }
@@ -655,7 +655,7 @@ public abstract class AuthMethodController<T extends AuthStepRequest, R extends 
             // special handling for SHOW_OPERATION_DETAIL - endpoint can be called only when either SMS_KEY, POWERAUTH_TOKEN or LOGIN_SCA are present in next steps
             if (currentAuthMethod == AuthMethod.SHOW_OPERATION_DETAIL) {
                 if (!isAuthMethodAvailable(operation, AuthMethod.SMS_KEY) && !isAuthMethodAvailable(operation, AuthMethod.POWERAUTH_TOKEN) && !isAuthMethodAvailable(operation, AuthMethod.LOGIN_SCA)) {
-                    logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod.toString());
+                    logger.warn("Authentication method is not available, operation ID: {}, authentication method: {}", operation.getOperationId(), currentAuthMethod);
                     throw new AuthMethodNotAvailableException("Authentication method is not available: " + currentAuthMethod);
                 }
             }

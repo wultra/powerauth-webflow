@@ -19,6 +19,8 @@ package io.getlime.security.powerauth.app.nextstep;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.security.Security;
 
@@ -28,6 +30,8 @@ import java.security.Security;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 @SpringBootApplication
+@EnableScheduling
+@ComponentScan(basePackages = {"io.getlime.security.powerauth.app.nextstep", "com.wultra.core.audit.base"})
 public class NextStepApplication {
 
     static {

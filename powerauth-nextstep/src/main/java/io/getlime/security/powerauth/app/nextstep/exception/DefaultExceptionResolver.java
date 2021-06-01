@@ -16,6 +16,9 @@
 
 package io.getlime.security.powerauth.app.nextstep.exception;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.error.CredentialValidationError;
@@ -24,6 +27,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.error.Violation;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -47,6 +51,15 @@ public class DefaultExceptionResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionResolver.class);
 
+    private static final AuditDetail AUDIT_DETAIL_UNEXPECTED_ERROR = new AuditDetail("UNEXPECTED_ERROR");
+    private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
+    private final Audit audit;
+
+    @Autowired
+    public DefaultExceptionResolver(AuditFactory auditFactory) {
+        this.audit = auditFactory.getAudit();
+    }
+
     /**
      * Default exception handler, for unexpected errors.
      * @param t Throwable.
@@ -56,6 +69,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in Next Step server", t);
+        audit.error("Error occurred in Next Step server", AUDIT_DETAIL_UNEXPECTED_ERROR, t);
         final Error error = new Error(Error.Code.ERROR_GENERIC, "Unknown error occurred, cause: " + t.getMessage());
         return new ErrorResponse(error);
     }
@@ -69,6 +83,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(InvalidRequestException.CODE, "Invalid request data, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
@@ -82,6 +97,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFinishedException(OperationAlreadyFinishedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationAlreadyFinishedException.CODE, "Operation is already in DONE state.");
         return new ErrorResponse(error);
     }
@@ -95,6 +111,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyFailedException(OperationAlreadyFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationAlreadyFailedException.CODE, "Operation is already in FAILED state.");
         return new ErrorResponse(error);
     }
@@ -108,6 +125,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationCanceledException(OperationAlreadyCanceledException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationAlreadyCanceledException.CODE, "Operation update attempted for CANCELED operation.");
         return new ErrorResponse(error);
     }
@@ -121,6 +139,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationNotFoundException(OperationNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationNotFoundException.CODE, "Operation not found.");
         return new ErrorResponse(error);
     }
@@ -134,6 +153,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationNotValidException(OperationNotValidException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationNotValidException.CODE, "Operation is not valid.");
         return new ErrorResponse(error);
     }
@@ -146,6 +166,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationAlreadyExistsException(OperationAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationAlreadyExistsException.CODE, "Operation already exists.");
         return new ErrorResponse(error);
     }
@@ -159,6 +180,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOrganizationNotFoundException(OrganizationNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OrganizationNotFoundException.CODE, "Organization not found.");
         return new ErrorResponse(error);
     }
@@ -172,6 +194,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOrganizationAlreadyExistsException(OrganizationAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OrganizationNotFoundException.CODE, "Organization already exists.");
         return new ErrorResponse(error);
     }
@@ -185,6 +208,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleStepDefinitionNotFoundException(StepDefinitionNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(StepDefinitionNotFoundException.CODE, "Step definition not found.");
         return new ErrorResponse(error);
     }
@@ -198,6 +222,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleStepDefinitionAlreadyExistsException(StepDefinitionAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(StepDefinitionAlreadyExistsException.CODE, "Step definition already exists.");
         return new ErrorResponse(error);
     }
@@ -211,6 +236,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidOperationDataException(InvalidOperationDataException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(InvalidOperationDataException.CODE, "Operation contains invalid data.");
         return new ErrorResponse(error);
     }
@@ -224,6 +250,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidRequestException(InvalidRequestException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(InvalidRequestException.CODE, "Request data is invalid, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
@@ -237,6 +264,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleInvalidConfigurationException(InvalidConfigurationException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(InvalidConfigurationException.CODE, "Next Step configuration is invalid, cause: " + ex.getMessage());
         return new ErrorResponse(error);
     }
@@ -250,6 +278,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthMethodNotFoundException(AuthMethodNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(AuthMethodNotFoundException.CODE, "Authentication method not found.");
         return new ErrorResponse(error);
     }
@@ -263,6 +292,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationConfigAlreadyExists(OperationConfigAlreadyExists ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationConfigAlreadyExists.CODE, "Operation config already exists.");
         return new ErrorResponse(error);
     }
@@ -276,6 +306,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationConfigNotFoundException(OperationConfigNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationConfigNotFoundException.CODE, "Operation config not found.");
         return new ErrorResponse(error);
     }
@@ -289,6 +320,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationMethodConfigAlreadyExists(OperationMethodConfigAlreadyExists ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationMethodConfigAlreadyExists.CODE, "Operation and authentication config already exists.");
         return new ErrorResponse(error);
     }
@@ -302,6 +334,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOperationMethodConfigNotFoundException(OperationMethodConfigNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OperationMethodConfigNotFoundException.CODE, "Operation and authentication config not found.");
         return new ErrorResponse(error);
     }
@@ -315,6 +348,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthMethodAlreadyExistsException(AuthMethodAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(AuthMethodAlreadyExistsException.CODE, "Authentication method already exists.");
         return new ErrorResponse(error);
     }
@@ -328,6 +362,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleApplicationNotFoundException(ApplicationNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(ApplicationNotFoundException.CODE, "Application not found.");
         return new ErrorResponse(error);
     }
@@ -341,6 +376,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleApplicationAlreadyExistsException(ApplicationAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(ApplicationAlreadyExistsException.CODE, "Application already exists.");
         return new ErrorResponse(error);
     }
@@ -354,6 +390,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleHashingConfigAlreadyExistsException(HashConfigAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(HashConfigAlreadyExistsException.CODE, "Hashing configuration already exists.");
         return new ErrorResponse(error);
     }
@@ -367,6 +404,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleHashingConfigNotFoundException(HashConfigNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(HashConfigNotFoundException.CODE, "Hashing configuration not found.");
         return new ErrorResponse(error);
     }
@@ -380,6 +418,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleRoleAlreadyExistsException(RoleAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(RoleAlreadyExistsException.CODE, "Role already exists.");
         return new ErrorResponse(error);
     }
@@ -393,6 +432,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleRoleNotFoundException(RoleNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(RoleNotFoundException.CODE, "Role not found.");
         return new ErrorResponse(error);
     }
@@ -406,6 +446,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleDeleteNotAllowedException(DeleteNotAllowedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(DeleteNotAllowedException.CODE, "Delete action is not allowed.");
         return new ErrorResponse(error);
     }
@@ -419,6 +460,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserRoleAlreadyAssignedException(UserRoleAlreadyAssignedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserRoleAlreadyAssignedException.CODE, "User role is already assigned.");
         return new ErrorResponse(error);
     }
@@ -432,6 +474,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserRoleNotAssignedException(UserRoleNotAssignedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserRoleNotAssignedException.CODE, "User role is not assigned.");
         return new ErrorResponse(error);
     }
@@ -445,6 +488,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialPolicyAlreadyExistsException(CredentialPolicyAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialPolicyAlreadyExistsException.CODE, "Credential policy already exists.");
         return new ErrorResponse(error);
     }
@@ -458,6 +502,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialPolicyNotFoundException(CredentialPolicyNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialPolicyNotFoundException.CODE, "Credential policy not found.");
         return new ErrorResponse(error);
     }
@@ -471,6 +516,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpPolicyAlreadyExistsException(OtpPolicyAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpPolicyAlreadyExistsException.CODE, "One time password policy already exists.");
         return new ErrorResponse(error);
     }
@@ -484,6 +530,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpPolicyNotFoundException(OtpPolicyNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpPolicyNotFoundException.CODE, "One time password policy not found.");
         return new ErrorResponse(error);
     }
@@ -497,6 +544,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialDefinitionAlreadyExistsException(CredentialDefinitionAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialDefinitionAlreadyExistsException.CODE, "Credential definition already exists.");
         return new ErrorResponse(error);
     }
@@ -510,6 +558,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialDefinitionNotFoundException(CredentialDefinitionNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialDefinitionNotFoundException.CODE, "Credential definition not found.");
         return new ErrorResponse(error);
     }
@@ -523,6 +572,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpDefinitionAlreadyExistsException(OtpDefinitionAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpDefinitionAlreadyExistsException.CODE, "One time password definition already exists.");
         return new ErrorResponse(error);
     }
@@ -536,6 +586,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpDefinitionNotFoundException(OtpDefinitionNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpDefinitionNotFoundException.CODE, "One time password definition not found.");
         return new ErrorResponse(error);
     }
@@ -549,6 +600,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserAlreadyExistsException(UserAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserAlreadyExistsException.CODE, "User identity already exists.");
         return new ErrorResponse(error);
     }
@@ -562,6 +614,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserNotFoundException(UserNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserNotFoundException.CODE, "User identity not found.");
         return new ErrorResponse(error);
     }
@@ -575,6 +628,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserNotActiveException(UserNotActiveException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserNotActiveException.CODE, "User identity is not active.");
         return new ErrorResponse(error);
     }
@@ -587,6 +641,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserAliasAlreadyExistsException(UserAliasAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserAliasAlreadyExistsException.CODE, "User alias already exists.");
         return new ErrorResponse(error);
     }
@@ -600,6 +655,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserAliasNotFoundException(UserAliasNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserAliasNotFoundException.CODE, "User alias not found.");
         return new ErrorResponse(error);
     }
@@ -613,6 +669,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserContactAlreadyExistsException(UserContactAlreadyExistsException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserContactAlreadyExistsException.CODE, "User contact already exists.");
         return new ErrorResponse(error);
     }
@@ -626,6 +683,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserContactNotFoundException(UserContactNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserContactNotFoundException.CODE, "User contact not found.");
         return new ErrorResponse(error);
     }
@@ -639,6 +697,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUserNotBlockedException(UserNotBlockedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(UserNotBlockedException.CODE, "User identity is not blocked.");
         return new ErrorResponse(error);
     }
@@ -652,6 +711,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialNotFoundException(CredentialNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialNotFoundException.CODE, "Credential not found.");
         return new ErrorResponse(error);
     }
@@ -665,6 +725,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialNotActiveException(CredentialNotActiveException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialNotActiveException.CODE, "Credential is not active.");
         return new ErrorResponse(error);
     }
@@ -678,6 +739,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialNotBlockedException(CredentialNotBlockedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(CredentialNotBlockedException.CODE, "Credential is not blocked.");
         return new ErrorResponse(error);
     }
@@ -691,6 +753,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpGenAlgorithmNotSupportedException(OtpGenAlgorithmNotSupportedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpGenAlgorithmNotSupportedException.CODE, "One time password generation algorithm is not supported.");
         return new ErrorResponse(error);
     }
@@ -704,6 +767,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleOtpNotFoundException(OtpNotFoundException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(OtpNotFoundException.CODE, "One time password not found.");
         return new ErrorResponse(error);
     }
@@ -717,6 +781,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleCredentialDecryptionFailed(EncryptionException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final Error error = new Error(EncryptionException.CODE, "Encryption or decryption failed.");
         return new ErrorResponse(error);
     }
@@ -731,6 +796,7 @@ public class DefaultExceptionResolver {
     public @ResponseBody ErrorResponse handleCredentialValidationFailedException(CredentialValidationFailedException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
         logger.warn("Validation errors: {}", ex.getError().getValidationFailures());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final CredentialValidationError error = new CredentialValidationError(CredentialValidationFailedException.CODE, "Credential validation failed.", ex.getError().getValidationFailures());
         return new ErrorResponse(error);
     }
@@ -744,6 +810,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleMissingServletRequestParameterException(MissingServletRequestParameterException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
         error.getViolations().add(
                 new Violation(ex.getParameterName(), null, ex.getMessage())
@@ -761,6 +828,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleConstraintViolationException(ConstraintViolationException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
             error.getViolations().add(
@@ -780,6 +848,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
         logger.warn("Error occurred in Next Step server: {}", ex.getMessage());
+        audit.warn("Error occurred in Next Step server", AUDIT_DETAIL_BAD_REQUEST, ex);
         final ExtendedError error = new ExtendedError(RequestValidationFailedException.CODE, "Request validation failed.");
         for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
             error.getViolations().add(
