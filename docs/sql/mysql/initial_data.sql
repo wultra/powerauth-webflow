@@ -43,10 +43,10 @@ INSERT INTO ns_credential_policy (name, description, status, username_length_min
 INSERT INTO ns_otp_policy (name, description, status, length, attempt_limit, expiration_time, gen_algorithm, gen_param) values ('OTP_POLICY', 'Sample OTP policy', 'ACTIVE', 8, 3, 300, 'OTP_DATA_DIGEST', '{}');
 
 -- credential and OTP definition configuration
-INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_CREDENTIAL', 'Sample credential definition for retail', 1, 'RETAIL', 1, 'PASSWORD', 1, 'ACTIVE', CURRENT_TIMESTAMP);
-INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_CREDENTIAL', 'Sample credential definition for SME', 1, 'SME', 1, 'PASSWORD', 1, 'ACTIVE', CURRENT_TIMESTAMP);
-INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_OTP', 'Sample OTP definition for retail', 1, 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
-INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_OTP', 'Sample OTP definition for SME', 1, 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_CREDENTIAL', 'Sample credential definition for retail', 1, 'RETAIL', 1, 'PASSWORD', TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_CREDENTIAL', 'Sample credential definition for SME', 1, 'SME', 1, 'PASSWORD', TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_OTP', 'Sample OTP definition for retail', 1, 1, TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_OTP', 'Sample OTP definition for SME', 1, 1, TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
 
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
