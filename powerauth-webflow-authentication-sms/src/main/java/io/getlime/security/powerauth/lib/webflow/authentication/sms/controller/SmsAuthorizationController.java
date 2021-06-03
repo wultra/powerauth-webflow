@@ -114,7 +114,7 @@ public class SmsAuthorizationController extends AuthMethodController<SmsAuthoriz
         final AuthMethod authMethod = getAuthMethodName(operation);
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         try {
-            if (operation.getUserId() == null) {
+            if (operation.getUserId() == null || operation.getAccountStatus() != UserAccountStatus.ACTIVE) {
                 // Fake OTP authentication, pretend 2FA authentication failure
                 logger.info("Step authentication failed with fake SMS authorization, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                 List<AuthInstrument> authInstruments = new ArrayList<>();
