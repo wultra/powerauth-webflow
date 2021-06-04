@@ -123,7 +123,10 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampCreated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was created, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
-        audit.info("OTP definition was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
+        audit.info("OTP definition was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpDefinition", otpDefinition)
+                .build());
         final CreateOtpDefinitionResponse response = new CreateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());
@@ -182,7 +185,10 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was updated, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
-        audit.info("OTP definition was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
+        audit.info("OTP definition was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpDefinition", otpDefinition)
+                .build());
         final UpdateOtpDefinitionResponse response  = new UpdateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setDescription(otpDefinition.getDescription());
@@ -236,7 +242,10 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was removed, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
-        audit.info("OTP definition was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
+        audit.info("OTP definition was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpDefinition", otpDefinition)
+                .build());
         final DeleteOtpDefinitionResponse response = new DeleteOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());

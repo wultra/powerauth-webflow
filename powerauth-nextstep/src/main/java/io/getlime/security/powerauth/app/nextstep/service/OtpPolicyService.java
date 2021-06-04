@@ -103,7 +103,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampCreated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was created, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
-        audit.info("OTP policy was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpPolicy", otpPolicy).build());
+        audit.info("OTP policy was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final CreateOtpPolicyResponse response = new CreateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -154,7 +157,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was updated, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
-        audit.info("OTP policy was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpPolicy", otpPolicy).build());
+        audit.info("OTP policy was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final UpdateOtpPolicyResponse response  = new UpdateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -209,7 +215,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was removed, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
-        audit.info("OTP policy was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpPolicy", otpPolicy).build());
+        audit.info("OTP policy was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final DeleteOtpPolicyResponse response = new DeleteOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setOtpPolicyStatus(otpPolicy.getStatus());

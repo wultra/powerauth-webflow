@@ -89,7 +89,10 @@ public class StepDefinitionService {
         stepDefinition.setResponseResult(request.getResponseResult());
         stepDefinition = stepDefinitionRepository.save(stepDefinition);
         logger.debug("Step definition was created, step definition ID: {}", stepDefinition.getStepDefinitionId());
-        audit.info("Step definition was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("stepDefinition", stepDefinition).build());
+        audit.info("Step definition was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("stepDefinition", stepDefinition)
+                .build());
         stepResolutionService.reloadStepDefinitions();
         final CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
         response.setStepDefinitionId(request.getStepDefinitionId());
@@ -120,7 +123,8 @@ public class StepDefinitionService {
         stepDefinitionRepository.delete(stepDefinition);
         logger.debug("Step definition was deleted, step definition ID: {}", stepDefinition.getStepDefinitionId());
         audit.info("Step definition was deleted", AuditDetail.builder()
-                .type(AUDIT_TYPE_CONFIGURATION).param("stepDefinitionId", stepDefinition.getStepDefinitionId())
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("stepDefinitionId", stepDefinition.getStepDefinitionId())
                 .build());
         stepResolutionService.reloadStepDefinitions();
         final DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();

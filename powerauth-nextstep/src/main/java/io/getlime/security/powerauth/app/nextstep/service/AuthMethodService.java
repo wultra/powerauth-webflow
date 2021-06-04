@@ -106,7 +106,10 @@ public class AuthMethodService {
         authMethod.setHasMobileToken(request.getHasMobileToken());
         authMethod = authMethodRepository.save(authMethod);
         logger.debug("Authentication method was created: {}", authMethod.getAuthMethod());
-        audit.info("Authentication method was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("authMethod", authMethod).build());
+        audit.info("Authentication method was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("authMethod", authMethod)
+                .build());
         final CreateAuthMethodResponse response = new CreateAuthMethodResponse();
         response.setAuthMethod(authMethod.getAuthMethod());
         response.setOrderNumber(authMethod.getOrderNumber());
@@ -260,8 +263,11 @@ public class AuthMethodService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
-        audit.info("User preferences were updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("userPrefs", userPrefs).build());
         logger.debug("User preferences were updated for user: {}, authentication method: {}", userId, authMethod);
+        audit.info("User preferences were updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("userPrefs", userPrefs)
+                .build());
     }
 
     /**

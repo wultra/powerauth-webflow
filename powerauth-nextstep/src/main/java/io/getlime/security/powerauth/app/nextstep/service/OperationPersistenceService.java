@@ -155,7 +155,8 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operationHistoryRepository.save(operationHistory);
-        audit.info("Operation was created", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("operationName", operation.getOperationName())
                 .param("operationData", operation.getOperationData())
@@ -165,7 +166,8 @@ public class OperationPersistenceService {
                 .param("organizationId", operation.getOperationId())
                 .param("operationHistory", operationHistory)
                 .build());
-        audit.debug("Operation was created (detail)", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.debug("Operation was created (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("operation", operation)
                 .build());
@@ -259,7 +261,8 @@ public class OperationPersistenceService {
         operation.getOperationHistory().add(operationHistory);
         operation = operationRepository.save(operation);
         logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
-        audit.info("Operation was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("result", operation.getResult())
                 .param("userId", operation.getUserId())
@@ -295,7 +298,8 @@ public class OperationPersistenceService {
             operation.setUserAccountStatus(accountStatus);
         }
         operationRepository.save(operation);
-        audit.info("Operation user was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation user was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("userId", operation.getUserId())
                 .param("organizationId", operation.getOrganization().getOrganizationId())
@@ -325,10 +329,12 @@ public class OperationPersistenceService {
         }
         operationRepository.save(operation);
         logger.debug("Operation form data was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
-        audit.info("Operation form data was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation form data was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .build());
-        audit.debug("Operation form data was updated (detail)", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.debug("Operation form data was updated (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("formData", operation.getOperationFormData())
                 .build());
@@ -376,7 +382,8 @@ public class OperationPersistenceService {
         }
         currentHistory.setChosenAuthMethod(chosenAuthMethod);
         operationHistoryRepository.save(currentHistory);
-        audit.info("Operation chosen auth method was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation chosen auth method was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("chosenAuthMethod", chosenAuthMethod)
                 .build());
@@ -411,7 +418,8 @@ public class OperationPersistenceService {
             currentHistory.setPowerAuthOperationId(null);
         }
         operationHistoryRepository.save(currentHistory);
-        audit.info("Operation mobile token status was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation mobile token status was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("mobileTokenActive", currentHistory.isMobileTokenActive())
                 .param("powerAuthOperationId", currentHistory.getPowerAuthOperationId())
@@ -450,7 +458,8 @@ public class OperationPersistenceService {
             logger.error("Error occurred while serializing application attributes for an operation", e);
         }
         operationRepository.save(operation);
-        audit.info("Operation application context was updated", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+        audit.info("Operation application context was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("operation", operation)
                 .build());
@@ -650,7 +659,8 @@ public class OperationPersistenceService {
             afsEntity.setTimestampCreated(request.getTimestampCreated());
             operation.getAfsActions().add(afsEntity);
             operationRepository.save(operation);
-            audit.info("Operation AFS action was created", AuditDetail.builder().type(AUDIT_TYPE_OPERATION)
+            audit.info("Operation AFS action was created", AuditDetail.builder()
+                    .type(AUDIT_TYPE_OPERATION)
                     .param("operationId", operation.getOperationId())
                     .param("afsAction", afsEntity)
                     .build());

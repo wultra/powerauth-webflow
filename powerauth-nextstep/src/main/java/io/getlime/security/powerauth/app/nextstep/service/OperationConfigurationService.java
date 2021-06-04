@@ -93,7 +93,10 @@ public class OperationConfigurationService {
         operationConfig.setExpirationTime(request.getExpirationTime());
         operationConfig = operationConfigRepository.save(operationConfig);
         logger.debug("Operation configuration was created, operation name: {}", operationConfig.getOperationName());
-        audit.info("Operation configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("operationConfig", operationConfig).build());
+        audit.info("Operation configuration was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("operationConfig", operationConfig)
+                .build());
         final CreateOperationConfigResponse response = new CreateOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
@@ -194,7 +197,10 @@ public class OperationConfigurationService {
         operationMethodConfig.setMaxAuthFails(request.getMaxAuthFails());
         operationMethodConfig = operationMethodConfigRepository.save(operationMethodConfig);
         logger.debug("Operation and authentication method configuration was created, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
-        audit.info("Operation and method configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("operationMethodConfig", operationMethodConfig).build());
+        audit.info("Operation and method configuration was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("operationMethodConfig", operationMethodConfig)
+                .build());
         final CreateOperationMethodConfigResponse response = new CreateOperationMethodConfigResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());

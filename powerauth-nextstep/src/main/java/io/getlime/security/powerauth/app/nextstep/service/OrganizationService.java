@@ -89,7 +89,10 @@ public class OrganizationService {
         organization.setDefaultOtpName(request.getDefaultOtpName());
         organization = organizationRepository.save(organization);
         logger.debug("Organization was created: {}", organization.getOrganizationId());
-        audit.info("Organization was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("organization", organization).build());
+        audit.info("Organization was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("organization", organization)
+                .build());
         final CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());

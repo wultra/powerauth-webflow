@@ -88,7 +88,10 @@ public class ApplicationService {
         application.setTimestampCreated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was created, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
-        audit.info("Application was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("application", application).build());
+        audit.info("Application was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final CreateApplicationResponse response = new CreateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -119,7 +122,10 @@ public class ApplicationService {
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was updated, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
-        audit.info("Application was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("application", application).build());
+        audit.info("Application was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final UpdateApplicationResponse response = new UpdateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -165,7 +171,10 @@ public class ApplicationService {
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was removed, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
-        audit.info("Application was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("application", application).build());
+        audit.info("Application was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final DeleteApplicationResponse response = new DeleteApplicationResponse();
         response.setApplicationName(application.getName());
         response.setApplicationStatus(application.getStatus());

@@ -102,7 +102,10 @@ public class HashConfigService {
         hashConfig.setTimestampCreated(new Date());
         hashConfig = hashConfigRepository.save(hashConfig);
         logger.debug("Hashing configuration was created, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
-        audit.info("Hashing configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
+        audit.info("Hashing configuration was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("hashConfig", hashConfig)
+                .build());
         final CreateHashConfigResponse response = new CreateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -141,7 +144,10 @@ public class HashConfigService {
         hashConfig.setTimestampLastUpdated(new Date());
         hashConfig = hashConfigRepository.save(hashConfig);
         logger.debug("Hashing configuration was updated, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
-        audit.info("Hashing configuration was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
+        audit.info("Hashing configuration was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("hashConfig", hashConfig)
+                .build());
         final UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -192,7 +198,10 @@ public class HashConfigService {
         hashConfig.setTimestampLastUpdated(new Date());
         hashConfig = hashConfigRepository.save(hashConfig);
         logger.debug("Hashing configuration was removed, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
-        audit.info("Hashing configuration was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
+        audit.info("Hashing configuration was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("hashConfig", hashConfig)
+                .build());
         final DeleteHashConfigResponse response = new DeleteHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setHashConfigStatus(HashConfigStatus.REMOVED);

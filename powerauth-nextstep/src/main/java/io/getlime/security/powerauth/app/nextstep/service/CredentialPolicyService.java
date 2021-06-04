@@ -122,7 +122,10 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampCreated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was created, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
-        audit.info("Credential policy was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
+        audit.info("Credential policy was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("credentialPolicy", credentialPolicy)
+                .build());
         final CreateCredentialPolicyResponse response = new CreateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -209,7 +212,10 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was updated, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
-        audit.info("Credential policy was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
+        audit.info("Credential policy was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("credentialPolicy", credentialPolicy)
+                .build());
         final UpdateCredentialPolicyResponse response  = new UpdateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -275,7 +281,10 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was removed, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
-        audit.info("Credential policy was rermoved", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
+        audit.info("Credential policy was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("credentialPolicy", credentialPolicy)
+                .build());
         final DeleteCredentialPolicyResponse response = new DeleteCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setCredentialPolicyStatus(credentialPolicy.getStatus());

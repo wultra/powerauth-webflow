@@ -87,7 +87,10 @@ public class RoleService {
         role.setTimestampCreated(new Date());
         role = roleRepository.save(role);
         logger.debug("Role was created, role ID: {}, role name: {}", role.getRoleId(), role.getName());
-        audit.info("Role was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("role", role).build());
+        audit.info("Role was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("role", role)
+                .build());
         final CreateRoleResponse response = new CreateRoleResponse();
         response.setRoleName(role.getName());
         response.setDescription(role.getDescription());
