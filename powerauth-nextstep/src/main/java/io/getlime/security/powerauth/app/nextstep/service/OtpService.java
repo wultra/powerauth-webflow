@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -51,22 +53,26 @@ import java.util.stream.Stream;
 public class OtpService {
 
     private final Logger logger = LoggerFactory.getLogger(OtpService.class);
+    private static final String AUDIT_TYPE_AUTHENTICATION = "AUTHENTICATION";
 
     private final OtpRepository otpRepository;
     private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
+    private final Audit audit;
 
     /**
      * OTP service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
      * @param otpValueConverter OTP value converter.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OtpService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter) {
+    public OtpService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit) {
         this.serviceCatalogue = serviceCatalogue;
         this.otpRepository = repositoryCatalogue.getOtpRepository();
         this.otpValueConverter = otpValueConverter;
+        this.audit = audit;
     }
 
     /**
@@ -234,6 +240,11 @@ public class OtpService {
             try (final Stream<OtpEntity> existingOtps = otpRepository.findAllByOperationAndStatus(operation, OtpStatus.ACTIVE)) {
                 existingOtps.forEach(otp -> {
                     logger.debug("Existing OTP was removed due to new OTP: {}", otp.getOtpId());
+                    audit.info("OTP was removed due to new OTP", AuditDetail.builder()
+                            .type(AUDIT_TYPE_AUTHENTICATION)
+                            .param("userId", userId)
+                            .param("otpId", otp.getOtpId())
+                            .build());
                     otp.setStatus(OtpStatus.REMOVED);
                     otpsToRemove.add(otp);
                 });
@@ -279,6 +290,11 @@ public class OtpService {
         }
         otp = otpRepository.save(otp);
         logger.debug("OTP was created, user ID: {}, OTP ID: {}", userId, otp.getOtpId());
+        audit.info("OTP was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", userId)
+                .param("otpId", otp.getOtpId())
+                .build());
         final CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
         response.setUserId(userId);
@@ -354,6 +370,10 @@ public class OtpService {
         otp.setStatus(OtpStatus.REMOVED);
         otpRepository.save(otp);
         logger.debug("OTP was removed, OTP ID: {}", otp.getOtpId());
+        audit.info("OTP was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otp.getOtpId())
+                .build());
         final DeleteOtpResponse response = new DeleteOtpResponse();
         response.setOtpId(otp.getOtpId());
         if (otp.getOperation() != null) {
