@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * Main Spring boot class for Web Flow server.
@@ -28,8 +29,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  */
 @SpringBootApplication
 @EnableJpaRepositories("io.getlime.security.powerauth.lib.webflow.authentication.repository")
-@ComponentScan(basePackages = "io.getlime.security.*" )
+@ComponentScan(basePackages = {"io.getlime.security.*", "com.wultra.core.audit.base"})
 @EntityScan("io.getlime.security.*")
+@EnableScheduling
 public class PowerAuthWebFlowApplication {
 
     public static void main(String[] args) {

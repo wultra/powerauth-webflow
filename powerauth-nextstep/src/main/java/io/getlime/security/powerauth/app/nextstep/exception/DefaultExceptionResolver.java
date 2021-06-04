@@ -55,6 +55,10 @@ public class DefaultExceptionResolver {
     private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
     private final Audit audit;
 
+    /**
+     * Exception resolver constructor.
+     * @param auditFactory Audit factory.
+     */
     @Autowired
     public DefaultExceptionResolver(AuditFactory auditFactory) {
         this.audit = auditFactory.getAudit();

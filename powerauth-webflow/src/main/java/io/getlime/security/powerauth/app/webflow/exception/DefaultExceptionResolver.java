@@ -16,6 +16,9 @@
 
 package io.getlime.security.powerauth.app.webflow.exception;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
@@ -42,14 +45,21 @@ public class DefaultExceptionResolver {
 
     private AuthenticationManagementService authenticationManagementService;
 
+    private static final AuditDetail AUDIT_DETAIL_UNEXPECTED_ERROR = new AuditDetail("UNEXPECTED_ERROR");
+    private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
+    private static final AuditDetail AUDIT_DETAIL_UNAUTHORIZED = new AuditDetail("AUTHORIZATION");
+    private final Audit audit;
+
     /**
      * Initialization of the class with default configuration.
      *
      * @param authenticationManagementService Service managing authentication context.
+     * @param auditFactory Audit factory.
      */
     @Autowired
-    public DefaultExceptionResolver(AuthenticationManagementService authenticationManagementService) {
+    public DefaultExceptionResolver(AuthenticationManagementService authenticationManagementService, AuditFactory auditFactory) {
         this.authenticationManagementService = authenticationManagementService;
+        this.audit = auditFactory.getAudit();
     }
 
     /**
@@ -61,6 +71,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in Web Flow server", t);
+        audit.error("Error occurred in Web Flow server", AUDIT_DETAIL_UNEXPECTED_ERROR, t);
         final Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
         return new ErrorResponse(error);
     }
@@ -74,6 +85,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleAuthStepException(AuthStepException ex) {
         logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Error occurred in Web Flow server", AUDIT_DETAIL_BAD_REQUEST, ex);
         // Web Flow returns message ID for front-end localization instead of message.
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
@@ -88,6 +100,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public String handleUnauthorizedException(InsufficientAuthenticationException ex) {
         logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Error occurred in Web Flow server", AUDIT_DETAIL_UNAUTHORIZED, ex);
         authenticationManagementService.clearContext();
         return "redirect:/oauth/error";
     }
@@ -102,6 +115,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public @ResponseBody ErrorResponse handleTlsClientAuthenticationException(TlsClientAuthenticationException ex) {
         logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Error occurred in Web Flow server", AUDIT_DETAIL_UNAUTHORIZED, ex);
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
     }

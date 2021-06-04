@@ -18,8 +18,12 @@ package io.getlime.security.powerauth.app.tppengine;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
+@EnableScheduling
+@ComponentScan(basePackages = {"io.getlime.security.powerauth.app.tppengine", "com.wultra.core.audit.base"})
 public class TppEngineApplication {
 
     public static void main(String[] args) {
