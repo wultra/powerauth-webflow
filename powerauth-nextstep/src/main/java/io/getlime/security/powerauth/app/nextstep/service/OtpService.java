@@ -294,6 +294,7 @@ public class OtpService {
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("userId", userId)
                 .param("otpId", otp.getOtpId())
+                .param("operationId", otp.getOperation() != null ? otp.getOperation().getOperationId() : null)
                 .build());
         final CreateOtpResponse response = new CreateOtpResponse();
         response.setOtpName(otp.getOtpDefinition().getName());
