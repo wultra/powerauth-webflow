@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpDefinitionConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpDefinitionRepository;
@@ -57,22 +59,26 @@ import java.util.Optional;
 public class OtpDefinitionService {
 
     private final Logger logger = LoggerFactory.getLogger(OtpDefinitionService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final OtpDefinitionRepository otpDefinitionRepository;
     private final OtpPolicyRepository otpPolicyRepository;
     private final ApplicationRepository applicationRepository;
+    private final Audit audit;
 
     private final OtpDefinitionConverter otpDefinitionConverter = new OtpDefinitionConverter();
 
     /**
      * OTP definition service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OtpDefinitionService(RepositoryCatalogue repositoryCatalogue) {
+    public OtpDefinitionService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.otpDefinitionRepository = repositoryCatalogue.getOtpDefinitionRepository();
         this.otpPolicyRepository = repositoryCatalogue.getOtpPolicyRepository();
         this.applicationRepository = repositoryCatalogue.getApplicationRepository();
+        this.audit = audit;
     }
 
     /**
@@ -117,6 +123,7 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampCreated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was created, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
+        audit.info("OTP definition was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
         final CreateOtpDefinitionResponse response = new CreateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());
@@ -175,6 +182,7 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was updated, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
+        audit.info("OTP definition was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
         final UpdateOtpDefinitionResponse response  = new UpdateOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setDescription(otpDefinition.getDescription());
@@ -228,6 +236,7 @@ public class OtpDefinitionService {
         otpDefinition.setTimestampLastUpdated(new Date());
         otpDefinition = otpDefinitionRepository.save(otpDefinition);
         logger.debug("OTP definition was removed, OTP definition ID: {}, OTP definition name: {}", otpDefinition.getOtpDefinitionId(), otpDefinition.getName());
+        audit.info("OTP definition was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("otpDefinition", otpDefinition).build());
         final DeleteOtpDefinitionResponse response = new DeleteOtpDefinitionResponse();
         response.setOtpDefinitionName(otpDefinition.getName());
         response.setOtpDefinitionStatus(otpDefinition.getStatus());

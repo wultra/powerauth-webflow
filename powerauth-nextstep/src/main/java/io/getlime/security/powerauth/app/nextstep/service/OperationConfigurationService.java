@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.OperationConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationConfigRepository;
@@ -44,24 +46,28 @@ import java.util.Optional;
 public class OperationConfigurationService {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationConfigurationService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final OperationConfigRepository operationConfigRepository;
     private final OperationMethodConfigRepository operationMethodConfigRepository;
     private final OperationRepository operationRepository;
     private final AuthMethodRepository authMethodRepository;
+    private final Audit audit;
 
     private final OperationConfigConverter configConverter = new OperationConfigConverter();
 
     /**
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OperationConfigurationService(RepositoryCatalogue repositoryCatalogue) {
+    public OperationConfigurationService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.operationConfigRepository = repositoryCatalogue.getOperationConfigRepository();
         this.operationMethodConfigRepository = repositoryCatalogue.getOperationMethodConfigRepository();
         this.operationRepository = repositoryCatalogue.getOperationRepository();
         this.authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        this.audit = audit;
     }
 
     /**
@@ -87,6 +93,7 @@ public class OperationConfigurationService {
         operationConfig.setExpirationTime(request.getExpirationTime());
         operationConfig = operationConfigRepository.save(operationConfig);
         logger.debug("Operation configuration was created, operation name: {}", operationConfig.getOperationName());
+        audit.info("Operation configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("operationConfig", operationConfig).build());
         final CreateOperationConfigResponse response = new CreateOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
         response.setTemplateVersion(operationConfig.getTemplateVersion());
@@ -150,6 +157,10 @@ public class OperationConfigurationService {
         final OperationConfigEntity operationConfig = operationConfigOptional.get();
         operationConfigRepository.delete(operationConfig);
         logger.debug("Operation configuration was deleted, operation name: {}", operationConfig.getOperationName());
+        audit.info("Operation configuration was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("operationName", operationConfig.getOperationName())
+                .build());
         final DeleteOperationConfigResponse response = new DeleteOperationConfigResponse();
         response.setOperationName(operationConfig.getOperationName());
         return response;
@@ -183,6 +194,7 @@ public class OperationConfigurationService {
         operationMethodConfig.setMaxAuthFails(request.getMaxAuthFails());
         operationMethodConfig = operationMethodConfigRepository.save(operationMethodConfig);
         logger.debug("Operation and authentication method configuration was created, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
+        audit.info("Operation and method configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("operationMethodConfig", operationMethodConfig).build());
         final CreateOperationMethodConfigResponse response = new CreateOperationMethodConfigResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());
@@ -221,6 +233,11 @@ public class OperationConfigurationService {
         final OperationMethodConfigEntity operationMethodConfig = operationMethodConfigOptional.get();
         operationMethodConfigRepository.delete(operationMethodConfig);
         logger.debug("Operation and authentication method configuration was deleted, operation name: {}, authentication method: {}", operationMethodConfig.getPrimaryKey().getOperationName(), operationMethodConfig.getPrimaryKey().getAuthMethod());
+        audit.info("Operation and authentication method configuration was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("operationName", operationMethodConfig.getPrimaryKey().getOperationName())
+                .param("authMethod", operationMethodConfig.getPrimaryKey().getAuthMethod())
+                .build());
         final DeleteOperationMethodConfigResponse response = new DeleteOperationMethodConfigResponse();
         response.setOperationName(operationMethodConfig.getPrimaryKey().getOperationName());
         response.setAuthMethod(operationMethodConfig.getPrimaryKey().getAuthMethod());

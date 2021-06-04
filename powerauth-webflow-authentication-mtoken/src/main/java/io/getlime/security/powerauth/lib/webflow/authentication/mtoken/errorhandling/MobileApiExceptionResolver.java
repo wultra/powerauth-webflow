@@ -16,7 +16,6 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
@@ -53,11 +52,11 @@ public class MobileApiExceptionResolver {
 
     /**
      * Exception resolver constructor.
-     * @param auditFactory Audit factory.
+     * @param audit Audit interface.
      */
     @Autowired
-    public MobileApiExceptionResolver(AuditFactory auditFactory) {
-        this.audit = auditFactory.getAudit();
+    public MobileApiExceptionResolver(Audit audit) {
+        this.audit = audit;
     }
 
 

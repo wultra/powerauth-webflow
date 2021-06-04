@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
@@ -57,9 +59,11 @@ import java.util.stream.Collectors;
 public class AuthMethodService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final RepositoryCatalogue repositoryCatalogue;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -67,11 +71,13 @@ public class AuthMethodService {
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.repositoryCatalogue = repositoryCatalogue;
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -100,6 +106,7 @@ public class AuthMethodService {
         authMethod.setHasMobileToken(request.getHasMobileToken());
         authMethod = authMethodRepository.save(authMethod);
         logger.debug("Authentication method was created: {}", authMethod.getAuthMethod());
+        audit.info("Authentication method was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("authMethod", authMethod).build());
         final CreateAuthMethodResponse response = new CreateAuthMethodResponse();
         response.setAuthMethod(authMethod.getAuthMethod());
         response.setOrderNumber(authMethod.getOrderNumber());
@@ -253,6 +260,7 @@ public class AuthMethodService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
+        audit.info("User preferences were updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("userPrefs", userPrefs).build());
         logger.debug("User preferences were updated for user: {}, authentication method: {}", userId, authMethod);
     }
 
@@ -329,6 +337,10 @@ public class AuthMethodService {
         final AuthMethodEntity authMethod = authMethodOptional.get();
         authMethodRepository.delete(authMethod);
         logger.debug("Authentication method was deleted: {}", authMethod.getAuthMethod());
+        audit.info("Authentication method was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("authMethod", authMethod.getAuthMethod())
+                .build());
         final DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();
         response.setAuthMethod(authMethod.getAuthMethod());
         return response;

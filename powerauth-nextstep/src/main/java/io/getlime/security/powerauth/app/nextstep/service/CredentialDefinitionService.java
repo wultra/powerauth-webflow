@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialDefinitionConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.*;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -51,26 +53,30 @@ import java.util.Optional;
 public class CredentialDefinitionService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialDefinitionService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final CredentialDefinitionRepository credentialDefinitionRepository;
     private final CredentialPolicyRepository credentialPolicyRepository;
     private final ApplicationRepository applicationRepository;
     private final HashConfigRepository hashConfigRepository;
     private final OrganizationRepository organizationRepository;
+    private final Audit audit;
 
     private final CredentialDefinitionConverter credentialDefinitionConverter = new CredentialDefinitionConverter();
 
     /**
      * Credential definition service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public CredentialDefinitionService(RepositoryCatalogue repositoryCatalogue) {
+    public CredentialDefinitionService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.credentialDefinitionRepository = repositoryCatalogue.getCredentialDefinitionRepository();
         this.credentialPolicyRepository = repositoryCatalogue.getCredentialPolicyRepository();
         this.applicationRepository = repositoryCatalogue.getApplicationRepository();
         this.hashConfigRepository = repositoryCatalogue.getHashConfigRepository();
         this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
+        this.audit = audit;
     }
 
     /**
@@ -143,6 +149,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setTimestampCreated(new Date());
         credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
         logger.debug("Credential definition was created, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
+        audit.info("Credential definition was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialDefinition", credentialDefinition).build());
         final CreateCredentialDefinitionResponse response = new CreateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
@@ -239,6 +246,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
         logger.debug("Credential definition was updated, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
+        audit.info("Credential definition was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialDefinition", credentialDefinition).build());
         final UpdateCredentialDefinitionResponse response  = new UpdateCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setDescription(credentialDefinition.getDescription());
@@ -304,6 +312,7 @@ public class CredentialDefinitionService {
         credentialDefinition.setTimestampLastUpdated(new Date());
         credentialDefinition = credentialDefinitionRepository.save(credentialDefinition);
         logger.debug("Credential definition was removed, credential definition ID: {}, credential definition name: {}", credentialDefinition.getCredentialDefinitionId(), credentialDefinition.getName());
+        audit.info("Credential definition was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialDefinition", credentialDefinition).build());
         final DeleteCredentialDefinitionResponse response = new DeleteCredentialDefinitionResponse();
         response.setCredentialDefinitionName(credentialDefinition.getName());
         response.setCredentialDefinitionStatus(credentialDefinition.getStatus());

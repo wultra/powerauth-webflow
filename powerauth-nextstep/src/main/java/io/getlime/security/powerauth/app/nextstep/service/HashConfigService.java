@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.HashConfigConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.HashConfigRepository;
@@ -53,8 +55,10 @@ import java.util.Optional;
 public class HashConfigService {
 
     private final Logger logger = LoggerFactory.getLogger(HashConfigService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final HashConfigRepository hashConfigRepository;
+    private final Audit audit;
 
     private final HashConfigConverter hashConfigConverter = new HashConfigConverter();
     private final ParameterConverter parameterConverter = new ParameterConverter();
@@ -62,10 +66,12 @@ public class HashConfigService {
     /**
      * Hashing configuration service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public HashConfigService(RepositoryCatalogue repositoryCatalogue) {
+    public HashConfigService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.hashConfigRepository = repositoryCatalogue.getHashConfigRepository();
+        this.audit = audit;
     }
 
     /**
@@ -96,6 +102,7 @@ public class HashConfigService {
         hashConfig.setTimestampCreated(new Date());
         hashConfig = hashConfigRepository.save(hashConfig);
         logger.debug("Hashing configuration was created, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
+        audit.info("Hashing configuration was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
         final CreateHashConfigResponse response = new CreateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -134,6 +141,7 @@ public class HashConfigService {
         hashConfig.setTimestampLastUpdated(new Date());
         hashConfig = hashConfigRepository.save(hashConfig);
         logger.debug("Hashing configuration was updated, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
+        audit.info("Hashing configuration was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
         final UpdateHashConfigResponse response = new UpdateHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setAlgorithm(hashConfig.getAlgorithm());
@@ -177,12 +185,14 @@ public class HashConfigService {
             throw new HashConfigNotFoundException("Hashing configuration not found: " + request.getHashConfigName());
         }
         HashConfigEntity hashConfig = hashConfigOptional.get();
-        if (hashConfig.getStatus() != HashConfigStatus.REMOVED) {
-            hashConfig.setStatus(HashConfigStatus.REMOVED);
-            hashConfig.setTimestampLastUpdated(new Date());
-            hashConfig = hashConfigRepository.save(hashConfig);
-            logger.debug("Hashing configuration was removed, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
+        if (hashConfig.getStatus() == HashConfigStatus.REMOVED) {
+            throw new HashConfigNotFoundException("Hashing configuration is already REMOVED: " + request.getHashConfigName());
         }
+        hashConfig.setStatus(HashConfigStatus.REMOVED);
+        hashConfig.setTimestampLastUpdated(new Date());
+        hashConfig = hashConfigRepository.save(hashConfig);
+        logger.debug("Hashing configuration was removed, hashing configuration ID: {}, hashing configuration name: {}", hashConfig.getHashConfigId(), hashConfig.getName());
+        audit.info("Hashing configuration was removed", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("hashConfig", hashConfig).build());
         final DeleteHashConfigResponse response = new DeleteHashConfigResponse();
         response.setHashConfigName(hashConfig.getName());
         response.setHashConfigStatus(HashConfigStatus.REMOVED);

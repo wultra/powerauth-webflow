@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
@@ -23,6 +25,7 @@ import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +43,7 @@ import org.springframework.context.annotation.Configuration;
 public class NextStepServerConfiguration {
 
     private static final Logger logger = LoggerFactory.getLogger(NextStepServerConfiguration.class);
+    private final AuditFactory auditFactory;
 
     /**
      * Data Adapter service URL.
@@ -97,6 +101,15 @@ public class NextStepServerConfiguration {
      */
     @Value("${powerauth.nextstep.service.applicationEnvironment}")
     private String applicationEnvironment;
+
+    /**
+     * Configuration constructor.
+     * @param auditFactory Audit factory.
+     */
+    @Autowired
+    public NextStepServerConfiguration(AuditFactory auditFactory) {
+        this.auditFactory = auditFactory;
+    }
 
     /**
      * Get the operation expiration time.
@@ -202,6 +215,15 @@ public class NextStepServerConfiguration {
             logger.error(ex.getMessage(), ex);
             return null;
         }
+    }
+
+    /**
+     * Prepare audit interface.
+     * @return Audit interface.
+     */
+    @Bean
+    public Audit audit() {
+        return auditFactory.getAudit();
     }
 
 }

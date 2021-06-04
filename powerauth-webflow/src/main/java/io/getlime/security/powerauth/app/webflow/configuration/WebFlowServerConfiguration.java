@@ -16,8 +16,12 @@
 
 package io.getlime.security.powerauth.app.webflow.configuration;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,6 +34,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("ext")
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class WebFlowServerConfiguration {
+
+    private final AuditFactory auditFactory;
 
     /**
      * Dynamic URL for external CSS stylesheet.
@@ -109,6 +115,15 @@ public class WebFlowServerConfiguration {
      */
     @Value("${powerauth.webflow.consent.limit.characters:750}")
     private int consentPanelLimitCharacters;
+
+    /**
+     * Configuration constructor.
+     * @param auditFactory Audit factory.
+     */
+    @Autowired
+    public WebFlowServerConfiguration(AuditFactory auditFactory) {
+        this.auditFactory = auditFactory;
+    }
 
     /**
      * Get custom external stylesheet URL.
@@ -215,5 +230,14 @@ public class WebFlowServerConfiguration {
      */
     public int getConsentPanelLimitCharacters() {
         return consentPanelLimitCharacters;
+    }
+
+    /**
+     * Prepare audit interface.
+     * @return Audit interface.
+     */
+    @Bean
+    public Audit audit() {
+        return auditFactory.getAudit();
     }
 }

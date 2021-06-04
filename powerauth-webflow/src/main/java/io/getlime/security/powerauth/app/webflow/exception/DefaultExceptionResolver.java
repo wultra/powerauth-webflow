@@ -17,7 +17,6 @@
 package io.getlime.security.powerauth.app.webflow.exception;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
@@ -54,12 +53,12 @@ public class DefaultExceptionResolver {
      * Initialization of the class with default configuration.
      *
      * @param authenticationManagementService Service managing authentication context.
-     * @param auditFactory Audit factory.
+     * @param audit Audit interface.
      */
     @Autowired
-    public DefaultExceptionResolver(AuthenticationManagementService authenticationManagementService, AuditFactory auditFactory) {
+    public DefaultExceptionResolver(AuthenticationManagementService authenticationManagementService, Audit audit) {
         this.authenticationManagementService = authenticationManagementService;
-        this.audit = auditFactory.getAudit();
+        this.audit = audit;
     }
 
     /**

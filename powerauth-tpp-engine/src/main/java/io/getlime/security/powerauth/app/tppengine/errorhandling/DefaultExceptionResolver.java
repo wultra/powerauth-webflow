@@ -17,7 +17,6 @@
 package io.getlime.security.powerauth.app.tppengine.errorhandling;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
@@ -53,11 +52,11 @@ public class DefaultExceptionResolver {
 
     /**
      * Exception resolver constructor.
-     * @param auditFactory Audit factory.
+     * @param audit Audit interface.
      */
     @Autowired
-    public DefaultExceptionResolver(AuditFactory auditFactory) {
-        this.audit = auditFactory.getAudit();
+    public DefaultExceptionResolver(Audit audit) {
+        this.audit = audit;
     }
 
     /**

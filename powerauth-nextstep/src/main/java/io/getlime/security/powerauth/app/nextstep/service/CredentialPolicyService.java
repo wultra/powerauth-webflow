@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialPolicyRepository;
@@ -53,8 +55,10 @@ import java.util.Optional;
 public class CredentialPolicyService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialPolicyService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final CredentialPolicyRepository credentialPolicyRepository;
+    private final Audit audit;
 
     private final CredentialPolicyConverter credentialPolicyConverter = new CredentialPolicyConverter();
     private final ParameterConverter parameterConverter = new ParameterConverter();
@@ -62,10 +66,12 @@ public class CredentialPolicyService {
     /**
      * Credential policy service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public CredentialPolicyService(RepositoryCatalogue repositoryCatalogue) {
+    public CredentialPolicyService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.credentialPolicyRepository = repositoryCatalogue.getCredentialPolicyRepository();
+        this.audit = audit;
     }
 
     /**
@@ -116,6 +122,7 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampCreated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was created, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
+        audit.info("Credential policy was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
         final CreateCredentialPolicyResponse response = new CreateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -202,6 +209,7 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was updated, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
+        audit.info("Credential policy was updated", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
         final UpdateCredentialPolicyResponse response  = new UpdateCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setDescription(credentialPolicy.getDescription());
@@ -267,6 +275,7 @@ public class CredentialPolicyService {
         credentialPolicy.setTimestampLastUpdated(new Date());
         credentialPolicy = credentialPolicyRepository.save(credentialPolicy);
         logger.debug("Credential policy was removed, credential policy ID: {}, credential policy name: {}", credentialPolicy.getCredentialPolicyId(), credentialPolicy.getName());
+        audit.info("Credential policy was rermoved", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("credentialPolicy", credentialPolicy).build());
         final DeleteCredentialPolicyResponse response = new DeleteCredentialPolicyResponse();
         response.setCredentialPolicyName(credentialPolicy.getName());
         response.setCredentialPolicyStatus(credentialPolicy.getStatus());

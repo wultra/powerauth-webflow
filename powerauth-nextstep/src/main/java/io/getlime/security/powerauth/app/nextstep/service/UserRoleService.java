@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -50,21 +52,25 @@ import java.util.Optional;
 public class UserRoleService {
 
     private final Logger logger = LoggerFactory.getLogger(UserRoleService.class);
+    private static final String AUDIT_TYPE_USER_IDENTITY = "USER_IDENTITY";
 
     private final RoleRepository roleRepository;
     private final UserIdentityRepository userIdentityRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     /**
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public UserRoleService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public UserRoleService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.roleRepository = repositoryCatalogue.getRoleRepository();
         this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -106,6 +112,11 @@ public class UserRoleService {
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User role was added, user ID: {}, role name: {}", user.getUserId(), role.getName());
+        audit.info("User role was added", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("roleName", role.getName())
+                .build());
         final AddUserRoleResponse response = new AddUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());
@@ -149,6 +160,11 @@ public class UserRoleService {
         userIdentityService.updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User role was removed, user ID: {}, role name: {}", user.getUserId(), role.getName());
+        audit.info("User role was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("roleName", role.getName())
+                .build());
         final RemoveUserRoleResponse response = new RemoveUserRoleResponse();
         response.setUserId(user.getUserId());
         response.setRoleName(role.getName());

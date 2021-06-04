@@ -17,7 +17,6 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
 import com.wultra.core.audit.base.Audit;
-import com.wultra.core.audit.base.AuditFactory;
 import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
@@ -54,11 +53,11 @@ public class AuthenticationExceptionResolver {
 
     /**
      * Exception resolver constructor.
-     * @param auditFactory Audit factory.
+     * @param audit Audit interface.
      */
     @Autowired
-    public AuthenticationExceptionResolver(AuditFactory auditFactory) {
-        this.audit = auditFactory.getAudit();
+    public AuthenticationExceptionResolver(Audit audit) {
+        this.audit = audit;
     }
 
     /**

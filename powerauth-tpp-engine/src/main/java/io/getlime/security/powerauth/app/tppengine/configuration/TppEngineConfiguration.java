@@ -16,8 +16,12 @@
 
 package io.getlime.security.powerauth.app.tppengine.configuration;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,6 +34,8 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties("ext")
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class TppEngineConfiguration {
+
+    private final AuditFactory auditFactory;
 
     /**
      * Application name.
@@ -55,6 +61,15 @@ public class TppEngineConfiguration {
      */
     @Value("${powerauth.tppEngine.service.oauth2.defaultAccessTokenValidityInSeconds}")
     private Long defaultAccessTokenValidityInSeconds;
+
+    /**
+     * Configuration constructor.
+     * @param auditFactory Audit factory.
+     */
+    @Autowired
+    public TppEngineConfiguration(AuditFactory auditFactory) {
+        this.auditFactory = auditFactory;
+    }
 
     /**
      * Get application name.
@@ -88,4 +103,12 @@ public class TppEngineConfiguration {
         return defaultAccessTokenValidityInSeconds;
     }
 
+    /**
+     * Prepare audit interface.
+     * @return Audit interface.
+     */
+    @Bean
+    public Audit audit() {
+        return auditFactory.getAudit();
+    }
 }

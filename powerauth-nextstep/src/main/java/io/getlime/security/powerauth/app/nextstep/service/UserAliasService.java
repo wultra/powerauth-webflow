@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserAliasConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
@@ -58,9 +60,11 @@ import java.util.stream.Collectors;
 public class UserAliasService {
 
     private final Logger logger = LoggerFactory.getLogger(UserAliasService.class);
+    private static final String AUDIT_TYPE_USER_IDENTITY = "USER_IDENTITY";
 
     private final UserIdentityRepository userIdentityRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     private final UserAliasConverter userAliasConverter = new UserAliasConverter();
     private final ExtrasConverter extrasConverter = new ExtrasConverter();
@@ -69,11 +73,13 @@ public class UserAliasService {
      * User alias service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public UserAliasService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public UserAliasService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.serviceCatalogue = serviceCatalogue;
         this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        this.audit = audit;
     }
 
     /**
@@ -115,6 +121,11 @@ public class UserAliasService {
         }
         user = userIdentityRepository.save(user);
         logger.debug("User alias was created, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
+        audit.info("User alias was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("alias", alias)
+                .build());
         CreateUserAliasResponse response = new CreateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -191,6 +202,11 @@ public class UserAliasService {
         }
         user = userIdentityRepository.save(user);
         logger.debug("User alias was updated, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
+        audit.info("User alias was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("alias", alias)
+                .build());
         final UpdateUserAliasResponse response = new UpdateUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());
@@ -227,6 +243,11 @@ public class UserAliasService {
         alias.setTimestampLastUpdated(new Date());
         user = userIdentityRepository.save(user);
         logger.debug("User alias was removed, user ID: {}, alias name: {}", user.getUserId(), alias.getName());
+        audit.info("User alias was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("alias", alias)
+                .build());
         final DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());
         response.setAliasName(alias.getName());

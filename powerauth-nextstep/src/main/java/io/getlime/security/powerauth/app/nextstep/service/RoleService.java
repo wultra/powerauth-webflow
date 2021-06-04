@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.RoleConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.RoleRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserRoleRepository;
@@ -47,20 +49,24 @@ import java.util.Optional;
 public class RoleService {
 
     private final Logger logger = LoggerFactory.getLogger(RoleService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final RoleRepository roleRepository;
     private final UserRoleRepository userRoleRepository;
+    private final Audit audit;
 
     private final RoleConverter roleConverter = new RoleConverter();
 
     /**
      * Role service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public RoleService(RepositoryCatalogue repositoryCatalogue) {
+    public RoleService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.roleRepository = repositoryCatalogue.getRoleRepository();
         this.userRoleRepository = repositoryCatalogue.getUserRoleRepository();
+        this.audit = audit;
     }
 
     /**
@@ -81,6 +87,7 @@ public class RoleService {
         role.setTimestampCreated(new Date());
         role = roleRepository.save(role);
         logger.debug("Role was created, role ID: {}, role name: {}", role.getRoleId(), role.getName());
+        audit.info("Role was created", AuditDetail.builder().type(AUDIT_TYPE_CONFIGURATION).param("role", role).build());
         final CreateRoleResponse response = new CreateRoleResponse();
         response.setRoleName(role.getName());
         response.setDescription(role.getDescription());
@@ -121,6 +128,11 @@ public class RoleService {
         }
         roleRepository.delete(role);
         logger.debug("Role was deleted, role ID: {}, role name: {}", role.getRoleId(), role.getName());
+        audit.info("Role was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("roleId", role.getRoleId())
+                .param("roleName", role.getName())
+                .build());
         final DeleteRoleResponse response = new DeleteRoleResponse();
         response.setRoleName(role.getName());
         return response;

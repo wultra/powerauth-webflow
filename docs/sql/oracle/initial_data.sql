@@ -48,6 +48,13 @@ INSERT INTO ns_credential_definition (credential_definition_id, name, descriptio
 INSERT INTO ns_otp_definition (otp_definition_id, name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values (1, 'RETAIL_OTP', 'Sample OTP definition for retail', 1, 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
 INSERT INTO ns_otp_definition (otp_definition_id, name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values (2, 'SME_OTP', 'Sample OTP definition for SME', 1, 1, 1, 'ACTIVE', CURRENT_TIMESTAMP);
 
+-- update sequences
+ALTER SEQUENCE NS_APPLICATION_SEQ INCREMENT BY 1;
+ALTER SEQUENCE NS_CREDENTIAL_POLICY_SEQ INCREMENT BY 1;
+ALTER SEQUENCE NS_CREDENTIAL_DEFINITION_SEQ INCREMENT BY 2;
+ALTER SEQUENCE NS_OTP_POLICY_SEQ INCREMENT BY 1;
+ALTER SEQUENCE NS_OTP_DEFINITION_SEQ INCREMENT BY 2;
+
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
 VALUES (1, 'login', 'CREATE', NULL, NULL, 1, 'USER_ID_ASSIGN', 'CONTINUE');
