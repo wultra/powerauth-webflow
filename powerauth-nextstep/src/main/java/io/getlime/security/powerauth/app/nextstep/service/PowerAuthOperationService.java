@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.model.request.OperationCreateRequest;
@@ -55,6 +56,7 @@ public class PowerAuthOperationService {
     private final NextStepServerConfiguration nextStepServerConfiguration;
     private final PowerAuthClient powerAuthClient;
     private final DataAdapterClient dataAdapterClient;
+    private final Audit audit;
 
     private final OperationConverter operationConverter = new OperationConverter();
 
@@ -63,12 +65,14 @@ public class PowerAuthOperationService {
      * @param nextStepServerConfiguration Next Step server configuration.
      * @param powerAuthClient PowerAuth client.
      * @param dataAdapterClient Data Adapter client.
+     * @param audit Audit interface.
      */
     @Autowired
-    public PowerAuthOperationService(NextStepServerConfiguration nextStepServerConfiguration, PowerAuthClient powerAuthClient, DataAdapterClient dataAdapterClient) {
+    public PowerAuthOperationService(NextStepServerConfiguration nextStepServerConfiguration, PowerAuthClient powerAuthClient, DataAdapterClient dataAdapterClient, Audit audit) {
         this.nextStepServerConfiguration = nextStepServerConfiguration;
         this.powerAuthClient = powerAuthClient;
         this.dataAdapterClient = dataAdapterClient;
+        this.audit = audit;
     }
 
     /**
@@ -115,6 +119,7 @@ public class PowerAuthOperationService {
             return paResponse.getId();
         } catch (PowerAuthClientException | DataAdapterClientErrorException | OperationNotValidException ex) {
             logger.warn(ex.getMessage(), ex);
+            audit.warn(ex.getMessage(), ex);
         }
         return null;
     }
@@ -147,6 +152,7 @@ public class PowerAuthOperationService {
             return powerAuthClient.operationDetail(request);
         } catch (PowerAuthClientException ex) {
             logger.warn(ex.getMessage(), ex);
+            audit.warn(ex.getMessage(), ex);
         }
         return null;
     }

@@ -110,7 +110,7 @@ public class UserContactService {
         audit.info("User contact was created", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
-                .param("contact", contact)
+                .param("contactName", contact.getName())
                 .build());
         final CreateUserContactResponse response = new CreateUserContactResponse();
         response.setUserId(user.getUserId());
@@ -171,7 +171,7 @@ public class UserContactService {
         audit.info("User contact was updated", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
-                .param("contact", contact)
+                .param("contactName", contact.getName())
                 .build());
         UpdateUserContactResponse response = new UpdateUserContactResponse();
         response.setUserId(user.getUserId());

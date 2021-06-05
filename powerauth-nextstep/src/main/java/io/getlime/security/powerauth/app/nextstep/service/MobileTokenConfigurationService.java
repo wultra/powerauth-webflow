@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
 import com.wultra.security.powerauth.client.PowerAuthClient;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
@@ -48,16 +49,19 @@ public class MobileTokenConfigurationService {
 
     private final ServiceCatalogue serviceCatalogue;
     private final PowerAuthClient powerAuthClient;
+    private final Audit audit;
 
     /**
      * Service constructor.
      * @param serviceCatalogue Service catalogue.
      * @param powerAuthClient PowerAuth service client.
+     * @param audit Audit interface.
      */
     @Autowired
-    public MobileTokenConfigurationService(@Lazy ServiceCatalogue serviceCatalogue, PowerAuthClient powerAuthClient) {
+    public MobileTokenConfigurationService(@Lazy ServiceCatalogue serviceCatalogue, PowerAuthClient powerAuthClient, Audit audit) {
         this.serviceCatalogue = serviceCatalogue;
         this.powerAuthClient = powerAuthClient;
+        this.audit = audit;
     }
 
     /**
@@ -96,6 +100,7 @@ public class MobileTokenConfigurationService {
         } catch (OperationConfigNotFoundException e) {
             // Operation is not configured, skip it
             logger.error(e.getMessage(), e);
+            audit.error(e.getMessage(), e);
             return false;
         }
 

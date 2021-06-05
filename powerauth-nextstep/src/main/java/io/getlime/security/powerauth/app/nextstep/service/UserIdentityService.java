@@ -206,11 +206,11 @@ public class UserIdentityService {
         // Save user identity and a snapshot to the history table
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
+        logger.debug("User identity was created, user ID: {}", user.getUserId());
         audit.info("User identity was created", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
                 .build());
-        logger.debug("User identity was created, user ID: {}", user.getUserId());
         return response;
     }
 

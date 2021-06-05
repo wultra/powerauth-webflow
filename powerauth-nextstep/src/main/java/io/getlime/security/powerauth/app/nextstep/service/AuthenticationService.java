@@ -646,6 +646,8 @@ public class AuthenticationService {
                 .param("otpId", otp.getOtpId())
                 .param("operationId", operation != null ? operation.getOperationId() : null)
                 .param("authenticationResult", authenticationResult)
+                .param("credentialAuthenticationResult", credentialAuthenticationResult)
+                .param("otpAuthenticationResult", otpAuthenticationResult)
                 .param("remainingAttempts", remainingAttempts)
                 .param("userStatus", user.getStatus())
                 .param("otpStatus", otp.getStatus())

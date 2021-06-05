@@ -195,6 +195,7 @@ public class NextStepServerConfiguration {
             return new DataAdapterClient(dataAdapterServiceUrl);
         } catch (DataAdapterClientErrorException ex) {
             logger.error(ex.getMessage(), ex);
+            audit().error(ex.getMessage(), ex);
             return null;
         }
     }
@@ -213,6 +214,7 @@ public class NextStepServerConfiguration {
             return new PowerAuthRestClient(powerAuthRestUrl, config);
         } catch (PowerAuthClientException ex) {
             logger.error(ex.getMessage(), ex);
+            audit().error(ex.getMessage(), ex);
             return null;
         }
     }

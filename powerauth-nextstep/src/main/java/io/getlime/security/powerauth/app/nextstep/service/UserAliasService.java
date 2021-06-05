@@ -124,7 +124,7 @@ public class UserAliasService {
         audit.info("User alias was created", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
-                .param("alias", alias)
+                .param("aliasName", alias.getName())
                 .build());
         CreateUserAliasResponse response = new CreateUserAliasResponse();
         response.setUserId(user.getUserId());
@@ -205,7 +205,7 @@ public class UserAliasService {
         audit.info("User alias was updated", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
-                .param("alias", alias)
+                .param("aliasName", alias.getName())
                 .build());
         final UpdateUserAliasResponse response = new UpdateUserAliasResponse();
         response.setUserId(user.getUserId());
@@ -246,7 +246,7 @@ public class UserAliasService {
         audit.info("User alias was removed", AuditDetail.builder()
                 .type(AUDIT_TYPE_USER_IDENTITY)
                 .param("userId", user.getUserId())
-                .param("alias", alias)
+                .param("aliasName", alias.getName())
                 .build());
         final DeleteUserAliasResponse response = new DeleteUserAliasResponse();
         response.setUserId(user.getUserId());

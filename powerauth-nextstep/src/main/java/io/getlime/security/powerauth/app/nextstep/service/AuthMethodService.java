@@ -173,6 +173,7 @@ public class AuthMethodService {
                             configMap = objectMapper.readValue(config, mapType);
                         } catch (IOException e) {
                             logger.error("Error while deserializing config", e);
+                            audit.error("Error while deserializing config", e);
                             configMap = new HashMap<>();
                         }
                         // add method in case it is enabled in user prefs
@@ -226,6 +227,7 @@ public class AuthMethodService {
             configAsStr = objectMapper.writeValueAsString(config);
         } catch (IOException e) {
             logger.error("Error while serializing config", e);
+            audit.error("Error while serializing config", e);
             configAsStr = "{}";
         }
         UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);

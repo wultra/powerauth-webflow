@@ -19,13 +19,12 @@ import io.getlime.security.powerauth.app.nextstep.configuration.NextStepClientFa
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepTestConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,9 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@TestPropertySource(locations = "classpath:application-test.properties")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ActiveProfiles("test")
+@TestPropertySource(locations = "classpath:application.properties")
+@Sql(scripts = "/db_schema.sql")
 public class NextStepTest {
 
     protected NextStepClient nextStepClient;

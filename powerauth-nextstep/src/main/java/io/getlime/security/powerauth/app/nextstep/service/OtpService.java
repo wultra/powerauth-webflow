@@ -328,6 +328,7 @@ public class OtpService {
                     response.getOtpDetails().add(otpDetail);
                 } catch (EncryptionException | InvalidConfigurationException ex) {
                     logger.error(ex.getMessage(), ex);
+                    audit.error(ex.getMessage(), ex);
                 }
             });
         }
