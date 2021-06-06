@@ -196,6 +196,12 @@ public class AuthenticationService {
                 .param("userId", user.getUserId())
                 .param("operationId", operation != null ? operation.getOperationId() : null)
                 .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("Credential authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
                 .param("remainingAttempts", remainingAttempts)
                 .param("userStatus", user.getStatus())
                 .param("credentialStatus", credential.getStatus())
@@ -260,6 +266,12 @@ public class AuthenticationService {
         logger.info("Credential custom authentication result: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), response.getRemainingAttempts(), userId, operationFailed);
         audit.info("Credential custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("Credential custom authentication result (detail)", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("userId", userId)
                 .param("operationId", operation.getOperationId())
@@ -419,6 +431,13 @@ public class AuthenticationService {
                 .param("otpId", otp.getOtpId())
                 .param("operationId", operation != null ? operation.getOperationId() : null)
                 .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("OTP authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user != null ? user.getUserId() : null)
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
                 .param("remainingAttempts", remainingAttempts)
                 .param("userStatus", user != null ? user.getStatus() : null)
                 .param("otpStatus", otp.getStatus())
@@ -475,6 +494,13 @@ public class AuthenticationService {
         logger.info("OTP custom authentication result: {}, OTP ID: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), otpId, response.getRemainingAttempts(), userId, operationFailed);
         audit.info("OTP custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("OTP custom authentication result (detail)", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("otpId", otpId)
                 .param("userId", userId)
@@ -646,6 +672,13 @@ public class AuthenticationService {
                 .param("otpId", otp.getOtpId())
                 .param("operationId", operation != null ? operation.getOperationId() : null)
                 .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("Combined authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
                 .param("credentialAuthenticationResult", credentialAuthenticationResult)
                 .param("otpAuthenticationResult", otpAuthenticationResult)
                 .param("remainingAttempts", remainingAttempts)
@@ -707,6 +740,13 @@ public class AuthenticationService {
         logger.info("Combined custom authentication result: {}, OTP ID: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), otpId, response.getRemainingAttempts(), userId, operationFailed);
         audit.info("Combined custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("Combined custom authentication result (detail)", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("otpId", otpId)
                 .param("userId", userId)

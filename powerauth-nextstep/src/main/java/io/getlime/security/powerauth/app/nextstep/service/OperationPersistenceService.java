@@ -161,6 +161,14 @@ public class OperationPersistenceService {
                 .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("operationName", operation.getOperationName())
+                .param("externalOperationName", operation.getExternalOperationName())
+                .param("externalTransactionId", operation.getExternalTransactionId())
+                .param("userId", operation.getUserId())
+                .build());
+        audit.debug("Operation was created (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("operationName", operation.getOperationName())
                 .param("operationData", operation.getOperationData())
                 .param("externalOperationName", operation.getExternalOperationName())
                 .param("externalTransactionId", operation.getExternalTransactionId())
@@ -170,11 +178,6 @@ public class OperationPersistenceService {
                 .param("requestAuthStepResult", operationHistory.getRequestAuthStepResult())
                 .param("responseResult", operationHistory.getResponseResult())
                 .param("responseSteps", operationHistory.getResponseSteps())
-                .build());
-        audit.debug("Operation was created (detail)", AuditDetail.builder()
-                .type(AUDIT_TYPE_OPERATION)
-                .param("operationId", operation.getOperationId())
-                .param("operation", operation)
                 .build());
     }
 
@@ -268,6 +271,13 @@ public class OperationPersistenceService {
         operation = operationRepository.save(operation);
         logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
         audit.info("Operation was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("userId", operation.getUserId())
+                .param("requestAuthMethod", operationHistory.getRequestAuthMethod())
+                .param("responseResult", operationHistory.getResponseResult())
+                .build());
+        audit.debug("Operation was updated (detail)", AuditDetail.builder()
                 .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
                 .param("userId", operation.getUserId())
