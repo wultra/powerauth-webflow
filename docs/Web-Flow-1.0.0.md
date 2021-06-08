@@ -1,4 +1,4 @@
-# Migration from 0.23.0 to 0.24.0
+# Migration from 0.24.0 to 1.0.0
 
 ## Database Changes
 
