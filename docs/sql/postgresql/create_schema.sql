@@ -17,7 +17,6 @@ CREATE SEQUENCE "ns_hashing_config_seq" MINVALUE 1 INCREMENT BY 1 START WITH 1 C
 CREATE SEQUENCE "ns_credential_definition_seq" MINVALUE 1 INCREMENT BY 1 START WITH 1 CACHE 20;
 CREATE SEQUENCE "ns_otp_definition_seq" MINVALUE 1 INCREMENT BY 1 START WITH 1 CACHE 20;
 CREATE SEQUENCE "ns_credential_history_seq" MINVALUE 1 INCREMENT BY 1 START WITH 1 CACHE 20;
-CREATE SEQUENCE "ns_audit_log_seq" MINVALUE 1 INCREMENT BY 1 START WITH 1 CACHE 20;
 
 -- Table oauth_client_details stores details about OAuth2 client applications.
 -- Every Web Flow client application should have a record in this table.
@@ -481,14 +480,6 @@ CREATE TABLE ns_operation_afs (
   CONSTRAINT operation_afs_fk FOREIGN KEY (operation_id) REFERENCES ns_operation (operation_id)
 );
 
--- Table ns_audit_log stores audit information.
-CREATE TABLE ns_audit_log (
-  audit_log_id           INTEGER NOT NULL PRIMARY KEY,                -- Audit log identifier.
-  action                 VARCHAR(256) NOT NULL,                       -- Action which is being audited.
-  data                   TEXT,                                        -- Data for the audit record.
-  timestamp_created      TIMESTAMP                                    -- Timestamp when audit record was created.
-);
-
 -- Table ns_user_prefs stores user preferences.
 -- Status of authentication methods is stored in this table per user (methods can be enabled or disabled).
 CREATE TABLE ns_user_prefs (
@@ -587,6 +578,31 @@ CREATE TABLE tpp_app_detail (
   CONSTRAINT tpp_client_secret_fk FOREIGN KEY (app_client_id) REFERENCES oauth_client_details (client_id)
 );
 
+-- Table audit_log stores auditing information
+CREATE TABLE audit_log (
+    audit_log_id       VARCHAR(36) PRIMARY KEY,
+    application_name   VARCHAR(256) NOT NULL,
+    audit_level        VARCHAR(32) NOT NULL,
+    audit_type         VARCHAR(256),
+    timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    message            TEXT NOT NULL,
+    exception_message  TEXT,
+    stack_trace        TEXT,
+    param              TEXT,
+    calling_class      VARCHAR(256) NOT NULL,
+    thread_name        VARCHAR(256) NOT NULL,
+    version            VARCHAR(256),
+    build_time         TIMESTAMP
+);
+
+-- Table audit_param stores auditing parameters
+CREATE TABLE audit_param (
+    audit_log_id       VARCHAR(36),
+    timestamp_created  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    param_key          VARCHAR(256),
+    param_value        VARCHAR(4000)
+);
+
 CREATE INDEX wf_operation_hash ON wf_operation_session (operation_hash);
 CREATE INDEX wf_websocket_session ON wf_operation_session (websocket_session_id);
 CREATE INDEX ns_operation_pending ON ns_operation (user_id, result);
@@ -619,10 +635,17 @@ CREATE INDEX ns_otp_storage_operation_id ON ns_otp_storage (operation_id);
 CREATE INDEX ns_authentication_user_id ON ns_authentication (user_id);
 CREATE INDEX ns_authentication_operation_id ON ns_authentication (operation_id);
 CREATE INDEX ns_authentication_timestamp_created ON ns_authentication (timestamp_created);
-CREATE INDEX ns_audit_log_created ON ns_audit_log (timestamp_created);
 CREATE UNIQUE INDEX ns_hashing_config_name ON ns_hashing_config (name);
 CREATE UNIQUE INDEX ns_user_alias_unique ON ns_user_alias (user_id, name);
 CREATE UNIQUE INDEX ns_user_role_unique ON ns_user_role (user_id, role_id);
+CREATE INDEX audit_log_timestamp ON audit_log (timestamp_created);
+CREATE INDEX audit_log_application ON audit_log (application_name);
+CREATE INDEX audit_log_level ON audit_log (audit_level);
+CREATE INDEX audit_log_type ON audit_log (audit_type);
+CREATE INDEX audit_param_log ON audit_param (audit_log_id);
+CREATE INDEX audit_param_timestamp ON audit_param (timestamp_created);
+CREATE INDEX audit_param_key ON audit_param (param_key);
+CREATE INDEX audit_param_value ON audit_param (param_value);
 
 -- Foreign keys for user identity, to be used only when all user identities are stored in Next Step
 ALTER TABLE ns_operation ADD CONSTRAINT ns_operation_user_fk FOREIGN KEY (user_id) REFERENCES ns_user_identity (user_id);

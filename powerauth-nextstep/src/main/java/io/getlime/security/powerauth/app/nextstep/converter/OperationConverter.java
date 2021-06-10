@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.app.nextstep.converter;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wultra.core.audit.base.Audit;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationAfsActionEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationHistoryEntity;
@@ -31,6 +32,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -46,7 +48,18 @@ public class OperationConverter {
 
     private static final Logger logger = LoggerFactory.getLogger(OperationConverter.class);
 
+    private Audit audit;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Se
+     * @param audit
+     */
+    @Autowired
+    public void setAudit(Audit audit) {
+        this.audit = audit;
+    }
 
     /**
      * Convert operation entity into operation detail.
@@ -105,6 +118,7 @@ public class OperationConverter {
                 formData = new ObjectMapper().readValue(operation.getOperationFormData(), OperationFormData.class);
             } catch (IOException ex) {
                 logger.error("Error while deserializing operation display formData", ex);
+                audit.error("Error while deserializing operation display formData", ex);
             }
             response.setFormData(formData);
         }
@@ -129,6 +143,7 @@ public class OperationConverter {
                     applicationContext.getOriginalScopes().addAll(originalScopes);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application scopes.", ex);
+                    audit.error("Error while deserializing application scopes.", ex);
                 }
             }
             if (operation.getApplicationExtras() != null) {
@@ -138,6 +153,7 @@ public class OperationConverter {
                     applicationContext.getExtras().putAll(extras);
                 } catch (IOException ex) {
                     logger.error("Error while deserializing application extras.", ex);
+                    audit.error("Error while deserializing application extras.", ex);
                 }
             }
             response.setApplicationContext(applicationContext);
@@ -199,6 +215,7 @@ public class OperationConverter {
             return objectMapper.readValue(extras, typeRef);
         } catch (IOException e) {
             logger.error("Error occurred while deserializing data", e);
+            audit.error("Error occurred while deserializing data", e);
             return new HashMap<>();
         }
     }

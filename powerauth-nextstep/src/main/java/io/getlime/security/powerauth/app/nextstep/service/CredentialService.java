@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepServerConfiguration;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.CredentialRepository;
@@ -51,10 +53,12 @@ import java.util.*;
 public class CredentialService {
 
     private final Logger logger = LoggerFactory.getLogger(CredentialService.class);
+    private static final String AUDIT_TYPE_USER_IDENTITY = "USER_IDENTITY";
 
     private final RepositoryCatalogue repositoryCatalogue;
     private final ServiceCatalogue serviceCatalogue;
     private final NextStepServerConfiguration nextStepServerConfiguration;
+    private final Audit audit;
 
     private final CredentialConverter credentialConverter = new CredentialConverter();
 
@@ -63,12 +67,14 @@ public class CredentialService {
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
      * @param nextStepServerConfiguration Next Step server configuration.
+     * @param audit Audit interface.
      */
     @Autowired
-    public CredentialService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration) {
+    public CredentialService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, NextStepServerConfiguration nextStepServerConfiguration, Audit audit) {
         this.repositoryCatalogue = repositoryCatalogue;
         this.serviceCatalogue = serviceCatalogue;
         this.nextStepServerConfiguration = nextStepServerConfiguration;
+        this.audit = audit;
     }
 
     /**
@@ -120,6 +126,11 @@ public class CredentialService {
         }
         user = userIdentityRepository.save(user);
         logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final CreateCredentialResponse response = new CreateCredentialResponse();
         response.setCredentialName(credentialDetail.getCredentialName());
         response.setCredentialType(credentialDetail.getCredentialType());
@@ -242,6 +253,11 @@ public class CredentialService {
         }
         user = userIdentityRepository.save(user);
         logger.debug("Credential was updated for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final UpdateCredentialResponse response = new UpdateCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -428,6 +444,11 @@ public class CredentialService {
         credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was reset for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was reset", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final ResetCredentialResponse response = new ResetCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -471,6 +492,11 @@ public class CredentialService {
         credential.setStatus(CredentialStatus.REMOVED);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was removed for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final DeleteCredentialResponse response = new DeleteCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -507,6 +533,11 @@ public class CredentialService {
         credential.setTimestampBlocked(new Date());
         user = userIdentityRepository.save(user);
         logger.debug("Credential was blocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was blocked", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final BlockCredentialResponse response = new BlockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -548,6 +579,11 @@ public class CredentialService {
         credential.setTimestampBlocked(null);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was unblocked for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was unblocked", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final UnblockCredentialResponse response = new UnblockCredentialResponse();
         response.setUserId(user.getUserId());
         response.setCredentialName(credential.getCredentialDefinition().getName());
@@ -622,7 +658,11 @@ public class CredentialService {
         final boolean newCredential;
         Date changeTimestamp = new Date();
         if (credentialOptional.isPresent()) {
-            // TODO - auditing
+            audit.info("Credential was reactivated", AuditDetail.builder()
+                    .type(AUDIT_TYPE_USER_IDENTITY)
+                    .param("userId", user.getUserId())
+                    .param("credentialDefinitionName", credentialDefinition.getName())
+                    .build());
             credential = credentialOptional.get();
             credential.setTimestampLastUpdated(changeTimestamp);
             credential.setTimestampLastCredentialChange(changeTimestamp);
@@ -697,6 +737,11 @@ public class CredentialService {
         credentialHistoryService.createCredentialHistory(user, credential, changeTimestamp);
         user = userIdentityRepository.save(user);
         logger.debug("Credential was created for user ID: {}, credential definition name: {}", user.getUserId(), credentialDefinition.getName());
+        audit.info("Credential was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("credentialDefinitionName", credentialDefinition.getName())
+                .build());
         final CredentialSecretDetail credentialDetail = new CredentialSecretDetail();
         credentialDetail.setCredentialName(credential.getCredentialDefinition().getName());
         credentialDetail.setCredentialType(credential.getType());

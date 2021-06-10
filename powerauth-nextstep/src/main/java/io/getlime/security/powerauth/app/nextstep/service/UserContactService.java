@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.UserIdentityRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -56,9 +58,11 @@ import java.util.stream.Collectors;
 public class UserContactService {
 
     private final Logger logger = LoggerFactory.getLogger(UserContactService.class);
+    private static final String AUDIT_TYPE_USER_IDENTITY = "USER_IDENTITY";
 
     private final UserIdentityRepository userIdentityRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
 
@@ -66,11 +70,13 @@ public class UserContactService {
      * User contact service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public UserContactService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public UserContactService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.serviceCatalogue = serviceCatalogue;
         this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
+        this.audit = audit;
     }
 
     /**
@@ -101,6 +107,11 @@ public class UserContactService {
         ensurePrimaryContactsAreUnique(user);
         user = userIdentityRepository.save(user);
         logger.debug("User contact was created, user ID: {}, contact name: {}", user.getUserId(), contact.getName());
+        audit.info("User contact was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("contactName", contact.getName())
+                .build());
         final CreateUserContactResponse response = new CreateUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(contact.getName());
@@ -157,6 +168,11 @@ public class UserContactService {
         ensurePrimaryContactsAreUnique(user);
         user = userIdentityRepository.save(user);
         logger.debug("User contact was updated, user ID: {}, contact name: {}", user.getUserId(), contact.getName());
+        audit.info("User contact was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("contactName", contact.getName())
+                .build());
         UpdateUserContactResponse response = new UpdateUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(contact.getName());
@@ -186,6 +202,11 @@ public class UserContactService {
         user.getContacts().remove(contact);
         user = userIdentityRepository.save(user);
         logger.debug("User contact was deleted, user ID: {}, contact name: {}", user.getUserId(), contact.getName());
+        audit.info("User contact was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .param("contactName", contact.getName())
+                .build());
         DeleteUserContactResponse response = new DeleteUserContactResponse();
         response.setUserId(user.getUserId());
         response.setContactName(request.getContactName());

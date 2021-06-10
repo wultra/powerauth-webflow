@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 public class ServiceCatalogue {
 
     private ApplicationService applicationService;
-    private AuditLogService auditLogService;
     private AuthenticationService authenticationService;
     private AuthMethodChangeService authMethodChangeService;
     private AuthMethodService authMethodService;
@@ -77,15 +76,6 @@ public class ServiceCatalogue {
     @Autowired
     public void setApplicationService(ApplicationService applicationService) {
         this.applicationService = applicationService;
-    }
-
-    /**
-     * Set audit log service.
-     * @param auditLogService Audit log service.
-     */
-    @Autowired
-    public void setAuditLogService(AuditLogService auditLogService) {
-        this.auditLogService = auditLogService;
     }
 
     /**
@@ -409,14 +399,6 @@ public class ServiceCatalogue {
      */
     public ApplicationService getApplicationService() {
         return applicationService;
-    }
-
-    /**
-     * Get audit log service.
-     * @return Audit log service.
-     */
-    public AuditLogService getAuditLogService() {
-        return auditLogService;
     }
 
     /**

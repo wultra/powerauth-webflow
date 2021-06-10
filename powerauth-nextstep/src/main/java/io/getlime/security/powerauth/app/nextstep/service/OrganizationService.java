@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.converter.OrganizationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OrganizationRepository;
@@ -48,18 +50,22 @@ import java.util.Optional;
 public class OrganizationService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final OrganizationRepository organizationRepository;
+    private final Audit audit;
 
     private final OrganizationConverter organizationConverter = new OrganizationConverter();
 
     /**
      * Organization service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OrganizationService(RepositoryCatalogue repositoryCatalogue) {
+    public OrganizationService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
+        this.audit = audit;
     }
 
     /**
@@ -83,6 +89,10 @@ public class OrganizationService {
         organization.setDefaultOtpName(request.getDefaultOtpName());
         organization = organizationRepository.save(organization);
         logger.debug("Organization was created: {}", organization.getOrganizationId());
+        audit.info("Organization was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("organization", organization)
+                .build());
         final CreateOrganizationResponse response = new CreateOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         response.setDisplayNameKey(organization.getDisplayNameKey());
@@ -140,6 +150,10 @@ public class OrganizationService {
         final OrganizationEntity organization = organizationOptional.get();
         organizationRepository.delete(organization);
         logger.debug("Organization was deleted: {}", organization.getOrganizationId());
+        audit.info("Organization was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("organizationId", organization.getOrganizationId())
+                .build());
         final DeleteOrganizationResponse response = new DeleteOrganizationResponse();
         response.setOrganizationId(organization.getOrganizationId());
         return response;

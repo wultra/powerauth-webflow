@@ -84,7 +84,7 @@ public class PushMessageService {
         } catch (NextStepClientException | ActivationNotConfiguredException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.noActivation");
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return initResponse;
         }
 
@@ -93,26 +93,26 @@ public class PushMessageService {
         } catch (ActivationNotActiveException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.activationNotActive");
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return initResponse;
         }
 
         try {
             final PushMessage message = createAuthStepInitPushMessage(operation, activationId, authMethod);
-            logger.info("Send init push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Send init push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             final ObjectResponse<PushMessageSendResult> response = pushServerClient.sendPushMessage(applicationId, message);
             if (response.getStatus().equals(Response.Status.OK)) {
                 initResponse.setResult(AuthStepResult.CONFIRMED);
-                logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             } else {
                 initResponse.setResult(AuthStepResult.AUTH_FAILED);
                 initResponse.setMessage("pushMessage.fail");
-                logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             }
         } catch (PushServerClientException ex) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("pushMessage.fail");
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         }
         return initResponse;
     }
@@ -128,10 +128,10 @@ public class PushMessageService {
             String activationId = getActivationId(operation);
             PushMessage message = createAuthStepFinishedPushMessage(operation, activationId, statusMessage, authMethod);
             Long applicationId = getApplicationId(activationId);
-            logger.info("Send step finished push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Send step finished push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             pushServerClient.sendPushMessage(applicationId, message);
         } catch (PushServerClientException ex) {
-            logger.info("Sending step finish push message failed for operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Sending step finish push message failed for operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         } catch (Exception ex) {
             // Exception which occurs when push message is sent is not critical, only log warning.
             logger.warn("Error occurred in Mobile Token API component", ex);
@@ -146,7 +146,7 @@ public class PushMessageService {
      * @return Constructed push message.
      */
     private PushMessage createAuthStepInitPushMessage(GetOperationDetailResponse operation, String activationId, AuthMethod authMethod) {
-        logger.info("Create init push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Create init push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);
@@ -187,7 +187,7 @@ public class PushMessageService {
      * @return Constructed push message.
      */
     private PushMessage createAuthStepFinishedPushMessage(GetOperationDetailResponse operation, String activationId, String statusMessage, AuthMethod authMethod) {
-        logger.info("Create step finished push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Create step finished push message, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         PushMessage message = new PushMessage();
         message.setUserId(operation.getUserId());
         message.setActivationId(activationId);

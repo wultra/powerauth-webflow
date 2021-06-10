@@ -131,7 +131,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         final GetOperationDetailResponse operation = getOperation();
         final String operationName = operation.getOperationName();
         final AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         // nonce is received from the UI - it was stored together with the QR code
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
@@ -155,7 +155,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     throw new OperationIsAlreadyFailedException("Operation approval has failed");
                 }
                 cleanHttpSession();
-                logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                 return new AuthResultDetail(userId, operation.getOrganizationId(), false);
             }
         } else {
@@ -214,7 +214,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         QrCodeInitResponse initResponse = new QrCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName();
-        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
 
         String userId = operation.getUserId();
 
@@ -252,7 +252,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("offlineMode.activationNotActive");
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return initResponse;
         }
 
@@ -273,7 +273,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         initResponse.setChosenActivation(activationEntity);
         // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);
-        logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         return initResponse;
     }
 
@@ -300,7 +300,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     response.setMessage("authentication.success");
                     pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                     cleanHttpSession();
-                    logger.info("Step result: CONFIRMED, authentication method: {}", authMethod.toString());
+                    logger.info("Step result: CONFIRMED, authentication method: {}", authMethod);
                     return response;
                 }
 
@@ -310,7 +310,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
-                    logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());
+                    logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod);
                     return response;
                 }
 
@@ -322,7 +322,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     response.getNext().addAll(steps);
                     pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                     cleanHttpSession();
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, authMethod);
                     return response;
                 }
             });
@@ -330,7 +330,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             logger.warn("Error occurred while verifying offline authorization code: {}", e.getMessage());
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod);
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -363,7 +363,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             response.setMessage("operation.canceled");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
         } catch (CommunicationFailedException ex) {
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();

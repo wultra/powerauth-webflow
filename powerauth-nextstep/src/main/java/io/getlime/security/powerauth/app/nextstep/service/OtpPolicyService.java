@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpPolicyConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ParameterConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.OtpPolicyRepository;
@@ -53,8 +55,10 @@ import java.util.Optional;
 public class OtpPolicyService {
 
     private final Logger logger = LoggerFactory.getLogger(OtpPolicyService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final OtpPolicyRepository otpPolicyRepository;
+    private final Audit audit;
 
     private final OtpPolicyConverter otpPolicyConverter = new OtpPolicyConverter();
     private final ParameterConverter parameterConverter = new ParameterConverter();
@@ -62,10 +66,12 @@ public class OtpPolicyService {
     /**
      * Constructor for OTP policy service.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OtpPolicyService(RepositoryCatalogue repositoryCatalogue) {
+    public OtpPolicyService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.otpPolicyRepository = repositoryCatalogue.getOtpPolicyRepository();
+        this.audit = audit;
     }
 
     /**
@@ -97,6 +103,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampCreated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was created, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
+        audit.info("OTP policy was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final CreateOtpPolicyResponse response = new CreateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -147,6 +157,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was updated, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
+        audit.info("OTP policy was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final UpdateOtpPolicyResponse response  = new UpdateOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setDescription(otpPolicy.getDescription());
@@ -201,6 +215,10 @@ public class OtpPolicyService {
         otpPolicy.setTimestampLastUpdated(new Date());
         otpPolicy = otpPolicyRepository.save(otpPolicy);
         logger.debug("OTP policy was removed, OTP policy ID: {}, OTP policy name: {}", otpPolicy.getOtpPolicyId(), otpPolicy.getName());
+        audit.info("OTP policy was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("otpPolicy", otpPolicy)
+                .build());
         final DeleteOtpPolicyResponse response = new DeleteOtpPolicyResponse();
         response.setOtpPolicyName(otpPolicy.getName());
         response.setOtpPolicyStatus(otpPolicy.getStatus());

@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.ApplicationConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.ApplicationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -49,18 +51,22 @@ import java.util.Optional;
 public class ApplicationService {
 
     private final Logger logger = LoggerFactory.getLogger(ApplicationService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final ApplicationRepository applicationRepository;
+    private final Audit audit;
 
     private final ApplicationConverter applicationConverter = new ApplicationConverter();
 
     /**
      * Application service constructor.
      * @param repositoryCatalogue Repository catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public ApplicationService(RepositoryCatalogue repositoryCatalogue) {
+    public ApplicationService(RepositoryCatalogue repositoryCatalogue, Audit audit) {
         this.applicationRepository = repositoryCatalogue.getApplicationRepository();
+        this.audit = audit;
     }
 
     /**
@@ -82,6 +88,10 @@ public class ApplicationService {
         application.setTimestampCreated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was created, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
+        audit.info("Application was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final CreateApplicationResponse response = new CreateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -112,6 +122,10 @@ public class ApplicationService {
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was updated, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
+        audit.info("Application was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final UpdateApplicationResponse response = new UpdateApplicationResponse();
         response.setApplicationName(application.getName());
         response.setDescription(application.getDescription());
@@ -157,6 +171,10 @@ public class ApplicationService {
         application.setTimestampLastUpdated(new Date());
         application = applicationRepository.save(application);
         logger.debug("Application was removed, application ID: {}, application name: {}", application.getApplicationId(), application.getName());
+        audit.info("Application was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("application", application)
+                .build());
         final DeleteApplicationResponse response = new DeleteApplicationResponse();
         response.setApplicationName(application.getName());
         response.setApplicationStatus(application.getStatus());

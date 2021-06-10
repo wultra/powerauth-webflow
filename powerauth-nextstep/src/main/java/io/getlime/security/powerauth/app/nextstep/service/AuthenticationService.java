@@ -18,6 +18,8 @@ package io.getlime.security.powerauth.app.nextstep.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.AuthenticationConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.OtpValueConverter;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
@@ -57,10 +59,12 @@ import java.util.stream.Stream;
 public class AuthenticationService {
 
     private final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
+    private static final String AUDIT_TYPE_AUTHENTICATION = "AUTHENTICATION";
 
     private final AuthenticationRepository authenticationRepository;
     private final ServiceCatalogue serviceCatalogue;
     private final OtpValueConverter otpValueConverter;
+    private final Audit audit;
 
     private final AuthenticationConverter authenticationConverter = new AuthenticationConverter();
 
@@ -71,12 +75,14 @@ public class AuthenticationService {
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
      * @param otpValueConverter OTP value converter.
+     * @param audit Audit audit.
      */
     @Autowired
-    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter) {
+    public AuthenticationService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, OtpValueConverter otpValueConverter, Audit audit) {
         this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
         this.serviceCatalogue = serviceCatalogue;
         this.otpValueConverter = otpValueConverter;
+        this.audit = audit;
     }
 
     /**
@@ -185,7 +191,22 @@ public class AuthenticationService {
 
         logger.info("Credential authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), credential.getStatus(), operationFailed);
-
+        audit.info("Credential authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("Credential authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .param("remainingAttempts", remainingAttempts)
+                .param("userStatus", user.getStatus())
+                .param("credentialStatus", credential.getStatus())
+                .param("operationFailed", operationFailed)
+                .build());
         final CredentialAuthenticationResponse response = new CredentialAuthenticationResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -244,6 +265,20 @@ public class AuthenticationService {
         response.setOperationFailed(operationFailed);
         logger.info("Credential custom authentication result: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), response.getRemainingAttempts(), userId, operationFailed);
+        audit.info("Credential custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("Credential custom authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .param("remainingAttempts", response.getRemainingAttempts())
+                .param("operationFailed", operationFailed)
+                .build());
         return response;
     }
 
@@ -390,7 +425,25 @@ public class AuthenticationService {
 
         logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
-
+        audit.info("OTP authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user != null ? user.getUserId() : null)
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("OTP authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user != null ? user.getUserId() : null)
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .param("remainingAttempts", remainingAttempts)
+                .param("userStatus", user != null ? user.getStatus() : null)
+                .param("otpStatus", otp.getStatus())
+                .param("credentialStatus", credential != null ? credential.getStatus() : null)
+                .param("operationFailed", operationFailed)
+                .build());
         final OtpAuthenticationResponse response = new OtpAuthenticationResponse();
         if (userId != null) {
             response.setUserId(userId);
@@ -440,6 +493,22 @@ public class AuthenticationService {
         response.setOperationFailed(operationFailed);
         logger.info("OTP custom authentication result: {}, OTP ID: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), otpId, response.getRemainingAttempts(), userId, operationFailed);
+        audit.info("OTP custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("OTP custom authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .param("remainingAttempts", response.getRemainingAttempts())
+                .param("operationFailed", operationFailed)
+                .build());
         return response;
     }
 
@@ -597,7 +666,27 @@ public class AuthenticationService {
 
         logger.info("Combined authentication result: {}, credential authentication result: {}, OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, credentialAuthenticationResult, otpAuthenticationResult, remainingAttempts, user.getUserId(), user.getStatus(), otp.getStatus(), credential.getStatus(), operationFailed);
-
+        audit.info("Combined authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .build());
+        audit.debug("Combined authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("userId", user.getUserId())
+                .param("otpId", otp.getOtpId())
+                .param("operationId", operation != null ? operation.getOperationId() : null)
+                .param("authenticationResult", authenticationResult)
+                .param("credentialAuthenticationResult", credentialAuthenticationResult)
+                .param("otpAuthenticationResult", otpAuthenticationResult)
+                .param("remainingAttempts", remainingAttempts)
+                .param("userStatus", user.getStatus())
+                .param("otpStatus", otp.getStatus())
+                .param("credentialStatus", credential.getStatus())
+                .param("operationFailed", operationFailed)
+                .build());
         final CombinedAuthenticationResponse response = new CombinedAuthenticationResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -650,6 +739,22 @@ public class AuthenticationService {
         response.setOperationFailed(operationFailed);
         logger.info("Combined custom authentication result: {}, OTP ID: {}, remaining attempts: {}, user ID: {}, operation failed: {}",
                 response.getAuthenticationResult(), otpId, response.getRemainingAttempts(), userId, operationFailed);
+        audit.info("Combined custom authentication result", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .build());
+        audit.debug("Combined custom authentication result (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_AUTHENTICATION)
+                .param("otpId", otpId)
+                .param("userId", userId)
+                .param("operationId", operation.getOperationId())
+                .param("authenticationResult", response.getAuthenticationResult())
+                .param("remainingAttempts", response.getRemainingAttempts())
+                .param("operationFailed", operationFailed)
+                .build());
         return response;
     }
 

@@ -2514,40 +2514,6 @@ public class NextStepClient {
         return postObjectImpl("/audit", new ObjectRequest<>(request), CreateAuditResponse.class);
     }
 
-    /**
-     * Get audit log list.
-     *
-     * @param startDate Audit log interval start date.
-     * @param endDate Audit log interval end date.
-     * @return Delete audit log response.
-     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
-     */
-    public ObjectResponse<GetAuditListResponse> getAuditList(@NotNull Date startDate, @NotNull Date endDate) throws NextStepClientException {
-        final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        if (startDate != null) {
-            params.put("startDate", Collections.singletonList(startDate.toString()));
-        }
-        if (endDate != null) {
-            params.put("endDate", Collections.singletonList(endDate.toString()));
-        }
-        return getObjectImpl("/audit", params, GetAuditListResponse.class);
-    }
-
-    /**
-     * Get audit log list using POST method.
-     *
-     * @param startDate Audit log interval start date.
-     * @param endDate Audit log interval end date.
-     * @return Delete audit log response.
-     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
-     */
-    public ObjectResponse<GetAuditListResponse> getAuditListPost(@NotNull Date startDate, @NotNull Date endDate) throws NextStepClientException {
-        final GetAuditListRequest request = new GetAuditListRequest();
-        request.setStartDate(startDate);
-        request.setEndDate(endDate);
-        return postObjectImpl("/audit/list", new ObjectRequest<>(request), GetAuditListResponse.class);
-    }
-
     // Generic HTTP client methods
 
     /**

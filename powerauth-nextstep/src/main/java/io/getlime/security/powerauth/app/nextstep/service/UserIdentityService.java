@@ -16,6 +16,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.converter.CredentialConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.ExtrasConverter;
 import io.getlime.security.powerauth.app.nextstep.converter.UserContactConverter;
@@ -53,11 +55,13 @@ import java.util.stream.Stream;
 public class UserIdentityService {
 
     private final Logger logger = LoggerFactory.getLogger(UserIdentityService.class);
+    private static final String AUDIT_TYPE_USER_IDENTITY = "USER_IDENTITY";
 
     private final UserIdentityRepository userIdentityRepository;
     private final RoleRepository roleRepository;
     private final OtpRepository otpRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     private final UserContactConverter userContactConverter = new UserContactConverter();
     private final CredentialConverter credentialConverter = new CredentialConverter();
@@ -68,13 +72,15 @@ public class UserIdentityService {
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public UserIdentityService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public UserIdentityService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.userIdentityRepository = repositoryCatalogue.getUserIdentityRepository();
         this.roleRepository = repositoryCatalogue.getRoleRepository();
         this.otpRepository = repositoryCatalogue.getOtpRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -112,8 +118,10 @@ public class UserIdentityService {
             if (user.getStatus() != UserIdentityStatus.REMOVED) {
                 throw new UserAlreadyExistsException("User identity already exists: " + request.getUserId());
             }
-            // Revive user identity
-            // TODO - auditing
+            audit.info("User identity was reactivated", AuditDetail.builder()
+                    .type(AUDIT_TYPE_USER_IDENTITY)
+                    .param("userId", user.getUserId())
+                    .build());
             user.setStatus(UserIdentityStatus.ACTIVE);
         } else {
             user = new UserIdentityEntity();
@@ -199,6 +207,10 @@ public class UserIdentityService {
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User identity was created, user ID: {}", user.getUserId());
+        audit.info("User identity was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .build());
         return response;
     }
 
@@ -303,6 +315,10 @@ public class UserIdentityService {
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User identity was updated, user ID: {}", user.getUserId());
+        audit.info("User identity was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .build());
         return response;
     }
 
@@ -402,6 +418,11 @@ public class UserIdentityService {
                     updateUserIdentityHistory(user);
                     user = userIdentityRepository.save(user);
                     logger.debug("User identity was updated, user ID: {}", user.getUserId());
+                    audit.info("User identity was updated", AuditDetail.builder()
+                            .type(AUDIT_TYPE_USER_IDENTITY)
+                            .param("userId", user.getUserId())
+                            .param("userStatus", user.getStatus())
+                            .build());
                 }
                 updatedUserIds.add(user.getUserId());
             });
@@ -433,6 +454,10 @@ public class UserIdentityService {
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User identity was removed, user ID: {}", user.getUserId());
+        audit.info("User identity was removed", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .build());
         final DeleteUserResponse response = new DeleteUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -459,6 +484,10 @@ public class UserIdentityService {
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User identity was blocked, user ID: {}", user.getUserId());
+        audit.info("User identity was blocked", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .build());
         final BlockUserResponse response = new BlockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());
@@ -485,6 +514,10 @@ public class UserIdentityService {
         updateUserIdentityHistory(user);
         user = userIdentityRepository.save(user);
         logger.debug("User identity was unblocked, user ID: {}", user.getUserId());
+        audit.info("User identity was unblocked", AuditDetail.builder()
+                .type(AUDIT_TYPE_USER_IDENTITY)
+                .param("userId", user.getUserId())
+                .build());
         final UnblockUserResponse response = new UnblockUserResponse();
         response.setUserId(user.getUserId());
         response.setUserIdentityStatus(user.getStatus());

@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
 import io.getlime.security.powerauth.app.nextstep.repository.OperationRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.OperationEntity;
@@ -50,16 +51,19 @@ public class AuthMethodChangeService {
 
     private final OperationRepository operationRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     /**
      * Authentication change service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public AuthMethodChangeService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public AuthMethodChangeService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.operationRepository = repositoryCatalogue.getOperationRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -77,6 +81,7 @@ public class AuthMethodChangeService {
             response.setResult(AuthResult.FAILED);
             response.setResultDescription("error.invalidRequest");
             logger.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
+            audit.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
             return response;
         }
         for (StepDefinitionEntity stepDef : stepDefinitions) {
@@ -86,6 +91,7 @@ public class AuthMethodChangeService {
                 response.getSteps().add(authStep);
                 response.setResult(AuthResult.CONTINUE);
                 logger.info("Authentication downgrade succeeded for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
+                audit.info("Authentication downgrade succeeded for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
                 return response;
             }
         }
@@ -93,6 +99,7 @@ public class AuthMethodChangeService {
         response.setResult(AuthResult.FAILED);
         response.setResultDescription("error.noAuthMethod");
         logger.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
+        audit.warn("Authentication downgrade failed for operation ID: {}, authentication method: {}", request.getOperationId(), request.getTargetAuthMethod());
         return response;
     }
 

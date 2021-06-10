@@ -15,9 +15,12 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import com.wultra.security.powerauth.client.model.enumeration.OperationStatus;
 import com.wultra.security.powerauth.client.model.response.OperationDetailResponse;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthenticationRepository;
@@ -63,6 +66,7 @@ import java.util.Optional;
 public class OperationPersistenceService {
 
     private final Logger logger = LoggerFactory.getLogger(OperationPersistenceService.class);
+    private static final String AUDIT_TYPE_OPERATION = "OPERATION";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -71,19 +75,26 @@ public class OperationPersistenceService {
     private final OperationHistoryRepository operationHistoryRepository;
     private final AuthenticationRepository authenticationRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
+
+    {
+        objectMapper.setSerializationInclusion(JsonInclude.Include.NON_EMPTY);
+    }
 
     /**
      * Service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public OperationPersistenceService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public OperationPersistenceService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.operationRepository = repositoryCatalogue.getOperationRepository();
         this.organizationRepository = repositoryCatalogue.getOrganizationRepository();
         this.operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
         this.authenticationRepository = repositoryCatalogue.getAuthenticationRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -121,13 +132,13 @@ public class OperationPersistenceService {
                 operation.setOperationFormData(objectMapper.writeValueAsString(request.getFormData()));
             } catch (JsonProcessingException ex) {
                 logger.error("Error while serializing operation form data", ex);
+                audit.error("Error while serializing operation form data", ex);
             }
         }
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
         operation = operationRepository.save(operation);
         logger.debug("Operation was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
-
         final OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(AuthMethod.INIT);
@@ -141,11 +152,33 @@ public class OperationPersistenceService {
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException ex) {
             logger.error("Error while serializing operation history", ex);
+            audit.error("Error while serializing operation history", ex);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operationHistoryRepository.save(operationHistory);
-        logger.debug("Operation initial history was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        audit.info("Operation was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("operationName", operation.getOperationName())
+                .param("externalOperationName", operation.getExternalOperationName())
+                .param("externalTransactionId", operation.getExternalTransactionId())
+                .param("userId", operation.getUserId())
+                .build());
+        audit.debug("Operation was created (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("operationName", operation.getOperationName())
+                .param("operationData", operation.getOperationData())
+                .param("externalOperationName", operation.getExternalOperationName())
+                .param("externalTransactionId", operation.getExternalTransactionId())
+                .param("userId", operation.getUserId())
+                .param("organizationId", operation.getOperationId())
+                .param("requestAuthMethod", operationHistory.getRequestAuthMethod())
+                .param("requestAuthStepResult", operationHistory.getRequestAuthStepResult())
+                .param("responseResult", operationHistory.getResponseResult())
+                .param("responseSteps", operationHistory.getResponseSteps())
+                .build());
     }
 
     /**
@@ -230,13 +263,31 @@ public class OperationPersistenceService {
             operationHistory.setResponseSteps(objectMapper.writeValueAsString(response.getSteps()));
         } catch (JsonProcessingException e) {
             logger.error("Error occurred while serializing operation history", e);
+            audit.error("Error occurred while serializing operation history", e);
         }
         operationHistory.setResponseTimestampCreated(response.getTimestampCreated());
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operation.getOperationHistory().add(operationHistory);
         operation = operationRepository.save(operation);
         logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
-
+        audit.info("Operation was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("userId", operation.getUserId())
+                .param("requestAuthMethod", operationHistory.getRequestAuthMethod())
+                .param("responseResult", operationHistory.getResponseResult())
+                .build());
+        audit.debug("Operation was updated (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("userId", operation.getUserId())
+                .param("organizationId", operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null)
+                .param("requestAuthMethod", operationHistory.getRequestAuthMethod())
+                .param("requestAuthStepResult", operationHistory.getRequestAuthStepResult())
+                .param("requestAuthInstruments", operationHistory.getRequestAuthInstruments())
+                .param("responseResult", operationHistory.getResponseResult())
+                .param("responseSteps", operationHistory.getResponseSteps())
+                .build());
         if (!originalResult.equals(operation.getResult())) {
             operationCustomizationService.notifyOperationChange(operation);
         }
@@ -267,6 +318,12 @@ public class OperationPersistenceService {
         }
         operationRepository.save(operation);
         logger.debug("Operation user was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        audit.info("Operation user was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("userId", operation.getUserId())
+                .param("organizationId", operation.getOrganization().getOrganizationId())
+                .build());
     }
 
     /**
@@ -288,9 +345,19 @@ public class OperationPersistenceService {
             operation.setOperationFormData(objectMapper.writeValueAsString(formData));
         } catch (IOException e) {
             logger.error("Error occurred while serializing operation form data", e);
+            audit.error("Error occurred while serializing operation form data", e);
         }
         operationRepository.save(operation);
         logger.debug("Operation form data was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        audit.info("Operation form data was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .build());
+        audit.debug("Operation form data was updated (detail)", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("formData", operation.getOperationFormData())
+                .build());
     }
 
     /**
@@ -335,6 +402,11 @@ public class OperationPersistenceService {
         }
         currentHistory.setChosenAuthMethod(chosenAuthMethod);
         operationHistoryRepository.save(currentHistory);
+        audit.info("Operation chosen auth method was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("chosenAuthMethod", chosenAuthMethod)
+                .build());
         logger.debug("Operation chosen authentication method was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
@@ -366,6 +438,12 @@ public class OperationPersistenceService {
             currentHistory.setPowerAuthOperationId(null);
         }
         operationHistoryRepository.save(currentHistory);
+        audit.info("Operation mobile token status was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("mobileTokenActive", currentHistory.isMobileTokenActive())
+                .param("powerAuthOperationId", currentHistory.getPowerAuthOperationId())
+                .build());
         logger.debug("Operation mobile token was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
@@ -398,8 +476,14 @@ public class OperationPersistenceService {
             }
         } catch (IOException e) {
             logger.error("Error occurred while serializing application attributes for an operation", e);
+            audit.error("Error occurred while serializing application attributes for an operation", e);
         }
         operationRepository.save(operation);
+        audit.info("Operation application context was updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_OPERATION)
+                .param("operationId", operation.getOperationId())
+                .param("applicationContext", applicationContext)
+                .build());
         logger.debug("Operation application was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
     }
 
@@ -474,6 +558,7 @@ public class OperationPersistenceService {
             } catch (OperationNotValidException ex) {
                 // Invalid operations are skipped
                 logger.warn(ex.getMessage(), ex);
+                audit.warn(ex.getMessage(), ex);
             }
         }
         return filteredList;
@@ -574,6 +659,7 @@ public class OperationPersistenceService {
         } catch (IOException e) {
             // in case of an error empty list is returned
             logger.error("Error occurred while deserializing response steps", e);
+            audit.error("Error occurred while deserializing response steps", e);
         }
         return steps;
     }
@@ -597,8 +683,14 @@ public class OperationPersistenceService {
             operation.getAfsActions().add(afsEntity);
             operationRepository.save(operation);
             logger.debug("Operation AFS action was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+            audit.info("Operation AFS action was created", AuditDetail.builder()
+                    .type(AUDIT_TYPE_OPERATION)
+                    .param("operationId", operation.getOperationId())
+                    .param("afsAction", afsEntity)
+                    .build());
         } catch (OperationNotFoundException e) {
             logger.error("AFS action could not be saved because operation does not exist: {}", request.getOperationId());
+            audit.error("AFS action could not be saved because operation does not exist: {}", request.getOperationId());
         }
     }
 
@@ -618,6 +710,7 @@ public class OperationPersistenceService {
             operationEntity.setApplicationOriginalScopes(objectMapper.writeValueAsString(applicationContext.getOriginalScopes()));
         } catch (JsonProcessingException ex) {
             logger.error("Error while serializing application attributes.", ex);
+            audit.error("Error while serializing application attributes.", ex);
         }
     }
 

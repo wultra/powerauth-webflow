@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.app.nextstep.service;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.controller.OrganizationController;
 import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
@@ -44,19 +46,23 @@ import java.util.Optional;
 public class StepDefinitionService {
 
     private static final Logger logger = LoggerFactory.getLogger(OrganizationController.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
     private final StepDefinitionRepository stepDefinitionRepository;
     private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
 
     /**
      * Step definition service constructor.
      * @param repositoryCatalogue Repository catalogue.
      * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public StepDefinitionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue) {
+    public StepDefinitionService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
         this.stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
         this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
     }
 
     /**
@@ -83,6 +89,10 @@ public class StepDefinitionService {
         stepDefinition.setResponseResult(request.getResponseResult());
         stepDefinition = stepDefinitionRepository.save(stepDefinition);
         logger.debug("Step definition was created, step definition ID: {}", stepDefinition.getStepDefinitionId());
+        audit.info("Step definition was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("stepDefinition", stepDefinition)
+                .build());
         stepResolutionService.reloadStepDefinitions();
         final CreateStepDefinitionResponse response = new CreateStepDefinitionResponse();
         response.setStepDefinitionId(request.getStepDefinitionId());
@@ -112,6 +122,10 @@ public class StepDefinitionService {
         final StepDefinitionEntity stepDefinition = stepDefinitionOptional.get();
         stepDefinitionRepository.delete(stepDefinition);
         logger.debug("Step definition was deleted, step definition ID: {}", stepDefinition.getStepDefinitionId());
+        audit.info("Step definition was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("stepDefinitionId", stepDefinition.getStepDefinitionId())
+                .build());
         stepResolutionService.reloadStepDefinitions();
         final DeleteStepDefinitionResponse response = new DeleteStepDefinitionResponse();
         response.setStepDefinitionId(stepDefinition.getStepDefinitionId());

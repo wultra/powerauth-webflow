@@ -16,12 +16,15 @@
 
 package io.getlime.security.powerauth.lib.webflow.authentication.exception;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.webflow.authentication.base.AuthStepResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -43,7 +46,19 @@ public class AuthenticationExceptionResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationExceptionResolver.class);
 
+    private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
+    private final Audit audit;
+
     private static final String ERROR_INVALID_REQUEST = "error.invalidRequest";
+
+    /**
+     * Exception resolver constructor.
+     * @param audit Audit interface.
+     */
+    @Autowired
+    public AuthenticationExceptionResolver(Audit audit) {
+        this.audit = audit;
+    }
 
     /**
      * Handling of AuthStepException.
@@ -55,6 +70,7 @@ public class AuthenticationExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleMethodNotValidException(AuthStepException ex) {
         logger.warn("Error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Error occurred in Web Flow server: {}", AUDIT_DETAIL_BAD_REQUEST, ex);
         // Web Flow returns message ID for front-end localization instead of message.
         final Error error = new Error(Error.Code.ERROR_GENERIC, ex.getMessageId());
         return new ErrorResponse(error);
@@ -67,8 +83,10 @@ public class AuthenticationExceptionResolver {
      * @return Response with error details.
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.OK) public @ResponseBody AuthStepResponse handleMethodNotValidException(MethodArgumentNotValidException ex) {
-        logger.debug("Validation error occurred in Web Flow server: {}", ex.getMessage());
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public @ResponseBody AuthStepResponse handleMethodNotValidException(MethodArgumentNotValidException ex) {
+        logger.warn("Validation error occurred in Web Flow server: {}", ex.getMessage());
+        audit.warn("Validation error occurred in Web Flow server: {}", AUDIT_DETAIL_BAD_REQUEST, ex);
         AuthStepResponse response = new AuthStepResponse();
         response.setResult(AuthStepResult.AUTH_FAILED);
         if (ex.getBindingResult().getFieldError() != null) {
