@@ -40,7 +40,7 @@
         <dependency>
             <groupId>org.springframework.security.oauth.boot</groupId>
             <artifactId>spring-security-oauth2-autoconfigure</artifactId>
-            <version>2.4.5</version>
+            <version>2.4.6</version>
             <exclusions>
                 <exclusion>
                     <artifactId>bcpkix-jdk15on</artifactId>
@@ -87,7 +87,6 @@
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
             <version>1.68</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- PowerAuth 2.0 Web Flow Dependencies -->
