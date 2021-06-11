@@ -245,7 +245,7 @@ public class AuthenticationService {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        final String organizationId = operation.getOperationId();
+        final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
         final AuthenticationContext authenticationContext = new AuthenticationContext();
         if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
             authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
@@ -479,7 +479,7 @@ public class AuthenticationService {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        final String organizationId = operation.getOperationId();
+        final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
         final OtpAuthenticationResponse response = authenticationCustomizationService.authenticateWithOtp(otpId, otpValue, userId, organizationId, operation);
         final boolean lastAttempt = response.getUserIdentityStatus() != UserIdentityStatus.ACTIVE ||
                 (response.getRemainingAttempts() != null && response.getRemainingAttempts() == 0);
@@ -718,7 +718,7 @@ public class AuthenticationService {
             throw new InvalidRequestException("Operation ID is missing in Data Adapter authentication with credential request");
         }
         final OperationEntity operation = operationPersistenceService.getOperation(operationId);
-        final String organizationId = operation.getOperationId();
+        final String organizationId = operation.getOrganization() != null ? operation.getOrganization().getOrganizationId() : null;
         final AuthenticationContext authenticationContext = new AuthenticationContext();
         if (credentialDefinition.isE2eEncryptionEnabled() && credentialDefinition.getE2eEncryptionAlgorithm() == EndToEndEncryptionAlgorithm.AES) {
             authenticationContext.setPasswordProtection(PasswordProtectionType.PASSWORD_ENCRYPTION_AES);
