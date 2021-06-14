@@ -1,5 +1,11 @@
 # Migration from 1.0.0 to 1.1.0
 
+## Embedded Bouncy Castle Library (Version 1.68)
+
+Bouncy Castle library has been updated to version `1.68` and it is now **included directly in the application bundle (\*.war)** for both Web Flow and Next Step.
+
+You can now safely remove any previous configurations of Bouncy Castle library you made earlier, such as installing BC globally inside JRE, putting it in the container's `lib` folder, or creating JBoss or Wildfly modules.
+
 ## Database Changes
 
 Following database changes were introduced in version `1.1.0`:
