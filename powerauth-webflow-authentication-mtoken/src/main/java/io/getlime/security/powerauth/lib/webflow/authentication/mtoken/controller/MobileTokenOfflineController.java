@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controll
 
 import com.google.common.io.BaseEncoding;
 import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.enumeration.SignatureType;
 import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
 import com.wultra.security.powerauth.client.v3.ActivationStatus;
 import com.wultra.security.powerauth.client.v3.CreatePersonalizedOfflineSignaturePayloadResponse;
@@ -26,22 +27,23 @@ import com.wultra.security.powerauth.client.v3.VerifyOfflineSignatureResponse;
 import io.getlime.security.powerauth.crypto.lib.enums.PowerAuthSignatureTypes;
 import io.getlime.security.powerauth.http.PowerAuthHttpBody;
 import io.getlime.security.powerauth.lib.mtoken.model.entity.AllowedSignatureType;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.converter.OperationTextNormalizer;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.OperationIsAlreadyFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling.exception.*;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.converter.OperationConverter;
@@ -53,6 +55,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.res
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.QrCodeInitResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.service.PushMessageService;
 import io.getlime.security.powerauth.lib.webflow.authentication.service.AuthMethodQueryService;
+import io.getlime.security.powerauth.lib.webflow.authentication.service.PowerAuthOperationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,6 +91,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
     private final AuthMethodQueryService authMethodQueryService;
     private final WebFlowServicesConfiguration webFlowServicesConfiguration;
     private final PushMessageService pushMessageService;
+    private final PowerAuthOperationService powerAuthOperationService;
     private final HttpSession httpSession;
 
     /**
@@ -96,14 +100,16 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @param authMethodQueryService Authentication method query service.
      * @param webFlowServicesConfiguration Web Flow configuration.
      * @param pushMessageService Push message service.
+     * @param powerAuthOperationService PowerAuth operation service.
      * @param httpSession HTTP session.
      */
     @Autowired
-    public MobileTokenOfflineController(PowerAuthClient powerAuthClient, AuthMethodQueryService authMethodQueryService, WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, HttpSession httpSession) {
+    public MobileTokenOfflineController(PowerAuthClient powerAuthClient, AuthMethodQueryService authMethodQueryService, WebFlowServicesConfiguration webFlowServicesConfiguration, PushMessageService pushMessageService, PowerAuthOperationService powerAuthOperationService, HttpSession httpSession) {
         this.powerAuthClient = powerAuthClient;
         this.authMethodQueryService = authMethodQueryService;
         this.webFlowServicesConfiguration = webFlowServicesConfiguration;
         this.pushMessageService = pushMessageService;
+        this.powerAuthOperationService = powerAuthOperationService;
         this.httpSession = httpSession;
     }
 
@@ -115,7 +121,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * @throws AuthStepException Thrown when authorization step fails.
      */
     @Override
-    protected AuthenticationResult authenticate(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(@RequestBody QrCodeAuthenticationRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
@@ -125,7 +131,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         final GetOperationDetailResponse operation = getOperation();
         final String operationName = operation.getOperationName();
         final AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         // nonce is received from the UI - it was stored together with the QR code
         String nonce = request.getNonce();
         // data for signature is {OPERATION_ID}&{OPERATION_DATA}
@@ -143,9 +149,19 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         if (signatureResponse.isSignatureValid()) {
             String userId = operation.getUserId();
             if (signatureResponse.getUserId().equals(userId)) {
+                SignatureType signatureType = SignatureType.enumFromString(signatureResponse.getSignatureType().toString());
+                boolean approvalSucceeded = powerAuthOperationService.approveOperation(operation, signatureResponse.getActivationId(), signatureType);
+                if (!approvalSucceeded) {
+                    throw new OperationIsAlreadyFailedException("Operation approval has failed");
+                }
                 cleanHttpSession();
-                logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                return new AuthenticationResult(userId, operation.getOrganizationId());
+                logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+                return new AuthResultDetail(userId, operation.getOrganizationId(), false);
+            }
+        } else {
+            boolean approvalFailSucceeded = powerAuthOperationService.failApprovalForOperation(operation);
+            if (!approvalFailSucceeded) {
+                throw new OperationIsAlreadyFailedException("Operation fail approval has failed");
             }
         }
         BigInteger remainingAttemptsPAObj = signatureResponse.getRemainingAttempts();
@@ -156,16 +172,20 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         // otherwise fail authorization
         Integer remainingAttemptsNS;
         try {
-            UpdateOperationResponse response = failAuthorization(operation.getOperationId(), getOperation().getUserId(), request.getAuthInstruments(), null);
-            if (response.getResult() == AuthResult.FAILED) {
-                // FAILED result instead of CONTINUE means the authentication method is failed
+            AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+            if (response.getAuthResult() == AuthResult.FAILED || signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+                if (signatureResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
+                    // Activation was blocked or removed, cancel the operation
+                    cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null, false);
+                }
+                // FAILED result instead of CONTINUE or non-active activation means the authentication method is failed
                 cleanHttpSession();
                 throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded");
             }
             GetOperationDetailResponse updatedOperation = getOperation();
             remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (NextStepClientException ex) {
+            logger.error("Error occurred in Next Step server", ex);
             throw new CommunicationFailedException("Authorization failed due to communication error");
         }
         OfflineModeInvalidAuthCodeException authEx = new OfflineModeInvalidAuthCodeException("Authorization code is invalid");
@@ -183,24 +203,29 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
      * Generates the QR code to be displayed to the user.
      * @param request QR code init request.
      * @return Response with QR code as String-based PNG image.
-     * @throws NextStepServiceException In case communication with Next Step service fails.
      * @throws AuthStepException In case authorization fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
     @ResponseBody
-    public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws NextStepServiceException, AuthStepException {
+    public QrCodeInitResponse initQrCode(@RequestBody QrCodeInitRequest request) throws AuthStepException {
         if (!webFlowServicesConfiguration.isOfflineModeAvailable()) {
             throw new OfflineModeDisabledException("Offline mode is disabled");
         }
         QrCodeInitResponse initResponse = new QrCodeInitResponse();
         final GetOperationDetailResponse operation = getOperation();
         final AuthMethod authMethod = getAuthMethodName();
-        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
 
         String userId = operation.getUserId();
 
         // try to get activation from authMethod configuration
-        String configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+        String configuredActivationId;
+        try {
+            configuredActivationId = authMethodQueryService.getActivationIdForMobileTokenAuthMethod(userId);
+        } catch (NextStepClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            throw new OfflineModeMissingActivationException("Activation configuration is not available");
+        }
 
         if (configuredActivationId == null) {
             // unexpected state - activation is not set or configuration is invalid
@@ -227,7 +252,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         if (activationStatusResponse.getActivationStatus() != ActivationStatus.ACTIVE) {
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             initResponse.setMessage("offlineMode.activationNotActive");
-            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return initResponse;
         }
 
@@ -248,7 +273,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         initResponse.setChosenActivation(activationEntity);
         // currently the choice of activations is limited only to the configured activation, however list is kept in case we decide in future to re-enable the choice
         initResponse.setActivations(activationEntities);
-        logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.debug("Init step succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         return initResponse;
     }
 
@@ -275,7 +300,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     response.setMessage("authentication.success");
                     pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                     cleanHttpSession();
-                    logger.info("Step result: CONFIRMED, authentication method: {}", authMethod.toString());
+                    logger.info("Step result: CONFIRMED, authentication method: {}", authMethod);
                     return response;
                 }
 
@@ -285,7 +310,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
                     response.setResult(AuthStepResult.AUTH_FAILED);
                     response.setMessage(failedReason);
-                    logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());
+                    logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod);
                     return response;
                 }
 
@@ -297,7 +322,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
                     response.getNext().addAll(steps);
                     pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                     cleanHttpSession();
-                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, authMethod.toString());
+                    logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operationId, authMethod);
                     return response;
                 }
             });
@@ -305,7 +330,7 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
             logger.warn("Error occurred while verifying offline authorization code: {}", e.getMessage());
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
-            logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod.toString());
+            logger.info("Step result: AUTH_FAILED, authentication method: {}", authMethod);
             if (e.getMessageId() != null) {
                 // prefer localized message over regular message string
                 response.setMessage(e.getMessageId());
@@ -332,16 +357,15 @@ public class MobileTokenOfflineController extends AuthMethodController<QrCodeAut
         try {
             GetOperationDetailResponse operation = getOperation();
             AuthMethod authMethod = getAuthMethodName(operation);
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
-        } catch (NextStepServiceException e) {
-            logger.error("Error occurred in Next Step server", e);
+        } catch (CommunicationFailedException ex) {
             final QrCodeAuthenticationResponse response = new QrCodeAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");

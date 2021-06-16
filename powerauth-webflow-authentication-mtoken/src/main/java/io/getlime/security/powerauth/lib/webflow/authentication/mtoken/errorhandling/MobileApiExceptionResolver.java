@@ -15,6 +15,8 @@
  */
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhandling;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.lib.mtoken.model.enumeration.ErrorCode;
@@ -23,6 +25,7 @@ import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.errorhand
 import io.getlime.security.powerauth.rest.api.base.exception.PowerAuthAuthenticationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -44,13 +47,28 @@ public class MobileApiExceptionResolver {
 
     private final Logger logger = LoggerFactory.getLogger(MobileApiExceptionResolver.class);
 
+    private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
+    private final Audit audit;
+
+    /**
+     * Exception resolver constructor.
+     * @param audit Audit interface.
+     */
+    @Autowired
+    public MobileApiExceptionResolver(Audit audit) {
+        this.audit = audit;
+    }
+
+
     private ErrorResponse error(String code, Throwable t) {
         logger.warn("Error occurred in Mobile Token API component", t);
+        audit.warn("Error occurred in Mobile Token API component", AUDIT_DETAIL_BAD_REQUEST, t);
         return new ErrorResponse(new Error(code, t.getMessage()));
     }
 
     private ErrorResponse error(String code, AuthStepException e) {
         logger.warn("Error occurred", e);
+        audit.warn("Error occurred", AUDIT_DETAIL_BAD_REQUEST, e);
         return new ErrorResponse(new Error(code, e.getMessageId()));
     }
 

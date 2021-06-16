@@ -15,31 +15,19 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.Size;
+
 /**
  * Request object used for querying authentication methods per user.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetUserAuthMethodsRequest {
 
+    @Size(min = 1, max = 256)
     private String userId;
-
-    /**
-     * Get the user id.
-     *
-     * @return user id
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set the user id.
-     *
-     * @param userId user id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
 
 }

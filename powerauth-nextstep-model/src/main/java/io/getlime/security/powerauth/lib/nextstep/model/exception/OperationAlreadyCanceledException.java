@@ -16,8 +16,6 @@
 
 package io.getlime.security.powerauth.lib.nextstep.model.exception;
 
-import io.getlime.core.rest.model.base.entity.Error;
-
 /**
  * Exception for case when operation was previously canceled and it is being updated.
  *
@@ -25,9 +23,10 @@ import io.getlime.core.rest.model.base.entity.Error;
  */
 public class OperationAlreadyCanceledException extends NextStepServiceException {
 
+    /**
+     * Operation is already canceled.
+     */
     public static final String CODE = "OPERATION_ALREADY_CANCELED";
-
-    private Error error;
 
     /**
      * Constructor with error message.
@@ -37,29 +36,4 @@ public class OperationAlreadyCanceledException extends NextStepServiceException 
         super(message);
     }
 
-    /**
-     * Constructor with cause.
-     * @param cause Original exception.
-     */
-    public OperationAlreadyCanceledException(Throwable cause) {
-        super(cause);
-    }
-
-    /**
-     * Constructor with cause and error details.
-     * @param cause Original exception.
-     * @param error Object with error information.
-     */
-    public OperationAlreadyCanceledException(Throwable cause, Error error) {
-        super(cause);
-        this.error = error;
-    }
-
-    /**
-     * Get error detail information.
-     * @return Error detail information.
-     */
-    public Error getError() {
-        return error;
-    }
 }

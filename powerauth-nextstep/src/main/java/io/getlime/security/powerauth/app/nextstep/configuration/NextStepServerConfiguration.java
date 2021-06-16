@@ -15,8 +15,20 @@
  */
 package io.getlime.security.powerauth.app.nextstep.configuration;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.AuditFactory;
+import com.wultra.security.powerauth.client.PowerAuthClient;
+import com.wultra.security.powerauth.client.model.error.PowerAuthClientException;
+import com.wultra.security.powerauth.rest.client.PowerAuthRestClient;
+import com.wultra.security.powerauth.rest.client.PowerAuthRestClientConfiguration;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
+import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,11 +42,47 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = {"io.getlime.security.powerauth"})
 public class NextStepServerConfiguration {
 
+    private static final Logger logger = LoggerFactory.getLogger(NextStepServerConfiguration.class);
+    private final AuditFactory auditFactory;
+
+    /**
+     * Data Adapter service URL.
+     */
+    @Value("${powerauth.dataAdapter.service.url}")
+    private String dataAdapterServiceUrl;
+
+    @Value("${powerauth.service.url}")
+    private String powerAuthRestUrl;
+
+    @Value("${powerauth.service.security.clientToken}")
+    private String powerAuthClientToken;
+
+    @Value("${powerauth.service.security.clientSecret}")
+    private String powerAuthClientSecret;
+
+    @Value("${powerauth.service.ssl.acceptInvalidSslCertificate}")
+    private boolean powerAuthAcceptInvalidSslCertificate;
+
     /**
      * Operation expiration time in seconds.
      */
     @Value("${powerauth.nextstep.operation.expirationTimeInSeconds}")
     private int operationExpirationTime;
+
+    @Value("${powerauth.nextstep.identity.credential.useOriginalUsername}")
+    private boolean useOriginalUsername;
+
+    @Value("${powerauth.nextstep.identity.credential.generateUsernameMaxAttempts}")
+    private int generateUsernameMaxAttempts;
+
+    @Value("${powerauth.nextstep.pa.operations.enabled}")
+    private boolean powerAuthOperationSupportEnabled;
+
+    @Value("${powerauth.nextstep.e2eEncryption.key}")
+    private String e2eEncryptionKey;
+
+    @Value("${powerauth.nextstep.db.master.encryption.key}")
+    private String masterDbEncryptionKey;
 
     /**
      * Application name.
@@ -55,12 +103,61 @@ public class NextStepServerConfiguration {
     private String applicationEnvironment;
 
     /**
+     * Configuration constructor.
+     * @param auditFactory Audit factory.
+     */
+    @Autowired
+    public NextStepServerConfiguration(AuditFactory auditFactory) {
+        this.auditFactory = auditFactory;
+    }
+
+    /**
      * Get the operation expiration time.
      *
      * @return expiration time for operations in seconds
      */
     public int getOperationExpirationTime() {
         return operationExpirationTime;
+    }
+
+    /**
+     * Get whether original username for a removed credential when the credential is recreated.
+     * @return Whether original username for a removed credential when the credential is recreated.
+     */
+    public boolean isUseOriginalUsername() {
+        return useOriginalUsername;
+    }
+
+    /**
+     * Get maximum number of attempts when generating username.
+     * @return Maximum number of attempts when generating username.
+     */
+    public int getGenerateUsernameMaxAttempts() {
+        return generateUsernameMaxAttempts;
+    }
+
+    /**
+     * Get whether PowerAuth operations support is enabled.
+     * @return Whether PowerAuth operations support is enabled.
+     */
+    public boolean isPowerAuthOperationSupportEnabled() {
+        return powerAuthOperationSupportEnabled;
+    }
+
+    /**
+     * Get end-to-end encryption key.
+     * @return End-to-end encryption key
+     */
+    public String getE2eEncryptionKey() {
+        return e2eEncryptionKey;
+    }
+
+    /**
+     * Get master DB encryption key.
+     * @return Master DB encryption key.
+     */
+    public String getMasterDbEncryptionKey() {
+        return masterDbEncryptionKey;
     }
 
     /**
@@ -85,6 +182,50 @@ public class NextStepServerConfiguration {
      */
     public String getApplicationEnvironment() {
         return applicationEnvironment;
+    }
+
+    /**
+     * Default data adapter client.
+     *
+     * @return Data adapter client.
+     */
+    @Bean
+    public DataAdapterClient defaultDataAdapterClient() {
+        try {
+            return new DataAdapterClient(dataAdapterServiceUrl);
+        } catch (DataAdapterClientErrorException ex) {
+            logger.error(ex.getMessage(), ex);
+            audit().error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+
+    /**
+     * Initialize PowerAuth REST client.
+     * @return PowerAuth REST client.
+     */
+    @Bean
+    public PowerAuthClient powerAuthClient() {
+        final PowerAuthRestClientConfiguration config = new PowerAuthRestClientConfiguration();
+        config.setPowerAuthClientToken(powerAuthClientToken);
+        config.setPowerAuthClientSecret(powerAuthClientSecret);
+        config.setAcceptInvalidSslCertificate(powerAuthAcceptInvalidSslCertificate);
+        try {
+            return new PowerAuthRestClient(powerAuthRestUrl, config);
+        } catch (PowerAuthClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            audit().error(ex.getMessage(), ex);
+            return null;
+        }
+    }
+
+    /**
+     * Prepare audit interface.
+     * @return Audit interface.
+     */
+    @Bean
+    public Audit audit() {
+        return auditFactory.getAudit();
     }
 
 }

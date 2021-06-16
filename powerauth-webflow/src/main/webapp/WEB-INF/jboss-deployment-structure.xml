@@ -9,6 +9,12 @@
 		<dependencies>
 			<module name="com.wultra.powerauth.webflow.conf" />
 		</dependencies>
+
+		<resources>
+			<!-- use WAR provided Bouncy Castle -->
+			<resource-root path="WEB-INF/lib/bcprov-jdk15on-1.68.jar" use-physical-code-source="true"/>
+		</resources>
+
 		<local-last value="true" />
 	</deployment>
 </jboss-deployment-structure>

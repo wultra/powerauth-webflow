@@ -8,14 +8,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <groupId>io.getlime.security</groupId>
     <artifactId>powerauth-webflow-authentication</artifactId>
     <name>powerauth-webflow-authentication</name>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <dependencies>
@@ -53,27 +53,32 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-data-adapter-client</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-nextstep-client</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-i18n</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-rest-client-spring</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-java-crypto</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getlime.core</groupId>
+            <artifactId>audit-base</artifactId>
+            <version>1.3.0</version>
         </dependency>
 
         <!-- Library for formatting monetary amounts -->
@@ -81,6 +86,13 @@
             <groupId>org.javamoney</groupId>
             <artifactId>moneta</artifactId>
             <version>1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.20</version>
+            <scope>provided</scope>
         </dependency>
 
         <!-- TEST -->
@@ -91,25 +103,6 @@
         </dependency>
 
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>[1.9,)</jdk>
-            </activation>
-            <dependencies>
-                <!-- JDK 9 dependencies -->
-                <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                    <version>${jaxb.version}</version>
-                    <!-- Library should be provided by runtime, otherwise there would be conflicts with jar bundled in war. -->
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <build>
         <plugins>

@@ -15,7 +15,10 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.entity;
 
-import java.util.HashMap;
+import lombok.Data;
+
+import javax.validation.constraints.NotNull;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -23,33 +26,10 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class AuthMethodConfiguration {
 
-    private Map<String, String> parameters = new HashMap<>();
+    @NotNull
+    private final Map<String, String> parameters = new LinkedHashMap<>();
 
-    /**
-     * Get all configuration parameters.
-     * @return Map with configuration parameters.
-     */
-    public Map<String, String> getParameters() {
-        return parameters;
-    }
-
-    /**
-     * Get value of a configuration parameter.
-     * @param parameterName Parameter name.
-     * @return Parameter value.
-     */
-    public String getParameterValue(String parameterName) {
-        return parameters.get(parameterName);
-    }
-
-    /**
-     * Set value of a configuration parameter.
-     * @param parameterName Parameter name.
-     * @param parameterValue Parameter value.
-     */
-    public void setParameterValue(String parameterName, String parameterValue) {
-        parameters.put(parameterName, parameterValue);
-    }
 }

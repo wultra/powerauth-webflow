@@ -25,7 +25,7 @@ import java.util.Objects;
  */
 public class OperationFormFieldConfig {
 
-    protected String id;
+    private String id;
     private boolean enabled;
     private String defaultValue;
 

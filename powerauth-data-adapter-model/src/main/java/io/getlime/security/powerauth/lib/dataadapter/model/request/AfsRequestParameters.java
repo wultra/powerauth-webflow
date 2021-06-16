@@ -16,14 +16,19 @@
 package io.getlime.security.powerauth.lib.dataadapter.model.request;
 
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Request parameters for AFS action.
+ *
+ * @author Roman Strobl, roman.strobl@wultra.com
+ */
 public class AfsRequestParameters {
 
     /**

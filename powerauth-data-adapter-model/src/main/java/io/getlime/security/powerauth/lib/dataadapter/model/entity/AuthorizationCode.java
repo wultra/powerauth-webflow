@@ -25,15 +25,28 @@ public class AuthorizationCode {
     private final String code;
     private final byte[] salt;
 
+    /**
+     * Authorization code constructor.
+     * @param code Authorization code.
+     * @param salt Salt used for creating the authorization code or null for unknown salt.
+     */
     public AuthorizationCode(String code, byte[] salt) {
         this.code = code;
         this.salt = salt;
     }
 
+    /**
+     * Get authorization code.
+     * @return Authorization code.
+     */
     public String getCode() {
         return code;
     }
 
+    /**
+     * Get salt.
+     * @return Salt.
+     */
     public byte[] getSalt() {
         return salt;
     }

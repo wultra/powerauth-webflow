@@ -15,6 +15,12 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
@@ -22,105 +28,26 @@ import java.util.Date;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class CreateAfsActionRequest {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationId;
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String afsAction;
-    private int stepIndex;
+    @NotNull
+    @Positive
+    private Integer stepIndex;
+    @Size(min = 2, max = 256)
     private String requestAfsExtras;
     private boolean afsResponseApplied;
+    @Size(min = 2, max = 256)
     private String afsLabel;
+    @Size(min = 2, max = 256)
     private String responseAfsExtras;
+    @NotNull
     private Date timestampCreated;
 
-    /**
-     * Default constructor.
-     */
-    public CreateAfsActionRequest() {
-    }
-
-    /**
-     * Constructor with all AFS action details.
-     * @param operationId Operation ID.
-     * @param afsAction Action in AFS request.
-     * @param stepIndex Step index for current action.
-     * @param requestAfsExtras AFS request extras.
-     * @param afsResponseApplied Whether AFS response is applied.
-     * @param afsLabel AFS label from response.
-     * @param responseAfsExtras AFS response extras.
-     */
-    public CreateAfsActionRequest(String operationId, String afsAction, int stepIndex, String requestAfsExtras, boolean afsResponseApplied, String afsLabel, String responseAfsExtras) {
-        this.operationId = operationId;
-        this.afsAction = afsAction;
-        this.stepIndex = stepIndex;
-        this.requestAfsExtras = requestAfsExtras;
-        this.afsResponseApplied = afsResponseApplied;
-        this.afsLabel = afsLabel;
-        this.responseAfsExtras = responseAfsExtras;
-        this.timestampCreated = new Date();
-    }
-
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    public String getAfsAction() {
-        return afsAction;
-    }
-
-    public void setAfsAction(String afsAction) {
-        this.afsAction = afsAction;
-    }
-
-    public int getStepIndex() {
-        return stepIndex;
-    }
-
-    public void setStepIndex(int stepIndex) {
-        this.stepIndex = stepIndex;
-    }
-
-    public String getRequestAfsExtras() {
-        return requestAfsExtras;
-    }
-
-    public void setRequestAfsExtras(String requestAfsExtras) {
-        this.requestAfsExtras = requestAfsExtras;
-    }
-
-    public boolean isAfsResponseApplied() {
-        return afsResponseApplied;
-    }
-
-    public void setAfsResponseApplied(boolean afsResponseApplied) {
-        this.afsResponseApplied = afsResponseApplied;
-    }
-
-    public String getAfsLabel() {
-        return afsLabel;
-    }
-
-    public void setAfsLabel(String afsLabel) {
-        this.afsLabel = afsLabel;
-    }
-
-    public String getResponseAfsExtras() {
-        return responseAfsExtras;
-    }
-
-    public void setResponseAfsExtras(String responseAfsExtras) {
-        this.responseAfsExtras = responseAfsExtras;
-    }
-
-    public Date getTimestampCreated() {
-        return timestampCreated;
-    }
-
-    public void setTimestampCreated(Date timestampCreated) {
-        this.timestampCreated = timestampCreated;
-    }
 }

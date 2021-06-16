@@ -28,7 +28,7 @@ import java.util.Objects;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = AmountAttribute.class, name = "AMOUNT"),
         @JsonSubTypes.Type(value = NoteAttribute.class, name = "NOTE"),
@@ -40,22 +40,61 @@ import java.util.Objects;
 })
 public class Attribute {
 
+    /**
+     * Attribute type.
+     */
     public enum Type {
+        /**
+         * Monetary amount.
+         */
         AMOUNT,
+
+        /**
+         * Text note.
+         */
         NOTE,
+
+        /**
+         * Bank account choice.
+         */
         BANK_ACCOUNT_CHOICE,
+
+        /**
+         * Key-value attribute.
+         */
         KEY_VALUE,
+
+        /**
+         * Banner with text.
+         */
         BANNER,
+
+        /**
+         * Heading element.
+         */
         HEADING,
+
+        /**
+         * Third party info.
+         */
         PARTY_INFO
     }
 
+    /**
+     * Attribute type.
+     */
     // JsonIgnore added, otherwise type was serialized twice
     @JsonIgnore
     protected Type type;
 
+    /**
+     * Attribute identifier.
+     */
     protected String id;
 
+    /**
+     * Attribute label.
+     */
     protected String label;
 
     // JsonIgnore added, otherwise type was serialized twice

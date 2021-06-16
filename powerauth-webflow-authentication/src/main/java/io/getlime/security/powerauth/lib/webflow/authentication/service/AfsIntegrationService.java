@@ -20,23 +20,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.OperationContext;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAction;
-import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsAuthInstrument;
+import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.AfsType;
 import io.getlime.security.powerauth.lib.dataadapter.model.enumeration.OperationTerminationReason;
 import io.getlime.security.powerauth.lib.dataadapter.model.request.AfsRequestParameters;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.AfsResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AfsActionDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationConfigDetailResponse;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -179,10 +179,10 @@ public class AfsIntegrationService {
                 }
 
             // AFS errors are not critical, Web Flow falls back to 2FA
-            } catch (NextStepServiceException e) {
-                logger.error("Error when obtaining operation configuration", e);
-            } catch (DataAdapterClientErrorException e) {
-                logger.error("Error when calling anti-fraud service", e);
+            } catch (NextStepClientException ex) {
+                logger.error("Error when obtaining operation configuration", ex);
+            } catch (DataAdapterClientErrorException ex) {
+                logger.error("Error when calling anti-fraud service", ex);
             }
         } else {
             logger.debug("AFS integration is disabled");
@@ -237,6 +237,9 @@ public class AfsIntegrationService {
         AfsType afsType = configuration.getAfsType();
         if (afsType == AfsType.THREAT_MARK) {
             RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
+            if (requestAttributes == null) {
+                return extras;
+            }
             if (!(requestAttributes instanceof ServletRequestAttributes)) {
                 // The action is not dispatched using DispatcherServlet. This occurs in case of processing of the Web
                 // Socket close session event. Obtain AFS parameters from last regular request and reuse them.
@@ -247,7 +250,7 @@ public class AfsIntegrationService {
                     return lastAction.getRequestExtras();
                 }
             } else {
-                HttpServletRequest servletRequest = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+                HttpServletRequest servletRequest = ((ServletRequestAttributes) requestAttributes).getRequest();
                 Cookie[] cookies = servletRequest.getCookies();
                 String deviceTagCookie = configuration.getTmDeviceTagCookie();
                 String sessionSidCookie = configuration.getTmSessionSidCookie();

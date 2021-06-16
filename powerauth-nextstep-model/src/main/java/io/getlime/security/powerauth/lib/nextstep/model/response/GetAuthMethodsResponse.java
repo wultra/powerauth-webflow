@@ -16,7 +16,9 @@
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
+import lombok.Data;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,22 +27,10 @@ import java.util.List;
  *
  * @author Roman Strobl
  */
+@Data
 public class GetAuthMethodsResponse {
 
-    private List<AuthMethodDetail> authMethods;
+    @NotNull
+    private final List<AuthMethodDetail> authMethods = new ArrayList<>();
 
-    /**
-     * Default constructor.
-     */
-    public GetAuthMethodsResponse() {
-        authMethods = new ArrayList<>();
-    }
-
-    public List<AuthMethodDetail> getAuthMethods() {
-        return authMethods;
-    }
-
-    public void setAuthMethods(List<AuthMethodDetail> authMethods) {
-        this.authMethods = authMethods;
-    }
 }

@@ -17,17 +17,18 @@
 package io.getlime.security.powerauth.lib.webflow.authentication.mtoken.controller;
 
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationHistory;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.configuration.WebFlowServicesConfiguration;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.request.MobileTokenAuthenticationRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.mtoken.model.response.MobileTokenAuthenticationResponse;
@@ -83,13 +84,13 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @throws AuthStepException Thrown when authentication fails.
      */
     @Override
-    protected AuthenticationResult authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(MobileTokenAuthenticationRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         final List<OperationHistory> history = operation.getHistory();
         for (OperationHistory h : history) {
             if (AuthMethod.POWERAUTH_TOKEN.equals(h.getAuthMethod())
                     && !AuthResult.FAILED.equals(h.getAuthResult())) {
-                return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
             }
         }
         return null;
@@ -107,32 +108,39 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
     /**
      * Initialize push message.
      * @return Initialization response.
-     * @throws NextStepServiceException Thrown when communication with Next Step server fails.
      * @throws AuthStepException Thrown when authentication fails.
      */
     @RequestMapping(value = "/init", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenInitResponse initPushMessage() throws NextStepServiceException, AuthStepException {
-        final GetOperationDetailResponse operation = getOperation();
-        final AuthMethod authMethod = getAuthMethodName(operation);
-        logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+    public @ResponseBody MobileTokenInitResponse initPushMessage() throws AuthStepException {
+        try {
+            final GetOperationDetailResponse operation = getOperation();
+            final AuthMethod authMethod = getAuthMethodName(operation);
+            logger.info("Init step started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
 
-        MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, authMethod);
-        initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
-        if (authMethod == AuthMethod.LOGIN_SCA) {
-            // Add username for LOGIN_SCA method
-            String username = getUsernameFromHttpSession();
-            initResponse.setUsername(username);
+            MobileTokenInitResponse initResponse = pushMessageService.sendStepInitPushMessage(operation, authMethod);
+            initResponse.setOfflineModeAvailable(webFlowServicesConfiguration.isOfflineModeAvailable());
+            if (authMethod == AuthMethod.LOGIN_SCA) {
+                // Add username for LOGIN_SCA method
+                String username = getUsernameFromHttpSession();
+                initResponse.setUsername(username);
+            }
+            if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
+                // Allow fallback to SMS in authentication method LOGIN_SCA
+                initResponse.setSmsFallbackAvailable(true);
+            }
+            if (authMethod == AuthMethod.POWERAUTH_TOKEN) {
+                // User selected POWERAUTH_TOKEN in a non-SCA step, set mobile token as active
+                nextStepClient.updateMobileToken(operation.getOperationId(), true);
+            }
+            logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+            return initResponse;
+        } catch (NextStepClientException ex) {
+            logger.error(ex.getMessage(), ex);
+            MobileTokenInitResponse response = new MobileTokenInitResponse();
+            response.setResult(AuthStepResult.AUTH_FAILED);
+            response.setMessage("error.communication");
+            return response;
         }
-        if (authMethod == AuthMethod.LOGIN_SCA || authMethod == AuthMethod.APPROVAL_SCA) {
-            // Allow fallback to SMS in authentication method LOGIN_SCA
-            initResponse.setSmsFallbackAvailable(true);
-        }
-        if (authMethod == AuthMethod.POWERAUTH_TOKEN) {
-            // User selected POWERAUTH_TOKEN in a non-SCA step, set mobile token as active
-            nextStepClient.updateMobileToken(operation.getOperationId(), true);
-        }
-        logger.debug("Step initialization succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-        return initResponse;
     }
 
     /**
@@ -143,17 +151,17 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
      * @throws AuthStepException Thrown when authentication fails.
      */
     @RequestMapping(value = "/authenticate", method = RequestMethod.POST)
-    public @ResponseBody MobileTokenAuthenticationResponse checkOperationStatus(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
+    public @ResponseBody MobileTokenAuthenticationResponse authenticateHandler(@RequestBody MobileTokenAuthenticationRequest request) throws AuthStepException {
 
         final GetOperationDetailResponse operation = getOperation(false);
         final AuthMethod authMethod = getAuthMethodName(operation);
         // Log level is set to FINE due to large amount of requests caused by polling.
-        logger.debug("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.debug("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         if (operation.isExpired()) {
             logger.info("Operation has timed out, operation ID: {}", operation.getOperationId());
             // Handle operation expiration
             try {
-                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null);
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.TIMED_OUT_OPERATION, null, true);
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
             }
@@ -163,7 +171,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setMessage("operation.timeout");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
         }
 
@@ -175,7 +183,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             response.setMessage("authentication.success");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
         }
 
@@ -189,7 +197,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.setMessage("authentication.success");
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                 cleanHttpSession();
-                logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                 return response;
             }
             // in case previous authentication lead to an authentication method failure, the authentication method has already failed
@@ -201,7 +209,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 response.setMessage("authentication.fail");
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                 cleanHttpSession();
-                logger.info("Step result: AUTH_METHOD_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Step result: AUTH_METHOD_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                 return response;
             }
             // in case the authentication has been canceled, the authentication method is canceled
@@ -209,10 +217,29 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
                 clearCurrentBrowserSession();
                 final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
                 response.setResult(AuthStepResult.CANCELED);
-                response.setMessage("operation.canceled");
+
+                if (h.getAuthStepResultDescription() != null) {
+                    switch (h.getAuthStepResultDescription()) {
+                        case "canceled.incorrect_data":
+                        case "canceled.unexpected_operation":
+                        case "canceled.unknown":
+                            // User rejected the operation
+                            response.setMessage("operation.canceled");
+                            break;
+                        case "canceled.timed_out_operation":
+                            // The operation timed out
+                            response.setMessage("operation.timeout");
+                            break;
+                        default:
+                            // The operation failed for other reason
+                            response.setMessage("operation.alreadyFailed");
+                    }
+                } else {
+                    response.setMessage("error.unknown");
+                }
                 pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
                 cleanHttpSession();
-                logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+                logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
                 return response;
             }
         }
@@ -222,10 +249,10 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         if (operation.getChosenAuthMethod() == AuthMethod.POWERAUTH_TOKEN && !isAuthMethodAvailable(operation)) {
             // when AuthMethod is disabled, operation should fail
             try {
-                logger.info("Operation will be canceled because authentication method is no longer available, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
-                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null);
-            } catch (NextStepServiceException ex) {
-                logger.error("Cancel operation request failed, reason: "+ex.getMessage());
+                logger.info("Operation will be canceled because authentication method is no longer available, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
+                cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.AUTH_METHOD_NOT_AVAILABLE, null, true);
+            } catch (CommunicationFailedException ex) {
+                // Exception is already logged
             }
             clearCurrentBrowserSession();
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
@@ -234,7 +261,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
             // push message may not be delivered when activation was blocked during authentication, error is logged and ignored
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
         }
 
@@ -243,7 +270,7 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         response.setResult(AuthStepResult.AUTH_FAILED);
         response.setMessage("authentication.fail");
         // Log level is set to FINE due to large amount of requests caused by polling.
-        logger.debug("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+        logger.debug("Step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
         return response;
     }
 
@@ -257,15 +284,15 @@ public class MobileTokenOnlineController extends AuthMethodController<MobileToke
         try {
             GetOperationDetailResponse operation = getOperation();
             AuthMethod authMethod = getAuthMethodName(operation);
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, true);
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.CANCELED);
             response.setMessage("operation.canceled");
             pushMessageService.sendAuthStepFinishedPushMessage(operation, response.getMessage(), authMethod);
             cleanHttpSession();
-            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod.toString());
+            logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), authMethod);
             return response;
-        } catch (NextStepServiceException e) {
+        } catch (CommunicationFailedException ex) {
             final MobileTokenAuthenticationResponse response = new MobileTokenAuthenticationResponse();
             response.setResult(AuthStepResult.AUTH_FAILED);
             response.setMessage("error.communication");

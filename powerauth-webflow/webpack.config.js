@@ -5,6 +5,7 @@ var node_dir = __dirname + '/node_modules';
 var webpack = require('webpack');
 
 module.exports = {
+    mode: 'production',
     entry: './src/main/js/client.js',
     devtool: 'source-map',
     cache: true,

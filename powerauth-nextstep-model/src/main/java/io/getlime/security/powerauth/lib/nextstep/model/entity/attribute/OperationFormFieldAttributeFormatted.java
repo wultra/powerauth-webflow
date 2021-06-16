@@ -27,8 +27,14 @@ import java.util.Map;
  */
 public class OperationFormFieldAttributeFormatted extends OperationFormFieldAttribute {
 
+    /**
+     * Type of formatted value.
+     */
     protected ValueFormatType valueFormatType;
 
+    /**
+     * Formatted values.
+     */
     protected Map<String, String> formattedValues = new HashMap<>();
 
     /**

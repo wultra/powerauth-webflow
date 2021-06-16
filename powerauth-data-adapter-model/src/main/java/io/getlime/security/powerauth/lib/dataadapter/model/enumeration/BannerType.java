@@ -21,7 +21,19 @@ package io.getlime.security.powerauth.lib.dataadapter.model.enumeration;
  * @author Roman Strobl, roman.strobl@wultra.com
  */
 public enum BannerType {
+
+    /**
+     * Info banner type.
+     */
     BANNER_INFO,
+
+    /**
+     * Warning banner type.
+     */
     BANNER_WARNING,
+
+    /**
+     * Error banner type.
+     */
     BANNER_ERROR
 }

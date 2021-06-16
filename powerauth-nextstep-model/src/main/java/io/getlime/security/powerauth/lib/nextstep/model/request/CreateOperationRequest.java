@@ -18,7 +18,11 @@ package io.getlime.security.powerauth.lib.nextstep.model.request;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.KeyValueParameter;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.OperationFormData;
+import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,143 +31,27 @@ import java.util.List;
  *
  * @author Petr Dvorak, petr@wultra.com
  */
+@Data
 public class CreateOperationRequest {
 
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String operationName;
+    @Size(min = 1, max = 256)
     private String operationId;
+    @NotNull
+    @Size(max = 256)
     private String operationData;
+    @Size(min = 2, max = 256)
+    private String operationNameExternal;
+    @Size(min = 1, max = 256)
+    private String userId;
+    @Size(min = 2, max = 256)
     private String organizationId;
+    @Size(min = 1, max = 256)
     private String externalTransactionId;
-    private List<KeyValueParameter> params;
+    private final List<KeyValueParameter> params = new ArrayList<>();
     private OperationFormData formData;
     private ApplicationContext applicationContext;
 
-    /**
-     * Default constructor.
-     */
-    public CreateOperationRequest() {
-        params = new ArrayList<>();
-    }
-
-    /**
-     * Get the new operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
-
-    /**
-     * Set the new operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    /**
-     * Get the operation ID.
-     *
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set the operation ID.
-     *
-     * @param operationId operation ID, use null value in case operation ID should be generated.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get operation data.
-     * @return Operation data.
-     */
-    public String getOperationData() {
-        return operationData;
-    }
-
-    /**
-     * Set operation data.
-     * @param operationData Operation data.
-     */
-    public void setOperationData(String operationData) {
-        this.operationData = operationData;
-    }
-
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    /**
-     * Get external transaction ID.
-     * @return External transaction ID.
-     */
-    public String getExternalTransactionId() {
-        return externalTransactionId;
-    }
-
-    /**
-     * Set external transaction ID.
-     * @param externalTransactionId External transaction ID.
-     */
-    public void setExternalTransactionId(String externalTransactionId) {
-        this.externalTransactionId = externalTransactionId;
-    }
-
-    /**
-     * Get the list with optional extra parameters.
-     * @return Extra parameters.
-     */
-    public List<KeyValueParameter> getParams() {
-        return params;
-    }
-
-    /**
-     * Get form data (title, message, other visual attributes, ...) of the operation.
-     * @return Form data.
-     */
-    public OperationFormData getFormData() {
-        return formData;
-    }
-
-    /**
-     * Set form data object.
-     * @param formData Set form data.
-     */
-    public void setFormData(OperationFormData formData) {
-        this.formData = formData;
-    }
-
-    /**
-     * Get application context for OAuth 2.0 consent screen.
-     * @return Application context for OAuth 2.0 consent screen.
-     */
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    /**
-     * Set application context for OAuth 2.0 consent screen.
-     * @param applicationContext Application context for OAuth 2.0 consent screen.
-     */
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 }

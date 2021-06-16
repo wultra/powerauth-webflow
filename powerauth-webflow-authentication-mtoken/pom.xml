@@ -24,14 +24,14 @@
     <parent>
         <artifactId>powerauth-webflow-parent</artifactId>
         <groupId>io.getlime.security</groupId>
-        <version>1.0.0</version>
+        <version>1.1.0</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>powerauth-webflow-authentication-mtoken</artifactId>
     <name>powerauth-webflow-authentication-mtoken</name>
     <groupId>io.getlime.security</groupId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
 
     <dependencies>
 
@@ -55,22 +55,27 @@
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-webflow-authentication</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-restful-security-spring</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-push-client</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>io.getlime.security</groupId>
             <artifactId>powerauth-mtoken-model</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.getlime.core</groupId>
+            <artifactId>audit-base</artifactId>
+            <version>1.3.0</version>
         </dependency>
 
         <!-- Other Dependencies -->
@@ -85,38 +90,7 @@
             <version>3.4.1</version>
         </dependency>
 
-        <!-- Dependencies for Java 11 -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.sun.xml.bind</groupId>
-            <artifactId>jaxb-impl</artifactId>
-            <version>2.3.3</version>
-        </dependency>
-
     </dependencies>
-
-    <profiles>
-        <profile>
-            <id>jdk9</id>
-            <activation>
-                <jdk>[1.9,)</jdk>
-            </activation>
-            <dependencies>
-                <!-- JDK 9 dependencies -->
-                <dependency>
-                    <groupId>javax.xml.bind</groupId>
-                    <artifactId>jaxb-api</artifactId>
-                    <version>${jaxb.version}</version>
-                    <!-- Library should be provided by runtime, otherwise there would be conflicts with jar bundled in war. -->
-                    <scope>provided</scope>
-                </dependency>
-            </dependencies>
-        </profile>
-    </profiles>
 
     <build>
         <plugins>

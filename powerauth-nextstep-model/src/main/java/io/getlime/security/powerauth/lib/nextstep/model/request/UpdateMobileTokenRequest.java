@@ -15,61 +15,22 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 /**
  * Request object used for updating mobile token status.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateMobileTokenRequest {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationId;
     private boolean mobileTokenActive;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateMobileTokenRequest() {
-    }
-
-    /**
-     * Constructor with mobile token status.
-     * @param operationId Operation ID.
-     * @param mobileTokenActive Whether mobile token is active.
-     */
-    public UpdateMobileTokenRequest(String operationId, boolean mobileTokenActive) {
-        this.operationId = operationId;
-        this.mobileTokenActive = mobileTokenActive;
-    }
-
-    /**
-     * Get operation ID.
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get whether mobile token is active.
-     * @return Whether mobile token is active.
-     */
-    public boolean isMobileTokenActive() {
-        return mobileTokenActive;
-    }
-
-    /**
-     * Set whether mobile token is active.
-     * @param mobileTokenActive Whether mobile token is active.
-     */
-    public void setMobileTokenActive(boolean mobileTokenActive) {
-        this.mobileTokenActive = mobileTokenActive;
-    }
 }

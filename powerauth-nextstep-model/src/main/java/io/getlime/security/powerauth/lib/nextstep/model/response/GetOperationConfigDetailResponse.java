@@ -15,130 +15,39 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.response;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.Size;
+
 /**
  * Response object used for getting the operation configuration.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetOperationConfigDetailResponse {
 
+    @NotBlank
+    @Size(min = 2, max = 256)
     private String operationName;
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String templateVersion;
+    @NotNull
+    @Positive
     private Integer templateId;
+    @NotNull
     private boolean mobileTokenEnabled;
+    @Size(min = 2, max = 256)
     private String mobileTokenMode;
+    @NotNull
     private boolean afsEnabled;
+    @Size(min = 2, max = 256)
     private String afsConfigId;
+    @Positive
+    private Integer expirationTime;
 
-    /**
-     * Get operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
-
-    /**
-     * Set operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    /**
-     * Get template version.
-     * @return Template version.
-     */
-    public String getTemplateVersion() {
-        return templateVersion;
-    }
-
-    /**
-     * Set template version.
-     * @param templateVersion Template version.
-     */
-    public void setTemplateVersion(String templateVersion) {
-        this.templateVersion = templateVersion;
-    }
-
-    /**
-     * Get template ID.
-     * @return Template ID.
-     */
-    public Integer getTemplateId() {
-        return templateId;
-    }
-
-    /**
-     * Set template ID.
-     * @param templateId Template ID.
-     */
-    public void setTemplateId(Integer templateId) {
-        this.templateId = templateId;
-    }
-
-    /**
-     * Get whether mobile token is enabled for this operation.
-     * @return Whether mobile token is enabled.
-     */
-    public boolean isMobileTokenEnabled() {
-        return mobileTokenEnabled;
-    }
-
-    /**
-     * Set whether mobile token is enabled for this operation.
-     * @param mobileTokenEnabled Whether mobile token is enabled.
-     */
-    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
-        this.mobileTokenEnabled = mobileTokenEnabled;
-    }
-
-    /**
-     * Get mobile token mode - JSON configuration of mobile token signatures.
-     * @return Mobile token mode.
-     */
-    public String getMobileTokenMode() {
-        return mobileTokenMode;
-    }
-
-    /**
-     * Set mobile token mode - JSON configuration of mobile token signatures.
-     * @param mobileTokenMode Mobile token mode.
-     */
-    public void setMobileTokenMode(String mobileTokenMode) {
-        this.mobileTokenMode = mobileTokenMode;
-    }
-
-    /**
-     * Get whether anti-fraud system is enabled.
-     * @return Whether anti-fraud system is enabled.
-     */
-    public boolean isAfsEnabled() {
-        return afsEnabled;
-    }
-
-    /**
-     * Set whether anti-fraud system is enabled.
-     * @param afsEnabled Whether anti-fraud system is enabled.
-     */
-    public void setAfsEnabled(boolean afsEnabled) {
-        this.afsEnabled = afsEnabled;
-    }
-
-    /**
-     * Get AFS configuration ID.
-     * @return AFS configuration ID.
-     */
-    public String getAfsConfigId() {
-        return afsConfigId;
-    }
-
-    /**
-     * Set AFS configuration ID.
-     * @param afsConfigId AFS configuration ID.
-     */
-    public void setAfsConfigId(String afsConfigId) {
-        this.afsConfigId = afsConfigId;
-    }
 }

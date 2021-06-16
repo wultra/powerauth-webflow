@@ -32,11 +32,11 @@ public class AuthInstrumentConverter {
         List<AfsAuthInstrument> authInstrumentsAfs = new ArrayList<>();
         for (AuthInstrument instrument: authInstruments) {
             switch (instrument) {
-                case PASSWORD:
-                    authInstrumentsAfs.add(AfsAuthInstrument.PASSWORD);
+                case CREDENTIAL:
+                    authInstrumentsAfs.add(AfsAuthInstrument.CREDENTIAL);
                     break;
-                case SMS_KEY:
-                    authInstrumentsAfs.add(AfsAuthInstrument.SMS_KEY);
+                case OTP_KEY:
+                    authInstrumentsAfs.add(AfsAuthInstrument.OTP_KEY);
                     break;
                 case POWERAUTH_TOKEN:
                     authInstrumentsAfs.add(AfsAuthInstrument.POWERAUTH_TOKEN);

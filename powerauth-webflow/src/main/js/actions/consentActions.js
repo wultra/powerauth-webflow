@@ -80,7 +80,8 @@ export function authenticate(options, callback) {
                     dispatchAction(dispatch, response);
                     break;
                 }
-                case 'CANCELED': {
+                case 'CANCELED':
+                case 'AUTH_METHOD_FAILED': {
                     callback();
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",

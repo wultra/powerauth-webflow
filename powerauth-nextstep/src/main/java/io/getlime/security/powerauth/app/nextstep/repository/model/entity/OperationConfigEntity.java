@@ -15,12 +15,14 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Entity which stores configuration of operations.
@@ -29,18 +31,20 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "ns_operation_config")
+@Data
+@EqualsAndHashCode(of = "operationName")
 public class OperationConfigEntity implements Serializable {
 
     private static final long serialVersionUID = 4855111531493246740L;
 
     @Id
-    @Column(name = "operation_name")
+    @Column(name = "operation_name", nullable = false)
     private String operationName;
 
-    @Column(name = "template_version")
+    @Column(name = "template_version", nullable = false)
     private String templateVersion;
 
-    @Column(name = "template_id")
+    @Column(name = "template_id", nullable = false)
     private Integer templateId;
 
     @Column(name = "mobile_token_enabled")
@@ -55,133 +59,7 @@ public class OperationConfigEntity implements Serializable {
     @Column(name = "afs_config_id")
     private String afsConfigId;
 
-    /**
-     * Get operation name.
-     * @return Operation name.
-     */
-    public String getOperationName() {
-        return operationName;
-    }
+    @Column(name = "expiration_time")
+    private Integer expirationTime;
 
-    /**
-     * Set operation name.
-     * @param operationName Operation name.
-     */
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    /**
-     * Get template version.
-     * @return Template version.
-     */
-    public String getTemplateVersion() {
-        return templateVersion;
-    }
-
-    /**
-     * Set template version.
-     * @param templateVersion Template version.
-     */
-    public void setTemplateVersion(String templateVersion) {
-        this.templateVersion = templateVersion;
-    }
-
-    /**
-     * Get template ID.
-     * @return Template ID.
-     */
-    public Integer getTemplateId() {
-        return templateId;
-    }
-
-    /**
-     * Set template ID.
-     * @param templateId Template ID.
-     */
-    public void setTemplateId(Integer templateId) {
-        this.templateId = templateId;
-    }
-
-    /**
-     * Get whether mobile token is enabled for this operation.
-     * @return Whether mobile token is enabled.
-     */
-    public boolean isMobileTokenEnabled() {
-        return mobileTokenEnabled;
-    }
-
-    /**
-     * Set whether mobile token is enabled for this operation.
-     * @param mobileTokenEnabled Whether mobile token is enabled.
-     */
-    public void setMobileTokenEnabled(boolean mobileTokenEnabled) {
-        this.mobileTokenEnabled = mobileTokenEnabled;
-    }
-
-    /**
-     * Get mobile token mode configuration.
-     * @return Mobile token mode configuration.
-     */
-    public String getMobileTokenMode() {
-        return mobileTokenMode;
-    }
-
-    /**
-     * Set mobile token mode configuration.
-     * @param mobileTokenMode Mobile token mode configuration.
-     */
-    public void setMobileTokenMode(String mobileTokenMode) {
-        this.mobileTokenMode = mobileTokenMode;
-    }
-
-    /**
-     * Get whether anti-fraud system is enabled.
-     * @return Whether anti-fraud system is enabled.
-     */
-    public boolean isAfsEnabled() {
-        return afsEnabled;
-    }
-
-    /**
-     * Set whether anti-fraud system is enabled.
-     * @param afsEnabled Whether anti-fraud system is enabled.
-     */
-    public void setAfsEnabled(boolean afsEnabled) {
-        this.afsEnabled = afsEnabled;
-    }
-
-    /**
-     * Get AFS configuration ID.
-     * @return AFS configuration ID.
-     */
-    public String getAfsConfigId() {
-        return afsConfigId;
-    }
-
-    /**
-     * Set AFS configuration ID.
-     * @param afsConfigId AFS configuration ID.
-     */
-    public void setAfsConfigId(String afsConfigId) {
-        this.afsConfigId = afsConfigId;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OperationConfigEntity that = (OperationConfigEntity) o;
-        return afsEnabled == that.afsEnabled &&
-                operationName.equals(that.operationName) &&
-                Objects.equals(templateVersion, that.templateVersion) &&
-                Objects.equals(templateId, that.templateId) &&
-                Objects.equals(mobileTokenMode, that.mobileTokenMode) &&
-                Objects.equals(afsConfigId, that.afsConfigId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(operationName, templateVersion, templateId, mobileTokenMode, afsEnabled, afsConfigId);
-    }
 }

@@ -16,7 +16,12 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -24,61 +29,15 @@ import java.util.Map;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateAuthMethodRequest {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
+    @NotNull
     private AuthMethod authMethod;
-    private Map<String, String> config;
+    @NotNull
+    private final Map<String, String> config = new LinkedHashMap<>();
 
-    /**
-     * Get the user ID.
-     *
-     * @return User ID.
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set the user ID.
-     *
-     * @param userId User ID.
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get the authentication method.
-     *
-     * @return Authentication method.
-     */
-    public AuthMethod getAuthMethod() {
-        return authMethod;
-    }
-
-    /**
-     * Set the authentication method.
-     *
-     * @param authMethod Authentication method.
-     */
-    public void setAuthMethod(AuthMethod authMethod) {
-        this.authMethod = authMethod;
-    }
-
-    /**
-     * Get the authentication method configuration.
-     * @return Configuration.
-     */
-    public Map<String, String> getConfig() {
-        return config;
-    }
-
-    /**
-     * Set the authentication method configuration.
-     * @param config Configuration.
-     */
-    public void setConfig(Map<String, String> config) {
-        this.config = config;
-    }
 }

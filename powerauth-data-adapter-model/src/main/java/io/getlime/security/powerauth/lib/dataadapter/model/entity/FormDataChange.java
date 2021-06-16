@@ -25,7 +25,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({
         @JsonSubTypes.Type(value = BankAccountChoice.class, name = "BANK_ACCOUNT_CHOICE"),
         @JsonSubTypes.Type(value = AuthMethodChoice.class, name = "AUTH_METHOD_CHOICE")
@@ -36,19 +36,28 @@ public class FormDataChange {
      * Enumeration representing form data change type.
      */
     public enum Type {
+        /**
+         * Bank account was chosen.
+         */
         BANK_ACCOUNT_CHOICE,
+        /**
+         * Authenticatio  method was chosen.
+         */
         AUTH_METHOD_CHOICE
     }
 
-    // JsonIgnore added, otherwise type was serialized twice
+    /**
+     * Form data change type.
+     */
     @JsonIgnore
+    // JsonIgnore added, otherwise type was serialized twice
     protected Type type;
 
-    // JsonIgnore added, otherwise type was serialized twice
     /**
      * Get form data change type.
      * @return Form data change type.
      */
+    // JsonIgnore added, otherwise type was serialized twice
     @JsonIgnore
     public Type getType() {
         return type;

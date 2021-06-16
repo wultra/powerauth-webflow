@@ -31,22 +31,43 @@ public class ConsentValidationFailedException extends AuthStepException {
     private String errorMessage;
     private List<ConsentOptionValidationResult> optionValidationResults;
 
+    /**
+     * Exception constructor.
+     * @param message Exception message.
+     * @param messageId Message ID for localization.
+     */
     public ConsentValidationFailedException(String message, String messageId) {
         super(message, messageId);
     }
 
+    /**
+     * Get validaton error message.
+     * @return Validation error message.
+     */
     public String getErrorMessage() {
         return errorMessage;
     }
 
+    /**
+     * Set validation error message.
+     * @param errorMessage Validation error message.
+     */
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
     }
 
+    /**
+     * Get list of consent validation results.
+     * @return List of consent validation results.
+     */
     public List<ConsentOptionValidationResult> getOptionValidationResults() {
         return optionValidationResults;
     }
 
+    /**
+     * Set list of consent validation results.
+     * @param optionValidationResults List of consent validation results.
+     */
     public void setOptionValidationResults(List<ConsentOptionValidationResult> optionValidationResults) {
         this.optionValidationResults = optionValidationResults;
     }

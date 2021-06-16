@@ -15,11 +15,14 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
 /**
  * Request object used for querying authentication methods.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetAuthMethodListRequest {
 
 }

@@ -1,7 +1,7 @@
 -- default oauth 2.0 client
 -- Note: bcrypt('changeme', 12) => '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.'
 INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, web_server_redirect_uri, additional_information, autoapprove)
-VALUES ('democlient', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', 'profile', 'authorization_code', 'http://localhost:8080/powerauth-webflow-client/connect/demo', '{}', 'true');
+VALUES ('democlient', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', 'profile,aisp,pisp', 'authorization_code', 'http://localhost:8080/powerauth-webflow-client/connect/demo', '{}', 'true');
 
 -- authentication methods
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
@@ -22,6 +22,8 @@ INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_pr
 VALUES ('LOGIN_SCA', 8, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.loginSca');
 INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
 VALUES ('APPROVAL_SCA', 9, FALSE, NULL, NULL, TRUE, 5, TRUE, TRUE, 'method.approvalSca');
+INSERT INTO ns_auth_method (auth_method, order_number, check_user_prefs, user_prefs_column, user_prefs_default, check_auth_fails, max_auth_fails, has_user_interface, has_mobile_token, display_name_key)
+VALUES ('OTP_CODE', 10, FALSE, NULL, NULL, TRUE, 3, TRUE, FALSE, 'method.otpCode');
 
 -- operation configuration
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('login', 'A', 2, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
@@ -30,8 +32,21 @@ INSERT INTO ns_operation_config (operation_name, template_version, template_id, 
 INSERT INTO ns_operation_config (operation_name, template_version, template_id, mobile_token_enabled, mobile_token_mode) VALUES ('authorize_payment_sca', 'A', 1, FALSE, '{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}');
 
 -- organization configuration
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number, default_credential_name, default_otp_name) VALUES ('RETAIL', 'organization.retail', TRUE, 1, 'RETAIL_CREDENTIAL', 'RETAIL_OTP');
+INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number, default_credential_name, default_otp_name) VALUES ('SME', 'organization.sme', FALSE, 2, 'SME_CREDENTIAL', 'SME_OTP');
+
+-- Next Step application configuration
+INSERT INTO ns_application (name, description, status, timestamp_created) values ('APP', 'Sample application', 'ACTIVE', CURRENT_TIMESTAMP);
+
+-- credential and OTP policy configuration
+INSERT INTO ns_credential_policy (name, description, status, username_length_min, username_length_max, username_allowed_pattern, credential_length_min, credential_length_max, limit_soft, limit_hard, check_history_count, rotation_enabled, username_gen_algorithm, username_gen_param, credential_gen_algorithm, credential_gen_param, credential_val_param, timestamp_created) values ('CREDENTIAL_POLICY', 'Sample credential policy', 'ACTIVE', 8, 20, '[0-9]+', 8, 40, 3, 5, 3, FALSE, 'RANDOM_DIGITS', '{"length": 8}', 'RANDOM_PASSWORD', '{"length": 12, "includeSmallLetters": true, "smallLettersCount": 5, "includeCapitalLetters": true, "capitalLettersCount": 5, "includeDigits": true, "digitsCount": 1, "includeSpecialChars": true, "specialCharsCount": 1}', '{"includeWhitespaceRule": true, "includeUsernameRule": true, "includeAllowedCharacterRule": false, "allowedChars": "", "includeAllowedRegexRule": false, "allowedRegex": ".*", "includeIllegalCharacterRule": false, "illegalChars": "", "includeIllegalRegexRule": false, "illegalRegex": "", "includeCharacterRule": true, "includeSmallLetters": "true", "smallLettersMin": 1, "includeCapitalLetters": true, "capitalLettersMin": 1, "includeAlphabeticalLetters": true, "alphabeticalLettersMin": 2, "includeDigits": true, "digitsMin": 1, "includeSpecialChars": true, "specialCharsMin": 1}', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_policy (name, description, status, length, attempt_limit, expiration_time, gen_algorithm, gen_param) values ('OTP_POLICY', 'Sample OTP policy', 'ACTIVE', 8, 3, 300, 'OTP_DATA_DIGEST', '{}');
+
+-- credential and OTP definition configuration
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_CREDENTIAL', 'Sample credential definition for retail', 1, 'RETAIL', 1, 'PASSWORD', TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_credential_definition (name, description, application_id, organization_id, credential_policy_id, category, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_CREDENTIAL', 'Sample credential definition for SME', 1, 'SME', 1, 'PASSWORD', TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('RETAIL_OTP', 'Sample OTP definition for retail', 1, 1, TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
+INSERT INTO ns_otp_definition (name, description, application_id, otp_policy_id, data_adapter_proxy_enabled, status, timestamp_created) values ('SME_OTP', 'Sample OTP definition for SME', 1, 1, TRUE, 'ACTIVE', CURRENT_TIMESTAMP);
 
 -- login - init operation -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
@@ -41,7 +56,7 @@ VALUES (2, 'login', 'CREATE', NULL, NULL, 2, 'USERNAME_PASSWORD_AUTH', 'CONTINUE
 
 -- login - update operation - CANCELED -> FAILED
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
-VALUES (3, 'login', 'UPDATE', 'INIT', 'CANCELED', 1, 'INIT', 'FAILED');
+VALUES (3, 'login', 'UPDATE', 'INIT', 'CANCELED', 1, NULL, 'FAILED');
 
 -- login - update operation - CONFIRMED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
@@ -91,7 +106,7 @@ VALUES (18, 'authorize_payment', 'CREATE', NULL, NULL, 2, 'USERNAME_PASSWORD_AUT
 
 -- authorize_payment - update operation - CANCELED -> FAILED
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)
-VALUES (19, 'authorize_payment', 'UPDATE', 'INIT', 'CANCELED', 1, 'INIT', 'FAILED');
+VALUES (19, 'authorize_payment', 'UPDATE', 'INIT', 'CANCELED', 1, NULL, 'FAILED');
 
 -- authorize_payment - update operation (login) - CONFIRMED -> CONTINUE
 INSERT INTO ns_step_definition (step_definition_id, operation_name, operation_type, request_auth_method, request_auth_step_result, response_priority, response_auth_method, response_result)

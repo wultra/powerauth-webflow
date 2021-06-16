@@ -16,6 +16,8 @@
 
 package io.getlime.security.powerauth.app.tppengine.errorhandling;
 
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.core.rest.model.base.entity.Error;
 import io.getlime.core.rest.model.base.response.ErrorResponse;
 import io.getlime.security.powerauth.app.tppengine.errorhandling.error.ConsentError;
@@ -26,6 +28,7 @@ import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.TppNo
 import io.getlime.security.powerauth.app.tppengine.errorhandling.exception.UnableToCreateAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -43,6 +46,19 @@ public class DefaultExceptionResolver {
 
     private static final Logger logger = LoggerFactory.getLogger(DefaultExceptionResolver.class);
 
+    private static final AuditDetail AUDIT_DETAIL_UNEXPECTED_ERROR = new AuditDetail("UNEXPECTED_ERROR");
+    private static final AuditDetail AUDIT_DETAIL_BAD_REQUEST = new AuditDetail("BAD_REQUEST");
+    private final Audit audit;
+
+    /**
+     * Exception resolver constructor.
+     * @param audit Audit interface.
+     */
+    @Autowired
+    public DefaultExceptionResolver(Audit audit) {
+        this.audit = audit;
+    }
+
     /**
      * Default exception handler, for unexpected errors.
      * @param t Throwable.
@@ -52,6 +68,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public @ResponseBody ErrorResponse handleDefaultException(Throwable t) {
         logger.error("Error occurred in TPP engine server", t);
+        audit.error("Error occurred in TPP engine server", AUDIT_DETAIL_UNEXPECTED_ERROR, t);
         Error error = new Error(Error.Code.ERROR_GENERIC, "error.unknown");
         return new ErrorResponse(error);
     }
@@ -65,6 +82,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleParameterException(MissingServletRequestParameterException t) {
         logger.warn("Missing request parameter", t);
+        audit.warn("Missing request parameter", AUDIT_DETAIL_BAD_REQUEST, t);
         Error error = new Error(Error.Code.ERROR_GENERIC, t.getMessage());
         return new ErrorResponse(error);
     }
@@ -78,6 +96,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public @ResponseBody ErrorResponse handleConsentNotFoundException(ConsentNotFoundException t) {
         logger.error("Consent with ID {} was not found", t.getId(), t);
+        audit.error("Consent with ID {} was not found", AUDIT_DETAIL_BAD_REQUEST, t);
         return new ErrorResponse(new ConsentError("consent.missing"));
     }
 
@@ -90,6 +109,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public @ResponseBody ErrorResponse handleTppAppNotFoundException(TppAppNotFoundException t) {
         logger.error("App with client ID '{}' was not found", t.getId(), t);
+        audit.error("App with client ID '{}' was not found", AUDIT_DETAIL_BAD_REQUEST, t.getId(), t);
         return new ErrorResponse(new TppAppError("tpp.app.notFound"));
     }
 
@@ -102,6 +122,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public @ResponseBody ErrorResponse handleTppNotFoundException(TppNotFoundException t) {
         logger.error("TPP was not found for provided license info: {}", t.getLicenseInfo(), t);
+        audit.error("TPP was not found for provided license info: {}", AUDIT_DETAIL_BAD_REQUEST, t.getLicenseInfo(), t);
         return new ErrorResponse(new TppAppError("tpp.notFound"));
     }
 
@@ -114,6 +135,7 @@ public class DefaultExceptionResolver {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public @ResponseBody ErrorResponse handleUnableToCreateAppException(UnableToCreateAppException t) {
         logger.error("Unable to create an app due to request errors: {}", t.getErrors(), t);
+        audit.error("Unable to create an app due to request errors: {}", AUDIT_DETAIL_BAD_REQUEST, t.getErrors(), t);
         return new ErrorResponse(new TppAppError("tpp.app.unableToCreate", t.getErrors()));
     }
 

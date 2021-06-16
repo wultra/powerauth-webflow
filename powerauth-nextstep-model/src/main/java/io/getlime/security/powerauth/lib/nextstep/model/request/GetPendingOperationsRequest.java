@@ -15,47 +15,22 @@
  */
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 /**
  * Request object used for querying of pending operations.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class GetPendingOperationsRequest {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String userId;
     private boolean mobileTokenOnly;
 
-    /**
-     * Get the user id.
-     *
-     * @return user id
-     */
-    public String getUserId() {
-        return userId;
-    }
-
-    /**
-     * Set the user id.
-     *
-     * @param userId user id
-     */
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    /**
-     * Get whether pending operation list should be filtered for only next step with mobile token support.
-     * @return Whether pending operation list should be filtered for only next step with mobile token support.
-     */
-    public boolean isMobileTokenOnly() {
-        return mobileTokenOnly;
-    }
-
-    /**
-     * Set whether pending operation list should be filtered for only next step with mobile token support.
-     * @param mobileTokenOnly Whether pending operation list should be filtered for only next step with mobile token support.
-     */
-    public void setMobileTokenOnly(boolean mobileTokenOnly) {
-        this.mobileTokenOnly = mobileTokenOnly;
-    }
 }

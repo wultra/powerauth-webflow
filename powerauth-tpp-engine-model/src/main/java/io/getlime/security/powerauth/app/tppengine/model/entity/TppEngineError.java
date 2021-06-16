@@ -33,6 +33,7 @@ public class TppEngineError extends Error {
      */
     public class Code extends Error.Code {
         public static final String REMOTE_ERROR = "REMOTE_ERROR";
+        public static final String TPP_ENGINE_CLIENT_ERROR = "TPP_ENGINE_CLIENT_ERROR";
         public static final String COMMUNICATION_ERROR = "COMMUNICATION_ERROR";
     }
 

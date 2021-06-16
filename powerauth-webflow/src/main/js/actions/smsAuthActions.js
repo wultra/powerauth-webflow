@@ -102,7 +102,7 @@ export function resend(component) {
             }
         }).then((response) => {
             if (response.data.result === 'AUTH_FAILED') {
-                // Handle  error when message delivery fails, another SMS message can be sent later.
+                // Handle error when message delivery fails, another SMS message can be sent later.
                 dispatch({
                     type: getActionType(component),
                     payload: {
@@ -182,7 +182,8 @@ export function authenticate(userAuthCode, userPassword, component) {
                         break;
                     }
                 }
-                case 'CANCELED': {
+                case 'CANCELED':
+                case 'AUTH_METHOD_FAILED': {
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {

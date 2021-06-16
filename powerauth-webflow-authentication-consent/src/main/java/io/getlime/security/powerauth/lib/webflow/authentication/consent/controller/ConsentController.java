@@ -18,6 +18,7 @@ package io.getlime.security.powerauth.lib.webflow.authentication.consent.control
 import io.getlime.core.rest.model.base.response.ObjectResponse;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClient;
 import io.getlime.security.powerauth.lib.dataadapter.client.DataAdapterClientErrorException;
+import io.getlime.security.powerauth.lib.dataadapter.model.converter.FormDataConverter;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOption;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.ConsentOptionValidationResult;
 import io.getlime.security.powerauth.lib.dataadapter.model.entity.FormData;
@@ -27,15 +28,14 @@ import io.getlime.security.powerauth.lib.dataadapter.model.response.InitConsentF
 import io.getlime.security.powerauth.lib.dataadapter.model.response.SaveConsentFormResponse;
 import io.getlime.security.powerauth.lib.dataadapter.model.response.ValidateConsentFormResponse;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import io.getlime.security.powerauth.lib.nextstep.client.NextStepClientException;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthStep;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationCancelReason;
-import io.getlime.security.powerauth.lib.nextstep.model.exception.NextStepServiceException;
 import io.getlime.security.powerauth.lib.nextstep.model.response.GetOperationDetailResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.UpdateOperationResponse;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.exception.ConsentValidationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.request.ConsentAuthRequest;
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.response.ConsentAuthResponse;
@@ -43,10 +43,11 @@ import io.getlime.security.powerauth.lib.webflow.authentication.consent.model.re
 import io.getlime.security.powerauth.lib.webflow.authentication.consent.service.HtmlSanitizationService;
 import io.getlime.security.powerauth.lib.webflow.authentication.controller.AuthMethodController;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.AuthStepException;
+import io.getlime.security.powerauth.lib.webflow.authentication.exception.CommunicationFailedException;
 import io.getlime.security.powerauth.lib.webflow.authentication.exception.MaxAttemptsExceededException;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthenticationResult;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthOperationResponse;
+import io.getlime.security.powerauth.lib.webflow.authentication.model.AuthResultDetail;
 import io.getlime.security.powerauth.lib.webflow.authentication.model.HttpSessionAttributeNames;
-import io.getlime.security.powerauth.lib.webflow.authentication.model.converter.FormDataConverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,14 +99,14 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
      * @throws AuthStepException Exception is thrown when consent validation or persistence fails.
      */
     @Override
-    protected AuthenticationResult authenticate(ConsentAuthRequest request) throws AuthStepException {
+    protected AuthResultDetail authenticate(ConsentAuthRequest request) throws AuthStepException {
         final GetOperationDetailResponse operation = getOperation();
         logger.info("Step authentication started, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
         if (getConsentSkippedFromHttpSession()) {
             // Consent form is skipped, step authentication is complete
             logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             cleanHttpSession();
-            return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+            return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
         }
         final String userId = operation.getUserId();
         final String organizationId = operation.getOrganizationId();
@@ -126,7 +127,7 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
                 cleanHttpSession();
                 if (saveResponse.isSaveSucceeded()) {
                     logger.info("Step authentication succeeded, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
-                    return new AuthenticationResult(operation.getUserId(), operation.getOrganizationId());
+                    return new AuthResultDetail(operation.getUserId(), operation.getOrganizationId(), false);
                 }
                 // Validation succeeded, however save failed, allow user to retry the consent confirmation
                 throw new AuthStepException("User consent could not be saved", "error.communication");
@@ -147,17 +148,17 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             // log failed authorization into operation history so that maximum number of Next Step update calls can be checked
             Integer remainingAttemptsNS;
             try {
-                UpdateOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
-                if (response.getResult() == AuthResult.FAILED) {
+                AuthOperationResponse response = failAuthorization(operation.getOperationId(), operation.getUserId(), request.getAuthInstruments(), null);
+                if (response.getAuthResult() == AuthResult.FAILED) {
                     cleanHttpSession();
                     // FAILED result instead of CONTINUE means the authentication method is failed
                     throw new MaxAttemptsExceededException("Maximum number of authentication attempts exceeded.");
                 }
                 GetOperationDetailResponse updatedOperation = getOperation();
                 remainingAttemptsNS = updatedOperation.getRemainingAttempts();
-            } catch (NextStepServiceException e2) {
+            } catch (NextStepClientException e2) {
                 logger.error("Error occurred in Next Step server", e);
-                throw new AuthStepException(e2.getError().getMessage(), e2, "error.communication");
+                throw new AuthStepException("Consent authentication failed", e2, "error.communication");
             }
             AuthStepException authEx = new AuthStepException(e.getError().getMessage(), e);
             Integer remainingAttemptsDA = e.getError().getRemainingAttempts();
@@ -222,8 +223,8 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
             initResponse.getOptions().addAll(createResponse.getOptions());
             logger.info("Init step result: CONFIRMED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return initResponse;
-        } catch (DataAdapterClientErrorException | NextStepServiceException e) {
-            logger.error("Error when creating consent form.", e);
+        } catch (DataAdapterClientErrorException | NextStepClientException ex) {
+            logger.error("Error when creating consent form.", ex);
             initResponse.setResult(AuthStepResult.AUTH_FAILED);
             logger.info("Init step result: AUTH_FAILED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             initResponse.setMessage("error.communication");
@@ -340,15 +341,14 @@ public class ConsentController extends AuthMethodController<ConsentAuthRequest, 
     public ConsentAuthResponse cancelAuthentication() throws AuthStepException {
         try {
             final GetOperationDetailResponse operation = getOperation();
-            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null);
+            cancelAuthorization(operation.getOperationId(), operation.getUserId(), OperationCancelReason.UNKNOWN, null, false);
             final ConsentAuthResponse cancelResponse = new ConsentAuthResponse();
             cancelResponse.setResult(AuthStepResult.CANCELED);
             cancelResponse.setMessage("operation.canceled");
             cleanHttpSession();
             logger.info("Step result: CANCELED, operation ID: {}, authentication method: {}", operation.getOperationId(), getAuthMethodName().toString());
             return cancelResponse;
-        } catch (NextStepServiceException e) {
-            logger.error("Error when canceling SMS message validation.", e);
+        } catch (CommunicationFailedException ex) {
             final ConsentAuthResponse cancelResponse = new ConsentAuthResponse();
             cancelResponse.setResult(AuthStepResult.AUTH_FAILED);
             cancelResponse.setMessage("error.communication");

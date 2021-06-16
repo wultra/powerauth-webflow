@@ -15,12 +15,14 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Objects;
 
 /**
  * Organization entity which adds organization context to operations.
@@ -29,6 +31,8 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "ns_organization")
+@Data
+@EqualsAndHashCode(of = "organizationId")
 public class OrganizationEntity implements Serializable {
 
     private static final long serialVersionUID = -3682348562614758414L;
@@ -46,83 +50,10 @@ public class OrganizationEntity implements Serializable {
     @Column(name = "order_number", nullable = false)
     private int orderNumber;
 
-    /**
-     * Get organization ID.
-     * @return Organization ID.
-     */
-    public String getOrganizationId() {
-        return organizationId;
-    }
+    @Column(name = "default_credential_name")
+    private String defaultCredentialName;
 
-    /**
-     * Set organization ID.
-     * @param organizationId Organization ID.
-     */
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
+    @Column(name = "default_otp_name")
+    private String defaultOtpName;
 
-    /**
-     * Get display name key.
-     * @return Display name key.
-     */
-    public String getDisplayNameKey() {
-        return displayNameKey;
-    }
-
-    /**
-     * Set display name key.
-     * @param displayNameKey Display name key.
-     */
-    public void setDisplayNameKey(String displayNameKey) {
-        this.displayNameKey = displayNameKey;
-    }
-
-    /**
-     * Get whether the organization is the default organization.
-     * @return Whether the organization is the default organization.
-     */
-    public boolean isDefault() {
-        return isDefault;
-    }
-
-    /**
-     * Set whether the organization is the default organization.
-     * @param isDefault Whether the organization is the default organization.
-     */
-    public void setDefault(boolean isDefault) {
-        this.isDefault = isDefault;
-    }
-
-    /**
-     * Get the order number.
-     * @return Order number.
-     */
-    public int getOrderNumber() {
-        return orderNumber;
-    }
-
-    /**
-     * Set the order number.
-     * @param orderNumber Order number.
-     */
-    public void setOrderNumber(int orderNumber) {
-        this.orderNumber = orderNumber;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        OrganizationEntity that = (OrganizationEntity) o;
-        return Objects.equals(organizationId, that.organizationId) &&
-                Objects.equals(displayNameKey, that.displayNameKey) &&
-                Objects.equals(isDefault, that.isDefault) &&
-                Objects.equals(orderNumber, that.orderNumber);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(organizationId, displayNameKey, isDefault, orderNumber);
-    }
 }

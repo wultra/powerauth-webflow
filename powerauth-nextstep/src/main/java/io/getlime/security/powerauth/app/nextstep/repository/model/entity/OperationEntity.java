@@ -17,6 +17,8 @@ package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.UserAccountStatus;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
@@ -28,32 +30,35 @@ import java.util.List;
 /**
  * Entity which stores status of an operation, its parameters and last result.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
 @Table(name = "ns_operation")
+@Data
+@EqualsAndHashCode(of = "operationId")
 public class OperationEntity implements Serializable {
 
     private static final long serialVersionUID = -8991119412441607003L;
 
     @Id
-    @Column(name = "operation_id")
+    @Column(name = "operation_id", nullable = false)
     private String operationId;
 
-    @Column(name = "operation_name")
+    @Column(name = "operation_name", nullable = false)
     private String operationName;
 
     @Column(name = "operation_form_data")
     private String operationFormData;
 
-    @Column(name = "operation_data")
+    @Column(name = "operation_data", nullable = false)
     private String operationData;
 
     @Column(name = "user_id")
     private String userId;
 
-    @Column(name = "organization_id")
-    private String organizationId;
+    @ManyToOne
+    @JoinColumn(name = "organization_id", referencedColumnName = "organization_id")
+    private OrganizationEntity organization;
 
     @Column(name = "application_id")
     private String applicationId;
@@ -74,6 +79,9 @@ public class OperationEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private UserAccountStatus userAccountStatus;
 
+    @Column(name = "external_operation_name")
+    private String externalOperationName;
+
     @Column(name = "external_transaction_id")
     private String externalTransactionId;
 
@@ -81,7 +89,7 @@ public class OperationEntity implements Serializable {
     @Enumerated(EnumType.STRING)
     private AuthResult result;
 
-    @Column(name = "timestamp_created")
+    @Column(name = "timestamp_created", nullable = false)
     private Date timestampCreated;
 
     @Column(name = "timestamp_expires")
@@ -96,134 +104,6 @@ public class OperationEntity implements Serializable {
     @Fetch(value = FetchMode.SUBSELECT)
     private List<OperationAfsActionEntity> afsActions;
 
-    public String getOperationId() {
-        return operationId;
-    }
-
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    public String getOperationName() {
-        return operationName;
-    }
-
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    public String getOperationFormData() {
-        return operationFormData;
-    }
-
-    public void setOperationFormData(String operationFormData) {
-        this.operationFormData = operationFormData;
-    }
-
-    public String getOperationData() {
-        return operationData;
-    }
-
-    public void setOperationData(String operationData) {
-        this.operationData = operationData;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getOrganizationId() {
-        return organizationId;
-    }
-
-    public void setOrganizationId(String organizationId) {
-        this.organizationId = organizationId;
-    }
-
-    public String getApplicationId() {
-        return applicationId;
-    }
-
-    public void setApplicationId(String applicationId) {
-        this.applicationId = applicationId;
-    }
-
-    public String getApplicationName() {
-        return applicationName;
-    }
-
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
-
-    public String getApplicationDescription() {
-        return applicationDescription;
-    }
-
-    public void setApplicationDescription(String applicationDescription) {
-        this.applicationDescription = applicationDescription;
-    }
-
-    public String getApplicationOriginalScopes() {
-        return applicationOriginalScopes;
-    }
-
-    public void setApplicationOriginalScopes(String applicationOriginalScopes) {
-        this.applicationOriginalScopes = applicationOriginalScopes;
-    }
-
-    public String getApplicationExtras() {
-        return applicationExtras;
-    }
-
-    public void setApplicationExtras(String applicationExtras) {
-        this.applicationExtras = applicationExtras;
-    }
-
-    public UserAccountStatus getUserAccountStatus() {
-        return userAccountStatus;
-    }
-
-    public void setUserAccountStatus(UserAccountStatus userAccountStatus) {
-        this.userAccountStatus = userAccountStatus;
-    }
-
-    public String getExternalTransactionId() {
-        return externalTransactionId;
-    }
-
-    public void setExternalTransactionId(String externalTransactionId) {
-        this.externalTransactionId = externalTransactionId;
-    }
-
-    public AuthResult getResult() {
-        return result;
-    }
-
-    public void setResult(AuthResult result) {
-        this.result = result;
-    }
-
-    public Date getTimestampCreated() {
-        return timestampCreated;
-    }
-
-    public void setTimestampCreated(Date timestampCreated) {
-        this.timestampCreated = timestampCreated;
-    }
-
-    public Date getTimestampExpires() {
-        return timestampExpires;
-    }
-
-    public void setTimestampExpires(Date timestampExpires) {
-        this.timestampExpires = timestampExpires;
-    }
-
     /**
      * Is the operation expired?
      *
@@ -231,22 +111,6 @@ public class OperationEntity implements Serializable {
      */
     public boolean isExpired() {
         return new Date().after(timestampExpires);
-    }
-
-    public List<OperationHistoryEntity> getOperationHistory() {
-        return operationHistory;
-    }
-
-    public void setOperationHistory(List<OperationHistoryEntity> operationHistory) {
-        this.operationHistory = operationHistory;
-    }
-
-    public List<OperationAfsActionEntity> getAfsActions() {
-        return afsActions;
-    }
-
-    public void setAfsActions(List<OperationAfsActionEntity> afsActions) {
-        this.afsActions = afsActions;
     }
 
     /**
@@ -259,21 +123,6 @@ public class OperationEntity implements Serializable {
             return null;
         }
         return operationHistory.get(operationHistory.size() - 1);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        OperationEntity that = (OperationEntity) o;
-
-        return operationId != null ? operationId.equals(that.operationId) : that.operationId == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return operationId != null ? operationId.hashCode() : 0;
     }
 
 }

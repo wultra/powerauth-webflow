@@ -16,9 +16,10 @@
 package io.getlime.security.powerauth.app.nextstep.repository;
 
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ import java.util.List;
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Component
+@Repository
 public interface StepDefinitionRepository extends CrudRepository<StepDefinitionEntity, Long> {
 
     /**
@@ -40,11 +41,25 @@ public interface StepDefinitionRepository extends CrudRepository<StepDefinitionE
     List<StepDefinitionEntity> findStepDefinitionsForOperation(String operationName);
 
     /**
-     * Finds all distict operation names.
+     * Finds all distinct operation names.
      *
      * @return List of operation names
      */
     @Query("SELECT DISTINCT(sd.operationName) FROM StepDefinitionEntity sd")
     List<String> findDistinctOperationNames();
+
+    /**
+     * Count number of step definitions with given request authentication method.
+     * @param authMethod Authentication method.
+     * @return Number of step definitions with given request authentication method.
+     */
+    long countByRequestAuthMethod(AuthMethod authMethod);
+
+    /**
+     * Count number of step definitions with given response authentication method.
+     * @param authMethod Authentication method.
+     * @return Number of step definitions with given response authentication method.
+     */
+    long countByResponseAuthMethod(AuthMethod authMethod);
 
 }

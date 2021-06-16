@@ -7,6 +7,7 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.enumeration.Value
 import io.getlime.security.powerauth.lib.nextstep.model.entity.validator.AmountValidator;
 import io.getlime.security.powerauth.lib.nextstep.model.exception.InvalidOperationDataException;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -22,11 +23,16 @@ public class OperationFormData {
     private OperationFormMessageAttribute title;
     private OperationFormMessageAttribute greeting;
     private OperationFormMessageAttribute summary;
-    private List<OperationFormFieldConfig> config;
-    private List<OperationFormBanner> banners;
-    private List<OperationFormFieldAttribute> parameters;
+    @NotNull
+    private final List<OperationFormFieldConfig> config;
+    @NotNull
+    private final List<OperationFormBanner> banners;
+    @NotNull
+    private final List<OperationFormFieldAttribute> parameters;
+    @NotNull
     private boolean dynamicDataLoaded;
-    private Map<String, String> userInput;
+    @NotNull
+    private final Map<String, String> userInput;
 
     /**
      * Default constructor.
@@ -430,14 +436,6 @@ public class OperationFormData {
      */
     public void addUserInput(String key, String value) {
         userInput.put(key, value);
-    }
-
-    /**
-     * Set user input map.
-     * @param userInput User input.
-     */
-    public void setUserInput(Map<String, String> userInput) {
-        this.userInput = userInput;
     }
 
     /**

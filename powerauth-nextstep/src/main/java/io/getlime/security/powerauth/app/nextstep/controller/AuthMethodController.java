@@ -22,37 +22,40 @@ import io.getlime.security.powerauth.app.nextstep.service.AuthMethodService;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetAuthMethodListRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.GetUserAuthMethodsRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.request.UpdateAuthMethodRequest;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetAuthMethodsResponse;
-import io.getlime.security.powerauth.lib.nextstep.model.response.GetUserAuthMethodsResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.request.*;
+import io.getlime.security.powerauth.lib.nextstep.model.response.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Nullable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 
 /**
- * Controller class related to Next Step authentication methods and user preferences.
+ * REST controller class related to Next Step authentication methods and user preferences.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
-@Controller
+@RestController
+@Validated
 public class AuthMethodController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodController.class);
 
-    private AuthMethodService authMethodService;
+    private final AuthMethodService authMethodService;
 
     /**
-     * Controller constructor.
+     * REST controller constructor.
      * @param authMethodService Authentication method service.
      */
     @Autowired
@@ -61,42 +64,127 @@ public class AuthMethodController {
     }
 
     /**
-     * Get all authentication methods supported by Next Step server.
-     *
-     * @param request Get auth methods request. Use null user ID in request.
-     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * Create an authentication method.
+     * @param request Create authentication method request.
+     * @return Create authentication method response.
+     * @throws AuthMethodAlreadyExistsException Thrown when authentication method already exists.
      */
-    @RequestMapping(value = "/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetAuthMethodsResponse> getAuthMethods(@RequestBody ObjectRequest<GetAuthMethodListRequest> request) {
-        logger.info("Received getAuthMethods request");
-        List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
-        if (authMethods == null || authMethods.isEmpty()) {
-            logger.error("No authentication method is configured in Next Step server");
-            throw new IllegalStateException("No authentication method is configured in Next Step server.");
-        }
-        GetAuthMethodsResponse response = new GetAuthMethodsResponse();
-        response.setAuthMethods(authMethods);
-        logger.debug("The getAuthMethods request succeeded, available authentication method count: {}", authMethods.size());
+    @Operation(summary = "Create an authentication method")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method was created"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, AUTH_METHOD_ALREADY_EXISTS"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "auth-method", method = RequestMethod.POST)
+    public ObjectResponse<CreateAuthMethodResponse> createAuthMethod(@Valid @RequestBody ObjectRequest<CreateAuthMethodRequest> request) throws AuthMethodAlreadyExistsException {
+        logger.info("Received createAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
+        final CreateAuthMethodResponse response = authMethodService.createAuthMethod(request.getRequestObject());
+        logger.info("The createAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 
     /**
-     * Get all enabled authentication methods for given user.
+     * Get all authentication methods supported by Next Step server.
+     *
+     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @Operation(summary = "Get authentication method list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "auth-method", method = RequestMethod.GET)
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodList() throws InvalidConfigurationException {
+        logger.info("Received getAuthMethodList request");
+        final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
+        if (authMethods == null || authMethods.isEmpty()) {
+            logger.error("No authentication method is configured in Next Step server");
+            throw new InvalidConfigurationException("No authentication method is configured in Next Step server.");
+        }
+        final GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.getAuthMethods().addAll(authMethods);
+        logger.debug("The getAuthMethodList request succeeded, available authentication method list size: {}", authMethods.size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get all authentication methods supported by Next Step server using POST method.
+     *
+     * @param request Get auth methods request.
+     * @return List of authentication methods wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @Operation(summary = "Get authentication method list")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "auth-method/list", method = RequestMethod.POST)
+    public ObjectResponse<GetAuthMethodsResponse> getAuthMethodListPost(@Valid @RequestBody ObjectRequest<GetAuthMethodListRequest> request) throws InvalidConfigurationException {
+        logger.info("Received getAuthMethodListPost request");
+        final List<AuthMethodDetail> authMethods = authMethodService.listAuthMethods();
+        if (authMethods == null || authMethods.isEmpty()) {
+            logger.error("No authentication method is configured in Next Step server");
+            throw new InvalidConfigurationException("No authentication method is configured in Next Step server.");
+        }
+        final GetAuthMethodsResponse response = new GetAuthMethodsResponse();
+        response.getAuthMethods().addAll(authMethods);
+        logger.debug("The getAuthMethodListPost request succeeded, available authentication method list size: {}", authMethods.size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get all enabled authentication methods for given user. In case user ID is null, list of auth methods enabled by default is returned.
+     *
+     * @param userId User ID.
+     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @Operation(summary = "Get authentication method list for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method", method = RequestMethod.GET)
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestParam @Nullable @Size(min = 1, max = 256) String userId) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", userId);
+        // userId can be null - in this case default setting is returned when user is not known
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        response.getUserAuthMethods().addAll(userAuthMethods);
+        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication list size: {}", userAuthMethods.size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Get all enabled authentication methods for given user using POST method.
      *
      * @param request Get auth methods request. In case user ID is null, list of auth methods enabled by default is returned.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @RequestMapping(value = "/user/auth-method/list", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUser(@RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) {
+    @Operation(summary = "Get authentication method list for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method/list", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> getAuthMethodsEnabledForUserPost(@Valid @RequestBody ObjectRequest<GetUserAuthMethodsRequest> request) throws InvalidConfigurationException {
         // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
-        logger.debug("Received getAuthMethodsEnabledForUser request, user ID: {}", request.getRequestObject().getUserId());
-        GetUserAuthMethodsRequest requestObject = request.getRequestObject();
+        logger.debug("Received getAuthMethodsEnabledForUserPost request, user ID: {}", request.getRequestObject().getUserId());
+        final GetUserAuthMethodsRequest requestObject = request.getRequestObject();
         // userId can be null - in this case default setting is returned when user is not known
-        String userId = requestObject.getUserId();
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
-        logger.debug("The getAuthMethodsEnabledForUser request succeeded, available authentication method count: {}", userAuthMethods.size());
+        final String userId = requestObject.getUserId();
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        response.getUserAuthMethods().addAll(userAuthMethods);
+        logger.debug("The getAuthMethodsEnabledForUserPost request succeeded, available authentication list size: {}", userAuthMethods.size());
         return new ObjectResponse<>(response);
     }
 
@@ -105,71 +193,143 @@ public class AuthMethodController {
      *
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @throws InvalidRequestException Thrown when request is invalid.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+    @Operation(summary = "Enable an authentication method for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method was enabled"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> enableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidRequestException, InvalidConfigurationException {
         logger.info("Received enableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
+        final UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        final String userId = requestObject.getUserId();
         if (userId == null) {
             logger.error("Parameter userId is null in request object when enabling authentication method");
-            throw new IllegalArgumentException("Parameter userId is null in request object when enabling authentication method");
+            throw new InvalidRequestException("Parameter userId is null in request object when enabling authentication method");
         }
-        AuthMethod authMethod = requestObject.getAuthMethod();
+        final AuthMethod authMethod = requestObject.getAuthMethod();
         if (authMethod == null) {
             logger.error("Parameter authMethod is null in request object when enabling authentication method");
-            throw new IllegalArgumentException("Parameter authMethod is null in request object when enabling authentication method");
+            throw new InvalidRequestException("Parameter authMethod is null in request object when enabling authentication method");
         }
-        Map<String, String> config = requestObject.getConfig();
+        final Map<String, String> config = requestObject.getConfig();
         authMethodService.updateAuthMethodForUser(userId, authMethod, true, config);
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        response.getUserAuthMethods().addAll(userAuthMethods);
         logger.debug("The enableAuthMethodForUser request succeeded");
         return new ObjectResponse<>(response);
     }
 
     /**
-     * Disable an authentication method for given user (DELETE method).
+     * Disable an authentication method for given user.
      *
      * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
      * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    @RequestMapping(value = "/user/auth-method", method = RequestMethod.DELETE)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
+    @Operation(summary = "Disable an authentication method for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method was disabled"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_REQUEST, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method/delete", method = RequestMethod.POST)
+    public ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUser(@Valid @RequestBody ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidRequestException, InvalidConfigurationException {
         return disableAuthMethodForUserImpl(request);
+    }
+
+    private ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserImpl(ObjectRequest<UpdateAuthMethodRequest> request) throws InvalidConfigurationException, InvalidRequestException {
+        logger.info("Received disableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
+        final UpdateAuthMethodRequest requestObject = request.getRequestObject();
+        final String userId = requestObject.getUserId();
+        if (userId == null) {
+            logger.error("Parameter userId is null in request object when disabling authentication method");
+            throw new InvalidRequestException("Parameter userId is null in request object when disabling authentication method");
+        }
+        final AuthMethod authMethod = requestObject.getAuthMethod();
+        if (authMethod == null) {
+            logger.error("Parameter authMethod is null in request object when disabling authentication method");
+            throw new InvalidRequestException("Parameter authMethod is null in request object when disabling authentication method");
+        }
+        final Map<String, String> config = requestObject.getConfig();
+        authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
+        final List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
+        final GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
+        response.getUserAuthMethods().addAll(userAuthMethods);
+        logger.debug("The disableAuthMethodForUser request succeeded");
+        return new ObjectResponse<>(response);
     }
 
     /**
-     * Disable an authentication method for given user (POST method alternative).
-     *
-     * @param request Update auth method request. Use non-null user ID in request and specify authMethod.
-     * @return List of enabled authentication methods for given user wrapped in GetAuthMethodResponse.
+     * Get enabled method list.
+     * @param userId User ID.
+     * @param operationName Operation name.
+     * @return Get enabled method list response.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
      */
-    @RequestMapping(value = "/user/auth-method/delete", method = RequestMethod.POST)
-    public @ResponseBody ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserPost(@RequestBody ObjectRequest<UpdateAuthMethodRequest> request) {
-        return disableAuthMethodForUserImpl(request);
+    @Operation(summary = "Get list of authentication methods enabled for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method/enabled", method = RequestMethod.GET)
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodList(@RequestParam @NotBlank @Size(min = 1, max = 256) String userId, @RequestParam @NotBlank @Size(min = 2, max = 256) String operationName) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getEnabledMethodList request, user ID: {}", userId);
+        GetEnabledMethodListRequest request = new GetEnabledMethodListRequest();
+        request.setUserId(userId);
+        request.setOperationName(operationName);
+        final GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request);
+        logger.debug("The getEnabledMethodList request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
+        return new ObjectResponse<>(response);
     }
 
-    private ObjectResponse<GetUserAuthMethodsResponse> disableAuthMethodForUserImpl(ObjectRequest<UpdateAuthMethodRequest> request) {
-        logger.info("Received disableAuthMethodForUser request, user ID: {}, authentication method: {}", request.getRequestObject().getUserId(), request.getRequestObject().getAuthMethod().toString());
-        UpdateAuthMethodRequest requestObject = request.getRequestObject();
-        String userId = requestObject.getUserId();
-        if (userId == null) {
-            logger.error("Parameter userId is null in request object when disabling authentication method");
-            throw new IllegalArgumentException("Parameter userId is null in request object when disabling authentication method");
-        }
-        AuthMethod authMethod = requestObject.getAuthMethod();
-        if (authMethod == null) {
-            logger.error("Parameter authMethod is null in request object when disabling authentication method");
-            throw new IllegalArgumentException("Parameter authMethod is null in request object when disabling authentication method");
-        }
-        Map<String, String> config = requestObject.getConfig();
-        authMethodService.updateAuthMethodForUser(userId, authMethod, false, config);
-        List<UserAuthMethodDetail> userAuthMethods = authMethodService.listAuthMethodsEnabledForUser(userId);
-        GetUserAuthMethodsResponse response = new GetUserAuthMethodsResponse();
-        response.setUserAuthMethods(userAuthMethods);
-        logger.debug("The disableAuthMethodForUser request succeeded");
+    /**
+     * Get enabled method list using POST method.
+     * @param request Get enabled method list request.
+     * @return Get enabled method list response.
+     * @throws InvalidConfigurationException Thrown when configuration is invalid.
+     */
+    @Operation(summary = "Get list of authentication methods enabled for user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method list sent in response"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, INVALID_CONFIGURATION"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "user/auth-method/enabled/list", method = RequestMethod.POST)
+    public ObjectResponse<GetEnabledMethodListResponse> getEnabledMethodListPost(@Valid @RequestBody ObjectRequest<GetEnabledMethodListRequest> request) throws InvalidConfigurationException {
+        // Log level is FINE to avoid flooding logs, this endpoint is used all the time.
+        logger.debug("Received getEnabledMethodListPost request, user ID: {}", request.getRequestObject().getUserId());
+        final GetEnabledMethodListResponse response = authMethodService.getEnabledMethodList(request.getRequestObject());
+        logger.debug("The getEnabledMethodListPost request succeeded, available authentication method list size: {}", response.getEnabledAuthMethods().size());
+        return new ObjectResponse<>(response);
+    }
+
+    /**
+     * Delete an authentication method.
+     * @param request Delete authentication method request.
+     * @return Delete authentication method response.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is invalid.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
+     */
+    @Operation(summary = "Delete an authentication method")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Authentication method was deleted"),
+            @ApiResponse(responseCode = "400", description = "Invalid request, error codes: REQUEST_VALIDATION_FAILED, AUTH_METHOD_NOT_FOUND, DELETE_NOT_ALLOWED"),
+            @ApiResponse(responseCode = "500", description = "Unexpected error")
+    })
+    @RequestMapping(value = "auth-method/delete", method = RequestMethod.POST)
+    public ObjectResponse<DeleteAuthMethodResponse> deleteAuthMethod(@Valid @RequestBody ObjectRequest<DeleteAuthMethodRequest> request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
+        logger.info("Received deleteAuthMethod request, authentication method: {}", request.getRequestObject().getAuthMethod());
+        final DeleteAuthMethodResponse response = authMethodService.deleteAuthMethod(request.getRequestObject());
+        logger.info("The deleteAuthMethod request succeeded, authentication method: {}", request.getRequestObject().getAuthMethod());
         return new ObjectResponse<>(response);
     }
 

@@ -19,6 +19,8 @@ import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.OperationRequestType;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -26,22 +28,24 @@ import java.io.Serializable;
 /**
  * Entity used to define steps for dynamic step resolution.
  *
- * @author Roman Strobl
+ * @author Roman Strobl, roman.strobl@wultra.com
  */
 @Entity
 @Table(name = "ns_step_definition")
+@Data
+@EqualsAndHashCode(of = {"operationName", "stepDefinitionId"})
 public class StepDefinitionEntity implements Serializable {
 
     private static final long serialVersionUID = 1125553531017608411L;
 
     @Id
     @Column(name = "step_definition_id")
-    private Long stepDefinitionId;
+    private long stepDefinitionId;
 
-    @Column(name = "operation_name")
+    @Column(name = "operation_name", nullable = false)
     private String operationName;
 
-    @Column(name = "operation_type")
+    @Column(name = "operation_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private OperationRequestType operationType;
 
@@ -54,93 +58,14 @@ public class StepDefinitionEntity implements Serializable {
     private AuthMethod requestAuthMethod;
 
     @Column(name = "response_priority")
-    private Long responsePriority;
+    private long responsePriority;
 
     @Column(name = "response_auth_method")
     @Enumerated(EnumType.STRING)
     private AuthMethod responseAuthMethod;
 
-    @Column(name = "response_result")
+    @Column(name = "response_result", nullable = false)
     @Enumerated(EnumType.STRING)
     private AuthResult responseResult;
-
-    public Long getStepDefinitionId() {
-        return stepDefinitionId;
-    }
-
-    public void setStepDefinitionId(Long stepDefinitionId) {
-        this.stepDefinitionId = stepDefinitionId;
-    }
-
-    public String getOperationName() {
-        return operationName;
-    }
-
-    public void setOperationName(String operationName) {
-        this.operationName = operationName;
-    }
-
-    public OperationRequestType getOperationType() {
-        return operationType;
-    }
-
-    public void setOperationType(OperationRequestType operationType) {
-        this.operationType = operationType;
-    }
-
-    public AuthStepResult getRequestAuthStepResult() {
-        return requestAuthStepResult;
-    }
-
-    public void setRequestAuthStepResult(AuthStepResult requestAuthStepResult) {
-        this.requestAuthStepResult = requestAuthStepResult;
-    }
-
-    public AuthMethod getRequestAuthMethod() {
-        return requestAuthMethod;
-    }
-
-    public void setRequestAuthMethod(AuthMethod requestAuthMethod) {
-        this.requestAuthMethod = requestAuthMethod;
-    }
-
-    public Long getResponsePriority() {
-        return responsePriority;
-    }
-
-    public void setResponsePriority(Long responsePriority) {
-        this.responsePriority = responsePriority;
-    }
-
-    public AuthMethod getResponseAuthMethod() {
-        return responseAuthMethod;
-    }
-
-    public void setResponseAuthMethod(AuthMethod responseAuthMethod) {
-        this.responseAuthMethod = responseAuthMethod;
-    }
-
-    public AuthResult getResponseResult() {
-        return responseResult;
-    }
-
-    public void setResponseResult(AuthResult responseResult) {
-        this.responseResult = responseResult;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        StepDefinitionEntity that = (StepDefinitionEntity) o;
-
-        return stepDefinitionId != null ? stepDefinitionId.equals(that.stepDefinitionId) : that.stepDefinitionId == null;
-    }
-
-    @Override
-    public int hashCode() {
-        return stepDefinitionId != null ? stepDefinitionId.hashCode() : 0;
-    }
 
 }

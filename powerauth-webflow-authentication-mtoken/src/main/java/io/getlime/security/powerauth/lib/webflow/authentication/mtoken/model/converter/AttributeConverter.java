@@ -26,6 +26,11 @@ import io.getlime.security.powerauth.lib.nextstep.model.entity.attribute.*;
  */
 public class AttributeConverter {
 
+    /**
+     * Convert form field attribute.
+     * @param input Form field attribute.
+     * @return Attribute.
+     */
     public Attribute fromOperationFormFieldAttribute(OperationFormFieldAttribute input) {
         if (input == null) {
             return null;

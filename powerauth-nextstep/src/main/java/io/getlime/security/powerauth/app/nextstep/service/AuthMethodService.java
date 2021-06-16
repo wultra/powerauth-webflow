@@ -17,26 +17,41 @@ package io.getlime.security.powerauth.app.nextstep.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.MapType;
+import com.wultra.core.audit.base.Audit;
+import com.wultra.core.audit.base.model.AuditDetail;
 import io.getlime.security.powerauth.app.nextstep.repository.AuthMethodRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.StepDefinitionRepository;
 import io.getlime.security.powerauth.app.nextstep.repository.UserPrefsRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.AuthMethodEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.StepDefinitionEntity;
+import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserIdentityEntity;
 import io.getlime.security.powerauth.app.nextstep.repository.model.entity.UserPrefsEntity;
+import io.getlime.security.powerauth.app.nextstep.service.catalogue.ServiceCatalogue;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.AuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.entity.UserAuthMethodDetail;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
+import io.getlime.security.powerauth.lib.nextstep.model.exception.*;
+import io.getlime.security.powerauth.lib.nextstep.model.request.CreateAuthMethodRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.DeleteAuthMethodRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.request.GetEnabledMethodListRequest;
+import io.getlime.security.powerauth.lib.nextstep.model.response.CreateAuthMethodResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.DeleteAuthMethodResponse;
+import io.getlime.security.powerauth.lib.nextstep.model.response.GetEnabledMethodListResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * This service handles querying of user authentication methods and enabling/disabling them.
+ * This service handles persistence of user authentication methods.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
@@ -44,22 +59,69 @@ import java.util.Map;
 public class AuthMethodService {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthMethodService.class);
+    private static final String AUDIT_TYPE_CONFIGURATION = "CONFIGURATION";
 
-    private final AuthMethodRepository authMethodRepository;
-    private final UserPrefsRepository userPrefsRepository;
-    private final ObjectMapper objectMapper;
+    private final RepositoryCatalogue repositoryCatalogue;
+    private final ServiceCatalogue serviceCatalogue;
+    private final Audit audit;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * Service constructor.
-     * @param authMethodRepository Authentication method repository.
-     * @param userPrefsRepository User preferences repository.
-     * @param objectMapper Object mapper.
+     * @param repositoryCatalogue Repository catalogue.
+     * @param serviceCatalogue Service catalogue.
+     * @param audit Audit interface.
      */
     @Autowired
-    public AuthMethodService(AuthMethodRepository authMethodRepository, UserPrefsRepository userPrefsRepository, ObjectMapper objectMapper) {
-        this.authMethodRepository = authMethodRepository;
-        this.userPrefsRepository = userPrefsRepository;
-        this.objectMapper = objectMapper;
+    public AuthMethodService(RepositoryCatalogue repositoryCatalogue, @Lazy ServiceCatalogue serviceCatalogue, Audit audit) {
+        this.repositoryCatalogue = repositoryCatalogue;
+        this.serviceCatalogue = serviceCatalogue;
+        this.audit = audit;
+    }
+
+    /**
+     * Create an authentication method.
+     * @param request Create authentication method request.
+     * @return Create authentication method response.
+     * @throws AuthMethodAlreadyExistsException Thrown when authentication method already exists.
+     */
+    @Transactional
+    public CreateAuthMethodResponse createAuthMethod(CreateAuthMethodRequest request) throws AuthMethodAlreadyExistsException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
+        if (authMethodOptional.isPresent()) {
+            throw new AuthMethodAlreadyExistsException("Authentication method already exists: " + request.getAuthMethod());
+        }
+        AuthMethodEntity authMethod = new AuthMethodEntity();
+        authMethod.setAuthMethod(request.getAuthMethod());
+        authMethod.setOrderNumber(request.getOrderNumber());
+        authMethod.setCheckUserPrefs(request.getCheckUserPrefs());
+        authMethod.setUserPrefsColumn(request.getUserPrefsColumn());
+        authMethod.setUserPrefsDefault(request.getUserPrefsDefault());
+        authMethod.setCheckAuthFails(request.getCheckAuthFails());
+        authMethod.setMaxAuthFails(request.getMaxAuthFails());
+        authMethod.setHasUserInterface(request.getHasUserInterface());
+        authMethod.setDisplayNameKey(request.getDisplayNameKey());
+        authMethod.setHasMobileToken(request.getHasMobileToken());
+        authMethod = authMethodRepository.save(authMethod);
+        logger.debug("Authentication method was created: {}", authMethod.getAuthMethod());
+        audit.info("Authentication method was created", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("authMethod", authMethod)
+                .build());
+        final CreateAuthMethodResponse response = new CreateAuthMethodResponse();
+        response.setAuthMethod(authMethod.getAuthMethod());
+        response.setOrderNumber(authMethod.getOrderNumber());
+        response.setCheckUserPrefs(authMethod.getCheckUserPrefs());
+        response.setUserPrefsColumn(authMethod.getUserPrefsColumn());
+        response.setUserPrefsDefault(authMethod.getUserPrefsDefault());
+        response.setCheckAuthFails(authMethod.getCheckAuthFails());
+        response.setMaxAuthFails(authMethod.getMaxAuthFails());
+        response.setHasUserInterface(authMethod.getHasUserInterface());
+        response.setDisplayNameKey(authMethod.getDisplayNameKey());
+        response.setHasMobileToken(authMethod.getHasMobileToken());
+        return response;
     }
 
     /**
@@ -67,9 +129,11 @@ public class AuthMethodService {
      *
      * @return List of all authentication methods.
      */
+    @Transactional
     public List<AuthMethodDetail> listAuthMethods() {
-        List<AuthMethodDetail> allMethods = new ArrayList<>();
-        List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final List<AuthMethodDetail> allMethods = new ArrayList<>();
+        final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         for (AuthMethodEntity authMethodEntity : authMethodList) {
             allMethods.add(getAuthMethodDetail(authMethodEntity));
         }
@@ -82,12 +146,16 @@ public class AuthMethodService {
      *
      * @param userId User ID
      * @return List of authentication methods enabled for given user.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
      */
-    public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) {
-        List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
-        List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
+    @Transactional
+    public List<UserAuthMethodDetail> listAuthMethodsEnabledForUser(String userId) throws InvalidConfigurationException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final UserPrefsRepository userPrefsRepository = repositoryCatalogue.getUserPrefsRepository();
+        final List<UserAuthMethodDetail> enabledMethods = new ArrayList<>();
+        final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         UserPrefsEntity userPrefs = null;
-        if (userId!=null) {
+        if (userId != null) {
             // read user prefs only when user ID is not null, for some authentication methods user ID is not known
             userPrefs = userPrefsRepository.findUserPrefs(userId);
         }
@@ -98,13 +166,14 @@ public class AuthMethodService {
                     // get status of methods with user prefs
                     if (userPrefs.getAuthMethodEnabled(authMethodEntity.getUserPrefsColumn())) {
                         // read configuration of method from user prefs
-                        String config = userPrefs.getAuthMethodConfig(authMethodEntity.getUserPrefsColumn());
+                        final String config = userPrefs.getAuthMethodConfig(authMethodEntity.getUserPrefsColumn());
                         Map<String, String> configMap;
                         try {
-                            MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
+                            final MapType mapType = objectMapper.getTypeFactory().constructMapType(Map.class, String.class, String.class);
                             configMap = objectMapper.readValue(config, mapType);
                         } catch (IOException e) {
                             logger.error("Error while deserializing config", e);
+                            audit.error("Error while deserializing config", e);
                             configMap = new HashMap<>();
                         }
                         // add method in case it is enabled in user prefs
@@ -114,12 +183,12 @@ public class AuthMethodService {
                     // user prefs are not set - resolve methods with user prefs by their default value
                     if (authMethodEntity.getUserPrefsDefault()) {
                         // add method in case it is enabled by default
-                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
+                        enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, Collections.emptyMap()));
                     }
                 }
             } else {
                 // add all methods without user prefs
-                enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, null));
+                enabledMethods.add(getUserAuthMethodDetail(userId, authMethodEntity, Collections.emptyMap()));
             }
         }
         return enabledMethods;
@@ -132,27 +201,33 @@ public class AuthMethodService {
      * @param authMethod Authentication method.
      * @param enabled True if enabled, false if disabled, null if unspecified.
      * @param config Authentication method configuration.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     * @throws InvalidRequestException Thrown when request is invalid.
      */
-    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) {
-        List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
+    @Transactional
+    public void updateAuthMethodForUser(String userId, AuthMethod authMethod, Boolean enabled, Map<String, String> config) throws InvalidConfigurationException, InvalidRequestException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final UserPrefsRepository userPrefsRepository = repositoryCatalogue.getUserPrefsRepository();
+        final List<AuthMethodEntity> authMethodList = authMethodRepository.findAllAuthMethods();
         boolean authMethodFound = false;
         // check whether this method supports modifications at all
         for (AuthMethodEntity authMethodEntity : authMethodList) {
             if (authMethodEntity.getAuthMethod() == authMethod) {
                 authMethodFound = true;
                 if (!authMethodEntity.getCheckUserPrefs()) {
-                    throw new IllegalArgumentException("Authentication method " + authMethod + " does not support user preferences.");
+                    throw new InvalidRequestException("Authentication method " + authMethod + " does not support user preferences.");
                 }
             }
         }
         if (!authMethodFound) {
-            throw new IllegalArgumentException("Authentication method " + authMethod + " is not supported.");
+            throw new InvalidRequestException("Authentication method " + authMethod + " is not supported.");
         }
         String configAsStr;
         try {
             configAsStr = objectMapper.writeValueAsString(config);
         } catch (IOException e) {
             logger.error("Error while serializing config", e);
+            audit.error("Error while serializing config", e);
             configAsStr = "{}";
         }
         UserPrefsEntity userPrefs = userPrefsRepository.findUserPrefs(userId);
@@ -190,7 +265,95 @@ public class AuthMethodService {
         }
         // finally save created or updated userPrefs
         userPrefsRepository.save(userPrefs);
+        logger.debug("User preferences were updated for user: {}, authentication method: {}", userId, authMethod);
+        audit.info("User preferences were updated", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("userPrefs", userPrefs)
+                .build());
     }
+
+    /**
+     * Get list of enabled authentication methods for a user and operation. Check current availability of mobile token.
+     * @param request Get enabled method list request.
+     * @return Get enabled method list response.
+     * @throws InvalidConfigurationException Thrown when Next Step configuration is invalid.
+     */
+    @Transactional
+    public GetEnabledMethodListResponse getEnabledMethodList(GetEnabledMethodListRequest request) throws InvalidConfigurationException {
+        final UserIdentityLookupService userIdentityLookupService = serviceCatalogue.getUserIdentityLookupService();
+        final StepDefinitionRepository stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        final MobileTokenConfigurationService mobileTokenConfigurationService = serviceCatalogue.getMobileTokenConfigurationService();
+        final String userId = request.getUserId();
+        final String operationName = request.getOperationName();
+        // Lookup user identity to obtain its status
+        final Optional<UserIdentityEntity> userIdentityOptional = userIdentityLookupService.findUserOptional(userId);
+        // Get all methods enabled for user
+        final List<AuthMethod> enabledAuthMethods = listAuthMethodsEnabledForUser(userId).stream()
+                .map(UserAuthMethodDetail::getAuthMethod)
+                .collect(Collectors.toList());
+        // Filter methods by step definitions for given operation to return only relevant methods for the operation.
+        // Do not return INIT method, it is not used for authentication.
+        final List<StepDefinitionEntity> stepDefinitions = stepDefinitionRepository.findStepDefinitionsForOperation(operationName);
+        final List<AuthMethod> methodsPerOperation = stepDefinitions.stream()
+                .map(StepDefinitionEntity::getRequestAuthMethod)
+                .filter(authMethod -> authMethod != AuthMethod.INIT)
+                .collect(Collectors.toList());
+        // Merge enabled methods and methods used in the operation
+        final List<AuthMethod> filteredMethods = enabledAuthMethods.stream()
+                .filter(methodsPerOperation::contains)
+                .collect(Collectors.toList());
+        // Check mobile token status, remove POWERAUTH_TOKEN method in case it is not currently available
+        if (filteredMethods.contains(AuthMethod.POWERAUTH_TOKEN)) {
+            if (!mobileTokenConfigurationService.isMobileTokenActive(userId, operationName, AuthMethod.POWERAUTH_TOKEN)) {
+                filteredMethods.remove(AuthMethod.POWERAUTH_TOKEN);
+            }
+        }
+        final GetEnabledMethodListResponse response = new GetEnabledMethodListResponse();
+        response.setUserId(userId);
+        response.setOperationName(operationName);
+        if (userIdentityOptional.isPresent()) {
+            final UserIdentityEntity user = userIdentityOptional.get();
+            response.setUserIdentityStatus(user.getStatus());
+        }
+        response.getEnabledAuthMethods().addAll(filteredMethods);
+        return response;
+    }
+
+    /**
+     * Delete an authentication method.
+     * @param request Delete authentication method request.
+     * @return Delete authentication method response.
+     * @throws AuthMethodNotFoundException Thrown when authentication method is not found.
+     * @throws DeleteNotAllowedException Thrown when delete action is not allowed.
+     */
+    @Transactional
+    public DeleteAuthMethodResponse deleteAuthMethod(DeleteAuthMethodRequest request) throws AuthMethodNotFoundException, DeleteNotAllowedException {
+        final AuthMethodRepository authMethodRepository = repositoryCatalogue.getAuthMethodRepository();
+        final StepDefinitionRepository stepDefinitionRepository = repositoryCatalogue.getStepDefinitionRepository();
+        final OperationHistoryRepository operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
+        final Optional<AuthMethodEntity> authMethodOptional = authMethodRepository.findByAuthMethod(request.getAuthMethod());
+        if (!authMethodOptional.isPresent()) {
+            throw new AuthMethodNotFoundException("Authentication method not found: " + request.getAuthMethod());
+        }
+        final long requestAuthMethods = stepDefinitionRepository.countByRequestAuthMethod(request.getAuthMethod());
+        final long responseAuthMethods = stepDefinitionRepository.countByResponseAuthMethod(request.getAuthMethod());
+        final long historyRequestAuthMethods = operationHistoryRepository.countByRequestAuthMethod(request.getAuthMethod());
+        final long historyChosenAuthMethods = operationHistoryRepository.countByChosenAuthMethod(request.getAuthMethod());
+        if (requestAuthMethods > 0 || responseAuthMethods > 0 || historyRequestAuthMethods > 0 || historyChosenAuthMethods > 0) {
+            throw new DeleteNotAllowedException("Authentication method cannot be deleted because it is used: " + request.getAuthMethod());
+        }
+        final AuthMethodEntity authMethod = authMethodOptional.get();
+        authMethodRepository.delete(authMethod);
+        logger.debug("Authentication method was deleted: {}", authMethod.getAuthMethod());
+        audit.info("Authentication method was deleted", AuditDetail.builder()
+                .type(AUDIT_TYPE_CONFIGURATION)
+                .param("authMethod", authMethod.getAuthMethod())
+                .build());
+        final DeleteAuthMethodResponse response = new DeleteAuthMethodResponse();
+        response.setAuthMethod(authMethod.getAuthMethod());
+        return response;
+    }
+
 
     /**
      * Converts AuthMethodEntity into AuthMethodDetail which contains less fields available for the UI.
@@ -202,8 +365,14 @@ public class AuthMethodService {
         if (authMethodEntity == null) {
             return null;
         }
-        AuthMethodDetail authMethodDetail = new AuthMethodDetail();
+        final AuthMethodDetail authMethodDetail = new AuthMethodDetail();
         authMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
+        authMethodDetail.setOrderNumber(authMethodEntity.getOrderNumber());
+        authMethodDetail.setCheckUserPrefs(authMethodEntity.getCheckUserPrefs());
+        authMethodDetail.setUserPrefsColumn(authMethodEntity.getUserPrefsColumn());
+        authMethodDetail.setUserPrefsDefault(authMethodEntity.getUserPrefsDefault());
+        authMethodDetail.setCheckAuthFails(authMethodEntity.getCheckAuthFails());
+        authMethodDetail.setMaxAuthFails(authMethodEntity.getMaxAuthFails());
         authMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         authMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
         authMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());
@@ -221,13 +390,14 @@ public class AuthMethodService {
         if (authMethodEntity == null) {
             return null;
         }
-        UserAuthMethodDetail userAuthMethodDetail = new UserAuthMethodDetail();
+        final UserAuthMethodDetail userAuthMethodDetail = new UserAuthMethodDetail();
         userAuthMethodDetail.setUserId(userId);
         userAuthMethodDetail.setAuthMethod(authMethodEntity.getAuthMethod());
         userAuthMethodDetail.setHasUserInterface(authMethodEntity.getHasUserInterface());
         userAuthMethodDetail.setDisplayNameKey(authMethodEntity.getDisplayNameKey());
         userAuthMethodDetail.setHasMobileToken(authMethodEntity.getHasMobileToken());
-        userAuthMethodDetail.setConfig(config);
+        userAuthMethodDetail.getConfig().putAll(config);
         return userAuthMethodDetail;
     }
+
 }

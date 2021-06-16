@@ -98,7 +98,8 @@ export function authenticateOnline(callback) {
                     dispatchAction(dispatch, response);
                     break;
                 }
-                case 'CANCELED': {
+                case 'CANCELED':
+                case 'AUTH_METHOD_FAILED': {
                     dispatch({
                         type: "SHOW_SCREEN_ERROR",
                         payload: {

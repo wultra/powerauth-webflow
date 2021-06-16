@@ -17,6 +17,8 @@
 package io.getlime.security.powerauth.app.nextstep.service;
 
 import io.getlime.security.powerauth.app.nextstep.repository.OperationHistoryRepository;
+import io.getlime.security.powerauth.app.nextstep.repository.catalogue.RepositoryCatalogue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -29,22 +31,47 @@ import java.util.UUID;
 @Service
 public class IdGeneratorService {
 
-    private OperationHistoryRepository operationHistoryRepository;
+    private final OperationHistoryRepository operationHistoryRepository;
 
     /**
      * ID generator constructor.
-     * @param operationHistoryRepository Operation history repository.
+     * @param repositoryCatalogue Repository catalogue.
      */
-    public IdGeneratorService(OperationHistoryRepository operationHistoryRepository) {
-        this.operationHistoryRepository = operationHistoryRepository;
+    @Autowired
+    public IdGeneratorService(RepositoryCatalogue repositoryCatalogue) {
+        this.operationHistoryRepository = repositoryCatalogue.getOperationHistoryRepository();
     }
 
     /**
-     * Generates random operationId using UUID.randomUUID().
+     * Generate random operationId using UUID.randomUUID().
      *
      * @return Generated operation ID.
      */
     public String generateOperationId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate credential ID.
+     * @return Credential ID.
+     */
+    public String generateCredentialId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate OTP ID.
+     * @return OTP ID.
+     */
+    public String generateOtpId() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Generate authentication ID.
+     * @return Authentication ID.
+     */
+    public String generateAuthenticationId() {
         return UUID.randomUUID().toString();
     }
 
@@ -55,7 +82,7 @@ public class IdGeneratorService {
      * @return Generated OperationHistory ID.
      */
     public synchronized Long generateOperationHistoryId(String operationId) {
-        Long maxId = operationHistoryRepository.findMaxResultId(operationId);
+        final Long maxId = operationHistoryRepository.findMaxResultId(operationId);
         if (maxId == null) {
             return 1L;
         } else {

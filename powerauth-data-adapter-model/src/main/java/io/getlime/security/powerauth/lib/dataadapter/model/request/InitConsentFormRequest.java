@@ -35,7 +35,7 @@ public class InitConsentFormRequest {
     private String organizationId;
 
     /**
-     * Operation context which provides context for creating the consent form.
+     * Operation context which provides context for initializing the consent form.
      */
     private OperationContext operationContext;
 
@@ -49,7 +49,7 @@ public class InitConsentFormRequest {
      * Constructor with user ID, language and operation context.
      * @param userId User ID.
      * @param organizationId Organization ID.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * @param operationContext Operation context which provides context for initializing the consent form.
      */
     public InitConsentFormRequest(String userId, String organizationId, OperationContext operationContext) {
         this.userId = userId;
@@ -90,16 +90,16 @@ public class InitConsentFormRequest {
     }
 
     /**
-     * Get operation context which provides context for creating the consent form.
-     * @return Operation context which provides context for creating the consent form.
+     * Get operation context which provides context for initializing the consent form.
+     * @return Operation context which provides context for initializing the consent form.
      */
     public OperationContext getOperationContext() {
         return operationContext;
     }
 
     /**
-     * Set operation context which provides context for creating the consent form.
-     * @param operationContext Operation context which provides context for creating the consent form.
+     * Set operation context which provides context for initializing the consent form.
+     * @param operationContext Operation context which provides context for initializing the consent form.
      */
     public void setOperationContext(OperationContext operationContext) {
         this.operationContext = operationContext;

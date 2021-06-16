@@ -16,66 +16,24 @@
 package io.getlime.security.powerauth.lib.nextstep.model.request;
 
 import io.getlime.security.powerauth.lib.nextstep.model.entity.ApplicationContext;
+import lombok.Data;
+
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  * Request object used for updating application context of an operation.
  *
  * @author Roman Strobl, roman.strobl@wultra.com
  */
+@Data
 public class UpdateApplicationContextRequest {
 
+    @NotBlank
+    @Size(min = 1, max = 256)
     private String operationId;
+    @NotNull
     private ApplicationContext applicationContext;
 
-    /**
-     * Default constructor.
-     */
-    public UpdateApplicationContextRequest() {
-    }
-
-    /**
-     * Constructor with operation ID and application context.
-     *
-     * @param operationId        Operation ID.
-     * @param applicationContext Application context.
-     */
-    public UpdateApplicationContextRequest(String operationId, ApplicationContext applicationContext) {
-        this.operationId = operationId;
-        this.applicationContext = applicationContext;
-    }
-
-    /**
-     * Get operation ID.
-     *
-     * @return Operation ID.
-     */
-    public String getOperationId() {
-        return operationId;
-    }
-
-    /**
-     * Set operation ID.
-     *
-     * @param operationId Operation ID.
-     */
-    public void setOperationId(String operationId) {
-        this.operationId = operationId;
-    }
-
-    /**
-     * Get application context.
-     *
-     * @return Application context.
-     */
-    public ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
-
-    /**
-     * Set application context.
-     * @param applicationContext Application context.
-     */
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
 }
