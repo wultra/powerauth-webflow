@@ -15,14 +15,20 @@
  */
 package io.getlime.security.powerauth.app.nextstep;
 
+import com.wultra.core.audit.base.database.DatabaseAudit;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepClientFactory;
 import io.getlime.security.powerauth.app.nextstep.configuration.NextStepTestConfiguration;
 import io.getlime.security.powerauth.lib.nextstep.client.NextStepClient;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.web.server.LocalServerPort;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.lang.NonNull;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -38,7 +44,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestPropertySource(locations = "classpath:application.properties")
 @Sql(scripts = "/db_schema.sql")
-public class NextStepTest {
+public class NextStepTest implements ApplicationContextAware {
+
+    private static ApplicationContext applicationContext;
 
     protected NextStepClient nextStepClient;
 
@@ -51,8 +59,20 @@ public class NextStepTest {
     @LocalServerPort
     protected int port;
 
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext1) throws BeansException {
+        NextStepTest.applicationContext = applicationContext1;
+    }
+
+    @AfterAll
+    public static void cleanup() {
+        // Flush audit data to database before the test application and H2 database are terminated
+        applicationContext.getBean(DatabaseAudit.class).flush();
+    }
+
     @Test
     public void testContextLoads() {
         assertTrue(port > 1024);
     }
+
 }
