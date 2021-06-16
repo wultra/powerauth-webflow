@@ -15,6 +15,7 @@
  */
 package io.getlime.security.powerauth.app.nextstep.repository.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthMethod;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthResult;
 import io.getlime.security.powerauth.lib.nextstep.model.enumeration.AuthStepResult;
@@ -85,6 +86,7 @@ public class OperationHistoryEntity implements Serializable {
     private String powerAuthOperationId;
 
     @ToString.Exclude
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "operation_id", insertable = false, updatable = false, nullable = false)
     private OperationEntity operation;

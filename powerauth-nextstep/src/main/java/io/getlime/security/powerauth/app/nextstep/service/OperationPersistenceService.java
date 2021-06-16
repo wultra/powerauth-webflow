@@ -138,7 +138,7 @@ public class OperationPersistenceService {
         operation.setTimestampCreated(response.getTimestampCreated());
         operation.setTimestampExpires(response.getTimestampExpires());
         operation = operationRepository.save(operation);
-        logger.debug("Operation was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
         final OperationHistoryEntity operationHistory = new OperationHistoryEntity(operation.getOperationId(),
                 idGeneratorService.generateOperationHistoryId(operation.getOperationId()));
         operationHistory.setRequestAuthMethod(AuthMethod.INIT);
@@ -269,7 +269,7 @@ public class OperationPersistenceService {
         operationHistory.setResponseTimestampExpires(response.getTimestampExpires());
         operation.getOperationHistory().add(operationHistory);
         operation = operationRepository.save(operation);
-        logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
         audit.info("Operation was updated", AuditDetail.builder()
                 .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
@@ -317,7 +317,7 @@ public class OperationPersistenceService {
             operation.setUserAccountStatus(accountStatus);
         }
         operationRepository.save(operation);
-        logger.debug("Operation user was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation user was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
         audit.info("Operation user was updated", AuditDetail.builder()
                 .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
@@ -348,7 +348,7 @@ public class OperationPersistenceService {
             audit.error("Error occurred while serializing operation form data", e);
         }
         operationRepository.save(operation);
-        logger.debug("Operation form data was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation form data was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
         audit.info("Operation form data was updated", AuditDetail.builder()
                 .type(AUDIT_TYPE_OPERATION)
                 .param("operationId", operation.getOperationId())
@@ -407,7 +407,7 @@ public class OperationPersistenceService {
                 .param("operationId", operation.getOperationId())
                 .param("chosenAuthMethod", chosenAuthMethod)
                 .build());
-        logger.debug("Operation chosen authentication method was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation chosen authentication method was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
     }
 
     /**
@@ -444,7 +444,7 @@ public class OperationPersistenceService {
                 .param("mobileTokenActive", currentHistory.isMobileTokenActive())
                 .param("powerAuthOperationId", currentHistory.getPowerAuthOperationId())
                 .build());
-        logger.debug("Operation mobile token was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation mobile token was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
     }
 
     /**
@@ -484,7 +484,7 @@ public class OperationPersistenceService {
                 .param("operationId", operation.getOperationId())
                 .param("applicationContext", applicationContext)
                 .build());
-        logger.debug("Operation application was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+        logger.debug("Operation application was updated, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
     }
 
     /**
@@ -682,7 +682,7 @@ public class OperationPersistenceService {
             afsEntity.setTimestampCreated(request.getTimestampCreated());
             operation.getAfsActions().add(afsEntity);
             operationRepository.save(operation);
-            logger.debug("Operation AFS action was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationId());
+            logger.debug("Operation AFS action was created, operation ID: {}, operation name: {}", operation.getOperationId(), operation.getOperationName());
             audit.info("Operation AFS action was created", AuditDetail.builder()
                     .type(AUDIT_TYPE_OPERATION)
                     .param("operationId", operation.getOperationId())
