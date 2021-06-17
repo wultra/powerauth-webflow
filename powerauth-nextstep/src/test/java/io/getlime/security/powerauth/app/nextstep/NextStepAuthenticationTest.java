@@ -596,5 +596,114 @@ public class NextStepAuthenticationTest extends NextStepTest {
         assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
     }
 
+    @Test
+    public void testOtpCheckSuccessNoOperation() throws NextStepClientException {
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA").getResponseObject();
+        assertEquals(OtpStatus.ACTIVE, r1.getOtpStatus());
+        assertNotNull(r1.getOtpId());
+        assertNotNull(r1.getOtpValue());
+        assertEquals(8, r1.getOtpValue().length());
+        OtpAuthenticationResponse r2 = nextStepClient.authenticateWithOtp(r1.getOtpId(), null, r1.getOtpValue(), true, false, null).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r2.getAuthenticationResult());
+        // OTP value was only checked, status OTP must stay ACTIVE for successful verification
+        assertEquals(OtpStatus.ACTIVE, r2.getOtpStatus());
+        assertEquals("test_user_1", r2.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r2.getUserIdentityStatus());
+        assertEquals(3, (int) r2.getRemainingAttempts());
+        OtpAuthenticationResponse r3 = nextStepClient.authenticateWithOtp(r1.getOtpId(), null, r1.getOtpValue(), false, false, null).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r3.getAuthenticationResult());
+        // OTP value was used for actual authentication
+        assertEquals(OtpStatus.USED, r3.getOtpStatus());
+        assertEquals("test_user_1", r3.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r3.getUserIdentityStatus());
+        assertEquals(0, (int) r3.getRemainingAttempts());
+    }
+
+    @Test
+    public void testOtpCheckFailNoOperation() throws NextStepClientException {
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA").getResponseObject();
+        assertEquals(OtpStatus.ACTIVE, r1.getOtpStatus());
+        assertNotNull(r1.getOtpId());
+        assertNotNull(r1.getOtpValue());
+        OtpAuthenticationResponse r2 = nextStepClient.authenticateWithOtp(r1.getOtpId(), null, "00000000000", true, false, null).getResponseObject();
+        // FAILED authentication result is reported in checkOnly mode as usual
+        assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
+        assertEquals(OtpStatus.ACTIVE, r2.getOtpStatus());
+        assertEquals("test_user_1", r2.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r2.getUserIdentityStatus());
+        assertEquals(2, (int) r2.getRemainingAttempts());
+    }
+
+    @Test
+    public void testOtpCheckBlockNoOperation() throws NextStepClientException {
+        CreateOtpResponse r1 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, "TEST_DATA").getResponseObject();
+        assertEquals(OtpStatus.ACTIVE, r1.getOtpStatus());
+        assertNotNull(r1.getOtpId());
+        assertNotNull(r1.getOtpValue());
+        nextStepClient.authenticateWithOtp(r1.getOtpId(), null, "00000000000", true, false, null);
+        nextStepClient.authenticateWithOtp(r1.getOtpId(), null, "00000000000", true, false, null);
+        OtpAuthenticationResponse r2 = nextStepClient.authenticateWithOtp(r1.getOtpId(), null, "00000000000", true, false, null).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r2.getAuthenticationResult());
+        // OTP is blocked in checkOnly mode as usual
+        assertEquals(OtpStatus.BLOCKED, r2.getOtpStatus());
+        assertEquals("test_user_1", r2.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r2.getUserIdentityStatus());
+        assertEquals(0, (int) r2.getRemainingAttempts());
+    }
+
+    @Test
+    public void testOtpCheckSuccessWithOperation() throws NextStepClientException {
+        CreateOperationResponse r1 = nextStepClient.createOperation("auth_otp", "test_operation_check_1", "A1", null, null).getResponseObject();
+        assertEquals("test_operation_check_1", r1.getOperationId());
+        assertEquals("A1", r1.getOperationData());
+        assertEquals(AuthResult.CONTINUE, r1.getResult());
+        CreateOtpResponse r2 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, null, "test_operation_check_1").getResponseObject();
+        assertEquals(OtpStatus.ACTIVE, r2.getOtpStatus());
+        assertNotNull(r2.getOtpId());
+        assertNotNull(r2.getOtpValue());
+        OtpAuthenticationResponse r3 = nextStepClient.authenticateWithOtp(null, "test_operation_check_1", r2.getOtpValue(), true, false, null).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r3.getAuthenticationResult());
+        assertEquals(OtpStatus.ACTIVE, r3.getOtpStatus());
+        assertEquals("test_user_1", r3.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r3.getUserIdentityStatus());
+        GetOperationDetailResponse r4 = nextStepClient.getOperationDetail("test_operation_check_1").getResponseObject();
+        assertEquals(AuthResult.CONTINUE, r4.getResult());
+        OtpAuthenticationResponse r5 = nextStepClient.authenticateWithOtp(null, "test_operation_check_1", r2.getOtpValue(), false, true, null).getResponseObject();
+        assertEquals(AuthenticationResult.SUCCEEDED, r5.getAuthenticationResult());
+        assertEquals(OtpStatus.USED, r5.getOtpStatus());
+        assertEquals("test_user_1", r5.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r5.getUserIdentityStatus());
+        GetOperationDetailResponse r6 = nextStepClient.getOperationDetail("test_operation_check_1").getResponseObject();
+        assertEquals(AuthResult.DONE, r6.getResult());
+    }
+
+    @Test
+    public void testOtpCheckFailWithOperation() throws NextStepClientException {
+        CreateOperationResponse r1 = nextStepClient.createOperation("auth_otp", "test_operation_check_2", "A1", null, null).getResponseObject();
+        assertEquals("test_operation_check_2", r1.getOperationId());
+        assertEquals("A1", r1.getOperationData());
+        assertEquals(AuthResult.CONTINUE, r1.getResult());
+        CreateOtpResponse r2 = nextStepClient.createOtp("test_user_1", "TEST_OTP", null, null, "test_operation_check_2").getResponseObject();
+        assertEquals(OtpStatus.ACTIVE, r2.getOtpStatus());
+        assertNotNull(r2.getOtpId());
+        assertNotNull(r2.getOtpValue());
+        nextStepClient.authenticateWithOtp(null, "test_operation_check_2", "00000000000", true, false, null);
+        nextStepClient.authenticateWithOtp(null, "test_operation_check_2", "00000000000", true, false, null);
+        OtpAuthenticationResponse r3 = nextStepClient.authenticateWithOtp(null, "test_operation_check_2", "00000000000", true, false, null).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r3.getAuthenticationResult());
+        assertEquals(OtpStatus.BLOCKED, r3.getOtpStatus());
+        assertEquals("test_user_1", r3.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r3.getUserIdentityStatus());
+        GetOperationDetailResponse r4 = nextStepClient.getOperationDetail("test_operation_check_2").getResponseObject();
+        assertEquals(AuthResult.CONTINUE, r4.getResult());
+        OtpAuthenticationResponse r5 = nextStepClient.authenticateWithOtp(null, "test_operation_check_2", r2.getOtpValue(), false, true, null).getResponseObject();
+        assertEquals(AuthenticationResult.FAILED, r5.getAuthenticationResult());
+        assertEquals(OtpStatus.BLOCKED, r5.getOtpStatus());
+        assertEquals("test_user_1", r5.getUserId());
+        assertEquals(UserIdentityStatus.ACTIVE, r5.getUserIdentityStatus());
+        GetOperationDetailResponse r6 = nextStepClient.getOperationDetail("test_operation_check_2").getResponseObject();
+        assertEquals(AuthResult.FAILED, r6.getResult());
+    }
+
 }
 
