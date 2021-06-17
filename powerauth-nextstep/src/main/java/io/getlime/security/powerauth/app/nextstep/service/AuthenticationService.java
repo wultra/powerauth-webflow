@@ -427,10 +427,8 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
-        String mode = "authentication";
-        if (checkOnly) {
-            mode = "check";
-        }
+        final String mode = checkOnly ? "check" : "authentication";
+
         logger.info("OTP " + mode + " result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
         audit.info("OTP authentication result", AuditDetail.builder()
