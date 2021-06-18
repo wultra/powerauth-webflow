@@ -341,8 +341,12 @@ public class AuthenticationService {
         if (request.isUpdateOperation() && operation == null) {
             throw new InvalidRequestException("Operation not found, however operation update requested for OTP name: " + otp.getOtpDefinition().getName());
         }
+        if (request.isUpdateOperation() && request.isCheckOnly()) {
+            throw new InvalidRequestException("Operation update requested in check only mode, these two modes are exclusive");
+        }
 
         final AuthenticationResult authenticationResult;
+        final boolean checkOnly = request.isCheckOnly();
         CredentialEntity credential = null;
         boolean credentialActive = true;
 
@@ -367,7 +371,7 @@ public class AuthenticationService {
                 authenticationResult = AuthenticationResult.FAILED;
             }
 
-            if (authenticationResult == AuthenticationResult.SUCCEEDED) {
+            if (!checkOnly && authenticationResult == AuthenticationResult.SUCCEEDED) {
                 otp.setStatus(OtpStatus.USED);
                 otp.setTimestampVerified(new Date());
                 logger.debug("OTP was successfully verified, OTP ID: {}", otp.getOtpId());
@@ -423,7 +427,9 @@ public class AuthenticationService {
             authenticationRepository.save(authentication);
         }
 
-        logger.info("OTP authentication result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
+        final String mode = checkOnly ? "check" : "authentication";
+
+        logger.info("OTP " + mode + " result: {}, remaining attempts: {}, user ID: {}, user identity status: {}, OTP status: {}, credential status: {}, operation failed: {}",
                 authenticationResult, remainingAttempts, user == null ? null : user.getUserId(), user == null ? null : user.getStatus(), otp.getStatus(), credential == null ? null : credential.getStatus(), operationFailed);
         audit.info("OTP authentication result", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
@@ -432,7 +438,7 @@ public class AuthenticationService {
                 .param("operationId", operation != null ? operation.getOperationId() : null)
                 .param("authenticationResult", authenticationResult)
                 .build());
-        audit.debug("OTP authentication result (detail)", AuditDetail.builder()
+        audit.debug("OTP " + mode + " result (detail)", AuditDetail.builder()
                 .type(AUDIT_TYPE_AUTHENTICATION)
                 .param("userId", user != null ? user.getUserId() : null)
                 .param("otpId", otp.getOtpId())
