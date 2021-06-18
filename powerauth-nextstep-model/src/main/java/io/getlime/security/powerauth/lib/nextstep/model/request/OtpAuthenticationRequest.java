@@ -37,6 +37,8 @@ public class OtpAuthenticationRequest {
     @NotBlank
     @Size(min = 1, max = 256)
     private String otpValue;
+    // Whether the OTP value is only being checked, successful OTP check does not change OTP status
+    private boolean checkOnly;
     // Operation ID is extracted from OTP record in case that otpId is sent
     private boolean updateOperation;
     // Authentication method is required only in case multiple methods are defined in Next Steps

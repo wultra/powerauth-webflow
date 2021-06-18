@@ -2282,11 +2282,35 @@ public class NextStepClient {
      * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
      */
     public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, String operationId, @NotNull String otpValue,
-                                                                           boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
+                                                                         boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
         final OtpAuthenticationRequest request = new OtpAuthenticationRequest();
         request.setOtpId(otpId);
         request.setOperationId(operationId);
         request.setOtpValue(otpValue);
+        request.setUpdateOperation(updateOperation);
+        request.setAuthMethod(authMethod);
+        return postObjectImpl("/auth/otp", new ObjectRequest<>(request), OtpAuthenticationResponse.class);
+    }
+
+    /**
+     * Authenticate using OTP with operation and checkOnly parameter.
+     *
+     * @param otpId OTP ID.
+     * @param operationId Operation ID.
+     * @param otpValue OTP value.
+     * @param checkOnly Whether the OTP value is only being checked, authentication result is not persisted in this case.
+     * @param updateOperation Whether operation should be updated.
+     * @param authMethod Authentication method used for operation update.
+     * @return OTP authentication response.
+     * @throws NextStepClientException Thrown when REST API call fails, including {@link ErrorResponse} with error code.
+     */
+    public ObjectResponse<OtpAuthenticationResponse> authenticateWithOtp(String otpId, String operationId, @NotNull String otpValue, boolean checkOnly,
+                                                                         boolean updateOperation, AuthMethod authMethod) throws NextStepClientException {
+        final OtpAuthenticationRequest request = new OtpAuthenticationRequest();
+        request.setOtpId(otpId);
+        request.setOperationId(operationId);
+        request.setOtpValue(otpValue);
+        request.setCheckOnly(checkOnly);
         request.setUpdateOperation(updateOperation);
         request.setAuthMethod(authMethod);
         return postObjectImpl("/auth/otp", new ObjectRequest<>(request), OtpAuthenticationResponse.class);
