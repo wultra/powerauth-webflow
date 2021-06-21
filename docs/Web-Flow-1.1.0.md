@@ -1,5 +1,9 @@
 # Migration from 1.0.0 to 1.1.0
 
+## Updated Minimum Java Runtime Version
+
+The minimum required Java runtime version has been updated to Java 11. This version is suggested for deployment because version 11 is a long term support (LTS) version of Java. The software should work`` on Java versions 11, 12, 13, 14, and 15.
+
 ## Embedded Bouncy Castle Library (Version 1.68)
 
 Bouncy Castle library has been updated to version `1.68` and it is now **included directly in the application bundle (\*.war)** for both Web Flow and Next Step.
