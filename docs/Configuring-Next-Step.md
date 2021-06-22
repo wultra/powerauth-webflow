@@ -178,10 +178,6 @@ INSERT INTO ns_operation_config (operation_name, template_version, template_id, 
 
 The operation configuration can be created using REST API by calling the `POST /operation/config` endpoint.
 
-## Configuration of Organizations
-
-At least one organization must be configured. 
-
 ## Configuration of Next Step Applications
 
 At least one Next Step application must be configured. Each application requires following configuration:
