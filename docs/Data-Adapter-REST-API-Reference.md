@@ -1,6 +1,8 @@
 # Data Adapter RESTful API Reference
 
-PowerAuth Web Flow server communicates with the Data Adapter via a REST API. This chapter defines the REST API implemented by Data Adapter and consumed by the Web Flow Server.
+_Warning: this page is currently being revised for version `1.1.0`. For most up-to-date documentation see the application Swagger at: http[s]://[host]:[port]/powerauth-data-adapter/swagger-ui.html_
+
+PowerAuth Web Flow server and Next Step server communicate with the Data Adapter via a REST API. This chapter defines the REST API implemented by Data Adapter and consumed by the Web Flow Server.
 
 Following topics are covered in this chapter:
 - [Status codes and error handling](#status-codes-and-error-handling)

@@ -1,5 +1,7 @@
 # NextStep Server RESTful API Reference
 
+_Warning: this page is currently being revised for version `1.1.0`. For most up-to-date documentation see the application Swagger at: http[s]://[host]:[port]/powerauth-nextstep/swagger-ui.html_
+
 PowerAuth Web Flow communicates with the Next Step Server via a REST API to resolve the next step in the authentication process. This chapter defines the REST API implemented by Next Step Server and consumed by the Web Flow Server during authentication. The REST API can be also used by other components.
 
 The Next Step API can list available authentication methods and enable/disable authentication methods per user. Authentication method configuration can be updated - for instance the activation ID of registered user device is set for the Mobile Token authentication method.
@@ -34,7 +36,7 @@ Following topics are covered in this chapter:
   - [Organization list](#list-organizations)
   - [Organization detail](#organization-detail)
 
-You can access the generated REST API documentation in deployed Next Step:
+You can access the generated REST API documentation in deployed Next Step application:
 
 ```
 http[s]://[host]:[port]/powerauth-nextstep/swagger-ui.html

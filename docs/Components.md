@@ -3,6 +3,7 @@
 Web Flow consists of following compoments:
 - [Web Flow Server](#web-flow-server)
 - [Next Step Server](#next-step-server)
+- [TPP Engine](#tpp-engine)  
 - [Data Adapter](#data-adapter)
 - [Mobile Token](#mobile-token)
 - [PowerAuth Server](#powerauth-server)
@@ -24,7 +25,7 @@ Web Flow Server consists of following parts:
   - This application is written in ReactJS and it communicates with the backend using [REST API](./Web-Flow-REST-API-Reference.md) and [Web Sockets](./Web-Socket-Communication-Protocol.md).
 - **Backend services** - REST services which respond to requests from the frontend application and communicate with other components.
   - The logic of resolving next step in the operation is handled by the Next Step server, so the Web Flow Backend offloads all such decisions to the Next Step server. Handling of operation updates is done by Next Step, too.
-  - Data Adapter is used to retrieve data from remote backends such as information about the user as well as trigger actions such as sending the authorization SMS with OTP.
+  - Data Adapter is used to retrieve data from remote backends such as information about the user and provides integration with any services required for completing the authentication flow.
   - Mobile Token interacts with Web Flow backend services to obtain information about current operation (retrieved from Next Step Server), signature verification (processed through PowerAuth Server) and push message delivery (requests sent to PowerAuth Push Server).
 
 ## Next Step Server
@@ -41,28 +42,43 @@ Based on Next Step response either of the following actions happens in Web Flow:
 - the authentication process is completed with a redirect
 - an error is shown followed by a redirect with error details
 
+The Next Step server provides also credential and OTP authentication services and services for managing user identities.
+
 ## Data Adapter
 
 Data Adapter connects Web Flow to other backends and serves as an integration component.
 
 Data Adapter handles following use cases:
 
-* Lookup user ID for given username.
-* User authentication with remote backend based on provided credentials for form based authentication step.
-* Retrieve user details for given user ID such as firstname and surname.
-* Retrieve data for given user and decorate operation data (e.g. bank account names, balances, currencies, etc.).
-* Notify backend about form data changes, e.g. when user fills in some data in Web Flow frontend.
-* Notify backend about operation status changes: finished operation, failed operation and canceled operation.
-* Send authorization SMS messages with OTP code -- message text is prepared and localized, however SMS message needs to be sent by the remote backend.
-* Verify authorization SMS code specified by the user.
-* Decide whether consent step should be displayed for given operation context.
-* Prepare consent form text and options. 
-* Verify consent form options selected by the user.
-* Save consent form options selected by the user.
-* Verify authorization SMS code and user password.
-* Execute an anti-fraud system (AFS) action and react on response from AFS.
+- convert username to user ID in case such conversion is required
+- perform user authentication against remote backend based on provided credentials
+- retrieve user details for given user ID
+- initialize an authentication method and set its parameters, e.g. client certificate configuration
+- decorate form data for given user (e.g. add user bank account list)
+- form data change notification
+- create an implicit login operation automatically on authentication start
+- map a complex operation into smaller operations and configure PowerAuth operation template
+- operation status change notification
+- generate OTP authorization code and send authorization SMS
+- send authorization SMS with previously generated OTP authorization code
+- verify OTP authorization code from SMS
+- authenticate user using user ID, password and OTP authorization code
+- verify a client TLS certificate
+- initialize OAuth 2.0 consent form
+- create OAuth 2.0 consent form
+- validate OAuth 2.0 consent form options
+- save OAuth 2.0 consent form options
+- execute an anti-fraud system (AFS) action and react on response from AFS
 
 For more information see the [Web Flow customization project](https://github.com/wultra/powerauth-webflow-customization)
+
+## TPP Engine
+
+Third Party Provider (TPP) Engine implements following functionality:
+- third party provider registry
+- storage of OAuth 2.0 consents
+
+TPP Engine is available as a separate application and its deployment is optional.
 
 ## Mobile Token
 

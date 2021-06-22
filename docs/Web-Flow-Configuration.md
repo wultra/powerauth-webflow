@@ -16,6 +16,9 @@ At minimum the following configuration properties should be updated based on dep
 
 Complete configuration file:
 ```properties
+# Allow externalization of properties using application-ext.properties
+spring.profiles.active=ext
+
 # Data Adapter Server Service URL
 powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
 
@@ -44,7 +47,6 @@ spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
-#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -71,6 +73,9 @@ powerauth.webflow.service.applicationEnvironment=
 # Configuration of Offline Mode
 powerauth.webflow.offlineMode.available=true
 
+# Enable or disable operations support in PowerAuth server
+powerauth.webflow.pa.operations.enabled=false
+
 # Configuration of Android Security Warning
 powerauth.webflow.android.showSecurityWarning=true
 
@@ -78,6 +83,9 @@ powerauth.webflow.android.showSecurityWarning=true
 powerauth.webflow.password.protection.type=NO_PROTECTION
 powerauth.webflow.password.encryption.transformation=
 powerauth.webflow.password.encryption.key=
+
+# Configuration of authentication using temporary credentials
+powerauth.webflow.authentication.allowTemporaryCredentials=false
 
 # Configuration of Delay for Resending SMS in Milliseconds
 powerauth.webflow.sms.resend.delayMs=60000
@@ -89,7 +97,7 @@ powerauth.webflow.timeout.warning.delayMs=60000
 powerauth.webflow.consent.limit.enabled=false
 powerauth.webflow.consent.limit.characters=750
 
-# Anti-fraud system configuration
+# Anti-fraud System Configuration
 powerauth.webflow.afs.enabled=false
 powerauth.webflow.afs.type=THREAT_MARK
 powerauth.webflow.afs.detectIpAddress=false
@@ -97,10 +105,32 @@ powerauth.webflow.afs.forceIpv4=true
 powerauth.webflow.afs.tm.cookies.deviceTag=
 powerauth.webflow.afs.tm.cookies.sessionSid=
 
-# User input validation
+# User Input Validation
 powerauth.webflow.input.username.maxLength=256
 powerauth.webflow.input.password.maxLength=128
 powerauth.webflow.input.smsOtp.maxLength=8
+
+# Configuration of CORS Requests for Client Certificate Verification
+powerauth.webflow.security.cors.enabled=false
+powerauth.webflow.security.cors.allowOrigin=https://localhost.cz
+
+# Set JMX default domain in case JMX is enabled, otherwise the application startup fails due to clash in JMX bean names
+spring.jmx.default-domain=powerauth-webflow
+
+# Set Jackson date format
+spring.jackson.date-format=yyyy-MM-dd'T'HH:mm:ssZ
+
+# Disable open session in view to avoid startup warning of Spring boot
+spring.jpa.open-in-view=false
+
+# Enable caching of static resources
+spring.resources.cache.cachecontrol.max-age=86400
+
+# Disable swagger-ui default petstore url
+springdoc.swagger-ui.disable-swagger-default-url=true
+
+# Set the Spring application name
+spring.application.name=powerauth-webflow
 ```
 
 Encryption of user passwords during transport can be configured using following properties:
@@ -129,10 +159,15 @@ For information about password decryption, see: [User Password Encryption And De
 ## Next Step Server
 At minimum the following configuration properties should be updated based on deployment:
 - `powerauth.nextstep.operation.expirationTimeInSeconds` - operation expiration time in seconds
+- `powerauth.dataAdapter.service.url` - Data Adapter service URL
+- `powerauth.service.url` - PowerAuth service URL
 - database configuration - see examples below
 
 Complete configuration file:
 ```properties
+# Allow externalization of properties using application-ext.properties
+spring.profiles.active=ext
+
 # Database Configuration - MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
@@ -140,7 +175,6 @@ spring.datasource.password=
 spring.datasource.driver-class-name=com.mysql.jdbc.Driver
 spring.jpa.properties.hibernate.connection.characterEncoding=utf8
 spring.jpa.properties.hibernate.connection.useUnicode=true
-#spring.jpa.properties.hibernate.connection.CharSet=utf8mb4
 
 # Database Configuration - PostgreSQL
 #spring.datasource.url=jdbc:postgresql://localhost:5432/powerauth
@@ -159,13 +193,59 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 # The following property speeds up Spring Boot startup
 #spring.jpa.properties.hibernate.temp.use_jdbc_metadata_defaults=false
 
+# Data Adapter Server Service URL
+powerauth.dataAdapter.service.url=http://localhost:8080/powerauth-data-adapter
+
+# PowerAuth Server URL
+powerauth.service.url=http://localhost:8080/powerauth-java-server/rest
+powerauth.service.security.clientToken=
+powerauth.service.security.clientSecret=
+# Whether invalid SSL certificates should be accepted
+powerauth.service.ssl.acceptInvalidSslCertificate=false
+
 # Operation expiration time in seconds
 powerauth.nextstep.operation.expirationTimeInSeconds=300
+
+# Use original username for a removed credential when the credential is recreated
+powerauth.nextstep.identity.credential.useOriginalUsername=false
+
+# Maximum number of attempts when generating username
+powerauth.nextstep.identity.credential.generateUsernameMaxAttempts=100
+
+# Enable or disable operations support in PowerAuth server
+powerauth.nextstep.pa.operations.enabled=false
+
+# Key used for end-to-end encryption of credentials
+powerauth.nextstep.e2eEncryption.key=
+
+# Key used for database record encryption
+powerauth.nextstep.db.master.encryption.key=
 
 # Application Service Configuration
 powerauth.nextstep.service.applicationName=powerauth-nextstep
 powerauth.nextstep.service.applicationDisplayName=PowerAuth Next Step Server
 powerauth.nextstep.service.applicationEnvironment=
+
+# Disable new Hibernate ID generators
+spring.jpa.hibernate.use-new-id-generator-mappings=false
+
+# Set JMX default domain in case JMX is enabled, otherwise the application startup fails due to clash in JMX bean names
+spring.jmx.default-domain=powerauth-nextstep
+
+# Set Jackson date format
+spring.jackson.date-format=yyyy-MM-dd'T'HH:mm:ssZ
+
+# Disable open session in view to avoid startup warning of Spring boot
+spring.jpa.open-in-view=false
+
+# Disable swagger-ui default petstore url
+springdoc.swagger-ui.disable-swagger-default-url=true
+
+# Set default media type for responses in REST API documentation
+springdoc.default-produces-media-type=application/json
+
+# Set the Spring application name
+spring.application.name=powerauth-nextstep
 ```
 
 ## Data Adapter
@@ -176,6 +256,9 @@ At minimum the following configuration properties should be updated based on dep
 
 Complete configuration file:
 ```properties
+# Allow externalization of properties using application-ext.properties
+spring.profiles.active=ext
+
 # Database Configuration - MySQL
 spring.datasource.url=jdbc:mysql://localhost:3306/powerauth
 spring.datasource.username=powerauth
@@ -206,6 +289,20 @@ spring.jpa.properties.hibernate.connection.useUnicode=true
 powerauth.authorization.sms-otp.expiration-time-in-seconds=300
 # Maximum number of tries to verify a SMS OTP authorization code
 powerauth.authorization.sms-otp.max-verify-tries-per-message=5
+
+# Set JMX default domain in case JMX is enabled, otherwise the application startup fails due to clash in JMX bean names
+spring.jmx.default-domain=powerauth-data-adapter
+
+# Application Service Configuration
+powerauth.dataAdapter.service.applicationName=powerauth-data-adapter
+powerauth.dataAdapter.service.applicationDisplayName=PowerAuth Data Adapter
+powerauth.dataAdapter.service.applicationEnvironment=
+
+# Disable open session in view to avoid startup warning of Spring boot
+spring.jpa.open-in-view=false
+
+# Disable swagger-ui default petstore url
+springdoc.swagger-ui.disable-swagger-default-url=true
 ```
 
 ## Web Flow Client
@@ -236,78 +333,45 @@ powerauth.service.ssl.acceptInvalidSslCertificate=false
 powerauth.webflow.client.service.applicationName=powerauth-webflow-client
 powerauth.webflow.client.service.applicationDisplayName=PowerAuth Web Flow Client
 powerauth.webflow.client.service.applicationEnvironment=
+
+# Set JMX default domain in case JMX is enabled, otherwise the application startup fails due to clash in JMX bean names
+spring.jmx.default-domain=powerauth-webflow-client
+
+# Set Jackson date format
+spring.jackson.date-format=yyyy-MM-dd'T'HH:mm:ssZ
+
+# Disable open session in view to avoid startup warning of Spring boot
+spring.jpa.open-in-view=false
+
+# Enable hidden method filter for DELETE method
+spring.mvc.hiddenmethod.filter.enabled=true
+
+# Disable harmless warning from Hikari Data Source during startup during H2 database driver initialization
+logging.level.com.zaxxer.hikari.util.DriverDataSource=ERROR
+
+# Enable caching of static resources
+spring.resources.cache.cachecontrol.max-age=86400
 ```
 
 ## OAuth 2.0 Client Configuration
 
-The OAuth 2.0 client needs to be configured in database during Web Flow deployment.
+The OAuth 2.0 client requires following configuration:
+- `client_id` - an identifier of the OAuth 2.0 client, choose the name so that it describes the client purpose
+- `client_secret` - secret used for authentication of the OAuth 2.0 client, use BCrypt to encrypt the secret
+- `scope` - OAuth 2.0 scopes supported by this client
+- `authorized_grant_types` - OAuth 2.0 grant types, use `authorization_code` for typical deployment
+- `web_server_redirect_url` - comma separated list of all redirect URLs after completion of OAuth 2.0 protocol
+- `additional_information` - additional information for this client, use `{}` for no additional information
+- `autoapprove` - use `true` value because consent page is displayed by Web Flow separately and is not handled by Spring OAuth 2.0 support
 
-Change the client_id and client_secret in SQL snipped below. The scope, authorized_grant_types, additional_information and autoapprove values should not be changed.
-
-Initialization of OAuth 2.0 client:
 ```sql
-INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, additional_information, autoapprove)
-VALUES ('democlient', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', 'profile', 'authorization_code', '{}', 'true');
+INSERT INTO oauth_client_details (client_id, client_secret, scope, authorized_grant_types, web_server_redirect_uri, additional_information, autoapprove)
+VALUES ('democlient', '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.', 'profile,aisp,pisp', 'authorization_code', 'http://localhost:8080/powerauth-webflow-client/connect/demo', '{}', 'true');
 ```
 
 Note: bcrypt('changeme', 12) => '$2a$12$MkYsT5igDXSDgRwyDVz1B.93h8F81E4GZJd/spy/1vhjM4CJgeed.'
 
 You can use [htpasswd](https://httpd.apache.org/docs/2.4/programs/htpasswd.html) from Apache HTTP server to generate bcrypt hashes.
-
-
-## Organization configuration
-
-Web Flow requires at least one organization configured. The default configuration is following:
-
-Oracle:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, 1, 1);
-```
-
-MySQL:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('DEFAULT', null, TRUE, 1);
-```
-
-The default configuration assigns the `DEFAULT` organization to all operations. You can define multiple organizations to support
-authentication for multiple segments which can have overlapping user IDs, e.g.:
-
-Oracle:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', 1, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', 0, 2);
-```
-
-MySQL:
-```sql
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('RETAIL', 'organization.retail', TRUE, 1);
-INSERT INTO ns_organization (organization_id, display_name_key, is_default, order_number) VALUES ('SME', 'organization.sme', FALSE, 2);
-```
-
-Such configuration defines two organizations `RETAIL` and `SME`. The user sees two tabs when authenticating with localized labels 
-based on keys `organization.retail` and `organization.sme`. The user can switch the organization against which the authentication is performed. 
-The `RETAIL` organization is the default one (it is preselected in the UI). The order of displayed organizations is defined as 
-`RETAIL`, `SME` using the last parameter. 
-
-_Warning: In case you configure multiple organizations make sure the user ID used in PowerAuth Web Flow, PowerAuth Server and PowerAuth Push Server is unique across all organizations and it is consistent in all PowerAuth backends. You can achieve this requirement by assigning unique user IDs in different organizations during user authentication. Alternatively the uniqueness requirement can be achieved by adding a prefix to all user IDs based on the organization against which the user was authenticated (e.g. `RETAIL.12345678`)._  
-
-## Operation configuration
-
-Operations need to be configured in table `ns_operation_config`.
-
-Following parameters are configured for each operation:
-- `operation_name` - unique operation name which identifies the operation
-- `template_version` - template version, see documentation for [Operation Data](./Operation-Data.md)
-  - currently used template version is `A`
-- `template_id` - template identifier, see documentation for [Operation Data](./Operation-Data.md)
-  - for approval (payment) use `1`
-  - for login use `2`
-- `mobile_token_enabled` - whether mobile token is enabled for this operation
-- `mobile_token_mode` - configuration of mobile token factors, use only when `mobile_token_enabled` value is true
-  - for 1FA use: `{"type":"1FA"}`
-  - for 2FA use e.g.: `{"type":"2FA","variants":["possession_knowledge","possession_biometry"]}`
-- `afs_enabled` - whether anti-fraud service integration is enabled for this operation
-- `afs_config_id` - identifier of AFS configuration, use only when `afs_enabled` value is true
 
 ## AFS configuration
 
@@ -330,7 +394,7 @@ AFS also needs to be configured using application properties:
 
 Authentication methods and next step definitions need to be configured during Web Flow deployment.
 
-See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for details.
+See chapter [Configuring Next Step](Configuring-Next-Step.md) for details.
 
 ## Mobile token configuration
 
