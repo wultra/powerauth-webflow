@@ -174,7 +174,7 @@ Each organization may use different user identifiers and authenticate against di
 
 Each step has an associated authentication method which performs either authentication or authorization during the operation.
 
-See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for more details.
+See chapter [Configuring Next Step](Configuring-Next-Step.md) for more details.
 
 ### Authentication method choice
 
@@ -196,7 +196,7 @@ Each operation consists of multiple steps. The next step of the operation is dec
 
 Before starting Next Step Server the next step definition has to be defined for all operation names. All steps are defined in database table `ns_step_definition`.
 
-See chapter [Configuring Next Step Definitions](./Configuring-Next-Step-Definitions.md) for more details.
+See chapter [Configuring Next Step](Configuring-Next-Step.md) for more details.
 
 ### Next step user preferences
 

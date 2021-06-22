@@ -28,15 +28,21 @@ Optionally, add your user to the "tomcat" group:
 `$ usermod -a -G tomcat ext_johndoe`
 
 
-### Install Bouncy Castle
+### Configure Bouncy Castle Provider
 
-Please follow our [Bouncy Castle installation tutorial](https://github.com/wultra/powerauth-server/blob/develop/docs/Installing-Bouncy-Castle.md).
+Add an entry to the `java.security` file, where N is the last number of provider in the file incremented by one:
+
+```properties
+security.provider.N=org.bouncycastle.jce.provider.BouncyCastleProvider
+```
+
+A recent version of the Bouncy Castle library is bundled with Web Flow and Next Step applications.
 
 ### Install Tomcat
 
-Unzip Tomcat 8.5.14 to "/opt/tomcat" folder. You can download Tomcat here:
+Unzip Tomcat to "/opt/tomcat" folder. You can download Tomcat here:
 
-[https://tomcat.apache.org/download-80.cgi](https://tomcat.apache.org/download-80.cgi)
+[https://tomcat.apache.org/download-90.cgi](https://tomcat.apache.org/download-90.cgi)
 
 Change owner of the files to "tomcat" user:
 
@@ -101,6 +107,14 @@ For more details see document [Database Table Structure](./Database-Table-Struct
 
 For more details see document [Database Table Structure](./Database-Table-Structure.md).
 
+### Create database schema - PostgreSQL
+
+* Create a new database or reuse an existing PowerAuth database.
+* Run the [create_schema.sql](./sql/postgresql/create_schema.sql) script to create tables.
+* Run the [initial_data.sql](./sql/postgresql/initial_data.sql) script to load initial data.
+
+For more details see document [Database Table Structure](./Database-Table-Structure.md).
+
 ### Update application configurations
 
 Copy XML files described below to "/opt/tomcat/conf/Catalina/localhost". Then, update configurations in the files to reflect expected values. Make sure to use absolute URLs, not references to `localhost`, for example:
@@ -133,7 +147,6 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 
     <!-- PowerAuth Push Server URL -->
     <Parameter name="powerauth.push.service.url" value="http://10.x.x.x:8080/powerauth-push-server"/>
-    <Parameter name="powerauth.push.service.appId" value="2"/>
 
     <!-- PowerAuth WebFlow Page Customization -->
     <Parameter name="powerauth.webflow.page.title" value="XYZ Bank - Web Authentication"/>
@@ -193,6 +206,14 @@ Note that the JDBC settings differ based on used database vendor and JDBC driver
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <Context>
+
+    <!-- PowerAuth Data Adapter Service URL -->
+    <Parameter name="powerauth.dataAdapter.service.url" value="http://10.x.x.x:8080/powerauth-data-adapter"/>
+
+    <!-- PowerAuthServer Service Security Settings -->
+    <Parameter name="powerauth.service.security.clientToken" value=""/>
+    <Parameter name="powerauth.service.security.clientSecret" value=""/>
+    <Parameter name="powerauth.service.ssl.acceptInvalidSslCertificate" value="false"/>
 
     <!-- Database Configuration - JDBC -->
     <Parameter name="spring.datasource.url" value="jdbc:oracle:thin:@//hostname:1523/SID"/>
@@ -293,6 +314,9 @@ The following war files are required for complete functionality including PowerA
 - powerauth-webflow-client.war
 - powerauth-webflow.war
 
+The following war files are optional:
+- powerauth-tpp-engine.war
+
 ### Configure Web Flow
 
 Web Flow needs to be configured before starting. See chapter [Web Flow Configuration](./Web-Flow-Configuration.md).
@@ -314,5 +338,3 @@ Start Tomcat with following command:
 To observe tomcat logs interactively, use following command:
 
 `$ tail -f -n200 /opt/tomcat/logs/catalina.out`
-
-

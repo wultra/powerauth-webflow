@@ -344,7 +344,3 @@ Remarks:
 
 Remarks:
 - The value is structured and it is not localized.
-
-## Pending issues for operation form data:
-- https://github.com/wultra/powerauth-webflow/issues/389
-- https://github.com/wultra/powerauth-webflow/issues/221

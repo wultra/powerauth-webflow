@@ -27,12 +27,14 @@ Web Flow can be built using [the parent pom.xml file](../pom.xml) of project [po
 Once you create a war package using steps above and set up database for Web Flow, you can deploy the war files to any Java web container, such as Tomcat or any Java EE server. You can remove the version from the war file for a nicer target URL in the container (e.g. rename powerauth-webflow-0.0.xx-SNAPSHOT.war to powerauth-webflow.war). After deployment, the client application frontend should be available at http[s]://host:port/powerauth-webflow-client.
 
 The following war files need to be deployed for a fully functional demo of Web Flow:
-* powerauth-webflow.war - the main Web Flow application
-* powerauth-nextstep.war - the Next Step service
-* powerauth-data-adapter.war - a Data Adapter for communication with client backends
-* powerauth-webflow-client.war - demo client application
+* `powerauth-webflow.war` - the main Web Flow application
+* `powerauth-nextstep.war` - the Next Step service
+* `powerauth-data-adapter.war` - a Data Adapter for communication with client backends
+* `powerauth-webflow-client.war` - demo client application
 
 The whole installation process is described in the [Web Flow Installation Manual](./Web-Flow-Installation-Manual.md).
+
+In case you want to use the Third Party Provider engine functionality, deploy the `powerauth-tpp-engine.war` file, too.
 
 ## Testing Web Flow
 

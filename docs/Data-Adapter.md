@@ -11,16 +11,21 @@ The Data Adapter needs to be customized for each deployment. You can find the do
 Following functionality needs to be customized during Web Flow deployment by implementing the Data Adapter interface (if applicable):
 
 - convert username to user ID in case such conversion is required
-- perform user authentication with remote backend based on provided credentials
+- perform user authentication against remote backend based on provided credentials
 - retrieve user details for given user ID
+- initialize an authentication method and set its parameters, e.g. client certificate configuration
 - decorate form data for given user (e.g. add user bank account list)
 - form data change notification
+- create an implicit login operation automatically on authentication start
+- map a complex operation into smaller operations and configure PowerAuth operation template
 - operation status change notification
-- send authorization SMS with generated text and authorization code 
-- verify authorization code from SMS
+- generate OTP authorization code and send authorization SMS
+- send authorization SMS with previously generated OTP authorization code   
+- verify OTP authorization code from SMS
+- authenticate user using user ID, password and OTP authorization code
+- verify a client TLS certificate 
 - initialize OAuth 2.0 consent form
 - create OAuth 2.0 consent form
 - validate OAuth 2.0 consent form options
 - save OAuth 2.0 consent form options
-- authenticate user using user ID, password and SMS authorization code
 - execute an anti-fraud system (AFS) action and react on response from AFS
