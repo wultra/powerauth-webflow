@@ -164,7 +164,7 @@ Whenever operation progresses to the next step, previous status of operation is 
 
 ### Operation review
 
-Operation review is a special non-SCA authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated and the next step is an authorization step.
+Operation review is a special non-SCA authentication step which handles review of operation form data and next authentication method choice. This step is executed after user is authenticated, and the next step is an authorization step.
 
 ### Organization
 
