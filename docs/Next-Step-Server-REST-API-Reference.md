@@ -117,7 +117,7 @@ Following topics are covered in this chapter:
   - [Reset all soft failed attempt counters](#reset-all-soft-failed-attempt-counters)
 - [OTP API](#otp-api)
   - [Create an OTP](#create-an-otp)
-  - [Send an OTP](#send-an-otp)
+  - [Send an OTP](#create-and-send-an-otp)
   - [Get OTP list](#get-otp-list)
   - [Get OTP detail](#get-otp-detail)
   - [Delete an OTP](#delete-an-otp)
@@ -176,6 +176,15 @@ Get a system status response, with basic information about the running applicati
 </table>
 <!-- end -->
 
+The list of expected status codes:
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - system status successfully retrieved |
+| 404  | Not found - application is not running |
+| 500  | Server errors - unexpected server error |
+
+
 #### Service status - response
 
 ```json
@@ -221,6 +230,13 @@ Create an authentication method in Next Step server.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `AUTH_METHOD_ALREADY_EXISTS` - authentication method already exists |
+| 500  | Server errors - unexpected error occurred |
 
 #### Create an authentication method - request
 
@@ -301,6 +317,13 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
 
 #### List authentication methods - request
 
@@ -418,6 +441,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### List authentication methods enabled for given user - request
 
 - Headers:
@@ -484,6 +514,13 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
 
 #### List authentication methods for given user - request
 
@@ -608,6 +645,14 @@ Enable an authentication method for given user and lists all authentication meth
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
 
 #### Enable an authentication method for given user - request
 
@@ -768,6 +813,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### Disable an authentication method for given user - request
 
 - Headers:
@@ -895,6 +948,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
+| 400  | `DELETE_NOT_ALLOWED` - authentication method removal is not allowed |
+| 500  | Server error - unexpected error occurred |
 
 #### Delete an authentication method - request
 
@@ -1392,6 +1453,15 @@ Documentation for operation data is available [in a separate document](https://d
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_ALREADY_EXISTS` - operation with specified identifier already exists |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Create an operation - request (AISP)
 
 - Headers:
@@ -1680,6 +1750,21 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method specified in request was not found |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `OPERATION_ALREADY_CANCELED` - operation is already in `FAILED/CANCELED` state |
+| 400  | `OPERATION_NOT_VALID` - operation which is being updated is not valid |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Update an operation - request
 
 - Headers:
@@ -1815,6 +1900,14 @@ Alternative with `POST` method
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_VALID` - operation is not valid |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Operation detail - request
 
@@ -1966,6 +2059,12 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
+
 #### List pending operations - request
 
 - Headers:
@@ -2098,6 +2197,12 @@ Find all operations with matching external transaction ID.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Lookup operations by external transaction ID - request
 
@@ -2249,6 +2354,13 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Update operation formData - request
 
 - Headers:
@@ -2397,6 +2509,13 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Update application context for an operation - request
 
 - Headers:
@@ -2465,6 +2584,14 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Update user for an operation - request
 
 - Headers:
@@ -2527,6 +2654,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OPERATION_NOT_VALID` - operation which is being updated is not valid |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Set chosen authentication method - request
 
 - Headers:
@@ -2585,6 +2721,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_VALID` - operation which is being updated is not valid |
+| 400  | `OPERATION_NOT_FOUND` - operation with specified identifier was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
 
 #### Update mobile token status for an operation - request
 
@@ -2646,6 +2791,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### Get mobile token configuration - request
 
 - Headers:
@@ -2695,6 +2847,12 @@ Store result of an AFS action for an operation.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Store result of an AFS action - request
 
@@ -2747,6 +2905,12 @@ Retrieve list of operation configurations.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### List operation configurations - request
 
@@ -2819,6 +2983,13 @@ Create an operation configuration.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_CONFIG_ALREADY_EXISTS` - operation configuration already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an operation configuration - request
 
@@ -2896,6 +3067,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_CONFIG_NOT_FOUND` - operation configuration was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Get operation configuration detail - request
 
 - Headers:
@@ -2961,6 +3139,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_CONFIG_NOT_FOUND` - operation configuration was not found |
+| 400  | `DELETE_NOT_ALLOWED` - operation configuration removal is not allowed |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an operation configuration - request
 
 - Headers:
@@ -3009,6 +3195,15 @@ Create a configuration for an operation and an authentication method.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_METHOD_CONFIG_ALREADY_EXISTS` - operation and authentication method configuration already exists |
+| 400  | `OPERATION_CONFIG_NOT_FOUND` - operation configuration was not found |
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an operation and authentication method configuration - request
 
@@ -3076,6 +3271,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_METHOD_CONFIG_NOT_FOUND` - operation and authentication method configuration was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Get an operation and authentication method configuration detail - request
 
 - Headers:
@@ -3129,6 +3331,13 @@ This method has a `POST /operation/auth-method/config/delete` alternative.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_METHOD_CONFIG_NOT_FOUND` - operation and authentication method configuration was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an operation and authentication method configuration detail - request
 
 - Headers:
@@ -3180,6 +3389,13 @@ Create an organization.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `ORGANIZATION_ALREADY_EXISTS` - organization with identifier specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an organization - request
 
@@ -3252,6 +3468,11 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 500  | Server error - unexpected error occurred |
 
 #### List organizations - request
 
@@ -3331,6 +3552,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Organization detail - request
 
 - Headers:
@@ -3399,6 +3627,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization specified in the request was not found |
+| 400  | `DELETE_NOT_ALLOWED` - organization removal is not allowed |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an organization - request
 
 - Headers:
@@ -3449,6 +3685,13 @@ Create a step definition.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `STEP_DEFINITION_ALREADY_EXISTS` - step definition with identifier specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a step definition - request
 
@@ -3526,6 +3769,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `STEP_DEFINITION_NOT_FOUND` - step definition with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a step definition - request
 
 - Headers:
@@ -3576,6 +3826,13 @@ Create a Next Step application.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `APPLICATION_ALREADY_EXISTS` - application with name specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an application - request
 
@@ -3641,6 +3898,12 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### List applications - request
 
@@ -3710,6 +3973,14 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/application/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update an application - request
 
@@ -3778,6 +4049,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an application - request
 
 - Headers:
@@ -3829,6 +4107,13 @@ Create a user role.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `ROLE_ALREADY_EXISTS` - role with name specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a role - request
 
@@ -3893,6 +4178,12 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### List roles - request
 
@@ -3962,6 +4253,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `ROLE_NOT_FOUND` - role with name specified in the request was not found |
+| 400  | `DELETE_NOT_ALLOWED` - role removal is not allowed |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a role - request
 
 - Headers:
@@ -4012,6 +4311,14 @@ Create a credential policy.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `CREDENTIAL_POLICY_ALREADY_EXISTS` - credential policy with name specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a credential policy - request
 
@@ -4178,6 +4485,12 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### List credential policies - request
 
 - Headers:
@@ -4296,6 +4609,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/credential/policy/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a credential policy - request
 
@@ -4464,6 +4786,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a credential policy - request
 
 - Headers:
@@ -4515,6 +4844,17 @@ Create a credential definition.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `CREDENTIAL_DEFINITION_ALREADY_EXISTS` - credential definition with name specified in the request already exists |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
+| 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a credential definition - request
 
@@ -4570,7 +4910,7 @@ Create a credential definition.
 <!-- end -->
 
 <!-- begin api GET /credential/definition -->
-### List Credential definitions
+### List Credential Definitions
 
 List all credential definitions configured on the server.
 
@@ -4601,6 +4941,12 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
 
 #### List credential definitions - request
 
@@ -4683,6 +5029,18 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/credential/definition/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
+| 400  | `CREDENTIAL_POLICY_NOT_FOUND` - credential policy with name specified in the request was not found |
+| 400  | `ORGANIZATION_NOT_FOUND` - organization with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a credential definition - request
 
@@ -4776,6 +5134,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a credential definition - request
 
 - Headers:
@@ -4827,6 +5192,14 @@ Create an OTP policy.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_POLICY_ALREADY_EXISTS` - OTP policy with name specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an OTP policy - request
 
@@ -4904,6 +5277,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### List OTP policies - request
 
 - Headers:
@@ -4979,6 +5359,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/otp/policy/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update an OTP policy - request
 
@@ -5061,6 +5450,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an OTP policy - request
 
 - Headers:
@@ -5112,6 +5508,15 @@ Create an OTP definition.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OTP_DEFINITION_ALREADY_EXISTS` - OTP definition with name specified in the request already exists |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Create an OTP definition - request
 
@@ -5189,6 +5594,12 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 500  | Server error - unexpected error occurred |
+
 #### List OTP definitions - request
 
 - Headers:
@@ -5262,6 +5673,16 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/otp/definition/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OTP_DEFINITION_NOT_FOUND` - OTP definition with name specified in the request was not found |
+| 400  | `APPLICATION_NOT_FOUND` - application with name specified in the request was not found |
+| 400  | `OTP_POLICY_NOT_FOUND` - OTP policy with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update an OTP definition - request
 
@@ -5340,6 +5761,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OTP_DEFINITION_NOT_FOUND` - OTP definition with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an OTP definition - request
 
 - Headers:
@@ -5391,6 +5819,14 @@ Create a hashing configuration.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `HASHING_CONFIG_ALREADY_EXISTS` - hashing configuration with name specified in the request already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a hashing configuration - request
 
@@ -5471,6 +5907,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_CONFIGURATION` - Next Step server configuration is invalid |
+| 500  | Server error - unexpected error occurred |
+
 #### List hashing configurations - request
 
 - Headers:
@@ -5545,6 +5988,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/hashconfig/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a hashing configuration - request
 
@@ -5627,6 +6079,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `HASHING_CONFIG_NOT_FOUND` - hashing configuration with name specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a hashing configuration - request
 
 - Headers:
@@ -5678,6 +6137,18 @@ Create a user identity.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_ALREADY_EXISTS` - user identity with identifier specified in the request already exist |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_VALIDATION_FAILED` - credential validation failed |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a user identity - request
 
@@ -5791,6 +6262,17 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
+
 #### Get user identity detail - request
 
 - Headers:
@@ -5804,7 +6286,7 @@ Alternative with `POST` method:
 }
 ```
 
-#### Create a user identity - response
+#### Get user identity detail - response
 
 - Status Code: `200`
 - Headers:
@@ -5883,6 +6365,19 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/user/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_VALIDATION_FAILED` - credential validation failed |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a user identity - request
 
@@ -6001,6 +6496,14 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/user/update/multi</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update multiple user identities - request
 
@@ -6060,6 +6563,16 @@ The operation ID parameter is required in case Data Adapter proxy is enabled.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Lookup a user identity - request
 
@@ -6146,6 +6659,16 @@ Lookup user identities.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Lookup user identities - request
 
@@ -6239,6 +6762,14 @@ Block a user identity.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_IDENTITY_NOT_ACTIVE` -  user identity with identifier specified in the request is not in `ACTIVE` state |
+| 500  | Server error - unexpected error occurred |
+
 #### Block a user identity - request
 
 - Headers:
@@ -6287,6 +6818,14 @@ Unblock a user identity.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_IDENTITY_NOT_BLOCKED` -  user identity with identifier specified in the request is not in `BLOCKED` state |
+| 500  | Server error - unexpected error occurred |
 
 #### Unblock a user identity - request
 
@@ -6351,6 +6890,13 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a user identity - request
 
 - Headers:
@@ -6399,6 +6945,14 @@ Create a user contact.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_CONTACT_ALREADY_EXISTS` - user contact already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a user contact - request
 
@@ -6470,6 +7024,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### List user contacts - request
 
 - Headers:
@@ -6540,6 +7101,15 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/user/contact/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_CONTACT_NOT_FOUND` - user contact was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a user contact - request
 
@@ -6612,6 +7182,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_CONTACT_NOT_FOUND` - user contact was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a user contact - request
 
 - Headers:
@@ -6663,6 +7241,15 @@ Create a user alias.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_ALIAS_ALREADY_EXISTS` - user alias already exists |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a user alias - request
 
@@ -6737,7 +7324,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
-<!-- end -->
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### List user aliases - request
 
@@ -6812,6 +7405,16 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/user/alias/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_ALIAS_NOT_FOUND` - user alias was not found |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a user alias - request
 
@@ -6887,6 +7490,14 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_ALIAS_NOT_FOUND` - user alias was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a user alias - request
 
 - Headers:
@@ -6937,6 +7548,15 @@ Assign a role to user identity.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_ROLE_ALREADY_ASSIGNED` - user role is already assigned |
+| 500  | Server error - unexpected error occurred |
 
 #### Assign a role to user identity - request
 
@@ -7003,6 +7623,15 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `USER_ROLE_NOT_ASSIGNED` - user role is not assigned |
+| 500  | Server error - unexpected error occurred |
+
 #### Remove a role from user identity - request
 
 - Headers:
@@ -7067,6 +7696,15 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Get user credential list - request
 
@@ -7146,6 +7784,13 @@ Alternative with `POST` method:
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Get user authentication list - request
 
 - Headers:
@@ -7208,6 +7853,18 @@ Create a credential.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_VALIDATION_FAILED` - credential validation failed |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Create a credential - request
 
@@ -7281,6 +7938,20 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/credential/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_VALIDATION_FAILED` - credential validation failed |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a credential - request
 
@@ -7339,6 +8010,17 @@ Validate a credential.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
+
 #### Validate a credential - request
 
 - Headers:
@@ -7395,6 +8077,17 @@ Reset a credential.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
+
 #### Reset a credential - request
 
 - Headers:
@@ -7449,6 +8142,16 @@ Block a credential.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
+| 500  | Server error - unexpected error occurred |
+
 #### Block a credential - request
 
 - Headers:
@@ -7499,6 +8202,16 @@ Block a credential.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_NOT_BLOCKED` - credential is not in `BLOCKED_PERMANENT` or `BLOCKED_TEMPORARY` state |
+| 500  | Server error - unexpected error occurred |
 
 #### Unblock a credential - request
 
@@ -7565,6 +8278,15 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete a credential - request
 
 - Headers:
@@ -7630,6 +8352,18 @@ Alternative with `POST` method for environments which do not allow `PUT` methods
         <td><code>/credential/counter/update</code></td>
     </tr>
 </table>
+<!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity with identifier specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
+| 500  | Server error - unexpected error occurred |
 
 #### Update a credential counter - request
 
@@ -7683,6 +8417,13 @@ Reset all soft failed counters.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 500  | Server error - unexpected error occurred |
+
 #### Reset all soft failed attempt counters - request
 
 - Headers:
@@ -7733,6 +8474,24 @@ Create an OTP.
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_DEFINITION_NOT_FOUND` - OTP definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `OTP_GEN_ALGORITHM_NOT_SUPPORTED` - OTP generation algorithm is not supported |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `USER_IDENTITY_NOT_ACTIVE` - user identity is not active |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
+
 #### Create an OTP - request
 
 - Headers:
@@ -7771,7 +8530,7 @@ Create an OTP.
 <!-- end -->
 
 <!-- begin api POST /otp/send -->
-### Send an OTP
+### Create And Send an OTP
 
 Create and send an OTP via Data Adapter.
 
@@ -7788,6 +8547,24 @@ Create and send an OTP via Data Adapter.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_DEFINITION_NOT_FOUND` - OTP definition with name specified in the request was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition with name specified in the request was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `OTP_GEN_ALGORITHM_NOT_SUPPORTED` - OTP generation algorithm is not supported |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `USER_IDENTITY_NOT_ACTIVE` - user identity is not active |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_NOT_ACTIVE` - credential is not in `ACTIVE` state |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Create and send an OTP - request
 
@@ -7860,6 +8637,14 @@ Alternative with `POST` method:
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Get OTP list - request
 
@@ -7941,8 +8726,18 @@ Alternative with `POST` method:
         <td><code>/otp/detail</code></td>
     </tr>
 </table>
-
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_NOT_FOUND` - OTP with identifier specified in the request was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Get OTP detail - request
 
@@ -8024,6 +8819,15 @@ Alternative with `POST` method for environments which do not allow `DELETE` meth
 </table>
 <!-- end -->
 
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `OTP_NOT_FOUND` - OTP with identifier specified in the request was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 500  | Server error - unexpected error occurred |
+
 #### Delete an OTP - request
 
 - Headers:
@@ -8076,6 +8880,23 @@ Authenticate using a one time password.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `OPERATION_ALREADY_CANCELED` - operation is already in `FAILED/CANCELED` state |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `OTP_NOT_FOUND` - OTP with identifier specified in the request was not found |
+| 400  | `OPERATION_NOT_VALID` - operation is not valid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Authenticate using an OTP - request
 
@@ -8137,6 +8958,24 @@ Authenticate using a credential.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |`
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `OPERATION_ALREADY_CANCELED` - operation is already in `FAILED/CANCELED` state |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `CREDENTIAL_DEFINITION_NOT_FOUND` - credential definition was not found |
+| 400  | `OPERATION_NOT_VALID` - operation is not valid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Authenticate using a credential - request
 
@@ -8201,6 +9040,24 @@ Authenticate using a credential and one time password.
     </tr>
 </table>
 <!-- end -->
+
+| Code | Description |
+|------|-------------|
+| 200  | OK response - request succeeded |
+| 400  | `REQUEST_VALIDATION_FAILED` - request validation failed |
+| 400  | `INVALID_REQUEST` - invalid request received |
+| 400  | `USER_IDENTITY_NOT_FOUND` - user identity was not found |`
+| 400  | `AUTH_METHOD_NOT_FOUND` - authentication method was not found |
+| 400  | `OPERATION_ALREADY_FINISHED` - operation is already in `DONE` state |
+| 400  | `OPERATION_ALREADY_FAILED` - operation is already in `FAILED` state |
+| 400  | `OPERATION_ALREADY_CANCELED` - operation is already in `FAILED/CANCELED` state |
+| 400  | `INVALID_CONFIGURATION` - Next Step configuration is invalid |
+| 400  | `CREDENTIAL_NOT_FOUND` - credential was not found |
+| 400  | `OPERATION_NOT_FOUND` - operation was not found |
+| 400  | `OTP_NOT_FOUND` - OTP with identifier specified in the request was not found |
+| 400  | `OPERATION_NOT_VALID` - operation is not valid |
+| 400  | `ENCRYPTION_FAILED` - encryption failed |
+| 500  | Server error - unexpected error occurred |
 
 #### Authenticate using a credential and OTP - request
 
